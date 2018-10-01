@@ -14,3 +14,13 @@ install: ./gradlew assemble -x javadoc -x signArchives
 script: ./gradlew test
 after_success:
 - ./gradlew jacocoTestReport coveralls
+before_deploy:
+  - ./gradlew javadoc
+deploy:
+  provider: pages
+  skip_cleanup: true
+  keep-history: true
+  local_dir: build/docs/javadoc
+  github_token: $GITHUB_TOKEN
+  on:
+    branch: master
