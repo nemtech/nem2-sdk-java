@@ -265,3 +265,11 @@ junitPlatformTest {
         destinationFile = file("${buildDir}/jacoco/test.exec")
     }
 }
+// Disable docs lint if Java8
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+}
