@@ -13,7 +13,7 @@ cache:
 install: ./gradlew assemble -x javadoc -x signArchives
 script: ./gradlew test
 after_success:
-- ./gradlew jacocoTestReport coveralls
+  - ./gradlew jacocoTestReport coveralls
 before_deploy:
   - ./gradlew javadoc
 deploy:
