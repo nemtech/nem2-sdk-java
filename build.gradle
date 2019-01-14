@@ -98,10 +98,6 @@ dependencies {
     compile "io.vertx:vertx-rx-java2:${vertxVersion}"
     compile "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
 
-    // Log
-    compile 'org.apache.logging.log4j:log4j-core:2.5'
-    compile 'org.apache.logging.log4j:log4j-jul:2.5'
-
     compile 'org.bouncycastle:bcprov-jdk15on:1.58'
     compile 'commons-codec:commons-codec:1.11'
     compile 'commons-lang:commons-lang:2.6'
@@ -127,6 +123,10 @@ dependencies {
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
     testCompile 'org.apiguardian:apiguardian-api:1.0.0'
     testCompile 'org.junit.platform:junit-platform-console-standalone:1.1.0-M1'
+
+    // Log
+    testCompile 'org.apache.logging.log4j:log4j-core:2.5'
+    testCompile 'org.apache.logging.log4j:log4j-jul:2.5'
 }
 
 junitPlatform {
