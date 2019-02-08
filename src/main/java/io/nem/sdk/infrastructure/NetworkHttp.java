@@ -17,10 +17,10 @@
 package io.nem.sdk.infrastructure;
 
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.reactivex.Observable;
-import io.vertx.reactivex.ext.web.client.HttpResponse;
-import io.vertx.reactivex.ext.web.codec.BodyCodec;
 
 import java.net.MalformedURLException;
 
@@ -37,11 +37,8 @@ public class NetworkHttp extends Http implements NetworkRepository {
     public Observable<NetworkType> getNetworkType() {
         return this.client
                 .getAbs(this.url.toString())
-                .as(BodyCodec.jsonObject())
-                .rxSend()
-                .toObservable()
-                .map(Http::mapJsonObjectOrError)
-                .map(json -> json.getString("name"))
+                .map(Http::mapStringOrError)
+                .map(str -> new Gson().fromJson(str, JsonObject.class).get("name").getAsString())
                 .map(name -> {
                     if (name.equalsIgnoreCase("mijinTest"))
                         return NetworkType.MIJIN_TEST;

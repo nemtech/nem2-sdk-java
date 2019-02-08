@@ -17,6 +17,8 @@
 package io.nem.sdk.infrastructure;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -26,15 +28,11 @@ import io.nem.sdk.model.namespace.NamespaceName;
 import io.nem.sdk.model.namespace.NamespaceType;
 import io.nem.sdk.model.transaction.UInt64;
 import io.reactivex.Observable;
-import io.vertx.core.json.JsonObject;
-import io.vertx.reactivex.ext.web.client.HttpResponse;
-import io.vertx.reactivex.ext.web.codec.BodyCodec;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Namespace http repository.
@@ -57,11 +55,8 @@ public class NamespaceHttp extends Http implements NamespaceRepository {
         return networkTypeResolve
                 .flatMap(networkType -> this.client
                         .getAbs(this.url + "/namespace/" + UInt64.bigIntegerToHex(namespaceId.getId()))
-                        .as(BodyCodec.jsonObject())
-                        .rxSend()
-                        .toObservable()
-                        .map(Http::mapJsonObjectOrError)
-                        .map(json -> objectMapper.readValue(json.toString(), NamespaceInfoDTO.class))
+                        .map(Http::mapStringOrError)
+                        .map(str -> objectMapper.readValue(str, NamespaceInfoDTO.class))
                         .map(namespaceInfoDTO -> new NamespaceInfo(namespaceInfoDTO.getMeta().isActive(),
                                 namespaceInfoDTO.getMeta().getIndex(),
                                 namespaceInfoDTO.getMeta().getId(),
@@ -90,11 +85,8 @@ public class NamespaceHttp extends Http implements NamespaceRepository {
         return networkTypeResolve
                 .flatMap(networkType -> this.client
                         .getAbs(this.url + "/account/" + address.plain() + "/namespaces" + (queryParams.isPresent() ? queryParams.get().toUrl() : ""))
-                        .as(BodyCodec.jsonArray())
-                        .rxSend()
-                        .toObservable()
-                        .map(Http::mapJsonArrayOrError)
-                        .map(json -> objectMapper.<List<NamespaceInfoDTO>>readValue(json.toString(), new TypeReference<List<NamespaceInfoDTO>>() {
+                        .map(Http::mapStringOrError)
+                        .map(str -> objectMapper.<List<NamespaceInfoDTO>>readValue(str, new TypeReference<List<NamespaceInfoDTO>>() {
                         }))
                         .flatMapIterable(item -> item)
                         .map(namespaceInfoDTO -> new NamespaceInfo(namespaceInfoDTO.getMeta().isActive(),
@@ -124,15 +116,17 @@ public class NamespaceHttp extends Http implements NamespaceRepository {
 
     private Observable<List<NamespaceInfo>> getNamespacesFromAccounts(List<Address> addresses, Optional<QueryParams> queryParams) {
         JsonObject requestBody = new JsonObject();
-        requestBody.put("addresses", addresses.stream().map((address -> address.plain())).collect(Collectors.toList()));
+        JsonArray addressesJsonArray = new JsonArray();
+        for(Address address : addresses) {
+            addressesJsonArray.add(address.plain());
+        }
+
+        requestBody.add("addresses", addressesJsonArray);
         Observable<NetworkType> networkTypeResolve = getNetworkTypeObservable();
         return networkTypeResolve
                 .flatMap(networkType -> this.client
-                        .postAbs(this.url + "/account/namespaces" + (queryParams.isPresent() ? queryParams.get().toUrl() : ""))
-                        .as(BodyCodec.jsonArray())
-                        .rxSendJson(requestBody)
-                        .toObservable()
-                        .map(Http::mapJsonArrayOrError)
+                        .postAbs(this.url + "/account/namespaces" + (queryParams.isPresent() ? queryParams.get().toUrl() : ""), requestBody)
+                        .map(Http::mapStringOrError)
                         .map(json -> objectMapper.<List<NamespaceInfoDTO>>readValue(json.toString(), new TypeReference<List<NamespaceInfoDTO>>() {
                         }))
                         .flatMapIterable(item -> item)
@@ -154,14 +148,16 @@ public class NamespaceHttp extends Http implements NamespaceRepository {
     @Override
     public Observable<List<NamespaceName>> getNamespaceNames(List<NamespaceId> namespaceIds) {
         JsonObject requestBody = new JsonObject();
-        requestBody.put("namespaceIds", namespaceIds.stream().map(id -> UInt64.bigIntegerToHex(id.getId())).collect(Collectors.toList()));
+        JsonArray namespaceIdJsonArray = new JsonArray();
+        for(NamespaceId namespaceId: namespaceIds) {
+            namespaceIdJsonArray.add(UInt64.bigIntegerToHex(namespaceId.getId()));
+        }
+
+        requestBody.add("namespaceIds", namespaceIdJsonArray);
         return this.client
-                .postAbs(this.url + "/namespace/names")
-                .as(BodyCodec.jsonArray())
-                .rxSendJson(requestBody)
-                .toObservable()
-                .map(Http::mapJsonArrayOrError)
-                .map(json -> objectMapper.<List<NamespaceNameDTO>>readValue(json.toString(), new TypeReference<List<NamespaceNameDTO>>() {
+                .postAbs(this.url + "/namespace/names", requestBody)
+                .map(Http::mapStringOrError)
+                .map(json -> objectMapper.<List<NamespaceNameDTO>>readValue(json, new TypeReference<List<NamespaceNameDTO>>() {
                 }))
                 .flatMapIterable(item -> item)
                 .map(namespaceNameDTO -> {

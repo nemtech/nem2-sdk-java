@@ -18,6 +18,7 @@ package io.nem.sdk.infrastructure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.BlockInfo;
@@ -84,7 +85,7 @@ public class Listener {
                 } else if (message.containsKey("transaction")) {
                     this.messageSubject.onNext(new ListenerMessage(
                             ListenerChannel.rawValueOf(message.getJsonObject("meta").getString("channelName")),
-                            new TransactionMapping().apply(message)
+                            new TransactionMapping().apply(new Gson().fromJson(message.toString(), com.google.gson.JsonObject.class))
                     ));
                 } else if (message.containsKey("block")) {
                     final JsonObject meta = message.getJsonObject("meta");

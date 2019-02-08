@@ -89,6 +89,7 @@ ext {
     vertxVersion = "3.5.0"
     rxjavaVersion = "2.1.7"
     junitVersion = "5.0.2"
+    okhttpVersion = "3.12.1"
 }
 
 dependencies {
@@ -96,6 +97,7 @@ dependencies {
     compile "io.vertx:vertx-core:${vertxVersion}"
     compile "io.vertx:vertx-web-client:${vertxVersion}"
     compile "io.vertx:vertx-rx-java2:${vertxVersion}"
+    compile "com.squareup.okhttp3:okhttp:${okhttpVersion}"
     compile "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
 
     compile 'org.bouncycastle:bcprov-jdk15on:1.58'

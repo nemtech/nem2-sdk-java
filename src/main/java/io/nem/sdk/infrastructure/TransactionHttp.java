@@ -17,16 +17,16 @@
 package io.nem.sdk.infrastructure;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.nem.sdk.model.transaction.*;
 import io.reactivex.Observable;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-import io.vertx.reactivex.ext.web.client.HttpResponse;
-import io.vertx.reactivex.ext.web.codec.BodyCodec;
 
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Transaction http repository.
@@ -46,25 +46,24 @@ public class TransactionHttp extends Http implements TransactionRepository {
     public Observable<Transaction> getTransaction(String transactionHash) {
         return this.client
                 .getAbs(this.url + transactionHash)
-                .as(BodyCodec.jsonObject())
-                .rxSend()
-                .toObservable()
-                .map(Http::mapJsonObjectOrError)
-                .map(json -> new JsonObject(json.toString()))
+                .map(Http::mapStringOrError)
+                .map(str -> new Gson().fromJson(str, JsonObject.class))
                 .map(new TransactionMapping());
     }
 
     @Override
     public Observable<List<Transaction>> getTransactions(List<String> transactionHashes) {
         JsonObject requestBody = new JsonObject();
-        requestBody.put("transactionIds", transactionHashes);
+        JsonArray transactionHashJsonArray = new JsonArray();
+        for(String transactionHash: transactionHashes) {
+            transactionHashJsonArray.add(transactionHash);
+        }
+
+        requestBody.add("transactionIds", transactionHashJsonArray);
         return this.client
-                .postAbs(this.url.toString())
-                .as(BodyCodec.jsonArray())
-                .rxSendJson(requestBody)
-                .toObservable()
-                .map(Http::mapJsonArrayOrError)
-                .map(json -> new JsonArray(json.toString()).stream().map(s -> (JsonObject) s).collect(Collectors.toList()))
+                .postAbs(this.url.toString(), requestBody)
+                .map(Http::mapStringOrError)
+                .map(str -> StreamSupport.stream(new Gson().fromJson(str, JsonArray.class).spliterator(), false).map(s -> (JsonObject) s).collect(Collectors.toList()))
                 .flatMapIterable(item -> item)
                 .map(new TransactionMapping())
                 .toList()
@@ -76,11 +75,8 @@ public class TransactionHttp extends Http implements TransactionRepository {
     public Observable<TransactionStatus> getTransactionStatus(String transactionHash) {
         return this.client
                 .getAbs(this.url + transactionHash + "/status")
-                .as(BodyCodec.jsonObject())
-                .rxSend()
-                .toObservable()
-                .map(Http::mapJsonObjectOrError)
-                .map(json -> objectMapper.readValue(json.toString(), TransactionStatusDTO.class))
+                .map(Http::mapStringOrError)
+                .map(str -> objectMapper.readValue(str, TransactionStatusDTO.class))
                 .map(transactionStatusDTO -> new TransactionStatus(transactionStatusDTO.getGroup(),
                         transactionStatusDTO.getStatus(),
                         transactionStatusDTO.getHash(),
@@ -91,14 +87,17 @@ public class TransactionHttp extends Http implements TransactionRepository {
     @Override
     public Observable<List<TransactionStatus>> getTransactionStatuses(List<String> transactionHashes) {
         JsonObject requestBody = new JsonObject();
-        requestBody.put("hashes", transactionHashes);
+
+        JsonArray transactionHashJsonArray = new JsonArray();
+        for(String transactionHash: transactionHashes) {
+            transactionHashJsonArray.add(transactionHash);
+        }
+
+        requestBody.add("hashes", transactionHashJsonArray);
         return this.client
-                .postAbs(this.url + "/statuses")
-                .as(BodyCodec.jsonArray())
-                .rxSendJson(requestBody)
-                .toObservable()
-                .map(Http::mapJsonArrayOrError)
-                .map(json -> objectMapper.<List<TransactionStatusDTO>>readValue(json.toString(), new TypeReference<List<TransactionStatusDTO>>() {
+                .postAbs(this.url + "/statuses", requestBody)
+                .map(Http::mapStringOrError)
+                .map(str -> objectMapper.<List<TransactionStatusDTO>>readValue(str, new TypeReference<List<TransactionStatusDTO>>() {
                 }))
                 .flatMapIterable(item -> item)
                 .map(transactionStatusDTO -> new TransactionStatus(transactionStatusDTO.getGroup(),
@@ -113,41 +112,32 @@ public class TransactionHttp extends Http implements TransactionRepository {
     @Override
     public Observable<TransactionAnnounceResponse> announce(SignedTransaction signedTransaction) {
         JsonObject requestBody = new JsonObject();
-        requestBody.put("payload", signedTransaction.getPayload());
+        requestBody.addProperty("payload", signedTransaction.getPayload());
         return this.client
-                .putAbs(this.url.toString())
-                .as(BodyCodec.jsonObject())
-                .rxSendJson(requestBody)
-                .toObservable()
-                .map(Http::mapJsonObjectOrError)
-                .map(json -> new TransactionAnnounceResponse(new JsonObject(json.toString()).getString("message")));
+                .putAbs(this.url.toString(), requestBody)
+                .map(Http::mapStringOrError)
+                .map(str -> new TransactionAnnounceResponse(new Gson().fromJson(str, JsonObject.class).get("message").getAsString()));
     }
 
     @Override
     public Observable<TransactionAnnounceResponse> announceAggregateBonded(SignedTransaction signedTransaction) {
         JsonObject requestBody = new JsonObject();
-        requestBody.put("payload", signedTransaction.getPayload());
+        requestBody.addProperty("payload", signedTransaction.getPayload());
         return this.client
-                .putAbs(this.url + "/partial")
-                .as(BodyCodec.jsonObject())
-                .rxSendJson(requestBody)
-                .toObservable()
-                .map(Http::mapJsonObjectOrError)
-                .map(json -> new TransactionAnnounceResponse(new JsonObject(json.toString()).getString("message")));
+                .putAbs(this.url + "/partial", requestBody)
+                .map(Http::mapStringOrError)
+                .map(str -> new TransactionAnnounceResponse(new Gson().fromJson(str, JsonObject.class).get("message").getAsString()));
     }
 
     @Override
     public Observable<TransactionAnnounceResponse> announceAggregateBondedCosignature(CosignatureSignedTransaction cosignatureSignedTransaction) {
         JsonObject requestBody = new JsonObject();
-        requestBody.put("parentHash", cosignatureSignedTransaction.getParentHash());
-        requestBody.put("signature", cosignatureSignedTransaction.getSignature());
-        requestBody.put("signer", cosignatureSignedTransaction.getSigner());
+        requestBody.addProperty("parentHash", cosignatureSignedTransaction.getParentHash());
+        requestBody.addProperty("signature", cosignatureSignedTransaction.getSignature());
+        requestBody.addProperty("signer", cosignatureSignedTransaction.getSigner());
         return this.client
-                .putAbs(this.url + "/cosignature")
-                .as(BodyCodec.jsonObject())
-                .rxSendJson(requestBody)
-                .toObservable()
-                .map(Http::mapJsonObjectOrError)
-                .map(json -> new TransactionAnnounceResponse(new JsonObject(json.toString()).getString("message")));
+                .putAbs(this.url + "/cosignature", requestBody)
+                .map(Http::mapStringOrError)
+                .map(str -> new TransactionAnnounceResponse(new Gson().fromJson(str, JsonObject.class).get("message").getAsString()));
     }
 }

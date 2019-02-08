@@ -17,6 +17,9 @@
 package io.nem.sdk.infrastructure;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.nem.sdk.model.account.*;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.Mosaic;
@@ -25,10 +28,6 @@ import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-import io.vertx.reactivex.ext.web.client.HttpResponse;
-import io.vertx.reactivex.ext.web.codec.BodyCodec;
 
 import java.net.MalformedURLException;
 import java.util.HashMap;
@@ -36,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Account http repository.
@@ -56,11 +56,8 @@ public class AccountHttp extends Http implements AccountRepository {
     public Observable<AccountInfo> getAccountInfo(Address address) {
         return this.client
                 .getAbs(this.url + address.plain())
-                .as(BodyCodec.jsonObject())
-                .rxSend()
-                .toObservable()
-                .map(Http::mapJsonObjectOrError)
-                .map(json -> objectMapper.readValue(json.toString(), AccountInfoDTO.class))
+                .map(Http::mapStringOrError)
+                .map(str -> objectMapper.readValue(str, AccountInfoDTO.class))
                 .map(AccountInfoDTO::getAccount)
                 .map(accountDTO -> new AccountInfo(Address.createFromRawAddress(accountDTO.getAddressEncoded()),
                         accountDTO.getAddressHeight().extractIntArray(),
@@ -77,16 +74,18 @@ public class AccountHttp extends Http implements AccountRepository {
     @Override
     public Observable<List<AccountInfo>> getAccountsInfo(List<Address> addresses) {
         JsonObject requestBody = new JsonObject();
-        requestBody.put("addresses", addresses.stream().map(address -> address.plain()).collect(Collectors.toList()));
+        JsonArray addressesJsonArray = new JsonArray();
+        for(Address address : addresses) {
+            addressesJsonArray.add(address.plain());
+        }
+        requestBody.add("addresses", addressesJsonArray);
+
         Observable<NetworkType> networkTypeResolve = getNetworkTypeObservable();
         return networkTypeResolve
                 .flatMap(networkType -> this.client
-                        .postAbs(this.url.toString())
-                        .as(BodyCodec.jsonArray())
-                        .rxSendJson(requestBody)
-                        .toObservable()
-                        .map(Http::mapJsonArrayOrError)
-                        .map(json -> objectMapper.<List<AccountInfoDTO>>readValue(json.toString(), new TypeReference<List<AccountInfoDTO>>() {
+                        .postAbs(this.url.toString(), requestBody)
+                        .map(Http::mapStringOrError)
+                        .map(str -> objectMapper.<List<AccountInfoDTO>>readValue(str, new TypeReference<List<AccountInfoDTO>>() {
                         }))
                         .flatMapIterable(item -> item)
                         .map(AccountInfoDTO::getAccount)
@@ -110,11 +109,8 @@ public class AccountHttp extends Http implements AccountRepository {
         return networkTypeResolve
                 .flatMap(networkType -> this.client
                         .getAbs(this.url + address.plain() + "/multisig")
-                        .as(BodyCodec.jsonObject())
-                        .rxSend()
-                        .toObservable()
-                        .map(Http::mapJsonObjectOrError)
-                        .map(json -> objectMapper.readValue(json.toString(), MultisigAccountInfoDTO.class))
+                        .map(Http::mapStringOrError)
+                        .map(string -> objectMapper.readValue(string, MultisigAccountInfoDTO.class))
                         .map(MultisigAccountInfoDTO::getMultisig)
                         .map(transfromMultisigAccountInfoDTO(networkType)));
     }
@@ -125,11 +121,8 @@ public class AccountHttp extends Http implements AccountRepository {
         return networkTypeResolve
                 .flatMap(networkType -> this.client
                         .getAbs(this.url + address.plain() + "/multisig/graph")
-                        .as(BodyCodec.jsonArray())
-                        .rxSend()
-                        .toObservable()
-                        .map(Http::mapJsonArrayOrError)
-                        .map(json -> objectMapper.<List<MultisigAccountGraphInfoDTO>>readValue(json.toString(), new TypeReference<List<MultisigAccountGraphInfoDTO>>() {
+                        .map(Http::mapStringOrError)
+                        .map(str -> objectMapper.<List<MultisigAccountGraphInfoDTO>>readValue(str, new TypeReference<List<MultisigAccountGraphInfoDTO>>() {
                         }))
                         .map(multisigAccountGraphInfoDTOList -> {
                             Map<Integer, List<MultisigAccountInfo>> multisigAccountInfoMap = new HashMap<>();
@@ -222,13 +215,11 @@ public class AccountHttp extends Http implements AccountRepository {
     }
 
     private Observable<List<Transaction>> findTransactions(PublicAccount publicAccount, Optional<QueryParams> queryParams, String path) {
+
         return this.client
                 .getAbs(this.url + publicAccount.getPublicKey() + path + (queryParams.isPresent() ? queryParams.get().toUrl() : ""))
-                .as(BodyCodec.jsonArray())
-                .rxSend()
-                .toObservable()
-                .map(Http::mapJsonArrayOrError)
-                .map(json -> new JsonArray(json.toString()).stream().map(s -> (JsonObject) s).collect(Collectors.toList()))
+                .map(Http::mapStringOrError)
+                .map(str -> StreamSupport.stream(new Gson().fromJson(str, JsonArray.class).spliterator(), false).map(s -> (JsonObject) s).collect(Collectors.toList()))
                 .flatMapIterable(item -> item)
                 .map(new TransactionMapping())
                 .toList()

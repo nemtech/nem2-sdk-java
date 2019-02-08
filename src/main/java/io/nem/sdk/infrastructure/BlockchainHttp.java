@@ -16,22 +16,22 @@
 
 package io.nem.sdk.infrastructure;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.BlockInfo;
 import io.nem.sdk.model.blockchain.BlockchainStorageInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.Transaction;
 import io.reactivex.Observable;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-import io.vertx.reactivex.ext.web.client.HttpResponse;
-import io.vertx.reactivex.ext.web.codec.BodyCodec;
 
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Blockchain http repository.
@@ -54,11 +54,8 @@ public class BlockchainHttp extends Http implements BlockchainRepository {
         return networkTypeResolve
                 .flatMap(networkType -> this.client
                         .getAbs(this.url + "/block/" + height.toString())
-                        .as(BodyCodec.jsonObject())
-                        .rxSend()
-                        .toObservable()
-                        .map(Http::mapJsonObjectOrError)
-                        .map(json -> objectMapper.readValue(json.toString(), BlockInfoDTO.class))
+                        .map(Http::mapStringOrError)
+                        .map(str -> objectMapper.readValue(str, BlockInfoDTO.class))
                         .map(blockInfoDTO -> new BlockInfo(blockInfoDTO.getMeta().getHash(),
                                 blockInfoDTO.getMeta().getGenerationHash(),
                                 Optional.of(blockInfoDTO.getMeta().getTotalFee().extractIntArray()),
@@ -89,11 +86,8 @@ public class BlockchainHttp extends Http implements BlockchainRepository {
     private Observable<List<Transaction>> getBlockTransactions(BigInteger height, Optional<QueryParams> queryParams) {
         return this.client
                 .getAbs(this.url + "/block/" + height + "/transactions" + (queryParams.isPresent() ? queryParams.get().toUrl() : ""))
-                .as(BodyCodec.jsonArray())
-                .rxSend()
-                .toObservable()
-                .map(Http::mapJsonArrayOrError)
-                .map(json -> new JsonArray(json.toString()).stream().map(s -> (JsonObject) s).collect(Collectors.toList()))
+                .map(Http::mapStringOrError)
+                .map(str -> StreamSupport.stream(new Gson().fromJson(str, JsonArray.class).spliterator(), false).map(s -> (JsonObject) s).collect(Collectors.toList()))
                 .flatMapIterable(item -> item)
                 .map(new TransactionMapping())
                 .toList()
@@ -104,22 +98,16 @@ public class BlockchainHttp extends Http implements BlockchainRepository {
     public Observable<BigInteger> getBlockchainHeight() {
         return this.client
                 .getAbs(this.url + "/chain/height")
-                .as(BodyCodec.jsonObject())
-                .rxSend()
-                .toObservable()
-                .map(Http::mapJsonObjectOrError)
-                .map(json -> objectMapper.readValue(json.toString(), HeightDTO.class))
+                .map(Http::mapStringOrError)
+                .map(str -> objectMapper.readValue(str, HeightDTO.class))
                 .map(blockchainHeight -> blockchainHeight.getHeight().extractIntArray());
     }
 
     public Observable<BigInteger> getBlockchainScore() {
         return this.client
                 .getAbs(this.url + "/chain/score")
-                .as(BodyCodec.jsonObject())
-                .rxSend()
-                .toObservable()
-                .map(Http::mapJsonObjectOrError)
-                .map(json -> objectMapper.readValue(json.toString(), BlockchainScoreDTO.class))
+                .map(Http::mapStringOrError)
+                .map(str -> objectMapper.readValue(str, BlockchainScoreDTO.class))
                 .map(blockchainScoreDTO -> blockchainScoreDTO.extractIntArray());
     }
 
@@ -127,10 +115,7 @@ public class BlockchainHttp extends Http implements BlockchainRepository {
     public Observable<BlockchainStorageInfo> getBlockchainStorage() {
         return this.client
                 .getAbs(this.url + "/diagnostic/storage")
-                .as(BodyCodec.jsonObject())
-                .rxSend()
-                .toObservable()
-                .map(Http::mapJsonObjectOrError)
+                .map(Http::mapStringOrError)
                 .map(json -> objectMapper.readValue(json.toString(), BlockchainStorageInfoDTO.class))
                 .map(blockchainStorageInfoDTO -> new BlockchainStorageInfo(blockchainStorageInfoDTO.getNumAccounts(),
                         blockchainStorageInfoDTO.getNumBlocks(),

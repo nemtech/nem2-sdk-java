@@ -20,17 +20,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.reactivex.Observable;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-import io.vertx.reactivex.core.Vertx;
-import io.vertx.reactivex.ext.web.client.HttpResponse;
-import io.vertx.reactivex.ext.web.client.WebClient;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public class Http {
-    protected final WebClient client;
+    //protected final WebClient client;
+    //protected final OkHttpHttpClient client;
+    protected final HttpClient client;
     protected final URL url;
     protected final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -39,8 +37,11 @@ public class Http {
 
     Http(String host, NetworkHttp networkHttp) throws MalformedURLException {
         this.url = new URL(host);
-        final Vertx vertx = Vertx.vertx();
-        this.client = WebClient.create(vertx);
+        //this.client = new OkHttpHttpClient.Builder().build();
+        //final Vertx vertx = Vertx.vertx();
+        //this.client = WebClient.create(vertx);
+        client = new OkHttpHttpClient();
+
         objectMapper.configure(DeserializationFeature.USE_LONG_FOR_INTS, true);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         this.networkHttp = networkHttp;
@@ -63,7 +64,8 @@ public class Http {
         return networkTypeResolve;
     }
 
-    static JsonObject mapJsonObjectOrError(final HttpResponse<JsonObject> response) {
+    /*
+    static JsonObject mapStringOrError(final HttpResponse<JsonObject> response) {
         if (response.statusCode() < 200 || response.statusCode() > 299) {
             throw new RuntimeException(response.statusMessage());
         }
@@ -75,5 +77,17 @@ public class Http {
             throw new RuntimeException(response.statusMessage());
         }
         return response.body();
+    }
+    */
+
+    static String mapStringOrError(final HttpResponse response) {
+        if (response.getCode() < 200 || response.getCode() > 299) {
+            throw new RuntimeException(response.getStatusMessage());
+        }
+        try {
+            return response.getBodyString();
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 }

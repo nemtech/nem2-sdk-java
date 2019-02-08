@@ -17,6 +17,8 @@
 package io.nem.sdk.infrastructure;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
@@ -26,9 +28,6 @@ import io.nem.sdk.model.mosaic.MosaicProperties;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.UInt64;
 import io.reactivex.Observable;
-import io.vertx.core.json.JsonObject;
-import io.vertx.reactivex.ext.web.client.HttpResponse;
-import io.vertx.reactivex.ext.web.codec.BodyCodec;
 
 import java.net.MalformedURLException;
 import java.util.List;
@@ -56,11 +55,8 @@ public class MosaicHttp extends Http implements MosaicRepository {
         return networkTypeResolve
                 .flatMap(networkType -> this.client
                         .getAbs(this.url + "/mosaic/" + UInt64.bigIntegerToHex(mosaicId.getId()))
-                        .as(BodyCodec.jsonObject())
-                        .rxSend()
-                        .toObservable()
-                        .map(Http::mapJsonObjectOrError)
-                        .map(json -> objectMapper.readValue(json.toString(), MosaicInfoDTO.class))
+                        .map(Http::mapStringOrError)
+                        .map(str -> objectMapper.readValue(str, MosaicInfoDTO.class))
                         .map(mosaicInfoDTO -> new MosaicInfo(mosaicInfoDTO.getMeta().isActive(),
                                 mosaicInfoDTO.getMeta().getIndex(),
                                 mosaicInfoDTO.getMeta().getId(),
@@ -76,16 +72,17 @@ public class MosaicHttp extends Http implements MosaicRepository {
     @Override
     public Observable<List<MosaicInfo>> getMosaics(List<MosaicId> mosaicIds) {
         JsonObject requestBody = new JsonObject();
-        requestBody.put("mosaicIds", mosaicIds.stream().map(id -> UInt64.bigIntegerToHex(id.getId())).collect(Collectors.toList()));
+        JsonArray mosaicIdJsonArray = new JsonArray();
+        for(MosaicId mosaicId: mosaicIds) {
+            mosaicIdJsonArray.add(UInt64.bigIntegerToHex(mosaicId.getId()));
+        }
+        requestBody.add("mosaicIds", mosaicIdJsonArray);
         Observable<NetworkType> networkTypeResolve = getNetworkTypeObservable();
         return networkTypeResolve
                 .flatMap(networkType -> this.client
-                        .postAbs(this.url + "/mosaic")
-                        .as(BodyCodec.jsonArray())
-                        .rxSendJson(requestBody)
-                        .toObservable()
-                        .map(Http::mapJsonArrayOrError)
-                        .map(json -> objectMapper.<List<MosaicInfoDTO>>readValue(json.toString(), new TypeReference<List<MosaicInfoDTO>>() {
+                        .postAbs(this.url + "/mosaic", requestBody)
+                        .map(Http::mapStringOrError)
+                        .map(str -> objectMapper.<List<MosaicInfoDTO>>readValue(str, new TypeReference<List<MosaicInfoDTO>>() {
                         }))
                         .flatMapIterable(item -> item)
                         .map(mosaicInfoDTO -> new MosaicInfo(mosaicInfoDTO.getMeta().isActive(),
@@ -117,11 +114,8 @@ public class MosaicHttp extends Http implements MosaicRepository {
         return networkTypeResolve
                 .flatMap(networkType -> this.client
                         .getAbs(this.url + "/namespace/" + UInt64.bigIntegerToHex(namespaceId.getId()) + "/mosaics" + (queryParams.isPresent() ? queryParams.get().toUrl() : ""))
-                        .as(BodyCodec.jsonArray())
-                        .rxSend()
-                        .toObservable()
-                        .map(Http::mapJsonArrayOrError)
-                        .map(json -> objectMapper.<List<MosaicInfoDTO>>readValue(json.toString(), new TypeReference<List<MosaicInfoDTO>>() {
+                        .map(Http::mapStringOrError)
+                        .map(str -> objectMapper.<List<MosaicInfoDTO>>readValue(str, new TypeReference<List<MosaicInfoDTO>>() {
                         }))
                         .flatMapIterable(item -> item)
                         .map(mosaicInfoDTO -> new MosaicInfo(mosaicInfoDTO.getMeta().isActive(),
@@ -141,14 +135,15 @@ public class MosaicHttp extends Http implements MosaicRepository {
     @Override
     public Observable<List<MosaicName>> getMosaicNames(List<MosaicId> mosaicIds) {
         JsonObject requestBody = new JsonObject();
-        requestBody.put("mosaicIds", mosaicIds.stream().map(id -> UInt64.bigIntegerToHex(id.getId())).collect(Collectors.toList()));
+        JsonArray mosaicIdJsonArray = new JsonArray();
+        for(MosaicId mosaicId: mosaicIds) {
+            mosaicIdJsonArray.add(UInt64.bigIntegerToHex(mosaicId.getId()));
+        }
+        requestBody.add("mosaicIds", mosaicIdJsonArray);
         return this.client
-                .postAbs(this.url + "/mosaic/names")
-                .as(BodyCodec.jsonArray())
-                .rxSendJson(requestBody)
-                .toObservable()
-                .map(Http::mapJsonArrayOrError)
-                .map(json -> objectMapper.<List<MosaicNameDTO>>readValue(json.toString(), new TypeReference<List<MosaicNameDTO>>() {
+                .postAbs(this.url + "/mosaic/names", requestBody)
+                .map(Http::mapStringOrError)
+                .map(str -> objectMapper.<List<MosaicNameDTO>>readValue(str, new TypeReference<List<MosaicNameDTO>>() {
                 }))
                 .flatMapIterable(item -> item)
                 .map(mosaicNameDTO -> new MosaicName(new MosaicId(mosaicNameDTO.getMosaicId().extractIntArray()),
