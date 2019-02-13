@@ -19,6 +19,8 @@ package io.nem.sdk.infrastructure;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.BlockInfo;
@@ -27,12 +29,8 @@ import io.nem.sdk.model.transaction.*;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
-import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpClient;
-import io.vertx.core.http.RequestOptions;
-import io.vertx.core.http.WebSocket;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
+import okhttp3.*;
+import okio.ByteString;
 
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -40,6 +38,7 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.StreamSupport;
 
 /**
  * Listener
@@ -65,84 +64,115 @@ public class Listener {
      * @return a {@link CompletableFuture} that resolves when the websocket connection is opened
      */
     public CompletableFuture<Void> open() {
-        HttpClient httpClient = Vertx.vertx().createHttpClient();
-
         CompletableFuture<Void> future = new CompletableFuture<>();
         if (this.webSocket != null) {
             return CompletableFuture.completedFuture(null);
         }
-        RequestOptions requestOptions = new RequestOptions();
-        requestOptions.setHost(this.url.getHost());
-        requestOptions.setPort(this.url.getPort());
-        requestOptions.setURI("/ws");
-        httpClient.websocket(requestOptions, webSocket -> {
-            this.webSocket = webSocket;
-            webSocket.handler(handler -> {
-                JsonObject message = handler.toJsonObject();
-                if (message.containsKey("uid")) {
-                    this.UID = message.getString("uid");
+
+        Request request = new Request.Builder()
+                .url(this.url.toString() + "/ws")
+                .build();
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .build();
+
+        webSocket = client.newWebSocket(request, new WebSocketListener() {
+            @Override
+            public void onOpen(WebSocket webSocket, Response response) {
+                super.onOpen(webSocket, response);
+            }
+
+            @Override
+            public void onMessage(WebSocket webSocket, String text) {
+                super.onMessage(webSocket, text);
+                JsonObject message = new Gson().fromJson(text, JsonObject.class);
+                if (message.has("uid")) {
+                    Listener.this.UID = message.get("uid").getAsString();
                     future.complete(null);
-                } else if (message.containsKey("transaction")) {
-                    this.messageSubject.onNext(new ListenerMessage(
-                            ListenerChannel.rawValueOf(message.getJsonObject("meta").getString("channelName")),
+                } else if (message.has("transaction")) {
+                    Listener.this.messageSubject.onNext(new ListenerMessage(
+                            ListenerChannel.rawValueOf(message.getAsJsonObject("meta").get("channelName").getAsString()),
                             new TransactionMapping().apply(new Gson().fromJson(message.toString(), com.google.gson.JsonObject.class))
                     ));
-                } else if (message.containsKey("block")) {
-                    final JsonObject meta = message.getJsonObject("meta");
-                    final JsonObject block = message.getJsonObject("block");
-                    int rawNetworkType = (int) Long.parseLong(Integer.toHexString(block.getInteger("version")).substring(0, 2), 16);
+                } else if (message.has("block")) {
+                    final JsonObject meta = message.getAsJsonObject("meta");
+                    final JsonObject block = message.getAsJsonObject("block");
+                    int rawNetworkType = (int) Long.parseLong(Integer.toHexString(block.get("version").getAsInt()).substring(0, 2), 16);
                     final NetworkType networkType;
                     if (rawNetworkType == NetworkType.MIJIN_TEST.getValue()) networkType = NetworkType.MIJIN_TEST;
                     else if (rawNetworkType == NetworkType.MIJIN.getValue()) networkType = NetworkType.MIJIN;
                     else if (rawNetworkType == NetworkType.MAIN_NET.getValue()) networkType = NetworkType.MAIN_NET;
                     else networkType = NetworkType.TEST_NET;
 
-                    final int version = (int) Long.parseLong(Integer.toHexString(block.getInteger("version")).substring(2, 4), 16);
-                    this.messageSubject.onNext(new ListenerMessage(
+                    final int version = (int) Long.parseLong(Integer.toHexString(block.get("version").getAsInt()).substring(2, 4), 16);
+                    Listener.this.messageSubject.onNext(new ListenerMessage(
                             ListenerChannel.BLOCK,
                             new BlockInfo(
-                                    meta.getString("hash"),
-                                    meta.getString("generationHash"),
+                                    meta.get("hash").getAsString(),
+                                    meta.get("generationHash").getAsString(),
                                     Optional.empty(),
                                     Optional.empty(),
-                                    block.getString("signature"),
-                                    new PublicAccount(block.getString("signer"), networkType),
+                                    block.get("signature").getAsString(),
+                                    new PublicAccount(block.get("signer").getAsString(), networkType),
                                     networkType,
                                     version,
-                                    block.getInteger("type"),
-                                    extractBigInteger(block.getJsonArray("height")),
-                                    extractBigInteger(block.getJsonArray("timestamp")),
-                                    extractBigInteger(block.getJsonArray("difficulty")),
-                                    block.getString("previousBlockHash"),
-                                    block.getString("blockTransactionsHash")
+                                    block.get("type").getAsInt(),
+                                    extractBigInteger(block.getAsJsonArray("height")),
+                                    extractBigInteger(block.getAsJsonArray("timestamp")),
+                                    extractBigInteger(block.getAsJsonArray("difficulty")),
+                                    block.get("previousBlockHash").getAsString(),
+                                    block.get("blockTransactionsHash").getAsString()
                             )
                     ));
-                } else if (message.containsKey("status")) {
-                    this.messageSubject.onNext(new ListenerMessage(
+                } else if (message.has("status")) {
+                    Listener.this.messageSubject.onNext(new ListenerMessage(
                             ListenerChannel.STATUS,
                             new TransactionStatusError(
-                                    message.getString("hash"),
-                                    message.getString("status"),
-                                    new Deadline(extractBigInteger(message.getJsonArray("deadline")))
+                                    message.get("hash").getAsString(),
+                                    message.get("status").getAsString(),
+                                    new Deadline(extractBigInteger(message.getAsJsonArray("deadline")))
                             )
                     ));
-                } else if (message.containsKey("meta")) {
-                    this.messageSubject.onNext(new ListenerMessage(
-                            ListenerChannel.rawValueOf(message.getJsonObject("meta").getString("channelName")),
-                            message.getJsonObject("meta").getString("hash")
+                } else if (message.has("meta")) {
+                    Listener.this.messageSubject.onNext(new ListenerMessage(
+                            ListenerChannel.rawValueOf(message.getAsJsonObject("meta").get("channelName").getAsString()),
+                            message.get("meta").getAsJsonObject().get("hash").getAsString()
                     ));
-                } else if (message.containsKey("parentHash")) {
-                    this.messageSubject.onNext(new ListenerMessage(
+                } else if (message.has("parentHash")) {
+                    Listener.this.messageSubject.onNext(new ListenerMessage(
                             ListenerChannel.COSIGNATURE,
                             new CosignatureSignedTransaction(
-                                    message.getString("parenthash"),
-                                    message.getString("signature"),
-                                    message.getString("signer")
+                                    message.get("parenthash").getAsString(),
+                                    message.get("signature").getAsString(),
+                                    message.get("signer").getAsString()
                             )
                     ));
                 }
-            });
+
+            }
+
+            @Override
+            public void onMessage(WebSocket webSocket, ByteString bytes) {
+                super.onMessage(webSocket, bytes);
+            }
+
+            @Override
+            public void onClosing(WebSocket webSocket, int code, String reason) {
+                super.onClosing(webSocket, code, reason);
+
+            }
+
+            @Override
+            public void onClosed(WebSocket webSocket, int code, String reason) {
+                super.onClosed(webSocket, code, reason);
+            }
+
+            @Override
+            public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+                super.onFailure(webSocket, t, response);
+            }
         });
+
         return future;
     }
 
@@ -159,7 +189,7 @@ public class Listener {
      * Close webSocket connection
      */
     public void close() {
-        this.webSocket.close();
+        this.webSocket.close(1000, "Closed.");
     }
 
     /**
@@ -292,12 +322,12 @@ public class Listener {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e.getCause());
         }
-        this.webSocket.writeTextMessage(json);
+        this.webSocket.send(json);
     }
 
     private BigInteger extractBigInteger(JsonArray input) {
         UInt64DTO uInt64DTO = new UInt64DTO();
-        input.stream().forEach(item -> uInt64DTO.add(new Long(item.toString())));
+        StreamSupport.stream(input.spliterator(), false).forEach(item -> uInt64DTO.add(new Long(item.toString())));
         return uInt64DTO.extractIntArray();
     }
 

@@ -87,7 +87,7 @@ class ListenerTest extends BaseTest {
         SignedTransaction signedTransaction = this.announceStandaloneTransferTransaction();
 
         Transaction transaction = listener.confirmed(this.account.getAddress()).take(1).toFuture().get();
-        assertEquals(signedTransaction.getHash(), transaction.getTransactionInfo().get().getHash());
+        assertEquals(signedTransaction.getHash(), transaction.getTransactionInfo().get().getHash().get());
     }
 
     @Test
@@ -98,7 +98,7 @@ class ListenerTest extends BaseTest {
         SignedTransaction signedTransaction = this.announceStandaloneTransferTransaction();
 
         Transaction transaction = listener.confirmed(Address.createFromRawAddress("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC")).take(1).toFuture().get();
-        assertEquals(signedTransaction.getHash(), transaction.getTransactionInfo().get().getHash());
+        assertEquals(signedTransaction.getHash(), transaction.getTransactionInfo().get().getHash().get());
 
     }
 
@@ -110,7 +110,7 @@ class ListenerTest extends BaseTest {
         SignedTransaction signedTransaction = this.announceStandaloneTransferTransaction();
 
         Transaction transaction = listener.unconfirmedAdded(this.account.getAddress()).take(1).toFuture().get();
-        assertEquals(signedTransaction.getHash(), transaction.getTransactionInfo().get().getHash());
+        assertEquals(signedTransaction.getHash(), transaction.getTransactionInfo().get().getHash().get());
     }
 
     @Test
