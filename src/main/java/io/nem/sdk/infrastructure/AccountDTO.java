@@ -30,10 +30,9 @@
 package io.nem.sdk.infrastructure;
 
 import com.google.gson.annotations.SerializedName;
+import io.nem.core.utils.Base32Encoder;
+import io.nem.core.utils.HexEncoder;
 import io.swagger.annotations.ApiModelProperty;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base32;
-import org.apache.commons.codec.binary.Hex;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -204,8 +203,8 @@ class AccountDTO {
     }
 
 
-    public String getAddressEncoded() throws DecoderException {
-        return new String(new Base32().encode(Hex.decodeHex(address)));
+    public String getAddressEncoded() throws IllegalArgumentException {
+        return new String(Base32Encoder.getString(HexEncoder.getBytes(address)));
     }
 
     @Override

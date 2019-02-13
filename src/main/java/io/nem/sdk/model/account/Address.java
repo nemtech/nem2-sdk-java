@@ -19,10 +19,8 @@ package io.nem.sdk.model.account;
 import io.nem.core.crypto.Hashes;
 import io.nem.core.utils.ArrayUtils;
 import io.nem.core.utils.Base32Encoder;
+import io.nem.core.utils.HexEncoder;
 import io.nem.sdk.model.blockchain.NetworkType;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base32;
-import org.apache.commons.codec.binary.Hex;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -90,8 +88,8 @@ public class Address {
      */
     public static Address createFromEncoded(String encodedAddress) {
         try {
-            return Address.createFromRawAddress(new String(new Base32().encode(Hex.decodeHex(encodedAddress))));
-        } catch (DecoderException e) {
+            return Address.createFromRawAddress(Base32Encoder.getString(HexEncoder.getBytes(encodedAddress)));
+        } catch (IllegalArgumentException e) {
             throw new RuntimeException(e.getCause());
         }
     }
@@ -111,8 +109,8 @@ public class Address {
         // step 1: sha3 hash of the public key
         byte[] publicKeyBytes;
         try {
-            publicKeyBytes = Hex.decodeHex(publicKey);
-        } catch (DecoderException e) {
+            publicKeyBytes = HexEncoder.getBytes(publicKey);
+        } catch (IllegalArgumentException e) {
             throw new RuntimeException("public key is not valid");
         }
         final byte[] sha3PublicKeyHash = Hashes.sha3_256(publicKeyBytes);

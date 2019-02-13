@@ -97,7 +97,6 @@ dependencies {
     compile "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
 
     compile 'org.bouncycastle:bcprov-jdk15on:1.58'
-    compile 'commons-codec:commons-codec:1.11'
     compile 'commons-lang:commons-lang:2.6'
     compile 'commons-io:commons-io:2.4'
     compile 'net.minidev:json-smart:1.2'
