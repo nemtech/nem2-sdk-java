@@ -16,8 +16,6 @@
 
 package io.nem.core.utils;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 
 /**
  * Static class that contains utility functions for converting hex strings to and from bytes.
@@ -31,11 +29,7 @@ public class HexEncoder {
      * @return The output byte array.
      */
     public static byte[] getBytes(final String hexString) {
-        try {
-            return getBytesInternal(hexString);
-        } catch (final DecoderException e) {
-            throw new IllegalArgumentException(e);
-        }
+        return getBytesInternal(hexString);
     }
 
     /**
@@ -47,16 +41,29 @@ public class HexEncoder {
     public static byte[] tryGetBytes(final String hexString) {
         try {
             return getBytesInternal(hexString);
-        } catch (final DecoderException e) {
+        } catch (final IllegalArgumentException e) {
             return null;
         }
     }
 
-    private static byte[] getBytesInternal(final String hexString) throws DecoderException {
-        final Hex codec = new Hex();
+    private static byte[] getBytesInternal(final String hexString) throws IllegalArgumentException {
         final String paddedHexString = 0 == hexString.length() % 2 ? hexString : "0" + hexString;
-        final byte[] encodedBytes = StringEncoder.getBytes(paddedHexString);
-        return codec.decode(encodedBytes);
+
+        final int length = paddedHexString.length();
+        final byte[] encodedBytes = new byte[length / 2];
+        int i = 0;
+        while (i < length) {
+            final int upper = Character.digit(paddedHexString.charAt(i), 16) << 4;
+            final int lower = Character.digit(paddedHexString.charAt(i + 1), 16);
+            if ((upper < 0) || (lower < 0)){
+                throw new IllegalArgumentException(hexString + " is not a valid hex string.");
+            }
+
+            encodedBytes[i / 2] = (byte)(lower + upper);
+            i += 2;
+        }
+
+        return encodedBytes;
     }
 
     /**
@@ -66,8 +73,10 @@ public class HexEncoder {
      * @return The output hex string.
      */
     public static String getString(final byte[] bytes) {
-        final Hex codec = new Hex();
-        final byte[] decodedBytes = codec.encode(bytes);
-        return StringEncoder.getString(decodedBytes);
+        final StringBuilder encodedString = new StringBuilder();
+        for(byte b : bytes) {
+            encodedString.append(String.format("%02x", b));
+        }
+        return encodedString.toString();
     }
 }

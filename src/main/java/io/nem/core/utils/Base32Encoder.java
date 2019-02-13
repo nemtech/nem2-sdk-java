@@ -16,12 +16,13 @@
 
 package io.nem.core.utils;
 
-import org.apache.commons.codec.binary.Base32;
 
 /**
  * Static class that contains utility functions for converting Base32 strings to and from bytes.
  */
 public class Base32Encoder {
+
+    private static String CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
     /**
      * Converts a string to a byte array.
@@ -30,13 +31,31 @@ public class Base32Encoder {
      * @return The output byte array.
      */
     public static byte[] getBytes(final String base32String) {
-        final Base32 codec = new Base32();
-        final byte[] encodedBytes = StringEncoder.getBytes(base32String);
-        if (!codec.isInAlphabet(encodedBytes, true)) {
-            throw new IllegalArgumentException("malformed base32 string passed to getBytes");
-        }
+        String replacedString = base32String.trim().replaceAll("=", "");
+        final byte[] convertedBytes = new byte[replacedString.length() * 5 / 8];
 
-        return codec.decode(encodedBytes);
+        int index = 0;
+        int bitCount = 0;
+        int current = 0;
+
+        for(char c : replacedString.toCharArray()) {
+            final int symbolValue = CHARS.indexOf(c);
+            if (symbolValue < 0) {
+                throw new IllegalArgumentException(base32String + " is not a valid Base32 string.");
+            }
+            for (int i = 4; i >= 0; i--) {
+                current = (current << 1) + (symbolValue >> i & 0x1);
+                bitCount++;
+
+                if (bitCount == 8) {
+                    convertedBytes[index++] = (byte)(current);
+
+                    bitCount = 0;
+                    current = 0;
+                }
+            }
+        }
+        return convertedBytes;
     }
 
     /**
@@ -46,8 +65,36 @@ public class Base32Encoder {
      * @return The output Base32 string.
      */
     public static String getString(final byte[] bytes) {
-        final Base32 codec = new Base32();
-        final byte[] decodedBytes = codec.encode(bytes);
-        return StringEncoder.getString(decodedBytes);
+        StringBuilder convertedString = new StringBuilder();
+
+        int bitCount = 0;
+        int current = 0;
+
+        for(Byte b : bytes) {
+            final int intValue = b.intValue();
+            for (int i = 7; i >= 0; i--) {
+                current = (current << 1) + (intValue >> i & 0x1);
+                bitCount++;
+
+                if (bitCount == 5) {
+                    convertedString.append(CHARS.charAt(current));
+
+                    bitCount = 0;
+                    current = 0;
+                }
+            }
+        }
+        if (bitCount > 0) {
+            current = current << (5 - bitCount);
+            convertedString.append(CHARS.charAt(current));
+        }
+
+        // padding
+        int outputLength = ((bytes.length * 8 + 39) / 40) * 8;
+        while(convertedString.length() < outputLength) {
+            convertedString.append("=");
+        }
+
+        return convertedString.toString();
     }
 }
