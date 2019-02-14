@@ -96,7 +96,7 @@ dependencies {
     compile "com.squareup.okhttp3:okhttp:${okhttpVersion}"
     compile "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
 
-    compile 'org.bouncycastle:bcprov-jdk15on:1.58'
+    compile 'com.madgag.spongycastle:prov:1.58.0.0'
     compile 'commons-lang:commons-lang:2.6'
     compile 'commons-io:commons-io:2.4'
     compile 'net.minidev:json-smart:1.2'

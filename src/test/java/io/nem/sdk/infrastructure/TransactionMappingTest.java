@@ -23,7 +23,7 @@ import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.namespace.NamespaceType;
 import io.nem.sdk.model.transaction.*;
 
-import org.bouncycastle.util.encoders.Hex;
+import org.spongycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 
 import java.io.UnsupportedEncodingException;

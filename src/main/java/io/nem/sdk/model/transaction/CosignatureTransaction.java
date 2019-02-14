@@ -18,7 +18,7 @@ package io.nem.sdk.model.transaction;
 
 import io.nem.core.crypto.Signer;
 import io.nem.sdk.model.account.Account;
-import org.bouncycastle.util.encoders.Hex;
+import org.spongycastle.util.encoders.Hex;
 
 /**
  * The cosignature transaction is used to sign an aggregate transactions with missing cosignatures.

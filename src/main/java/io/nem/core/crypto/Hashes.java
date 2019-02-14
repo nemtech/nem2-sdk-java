@@ -17,7 +17,7 @@
 package io.nem.core.crypto;
 
 import io.nem.core.utils.ExceptionUtils;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.spongycastle.jce.provider.BouncyCastleProvider;
 
 import java.security.MessageDigest;
 import java.security.Security;
@@ -67,7 +67,7 @@ public class Hashes {
     private static byte[] hash(final String algorithm, final byte[]... inputs) {
         return ExceptionUtils.propagate(
                 () -> {
-                    final MessageDigest digest = MessageDigest.getInstance(algorithm, "BC");
+                    final MessageDigest digest = MessageDigest.getInstance(algorithm, "SC");
 
                     for (final byte[] input : inputs) {
                         digest.update(input);
