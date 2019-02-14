@@ -17,11 +17,11 @@
 package io.nem.sdk.model.transaction;
 
 import com.google.flatbuffers.FlatBufferBuilder;
+import io.nem.core.utils.Base32Encoder;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.Mosaic;
-import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.lang3.Validate;
 
 import java.math.BigInteger;
@@ -125,7 +125,7 @@ public class TransferTransaction extends Transaction {
             mosaicBuffers[i] = MosaicBuffer.endMosaicBuffer(builder);
         }
 
-        byte[] address = new Base32().decode(getRecipient().plain().getBytes(StandardCharsets.UTF_8));
+        byte[] address = Base32Encoder.getBytes(getRecipient().plain());
         // Create Vectors
         int signatureVector = TransferTransactionBuffer.createSignatureVector(builder, new byte[64]);
         int signerVector = TransferTransactionBuffer.createSignerVector(builder, new byte[32]);

@@ -17,11 +17,11 @@
 package io.nem.sdk.model.transaction;
 
 import com.google.flatbuffers.FlatBufferBuilder;
+import io.nem.core.utils.Base32Encoder;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.Mosaic;
-import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.lang3.Validate;
 import org.spongycastle.util.encoders.Hex;
 
@@ -131,7 +131,7 @@ public class SecretLockTransaction extends Transaction {
         int durationVector = SecretLockTransactionBuffer.createDurationVector(builder, UInt64.fromBigInteger(duration));
         int secretVector = SecretLockTransactionBuffer.createSecretVector(builder, Hex.decode(secret));
 
-        byte[] address = new Base32().decode(getRecipient().plain().getBytes(StandardCharsets.UTF_8));
+        byte[] address = Base32Encoder.getBytes(getRecipient().plain());
         int recipientVector = SecretLockTransactionBuffer.createRecipientVector(builder, address);
 
         SecretLockTransactionBuffer.startSecretLockTransactionBuffer(builder);
