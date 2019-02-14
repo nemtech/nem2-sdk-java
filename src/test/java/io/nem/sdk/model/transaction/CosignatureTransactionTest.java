@@ -61,7 +61,7 @@ public class CosignatureTransactionTest {
     @Test
     void shouldThrowExceptionWhenTransactionToCosignHasNotBeenAnnunced() throws Exception {
 
-        AggregateTransaction aggregateTransaction = AggregateTransaction.createComplete(Deadline.create(2, ChronoUnit.HOURS), Collections.emptyList(), NetworkType.MIJIN_TEST);
+        AggregateTransaction aggregateTransaction = AggregateTransaction.createComplete(new Deadline(2, ChronoUnit.HOURS), Collections.emptyList(), NetworkType.MIJIN_TEST);
 
         assertThrows(IllegalArgumentException.class, ()->{CosignatureTransaction.create(aggregateTransaction);}, "Transaction to cosign should be announced before being able to cosign it");
 

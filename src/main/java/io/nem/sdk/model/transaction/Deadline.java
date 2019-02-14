@@ -16,11 +16,12 @@
 
 package io.nem.sdk.model.transaction;
 
+import org.threeten.bp.Instant;
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.ZoneId;
+import org.threeten.bp.temporal.ChronoUnit;
+
 import java.math.BigInteger;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 
 /**
  * The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block.
@@ -45,6 +46,18 @@ public class Deadline {
     public Deadline(int units, ChronoUnit chronoUnit) {
         instant = Instant.now().plus(units, chronoUnit);
     }
+
+    /**
+     * Constructor
+     *
+     * @param units      int
+     * @param chronoUnit Chrono unit
+     */
+    public Deadline(int units, java.time.temporal.ChronoUnit chronoUnit) {
+        ChronoUnit threetenChronoUnit = ChronoUnit.valueOf(chronoUnit.name());
+        instant = Instant.now().plus(units, threetenChronoUnit);
+    }
+
 
     /**
      * Constructor

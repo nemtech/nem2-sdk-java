@@ -17,10 +17,10 @@
 package io.nem.sdk.model.transaction;
 
 import org.junit.jupiter.api.Test;
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.temporal.ChronoUnit;
 
 import java.math.BigInteger;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
