@@ -62,7 +62,10 @@ public class AccountLinkTransaction extends Transaction{
         this.linkAction = linkAction;
     }
 
-    public static AccountLinkTransaction create(Deadline deadline, String remoteAccountKey,LinkActionType linkAction, NetworkType networkType) {
+    public static AccountLinkTransaction create(Deadline deadline,
+                                                String remoteAccountKey,
+                                                LinkActionType linkAction,
+                                                NetworkType networkType) {
         return new AccountLinkTransaction(networkType, 2,deadline, BigInteger.valueOf(0), remoteAccountKey, linkAction);
     }
 
