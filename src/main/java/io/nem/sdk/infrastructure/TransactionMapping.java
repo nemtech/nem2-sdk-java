@@ -63,6 +63,8 @@ public class TransactionMapping implements Function<JsonObject, Transaction> {
             return new SecretLockTransactionMapping().apply(input);
         } else if (type == TransactionType.SECRET_PROOF.getValue()) {
             return new SecretProofTransactionMapping().apply(input);
+        }else if (type == TransactionType.ACCOUNT_LINK.getValue()) {
+            return new AccountLinkTransactionMapping().apply(input);
         }
 
         throw new UnsupportedOperationException("Unimplemented Transaction type");
@@ -407,3 +409,26 @@ class SecretProofTransactionMapping extends TransactionMapping {
     }
 }
 
+class AccountLinkTransactionMapping extends TransactionMapping{
+
+    @Override
+    public AccountLinkTransaction apply(JsonObject input) {
+        TransactionInfo transactionInfo = this.createTransactionInfo(input.getJsonObject("meta"));
+
+        JsonObject transaction = input.getJsonObject("transaction");
+        Deadline deadline = new Deadline(extractBigInteger(transaction.getJsonArray("deadline")));
+        NetworkType networkType = extractNetworkType(transaction.getInteger("version"));
+
+        return new AccountLinkTransaction(
+                networkType,
+                extractTransactionVersion(transaction.getInteger("version")),
+                deadline,
+                extractBigInteger(transaction.getJsonArray("fee")),
+                transaction.getString("remoteAccountKey"),
+                LinkActionType.rawValueOf(transaction.getInteger("linkAction")),
+                transaction.getString("signature"),
+                new PublicAccount(transaction.getString("signer"), networkType),
+                transactionInfo
+        );
+    }
+}
