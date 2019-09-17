@@ -20,12 +20,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 
 class MosaicIdTest {
+
+    static SignSchema signSchema = SignSchema.DEFAULT;
 
     String publicKey = "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf";
 
@@ -75,7 +78,8 @@ class MosaicIdTest {
 
     @Test
     void createAMosaicIdFromNonceAndOwner() {
-        PublicAccount owner = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST);
+        PublicAccount owner = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST,
+            signSchema);
         byte[] bytes = new byte[]{0x0, 0x0, 0x0, 0x0};
         MosaicNonce nonce = new MosaicNonce(bytes);
         MosaicId mosaicId = MosaicId.createFromNonce(nonce, owner);
@@ -85,7 +89,8 @@ class MosaicIdTest {
 
     @Test
     void createAMosaicIdFromNonceAndOwnerTwiceTheSame() {
-        PublicAccount owner = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST);
+        PublicAccount owner = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST,
+            signSchema);
         byte[] bytes = new byte[]{0x0, 0x0, 0x0, 0x0};
         MosaicNonce nonce = new MosaicNonce(bytes);
         MosaicId mosaicId1 = MosaicId.createFromNonce(nonce, owner);

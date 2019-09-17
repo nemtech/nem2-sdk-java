@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.vertx;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
@@ -52,8 +53,10 @@ import java.util.stream.Collectors;
 public class ReceiptMappingVertx {
 
     private final JsonHelper jsonHelper;
+    private final SignSchema signSchema;
 
-    public ReceiptMappingVertx(JsonHelper jsonHelper) {
+    public ReceiptMappingVertx(SignSchema signSchema, JsonHelper jsonHelper) {
+        this.signSchema = signSchema;
         this.jsonHelper = jsonHelper;
     }
 
@@ -162,7 +165,8 @@ public class ReceiptMappingVertx {
     public BalanceChangeReceipt createBalanceChangeReceipt(
         BalanceChangeReceiptDTO receipt, NetworkType networkType) {
         return new BalanceChangeReceipt(
-            PublicAccount.createFromPublicKey(receipt.getTargetPublicKey(), networkType),
+            PublicAccount
+                .createFromPublicKey(receipt.getTargetPublicKey(), networkType, signSchema),
             new MosaicId(receipt.getMosaicId()),
             receipt.getAmount(),
             ReceiptType.rawValueOf(receipt.getType().getValue()),
@@ -172,7 +176,8 @@ public class ReceiptMappingVertx {
     public BalanceTransferReceipt<Address> createBalanceTransferRecipient(
         BalanceTransferReceiptDTO receipt, NetworkType networkType) {
         return new BalanceTransferReceipt<>(
-            PublicAccount.createFromPublicKey(receipt.getSenderPublicKey(), networkType),
+            PublicAccount
+                .createFromPublicKey(receipt.getSenderPublicKey(), networkType, signSchema),
             MapperUtils.toAddressFromUnresolved(receipt.getRecipientAddress()),
             new MosaicId(receipt.getMosaicId()),
             receipt.getAmount(),

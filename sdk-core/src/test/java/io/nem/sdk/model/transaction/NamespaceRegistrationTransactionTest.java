@@ -19,6 +19,7 @@ package io.nem.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.HexEncoder;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -33,10 +34,12 @@ import org.junit.jupiter.api.Test;
 
 class NamespaceRegistrationTransactionTest {
 
+    static SignSchema signSchema = SignSchema.DEFAULT;
+
     private final String publicKey =
         "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf";
     private final Account testAccount =
-        Account.createFromPrivateKey(publicKey, NetworkType.MIJIN_TEST);
+        Account.createFromPrivateKey(publicKey, NetworkType.MIJIN_TEST, signSchema);
     private final String generationHash =
         "57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6";
 

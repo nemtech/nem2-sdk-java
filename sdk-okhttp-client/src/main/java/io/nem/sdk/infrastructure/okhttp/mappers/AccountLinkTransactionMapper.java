@@ -17,6 +17,7 @@
 
 package io.nem.sdk.infrastructure.okhttp.mappers;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.AccountLinkAction;
@@ -31,8 +32,9 @@ import io.nem.sdk.openapi.okhttp_gson.model.AccountLinkTransactionDTO;
 class AccountLinkTransactionMapper extends AbstractTransactionMapper<AccountLinkTransactionDTO> {
 
 
-    public AccountLinkTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.ACCOUNT_LINK, AccountLinkTransactionDTO.class);
+    public AccountLinkTransactionMapper(JsonHelper jsonHelper,
+        SignSchema signSchema) {
+        super(jsonHelper, TransactionType.ACCOUNT_LINK, AccountLinkTransactionDTO.class, signSchema);
     }
 
     @Override
@@ -46,10 +48,10 @@ class AccountLinkTransactionMapper extends AbstractTransactionMapper<AccountLink
             deadline,
             transaction.getMaxFee(),
             PublicAccount
-                .createFromPublicKey(transaction.getRemotePublicKey(), networkType),
+                .createFromPublicKey(transaction.getRemotePublicKey(), networkType, getSignSchema()),
             AccountLinkAction.rawValueOf(transaction.getLinkAction().getValue()),
             transaction.getSignature(),
-            new PublicAccount(transaction.getSignerPublicKey(), networkType),
+            new PublicAccount(transaction.getSignerPublicKey(), networkType, getSignSchema()),
             transactionInfo);
     }
 }

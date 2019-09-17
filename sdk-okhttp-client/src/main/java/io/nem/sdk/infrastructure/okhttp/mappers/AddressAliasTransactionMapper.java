@@ -19,6 +19,7 @@ package io.nem.sdk.infrastructure.okhttp.mappers;
 
 import static io.nem.core.utils.MapperUtils.toAddressFromUnresolved;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -37,8 +38,10 @@ class AddressAliasTransactionMapper extends
     AbstractTransactionMapper<AddressAliasTransactionDTO> {
 
 
-    public AddressAliasTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.ADDRESS_ALIAS, AddressAliasTransactionDTO.class);
+    public AddressAliasTransactionMapper(JsonHelper jsonHelper,
+        SignSchema signSchema) {
+        super(jsonHelper, TransactionType.ADDRESS_ALIAS, AddressAliasTransactionDTO.class,
+            signSchema);
     }
 
     @Override
@@ -58,7 +61,7 @@ class AddressAliasTransactionMapper extends
             namespaceId,
             toAddressFromUnresolved(transaction.getAddress()),
             Optional.ofNullable(transaction.getSignature()),
-            Optional.of(new PublicAccount(transaction.getSignerPublicKey(), networkType)),
+            Optional.of(new PublicAccount(transaction.getSignerPublicKey(), networkType, getSignSchema())),
             Optional.of(transactionInfo));
     }
 }

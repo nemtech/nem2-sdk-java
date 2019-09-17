@@ -17,6 +17,7 @@
 
 package io.nem.sdk.infrastructure.vertx.mappers;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.Transaction;
@@ -41,10 +42,13 @@ public abstract class AbstractTransactionMapper<T> implements TransactionMapper 
 
     private final JsonHelper jsonHelper;
 
-    private Class<T> transactionDtoClass;
+    private final Class<T> transactionDtoClass;
+
+    private final SignSchema signSchema;
 
     public AbstractTransactionMapper(JsonHelper jsonHelper, TransactionType transactionType,
-        Class<T> transactionDtoClass) {
+        Class<T> transactionDtoClass, SignSchema signSchema) {
+        this.signSchema = signSchema;
         this.jsonHelper = jsonHelper;
         this.transactionType = transactionType;
         this.transactionDtoClass = transactionDtoClass;
@@ -127,5 +131,9 @@ public abstract class AbstractTransactionMapper<T> implements TransactionMapper 
     @Override
     public TransactionType getTransactionType() {
         return transactionType;
+    }
+
+    protected SignSchema getSignSchema() {
+        return signSchema;
     }
 }

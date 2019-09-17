@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
@@ -52,6 +53,8 @@ public class VertxAggregateTransactionTest {
 
     private final JsonHelper jsonHelper = new JsonHelperJackson2(Json.mapper);
 
+    private SignSchema signSchema = SignSchema.DEFAULT;
+
     @Test
     void createAAggregateTransactionViaStaticConstructor() {
 
@@ -73,7 +76,7 @@ public class VertxAggregateTransactionTest {
                     transferTx.toAggregate(
                         new PublicAccount(
                             "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
-                            NetworkType.MIJIN_TEST))),
+                            NetworkType.MIJIN_TEST, signSchema))),
                 NetworkType.MIJIN_TEST);
 
         assertEquals(NetworkType.MIJIN_TEST, aggregateTx.getNetworkType());
@@ -108,7 +111,7 @@ public class VertxAggregateTransactionTest {
                     transferTx.toAggregate(
                         new PublicAccount(
                             "846B4439154579A5903B1459C9CF69CB8153F6D0110A7A0ED61DE29AE4810BF2",
-                            NetworkType.MIJIN_TEST))),
+                            NetworkType.MIJIN_TEST, SignSchema.DEFAULT))),
                 NetworkType.MIJIN_TEST);
 
         byte[] actual = aggregateTx.generateBytes();
@@ -135,17 +138,17 @@ public class VertxAggregateTransactionTest {
                     transferTx.toAggregate(
                         new PublicAccount(
                             "B694186EE4AB0558CA4AFCFDD43B42114AE71094F5A1FC4A913FE9971CACD21D",
-                            NetworkType.MIJIN_TEST))),
+                            NetworkType.MIJIN_TEST, signSchema))),
                 NetworkType.MIJIN_TEST);
 
         Account cosignatoryAccount =
             new Account(
                 "2a2b1f5d366a5dd5dc56c3c757cf4fe6c66e2787087692cf329d7a49a594658b",
-                NetworkType.MIJIN_TEST);
+                NetworkType.MIJIN_TEST, signSchema);
         Account cosignatoryAccount2 =
             new Account(
                 "b8afae6f4ad13a1b8aad047b488e0738a437c7389d4ff30c359ac068910c1d59",
-                NetworkType.MIJIN_TEST); // TODO bug with private key
+                NetworkType.MIJIN_TEST, signSchema); // TODO bug with private key
 
         SignedTransaction signedTransaction =
             cosignatoryAccount.signTransactionWithCosignatories(
@@ -163,24 +166,24 @@ public class VertxAggregateTransactionTest {
             "shouldFindAccountInAsASignerOfTheTransaction.json");
 
         AggregateTransaction aggregateTransferTransaction =
-            (AggregateTransaction) new GeneralTransactionMapper(jsonHelper)
+            (AggregateTransaction) new GeneralTransactionMapper(jsonHelper, signSchema)
                 .map(aggregateTransferTransactionDTO);
 
         assertTrue(
             aggregateTransferTransaction.signedByAccount(
                 PublicAccount.createFromPublicKey(
                     "A5F82EC8EBB341427B6785C8111906CD0DF18838FB11B51CE0E18B5E79DFF630",
-                    NetworkType.MIJIN_TEST)));
+                    NetworkType.MIJIN_TEST, signSchema)));
         assertTrue(
             aggregateTransferTransaction.signedByAccount(
                 PublicAccount.createFromPublicKey(
                     "7681ED5023141D9CDCF184E5A7B60B7D466739918ED5DA30F7E71EA7B86EFF2D",
-                    NetworkType.MIJIN_TEST)));
+                    NetworkType.MIJIN_TEST, signSchema)));
         assertFalse(
             aggregateTransferTransaction.signedByAccount(
                 PublicAccount.createFromPublicKey(
                     "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                    NetworkType.MIJIN_TEST)));
+                    NetworkType.MIJIN_TEST, signSchema)));
     }
 
 

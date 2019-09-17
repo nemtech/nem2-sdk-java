@@ -20,6 +20,7 @@ package io.nem.sdk.infrastructure.okhttp.mappers;
 import static io.nem.core.utils.MapperUtils.toAddressFromUnresolved;
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.Mosaic;
@@ -34,8 +35,9 @@ import io.nem.sdk.openapi.okhttp_gson.model.SecretLockTransactionDTO;
 
 class SecretLockTransactionMapper extends AbstractTransactionMapper<SecretLockTransactionDTO> {
 
-    public SecretLockTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.SECRET_LOCK, SecretLockTransactionDTO.class);
+    public SecretLockTransactionMapper(JsonHelper jsonHelper,
+        SignSchema signSchema) {
+        super(jsonHelper, TransactionType.SECRET_LOCK, SecretLockTransactionDTO.class, signSchema);
     }
 
     @Override
@@ -59,7 +61,7 @@ class SecretLockTransactionMapper extends AbstractTransactionMapper<SecretLockTr
             transaction.getSecret(),
             toAddressFromUnresolved(transaction.getRecipientAddress()),
             transaction.getSignature(),
-            new PublicAccount(transaction.getSignerPublicKey(), networkType),
+            new PublicAccount(transaction.getSignerPublicKey(), networkType, getSignSchema()),
             transactionInfo);
     }
 }

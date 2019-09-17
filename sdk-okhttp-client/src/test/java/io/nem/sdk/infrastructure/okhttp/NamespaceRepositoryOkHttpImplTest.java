@@ -50,7 +50,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new NamespaceRepositoryOkHttpImpl(apiClientMock);
+        repository = new NamespaceRepositoryOkHttpImpl(apiClientMock, signSchema);
     }
 
 

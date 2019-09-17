@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
@@ -27,10 +28,12 @@ import org.junit.jupiter.api.Test;
 
 public class TransactionTest {
 
+    static SignSchema signSchema = SignSchema.DEFAULT;
+
     private final PublicAccount signer =
         PublicAccount.createFromPublicKey(
             "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf",
-            NetworkType.MIJIN_TEST);
+            NetworkType.MIJIN_TEST, signSchema);
     private final String generationHash =
         "57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6";
 

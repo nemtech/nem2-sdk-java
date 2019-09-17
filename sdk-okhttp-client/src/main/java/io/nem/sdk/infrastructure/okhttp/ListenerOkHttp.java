@@ -17,6 +17,7 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import com.google.gson.JsonObject;
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.infrastructure.Listener;
 import io.nem.sdk.infrastructure.ListenerBase;
 import io.nem.sdk.infrastructure.ListenerChannel;
@@ -57,14 +58,14 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
 
     private final TransactionMapper transactionMapper;
 
+    private final SignSchema signSchema;
+
     private WebSocket webSocket;
 
     private String uid;
 
-    /**
-     * @param url nis host
-     */
-    public ListenerOkHttp(OkHttpClient httpClient, String url, JSON json) {
+
+    public ListenerOkHttp(OkHttpClient httpClient, String url, JSON json, SignSchema signSchema) {
         try {
             this.url = new URL(url);
         } catch (MalformedURLException e) {
@@ -73,7 +74,8 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
         }
         this.httpClient = httpClient;
         this.jsonHelper = new JsonHelperGson(json.getGson());
-        this.transactionMapper = new GeneralTransactionMapper(jsonHelper);
+        this.transactionMapper = new GeneralTransactionMapper(jsonHelper, signSchema);
+        this.signSchema = signSchema;
     }
 
     /**
@@ -139,7 +141,7 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
     }
 
     private BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO) {
-        return BlockRepositoryOkHttpImpl.toBlockInfo(blockInfoDTO);
+        return BlockRepositoryOkHttpImpl.toBlockInfo(signSchema, blockInfoDTO);
     }
 
     private Transaction toTransaction(TransactionInfoDTO transactionInfo) {

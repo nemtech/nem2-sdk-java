@@ -41,7 +41,7 @@ public class NodeRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest 
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new NodeRepositoryOkHttpImpl(apiClientMock);
+        repository = new NodeRepositoryOkHttpImpl(apiClientMock, signSchema);
     }
 
     @Test

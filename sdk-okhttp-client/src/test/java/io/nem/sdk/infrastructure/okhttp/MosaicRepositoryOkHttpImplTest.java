@@ -44,7 +44,7 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new MosaicRepositoryOkHttpImpl(apiClientMock);
+        repository = new MosaicRepositoryOkHttpImpl(apiClientMock, signSchema);
     }
 
 

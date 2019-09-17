@@ -20,6 +20,7 @@ import static io.nem.core.utils.MapperUtils.toAddress;
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.core.crypto.PublicKey;
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
@@ -70,10 +71,10 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
 
     private final TransactionMapper transactionMapper;
 
-    public AccountRepositoryOkHttpImpl(ApiClient apiClient) {
-        super(apiClient);
+    public AccountRepositoryOkHttpImpl(ApiClient apiClient, SignSchema signSchema) {
+        super(apiClient, signSchema);
         this.client = new AccountRoutesApi(apiClient);
-        this.transactionMapper = new GeneralTransactionMapper(getJsonHelper());
+        this.transactionMapper = new GeneralTransactionMapper(getJsonHelper(), signSchema);
     }
 
     private String getAddressEncoded(String address) throws DecoderException {
@@ -322,14 +323,15 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         NetworkType networkType = getNetworkTypeBlocking();
         return new MultisigAccountInfo(
             new PublicAccount(
-                dto.getAccountPublicKey(), networkType),
+                dto.getAccountPublicKey(), networkType, getSignSchema()),
             dto.getMinApproval(),
             dto.getMinRemoval(),
             dto.getCosignatoryPublicKeys().stream()
-                .map(cosigner -> new PublicAccount(cosigner, networkType))
+                .map(cosigner -> new PublicAccount(cosigner, networkType, getSignSchema()))
                 .collect(Collectors.toList()),
             dto.getMultisigPublicKeys().stream()
-                .map(multisigAccount -> new PublicAccount(multisigAccount, networkType))
+                .map(multisigAccount -> new PublicAccount(multisigAccount, networkType,
+                    getSignSchema()))
                 .collect(Collectors.toList()));
     }
 

@@ -34,7 +34,7 @@ public class NetworkRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new NetworkRepositoryVertxImpl(apiClientMock);
+        repository = new NetworkRepositoryVertxImpl(apiClientMock, signSchema);
     }
 
     @Test

@@ -17,6 +17,7 @@
 
 package io.nem.sdk.infrastructure.okhttp.mappers;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -34,8 +35,9 @@ import java.util.Optional;
 class MosaicAliasTransactionMapper extends
     AbstractTransactionMapper<MosaicAliasTransactionDTO> {
 
-    public MosaicAliasTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.MOSAIC_ALIAS, MosaicAliasTransactionDTO.class);
+    public MosaicAliasTransactionMapper(JsonHelper jsonHelper,
+        SignSchema signSchema) {
+        super(jsonHelper, TransactionType.MOSAIC_ALIAS, MosaicAliasTransactionDTO.class, signSchema);
     }
 
     @Override
@@ -55,7 +57,7 @@ class MosaicAliasTransactionMapper extends
             namespaceId,
             MapperUtils.toMosaicId(transaction.getMosaicId()),
             Optional.ofNullable(transaction.getSignature()),
-            Optional.of(new PublicAccount(transaction.getSignerPublicKey(), networkType)),
+            Optional.of(new PublicAccount(transaction.getSignerPublicKey(), networkType, getSignSchema())),
             Optional.of(transactionInfo));
     }
 }

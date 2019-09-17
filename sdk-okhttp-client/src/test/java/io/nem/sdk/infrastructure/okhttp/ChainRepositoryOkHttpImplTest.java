@@ -37,7 +37,7 @@ public class ChainRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new ChainRepositoryOkHttpImpl(apiClientMock);
+        repository = new ChainRepositoryOkHttpImpl(apiClientMock, signSchema);
     }
 
     @Test

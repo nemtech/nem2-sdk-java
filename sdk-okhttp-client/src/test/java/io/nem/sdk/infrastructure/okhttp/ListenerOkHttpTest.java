@@ -18,6 +18,7 @@ package io.nem.sdk.infrastructure.okhttp;
 import static org.mockito.Mockito.when;
 
 import com.google.gson.JsonObject;
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.infrastructure.ListenerChannel;
 import io.nem.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.sdk.model.account.Address;
@@ -59,12 +60,13 @@ public class ListenerOkHttpTest {
     private JsonHelper jsonHelper;
 
     private String wsId = "TheWSid";
+    private SignSchema signSchema = SignSchema.DEFAULT;
 
     @BeforeEach
     public void setUp() {
         httpClientMock = Mockito.mock(OkHttpClient.class);
         String url = "http://nem.com:3000/";
-        listener = new ListenerOkHttp(httpClientMock, url, new JSON());
+        listener = new ListenerOkHttp(httpClientMock, url, new JSON(), signSchema);
         jsonHelper = listener.getJsonHelper();
     }
 
@@ -96,7 +98,7 @@ public class ListenerOkHttpTest {
 
         Address address = Address.createFromPublicKey(
             jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
-            NetworkType.MIJIN_TEST);
+            NetworkType.MIJIN_TEST, signSchema);
 
         String channelName = ListenerChannel.CONFIRMED_ADDED.toString();
 

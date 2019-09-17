@@ -18,6 +18,7 @@ package io.nem.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
@@ -33,7 +34,7 @@ public class AccountLinkTransactionTest {
         account =
             new Account(
                 "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
-                NetworkType.MIJIN_TEST);
+                NetworkType.MIJIN_TEST, SignSchema.DEFAULT);
     }
 
     @Test

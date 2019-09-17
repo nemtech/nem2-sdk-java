@@ -17,6 +17,7 @@
 
 package io.nem.sdk.infrastructure.vertx.mappers;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionType;
@@ -34,26 +35,29 @@ public class GeneralTransactionMapper implements TransactionMapper {
 
     private final JsonHelper jsonHelper;
 
-    private Map<TransactionType, TransactionMapper> transactionMappers = new EnumMap<>(TransactionType.class);
+    private Map<TransactionType, TransactionMapper> transactionMappers = new EnumMap<>(
+        TransactionType.class);
 
-    public GeneralTransactionMapper(JsonHelper jsonHelper) {
+    public GeneralTransactionMapper(JsonHelper jsonHelper, SignSchema signSchema) {
         this.jsonHelper = jsonHelper;
-        register(new AccountLinkTransactionMapper(jsonHelper));
-        register(new AddressAliasTransactionMapper(jsonHelper));
-        register(new HashLockTransactionMapper(jsonHelper));
-        register(new MosaicAliasTransactionMapper(jsonHelper));
-        register(new MosaicDefinitionTransactionMapper(jsonHelper));
-        register(new MosaicSupplyChangeTransactionMapper(jsonHelper));
-        register(new MultisigAccountModificationTransactionMapper(jsonHelper));
-        register(new NamespaceRegistrationTransactionMapper(jsonHelper));
-        register(new SecretLockTransactionMapper(jsonHelper));
-        register(new SecretProofTransactionMapper(jsonHelper));
-        register(new TransferTransactionMapper(jsonHelper));
+        register(new AccountLinkTransactionMapper(jsonHelper, signSchema));
+        register(new AddressAliasTransactionMapper(jsonHelper, signSchema));
+        register(new HashLockTransactionMapper(jsonHelper, signSchema));
+        register(new MosaicAliasTransactionMapper(jsonHelper, signSchema));
+        register(new MosaicDefinitionTransactionMapper(jsonHelper, signSchema));
+        register(new MosaicSupplyChangeTransactionMapper(jsonHelper, signSchema));
+        register(new MultisigAccountModificationTransactionMapper(jsonHelper, signSchema));
+        register(new NamespaceRegistrationTransactionMapper(jsonHelper, signSchema));
+        register(new SecretLockTransactionMapper(jsonHelper, signSchema));
+        register(new SecretProofTransactionMapper(jsonHelper, signSchema));
+        register(new TransferTransactionMapper(jsonHelper, signSchema));
 
         register(
-            new AggregateTransactionMapper(jsonHelper, TransactionType.AGGREGATE_BONDED, this));
+            new AggregateTransactionMapper(jsonHelper, TransactionType.AGGREGATE_BONDED, this,
+                signSchema));
         register(
-            new AggregateTransactionMapper(jsonHelper, TransactionType.AGGREGATE_COMPLETE, this));
+            new AggregateTransactionMapper(jsonHelper, TransactionType.AGGREGATE_COMPLETE, this,
+                signSchema));
     }
 
     private void register(TransactionMapper mapper) {

@@ -18,12 +18,15 @@ package io.nem.sdk.model.node;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.blockchain.NetworkType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class NodeInfoTest {
+
+    static SignSchema signSchema = SignSchema.DEFAULT;
 
     static Account account;
 
@@ -32,7 +35,7 @@ public class NodeInfoTest {
         account =
             new Account(
                 "787225aaff3d2c71f4ffa32d4f19ec4922f3cd869747f267378f81f8e3fcb12d",
-                NetworkType.MIJIN_TEST);
+                NetworkType.MIJIN_TEST, signSchema);
     }
 
     @Test

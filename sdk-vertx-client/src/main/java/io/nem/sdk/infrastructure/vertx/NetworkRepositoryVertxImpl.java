@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.vertx;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.NetworkRepository;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.openapi.vertx.api.NetworkRoutesApi;
@@ -37,8 +38,8 @@ public class NetworkRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
 
     private final NetworkRoutesApi client;
 
-    public NetworkRepositoryVertxImpl(ApiClient apiClient) {
-        super(apiClient, null);
+    public NetworkRepositoryVertxImpl(ApiClient apiClient, SignSchema signSchema) {
+        super(apiClient, null, signSchema);
         client = new NetworkRoutesApiImpl(apiClient);
     }
 

@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.vertx;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.TransactionRepository;
 import io.nem.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.sdk.infrastructure.vertx.mappers.TransactionMapper;
@@ -56,10 +57,10 @@ public class TransactionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
     private final TransactionMapper transactionMapper;
 
     public TransactionRepositoryVertxImpl(ApiClient apiClient,
-        Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
+        Supplier<NetworkType> networkType, SignSchema signSchema) {
+        super(apiClient, networkType, signSchema);
         client = new TransactionRoutesApiImpl(apiClient);
-        transactionMapper = new GeneralTransactionMapper(getJsonHelper());
+        transactionMapper = new GeneralTransactionMapper(getJsonHelper(), signSchema);
     }
 
 

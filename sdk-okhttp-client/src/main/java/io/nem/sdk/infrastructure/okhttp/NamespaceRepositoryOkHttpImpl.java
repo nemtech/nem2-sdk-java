@@ -18,6 +18,7 @@ package io.nem.sdk.infrastructure.okhttp;
 
 import static io.nem.core.utils.MapperUtils.toNamespaceId;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.api.NamespaceRepository;
 import io.nem.sdk.api.QueryParams;
@@ -58,8 +59,8 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
 
     private final NamespaceRoutesApi client;
 
-    public NamespaceRepositoryOkHttpImpl(ApiClient apiClient) {
-        super(apiClient);
+    public NamespaceRepositoryOkHttpImpl(ApiClient apiClient, SignSchema signSchema) {
+        super(apiClient, signSchema);
         client = new NamespaceRoutesApi(apiClient);
     }
 
@@ -196,7 +197,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
             this.extractLevels(namespaceInfoDTO),
             toNamespaceId(namespaceInfoDTO.getNamespace().getParentId()),
             new PublicAccount(namespaceInfoDTO.getNamespace().getOwnerPublicKey(),
-                getNetworkTypeBlocking()),
+                getNetworkTypeBlocking(), getSignSchema()),
             namespaceInfoDTO.getNamespace().getStartHeight(),
             namespaceInfoDTO.getNamespace().getEndHeight(),
             this.extractAlias(namespaceInfoDTO.getNamespace()));

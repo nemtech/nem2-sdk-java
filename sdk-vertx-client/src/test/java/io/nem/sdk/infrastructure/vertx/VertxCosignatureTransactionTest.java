@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -44,12 +45,14 @@ public class VertxCosignatureTransactionTest {
     private final JsonHelper jsonHelper = new JsonHelperJackson2(
         JsonHelperJackson2.configureMapper(Json.mapper));
 
+    private static SignSchema signSchema = SignSchema.DEFAULT;
+
     @BeforeAll
     public static void setup() {
         account =
             new Account(
                 "26b64cb10f005e5988a36744ca19e20d835ccc7c105aaa5f3b212da593180930",
-                NetworkType.MIJIN_TEST);
+                NetworkType.MIJIN_TEST, signSchema);
     }
 
     @Test
@@ -57,7 +60,7 @@ public class VertxCosignatureTransactionTest {
         TransactionInfoDTO transactionInfoDTO = loadCosignatureTransactionInfoDTO(
             "createACosignatureTransactionViaConstructor.json");
         AggregateTransaction aggregateTransaction =
-            (AggregateTransaction) new GeneralTransactionMapper(jsonHelper)
+            (AggregateTransaction) new GeneralTransactionMapper(jsonHelper, signSchema)
                 .map(transactionInfoDTO);
 
         CosignatureTransaction cosignatureTransaction =

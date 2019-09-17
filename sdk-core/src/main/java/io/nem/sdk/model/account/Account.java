@@ -18,6 +18,7 @@ package io.nem.sdk.model.account;
 
 import io.nem.core.crypto.KeyPair;
 import io.nem.core.crypto.PrivateKey;
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
@@ -41,35 +42,45 @@ public class Account {
      * Constructor
      *
      * @param privateKey String
-     * @param networkType NetworkType
+     * @param networkType {@link NetworkType}
+     * @param signSchema the {@link SignSchema}
      */
-    public Account(String privateKey, NetworkType networkType) {
+    public Account(String privateKey, NetworkType networkType, SignSchema signSchema) {
         this.keyPair = new KeyPair(PrivateKey.fromHexString(privateKey));
-        this.publicAccount = new PublicAccount(this.getPublicKey(), networkType);
+        this.publicAccount = new PublicAccount(this.getPublicKey(), networkType, signSchema);
     }
 
-    public Account(KeyPair keyPair, NetworkType networkType) {
+    /**
+     * Constructor
+     *
+     * @param keyPair the public private key pair.
+     * @param networkType {@link NetworkType}
+     * @param signSchema the {@link SignSchema}
+     */
+    public Account(KeyPair keyPair, NetworkType networkType, SignSchema signSchema) {
         this.keyPair = keyPair;
-        this.publicAccount = new PublicAccount(this.getPublicKey(), networkType);
+        this.publicAccount = new PublicAccount(this.getPublicKey(), networkType, signSchema);
     }
 
     /**
      * Create an Account from a given private key.
      *
      * @param privateKey Private key from an account
-     * @param networkType NetworkType
+     * @param networkType {@link NetworkType}
+     * @param signSchema the {@link SignSchema}
      * @return {@link Account}
      */
-    public static Account createFromPrivateKey(String privateKey, NetworkType networkType) {
-        return new Account(privateKey, networkType);
+    public static Account createFromPrivateKey(String privateKey, NetworkType networkType,
+        SignSchema signSchema) {
+        return new Account(privateKey, networkType, signSchema);
     }
 
     /**
-     * Create an new Account
+     * It generates a new account for the given network.
      */
-    public static Account generateNewAccount(NetworkType networkType) {
+    public static Account generateNewAccount(NetworkType networkType, SignSchema signSchema) {
         KeyPair keyPair = new KeyPair();
-        return new Account(keyPair.getPrivateKey().toString(), networkType);
+        return new Account(keyPair.getPrivateKey().toString(), networkType, signSchema);
     }
 
     /**

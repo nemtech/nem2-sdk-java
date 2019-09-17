@@ -53,7 +53,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new NamespaceRepositoryVertxImpl(apiClientMock, networkType);
+        repository = new NamespaceRepositoryVertxImpl(apiClientMock, networkType, signSchema);
     }
 
     @Test

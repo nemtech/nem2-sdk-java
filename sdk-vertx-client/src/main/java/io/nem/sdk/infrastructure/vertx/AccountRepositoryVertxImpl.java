@@ -20,6 +20,7 @@ import static io.nem.core.utils.MapperUtils.toAddress;
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.core.crypto.PublicKey;
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
@@ -76,11 +77,11 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
     private final TransactionMapper transactionMapper;
 
     public AccountRepositoryVertxImpl(ApiClient apiClient,
-        Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
+        Supplier<NetworkType> networkType, SignSchema signSchema) {
+        super(apiClient, networkType, signSchema);
         this.client = new AccountRoutesApiImpl(apiClient);
 
-        transactionMapper = new GeneralTransactionMapper(getJsonHelper());
+        transactionMapper = new GeneralTransactionMapper(getJsonHelper(), signSchema);
     }
 
     private String getAddressEncoded(String address) throws DecoderException {
@@ -351,21 +352,21 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
     private MultisigAccountInfo toMultisigAccountInfo(MultisigDTO dto) {
         NetworkType networkType = getNetworkTypeBlocking();
         return new MultisigAccountInfo(
-            new PublicAccount(dto.getAccountPublicKey(), networkType),
+            new PublicAccount(dto.getAccountPublicKey(), networkType, getSignSchema()),
             dto.getMinApproval(),
             dto.getMinRemoval(),
             dto.getCosignatoryPublicKeys().stream()
                 .map(
                     cosigner ->
                         new PublicAccount(
-                            cosigner, networkType))
+                            cosigner, networkType, getSignSchema()))
                 .collect(Collectors.toList()),
             dto.getMultisigPublicKeys().stream()
                 .map(
                     multisigAccount ->
                         new PublicAccount(
                             multisigAccount,
-                            networkType))
+                            networkType, getSignSchema()))
                 .collect(Collectors.toList()));
     }
 

@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.nem.core.crypto.KeyPair;
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.crypto.ed25519.Ed25519CryptoEngine;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.Mosaic;
@@ -33,6 +34,8 @@ import java.util.Collections;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class AccountTest {
 
@@ -44,7 +47,7 @@ class AccountTest {
         Account account =
             new Account(
                 "787225aaff3d2c71f4ffa32d4f19ec4922f3cd869747f267378f81f8e3fcb12d",
-                NetworkType.MIJIN_TEST);
+                NetworkType.MIJIN_TEST, SignSchema.SHA3);
         assertEquals(
             "787225AAFF3D2C71F4FFA32D4F19EC4922F3CD869747F267378F81F8E3FCB12D",
             account.getPrivateKey());
@@ -59,7 +62,7 @@ class AccountTest {
         Account account =
             Account.createFromPrivateKey(
                 "787225AAFF3D2C71F4FFA32D4F19EC4922F3CD869747F267378F81F8E3FCB12D",
-                NetworkType.MIJIN_TEST);
+                NetworkType.MIJIN_TEST, SignSchema.SHA3);
         assertEquals(
             "787225AAFF3D2C71F4FFA32D4F19EC4922F3CD869747F267378F81F8E3FCB12D",
             account.getPrivateKey());
@@ -74,7 +77,7 @@ class AccountTest {
         Account account =
             Account.createFromPrivateKey(
                 "5098D500390934F81EA416D9A2F50F276DE446E28488E1801212931E3470DA31",
-                NetworkType.MIJIN_TEST);
+                NetworkType.MIJIN_TEST, SignSchema.SHA3);
         assertEquals(
             "5098D500390934F81EA416D9A2F50F276DE446E28488E1801212931E3470DA31",
             account.getPrivateKey());
@@ -90,7 +93,7 @@ class AccountTest {
         Account account =
             Account.createFromPrivateKey(
                 "B8AFAE6F4AD13A1B8AAD047B488E0738A437C7389D4FF30C359AC068910C1D59",
-                NetworkType.MIJIN_TEST);
+                NetworkType.MIJIN_TEST, SignSchema.SHA3);
         assertEquals(
             "B8AFAE6F4AD13A1B8AAD047B488E0738A437C7389D4FF30C359AC068910C1D59",
             account.getPrivateKey());
@@ -100,20 +103,22 @@ class AccountTest {
         assertEquals("SBE6CS7LZKJXLDVTNAC3VZ3AUVZDTF3PACNFIXFN", account.getAddress().plain());
     }
 
-    @Test
-    void generateNewAccountTest() {
-        Account account = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+    @ParameterizedTest
+    @EnumSource(SignSchema.class)
+    void generateNewAccountTest(SignSchema signSchema) {
+        Account account = Account.generateNewAccount(NetworkType.MIJIN_TEST, signSchema);
         assertNotEquals(null, account.getPrivateKey());
         assertNotEquals(null, account.getPublicKey());
         assertEquals(64, account.getPrivateKey().length());
     }
 
-    @Test
-    void shouldSignTransaction() {
+    @ParameterizedTest
+    @EnumSource(SignSchema.class)
+    void shouldSignTransaction(SignSchema signSchema) {
         Account account =
             new Account(
                 "787225aaff3d2c71f4ffa32d4f19ec4922f3cd869747f267378f81f8e3fcb12d",
-                NetworkType.MIJIN_TEST);
+                NetworkType.MIJIN_TEST, signSchema);
         TransferTransaction transferTransaction =
             TransferTransaction.create(
                 new FakeDeadline(),
@@ -135,10 +140,11 @@ class AccountTest {
             signedTransaction.getHash());
     }
 
-    @Test
-    void shouldAcceptKeyPairAsConstructor() {
+    @ParameterizedTest
+    @EnumSource(SignSchema.class)
+    void shouldAcceptKeyPairAsConstructor(SignSchema signSchema) {
         KeyPair random = KeyPair.random(new Ed25519CryptoEngine());
-        Account account = new Account(random, NetworkType.MIJIN_TEST);
+        Account account = new Account(random, NetworkType.MIJIN_TEST, signSchema);
         assertEquals(random.getPrivateKey().toString().toUpperCase(), account.getPrivateKey());
         assertEquals(NetworkType.MIJIN_TEST, account.getAddress().getNetworkType());
     }
@@ -147,7 +153,7 @@ class AccountTest {
     public void testAddresses2() {
         Address address = Address
             .createFromPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C",
-                NetworkType.MIJIN_TEST);
+                NetworkType.MIJIN_TEST, SignSchema.DEFAULT);
         Assert.assertEquals("SCUNEE-EE4FON-6N3DKD-FZUM6U-V7AU26-ZFTWT5-6NUX", address.pretty());
         Assert.assertEquals("SCUNEEEE4FON6N3DKDFZUM6UV7AU26ZFTWT56NUX", address.plain());
     }
@@ -156,7 +162,7 @@ class AccountTest {
     void shouldConstruct() {
         PublicAccount account1 = PublicAccount.createFromPublicKey(
             "A5F82EC8EBB341427B6785C8111906CD0DF18838FB11B51CE0E18B5E79DFF630",
-            NetworkType.MIJIN_TEST);
+            NetworkType.MIJIN_TEST, SignSchema.DEFAULT);
 
         Assertions.assertEquals("SDWGJE7XOYRX5RQMMLWF4TE7U5Y2HUYBRDVX2OJE",
             account1.getAddress().plain());

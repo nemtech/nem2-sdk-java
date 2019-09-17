@@ -18,6 +18,7 @@ package io.nem.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.NamespaceRepository;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
@@ -47,7 +48,8 @@ class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
     void setup() {
         // String publicKey = "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF";
         String publicKey = "F227B3268481DF7F9825CFB7C2051F441A9BC0C65FA0AA2CF3A438C4B3177B81";
-        publicAccount = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST);
+        publicAccount = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST,
+            SignSchema.DEFAULT);
         namespaceId = NetworkCurrencyMosaic.NAMESPACEID;
     }
 

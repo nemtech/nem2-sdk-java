@@ -16,6 +16,7 @@
 
 package io.nem.sdk.model.blockchain;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import java.math.BigInteger;
 import java.util.List;
@@ -90,6 +91,7 @@ public class BlockInfo {
 
     @SuppressWarnings("squid:S00107")
     public static BlockInfo create(
+        SignSchema signSchema,
         String hash,
         String generationHash,
         BigInteger totalFee,
@@ -110,9 +112,10 @@ public class BlockInfo {
         String beneficiaryPublicKey) {
         NetworkType networkType = BlockInfo.getNetworkType(blockVersion);
         Integer transactionVersion = BlockInfo.getTransactionVersion(blockVersion);
-        PublicAccount signerPublicAccount = BlockInfo.getPublicAccount(signer, networkType);
+        PublicAccount signerPublicAccount = BlockInfo
+            .getPublicAccount(signer, networkType, signSchema);
         PublicAccount beneficiaryPublicAccount =
-            BlockInfo.getPublicAccount(beneficiaryPublicKey, networkType);
+            BlockInfo.getPublicAccount(beneficiaryPublicKey, networkType, signSchema);
         return new BlockInfo(
             hash,
             generationHash,
@@ -159,8 +162,9 @@ public class BlockInfo {
      *
      * @return public account
      */
-    public static PublicAccount getPublicAccount(String publicKey, NetworkType networkType) {
-        return new PublicAccount(publicKey, networkType);
+    public static PublicAccount getPublicAccount(String publicKey, NetworkType networkType,
+        SignSchema signSchema) {
+        return new PublicAccount(publicKey, networkType, signSchema);
     }
 
     /**
@@ -169,9 +173,10 @@ public class BlockInfo {
      * @return public account
      */
     public static Optional<PublicAccount> getPublicAccount(
-        Optional<String> publicKey, NetworkType networkType) {
+        Optional<String> publicKey, NetworkType networkType,
+        SignSchema signSchema) {
         if (publicKey.isPresent() && !publicKey.get().isEmpty()) {
-            return Optional.of(new PublicAccount(publicKey.get(), networkType));
+            return Optional.of(new PublicAccount(publicKey.get(), networkType, signSchema));
         } else {
             return Optional.empty();
         }

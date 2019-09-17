@@ -53,7 +53,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new TransactionRepositoryVertxImpl(apiClientMock, networkType);
+        repository = new TransactionRepositoryVertxImpl(apiClientMock, networkType, signSchema);
     }
 
     @Test
@@ -178,7 +178,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
 
         Account account = Account.createFromPrivateKey(
             "063F36659A8BB01D5685826C19E2C2CA9D281465B642BD5E43CB69510408ECF7",
-            this.networkType.get());
+            this.networkType.get(), signSchema);
 
         Address address =
             Address.createFromRawAddress(

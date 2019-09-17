@@ -19,6 +19,7 @@ package io.nem.sdk.infrastructure.okhttp.mappers;
 
 import static io.nem.core.utils.MapperUtils.toAddressFromUnresolved;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.Deadline;
@@ -33,8 +34,9 @@ import io.nem.sdk.openapi.okhttp_gson.model.SecretProofTransactionDTO;
 class SecretProofTransactionMapper extends
     AbstractTransactionMapper<SecretProofTransactionDTO> {
 
-    public SecretProofTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.SECRET_PROOF, SecretProofTransactionDTO.class);
+    public SecretProofTransactionMapper(JsonHelper jsonHelper,
+        SignSchema signSchema) {
+        super(jsonHelper, TransactionType.SECRET_PROOF, SecretProofTransactionDTO.class, signSchema);
     }
 
     @Override
@@ -52,7 +54,7 @@ class SecretProofTransactionMapper extends
             transaction.getSecret(),
             transaction.getProof(),
             transaction.getSignature(),
-            new PublicAccount(transaction.getSignerPublicKey(), networkType),
+            new PublicAccount(transaction.getSignerPublicKey(), networkType, getSignSchema()),
             transactionInfo);
     }
 }

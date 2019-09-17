@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.BlockRepository;
 import io.nem.sdk.api.ChainRepository;
@@ -47,13 +48,26 @@ import org.threeten.bp.OffsetDateTime;
 
 public class RepositoryFactoryOkHttpImpl implements RepositoryFactory {
 
-
+    /**
+     * The low level open api generated client. The repositories use the client to perform the rest
+     * calls.
+     */
     private final ApiClient apiClient;
 
+    /**
+     * The base url of the Catapult server.
+     */
     private final String baseUrl;
 
-    public RepositoryFactoryOkHttpImpl(String baseUrl) {
+    /**
+     * The sign schema used to generate Addresses. At the moment the user needs to configure it or
+     * use the default. The server should provide how's the configuration.
+     */
+    private final SignSchema signSchema;
+
+    public RepositoryFactoryOkHttpImpl(String baseUrl, SignSchema signSchema) {
         this.baseUrl = baseUrl;
+        this.signSchema = signSchema;
         this.apiClient = new ApiClient();
         this.apiClient.setBasePath(baseUrl);
 
@@ -77,51 +91,52 @@ public class RepositoryFactoryOkHttpImpl implements RepositoryFactory {
 
     @Override
     public AccountRepository createAccountRepository() {
-        return new AccountRepositoryOkHttpImpl(apiClient);
+        return new AccountRepositoryOkHttpImpl(apiClient, signSchema);
     }
 
     @Override
     public BlockRepository createBlockRepository() {
-        return new BlockRepositoryOkHttpImpl(apiClient);
+        return new BlockRepositoryOkHttpImpl(apiClient, signSchema);
     }
 
     @Override
     public ChainRepository createChainRepository() {
-        return new ChainRepositoryOkHttpImpl(apiClient);
+        return new ChainRepositoryOkHttpImpl(apiClient, signSchema);
     }
 
     @Override
     public DiagnosticRepository createDiagnosticRepository() {
-        return new DiagnosticRepositoryOkHttpImpl(apiClient);
+        return new DiagnosticRepositoryOkHttpImpl(apiClient, signSchema);
     }
 
     @Override
     public MosaicRepository createMosaicRepository() {
-        return new MosaicRepositoryOkHttpImpl(apiClient);
+        return new MosaicRepositoryOkHttpImpl(apiClient, signSchema);
     }
 
     @Override
     public NamespaceRepository createNamespaceRepository() {
-        return new NamespaceRepositoryOkHttpImpl(apiClient);
+        return new NamespaceRepositoryOkHttpImpl(apiClient, signSchema);
     }
 
     @Override
     public NetworkRepository createNetworkRepository() {
-        return new NetworkRepositoryOkHttpImpl(apiClient);
+        return new NetworkRepositoryOkHttpImpl(apiClient, signSchema);
     }
 
     @Override
     public NodeRepository createNodeRepository() {
-        return new NodeRepositoryOkHttpImpl(apiClient);
+        return new NodeRepositoryOkHttpImpl(apiClient, signSchema);
     }
 
     @Override
     public TransactionRepository createTransactionRepository() {
-        return new TransactionRepositoryOkHttpImpl(apiClient);
+        return new TransactionRepositoryOkHttpImpl(apiClient, signSchema);
     }
 
     @Override
     public Listener createListener() {
-        return new ListenerOkHttp(apiClient.getHttpClient(), baseUrl, apiClient.getJSON());
+        return new ListenerOkHttp(apiClient.getHttpClient(), baseUrl, apiClient.getJSON(),
+            signSchema);
     }
 }

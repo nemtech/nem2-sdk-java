@@ -18,6 +18,7 @@ package io.nem.sdk.model.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
@@ -57,7 +58,7 @@ class AccountInfoTest {
         assertEquals(
             PublicAccount.createFromPublicKey(
                 "cf893ffcc47c33e7f68ab1db56365c156b0736824a0c1e273f9e00b8df8f01eb",
-                NetworkType.MIJIN_TEST),
+                NetworkType.MIJIN_TEST, SignSchema.DEFAULT),
             accountInfo.getPublicAccount());
 
         Assert.assertEquals(AccountType.REMOTE_UNLINKED,

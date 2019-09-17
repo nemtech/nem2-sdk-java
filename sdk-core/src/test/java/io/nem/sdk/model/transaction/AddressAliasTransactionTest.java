@@ -17,6 +17,7 @@
 
 package io.nem.sdk.model.transaction;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.HexEncoder;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -29,7 +30,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class AddressAliasTransactionTest {
-
+    private static SignSchema signSchema = SignSchema.DEFAULT;
     @Test
     void shouldSerialize() {
 
@@ -40,7 +41,7 @@ public class AddressAliasTransactionTest {
         NamespaceId namespaceId = NamespaceId.createFromId(new BigInteger("-8884663987180930485"));
         PublicAccount signature = PublicAccount.createFromPublicKey(
             "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b763",
-            NetworkType.MIJIN_TEST);
+            NetworkType.MIJIN_TEST, signSchema);
         TransactionInfo transactionInfo =
             TransactionInfo.createAggregate(
                 new BigInteger("121855"),

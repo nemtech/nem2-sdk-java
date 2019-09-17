@@ -46,7 +46,7 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new AccountRepositoryOkHttpImpl(apiClientMock);
+        repository = new AccountRepositoryOkHttpImpl(apiClientMock, signSchema);
     }
 
     @Test

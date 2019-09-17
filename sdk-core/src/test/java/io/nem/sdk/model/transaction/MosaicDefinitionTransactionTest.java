@@ -19,6 +19,7 @@ package io.nem.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
@@ -32,6 +33,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class MosaicDefinitionTransactionTest {
+
+    static SignSchema signSchema = SignSchema.DEFAULT;
 
     @Test
     void createAMosaicCreationTransactionViaStaticConstructor() {
@@ -92,7 +95,7 @@ class MosaicDefinitionTransactionTest {
 
         PublicAccount signature = PublicAccount.createFromPublicKey(
             "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b763",
-            NetworkType.MIJIN_TEST);
+            NetworkType.MIJIN_TEST, signSchema);
         TransactionInfo transactionInfo =
             TransactionInfo.createAggregate(
                 new BigInteger("121855"),

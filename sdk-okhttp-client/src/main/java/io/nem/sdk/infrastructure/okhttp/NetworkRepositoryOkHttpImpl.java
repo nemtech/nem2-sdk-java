@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.NetworkRepository;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.openapi.okhttp_gson.api.NetworkRoutesApi;
@@ -33,8 +34,8 @@ public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
 
     private final NetworkRoutesApi client;
 
-    public NetworkRepositoryOkHttpImpl(ApiClient apiClient) {
-        super(apiClient);
+    public NetworkRepositoryOkHttpImpl(ApiClient apiClient, SignSchema signSchema) {
+        super(apiClient, signSchema);
         client = new NetworkRoutesApi(apiClient);
     }
 

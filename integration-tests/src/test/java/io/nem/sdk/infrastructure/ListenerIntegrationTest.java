@@ -71,15 +71,15 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         multisigAccount =
             new Account(
                 "5edebfdbeb32e9146d05ffd232c8af2cf9f396caf9954289daa0362d097fff3b",
-                NetworkType.MIJIN_TEST);
+                NetworkType.MIJIN_TEST, signSchema);
         cosignatoryAccount =
             new Account(
                 "2a2b1f5d366a5dd5dc56c3c757cf4fe6c66e2787087692cf329d7a49a594658b",
-                NetworkType.MIJIN_TEST);
+                NetworkType.MIJIN_TEST, signSchema);
         cosignatoryAccount2 =
             new Account(
                 "b8afae6f4ad13a1b8aad047b488e0738a437c7389d4ff30c359ac068910c1d59",
-                NetworkType.MIJIN);
+                NetworkType.MIJIN, signSchema);
         generationHash = this.getGenerationHash();
     }
 

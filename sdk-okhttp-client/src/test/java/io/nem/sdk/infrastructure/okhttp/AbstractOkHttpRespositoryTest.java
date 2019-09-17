@@ -17,6 +17,7 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import com.google.gson.Gson;
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.HttpStatus;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -45,6 +46,7 @@ import org.mockito.Mockito;
  */
 public abstract class AbstractOkHttpRespositoryTest {
 
+    protected SignSchema signSchema = SignSchema.DEFAULT;
 
     protected ApiClient apiClientMock;
 

@@ -52,7 +52,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new BlockRepositoryOkHttpImpl(apiClientMock);
+        repository = new BlockRepositoryOkHttpImpl(apiClientMock, signSchema);
     }
 
     @Test

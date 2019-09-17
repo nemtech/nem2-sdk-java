@@ -20,6 +20,7 @@ import static io.nem.core.utils.MapperUtils.toAddress;
 import static io.nem.core.utils.MapperUtils.toAddressFromUnresolved;
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
@@ -55,9 +56,11 @@ import java.util.stream.Collectors;
 public class ReceiptMappingOkHttp {
 
     private final JsonHelper jsonHelper;
+    private final SignSchema signSchema;
 
-    public ReceiptMappingOkHttp(JsonHelper jsonHelper) {
+    public ReceiptMappingOkHttp(JsonHelper jsonHelper, SignSchema signSchema) {
         this.jsonHelper = jsonHelper;
+        this.signSchema = signSchema;
     }
 
     public Statement createStatementFromDto(StatementsDTO input, NetworkType networkType) {
@@ -169,7 +172,7 @@ public class ReceiptMappingOkHttp {
     public BalanceChangeReceipt createBalanceChangeReceipt(
         BalanceChangeReceiptDTO receipt, NetworkType networkType) {
         return new BalanceChangeReceipt(
-            PublicAccount.createFromPublicKey(receipt.getTargetPublicKey(), networkType),
+            PublicAccount.createFromPublicKey(receipt.getTargetPublicKey(), networkType, signSchema),
             new MosaicId(receipt.getMosaicId()),
             receipt.getAmount(),
             ReceiptType.rawValueOf(receipt.getType().getValue()),
@@ -179,7 +182,7 @@ public class ReceiptMappingOkHttp {
     public BalanceTransferReceipt<Address> createBalanceTransferRecipient(
         BalanceTransferReceiptDTO receipt, NetworkType networkType) {
         return new BalanceTransferReceipt<>(
-            PublicAccount.createFromPublicKey(receipt.getSenderPublicKey(), networkType),
+            PublicAccount.createFromPublicKey(receipt.getSenderPublicKey(), networkType, signSchema),
             MapperUtils.toAddressFromUnresolved(receipt.getRecipientAddress()),
             new MosaicId(receipt.getMosaicId()),
             receipt.getAmount(),

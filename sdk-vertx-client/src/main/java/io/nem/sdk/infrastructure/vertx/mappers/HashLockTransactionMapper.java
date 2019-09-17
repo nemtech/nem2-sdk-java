@@ -19,12 +19,13 @@ package io.nem.sdk.infrastructure.vertx.mappers;
 
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.transaction.Deadline;
-import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.HashLockTransaction;
+import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionInfo;
@@ -33,8 +34,8 @@ import io.nem.sdk.openapi.vertx.model.HashLockTransactionDTO;
 
 class HashLockTransactionMapper extends AbstractTransactionMapper<HashLockTransactionDTO> {
 
-    public HashLockTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.LOCK, HashLockTransactionDTO.class);
+    public HashLockTransactionMapper(JsonHelper jsonHelper, SignSchema signSchema) {
+        super(jsonHelper, TransactionType.LOCK, HashLockTransactionDTO.class, signSchema);
     }
 
     @Override
@@ -54,7 +55,7 @@ class HashLockTransactionMapper extends AbstractTransactionMapper<HashLockTransa
             new SignedTransaction("", transaction.getHash(),
                 TransactionType.AGGREGATE_BONDED),
             transaction.getSignature(),
-            new PublicAccount(transaction.getSignerPublicKey(), networkType),
+            new PublicAccount(transaction.getSignerPublicKey(), networkType, getSignSchema()),
             transactionInfo);
     }
 

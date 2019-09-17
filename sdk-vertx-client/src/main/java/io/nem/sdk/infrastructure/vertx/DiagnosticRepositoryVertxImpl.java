@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.vertx;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.DiagnosticRepository;
 import io.nem.sdk.model.blockchain.BlockchainStorageInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -40,8 +41,9 @@ public class DiagnosticRepositoryVertxImpl extends AbstractRepositoryVertxImpl i
 
     private final DiagnosticRoutesApi client;
 
-    public DiagnosticRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
+    public DiagnosticRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType,
+        SignSchema signSchema) {
+        super(apiClient, networkType, signSchema);
         client = new DiagnosticRoutesApiImpl(apiClient);
     }
 

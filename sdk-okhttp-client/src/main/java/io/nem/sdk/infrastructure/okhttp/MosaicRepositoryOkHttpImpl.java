@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.api.MosaicRepository;
 import io.nem.sdk.model.account.PublicAccount;
@@ -47,8 +48,8 @@ public class MosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imp
 
     private final MosaicRoutesApi client;
 
-    public MosaicRepositoryOkHttpImpl(ApiClient apiClient) {
-        super(apiClient);
+    public MosaicRepositoryOkHttpImpl(ApiClient apiClient, SignSchema signSchema) {
+        super(apiClient, signSchema);
         client = new MosaicRoutesApi(apiClient);
     }
 
@@ -112,7 +113,8 @@ public class MosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imp
             MapperUtils.toMosaicId(mosaicInfoDTO.getMosaic().getId()),
             mosaicInfoDTO.getMosaic().getSupply(),
             mosaicInfoDTO.getMosaic().getStartHeight(),
-            new PublicAccount(mosaicInfoDTO.getMosaic().getOwnerPublicKey(), networkType),
+            new PublicAccount(mosaicInfoDTO.getMosaic().getOwnerPublicKey(), networkType,
+                getSignSchema()),
             mosaicInfoDTO.getMosaic().getRevision(),
             extractMosaicProperties(mosaicInfoDTO.getMosaic().getProperties()));
     }

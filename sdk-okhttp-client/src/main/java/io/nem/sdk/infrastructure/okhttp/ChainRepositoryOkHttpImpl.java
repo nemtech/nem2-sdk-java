@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.ChainRepository;
 import io.nem.sdk.model.blockchain.BlockchainScore;
 import io.nem.sdk.openapi.okhttp_gson.api.ChainRoutesApi;
@@ -34,8 +35,8 @@ public class ChainRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
 
     private final ChainRoutesApi client;
 
-    public ChainRepositoryOkHttpImpl(ApiClient apiClient) {
-        super(apiClient);
+    public ChainRepositoryOkHttpImpl(ApiClient apiClient, SignSchema signSchema) {
+        super(apiClient, signSchema);
         client = new ChainRoutesApi(apiClient);
     }
 

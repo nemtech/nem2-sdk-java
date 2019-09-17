@@ -17,6 +17,7 @@
 package io.nem.sdk.infrastructure.vertx;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.infrastructure.Listener;
 import io.nem.sdk.infrastructure.ListenerBase;
 import io.nem.sdk.infrastructure.ListenerChannel;
@@ -56,6 +57,7 @@ public class ListenerVertx extends ListenerBase implements Listener {
     private final HttpClient httpClient;
 
     private final TransactionMapper transactionMapper;
+    private final SignSchema signSchema;
 
     private WebSocket webSocket;
 
@@ -64,8 +66,10 @@ public class ListenerVertx extends ListenerBase implements Listener {
     /**
      * @param httpClient the http client instance.
      * @param url of the host
+     * @param signSchema the {@link SignSchema}
      */
-    public ListenerVertx(HttpClient httpClient, String url) {
+    public ListenerVertx(HttpClient httpClient, String url, SignSchema signSchema) {
+        this.signSchema = signSchema;
         try {
             this.url = new URL(url);
         } catch (MalformedURLException e) {
@@ -74,14 +78,14 @@ public class ListenerVertx extends ListenerBase implements Listener {
         }
         this.httpClient = httpClient;
         this.jsonHelper = new JsonHelperJackson2(JsonHelperJackson2.configureMapper(Json.mapper));
-        this.transactionMapper = new GeneralTransactionMapper(jsonHelper);
+        this.transactionMapper = new GeneralTransactionMapper(jsonHelper, this.signSchema);
     }
 
     /**
      * @param url of the host
      */
-    public ListenerVertx(String url) {
-        this(createHttpClient(), url);
+    public ListenerVertx(String url, SignSchema signSchema) {
+        this(createHttpClient(), url, signSchema);
     }
 
     private static HttpClient createHttpClient() {
@@ -153,7 +157,7 @@ public class ListenerVertx extends ListenerBase implements Listener {
     }
 
     private BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO) {
-        return BlockRepositoryVertxImpl.toBlockInfo(blockInfoDTO);
+        return BlockRepositoryVertxImpl.toBlockInfo(signSchema, blockInfoDTO);
     }
 
     private Transaction toTransaction(TransactionInfoDTO transactionInfo) {

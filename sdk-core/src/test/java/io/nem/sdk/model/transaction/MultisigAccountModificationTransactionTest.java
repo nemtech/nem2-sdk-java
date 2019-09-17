@@ -19,6 +19,7 @@ package io.nem.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
@@ -32,6 +33,8 @@ import org.junit.jupiter.api.Test;
 
 class MultisigAccountModificationTransactionTest {
 
+    static SignSchema signSchema = SignSchema.DEFAULT;
+
     @Test
     void createAMultisigModificationTransactionViaConstructor() {
         MultisigAccountModificationTransaction multisigAccountModificationTransaction =
@@ -44,7 +47,7 @@ class MultisigAccountModificationTransactionTest {
                         MultisigCosignatoryModificationType.ADD,
                         PublicAccount.createFromPublicKey(
                             "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b763",
-                            NetworkType.MIJIN_TEST))),
+                            NetworkType.MIJIN_TEST, signSchema))),
                 NetworkType.MIJIN_TEST);
 
         assertEquals(NetworkType.MIJIN_TEST, multisigAccountModificationTransaction.getNetworkType());
@@ -85,12 +88,12 @@ class MultisigAccountModificationTransactionTest {
                         MultisigCosignatoryModificationType.ADD,
                         PublicAccount.createFromPublicKey(
                             "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b763",
-                            NetworkType.MIJIN_TEST)),
+                            NetworkType.MIJIN_TEST, signSchema)),
                     new MultisigCosignatoryModification(
                         MultisigCosignatoryModificationType.ADD,
                         PublicAccount.createFromPublicKey(
                             "cf893ffcc47c33e7f68ab1db56365c156b0736824a0c1e273f9e00b8df8f01eb",
-                            NetworkType.MIJIN_TEST))),
+                            NetworkType.MIJIN_TEST, signSchema))),
                 NetworkType.MIJIN_TEST);
 
         byte[] actual = multisigAccountModificationTransaction.generateBytes();

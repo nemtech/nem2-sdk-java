@@ -20,12 +20,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 
 class MosaicInfoTest {
+    static SignSchema signSchema = SignSchema.DEFAULT;
+
 
     @Test
     void createAMosaicInfoViaConstructor() {
@@ -40,7 +43,7 @@ class MosaicInfoTest {
                 new BigInteger("0"),
                 new PublicAccount(
                     "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                    NetworkType.MIJIN_TEST),
+                    NetworkType.MIJIN_TEST, signSchema),
                 1,
                 mosaicProperties);
 
@@ -50,7 +53,7 @@ class MosaicInfoTest {
         assertEquals(
             new PublicAccount(
                 "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                NetworkType.MIJIN_TEST),
+                NetworkType.MIJIN_TEST, signSchema),
             mosaicInfo.getOwner());
         assertTrue(mosaicInfo.isSupplyMutable());
         assertTrue(mosaicInfo.isTransferable());
@@ -70,7 +73,7 @@ class MosaicInfoTest {
                 new BigInteger("0"),
                 new PublicAccount(
                     "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                    NetworkType.MIJIN_TEST),
+                    NetworkType.MIJIN_TEST, signSchema),
                 1,
                 mosaicProperties);
 
@@ -89,7 +92,7 @@ class MosaicInfoTest {
                 new BigInteger("0"),
                 new PublicAccount(
                     "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                    NetworkType.MIJIN_TEST),
+                    NetworkType.MIJIN_TEST, signSchema),
                 1,
                 mosaicProperties);
 
@@ -108,7 +111,7 @@ class MosaicInfoTest {
                 new BigInteger("0"),
                 new PublicAccount(
                     "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                    NetworkType.MIJIN_TEST),
+                    NetworkType.MIJIN_TEST, signSchema),
                 1,
                 mosaicProperties);
 
@@ -127,7 +130,7 @@ class MosaicInfoTest {
                 new BigInteger("0"),
                 new PublicAccount(
                     "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                    NetworkType.MIJIN_TEST),
+                    NetworkType.MIJIN_TEST, signSchema),
                 1,
                 mosaicProperties);
 

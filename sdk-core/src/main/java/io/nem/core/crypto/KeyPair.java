@@ -16,6 +16,9 @@
 
 package io.nem.core.crypto;
 
+/**
+ * It represents an asymmetric private/public encryption key.
+ */
 public class KeyPair {
 
     private final PrivateKey privateKey;

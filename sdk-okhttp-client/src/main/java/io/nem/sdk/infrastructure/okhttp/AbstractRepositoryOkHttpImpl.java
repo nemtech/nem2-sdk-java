@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.Suppliers;
 import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.api.RepositoryCallException;
@@ -46,11 +47,14 @@ public abstract class AbstractRepositoryOkHttpImpl {
 
     private final JsonHelper jsonHelper;
 
-    public AbstractRepositoryOkHttpImpl(ApiClient apiClient) {
+    private final SignSchema signSchema;
+
+    public AbstractRepositoryOkHttpImpl(ApiClient apiClient, SignSchema signSchema) {
         networkTypeObservable = Suppliers
-            .memoize(() -> new NetworkRepositoryOkHttpImpl(apiClient).getNetworkType().cache());
+            .memoize(() -> new NetworkRepositoryOkHttpImpl(apiClient, signSchema).getNetworkType().cache());
         jsonHelper = new JsonHelperGson(apiClient.getJSON().getGson());
 
+        this.signSchema = signSchema;
     }
 
     public <T> Observable<T> call(Callable<T> callback) {
@@ -114,8 +118,11 @@ public abstract class AbstractRepositoryOkHttpImpl {
         return queryParams.map(QueryParams::getId).orElse(null);
     }
 
-
     public JsonHelper getJsonHelper() {
         return jsonHelper;
+    }
+
+    public SignSchema getSignSchema() {
+        return signSchema;
     }
 }

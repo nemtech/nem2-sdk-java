@@ -139,7 +139,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
         AccountRepository accountHttp = getRepositoryFactory(type).createAccountRepository();
         Address addressObject = Address
             .createFromPublicKey("67F69FA4BFCD158F6E1AF1ABC82F725F5C5C4710D6E29217B12BE66397435DFB",
-                NetworkType.MIJIN_TEST);
+                NetworkType.MIJIN_TEST, signSchema);
 
         try {
             accountHttp.getAccountInfo(addressObject).toFuture().get();

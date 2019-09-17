@@ -16,6 +16,7 @@
 
 package io.nem.sdk.model.account;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.mosaic.Mosaic;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -133,7 +134,8 @@ public class AccountInfo {
      * @return {@link PublicAccount}
      */
     public PublicAccount getPublicAccount() {
-        return PublicAccount.createFromPublicKey(this.publicKey, this.address.getNetworkType());
+        return PublicAccount.createFromPublicKey(this.publicKey, this.address.getNetworkType(),
+            SignSchema.DEFAULT);
     }
 
     /**

@@ -18,6 +18,7 @@ package io.nem.sdk.infrastructure.vertx;
 
 import static io.nem.core.utils.MapperUtils.toNamespaceId;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.api.NamespaceRepository;
 import io.nem.sdk.api.QueryParams;
@@ -63,8 +64,9 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
 
     private final NamespaceRoutesApi client;
 
-    public NamespaceRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
+    public NamespaceRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType,
+        SignSchema signSchema) {
+        super(apiClient, networkType, signSchema);
         client = new NamespaceRoutesApiImpl(apiClient);
     }
 
@@ -204,7 +206,7 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
             this.extractLevels(namespaceInfoDTO),
             toNamespaceId(namespaceInfoDTO.getNamespace().getParentId()),
             new PublicAccount(namespaceInfoDTO.getNamespace().getOwnerPublicKey(),
-                getNetworkTypeBlocking()),
+                getNetworkTypeBlocking(), getSignSchema()),
             namespaceInfoDTO.getNamespace().getStartHeight(),
             namespaceInfoDTO.getNamespace().getEndHeight(),
             this.extractAlias(namespaceInfoDTO.getNamespace()));

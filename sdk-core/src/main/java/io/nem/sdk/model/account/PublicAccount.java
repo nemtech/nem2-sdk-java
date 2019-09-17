@@ -17,6 +17,7 @@
 package io.nem.sdk.model.account;
 
 import io.nem.core.crypto.PublicKey;
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.Objects;
 
@@ -30,8 +31,8 @@ public class PublicAccount {
     private final Address address;
     private final PublicKey publicKey;
 
-    public PublicAccount(String publicKey, NetworkType networkType) {
-        this.address = Address.createFromPublicKey(publicKey, networkType);
+    public PublicAccount(String publicKey, NetworkType networkType, SignSchema signSchema) {
+        this.address = Address.createFromPublicKey(publicKey, networkType, signSchema);
         this.publicKey = PublicKey.fromHexString(publicKey);
     }
 
@@ -40,10 +41,12 @@ public class PublicAccount {
      *
      * @param publicKey Public key
      * @param networkType NetworkType
+     * @param signSchema the {@link SignSchema}
      * @return {@link PublicAccount}
      */
-    public static PublicAccount createFromPublicKey(String publicKey, NetworkType networkType) {
-        return new PublicAccount(publicKey, networkType);
+    public static PublicAccount createFromPublicKey(String publicKey, NetworkType networkType,
+        SignSchema signSchema) {
+        return new PublicAccount(publicKey, networkType, signSchema);
     }
 
     /**
@@ -86,4 +89,6 @@ public class PublicAccount {
     public PublicKey getPublicKey() {
         return publicKey;
     }
+
+
 }

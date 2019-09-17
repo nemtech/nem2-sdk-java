@@ -19,6 +19,7 @@ package io.nem.sdk.infrastructure.okhttp.mappers;
 
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.mosaic.MosaicNonce;
 import io.nem.sdk.model.mosaic.MosaicProperties;
@@ -33,8 +34,10 @@ import io.nem.sdk.openapi.okhttp_gson.model.MosaicDefinitionTransactionDTO;
 class MosaicDefinitionTransactionMapper extends
     AbstractTransactionMapper<MosaicDefinitionTransactionDTO> {
 
-    public MosaicDefinitionTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.MOSAIC_DEFINITION, MosaicDefinitionTransactionDTO.class);
+    public MosaicDefinitionTransactionMapper(JsonHelper jsonHelper,
+        SignSchema signSchema) {
+        super(jsonHelper, TransactionType.MOSAIC_DEFINITION, MosaicDefinitionTransactionDTO.class,
+            signSchema);
     }
 
     @Override
@@ -64,7 +67,7 @@ class MosaicDefinitionTransactionMapper extends
             transaction.getSignature(),
             new PublicAccount(
                 transaction.getSignerPublicKey(),
-                extractNetworkType(transaction.getVersion())),
+                extractNetworkType(transaction.getVersion()), getSignSchema()),
             transactionInfo);
     }
 }

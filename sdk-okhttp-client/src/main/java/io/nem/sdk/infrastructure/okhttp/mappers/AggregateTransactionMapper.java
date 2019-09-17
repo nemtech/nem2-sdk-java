@@ -17,6 +17,7 @@
 
 package io.nem.sdk.infrastructure.okhttp.mappers;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.AggregateTransaction;
@@ -40,8 +41,8 @@ class AggregateTransactionMapper extends
 
     public AggregateTransactionMapper(JsonHelper jsonHelper,
         TransactionType transactionType,
-        TransactionMapper transactionMapper) {
-        super(jsonHelper, transactionType, AggregateBondedTransactionDTO.class);
+        TransactionMapper transactionMapper, SignSchema signSchema) {
+        super(jsonHelper, transactionType, AggregateBondedTransactionDTO.class, signSchema);
         this.transactionMapper = transactionMapper;
     }
 
@@ -77,7 +78,7 @@ class AggregateTransactionMapper extends
                             new AggregateTransactionCosignature(
                                 aggregateCosignature.getSignature(),
                                 new PublicAccount(aggregateCosignature.getSignerPublicKey(),
-                                    networkType)))
+                                    networkType, getSignSchema())))
                     .collect(Collectors.toList());
         }
 
@@ -90,7 +91,7 @@ class AggregateTransactionMapper extends
             transactions,
             cosignatures,
             transaction.getSignature(),
-            new PublicAccount(transaction.getSignerPublicKey(), networkType),
+            new PublicAccount(transaction.getSignerPublicKey(), networkType, getSignSchema()),
             transactionInfo);
     }
 

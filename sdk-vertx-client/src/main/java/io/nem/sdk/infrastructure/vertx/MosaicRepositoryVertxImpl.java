@@ -18,6 +18,7 @@ package io.nem.sdk.infrastructure.vertx;
 
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.MosaicRepository;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -52,8 +53,9 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl imple
 
     private final MosaicRoutesApi client;
 
-    public MosaicRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
+    public MosaicRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType,
+        SignSchema signSchema) {
+        super(apiClient, networkType, signSchema);
         client = new MosaicRoutesApiImpl(apiClient);
     }
 
@@ -89,7 +91,8 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl imple
             toMosaicId(mosaicInfoDTO.getMosaic().getId()),
             mosaicInfoDTO.getMosaic().getSupply(),
             mosaicInfoDTO.getMosaic().getStartHeight(),
-            new PublicAccount(mosaicInfoDTO.getMosaic().getOwnerPublicKey(), networkType),
+            new PublicAccount(mosaicInfoDTO.getMosaic().getOwnerPublicKey(), networkType,
+                getSignSchema()),
             mosaicInfoDTO.getMosaic().getRevision(),
             extractMosaicProperties(mosaicInfoDTO.getMosaic().getProperties()));
     }

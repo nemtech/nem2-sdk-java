@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.RepositoryFactory;
 import io.nem.sdk.infrastructure.okhttp.RepositoryFactoryOkHttpImpl;
 import io.nem.sdk.infrastructure.vertx.RepositoryFactoryVertxImpl;
@@ -34,6 +35,7 @@ import java.util.Map;
  */
 public abstract class BaseIntegrationTest {
 
+    protected static SignSchema signSchema = SignSchema.DEFAULT;
 
     /**
      * Known implementations of repositories that the integration tests use.
@@ -73,9 +75,9 @@ public abstract class BaseIntegrationTest {
 
         switch (type) {
             case VERTX:
-                return new RepositoryFactoryVertxImpl(getApiUrl());
+                return new RepositoryFactoryVertxImpl(getApiUrl(), signSchema);
             case OKHTTP:
-                return new RepositoryFactoryOkHttpImpl(getApiUrl());
+                return new RepositoryFactoryOkHttpImpl(getApiUrl(), signSchema);
             default:
                 throw new IllegalStateException("Invalid Repository type " + type);
         }
@@ -100,7 +102,7 @@ public abstract class BaseIntegrationTest {
         if (this.testAccount == null) {
             this.testAccount =
                 Account.createFromPrivateKey(
-                    this.config().getTestAccountPrivateKey(), this.getNetworkType());
+                    this.config().getTestAccountPrivateKey(), this.getNetworkType(), signSchema);
         }
         return this.testAccount;
     }
@@ -109,7 +111,7 @@ public abstract class BaseIntegrationTest {
         if (this.testPublicAccount == null) {
             this.testPublicAccount =
                 PublicAccount.createFromPublicKey(
-                    this.config().getTestAccountPublicKey(), this.getNetworkType());
+                    this.config().getTestAccountPublicKey(), this.getNetworkType(), SignSchema.DEFAULT);
         }
         return this.testPublicAccount;
     }
@@ -126,7 +128,7 @@ public abstract class BaseIntegrationTest {
         if (this.testMultisigAccount == null) {
             this.testMultisigAccount =
                 Account.createFromPrivateKey(
-                    this.config().getMultisigAccountPrivateKey(), this.getNetworkType());
+                    this.config().getMultisigAccountPrivateKey(), this.getNetworkType(), signSchema);
         }
         return this.testMultisigAccount;
     }
@@ -135,7 +137,8 @@ public abstract class BaseIntegrationTest {
         if (this.testCosignatoryAccount == null) {
             this.testCosignatoryAccount =
                 Account.createFromPrivateKey(
-                    this.config().getCosignatoryAccountPrivateKey(), this.getNetworkType());
+                    this.config().getCosignatoryAccountPrivateKey(), this.getNetworkType(),
+                    signSchema);
         }
         return this.testCosignatoryAccount;
     }
@@ -144,7 +147,8 @@ public abstract class BaseIntegrationTest {
         if (this.testCosignatoryAccount2 == null) {
             this.testCosignatoryAccount2 =
                 Account.createFromPrivateKey(
-                    this.config().getCosignatory2AccountPrivateKey(), this.getNetworkType());
+                    this.config().getCosignatory2AccountPrivateKey(), this.getNetworkType(),
+                    signSchema);
         }
         return this.testCosignatoryAccount2;
     }

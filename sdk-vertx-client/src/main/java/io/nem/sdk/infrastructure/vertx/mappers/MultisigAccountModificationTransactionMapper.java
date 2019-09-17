@@ -17,6 +17,7 @@
 
 package io.nem.sdk.infrastructure.vertx.mappers;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.Deadline;
@@ -35,9 +36,11 @@ import java.util.stream.Collectors;
 class MultisigAccountModificationTransactionMapper extends
     AbstractTransactionMapper<MultisigAccountModificationTransactionDTO> {
 
-    public MultisigAccountModificationTransactionMapper(JsonHelper jsonHelper) {
+    public MultisigAccountModificationTransactionMapper(JsonHelper jsonHelper,
+        SignSchema signSchema) {
         super(jsonHelper, TransactionType.MODIFY_MULTISIG_ACCOUNT,
-            MultisigAccountModificationTransactionDTO.class);
+            MultisigAccountModificationTransactionDTO.class, signSchema
+        );
     }
 
     @Override
@@ -56,7 +59,7 @@ class MultisigAccountModificationTransactionMapper extends
                                     multisigModification.getModificationAction().getValue()),
                                 PublicAccount.createFromPublicKey(
                                     multisigModification.getCosignatoryPublicKey(),
-                                    networkType)))
+                                    networkType, getSignSchema())))
                     .collect(Collectors.toList());
 
         return new MultisigAccountModificationTransaction(
@@ -68,7 +71,7 @@ class MultisigAccountModificationTransactionMapper extends
             transaction.getMinRemovalDelta().byteValue(),
             modifications,
             transaction.getSignature(),
-            new PublicAccount(transaction.getSignerPublicKey(), networkType),
+            new PublicAccount(transaction.getSignerPublicKey(), networkType, getSignSchema()),
             transactionInfo);
     }
 }

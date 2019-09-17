@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.account.Address;
@@ -28,12 +29,12 @@ import io.nem.sdk.model.namespace.AliasAction;
 import io.nem.sdk.model.namespace.NamespaceType;
 import io.nem.sdk.model.transaction.AddressAliasTransaction;
 import io.nem.sdk.model.transaction.AggregateTransaction;
-import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.HashLockTransaction;
-import io.nem.sdk.model.transaction.MultisigAccountModificationTransaction;
+import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.MosaicAliasTransaction;
 import io.nem.sdk.model.transaction.MosaicDefinitionTransaction;
 import io.nem.sdk.model.transaction.MosaicSupplyChangeTransaction;
+import io.nem.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.sdk.model.transaction.SecretLockTransaction;
 import io.nem.sdk.model.transaction.SecretProofTransaction;
@@ -71,7 +72,8 @@ public class TransactionMapperVertxTest {
     void shouldFailWhenNotTransactionType() {
         TransactionInfoDTO transaction = new TransactionInfoDTO();
 
-        Assertions.assertEquals("Transaction cannot be mapped, object does not not have transaction type.",
+        Assertions.assertEquals(
+            "Transaction cannot be mapped, object does not not have transaction type.",
             Assertions.assertThrows(IllegalArgumentException.class, () -> map(transaction))
                 .getMessage());
     }
@@ -297,7 +299,7 @@ public class TransactionMapperVertxTest {
     }
 
     private Transaction map(TransactionInfoDTO jsonObject) {
-        return new GeneralTransactionMapper(jsonHelper).map(jsonObject);
+        return new GeneralTransactionMapper(jsonHelper, SignSchema.DEFAULT).map(jsonObject);
     }
 
     void validateStandaloneTransaction(Transaction transaction, TransactionInfoDTO transactionDTO) {
@@ -373,7 +375,8 @@ public class TransactionMapperVertxTest {
         if (transaction.getType() == TransactionType.TRANSFER) {
             validateTransferTx((TransferTransaction) transaction, transactionDTO);
         } else if (transaction.getType() == TransactionType.REGISTER_NAMESPACE) {
-            validateNamespaceCreationTx((NamespaceRegistrationTransaction) transaction, transactionDTO);
+            validateNamespaceCreationTx((NamespaceRegistrationTransaction) transaction,
+                transactionDTO);
         } else if (transaction.getType() == TransactionType.MOSAIC_DEFINITION) {
             validateMosaicCreationTx((MosaicDefinitionTransaction) transaction, transactionDTO);
         } else if (transaction.getType() == TransactionType.MOSAIC_SUPPLY_CHANGE) {

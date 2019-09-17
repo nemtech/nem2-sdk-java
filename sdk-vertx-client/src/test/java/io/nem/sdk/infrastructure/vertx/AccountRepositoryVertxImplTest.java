@@ -17,6 +17,7 @@
 package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.core.crypto.PublicKey;
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.ExceptionUtils;
 import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.model.account.AccountInfo;
@@ -47,7 +48,7 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new AccountRepositoryVertxImpl(apiClientMock, networkType);
+        repository = new AccountRepositoryVertxImpl(apiClientMock, networkType, signSchema);
     }
 
     @Test

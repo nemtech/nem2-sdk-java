@@ -24,7 +24,10 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 
 /**
- * Created by fernando on 06/08/19.
+ * The open api generates objects where the array fields are empty initialized. When these objects
+ * are serialized back to json, those empty fields should be excluded
+ *
+ * This adapter exclude emtpy array fields to be serialized.
  *
  * @author Fernando Boucquez
  */

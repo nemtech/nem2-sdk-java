@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.DiagnosticRepository;
 import io.nem.sdk.model.blockchain.BlockchainStorageInfo;
 import io.nem.sdk.model.blockchain.ServerInfo;
@@ -35,8 +36,8 @@ public class DiagnosticRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
 
     private final DiagnosticRoutesApi client;
 
-    public DiagnosticRepositoryOkHttpImpl(ApiClient apiClient) {
-        super(apiClient);
+    public DiagnosticRepositoryOkHttpImpl(ApiClient apiClient, SignSchema signSchema) {
+        super(apiClient, signSchema);
         client = new DiagnosticRoutesApi(apiClient);
     }
 

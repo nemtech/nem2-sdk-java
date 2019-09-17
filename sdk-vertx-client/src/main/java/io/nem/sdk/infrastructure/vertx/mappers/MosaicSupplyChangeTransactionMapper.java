@@ -19,6 +19,7 @@ package io.nem.sdk.infrastructure.vertx.mappers;
 
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.mosaic.MosaicSupplyType;
 import io.nem.sdk.model.transaction.Deadline;
@@ -32,9 +33,10 @@ import io.nem.sdk.openapi.vertx.model.MosaicSupplyChangeTransactionDTO;
 class MosaicSupplyChangeTransactionMapper extends
     AbstractTransactionMapper<MosaicSupplyChangeTransactionDTO> {
 
-    public MosaicSupplyChangeTransactionMapper(JsonHelper jsonHelper) {
+    public MosaicSupplyChangeTransactionMapper(JsonHelper jsonHelper, SignSchema signSchema) {
         super(jsonHelper, TransactionType.MOSAIC_SUPPLY_CHANGE,
-            MosaicSupplyChangeTransactionDTO.class);
+            MosaicSupplyChangeTransactionDTO.class, signSchema
+        );
     }
 
     @Override
@@ -53,7 +55,7 @@ class MosaicSupplyChangeTransactionMapper extends
             transaction.getDelta(),
             transaction.getSignature(),
             new PublicAccount(transaction.getSignerPublicKey(),
-                extractNetworkType(transaction.getVersion())),
+                extractNetworkType(transaction.getVersion()), getSignSchema()),
             transactionInfo);
     }
 

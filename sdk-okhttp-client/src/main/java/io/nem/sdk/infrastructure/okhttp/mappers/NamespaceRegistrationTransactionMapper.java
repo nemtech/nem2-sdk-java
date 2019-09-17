@@ -19,6 +19,7 @@ package io.nem.sdk.infrastructure.okhttp.mappers;
 
 import static io.nem.core.utils.MapperUtils.toNamespaceId;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.namespace.NamespaceType;
@@ -34,9 +35,10 @@ import java.util.Optional;
 class NamespaceRegistrationTransactionMapper extends
     AbstractTransactionMapper<NamespaceRegistrationTransactionDTO> {
 
-    public NamespaceRegistrationTransactionMapper(JsonHelper jsonHelper) {
+    public NamespaceRegistrationTransactionMapper(JsonHelper jsonHelper,
+        SignSchema signSchema) {
         super(jsonHelper, TransactionType.REGISTER_NAMESPACE,
-            NamespaceRegistrationTransactionDTO.class);
+            NamespaceRegistrationTransactionDTO.class, signSchema);
     }
 
     @Override
@@ -65,7 +67,7 @@ class NamespaceRegistrationTransactionMapper extends
             transaction.getSignature(),
             new PublicAccount(
                 transaction.getSignerPublicKey(),
-                extractNetworkType(transaction.getVersion())),
+                extractNetworkType(transaction.getVersion()), getSignSchema()),
             transactionInfo);
     }
 }

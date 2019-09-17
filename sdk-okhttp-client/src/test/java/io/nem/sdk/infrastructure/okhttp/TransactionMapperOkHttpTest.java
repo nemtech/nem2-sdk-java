@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.account.Address;
@@ -28,12 +29,12 @@ import io.nem.sdk.model.namespace.AliasAction;
 import io.nem.sdk.model.namespace.NamespaceType;
 import io.nem.sdk.model.transaction.AddressAliasTransaction;
 import io.nem.sdk.model.transaction.AggregateTransaction;
-import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.HashLockTransaction;
-import io.nem.sdk.model.transaction.MultisigAccountModificationTransaction;
+import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.MosaicAliasTransaction;
 import io.nem.sdk.model.transaction.MosaicDefinitionTransaction;
 import io.nem.sdk.model.transaction.MosaicSupplyChangeTransaction;
+import io.nem.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.sdk.model.transaction.SecretLockTransaction;
 import io.nem.sdk.model.transaction.SecretProofTransaction;
@@ -61,6 +62,7 @@ import org.junit.jupiter.api.Test;
 
 public class TransactionMapperOkHttpTest {
 
+    private final SignSchema signSchema = SignSchema.DEFAULT;
 
     private final JsonHelper jsonHelper = new JsonHelperGson(new JSON().getGson());
 
@@ -285,7 +287,7 @@ public class TransactionMapperOkHttpTest {
     }
 
     private Transaction map(TransactionInfoDTO jsonObject) {
-        return new GeneralTransactionMapper(jsonHelper).map(jsonObject);
+        return new GeneralTransactionMapper(jsonHelper, signSchema).map(jsonObject);
     }
 
     void validateStandaloneTransaction(Transaction transaction, TransactionInfoDTO transactionDTO) {
@@ -361,7 +363,8 @@ public class TransactionMapperOkHttpTest {
         if (transaction.getType() == TransactionType.TRANSFER) {
             validateTransferTx((TransferTransaction) transaction, transactionDTO);
         } else if (transaction.getType() == TransactionType.REGISTER_NAMESPACE) {
-            validateNamespaceCreationTx((NamespaceRegistrationTransaction) transaction, transactionDTO);
+            validateNamespaceCreationTx((NamespaceRegistrationTransaction) transaction,
+                transactionDTO);
         } else if (transaction.getType() == TransactionType.MOSAIC_DEFINITION) {
             validateMosaicCreationTx((MosaicDefinitionTransaction) transaction, transactionDTO);
         } else if (transaction.getType() == TransactionType.MOSAIC_SUPPLY_CHANGE) {

@@ -17,6 +17,7 @@
 package io.nem.sdk.infrastructure.vertx;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.HttpStatus;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -44,6 +45,7 @@ import org.mockito.stubbing.Answer;
  */
 public abstract class AbstractVertxRespositoryTest {
 
+    protected SignSchema signSchema = SignSchema.DEFAULT;
 
     protected ApiClient apiClientMock;
 

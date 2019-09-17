@@ -37,7 +37,7 @@ public class ChainRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new ChainRepositoryVertxImpl(apiClientMock, networkType);
+        repository = new ChainRepositoryVertxImpl(apiClientMock, networkType, signSchema);
     }
 
     @Test

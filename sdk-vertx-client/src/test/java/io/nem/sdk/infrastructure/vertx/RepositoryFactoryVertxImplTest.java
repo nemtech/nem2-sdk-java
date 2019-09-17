@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.vertx;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.api.RepositoryFactory;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -32,8 +33,7 @@ public class RepositoryFactoryVertxImplTest {
 
         String baseUrl = "https://nem.com:3000/path";
 
-        RepositoryFactory factory = new RepositoryFactoryVertxImpl(
-            baseUrl) {
+        RepositoryFactory factory = new RepositoryFactoryVertxImpl(baseUrl, SignSchema.DEFAULT) {
             @Override
             protected NetworkType loadNetworkType() {
                 return NetworkType.MAIN_NET;
@@ -58,7 +58,7 @@ public class RepositoryFactoryVertxImplTest {
         String baseUrl = "https://localhost:1934/path";
 
         RepositoryCallException e = Assertions.assertThrows(RepositoryCallException.class, () -> {
-            new RepositoryFactoryVertxImpl(baseUrl);
+            new RepositoryFactoryVertxImpl(baseUrl, SignSchema.DEFAULT);
         });
 
         Assertions.assertTrue(

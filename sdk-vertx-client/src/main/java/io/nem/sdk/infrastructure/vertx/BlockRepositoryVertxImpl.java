@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.vertx;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.BlockRepository;
 import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
@@ -55,16 +56,18 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
 
     private final TransactionMapper transactionMapper;
 
-    public BlockRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
+    public BlockRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType,
+        SignSchema signSchema) {
+        super(apiClient, networkType, signSchema);
         client = new BlockRoutesApiImpl(apiClient);
-        transactionMapper = new GeneralTransactionMapper(getJsonHelper());
+        transactionMapper = new GeneralTransactionMapper(getJsonHelper(), signSchema);
     }
 
     public Observable<BlockInfo> getBlockByHeight(BigInteger height) {
         Consumer<Handler<AsyncResult<BlockInfoDTO>>> callback = handler -> getClient()
             .getBlockByHeight(height.longValue(), handler);
-        return exceptionHandling(call(callback).map(BlockRepositoryVertxImpl::toBlockInfo));
+        return exceptionHandling(call(callback).map(
+            blockInfoDTO -> toBlockInfo(getSignSchema(), blockInfoDTO)));
     }
 
     public Observable<List<Transaction>> getBlockTransactions(
@@ -82,7 +85,8 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
             client.getBlocksByHeightWithLimit(height.longValue(), limit, handler);
 
         return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(BlockRepositoryVertxImpl::toBlockInfo)
+            call(callback).flatMapIterable(item -> item).map(
+                blockInfoDTO -> toBlockInfo(getSignSchema(), blockInfoDTO))
                 .toList()
                 .toObservable());
     }
@@ -117,7 +121,7 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
         Consumer<Handler<AsyncResult<StatementsDTO>>> callback = handler ->
             client.getBlockReceipts(height.longValue(), handler);
         return exceptionHandling(call(callback).map(statementsDTO ->
-            new ReceiptMappingVertx(getJsonHelper())
+            new ReceiptMappingVertx(getSignSchema(), getJsonHelper())
                 .createStatementFromDto(statementsDTO, getNetworkTypeBlocking())));
     }
 
@@ -139,8 +143,10 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
         return transactionMapper.map(input);
     }
 
-    public static BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO) {
+    public static BlockInfo toBlockInfo(SignSchema signSchema,
+        BlockInfoDTO blockInfoDTO) {
         return BlockInfo.create(
+            signSchema,
             blockInfoDTO.getMeta().getHash(),
             blockInfoDTO.getMeta().getGenerationHash(),
             blockInfoDTO.getMeta().getTotalFee(),

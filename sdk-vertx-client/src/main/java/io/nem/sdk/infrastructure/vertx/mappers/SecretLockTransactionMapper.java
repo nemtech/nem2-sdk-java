@@ -19,6 +19,7 @@ package io.nem.sdk.infrastructure.vertx.mappers;
 
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -34,8 +35,8 @@ import io.nem.sdk.openapi.vertx.model.SecretLockTransactionDTO;
 
 class SecretLockTransactionMapper extends AbstractTransactionMapper<SecretLockTransactionDTO> {
 
-    public SecretLockTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.SECRET_LOCK, SecretLockTransactionDTO.class);
+    public SecretLockTransactionMapper(JsonHelper jsonHelper, SignSchema signSchema) {
+        super(jsonHelper, TransactionType.SECRET_LOCK, SecretLockTransactionDTO.class, signSchema);
     }
 
     @Override
@@ -59,7 +60,7 @@ class SecretLockTransactionMapper extends AbstractTransactionMapper<SecretLockTr
             transaction.getSecret(),
             MapperUtils.toAddressFromUnresolved(transaction.getRecipientAddress()),
             transaction.getSignature(),
-            new PublicAccount(transaction.getSignerPublicKey(), networkType),
+            new PublicAccount(transaction.getSignerPublicKey(), networkType, getSignSchema()),
             transactionInfo);
     }
 }

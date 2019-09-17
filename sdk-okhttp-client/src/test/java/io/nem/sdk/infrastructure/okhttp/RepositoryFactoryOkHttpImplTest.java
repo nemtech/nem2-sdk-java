@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.RepositoryFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ public class RepositoryFactoryOkHttpImplTest {
         String baseUrl = "https://nem.com:3000/path";
 
         RepositoryFactory factory = new RepositoryFactoryOkHttpImpl(
-            baseUrl);
+            baseUrl, SignSchema.DEFAULT);
 
         Assertions.assertNotNull(factory.createAccountRepository());
         Assertions.assertNotNull(factory.createBlockRepository());
@@ -45,5 +46,6 @@ public class RepositoryFactoryOkHttpImplTest {
         Assertions.assertNotNull(factory.createNodeRepository());
         Assertions.assertNotNull(factory.createTransactionRepository());
     }
+
 
 }

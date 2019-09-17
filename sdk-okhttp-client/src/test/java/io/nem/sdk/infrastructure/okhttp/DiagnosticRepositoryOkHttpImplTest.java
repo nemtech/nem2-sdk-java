@@ -38,7 +38,7 @@ public class DiagnosticRepositoryOkHttpImplTest extends AbstractOkHttpRespositor
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new DiagnosticRepositoryOkHttpImpl(apiClientMock);
+        repository = new DiagnosticRepositoryOkHttpImpl(apiClientMock, signSchema);
     }
 
     @Test

@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.BlockRepository;
 import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
@@ -49,15 +50,16 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
 
     private final GeneralTransactionMapper transactionMapper;
 
-    public BlockRepositoryOkHttpImpl(ApiClient apiClient) {
-        super(apiClient);
+    public BlockRepositoryOkHttpImpl(ApiClient apiClient, SignSchema signSchema) {
+        super(apiClient, signSchema);
         this.client = new BlockRoutesApi(apiClient);
-        this.transactionMapper = new GeneralTransactionMapper(getJsonHelper());
+        this.transactionMapper = new GeneralTransactionMapper(getJsonHelper(), signSchema);
     }
 
     public Observable<BlockInfo> getBlockByHeight(BigInteger height) {
         Callable<BlockInfoDTO> callback = () -> getClient().getBlockByHeight(height.longValue());
-        return exceptionHandling(call(callback).map(BlockRepositoryOkHttpImpl::toBlockInfo));
+        return exceptionHandling(call(callback).map(
+            blockInfoDTO -> toBlockInfo(getSignSchema(), blockInfoDTO)));
     }
 
     public Observable<List<Transaction>> getBlockTransactions(
@@ -76,7 +78,8 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
             getClient().getBlocksByHeightWithLimit(height.longValue(), limit);
 
         return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(BlockRepositoryOkHttpImpl::toBlockInfo)
+            call(callback).flatMapIterable(item -> item).map(
+                blockInfoDTO -> toBlockInfo(getSignSchema(), blockInfoDTO))
                 .toList()
                 .toObservable());
     }
@@ -111,7 +114,7 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
         Callable<StatementsDTO> callback = () ->
             getClient().getBlockReceipts(height.longValue());
         return exceptionHandling(call(callback).map(statementsDTO ->
-            new ReceiptMappingOkHttp(getJsonHelper())
+            new ReceiptMappingOkHttp(getJsonHelper(), getSignSchema())
                 .createStatementFromDto(statementsDTO, getNetworkTypeBlocking())));
     }
 
@@ -133,9 +136,10 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
         return transactionMapper.map(input);
     }
 
-    public static BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO) {
+    public static BlockInfo toBlockInfo(SignSchema signSchema,
+        BlockInfoDTO blockInfoDTO) {
         return BlockInfo.create(
-            blockInfoDTO.getMeta().getHash(),
+            signSchema, blockInfoDTO.getMeta().getHash(),
             blockInfoDTO.getMeta().getGenerationHash(),
             (blockInfoDTO.getMeta().getTotalFee()),
             blockInfoDTO.getMeta().getNumTransactions(),

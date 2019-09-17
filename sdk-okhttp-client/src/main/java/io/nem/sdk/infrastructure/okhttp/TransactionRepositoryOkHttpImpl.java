@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.TransactionRepository;
 import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
@@ -48,10 +49,10 @@ public class TransactionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImp
     private final TransactionRoutesApi client;
     private final GeneralTransactionMapper transactionMapper;
 
-    public TransactionRepositoryOkHttpImpl(ApiClient apiClient) {
-        super(apiClient);
+    public TransactionRepositoryOkHttpImpl(ApiClient apiClient, SignSchema signSchema) {
+        super(apiClient, signSchema);
         this.client = new TransactionRoutesApi(apiClient);
-        this.transactionMapper = new GeneralTransactionMapper(getJsonHelper());
+        this.transactionMapper = new GeneralTransactionMapper(getJsonHelper(), signSchema);
     }
 
 

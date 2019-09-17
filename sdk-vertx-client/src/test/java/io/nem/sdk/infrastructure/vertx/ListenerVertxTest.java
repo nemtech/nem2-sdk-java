@@ -19,6 +19,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.infrastructure.ListenerChannel;
 import io.nem.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.sdk.model.account.Address;
@@ -65,7 +66,7 @@ public class ListenerVertxTest {
     public void setUp() {
         httpClientMock = Mockito.mock(HttpClient.class);
         String url = "http://nem.com:3000/";
-        listener = new ListenerVertx(httpClientMock, url);
+        listener = new ListenerVertx(httpClientMock, url, SignSchema.DEFAULT);
         jsonHelper = listener.getJsonHelper();
     }
 
@@ -97,7 +98,7 @@ public class ListenerVertxTest {
 
         Address address = Address.createFromPublicKey(
             jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
-            NetworkType.MIJIN_TEST);
+            NetworkType.MIJIN_TEST, SignSchema.DEFAULT);
 
         String channelName = ListenerChannel.CONFIRMED_ADDED.toString();
 

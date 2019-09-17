@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.vertx;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -48,9 +49,13 @@ public abstract class AbstractRepositoryVertxImpl {
 
     private final JsonHelper jsonHelper;
 
-    public AbstractRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType) {
+    private final SignSchema signSchema;
+
+    public AbstractRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType,
+        SignSchema signSchema) {
         this.networkType = networkType;
         this.jsonHelper = new JsonHelperJackson2(apiClient.getObjectMapper());
+        this.signSchema = signSchema;
     }
 
     public <T> Observable<T> call(Consumer<Handler<AsyncResult<T>>> callback) {
@@ -109,5 +114,9 @@ public abstract class AbstractRepositoryVertxImpl {
 
     public JsonHelper getJsonHelper() {
         return jsonHelper;
+    }
+
+    public SignSchema getSignSchema() {
+        return signSchema;
     }
 }

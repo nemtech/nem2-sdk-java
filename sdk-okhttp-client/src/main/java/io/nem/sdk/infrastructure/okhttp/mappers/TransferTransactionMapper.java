@@ -20,6 +20,7 @@ package io.nem.sdk.infrastructure.okhttp.mappers;
 import static io.nem.core.utils.MapperUtils.toAddressFromUnresolved;
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.transaction.Deadline;
@@ -40,8 +41,9 @@ import org.bouncycastle.util.encoders.Hex;
 
 class TransferTransactionMapper extends AbstractTransactionMapper<TransferTransactionDTO> {
 
-    public TransferTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.TRANSFER, TransferTransactionDTO.class);
+    public TransferTransactionMapper(JsonHelper jsonHelper,
+        SignSchema signSchema) {
+        super(jsonHelper, TransactionType.TRANSFER, TransferTransactionDTO.class, signSchema);
     }
 
     @Override
@@ -81,7 +83,7 @@ class TransferTransactionMapper extends AbstractTransactionMapper<TransferTransa
             transaction.getSignature(),
             new PublicAccount(
                 transaction.getSignerPublicKey(),
-                extractNetworkType(transaction.getVersion())),
+                extractNetworkType(transaction.getVersion()), getSignSchema()),
             transactionInfo);
     }
 }

@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -35,13 +36,14 @@ public class BalanceTransferReceiptTest {
     static MosaicId mosaicId;
     static Address recipientAddress;
     static AddressAlias recipientAddressAlias;
+    static SignSchema signSchema = SignSchema.DEFAULT;
 
     @BeforeAll
     public static void setup() {
         account =
             new Account(
                 "787225aaff3d2c71f4ffa32d4f19ec4922f3cd869747f267378f81f8e3fcb12d",
-                NetworkType.MIJIN_TEST);
+                NetworkType.MIJIN_TEST, signSchema);
         mosaicId = new MosaicId("85BBEA6CC462B244");
         recipientAddress =
             new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST);

@@ -18,12 +18,14 @@ package io.nem.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import org.junit.jupiter.api.Test;
 
 public class AggregateTransactionCosignatureTest {
 
+    private static SignSchema signSchema = SignSchema.DEFAULT;
     @Test
     void createAnAggregateCosignatureViaConstructor() {
         AggregateTransactionCosignature aggregateTransactionCosignature =
@@ -31,13 +33,13 @@ public class AggregateTransactionCosignatureTest {
                 "signature",
                 new PublicAccount(
                     "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
-                    NetworkType.MIJIN_TEST));
+                    NetworkType.MIJIN_TEST, signSchema));
 
         assertEquals("signature", aggregateTransactionCosignature.getSignature());
         assertEquals(
             new PublicAccount(
                 "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
-                NetworkType.MIJIN_TEST),
+                NetworkType.MIJIN_TEST, signSchema),
             aggregateTransactionCosignature.getSigner());
     }
 }

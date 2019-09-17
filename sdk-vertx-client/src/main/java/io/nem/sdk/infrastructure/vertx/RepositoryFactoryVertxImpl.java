@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.vertx;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.Suppliers;
 import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.BlockRepository;
@@ -47,22 +48,36 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 public class RepositoryFactoryVertxImpl implements RepositoryFactory {
 
+    /**
+     * The low level open api generated client. The repositories use the client to perform the rest
+     * calls.
+     */
     private final ApiClient apiClient;
 
+    /**
+     * The lazily load network type configuration.
+     */
     private final Supplier<NetworkType> networkType;
 
-    private final WebClient webClient;
-
+    /**
+     * The base url of the Catapult server.
+     */
     private final String baseUrl;
 
-    public RepositoryFactoryVertxImpl(String baseUrl) {
+    /**
+     * The sign schema used to generate Addresses. At the moment the user needs to configure it or
+     * use the default. The server should provide how's the configuration.
+     */
+    private final SignSchema signSchema;
+
+    public RepositoryFactoryVertxImpl(String baseUrl, SignSchema signSchema) {
         this.baseUrl = baseUrl;
+        this.signSchema = signSchema;
         Vertx vertx = Vertx.vertx();
-        webClient = WebClient.create(vertx);
         this.apiClient = new ApiClient(vertx, new JsonObject().put("basePath", baseUrl)) {
             @Override
             public synchronized WebClient getWebClient() {
-                return webClient;
+                return WebClient.create(vertx);
             }
         };
         //Note: For some reason the genereated code use to mapper instances.
@@ -77,7 +92,7 @@ public class RepositoryFactoryVertxImpl implements RepositoryFactory {
         try {
             return io.nem.core.utils.ExceptionUtils.propagate(() -> {
                 NetworkRepositoryVertxImpl networkRepository = new NetworkRepositoryVertxImpl(
-                    apiClient);
+                    apiClient, signSchema);
                 return networkRepository.getNetworkType().toFuture().get(10, TimeUnit.SECONDS);
             });
         } catch (Exception e) {
@@ -89,51 +104,51 @@ public class RepositoryFactoryVertxImpl implements RepositoryFactory {
 
     @Override
     public AccountRepository createAccountRepository() {
-        return new AccountRepositoryVertxImpl(apiClient, networkType);
+        return new AccountRepositoryVertxImpl(apiClient, networkType, signSchema);
     }
 
     @Override
     public BlockRepository createBlockRepository() {
-        return new BlockRepositoryVertxImpl(apiClient, networkType);
+        return new BlockRepositoryVertxImpl(apiClient, networkType, signSchema);
     }
 
     @Override
     public ChainRepository createChainRepository() {
-        return new ChainRepositoryVertxImpl(apiClient, networkType);
+        return new ChainRepositoryVertxImpl(apiClient, networkType, signSchema);
     }
 
     @Override
     public DiagnosticRepository createDiagnosticRepository() {
-        return new DiagnosticRepositoryVertxImpl(apiClient, networkType);
+        return new DiagnosticRepositoryVertxImpl(apiClient, networkType, signSchema);
     }
 
     @Override
     public MosaicRepository createMosaicRepository() {
-        return new MosaicRepositoryVertxImpl(apiClient, networkType);
+        return new MosaicRepositoryVertxImpl(apiClient, networkType, signSchema);
     }
 
     @Override
     public NamespaceRepository createNamespaceRepository() {
-        return new NamespaceRepositoryVertxImpl(apiClient, networkType);
+        return new NamespaceRepositoryVertxImpl(apiClient, networkType, signSchema);
     }
 
     @Override
     public NetworkRepository createNetworkRepository() {
-        return new NetworkRepositoryVertxImpl(apiClient);
+        return new NetworkRepositoryVertxImpl(apiClient, signSchema);
     }
 
     @Override
     public NodeRepository createNodeRepository() {
-        return new NodeRepositoryVertxImpl(apiClient, networkType);
+        return new NodeRepositoryVertxImpl(apiClient, networkType, signSchema);
     }
 
     @Override
     public TransactionRepository createTransactionRepository() {
-        return new TransactionRepositoryVertxImpl(apiClient, networkType);
+        return new TransactionRepositoryVertxImpl(apiClient, networkType, signSchema);
     }
 
     @Override
     public Listener createListener() {
-        return new ListenerVertx(baseUrl);
+        return new ListenerVertx(baseUrl, signSchema);
     }
 }

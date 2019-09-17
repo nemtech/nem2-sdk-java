@@ -18,11 +18,11 @@ package io.nem.sdk.model.blockchain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.account.PublicAccount;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -60,6 +60,7 @@ class BlockInfoTest {
         beneficiaryPublicKey = "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF";
         blockInfo =
             BlockInfo.create(
+                SignSchema.DEFAULT,
                 hash,
                 generationHash,
                 BigInteger.ZERO,
@@ -87,8 +88,8 @@ class BlockInfoTest {
         assertEquals(BigInteger.valueOf(0), blockInfo.getTotalFee());
         assertEquals(new Integer(25), blockInfo.getNumTransactions());
         assertEquals(signature, blockInfo.getSignature());
-        Assertions.assertEquals(
-            new PublicAccount(signer, NetworkType.MIJIN_TEST), blockInfo.getSignerPublicAccount());
+        assertEquals(new PublicAccount(signer, NetworkType.MIJIN_TEST, SignSchema.DEFAULT),
+            blockInfo.getSignerPublicAccount());
         assertEquals(NetworkType.MIJIN_TEST, blockInfo.getNetworkType());
         assertEquals(3, (int) blockInfo.getVersion());
         assertEquals(32768, blockInfo.getType());
@@ -101,7 +102,7 @@ class BlockInfoTest {
         assertEquals(blockReceiptsHash, blockInfo.getBlockReceiptsHash());
         assertEquals(stateHash, blockInfo.getStateHash());
         assertEquals(
-            new PublicAccount(beneficiaryPublicKey, NetworkType.MIJIN_TEST),
+            new PublicAccount(beneficiaryPublicKey, NetworkType.MIJIN_TEST, SignSchema.DEFAULT),
             blockInfo.getBeneficiaryPublicAccount());
     }
 }
