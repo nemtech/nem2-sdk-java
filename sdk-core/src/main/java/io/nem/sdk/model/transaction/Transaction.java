@@ -20,7 +20,6 @@ import io.nem.catapult.builders.EntityTypeDto;
 import io.nem.core.crypto.CryptoEngines;
 import io.nem.core.crypto.DsaSigner;
 import io.nem.core.crypto.Hashes;
-import io.nem.core.crypto.SignSchema;
 import io.nem.core.crypto.Signature;
 import io.nem.core.utils.HexEncoder;
 import io.nem.sdk.model.account.Account;
@@ -157,14 +156,26 @@ public abstract class Transaction {
     }
 
     /**
-     *
+     * 
+     * @return
      */
     abstract byte[] generateBytes();
 
     /**
-     * Geneterate the
+     * 
+     * @return
      */
     abstract byte[] generateEmbeddedBytes();
+
+    /**
+     * Serialises a transaction model into binary (unsigned payload).
+     * Gets the serialised bytes for a transaction.
+     *
+     * @return bytes of the transaction
+     */
+    public byte[] serialize() {
+        return this.generateBytes();
+    }
 
     /**
      * Serialize and sign transaction creating a new SignedTransaction.
@@ -206,7 +217,7 @@ public abstract class Transaction {
      *
      * @return transaction with signer serialized to be part of an aggregate transaction
      */
-    byte[] toAggregateTransactionBytes() {
+    public byte[] toAggregateTransactionBytes() {
         return this.generateEmbeddedBytes();
     }
 

@@ -72,7 +72,7 @@ class TransferTransactionTest {
 
     @Test
     @DisplayName("Serialization")
-    void serialization() {
+    void shouldGenerateBytes() {
         // Generated at nem2-library-js/test/transactions/TransferTransaction.spec.js
         String expected =
             "a5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019054410000000000000000010000000000000090e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac01000100672b0000ce5600006400000000000000";
@@ -85,6 +85,24 @@ class TransferTransactionTest {
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
                 PlainMessage.Empty).deadline(new FakeDeadline()).build();
         byte[] actual = transferTransaction.generateBytes();
+        assertEquals(expected, Hex.toHexString(actual));
+    }
+
+    @Test
+    @DisplayName("Serialization-public")
+    void serialization() {
+        // Generated at nem2-library-js/test/transactions/TransferTransaction.spec.js
+        String expected =
+            "a5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019054410000000000000000010000000000000090e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac01000100672b0000ce5600006400000000000000";
+        TransferTransaction transferTransaction =
+            TransferTransactionFactory.create(
+                NetworkType.MIJIN_TEST,
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                Arrays.asList(
+                    new Mosaic(
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
+                PlainMessage.Empty).deadline(new FakeDeadline()).build();
+        byte[] actual = transferTransaction.serialize();
         assertEquals(expected, Hex.toHexString(actual));
     }
 
