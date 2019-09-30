@@ -42,7 +42,7 @@ public class JsonHelperJackson2Test {
     }
 
     @Test
-    public void shouldFailtWhenParsingInvalid() {
+    public void shouldFailWhenParsingInvalid() {
         Assertions.assertEquals(
             "Unexpected end-of-input: expected close marker for Object (start marker at [Source: (String)\"{\"; line: 1, column: 1])\n"
                 + " at [Source: (String)\"{\"; line: 1, column: 3]",

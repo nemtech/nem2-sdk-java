@@ -41,7 +41,7 @@ public class JsonHelperGsonTest {
     }
 
     @Test
-    public void shouldFailtWhenParsingInvalid() {
+    public void shouldFailWhenParsingInvalid() {
         Assertions.assertEquals("java.io.EOFException: End of input at line 1 column 2 path $.",
             Assertions.assertThrows(IllegalArgumentException.class,
                 () -> jsonHelper.parse("{", Car.class)).getMessage());
