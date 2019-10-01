@@ -40,6 +40,11 @@ public class AccountLinkTransactionFactory extends TransactionFactory<AccountLin
         this.linkAction = linkAction;
     }
 
+    public static AccountLinkTransactionFactory create(NetworkType networkType, PublicAccount remoteAccount,
+        AccountLinkAction linkAction) {
+        return new AccountLinkTransactionFactory(networkType, remoteAccount, linkAction);
+    }
+
     /**
      * Gets the public key.
      *

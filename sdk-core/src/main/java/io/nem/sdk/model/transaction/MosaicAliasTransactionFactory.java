@@ -53,6 +53,9 @@ public class MosaicAliasTransactionFactory extends TransactionFactory<MosaicAlia
         this.mosaicId = mosaicId;
     }
 
+    public static MosaicAliasTransactionFactory create(NetworkType networkType, AliasAction aliasAction, NamespaceId namespaceId, MosaicId mosaicId) {
+        return new MosaicAliasTransactionFactory(networkType, aliasAction, namespaceId, mosaicId);
+    }
 
     /**
      * Gets the alias action.

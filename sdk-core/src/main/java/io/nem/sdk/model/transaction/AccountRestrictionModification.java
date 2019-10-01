@@ -16,7 +16,6 @@
 package io.nem.sdk.model.transaction;
 
 import io.nem.sdk.model.account.Address;
-import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.mosaic.MosaicId;
 
 public class AccountRestrictionModification<T> {
@@ -39,7 +38,7 @@ public class AccountRestrictionModification<T> {
     }
 
     /**
-     * @return AccountRestrictionModification {@link Address}
+     * @return AccountRestrictionModification {@link MosaicId}
      */
     public static AccountRestrictionModification<MosaicId> createForMosaic(
         AccountRestrictionModificationAction modificationType, MosaicId mosaicId) {

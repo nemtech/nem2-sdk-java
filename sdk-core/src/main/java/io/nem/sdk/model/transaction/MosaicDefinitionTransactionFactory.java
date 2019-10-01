@@ -62,6 +62,12 @@ public class MosaicDefinitionTransactionFactory extends
         this.blockDuration = blockDuration;
     }
 
+    public static MosaicDefinitionTransactionFactory create(NetworkType networkType, MosaicNonce mosaicNonce,
+        MosaicId mosaicId, MosaicFlags mosaicFlags, int divisibility,
+        BlockDuration blockDuration) {
+        return new MosaicDefinitionTransactionFactory(networkType, mosaicNonce, mosaicId, mosaicFlags, divisibility, blockDuration);
+    }
+
     /**
      * Returns the mosaic id.
      *

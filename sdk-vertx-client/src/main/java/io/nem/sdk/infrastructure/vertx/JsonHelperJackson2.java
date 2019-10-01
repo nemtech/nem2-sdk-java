@@ -22,6 +22,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nem.sdk.model.transaction.JsonHelper;
+import io.nem.sdk.model.transaction.Transaction;
+import io.vertx.core.json.JsonObject;
+import java.io.IOException;
 import java.math.BigInteger;
 import org.apache.commons.lang3.StringUtils;
 
@@ -183,4 +186,32 @@ JsonHelperJackson2 implements JsonHelper {
         return child;
     }
 
+    @Override
+    public JsonObject toJsonObject(Transaction transaction) {
+        return (new TransactionModelMapper()).toJSONObject(transaction);
+    }
+
+    @Override
+    public String toJSON(Transaction transaction) {
+        return toJsonObject(transaction).encode();
+    }
+
+    @Override
+    public String toJSONPretty(Transaction transaction) {
+        return toJsonObject(transaction).encodePrettily();
+    }
+
+    @Override
+    public String toJSONPretty(String jsonString) {
+        String prettyJson = null;
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Object json = mapper.readValue(jsonString, Object.class);
+            prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
+        } catch (IOException ex) {
+            System.out.println("Caught IOException:" + ex);
+            System.out.println("Warning: toPrettyFormat failed for json string: " + jsonString);
+        }
+        return prettyJson;
+    }
 }

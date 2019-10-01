@@ -16,9 +16,6 @@
 
 package io.nem.sdk.model.mosaic;
 
-import java.math.BigInteger;
-import org.apache.commons.lang3.Validate;
-
 /**
  * The mosaic flags structure describes mosaic flags.
  *
@@ -79,6 +76,15 @@ public class MosaicFlags {
     public static MosaicFlags create(
         boolean supplyMutable, boolean transferable) {
         return new MosaicFlags(supplyMutable, transferable, false);
+    }
+
+    /**
+     * Gets the consolidated mosaic flags value.
+     *
+     * @return long
+     */
+    public long getValue() {
+        return (this.supplyMutable ? 1 : 0) + (this.transferable ? 2 : 0) + (this.restrictable ? 4 : 0);
     }
 
     /**

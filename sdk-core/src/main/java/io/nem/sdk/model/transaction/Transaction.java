@@ -285,7 +285,16 @@ public abstract class Transaction {
      * @return Version of the transaction
      */
     protected short getNetworkVersion() {
-        return (short)
+        return (short) getTransactionVersion();
+    }
+
+    /**
+     * Gets the version of the transaction to use in JSON.
+     *
+     * @return Version of the transaction
+     */
+    public int getTransactionVersion() {
+        return (int)
             Long.parseLong(
                 Integer.toHexString(getNetworkType().getValue())
                     + "0"

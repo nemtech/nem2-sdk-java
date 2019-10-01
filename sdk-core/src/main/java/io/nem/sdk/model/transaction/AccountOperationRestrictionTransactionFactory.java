@@ -42,6 +42,10 @@ public class AccountOperationRestrictionTransactionFactory extends
         this.modifications = modifications;
     }
 
+    public static AccountOperationRestrictionTransactionFactory create(NetworkType networkType, AccountRestrictionType restrictionType,
+        List<AccountRestrictionModification<TransactionType>> modifications) {
+        return new AccountOperationRestrictionTransactionFactory(networkType, restrictionType, modifications);
+    }
 
     /**
      * Get account restriction type

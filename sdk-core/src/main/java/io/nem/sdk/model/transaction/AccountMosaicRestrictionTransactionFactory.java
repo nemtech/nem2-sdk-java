@@ -43,6 +43,11 @@ public class AccountMosaicRestrictionTransactionFactory extends
         this.modifications = modifications;
     }
 
+    public static AccountMosaicRestrictionTransactionFactory create(NetworkType networkType, AccountRestrictionType restrictionType,
+        List<AccountRestrictionModification<MosaicId>> modifications) {
+        return new AccountMosaicRestrictionTransactionFactory(networkType, restrictionType, modifications);
+    }
+
     /**
      * Get account restriction type
      *

@@ -158,4 +158,27 @@ public interface JsonHelper {
      * @return if there is a attribute set in the object following the giving path.
      */
     boolean contains(Object object, String... path);
+
+    Object toJsonObject(Transaction transaction);
+
+    /**
+     * Convert transaction model to JSON string.
+     *
+     * @return String
+     */
+    String toJSON(Transaction transaction);
+
+    /**
+     * Convert transaction model to JSON string in pretty format.
+     *
+     * @return String
+     */
+    String toJSONPretty(Transaction transaction);
+
+    /**
+     * Pretty format a JSON string
+     * @param jsonString
+     * @return
+     */
+    String toJSONPretty(String jsonString);
 }

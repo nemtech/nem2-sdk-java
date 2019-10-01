@@ -53,6 +53,10 @@ public class AddressAliasTransactionFactory extends TransactionFactory<AddressAl
         this.address = address;
     }
 
+    public static AddressAliasTransactionFactory create(NetworkType networkType, AliasAction aliasAction, NamespaceId namespaceId, Address address) {
+        return new AddressAliasTransactionFactory(networkType, aliasAction, namespaceId, address);
+    }
+
     /**
      * Gets the alias action.
      *

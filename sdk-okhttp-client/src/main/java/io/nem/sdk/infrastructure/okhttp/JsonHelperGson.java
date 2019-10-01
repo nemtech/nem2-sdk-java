@@ -17,9 +17,12 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.nem.sdk.model.transaction.JsonHelper;
+import io.nem.sdk.model.transaction.Transaction;
 import java.math.BigInteger;
 import org.apache.commons.lang3.StringUtils;
 
@@ -170,5 +173,44 @@ public class JsonHelperGson implements JsonHelper {
             }
         }
         return child;
+    }
+
+    @Override
+    public JsonObject toJsonObject(Transaction transaction) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("type", transaction.getType().getValue());
+        jsonObject.addProperty("networkType", transaction.getNetworkType().getValue());
+        jsonObject.addProperty("version", transaction.getVersion());
+        jsonObject.addProperty("maxFee", transaction.getMaxFee());
+        jsonObject.addProperty("deadline", transaction.getDeadline().getInstant());
+        jsonObject.addProperty("signature", (transaction.getSignature().isPresent() ? transaction.getSignature().get() : ""));
+
+        if (transaction.getSigner().isPresent()) jsonObject.addProperty("signerPublicKey", transaction.getSigner().get().getPublicKey().toString());
+
+
+
+        return jsonObject;
+    }
+
+    @Override
+    public String toJSON(Transaction transaction) {
+        return toJsonObject(transaction).toString();
+    }
+
+    @Override
+    public String toJSONPretty(Transaction transaction) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(toJsonObject(transaction));
+    }
+
+    @Override
+    public String toJSONPretty(String jsonString) {
+        JsonParser parser = new JsonParser();
+        JsonObject json = parser.parse(jsonString).getAsJsonObject();
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String prettyJson = gson.toJson(json);
+
+        return prettyJson;
     }
 }
