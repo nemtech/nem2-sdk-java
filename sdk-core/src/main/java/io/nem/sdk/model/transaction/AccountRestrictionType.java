@@ -54,12 +54,6 @@ public enum AccountRestrictionType {
         AccountRestrictionTargetType.MOSAIC_ID),
 
     /**
-     * Allow only incoming transactions of a given type.
-     */
-    ALLOW_INCOMING_TRANSACTION_TYPE(AccountRestrictionTypeValueOptions.TRANSACTION_TYPE_VALUE,
-        AccountRestrictionTargetType.TRANSACTION_TYPE),
-
-    /**
      * Allow only outgoing transactions from a given address.
      */
     ALLOW_OUTGOING_ADDRESS(AccountRestrictionTypeValueOptions.ADDRESS_VALUE

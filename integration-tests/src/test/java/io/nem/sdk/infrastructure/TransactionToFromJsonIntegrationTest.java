@@ -165,13 +165,13 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
 
         AccountOperationRestrictionTransaction transaction =
             AccountOperationRestrictionTransactionFactory.create(NetworkType.MIJIN_TEST,
-                AccountRestrictionType.ALLOW_INCOMING_TRANSACTION_TYPE,
+                AccountRestrictionType.ALLOW_OUTGOING_TRANSACTION_TYPE,
                 Arrays.asList(operationRestrictionFilter)
             ).build();
 
         JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
         assertEquals(TransactionType.ACCOUNT_OPERATION_RESTRICTION.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
-        assertEquals(AccountRestrictionType.ALLOW_INCOMING_TRANSACTION_TYPE.getValue(), json.getJsonObject("transaction").getInteger("restrictionType").intValue());
+        assertEquals(AccountRestrictionType.ALLOW_OUTGOING_TRANSACTION_TYPE.getValue(), json.getJsonObject("transaction").getInteger("restrictionType").intValue());
         assertEquals(1, transaction.getModifications().size());
         System.out.println(json.encodePrettily());
     }
