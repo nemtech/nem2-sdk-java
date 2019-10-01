@@ -20,7 +20,7 @@ package io.nem.core.crypto.ed25519;
 import io.nem.core.crypto.PrivateKey;
 import io.nem.core.crypto.PublicKey;
 import io.nem.core.crypto.SignSchema;
-import io.nem.core.utils.AbstractVectorTest;
+import io.nem.core.utils.AbstractVectorTester;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class Ed25519BlockCipherVectorTest extends AbstractVectorTest {
+class Ed25519BlockCipherVectorTester extends AbstractVectorTester {
 
     private static Stream<Arguments> testResolveSharedKey() {
         //NOTE!! first example of each file is broken?????

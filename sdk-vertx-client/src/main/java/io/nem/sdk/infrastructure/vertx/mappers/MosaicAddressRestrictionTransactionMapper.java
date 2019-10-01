@@ -26,22 +26,22 @@ import io.nem.sdk.model.transaction.MosaicAddressRestrictionTransaction;
 import io.nem.sdk.model.transaction.MosaicAddressRestrictionTransactionFactory;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.vertx.model.AddressMosaicRestrictionTransactionDTO;
+import io.nem.sdk.openapi.vertx.model.MosaicAddressRestrictionTransactionDTO;
 import java.math.BigInteger;
 
 /**
  * Mosaic address restriction transaction mapper.
  */
 class MosaicAddressRestrictionTransactionMapper extends
-    AbstractTransactionMapper<AddressMosaicRestrictionTransactionDTO, MosaicAddressRestrictionTransaction> {
+    AbstractTransactionMapper<MosaicAddressRestrictionTransactionDTO, MosaicAddressRestrictionTransaction> {
 
     public MosaicAddressRestrictionTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.MOSAIC_ADDRESS_RESTRICTION, AddressMosaicRestrictionTransactionDTO.class);
+        super(jsonHelper, TransactionType.MOSAIC_ADDRESS_RESTRICTION, MosaicAddressRestrictionTransactionDTO.class);
     }
 
     @Override
     protected TransactionFactory<MosaicAddressRestrictionTransaction> createFactory(NetworkType networkType,
-        AddressMosaicRestrictionTransactionDTO transaction) {
+        MosaicAddressRestrictionTransactionDTO transaction) {
         return new MosaicAddressRestrictionTransactionFactory(networkType,
             toMosaicId(transaction.getMosaicId()),
             new BigInteger(transaction.getRestrictionKey()),

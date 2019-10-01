@@ -31,6 +31,7 @@ import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionStatusError;
 import io.nem.sdk.openapi.okhttp_gson.invoker.JSON;
 import io.nem.sdk.openapi.okhttp_gson.model.BlockInfoDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.TransactionDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -51,20 +52,19 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
 
     private final URL url;
 
-    private final JsonHelper jsonHelper;
-
     private final OkHttpClient httpClient;
 
     private final TransactionMapper transactionMapper;
 
     private WebSocket webSocket;
 
-    private String uid;
-
     /**
+     * @param httpClient the ok http client
      * @param url nis host
+     * @param json gson's json.
      */
     public ListenerOkHttp(OkHttpClient httpClient, String url, JSON json) {
+        super(new JsonHelperGson(json.getGson()));
         try {
             this.url = new URL(url);
         } catch (MalformedURLException e) {
@@ -72,8 +72,7 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
                 "Parameter '" + url + "' is not a valid URL. " + ExceptionUtils.getMessage(e));
         }
         this.httpClient = httpClient;
-        this.jsonHelper = new JsonHelperGson(json.getGson());
-        this.transactionMapper = new GeneralTransactionMapper(jsonHelper);
+        this.transactionMapper = new GeneralTransactionMapper(getJsonHelper());
     }
 
     /**
@@ -91,7 +90,7 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
         WebSocketListener webSocketListener = new WebSocketListener() {
             @Override
             public void onMessage(WebSocket webSocket, String text) {
-                handle(jsonHelper.parse(text, JsonObject.class), future);
+                handle(getJsonHelper().parse(text, JsonObject.class), future);
             }
         };
         this.webSocket = httpClient.newWebSocket(webSocketRequest, webSocketListener);
@@ -102,48 +101,17 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
         return url.endsWith("/") ? url : url + "/";
     }
 
-    protected void handle(Object message, CompletableFuture<Void> future) {
-        if (jsonHelper.contains(message, "uid")) {
-            uid = jsonHelper.getString(message, "uid");
-            future.complete(null);
-        } else if (jsonHelper.contains(message, "transaction")) {
-            TransactionInfoDTO transactionInfo = jsonHelper
-                .convert(message, TransactionInfoDTO.class);
-            Transaction messageObject = toTransaction(transactionInfo);
-            ListenerChannel channel = ListenerChannel
-                .rawValueOf(jsonHelper.getString(message, "meta", "channelName"));
-            onNext(channel, messageObject);
-        } else if (jsonHelper.contains(message, "block")) {
-            BlockInfoDTO blockInfoDTO = jsonHelper
-                .convert(message, BlockInfoDTO.class);
-            BlockInfo messageObject = toBlockInfo(blockInfoDTO);
-            onNext(ListenerChannel.BLOCK, messageObject);
-        } else if (jsonHelper.contains(message, "status")) {
-            TransactionStatusError messageObject = new TransactionStatusError(
-                jsonHelper.getString(message, "hash"),
-                jsonHelper.getString(message, "status"),
-                new Deadline(
-                    new BigInteger(jsonHelper.getString(message, "deadline"))));
-            onNext(ListenerChannel.STATUS, messageObject);
-        } else if (jsonHelper.contains(message, "meta")) {
-            onNext(ListenerChannel.rawValueOf(
-                jsonHelper.getString(message, "meta", "channelName")),
-                jsonHelper.getString(message, "meta", "hash"));
-        } else if (jsonHelper.contains(message, "parentHash")) {
-            CosignatureSignedTransaction messageObject = new CosignatureSignedTransaction(
-                jsonHelper.getString(message, "parenthash"),
-                jsonHelper.getString(message, "signature"),
-                jsonHelper.getString(message, "signer"));
-            onNext(ListenerChannel.COSIGNATURE, messageObject);
-        }
+
+    @Override
+    protected BlockInfo toBlockInfo(Object blockInfoDTO) {
+        return BlockRepositoryOkHttpImpl
+            .toBlockInfo(getJsonHelper().convert(blockInfoDTO, BlockInfoDTO.class));
     }
 
-    private BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO) {
-        return BlockRepositoryOkHttpImpl.toBlockInfo(blockInfoDTO);
-    }
-
-    private Transaction toTransaction(TransactionInfoDTO transactionInfo) {
-        return transactionMapper.map(transactionInfo);
+    @Override
+    protected Transaction toTransaction(Object transactionInfo) {
+        return transactionMapper
+            .map(getJsonHelper().convert(transactionInfo, TransactionInfoDTO.class));
     }
 
 
@@ -153,27 +121,16 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
     @Override
     public void close() {
         if (this.webSocket != null) {
-            this.uid = null;
+            setUid(null);
             this.webSocket.close(1000, null);
             this.webSocket = null;
         }
     }
 
     protected void subscribeTo(String channel) {
-        final ListenerSubscribeMessage subscribeMessage = new ListenerSubscribeMessage(this.uid,
-            channel);
-        this.webSocket.send(jsonHelper.print(subscribeMessage));
+        final ListenerSubscribeMessage subscribeMessage = new ListenerSubscribeMessage(
+            this.getUid(), channel);
+        this.webSocket.send(getJsonHelper().print(subscribeMessage));
     }
 
-    /**
-     * @return the UID connected to
-     */
-    @Override
-    public String getUid() {
-        return uid;
-    }
-
-    public JsonHelper getJsonHelper() {
-        return jsonHelper;
-    }
 }

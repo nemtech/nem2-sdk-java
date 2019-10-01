@@ -28,85 +28,134 @@ import java.util.Set;
  * @see <a href="https://github.com/nemtech/catapult-server/blob/master/src/catapult/model/ReceiptType.cpp"></a>
  */
 public enum ReceiptType {
+
     /**
      * The recipient, account and amount of fees received for harvesting a block. It is recorded
      * when a block is harvested.
+     *
+     * 0x2143 (8515 decimal) - Harvest_Fee.
      */
-    HARVEST_FEE(0x2143),
+    HARVEST_FEE(8515),
+
     /**
      * The unresolved and resolved alias. It is recorded when a transaction indicates a valid
      * address alias instead of an address.
+     *
+     * 0xF143 (61763 decimal) - Address_Alias_Resolution.
      */
-    ADDRESS_ALIAS_RESOLUTION(0xF143),
+    ADDRESS_ALIAS_RESOLUTION(61763),
+
     /**
      * The unresolved and resolved alias. It is recorded when a transaction indicates a valid mosaic
      * alias instead of a mosaicId.
+     *
+     * 0xF243 (62019 decimal) - Mosaic_Alias_Resolution.
      */
-    MOSAIC_ALIAS_RESOLUTION(0xF243),
+    MOSAIC_ALIAS_RESOLUTION(62019),
+
     /**
      * A collection of state changes for a given source. It is recorded when a state change receipt
      * is issued.
+     *
+     * 0xE134 (57652 decimal) - Transaction_Group.
      */
-    TRANSACTION_GROUP(0xE143),
-    /**
-     * The mosaicId expiring in this block. It is recorded when a mosaic expires.
-     */
-    MOSAIC_EXPIRED(0x414D),
-    /**
-     * The sender and recipient of the levied mosaic, the mosaicId and amount. It is recorded when a
-     * transaction has a levied mosaic.
-     */
-    MOSAIC_LEVY(0x124D),
+    TRANSACTION_GROUP(57667),
+
     /**
      * The sender and recipient of the mosaicId and amount representing the cost of registering the
      * mosaic. It is recorded when a mosaic is registered.
+     *
+     * 0x124D (4685 decimal) - Mosaic_Rental_Fee.
      */
-    MOSAIC_RENTAL_FEE(0x134D),
-    /**
-     * The namespaceId expiring in this block. It is recorded when a namespace expires.
-     */
-    NAMESPACE_EXPIRED(0x414E),
+    MOSAIC_RENTAL_FEE(4685),
+
     /**
      * The sender and recipient of the mosaicId and amount representing the cost of extending the
      * namespace. It is recorded when a namespace is registered or its duration is extended.
+     *
+     * 0x134E (4942 decimal) - Namespace_Rental_Fee.
      */
-    NAMESPACE_RENTAL_FEE(0x124E),
-    /**
-     * The lockhash sender, mosaicId and amount locked. It is recorded when a valid
-     * HashLockTransaction is announced.
-     */
-    LOCK_HASH_CREATED(0x3148),
+    NAMESPACE_RENTAL_FEE(4942),
+
     /**
      * The haslock sender, mosaicId and amount locked that is returned. It is recorded when an
      * aggregate bonded transaction linked to the hash completes.
+     *
+     * 0x2248 (8776 decimal) - LockHash_Completed.
      */
-    LOCK_HASH_COMPLETED(0x2248),
+    LOCK_HASH_COMPLETED(8776),
+
     /**
-     * The account receiving the locked mosaic, the mosaicId and the amount. It is recorded when a
+     * The account receiving the locked mosaic, the mosaicId and the amount. It is recorded when a *
      * lock hash expires.
+     *
+     * 0x2348 (9032 decimal) - LockHash_Expired.
      */
-    LOCK_HASH_EXPIRED(0x2348),
-    /**
-     * The secretlock sender, mosaicId and amount locked. It is recorded when a valid
-     * SecretLockTransaction is announced.
-     */
-    LOCK_SECRET_CREATED(0x3152),
-    /**
-     * The secretlock sender, mosaicId and amount locked. It is recorded when a secretlock is
-     * proved.
-     */
-    LOCK_SECRET_COMPLETED(0x2252),
+    LOCK_HASH_EXPIRED(9032),
+
     /**
      * The account receiving the locked mosaic, the mosaicId and the amount. It is recorded when a
      * secretlock expires
+     *
+     * 0x2352 (9042 decimal) - LockSecret_Expired.
      */
-    LOCK_SECRET_EXPIRED(0x2352),
+    LOCK_SECRET_EXPIRED(9042),
+
+    /**
+     * The lockhash sender, mosaicId and amount locked. It is recorded when a valid
+     * HashLockTransaction is announced.
+     *
+     * 0x3148 (12616 decimal) - LockHash_Created.
+     */
+    LOCK_HASH_CREATED(12616),
+
+    /**
+     * The secretlock sender, mosaicId and amount locked. It is recorded when a valid *
+     * SecretLockTransaction is announced.
+     *
+     * 0x3152 (12626 decimal) - LockSecret_Created.
+     */
+    LOCK_SECRET_CREATED(12626),
+
+    /**
+     * The secretlock sender, mosaicId and amount locked. It is recorded when a secretlock is
+     * proved.
+     *
+     * 0x2252 (8786 decimal) - LockSecret_Completed
+     */
+    LOCK_SECRET_COMPLETED(8786),
+
+    /**
+     * The mosaicId expiring in this block. It is recorded when a mosaic expires.
+     *
+     * 0x414D (16717 decimal) - Mosaic_Expired.
+     */
+    MOSAIC_EXPIRED(16717),
+
+    /**
+     * The identifier of the namespace expiring in this block. It is recorded when the namespace
+     * lifetime elapses.
+     *
+     * 0x414E (16718 decimal) - Namespace_Expired.
+     */
+    NAMESPACE_EXPIRED(16718),
+
+    /**
+     * The identifier of the namespace deleted in this block. It is recorded when the namespace
+     * grace period elapses.
+     *
+     * 0x424E (16974 decimal) - Namespace_Deleted.
+     */
+    NAMESPACE_DELETED(16974),
 
     /**
      * The amount of native currency mosaics created. The receipt is recorded when the network has
      * inflation configured, and a new block triggers the creation of currency mosaics.
+     *
+     * 0x5143 (20803 decimal) - Inflation.
      */
-    INFLATION(0x5143);
+    INFLATION(20803);
+
 
     public static final Set<ReceiptType> ARTIFACT_EXPIRY = Collections.unmodifiableSet(EnumSet
         .of(MOSAIC_EXPIRED, NAMESPACE_EXPIRED));
@@ -114,7 +163,6 @@ public enum ReceiptType {
     public static final Set<ReceiptType> BALANCE_CHANGE = Collections.unmodifiableSet(EnumSet.of(
         HARVEST_FEE,
         LOCK_HASH_COMPLETED,
-        LOCK_HASH_CREATED,
         LOCK_HASH_CREATED,
         LOCK_HASH_EXPIRED,
         LOCK_SECRET_COMPLETED,

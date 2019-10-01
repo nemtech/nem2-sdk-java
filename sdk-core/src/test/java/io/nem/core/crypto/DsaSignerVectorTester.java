@@ -17,7 +17,7 @@
 
 package io.nem.core.crypto;
 
-import io.nem.core.utils.AbstractVectorTest;
+import io.nem.core.utils.AbstractVectorTester;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 /**
  * Test the signer using the vector test data.
  */
-public class DsaSignerVectorTest extends AbstractVectorTest {
+public class DsaSignerVectorTester extends AbstractVectorTester {
 
     private static Stream<Arguments> testSignAll() throws Exception {
         Stream<Arguments> catapultArguments = createArguments("2.test-sign-catapult.json",

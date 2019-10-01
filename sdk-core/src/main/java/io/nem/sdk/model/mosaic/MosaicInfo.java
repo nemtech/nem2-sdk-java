@@ -29,6 +29,7 @@ public class MosaicInfo {
     private final int divisibility;
     private final BigInteger duration;
 
+    @SuppressWarnings("squid:S00107")
     private MosaicInfo(final MosaicId mosaicId, final BigInteger supply,
         final BigInteger startHeight, final PublicAccount owner, final Integer revision,
         final MosaicFlags mosaicFlags, final int divisibility, final BigInteger duration) {
@@ -42,11 +43,13 @@ public class MosaicInfo {
         this.duration = duration;
     }
 
+    @SuppressWarnings("squid:S00107")
     public static MosaicInfo create(final MosaicId mosaicId,
         final BigInteger supply, final BigInteger startHeight,
         final PublicAccount owner, final Integer revision, final MosaicFlags mosaicFlags,
         final int divisibility, final BigInteger duration) {
-        return new MosaicInfo(mosaicId, supply, startHeight, owner, revision, mosaicFlags, divisibility, duration);
+        return new MosaicInfo(mosaicId, supply, startHeight, owner, revision, mosaicFlags,
+            divisibility, duration);
     }
 
     /**
@@ -108,7 +111,8 @@ public class MosaicInfo {
      *
      * @return if the mosaic is transferable between non-owner accounts
      */
-    public boolean isTransferable() { return mosaicFlags.isTransferable();
+    public boolean isTransferable() {
+        return mosaicFlags.isTransferable();
     }
 
     /**
@@ -116,7 +120,8 @@ public class MosaicInfo {
      *
      * @return if the mosaic is restrictable between non-owner accounts
      */
-    public boolean isRestrictable() { return mosaicFlags.isRestrictable();
+    public boolean isRestrictable() {
+        return mosaicFlags.isRestrictable();
     }
 
     /**
@@ -124,7 +129,9 @@ public class MosaicInfo {
      *
      * @return mosaic divisibility
      */
-    public int getDivisibility() { return divisibility; }
+    public int getDivisibility() {
+        return divisibility;
+    }
 
     /**
      * Return the number of blocks from height it will be active

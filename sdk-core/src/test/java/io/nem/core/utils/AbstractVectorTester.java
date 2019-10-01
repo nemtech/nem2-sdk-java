@@ -20,7 +20,6 @@ package io.nem.core.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.Reader;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -34,13 +33,13 @@ import org.junit.jupiter.params.provider.Arguments;
  * Abstract class for all the vector tests. Tests that take their input from
  * https://raw.githubusercontent.com/nemtech/test-vectors/master/
  */
-public class AbstractVectorTest {
+public class AbstractVectorTester {
 
     protected static Stream<Arguments> createArguments(String fileName,
         Function<Map<String, String>, List<Arguments>> extractArguments, long skip, int limit) {
         try {
             //The files loaded here are a trimmed down version of the vectors tests https://github.com/nemtech/test-vectors
-            URL url = AbstractVectorTest.class.getClassLoader()
+            URL url = AbstractVectorTester.class.getClassLoader()
                 .getResource("vectors/" + fileName);
             ObjectMapper objectMapper = new ObjectMapper();
             // Change this to just load the first 'limit' objects from the json array file.

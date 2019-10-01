@@ -21,10 +21,27 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nem.sdk.infrastructure.ListenerChannel;
 import io.nem.sdk.infrastructure.ListenerSubscribeMessage;
+import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.mosaic.Mosaic;
+import io.nem.sdk.model.transaction.AggregateTransaction;
+import io.nem.sdk.model.transaction.AggregateTransactionCosignature;
+import io.nem.sdk.model.transaction.AggregateTransactionFactory;
+import io.nem.sdk.model.transaction.CosignatoryModificationActionType;
+import io.nem.sdk.model.transaction.HashLockTransaction;
+import io.nem.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.sdk.model.transaction.JsonHelper;
+import io.nem.sdk.model.transaction.MultisigAccountModificationTransaction;
+import io.nem.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
+import io.nem.sdk.model.transaction.MultisigCosignatoryModification;
+import io.nem.sdk.model.transaction.PlainMessage;
+import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
+import io.nem.sdk.model.transaction.TransactionType;
+import io.nem.sdk.model.transaction.TransferTransaction;
+import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -32,6 +49,7 @@ import io.vertx.core.buffer.impl.BufferFactoryImpl;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.RequestOptions;
 import io.vertx.core.http.WebSocket;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -75,7 +93,8 @@ public class ListenerVertxTest {
 
         Assertions.assertNull(listener.getUid());
 
-        Assertions.assertEquals("Listener has not been opened yet. Please call the open method before subscribing.",
+        Assertions.assertEquals(
+            "Listener has not been opened yet. Please call the open method before subscribing.",
             Assertions
                 .assertThrows(IllegalStateException.class, () -> listener.newBlock()).getMessage());
 
@@ -90,7 +109,8 @@ public class ListenerVertxTest {
 
         Assertions.assertNull(listener.getUid());
 
-        Assertions.assertEquals("Listener has not been opened yet. Please call the open method before subscribing.",
+        Assertions.assertEquals(
+            "Listener has not been opened yet. Please call the open method before subscribing.",
             Assertions
                 .assertThrows(IllegalStateException.class, () -> listener.newBlock()).getMessage());
     }
@@ -155,6 +175,257 @@ public class ListenerVertxTest {
         bufferHandler.handle(event);
 
         future.get(3, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void shouldCheckTransactionFromAddressTransferTransaction() {
+        Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+        Account account2 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+        Account account3 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                transferTransaction(account1.getPublicAccount(), account3.getAddress()),
+                account1.getAddress()));
+
+        Assertions.assertFalse(listener
+            .transactionFromAddress(
+                transferTransaction(account2.getPublicAccount(), account3.getAddress()),
+                account1.getAddress()));
+
+        Assertions.assertFalse(listener
+            .transactionFromAddress(transferTransaction(null, account3.getAddress()),
+                account1.getAddress()));
+
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                transferTransaction(account1.getPublicAccount(), account3.getAddress()),
+                account3.getAddress()));
+
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                transferTransaction(account2.getPublicAccount(), account3.getAddress()),
+                account3.getAddress()));
+
+        Assertions.assertTrue(listener
+            .transactionFromAddress(transferTransaction(null, account3.getAddress()),
+                account3.getAddress()));
+
+    }
+
+
+    @Test
+    public void shouldCheckMultisigAccountModificationTransaction() {
+        Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+        Account account2 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+        Account account3 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                multisigAccountModificationTransaction(account1.getPublicAccount(),
+                    CosignatoryModificationActionType.ADD, account3.getPublicAccount()),
+                account1.getAddress()));
+
+        Assertions.assertFalse(listener
+            .transactionFromAddress(
+                multisigAccountModificationTransaction(account2.getPublicAccount(),
+                    CosignatoryModificationActionType.ADD,
+                    account3.getPublicAccount()),
+                account1.getAddress()));
+
+        Assertions.assertFalse(listener
+            .transactionFromAddress(
+                multisigAccountModificationTransaction(null, CosignatoryModificationActionType.ADD,
+                    account3.getPublicAccount()),
+                account1.getAddress()));
+
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                multisigAccountModificationTransaction(account1.getPublicAccount(),
+                    CosignatoryModificationActionType.ADD,
+                    account3.getPublicAccount()),
+                account3.getAddress()));
+
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                multisigAccountModificationTransaction(account2.getPublicAccount(),
+                    CosignatoryModificationActionType.ADD,
+                    account3.getPublicAccount()),
+                account3.getAddress()));
+
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                multisigAccountModificationTransaction(null, CosignatoryModificationActionType.ADD,
+                    account3.getPublicAccount()),
+                account3.getAddress()));
+
+        Assertions.assertFalse(listener
+            .transactionFromAddress(
+                multisigAccountModificationTransaction(account1.getPublicAccount(),
+                    CosignatoryModificationActionType.REMOVE,
+                    account3.getPublicAccount()),
+                account3.getAddress()));
+
+        Assertions.assertFalse(listener
+            .transactionFromAddress(
+                multisigAccountModificationTransaction(account2.getPublicAccount(),
+                    CosignatoryModificationActionType.REMOVE,
+                    account3.getPublicAccount()),
+                account3.getAddress()));
+
+        Assertions.assertFalse(listener
+            .transactionFromAddress(
+                multisigAccountModificationTransaction(null,
+                    CosignatoryModificationActionType.REMOVE,
+                    account3.getPublicAccount()),
+                account3.getAddress()));
+
+    }
+
+    @Test
+    public void shouldCheckTransactionFromAddressHashLockTransaction() {
+        Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+        Account account2 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+        Assertions.assertTrue(listener
+            .transactionFromAddress(hashLockTransaction(account1.getPublicAccount()),
+                account1.getAddress()));
+
+        Assertions.assertFalse(listener
+            .transactionFromAddress(hashLockTransaction(account2.getPublicAccount()),
+                account1.getAddress()));
+
+        Assertions.assertFalse(listener
+            .transactionFromAddress(hashLockTransaction(null),
+                account1.getAddress()));
+
+    }
+
+    private TransferTransaction transferTransaction(PublicAccount signer, Address recipient) {
+        TransferTransactionFactory factory = TransferTransactionFactory
+            .create(NetworkType.MIJIN_TEST, recipient, Collections.emptyList(), PlainMessage.Empty);
+        if (signer != null) {
+            factory.signer(signer);
+        }
+        return factory.build();
+    }
+
+    private MultisigAccountModificationTransaction multisigAccountModificationTransaction(
+        PublicAccount signer, CosignatoryModificationActionType modificationAction,
+        PublicAccount cosignatoryPublicAccount) {
+        List<MultisigCosignatoryModification> modifications = new ArrayList<>();
+        modifications
+            .add(new MultisigCosignatoryModification(modificationAction, cosignatoryPublicAccount));
+        MultisigAccountModificationTransactionFactory factory = new MultisigAccountModificationTransactionFactory(
+            NetworkType.MIJIN_TEST, (byte) 0, (byte) 0, modifications);
+        if (signer != null) {
+            factory.signer(signer);
+        }
+        return factory.build();
+    }
+
+    @Test
+    public void shouldCheckTransactionAggregateTransaction() {
+        Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+        Account account2 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+        Account account3 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+        Transaction anotherTransaction = hashLockTransaction(account2.getPublicAccount());
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                aggregateTransaction(account1.getPublicAccount(),
+                    anotherTransaction, account3.getPublicAccount()),
+                account1.getAddress()));
+
+        Assertions.assertFalse(listener
+            .transactionFromAddress(
+                aggregateTransaction(account2.getPublicAccount(),
+                    anotherTransaction,
+                    account3.getPublicAccount()),
+                account1.getAddress()));
+
+        Assertions.assertFalse(listener
+            .transactionFromAddress(
+                aggregateTransaction(null, anotherTransaction,
+                    account3.getPublicAccount()),
+                account1.getAddress()));
+
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                aggregateTransaction(account1.getPublicAccount(),
+                    anotherTransaction,
+                    account3.getPublicAccount()),
+                account3.getAddress()));
+
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                aggregateTransaction(account2.getPublicAccount(),
+                    anotherTransaction,
+                    account3.getPublicAccount()),
+                account3.getAddress()));
+
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                aggregateTransaction(null, anotherTransaction,
+                    account3.getPublicAccount()),
+                account3.getAddress()));
+
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                aggregateTransaction(account1.getPublicAccount(),
+                    anotherTransaction,
+                    account3.getPublicAccount()),
+                account3.getAddress()));
+
+        Assertions.assertFalse(listener
+            .transactionFromAddress(
+                aggregateTransaction(account1.getPublicAccount(),
+                    anotherTransaction,
+                    account2.getPublicAccount()),
+                account3.getAddress()));
+
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                aggregateTransaction(account2.getPublicAccount(),
+                    anotherTransaction,
+                    account3.getPublicAccount()),
+                account2.getAddress()));
+
+        Assertions.assertFalse(listener
+            .transactionFromAddress(
+                aggregateTransaction(null,
+                    anotherTransaction,
+                    account2.getPublicAccount()),
+                account3.getAddress()));
+    }
+
+    private AggregateTransaction aggregateTransaction(PublicAccount signer,
+        Transaction anotherTransaction, PublicAccount consignauturePublicAccount) {
+        List<AggregateTransactionCosignature> cosignatures = new ArrayList<>();
+        cosignatures
+            .add(new AggregateTransactionCosignature("Signature", consignauturePublicAccount));
+        AggregateTransactionFactory factory = new AggregateTransactionFactory(
+            TransactionType.AGGREGATE_COMPLETE, NetworkType.MIJIN_TEST,
+            Collections.singletonList(anotherTransaction),
+            cosignatures);
+        if (signer != null) {
+            factory.signer(signer);
+        }
+        return factory.build();
+    }
+
+
+    private HashLockTransaction hashLockTransaction(PublicAccount signer) {
+        SignedTransaction signedTransaction =
+            new SignedTransaction(
+                "payload",
+                "8498B38D89C1DC8A448EA5824938FF828926CD9F7747B1844B59B4B6807E878B",
+                TransactionType.AGGREGATE_BONDED);
+        HashLockTransactionFactory factory = new HashLockTransactionFactory(
+            NetworkType.MIJIN_TEST, Mockito.mock(Mosaic.class),
+            BigInteger.TEN, signedTransaction);
+        if (signer != null) {
+            factory.signer(signer);
+        }
+        return factory.build();
     }
 
 }

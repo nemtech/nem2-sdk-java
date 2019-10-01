@@ -17,7 +17,7 @@
 
 package io.nem.core.crypto;
 
-import io.nem.core.utils.AbstractVectorTest;
+import io.nem.core.utils.AbstractVectorTester;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,16 +30,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 /**
  * Test of SignSchema.
  */
-public class KeyPairVectorTest extends AbstractVectorTest {
+public class KeyPairVectorTester extends AbstractVectorTester {
 
     private static Stream<Arguments> testKeysCatapult() {
-        return createArguments("1.test-keys-catapult.json", KeyPairVectorTest::extractArguments, 0,
+        return createArguments("1.test-keys-catapult.json", KeyPairVectorTester::extractArguments, 0,
             10
         );
     }
 
     private static Stream<Arguments> testKeysNis1() {
-        return createArguments("1.test-keys-nis1.json", KeyPairVectorTest::extractArguments, 0, 10
+        return createArguments("1.test-keys-nis1.json", KeyPairVectorTester::extractArguments, 0, 10
         );
     }
 

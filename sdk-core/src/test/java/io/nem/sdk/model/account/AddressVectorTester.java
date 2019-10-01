@@ -17,8 +17,7 @@
 
 package io.nem.sdk.model.account;
 
-import io.nem.core.crypto.SignSchema;
-import io.nem.core.utils.AbstractVectorTest;
+import io.nem.core.utils.AbstractVectorTester;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,16 +31,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 /**
  * Unit tests that uses the vector tests from github as inputs.
  */
-class AddressVectorTest extends AbstractVectorTest {
+class AddressVectorTester extends AbstractVectorTester {
 
     private static Stream<Arguments> testAddressCatapult() throws Exception {
-        return createArguments("1.test-address-catapult.json", AddressVectorTest::extractArgumentsSha,
+        return createArguments("1.test-address-catapult.json", AddressVectorTester::extractArgumentsSha,
             0, 5
         );
     }
 
     private static Stream<Arguments> testAddressNis1() throws Exception {
-        return createArguments("1.test-address-nis1.json", AddressVectorTest::extractArgumentsKeccak, 0, 5
+        return createArguments("1.test-address-nis1.json", AddressVectorTester::extractArgumentsKeccak, 0, 5
         );
     }
 

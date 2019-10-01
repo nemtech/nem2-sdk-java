@@ -19,13 +19,19 @@ package io.nem.sdk.infrastructure;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.BlockInfo;
 import io.nem.sdk.model.transaction.AggregateTransaction;
+import io.nem.sdk.model.transaction.CosignatoryModificationActionType;
 import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
+import io.nem.sdk.model.transaction.Deadline;
+import io.nem.sdk.model.transaction.JsonHelper;
+import io.nem.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionStatusError;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
+import java.math.BigInteger;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Created by fernando on 19/08/19.
@@ -35,6 +41,55 @@ import io.reactivex.subjects.Subject;
 public abstract class ListenerBase implements Listener {
 
     private final Subject<ListenerMessage> messageSubject = PublishSubject.create();
+
+
+    private final JsonHelper jsonHelper;
+
+    private String uid;
+
+    protected ListenerBase(JsonHelper jsonHelper) {
+        this.jsonHelper = jsonHelper;
+    }
+
+    /**
+     * It knows how to handle a ws message coming from the server. Each subclass is responsible of
+     * hooking the web socket implementation with this method.
+     *
+     * @param message the generic json with the message.
+     * @param future to tell the user that the connection to the ws has been stabilised.
+     */
+    public void handle(Object message, CompletableFuture<Void> future) {
+        if (jsonHelper.contains(message, "uid")) {
+            uid = jsonHelper.getString(message, "uid");
+            future.complete(null);
+        } else if (jsonHelper.contains(message, "transaction")) {
+            Transaction messageObject = toTransaction(message);
+            ListenerChannel channel = ListenerChannel
+                .rawValueOf(jsonHelper.getString(message, "meta", "channelName"));
+            onNext(channel, messageObject);
+        } else if (jsonHelper.contains(message, "block")) {
+            BlockInfo messageObject = toBlockInfo(message);
+            onNext(ListenerChannel.BLOCK, messageObject);
+        } else if (jsonHelper.contains(message, "status")) {
+            TransactionStatusError messageObject = new TransactionStatusError(
+                jsonHelper.getString(message, "hash"),
+                jsonHelper.getString(message, "status"),
+                new Deadline(
+                    new BigInteger(jsonHelper.getString(message, "deadline"))));
+            onNext(ListenerChannel.STATUS, messageObject);
+        } else if (jsonHelper.contains(message, "parentHash")) {
+            CosignatureSignedTransaction messageObject = new CosignatureSignedTransaction(
+                jsonHelper.getString(message, "parenthash"),
+                jsonHelper.getString(message, "signature"),
+                jsonHelper.getString(message, "signer"));
+            onNext(ListenerChannel.COSIGNATURE, messageObject);
+        } else if (jsonHelper.contains(message, "meta")) {
+            onNext(ListenerChannel.rawValueOf(
+                jsonHelper.getString(message, "meta", "channelName")),
+                jsonHelper.getString(message, "meta", "hash"));
+        }
+    }
+
 
     @Override
     public Observable<BlockInfo> newBlock() {
@@ -182,43 +237,78 @@ public abstract class ListenerBase implements Listener {
     }
 
 
-    private boolean transactionFromAddress(final Transaction transaction, final Address address) {
-        return transactionHasSignerOrReceptor(transaction, address)
-            || isAggregateTransactionSignerOrInnerTransaction(transaction, address);
-    }
+    public boolean transactionFromAddress(final Transaction transaction, final Address address) {
+        if (transaction.getSigner().filter(s -> s.getAddress().equals(address)).isPresent()) {
+            return true;
+        }
 
-    private boolean transactionHasSignerOrReceptor(final Transaction transaction,
-        final Address address) {
-        return transaction.getSigner().filter(s -> s.getAddress().equals(address)).isPresent()
-            || isTransferTransactionRecipient(transaction, address);
-    }
+        if (transaction instanceof TransferTransaction) {
+            return ((TransferTransaction) transaction)
+                .getRecipient().filter(r -> r.equals(address)).isPresent();
+        }
 
-    private boolean isTransferTransactionRecipient(final Transaction transaction,
-        final Address address) {
-        return transaction instanceof TransferTransaction && ((TransferTransaction) transaction)
-            .getRecipient().filter(r -> r.equals(address)).isPresent();
-    }
-
-    private boolean isAggregateTransactionSignerOrInnerTransaction(final Transaction transaction,
-        final Address address) {
+        if (transaction instanceof MultisigAccountModificationTransaction) {
+            return ((MultisigAccountModificationTransaction) transaction)
+                .getModifications().stream()
+                .anyMatch(
+                    m -> m.getModificationAction() == CosignatoryModificationActionType.ADD && m
+                        .getCosignatoryPublicAccount().getAddress().equals(address));
+        }
         if (transaction instanceof AggregateTransaction) {
             final AggregateTransaction aggregateTransaction = (AggregateTransaction) transaction;
-            return aggregateTransaction.getCosignatures()
-                .stream().anyMatch(c -> c.getSigner().getAddress().equals(address)) ||
-                aggregateTransaction.getInnerTransactions()
-                    .stream().anyMatch(t -> this.transactionHasSignerOrReceptor(t, address));
-        } else {
-            return false;
+            if (aggregateTransaction.getCosignatures()
+                .stream().anyMatch(c -> c.getSigner().getAddress().equals(address))) {
+                return true;
+            }
+            //Recursion...
+            return aggregateTransaction.getInnerTransactions()
+                .stream().anyMatch(t -> this.transactionFromAddress(t, address));
         }
+        return false;
     }
+
 
     protected void onNext(ListenerChannel channel, Object messageObject) {
         this.getMessageSubject().onNext(new ListenerMessage(channel, messageObject));
     }
 
+    /**
+     * Subclasses know how to map a generic blockInfoDTO json to a BlockInfo using the generated
+     * DTOs of the implementation.
+     *
+     * @param blockInfoDTO the generic json
+     * @return the model {@link BlockInfo}
+     */
+    protected abstract BlockInfo toBlockInfo(Object blockInfoDTO);
+
+    /**
+     * Subclasses know how to map a generic TransactionInfoDto json to a Transaction using the
+     * generated DTOs of the implementation.
+     *
+     * @param transactionInfo the generic json
+     * @return the model {@link Transaction}
+     */
+    protected abstract Transaction toTransaction(Object transactionInfo);
+
     protected abstract void subscribeTo(String channel);
 
     public Subject<ListenerMessage> getMessageSubject() {
         return messageSubject;
+    }
+
+    public JsonHelper getJsonHelper() {
+        return jsonHelper;
+    }
+
+    /**
+     * @return the UID connected to
+     */
+    @Override
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }

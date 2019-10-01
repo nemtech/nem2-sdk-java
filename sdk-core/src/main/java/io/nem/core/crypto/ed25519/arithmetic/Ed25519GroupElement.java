@@ -110,7 +110,7 @@ public class Ed25519GroupElement implements Serializable {
     /**
      * Creates a new group element using the P3 coordinate system.
      *
-     * @param X The X coordinate.
+     * @param x The X coordinate.
      * @param y The Y coordinate.
      * @param z The Z coordinate.
      * @param t The T coordinate.

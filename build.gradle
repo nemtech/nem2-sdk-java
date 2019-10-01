@@ -95,7 +95,7 @@ subprojects {
     }
 
     javadoc {
-        failOnError = false
+        failOnError = true
     }
 
     task sourcesJar(type: Jar) {

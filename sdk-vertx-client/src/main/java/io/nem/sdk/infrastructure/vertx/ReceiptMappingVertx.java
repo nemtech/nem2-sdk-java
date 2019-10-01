@@ -135,7 +135,6 @@ public class ReceiptMappingVertx {
             case LOCK_SECRET_EXPIRED:
                 return createBalanceChangeReceipt(
                     jsonHelper.convert(receiptDto, BalanceChangeReceiptDTO.class), networkType);
-            case MOSAIC_LEVY:
             case MOSAIC_RENTAL_FEE:
             case NAMESPACE_RENTAL_FEE:
                 return createBalanceTransferRecipient(

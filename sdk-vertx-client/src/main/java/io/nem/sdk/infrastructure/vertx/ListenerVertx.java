@@ -51,21 +51,19 @@ public class ListenerVertx extends ListenerBase implements Listener {
 
     private final URL url;
 
-    private final JsonHelper jsonHelper;
-
     private final HttpClient httpClient;
 
     private final TransactionMapper transactionMapper;
 
     private WebSocket webSocket;
 
-    private String uid;
 
     /**
      * @param httpClient the http client instance.
      * @param url of the host
      */
     public ListenerVertx(HttpClient httpClient, String url) {
+        super(new JsonHelperJackson2(JsonHelperJackson2.configureMapper(Json.mapper)));
         try {
             this.url = new URL(url);
         } catch (MalformedURLException e) {
@@ -73,8 +71,7 @@ public class ListenerVertx extends ListenerBase implements Listener {
                 "' is not a valid URL. " + ExceptionUtils.getMessage(e));
         }
         this.httpClient = httpClient;
-        this.jsonHelper = new JsonHelperJackson2(JsonHelperJackson2.configureMapper(Json.mapper));
-        this.transactionMapper = new GeneralTransactionMapper(jsonHelper);
+        this.transactionMapper = new GeneralTransactionMapper(getJsonHelper());
     }
 
     /**
@@ -109,7 +106,7 @@ public class ListenerVertx extends ListenerBase implements Listener {
                 this.webSocket = ws;
                 ws.handler(
                     handler -> {
-                        ObjectNode message = jsonHelper
+                        ObjectNode message = getJsonHelper()
                             .convert(handler.toJsonObject(), ObjectNode.class);
                         handle(message, future);
                     });
@@ -117,47 +114,17 @@ public class ListenerVertx extends ListenerBase implements Listener {
         return future;
     }
 
-    protected void handle(Object message, CompletableFuture<Void> future) {
-        if (jsonHelper.contains(message, "uid")) {
-            uid = jsonHelper.getString(message, "uid");
-            future.complete(null);
-        } else if (jsonHelper.contains(message, "transaction")) {
-            TransactionInfoDTO transactionInfo = jsonHelper
-                .convert(message, TransactionInfoDTO.class);
-            Transaction messageObject = toTransaction(transactionInfo);
-            ListenerChannel channel = ListenerChannel
-                .rawValueOf(jsonHelper.getString(message, "meta", "channelName"));
-            onNext(channel, messageObject);
-        } else if (jsonHelper.contains(message, "block")) {
-            BlockInfoDTO blockInfoDTO = jsonHelper
-                .convert(message, BlockInfoDTO.class);
-            BlockInfo messageObject = toBlockInfo(blockInfoDTO);
-            onNext(ListenerChannel.BLOCK, messageObject);
-        } else if (jsonHelper.contains(message, "status")) {
-            TransactionStatusError messageObject = new TransactionStatusError(
-                jsonHelper.getString(message, "hash"),
-                jsonHelper.getString(message, "status"),
-                new Deadline(new BigInteger(jsonHelper.getString(message, "deadline"))));
-            onNext(ListenerChannel.STATUS, messageObject);
-        } else if (jsonHelper.contains(message, "meta")) {
-            onNext(ListenerChannel.rawValueOf(
-                jsonHelper.getString(message, "meta", "channelName")),
-                jsonHelper.getString(message, "meta", "hash"));
-        } else if (jsonHelper.contains(message, "parentHash")) {
-            CosignatureSignedTransaction messageObject = new CosignatureSignedTransaction(
-                jsonHelper.getString(message, "parenthash"),
-                jsonHelper.getString(message, "signature"),
-                jsonHelper.getString(message, "signer"));
-            onNext(ListenerChannel.COSIGNATURE, messageObject);
-        }
+
+    @Override
+    protected BlockInfo toBlockInfo(Object blockInfoDTO) {
+        return BlockRepositoryVertxImpl
+            .toBlockInfo(getJsonHelper().convert(blockInfoDTO, BlockInfoDTO.class));
     }
 
-    private BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO) {
-        return BlockRepositoryVertxImpl.toBlockInfo(blockInfoDTO);
-    }
-
-    private Transaction toTransaction(TransactionInfoDTO transactionInfo) {
-        return transactionMapper.map(transactionInfo);
+    @Override
+    protected Transaction toTransaction(Object transactionInfo) {
+        return transactionMapper
+            .map(getJsonHelper().convert(transactionInfo, TransactionInfoDTO.class));
     }
 
 
@@ -167,28 +134,17 @@ public class ListenerVertx extends ListenerBase implements Listener {
     @Override
     public void close() {
         if (this.webSocket != null) {
-            this.uid = null;
+            this.setUid(null);
             this.webSocket.close();
             this.webSocket = null;
         }
     }
 
     protected void subscribeTo(String channel) {
-        final ListenerSubscribeMessage subscribeMessage = new ListenerSubscribeMessage(this.uid,
+        final ListenerSubscribeMessage subscribeMessage = new ListenerSubscribeMessage(
+            this.getUid(),
             channel);
-        this.webSocket.writeTextMessage(jsonHelper.print(subscribeMessage));
+        this.webSocket.writeTextMessage(getJsonHelper().print(subscribeMessage));
     }
 
-    /**
-     * @return the UID connected to
-     */
-    @Override
-    public String getUid() {
-        return uid;
-    }
-
-
-    public JsonHelper getJsonHelper() {
-        return jsonHelper;
-    }
 }

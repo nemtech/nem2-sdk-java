@@ -53,7 +53,7 @@ public class AccountOperationRestrictionTransaction extends Transaction {
     /**
      * Get account operation restriction modifications
      *
-     * @return {@link List<AccountRestrictionModification<TransactionType>>}
+     * @return list of {@link AccountRestrictionModification}
      */
     public List<AccountRestrictionModification<TransactionType>> getModifications() {
         return this.modifications;

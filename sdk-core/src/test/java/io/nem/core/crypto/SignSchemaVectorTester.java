@@ -17,7 +17,7 @@
 
 package io.nem.core.crypto;
 
-import io.nem.core.utils.AbstractVectorTest;
+import io.nem.core.utils.AbstractVectorTester;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,16 +31,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 /**
  * ex Test of SignSchema.
  */
-public class SignSchemaVectorTest extends AbstractVectorTest {
+public class SignSchemaVectorTester extends AbstractVectorTester {
 
     private static Stream<Arguments> testKeccak256() throws Exception {
-        return createArguments("0.test-keccak-256.json", SignSchemaVectorTest::extractArguments, 0,
+        return createArguments("0.test-keccak-256.json", SignSchemaVectorTester::extractArguments, 0,
             10
         );
     }
 
     private static Stream<Arguments> testSha256() throws Exception {
-        return createArguments("0.test-sha3-256.json", SignSchemaVectorTest::extractArguments, 0, 10
+        return createArguments("0.test-sha3-256.json", SignSchemaVectorTester::extractArguments, 0, 10
         );
     }
 

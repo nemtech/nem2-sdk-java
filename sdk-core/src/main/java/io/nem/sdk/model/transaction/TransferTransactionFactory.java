@@ -79,7 +79,7 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
     /**
      * Returns list of mosaic objects.
      *
-     * @retur List of {@link Mosaic}
+     * @return List of {@link Mosaic}
      */
     public List<Mosaic> getMosaics() {
         return mosaics;

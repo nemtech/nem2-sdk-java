@@ -26,22 +26,22 @@ import io.nem.sdk.model.transaction.MosaicGlobalRestrictionTransactionFactory;
 import io.nem.sdk.model.transaction.MosaicRestrictionType;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.okhttp_gson.model.GlobalMosaicRestrictionTransactionDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.MosaicGlobalRestrictionTransactionDTO;
 import java.math.BigInteger;
 
 /**
  * Mosaic global restriction transaction mapper.
  */
 class MosaicGlobalRestrictionTransactionMapper extends
-    AbstractTransactionMapper<GlobalMosaicRestrictionTransactionDTO, MosaicGlobalRestrictionTransaction> {
+    AbstractTransactionMapper<MosaicGlobalRestrictionTransactionDTO, MosaicGlobalRestrictionTransaction> {
 
     public MosaicGlobalRestrictionTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.MOSAIC_GLOBAL_RESTRICTION, GlobalMosaicRestrictionTransactionDTO.class);
+        super(jsonHelper, TransactionType.MOSAIC_GLOBAL_RESTRICTION, MosaicGlobalRestrictionTransactionDTO.class);
     }
 
     @Override
     protected TransactionFactory<MosaicGlobalRestrictionTransaction> createFactory(NetworkType networkType,
-        GlobalMosaicRestrictionTransactionDTO transaction) {
+        MosaicGlobalRestrictionTransactionDTO transaction) {
 
         byte prevRestrictionType = transaction.getPreviousRestrictionType().getValue().byteValue();
         byte newRestrictionType = transaction.getNewRestrictionType().getValue().byteValue();

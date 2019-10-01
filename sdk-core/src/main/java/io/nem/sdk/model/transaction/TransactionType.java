@@ -23,11 +23,6 @@ import java.util.Arrays;
  */
 public enum TransactionType {
 
-    /**
-     * RESERVED
-     */
-    RESERVED(0, 1),
-
     // Mosaic
     /**
      * Mosaic definition transaction type.

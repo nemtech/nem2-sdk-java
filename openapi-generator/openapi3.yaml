@@ -15,6 +15,7 @@ tags:
   - name: Transaction routes
   - name: Network routes
   - name: Node routes
+  - name: Metadata routes
 paths:
   "/account/{accountId}":
     get:
@@ -840,6 +841,205 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NodeTimeDTO"
+  "/account/{accountId}/metadata":
+    get:
+      tags:
+        - Metadata routes
+      summary: Get account metadata
+      description: Returns the account metadata given an account id.
+      operationId: getAccountMetadata
+      parameters:
+        - $ref: "#/components/parameters/accountId"
+        - $ref: "#/components/parameters/pageSize"
+        - $ref: "#/components/parameters/metadataIdLimit"
+        - $ref: "#/components/parameters/ordering"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetadataEntriesDTO"
+        "404":
+          description: resource not found
+        "409":
+          description: invalid argument
+  "/mosaic/{mosaicId}/metadata":
+    get:
+      tags:
+        - Metadata routes
+      summary: Get mosaic metadata
+      description: Returns the mosaic metadata given a mosaic id.
+      operationId: getMosaicMetadata
+      parameters:
+        - $ref: "#/components/parameters/mosaicId"
+        - $ref: "#/components/parameters/pageSize"
+        - $ref: "#/components/parameters/metadataIdLimit"
+        - $ref: "#/components/parameters/ordering"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetadataEntriesDTO"
+        "404":
+          description: resource not found
+        "409":
+          description: invalid argument
+  "/namespace/{namespaceId}/metadata":
+    get:
+      tags:
+        - Metadata routes
+      summary: Get namespace metadata
+      description: Returns the namespace metadata given a namespace id.
+      operationId: getNamespaceMetadata
+      parameters:
+        - $ref: "#/components/parameters/namespaceId"
+        - $ref: "#/components/parameters/pageSize"
+        - $ref: "#/components/parameters/metadataIdLimit"
+        - $ref: "#/components/parameters/ordering"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetadataEntriesDTO"
+        "404":
+          description: resource not found
+        "409":
+          description: invalid argument
+  "/account/{accountId}/metadata/{key}":
+    get:
+      tags:
+        - Metadata routes
+      summary: Get account metadata
+      description: Returns the account metadata given an account id and a key
+      operationId: getAccountMetadataByKey
+      parameters:
+        - $ref: "#/components/parameters/accountId"
+        - $ref: "#/components/parameters/metadataKey"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetadataEntriesDTO"
+        "404":
+          description: resource not found
+        "409":
+          description: invalid argument
+  "/mosaic/{mosaicId}/metadata/{key}":
+    get:
+      tags:
+        - Metadata routes
+      summary: Get mosaic metadata
+      description: Returns the mosaic metadata given a mosaic id and a key
+      operationId: getMosaicMetadataByKey
+      parameters:
+        - $ref: "#/components/parameters/mosaicId"
+        - $ref: "#/components/parameters/metadataKey"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetadataEntriesDTO"
+        "404":
+          description: resource not found
+        "409":
+          description: invalid argument
+  "/namespace/{namespaceId}/metadata/{key}":
+    get:
+      tags:
+        - Metadata routes
+      summary: Get namespace metadata
+      description: Returns the namespace metadata given a namespace id and a key
+      operationId: getNamespaceMetadataByKey
+      parameters:
+        - $ref: "#/components/parameters/namespaceId"
+        - $ref: "#/components/parameters/metadataKey"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetadataEntriesDTO"
+        "404":
+          description: resource not found
+        "409":
+          description: invalid argument
+  "/account/{accountId}/metadata/{key}/sender/{publicKey}":
+    get:
+      tags:
+        - Metadata routes
+      summary: Get account metadata
+      description: Returns the account metadata given an account id, a key, and a sender
+      operationId: getAccountMetadataByKeyAndSender
+      parameters:
+        - $ref: "#/components/parameters/accountId"
+        - $ref: "#/components/parameters/metadataKey"
+        - $ref: "#/components/parameters/publicKey"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetadataDTO"
+        "404":
+          description: resource not found
+        "409":
+          description: invalid argument
+  "/mosaic/{mosaicId}/metadata/{key}/sender/{publicKey}":
+    get:
+      tags:
+        - Metadata routes
+      summary: Get mosaic metadata
+      description: Returns the mosaic metadata given a mosaic id, a key, and a sender
+      operationId: getMosaicMetadataByKeyAndSender
+      parameters:
+        - $ref: "#/components/parameters/mosaicId"
+        - $ref: "#/components/parameters/metadataKey"
+        - $ref: "#/components/parameters/publicKey"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetadataDTO"
+        "404":
+          description: resource not found
+        "409":
+          description: invalid argument
+  "/namespace/{namespaceId}/metadata/{key}/sender/{publicKey}":
+    get:
+      tags:
+        - Metadata routes
+      summary: Get namespace metadata
+      description: Returns the namespace metadata given a namespace id, a key, and a sender
+      operationId: getNamespaceMetadataByKeyAndSender
+      parameters:
+        - $ref: "#/components/parameters/namespaceId"
+        - $ref: "#/components/parameters/metadataKey"
+        - $ref: "#/components/parameters/publicKey"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetadataDTO"
+        "404":
+          description: resource not found
+        "409":
+          description: invalid argument
+
 externalDocs:
   description: NEM Developer Center
   url: https://nemtech.github.io/
@@ -884,6 +1084,14 @@ components:
           - 50
           - 75
           - 100
+    metadataKey:
+      name: key
+      in: path
+      description: Metadata key.
+      required: true
+      schema:
+        type: string
+        format: hex
     mosaicId:
       name: mosaicId
       in: path
@@ -920,6 +1128,13 @@ components:
         minimum: 10
         maximum: 100
         default: 10
+    publicKey:
+      name: publicKey
+      in: path
+      description: Account public key
+      required: true
+      schema:
+        $ref: "#/components/schemas/PublicKey"
     receiptHash:
       name: hash
       in: path
@@ -932,6 +1147,12 @@ components:
       in: path
       description: Transaction identifier or hash.
       required: true
+      schema:
+        type: string
+    metadataIdLimit:
+      name: id
+      in: query
+      description: Metadata identifier up to which metadata are returned.
       schema:
         type: string
     transactionIdLimit:
@@ -1233,6 +1454,19 @@ components:
         * 0 - Remove cosignatory.
         * 1 - Add cosignatory.
       example: 0
+    # Enumerations - Metadata
+    MetadataTypeEnum:
+      type: integer
+      format: int32
+      enum:
+        - 0
+        - 1
+        - 2
+      description: |
+        Metadata type:
+        * 0 - Account.
+        * 1 - Mosaic.
+        * 2 - Namespace.
     # Enumerations - Namespace
     AliasActionEnum:
       type: integer
@@ -1278,14 +1512,16 @@ components:
         - 4942
         - 8515
         - 8776
-        - 9042
+        - 9032
         - 12616
+        - 8786
+        - 9042
         - 12626
         - 16717
         - 16718
         - 16974
         - 20803
-        - 57652
+        - 57667
         - 61763
         - 62019
       description: |
@@ -1303,7 +1539,7 @@ components:
         * 0x414E (16718 decimal) - Namespace_Expired.
         * 0x424E (16974 decimal) - Namespace_Deleted.
         * 0x5143 (20803 decimal) - Inflation.
-        * 0xE134 (57652 decimal) - Transaction_Group.
+        * 0xE143 (57667 decimal) - Transaction_Group.
         * 0xF143 (61763 decimal) - Address_Alias_Resolution.
         * 0xF243 (62019 decimal) - Mosaic_Alias_Resolution.
     BalanceTransferReceiptDTO:
@@ -1820,8 +2056,8 @@ components:
             - $ref: "#/components/schemas/AccountAddressRestrictionTransactionDTO"
             - $ref: "#/components/schemas/AccountMosaicRestrictionTransactionDTO"
             - $ref: "#/components/schemas/AccountOperationRestrictionTransactionDTO"
-            - $ref: "#/components/schemas/GlobalMosaicRestrictionTransactionDTO"
-            - $ref: "#/components/schemas/AddressMosaicRestrictionTransactionDTO"
+            - $ref: "#/components/schemas/MosaicGlobalRestrictionTransactionDTO"
+            - $ref: "#/components/schemas/MosaicAddressRestrictionTransactionDTO"
             - $ref: "#/components/schemas/TransferTransactionDTO"
     EmbeddedTransactionMetaDTO:
       type: object
@@ -1866,8 +2102,8 @@ components:
             - $ref: "#/components/schemas/EmbeddedAccountAddressRestrictionTransactionDTO"
             - $ref: "#/components/schemas/EmbeddedAccountMosaicRestrictionTransactionDTO"
             - $ref: "#/components/schemas/EmbeddedAccountOperationRestrictionTransactionDTO"
-            - $ref: "#/components/schemas/EmbeddedGlobalMosaicRestrictionTransactionDTO"
-            - $ref: "#/components/schemas/EmbeddedAddressMosaicRestrictionTransactionDTO"
+            - $ref: "#/components/schemas/EmbeddedMosaicGlobalRestrictionTransactionDTO"
+            - $ref: "#/components/schemas/EmbeddedMosaicAddressRestrictionTransactionDTO"
             - $ref: "#/components/schemas/EmbeddedTransferTransactionDTO"
     TransactionBodyDTO:
       type: object
@@ -2284,6 +2520,7 @@ components:
           description: Value size in bytes.
         value:
           type: string
+          format: hex
           description: When there is an existing value, the new value is calculated as xor(previous-value, value).
     AccountMetadataTransactionDTO:
       type: object
@@ -2323,6 +2560,7 @@ components:
           description: Value size in bytes.
         value:
           type: string
+          format: hex
           description: When there is an existing value, the new value is calculated as xor(previous-value, value).
     MosaicMetadataTransactionDTO:
       type: object
@@ -2362,6 +2600,7 @@ components:
           description: Value size in bytes.
         value:
           type: string
+          format: hex
           description: When there is an existing value, the new value is calculated as xor(previous-value, value).
     NamespaceMetadataTransactionDTO:
       type: object
@@ -2490,12 +2729,12 @@ components:
     NamespaceNameDTO:
       type: object
       required:
-        - namespaceId
+        - id
         - name
       properties:
         parentId:
           $ref: "#/components/schemas/NamespaceId"
-        namespaceId:
+        id:
           $ref: "#/components/schemas/NamespaceId"
         name:
           type: string
@@ -2853,7 +3092,7 @@ components:
         - $ref: "#/components/schemas/EmbeddedTransactionDTO"
         - $ref: "#/components/schemas/AccountOperationRestrictionTransactionBodyDTO"
     # Schemas - RestrictionMosaic
-    AddressMosaicRestrictionTransactionBodyDTO:
+    MosaicAddressRestrictionTransactionBodyDTO:
       type: object
       required:
         - mosaicId
@@ -2875,18 +3114,18 @@ components:
         newRestrictionValue:
           type: string
           description: New restriction value.
-    AddressMosaicRestrictionTransactionDTO:
+    MosaicAddressRestrictionTransactionDTO:
       type: object
       description: Transaction to set a restriction rule to an address.
       allOf:
         - $ref: "#/components/schemas/TransactionDTO"
-        - $ref: "#/components/schemas/AddressMosaicRestrictionTransactionBodyDTO"
-    EmbeddedAddressMosaicRestrictionTransactionDTO:
+        - $ref: "#/components/schemas/MosaicAddressRestrictionTransactionBodyDTO"
+    EmbeddedMosaicAddressRestrictionTransactionDTO:
       type: object
       allOf:
         - $ref: "#/components/schemas/EmbeddedTransactionDTO"
-        - $ref: "#/components/schemas/AddressMosaicRestrictionTransactionBodyDTO"
-    GlobalMosaicRestrictionTransactionBodyDTO:
+        - $ref: "#/components/schemas/MosaicAddressRestrictionTransactionBodyDTO"
+    MosaicGlobalRestrictionTransactionBodyDTO:
       type: object
       required:
         - mosaicId
@@ -2914,17 +3153,17 @@ components:
           description: New restriction value.
         newRestrictionType:
           $ref: "#/components/schemas/MosaicRestrictionTypeEnum"
-    GlobalMosaicRestrictionTransactionDTO:
+    MosaicGlobalRestrictionTransactionDTO:
       type: object
       description: Transaction to set a network-wide restriction rule to a mosaic.
       allOf:
         - $ref: "#/components/schemas/TransactionDTO"
-        - $ref: "#/components/schemas/GlobalMosaicRestrictionTransactionBodyDTO"
-    EmbeddedGlobalMosaicRestrictionTransactionDTO:
+        - $ref: "#/components/schemas/MosaicGlobalRestrictionTransactionBodyDTO"
+    EmbeddedMosaicGlobalRestrictionTransactionDTO:
       type: object
       allOf:
         - $ref: "#/components/schemas/EmbeddedTransactionDTO"
-        - $ref: "#/components/schemas/GlobalMosaicRestrictionTransactionBodyDTO"
+        - $ref: "#/components/schemas/MosaicGlobalRestrictionTransactionBodyDTO"
     # Schemas - Transfer
     MessageDTO:
       type: object
@@ -2966,6 +3205,67 @@ components:
       allOf:
         - $ref: "#/components/schemas/EmbeddedTransactionDTO"
         - $ref: "#/components/schemas/TransferTransactionBodyDTO"
+
+    # Schemas - Metadata
+    MetadataEntriesDTO:
+      type: object
+      required:
+        - metadataEntries
+      properties:
+        metadataEntries:
+          type: array
+          description: Array of account metadata.
+          items:
+            $ref: "#/components/schemas/MetadataDTO"
+    MetadataDTO:
+      type: object
+      required:
+        - meta
+        - metadataEntry
+      properties:
+        meta:
+          $ref: "#/components/schemas/MetadataMetaDTO"
+        metadataEntry:
+          $ref: "#/components/schemas/MetadataEntryDTO"
+    MetadataMetaDTO:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+    MetadataEntryDTO:
+      type: object
+      required:
+        - compositeHash
+        - senderPublicKey
+        - targetPublicKey
+        - scopedMetadataKey
+        - metadataType
+        - valueSize
+        - value
+      properties:
+        compositeHash:
+          $ref: "#/components/schemas/Hash256"
+        senderPublicKey:
+          $ref: "#/components/schemas/PublicKey"
+        targetPublicKey:
+          $ref: "#/components/schemas/PublicKey"
+        scopedMetadataKey:
+          type: string
+          format: hex
+        targetId:
+          anyOf:
+            - $ref: "#/components/schemas/MosaicId"
+            - $ref: "#/components/schemas/NamespaceId"
+        metadataType:
+          $ref: "#/components/schemas/MetadataTypeEnum"
+        valueSize:
+          type: integer
+          format: int32
+        value:
+          type: string
+
     # Request bodies
     accountIds:
       type: object

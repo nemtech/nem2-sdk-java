@@ -18,7 +18,6 @@ package io.nem.sdk.model.account;
 
 import io.nem.core.crypto.KeyPair;
 import io.nem.core.crypto.PrivateKey;
-import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.CosignatureSignedTransaction;

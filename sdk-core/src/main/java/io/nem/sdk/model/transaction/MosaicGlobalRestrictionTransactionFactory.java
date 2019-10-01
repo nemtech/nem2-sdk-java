@@ -48,6 +48,7 @@ public class MosaicGlobalRestrictionTransactionFactory
      * @param newRestrictionValue BigInteger
      * @param newRestrictionType {@link MosaicRestrictionType}
      */
+    @SuppressWarnings("squid:S00107")
     public MosaicGlobalRestrictionTransactionFactory(
         NetworkType networkType,
         MosaicId mosaicId,
