@@ -1,0 +1,4 @@
+io.nem.sdk.openapi.jersey2.api
+io.nem.sdk.openapi.jersey2.invoker
+io.nem.sdk.openapi.jersey2.invoker.auth
+io.nem.sdk.openapi.jersey2.model
