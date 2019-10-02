@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.ajoberstar:gradle-git:1.7.2'
+    }
+}
+
 plugins {
     id "org.openapi.generator" version "4.1.0"
 }
@@ -7,14 +16,14 @@ task clean(type: Delete) {
 }
 
 ext {
-    generateVersion = "0.7.18-SNAPSHOT"
+    artifactVersion = '0.7.18-SNAPSHOT'
 }
 
 //NOTE - For some reason the library field is ignored. I had to create a configFile per library.
 
 ["vertx", "okhttp-gson", "jersey2"].eachWithIndex { library, index ->
     task "generate_${library}"(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
-        version = "${generateVersion}".toString()
+        version = "${artifactVersion}".toString()
         id = "api-${library}-client".toString()
         configFile = "$rootDir/${library}.json".toString()
         library = "${library}".toString()
@@ -25,7 +34,7 @@ ext {
         invokerPackage = "io.nem.sdk.openapi.${library}.invoker".toString()
         modelPackage = "io.nem.sdk.openapi.${library}.model".toString()
         outputDir = "$rootDir/target/api-${library}-client".toString()
-        typeMappings =  ["x-number-string": "java.math.BigInteger"]
+        typeMappings = ["x-number-string": "java.math.BigInteger"]
     }
 }
 
@@ -48,15 +57,23 @@ def signingSecretKeyRingFile = getPropertyValue('signingSecretKeyRingFile')
 def signingKeyId = getPropertyValue('signingKeyId')
 def signingPassword = getPropertyValue('signingPassword')
 
+def githubToken = getPropertyValue('githubToken')
+def repoPath = getPropertyValue('TRAVIS_REPO_SLUG')
+
 allprojects {
     ext."signing.keyId" = signingKeyId
     ext."signing.secretKeyRingFile" = signingSecretKeyRingFile
     ext."signing.password" = signingPassword
 }
 
+task githubPages {
+    subprojects.each { dependsOn("${it.name}:githubPages") }
+}
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
+    apply plugin: 'org.ajoberstar.github-pages'
 
     javadoc {
         failOnError = false
@@ -70,6 +87,26 @@ subprojects {
     task javadocJar(type: Jar) {
         classifier = 'javadoc'
         from javadoc
+    }
+
+    githubPages {
+        System.out.println("$buildDir/docs/javadoc")
+        if (githubToken) {
+            repoUri = "https://github.com/${repoPath}.git".toString()
+            credentials {
+                username = githubToken
+                password = ''
+            }
+        } else {
+            repoUri = "git@github.com:${repoPath}.git".toString()
+        }
+        deleteExistingFiles = false
+        commitMessage = "Publishing Generated Client Javadocs for version ${artifactVersion}".toString()
+        pages {
+            from(file("$buildDir/docs/javadoc")) {
+                into "client/${project.name}/javadoc/${artifactVersion}".toString()
+            }
+        }
     }
 
     artifacts {
@@ -104,7 +141,8 @@ subprojects {
                 pom.project {
                     packaging 'jar'
                     url 'https://github.com/nemtech/nem2-sdk-java'
-
+                    name "${project.name}"
+                    description "Generated Open API client for NEM"
                     scm {
                         connection 'scm:git:https://github.com/nemtech/nem2-sdk-java.git'
                         developerConnection 'scm:svn:https://github.com/nemtech/nem2-sdk-java'
@@ -115,6 +153,20 @@ subprojects {
                         license {
                             name 'The Apache License, Version 2.0'
                             url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id 'fullcircle23'
+                            name 'Ravi Shanker'
+                        }
+                        developer {
+                            id 'rg911'
+                            name 'Steven Liu'
+                        }
+                        developer {
+                            id 'fboucquez'
+                            name 'Fernando Boucquez'
                         }
                     }
                 }

@@ -55,6 +55,7 @@ public enum AccountType {
     /**
      * Static constructor converting role type raw value to enum instance.
      *
+     * @param value number value of the enum.
      * @return {@link AccountType}
      */
     public static AccountType rawValueOf(int value) {

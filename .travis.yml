@@ -29,3 +29,11 @@ deploy:
     on:
       branch: master
       jdk: oraclejdk9
+before_install:
+  - |
+    if [ -z "${signingKeyId}" ]; then
+      echo "No signing the artifacts"
+    else
+      echo "Signing artifacts"
+      openssl aes-256-cbc -K $encrypted_98cf1ffdea51_key -iv $encrypted_98cf1ffdea51_iv -in nem2-sdk-java.gpg.enc -out nem2-sdk-java.gpg -d
+    fi

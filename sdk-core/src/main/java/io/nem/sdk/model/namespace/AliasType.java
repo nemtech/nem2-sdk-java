@@ -21,7 +21,6 @@ import java.util.Arrays;
 /**
  * The alias type. Supported types are: 0: No alias. 1: Mosaic id alias. 2: Address alias.
  *
- * @since
  */
 public enum AliasType {
     NONE(0),

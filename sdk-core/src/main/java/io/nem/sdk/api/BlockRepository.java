@@ -64,6 +64,8 @@ public interface BlockRepository {
      * client can compare if the calculated root equals the one recorded in the block header,
      * verifying that the receipt was linked with the block.
      *
+     * @param height the height
+     * @param limit the limit.
      * @param queryParams QueryParams
      * @return {@link Observable} of BlockInfo
      */
@@ -71,6 +73,8 @@ public interface BlockRepository {
         BigInteger height, int limit, Optional<QueryParams> queryParams);
 
     /**
+     * @param height the height
+     * @param hash the hash.
      * @return {@link Observable} of MerkleProofInfo
      */
     Observable<MerkelProofInfo> getMerkleReceipts(BigInteger height, String hash);
@@ -89,6 +93,7 @@ public interface BlockRepository {
     /**
      * Get receipts from a block
      *
+     * @param height the height
      * @return {@link Observable} of Statement
      */
     Observable<Statement> getBlockReceipts(BigInteger height);

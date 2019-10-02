@@ -21,6 +21,8 @@ buildscript {
     dependencies {
         classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.2'
         classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2"
+        classpath 'org.ajoberstar:gradle-git:1.7.2'
+        classpath 'com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1'
     }
 }
 
@@ -28,8 +30,13 @@ plugins {
     id "org.sonarqube" version "2.7"
 }
 
+apply plugin: 'org.ajoberstar.github-pages'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'jacoco'
+apply plugin: 'nebula-aggregate-javadocs'
+
+
+def artifactVersion = '0.13.0-SNAPSHOT'
 
 ext {
     vertxVersion = "3.5.0"
@@ -66,6 +73,9 @@ def signingSecretKeyRingFile = getPropertyValue('signingSecretKeyRingFile')
 def signingKeyId = getPropertyValue('signingKeyId')
 def signingPassword = getPropertyValue('signingPassword')
 
+def githubToken = getPropertyValue('githubToken')
+def repoPath = getPropertyValue('TRAVIS_REPO_SLUG')
+
 
 allprojects {
     ext."signing.keyId" = signingKeyId
@@ -83,7 +93,7 @@ subprojects {
     apply plugin: 'project-report'
     group 'io.nem'
     sourceCompatibility = 1.8
-    version = '0.13.0-SNAPSHOT'
+    version = artifactVersion
 
 
     repositories {
@@ -95,7 +105,10 @@ subprojects {
     }
 
     javadoc {
+        // options.addBooleanOption('html5', true)
         failOnError = true
+        source = sourceSets.main.allJava
+        classpath = configurations.compile
     }
 
     task sourcesJar(type: Jar) {
@@ -206,6 +219,8 @@ subprojects {
                 pom.project {
                     packaging 'jar'
                     url 'https://github.com/nemtech/nem2-sdk-java'
+                    name "${project.name}"
+                    description "${project.name} lib for NEM2 sdk Java"
 
                     scm {
                         connection 'scm:git:https://github.com/nemtech/nem2-sdk-java.git'
@@ -217,6 +232,20 @@ subprojects {
                         license {
                             name 'The Apache License, Version 2.0'
                             url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id 'fullcircle23'
+                            name 'Ravi Shanker'
+                        }
+                        developer {
+                            id 'rg911'
+                            name 'Steven Liu'
+                        }
+                        developer {
+                            id 'fboucquez'
+                            name 'Fernando Boucquez'
                         }
                     }
                 }
@@ -262,6 +291,39 @@ tasks.coveralls {
     description = 'Uploads the aggregated coverage report to Coveralls'
     dependsOn jacocoRootReport
 }
+
+task clean {
+    subprojects.each {
+        it.afterEvaluate {
+            def cleanTask = it.tasks.findByName('clean')
+            if (cleanTask) {
+                dependsOn(cleanTask)
+            }
+        }
+    }
+}
+
+githubPages {
+    if (githubToken) {
+        repoUri = "https://github.com/${repoPath}.git".toString()
+        credentials {
+            username = githubToken
+            password = ''
+        }
+    } else {
+        repoUri = "git@github.com:${repoPath}.git".toString()
+    }
+    deleteExistingFiles = false
+    commitMessage = "Publishing SDK Javadocs for version ${artifactVersion}".toString()
+    pages {
+        from(file("$buildDir/docs/javadoc")) {
+            into "javadoc/${artifactVersion}".toString()
+        }
+    }
+}
+
+publishGhPages.dependsOn("aggregateJavadocs")
+
 
 def gitBranch() {
     def branch = ""

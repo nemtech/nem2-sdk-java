@@ -71,7 +71,10 @@ public class Account {
     }
 
     /**
-     * Create an new Account
+     * Generates an new Account for provided network type
+     *
+     *  @param networkType the network type
+     * @return the account.
      */
     public static Account generateNewAccount(NetworkType networkType) {
         KeyPair keyPair = KeyPair.random(networkType.resolveSignSchema());
@@ -127,6 +130,7 @@ public class Account {
      * Sign a transaction.
      *
      * @param transaction The transaction to be signed.
+     * @param generationHash the generation hash.
      * @return {@link SignedTransaction}
      */
     public SignedTransaction sign(final Transaction transaction, final String generationHash) {
@@ -149,6 +153,7 @@ public class Account {
      *
      * @param transaction The aggregate transaction to be signed.
      * @param cosignatories The list of accounts that will cosign the transaction
+     * @param generationHash the generation hash.
      * @return {@link SignedTransaction}
      */
     public SignedTransaction signTransactionWithCosignatories(

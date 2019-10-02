@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-echo "Uploading generated clients jars"
-./gradlew -b ./openapi-generator/build.gradle uploadArchives -x javadoc
+echo "Uploading generated clients jars and javadocs"
+./gradlew -b ./openapi-generator/build.gradle uploadArchives publishGhPages
 
-echo "Uploading sdk jars"
-./gradlew uploadArchives -x javadoc
+echo "Uploading sdk jars and javadocs"
+./gradlew uploadArchives publishGhPages
