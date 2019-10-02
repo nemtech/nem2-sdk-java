@@ -65,6 +65,15 @@ public class MosaicAddressRestrictionTransactionFactory
         this.newRestrictionValue = newRestrictionValue;
     }
 
+    public static MosaicAddressRestrictionTransactionFactory create(NetworkType networkType,
+        MosaicId mosaicId,
+        BigInteger restrictionKey,
+        Address targetAddress,
+        BigInteger previousRestrictionValue,
+        BigInteger newRestrictionValue) {
+        return new MosaicAddressRestrictionTransactionFactory(networkType, mosaicId, restrictionKey, targetAddress, previousRestrictionValue, newRestrictionValue);
+    }
+
     @Override
     public MosaicAddressRestrictionTransaction build() {
         return new MosaicAddressRestrictionTransaction(this);

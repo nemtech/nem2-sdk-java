@@ -75,6 +75,17 @@ public class MosaicGlobalRestrictionTransactionFactory
         this.newRestrictionType = newRestrictionType;
     }
 
+    public static MosaicGlobalRestrictionTransactionFactory create (NetworkType networkType,
+        MosaicId mosaicId,
+        MosaicId referenceMosaicId,
+        BigInteger restrictionKey,
+        BigInteger previousRestrictionValue,
+        MosaicRestrictionType previousRestrictionType,
+        BigInteger newRestrictionValue,
+        MosaicRestrictionType newRestrictionType) {
+        return new MosaicGlobalRestrictionTransactionFactory(networkType, mosaicId, referenceMosaicId, restrictionKey, previousRestrictionValue, previousRestrictionType, newRestrictionValue, newRestrictionType);
+    }
+
     @Override
     public MosaicGlobalRestrictionTransaction build() {
         return new MosaicGlobalRestrictionTransaction(this);

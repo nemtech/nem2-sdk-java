@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Created by fernando on 06/08/19.
  *
- * @author Fernando Boucquez
+ * @author Fernando Boucquez, Ravi Shanker
  */
 public class JsonHelperGson implements JsonHelper {
 

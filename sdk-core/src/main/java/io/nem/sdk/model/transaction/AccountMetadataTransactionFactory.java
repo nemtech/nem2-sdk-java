@@ -40,6 +40,11 @@ public class AccountMetadataTransactionFactory extends
 
     }
 
+    public static AccountMetadataTransactionFactory create(NetworkType networkType,
+        PublicAccount targetAccount, BigInteger scopedMetadataKey, int valueSizeDelta, int valueSize, String value) {
+        return new AccountMetadataTransactionFactory(networkType, targetAccount, scopedMetadataKey, valueSizeDelta, valueSize, value);
+    }
+
     @Override
     public AccountMetadataTransaction build() {
         return new AccountMetadataTransaction(this);

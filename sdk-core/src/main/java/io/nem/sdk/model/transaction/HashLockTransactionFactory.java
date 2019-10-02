@@ -44,6 +44,11 @@ public class HashLockTransactionFactory extends TransactionFactory<HashLockTrans
         this.signedTransaction = signedTransaction;
     }
 
+    public static HashLockTransactionFactory create(NetworkType networkType,
+        Mosaic mosaic, BigInteger duration, SignedTransaction signedTransaction) {
+        return new HashLockTransactionFactory(networkType, mosaic, duration, signedTransaction);
+    }
+
     /**
      * Returns locked mosaic.
      *

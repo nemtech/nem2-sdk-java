@@ -31,10 +31,9 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Created by fernando on 03/08/19.
  *
- * @author Fernando Boucquez
+ * @author Fernando Boucquez, Ravi Shanker
  */
-public class
-JsonHelperJackson2 implements JsonHelper {
+public class JsonHelperJackson2 implements JsonHelper {
 
     private final ObjectMapper objectMapper;
 
@@ -188,7 +187,7 @@ JsonHelperJackson2 implements JsonHelper {
 
     @Override
     public JsonObject toJsonObject(Transaction transaction) {
-        return (new TransactionModelMapper()).toJSONObject(transaction);
+        return (new TransactionSerialization()).toJSONObject(transaction);
     }
 
     @Override

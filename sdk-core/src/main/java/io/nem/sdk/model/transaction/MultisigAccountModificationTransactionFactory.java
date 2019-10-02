@@ -45,6 +45,11 @@ public class MultisigAccountModificationTransactionFactory extends
         this.modifications = modifications;
     }
 
+    public static MultisigAccountModificationTransactionFactory create(NetworkType networkType,
+        int minApprovalDelta, int minRemovalDelta, List<MultisigCosignatoryModification> modifications) {
+        return new MultisigAccountModificationTransactionFactory(networkType, (byte) minApprovalDelta, (byte) minRemovalDelta, modifications);
+    }
+
     /**
      * Return number of signatures needed to approve a transaction. If we are modifying and existing
      * multi-signature account this indicates the relative change of the minimum cosignatories.

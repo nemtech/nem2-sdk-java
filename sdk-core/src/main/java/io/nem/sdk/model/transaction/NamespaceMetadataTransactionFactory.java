@@ -48,6 +48,12 @@ public class NamespaceMetadataTransactionFactory extends
         this.targetNamespaceId = targetNamespaceId;
     }
 
+    public static NamespaceMetadataTransactionFactory create(NetworkType networkType,
+        PublicAccount targetAccount, NamespaceId targetNamespaceId, BigInteger scopedMetadataKey,
+        int valueSizeDelta, int valueSize, String value) {
+        return new NamespaceMetadataTransactionFactory(networkType, targetAccount, targetNamespaceId, scopedMetadataKey, valueSizeDelta, valueSize, value);
+    }
+
     public NamespaceId getTargetNamespaceId() {
         return targetNamespaceId;
     }

@@ -48,6 +48,12 @@ public class MosaicMetadataTransactionFactory extends
         this.targetMosaicId = targetMosaicId;
     }
 
+    public static MosaicMetadataTransactionFactory create(NetworkType networkType,
+        PublicAccount targetAccount, MosaicId targetMosaicId, BigInteger scopedMetadataKey,
+        int valueSizeDelta, int valueSize, String value) {
+        return new MosaicMetadataTransactionFactory(networkType, targetAccount, targetMosaicId, scopedMetadataKey, valueSizeDelta, valueSize, value);
+    }
+
 
     public MosaicId getTargetMosaicId() {
         return targetMosaicId;
