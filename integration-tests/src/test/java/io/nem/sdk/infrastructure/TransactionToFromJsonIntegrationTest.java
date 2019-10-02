@@ -138,7 +138,9 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
         assertEquals(TransactionType.ACCOUNT_LINK.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(account.getPublicKey(), json.getJsonObject("transaction").getString("remotePublicKey"));
         assertEquals(AccountLinkAction.LINK.getValue(), json.getJsonObject("transaction").getInteger("linkAction").intValue());
-        assertNotNull(json.encodePrettily());
+        assertEquals(json.encode(), this.jsonHelper().toJSON(transaction));
+        assertNotNull(json.encodePrettily(), this.jsonHelper().toJSONPretty(transaction));
+        assertNotNull(json.encodePrettily(), this.jsonHelper().toJSONPretty(json.encode()));
     }
 
     @ParameterizedTest
