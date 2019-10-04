@@ -22,7 +22,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.nem.sdk.model.transaction.JsonHelper;
-import io.nem.sdk.model.transaction.Transaction;
 import java.math.BigInteger;
 import org.apache.commons.lang3.StringUtils;
 
@@ -176,31 +175,19 @@ public class JsonHelperGson implements JsonHelper {
     }
 
     @Override
-    public JsonObject toJsonObject(Transaction transaction) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("type", transaction.getType().getValue());
-        jsonObject.addProperty("networkType", transaction.getNetworkType().getValue());
-        jsonObject.addProperty("version", transaction.getVersion());
-        jsonObject.addProperty("maxFee", transaction.getMaxFee());
-        jsonObject.addProperty("deadline", transaction.getDeadline().getInstant());
-        jsonObject.addProperty("signature", (transaction.getSignature().isPresent() ? transaction.getSignature().get() : ""));
-
-        if (transaction.getSigner().isPresent()) jsonObject.addProperty("signerPublicKey", transaction.getSigner().get().getPublicKey().toString());
-
-
-
-        return jsonObject;
+    public JsonObject toJsonObject(Object object) {
+        return Serialization.toJsonObject(object);
     }
 
     @Override
-    public String toJSON(Transaction transaction) {
-        return toJsonObject(transaction).toString();
+    public String toJSON(Object object) {
+        return toJsonObject(object).toString();
     }
 
     @Override
-    public String toJSONPretty(Transaction transaction) {
+    public String toJSONPretty(Object object) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(toJsonObject(transaction));
+        return gson.toJson(toJsonObject(object));
     }
 
     @Override

@@ -1,4 +1,4 @@
-package io.nem.sdk.infrastructure.vertx;
+package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.mosaic.Mosaic;
