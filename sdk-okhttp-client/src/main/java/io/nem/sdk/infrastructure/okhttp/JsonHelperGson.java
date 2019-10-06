@@ -176,7 +176,7 @@ public class JsonHelperGson implements JsonHelper {
 
     @Override
     public JsonObject toJsonObject(Object object) {
-        return Serialization.toJsonObject(object);
+        return ModelToJSON.convert(object);
     }
 
     @Override

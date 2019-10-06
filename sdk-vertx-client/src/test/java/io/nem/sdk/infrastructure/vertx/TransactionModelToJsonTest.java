@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package io.nem.sdk.infrastructure;
+package io.nem.sdk.infrastructure.vertx;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nem.core.crypto.Hashes;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
@@ -53,6 +54,7 @@ import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.CosignatoryModificationActionType;
 import io.nem.sdk.model.transaction.HashLockTransaction;
 import io.nem.sdk.model.transaction.HashLockTransactionFactory;
+import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.LockHashAlgorithmType;
 import io.nem.sdk.model.transaction.MosaicAddressRestrictionTransaction;
 import io.nem.sdk.model.transaction.MosaicAddressRestrictionTransactionFactory;
@@ -80,6 +82,7 @@ import io.nem.sdk.model.transaction.SecretLockTransactionFactory;
 import io.nem.sdk.model.transaction.SecretProofTransaction;
 import io.nem.sdk.model.transaction.SecretProofTransactionFactory;
 import io.nem.sdk.model.transaction.SignedTransaction;
+import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
@@ -89,18 +92,17 @@ import java.util.Arrays;
 import java.util.Random;
 import org.apache.commons.codec.binary.Hex;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 
 /**
- * Tests for transaction serialization to JSON and deserialization from JSON.
+ * Tests for transaction model serialization to JSON using Jackson.
  *
  * @author Ravi Shanker
  */
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
+class TransactionModelToJsonTest {
 
     private Account account;
     private Address recipientAddress;
@@ -110,22 +112,32 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
     private MosaicId mosaicId;
     private MosaicNonce mosaicNonce;
     private String generationHash;
+    private JsonHelper jsonHelper;
 
     @BeforeAll
     void setup() {
-        account = this.getTestAccount();
-        recipientAddress = this.getRecipient();
-        multisigAccount = this.getTestMultisigAccount();
-        cosignatoryAccount = this.getTestCosignatoryAccount();
-        generationHash = this.getGenerationHash();
-        mosaicId = new MosaicId(BigInteger.ONE);
+        ObjectMapper objectMapper = JsonHelperJackson2.configureMapper(new ObjectMapper());
+        jsonHelper = new JsonHelperJackson2(objectMapper);
+
+        generationHash = "A94B1BE81F1D4C95D6D252AD7BA3FFFB1674991FD880B7A57DC3180AF8D69C32";
+
+        account = Account
+            .createFromPrivateKey("D9C23EDDC694D81107E6BB0B2AAB6E3C22C0C59F128F1B8FE0A1094736960074", NetworkType.MIJIN_TEST);
+        recipientAddress = Account
+            .createFromPrivateKey("063F36659A8BB01D5685826C19E2C2CA9D281465B642BD5E43CB69510408ECF7", NetworkType.MIJIN_TEST)
+            .getAddress();
+        multisigAccount = Account
+            .createFromPrivateKey("90F3C67116A4D84085FD40AC63CDDEA369948C93E265FC24703475EDE5368D1B", NetworkType.MIJIN_TEST);
+        cosignatoryAccount = Account
+            .createFromPrivateKey("9D17F0C7C146D1857A41F075D8A89C24E5521C63F59E4110D3F51F5F1292A73F", NetworkType.MIJIN_TEST);
+
         mosaicNonce = MosaicNonce.createFromBigInteger(BigInteger.ONE);
+        mosaicId = new MosaicId(BigInteger.ONE);
         namespaceId = NamespaceId.createFromId(BigInteger.ONE);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateAccountLinkTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateAccountLinkTransaction() {
 
         AccountLinkTransaction transaction =
             AccountLinkTransactionFactory
@@ -134,18 +146,17 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     AccountLinkAction.LINK)
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.ACCOUNT_LINK.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(account.getPublicKey(), json.getJsonObject("transaction").getString("remotePublicKey"));
         assertEquals(AccountLinkAction.LINK.getValue(), json.getJsonObject("transaction").getInteger("linkAction").intValue());
-        assertEquals(json.encode(), this.jsonHelper().toJSON(transaction));
-        assertNotNull(json.encodePrettily(), this.jsonHelper().toJSONPretty(transaction));
-        assertNotNull(json.encodePrettily(), this.jsonHelper().toJSONPretty(json.encode()));
+        assertEquals(json.encode(), jsonHelper.toJSON(transaction));
+        assertEquals(json.encodePrettily(), jsonHelper.toJSONPretty(transaction));
+        assertEquals(json.encodePrettily(), jsonHelper.toJSONPretty(json.encode()));
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateAccountAddressRestrictionTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateAccountAddressRestrictionTransaction() {
 
         AccountRestrictionModification addressRestrictionFilter =
             AccountRestrictionModification.createForAddress(
@@ -158,16 +169,15 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     Arrays.asList(addressRestrictionFilter))
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.ACCOUNT_ADDRESS_RESTRICTION.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(AccountRestrictionType.ALLOW_INCOMING_ADDRESS.getValue(), json.getJsonObject("transaction").getInteger("restrictionType").intValue());
         assertEquals(1, json.getJsonObject("transaction").getJsonArray("modifications").size());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateAccountMosaicRestrictionTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateAccountMosaicRestrictionTransaction() {
 
         AccountRestrictionModification mosaicRestrictionFilter =
             AccountRestrictionModification.createForMosaic(
@@ -180,16 +190,15 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     Arrays.asList(mosaicRestrictionFilter))
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.ACCOUNT_MOSAIC_RESTRICTION.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(AccountRestrictionType.ALLOW_INCOMING_MOSAIC.getValue(), json.getJsonObject("transaction").getInteger("restrictionType").intValue());
         assertEquals(1, json.getJsonObject("transaction").getJsonArray("modifications").size());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateAccountOperationRestrictionTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateAccountOperationRestrictionTransaction() {
 
         TransactionType operation = TransactionType.ADDRESS_ALIAS;
 
@@ -204,16 +213,15 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     Arrays.asList(operationRestrictionFilter))
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.ACCOUNT_OPERATION_RESTRICTION.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(AccountRestrictionType.ALLOW_OUTGOING_TRANSACTION_TYPE.getValue(), json.getJsonObject("transaction").getInteger("restrictionType").intValue());
         assertEquals(1, json.getJsonObject("transaction").getJsonArray("modifications").size());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateAddressAliasTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateAddressAliasTransaction() {
 
         AddressAliasTransaction transaction =
             AddressAliasTransactionFactory
@@ -223,15 +231,14 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     recipientAddress)
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.ADDRESS_ALIAS.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(AliasAction.LINK.getValue(), json.getJsonObject("transaction").getInteger("aliasAction").intValue());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateMosaicAliasTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateMosaicAliasTransaction() {
 
         MosaicAliasTransaction transaction =
             MosaicAliasTransactionFactory
@@ -241,15 +248,14 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     mosaicId)
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.MOSAIC_ALIAS.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(AliasAction.LINK.getValue(), json.getJsonObject("transaction").getInteger("aliasAction").intValue());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateMosaicDefinitionTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateMosaicDefinitionTransaction() {
 
         MosaicDefinitionTransaction transaction =
             MosaicDefinitionTransactionFactory
@@ -261,17 +267,16 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     new BlockDuration(BigInteger.valueOf(1000)))
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.MOSAIC_DEFINITION.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(7, json.getJsonObject("transaction").getInteger("flags").intValue());
         assertEquals(5, json.getJsonObject("transaction").getInteger("divisibility").intValue());
         assertEquals("1000", json.getJsonObject("transaction").getString("duration"));
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateMosaicDefinitionTransactionWithoutDuration(RepositoryType type) {
+    @Test
+    void shouldCreateMosaicDefinitionTransactionWithoutDuration() {
 
         MosaicDefinitionTransaction transaction =
             MosaicDefinitionTransactionFactory
@@ -283,16 +288,15 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     new BlockDuration(BigInteger.valueOf(0)))
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.MOSAIC_DEFINITION.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(1, json.getJsonObject("transaction").getInteger("flags").intValue());
         assertEquals(3, json.getJsonObject("transaction").getInteger("divisibility").intValue());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateMosaicSupplyChangeTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateMosaicSupplyChangeTransaction() {
 
         MosaicSupplyChangeTransaction transaction =
             MosaicSupplyChangeTransactionFactory
@@ -302,16 +306,15 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     BigInteger.TEN)
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.MOSAIC_SUPPLY_CHANGE.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(MosaicSupplyChangeActionType.INCREASE.getValue(), json.getJsonObject("transaction").getInteger("direction").intValue());
         assertEquals("10", json.getJsonObject("transaction").getString("delta"));
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateTransferTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateTransferTransaction() {
 
         TransferTransaction transaction =
             TransferTransactionFactory
@@ -323,17 +326,16 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     PlainMessage.create("test-message"))
                 .build();
 
-        JsonObject json = (JsonObject)this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject)jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.TRANSFER.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(2, json.getJsonObject("transaction").getJsonArray("mosaics").size());
         assertEquals("test-message", json.getJsonObject("transaction").getJsonObject("message").getString("payload"));
         assertEquals(0, json.getJsonObject("transaction").getJsonObject("message").getInteger("type").intValue());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateSecretLockTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateSecretLockTransaction() {
 
         byte[] secretBytes = new byte[20];
         new Random().nextBytes(secretBytes);
@@ -350,16 +352,15 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     recipientAddress)
                 .build();
 
-        JsonObject json = (JsonObject)this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject)jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.SECRET_LOCK.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(LockHashAlgorithmType.SHA3_256.getValue(), json.getJsonObject("transaction").getInteger("hashAlgorithm").intValue());
         assertEquals(secret, json.getJsonObject("transaction").getString("secret"));
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateSecretProofTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateSecretProofTransaction() {
 
         byte[] secretBytes = new byte[20];
         new Random().nextBytes(secretBytes);
@@ -376,17 +377,16 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     proof)
                 .build();
 
-        JsonObject json = (JsonObject)this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject)jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.SECRET_PROOF.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(LockHashAlgorithmType.SHA3_256.getValue(), json.getJsonObject("transaction").getInteger("hashAlgorithm").intValue());
         assertEquals(secret, json.getJsonObject("transaction").getString("secret"));
         assertEquals(proof, json.getJsonObject("transaction").getString("proof"));
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateMultisigCosignatoryModificationTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateMultisigCosignatoryModificationTransaction() {
 
         MultisigCosignatoryModification multisigCosignatoryModification =
             MultisigCosignatoryModification.create(CosignatoryModificationActionType.ADD, cosignatoryAccount.getPublicAccount());
@@ -399,17 +399,16 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     Arrays.asList(multisigCosignatoryModification))
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.MODIFY_MULTISIG_ACCOUNT.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(2, json.getJsonObject("transaction").getInteger("minApprovalDelta").intValue());
         assertEquals(1, json.getJsonObject("transaction").getInteger("minRemovalDelta").intValue());
         assertEquals(1, json.getJsonObject("transaction").getJsonArray("modifications").size());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateAggregateTransactionComplete(RepositoryType type) {
+    @Test
+    void shouldCreateAggregateTransactionComplete() {
 
         TransferTransaction transferTransaction =
             TransferTransactionFactory
@@ -430,7 +429,7 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     Arrays.asList(multisigCosignatoryModification))
                 .build();
 
-        AggregateTransaction aggregateTransaction =
+        AggregateTransaction transaction =
             AggregateTransactionFactory
                 .createComplete(NetworkType.MIJIN_TEST,
                     Arrays.asList(
@@ -438,15 +437,14 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                         multisigAccountModificationTransaction.toAggregate(multisigAccount.getPublicAccount())))
                 .build();
 
-        JsonObject json = (JsonObject)this.jsonHelper().toJsonObject(aggregateTransaction);
+        JsonObject json = (JsonObject)jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.AGGREGATE_COMPLETE.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(2, json.getJsonObject("transaction").getJsonArray("transactions").size());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateAggregateTransactionBonded(RepositoryType type) {
+    @Test
+    void shouldCreateAggregateTransactionBonded() {
 
         TransferTransaction transferTransaction =
             TransferTransactionFactory
@@ -467,7 +465,7 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     Arrays.asList(multisigCosignatoryModification))
                 .build();
 
-        AggregateTransaction aggregateTransaction =
+        AggregateTransaction transaction =
             AggregateTransactionFactory
                 .createBonded(NetworkType.MIJIN_TEST,
                     Arrays.asList(
@@ -475,15 +473,14 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                         multisigAccountModificationTransaction.toAggregate(multisigAccount.getPublicAccount())))
                 .build();
 
-        JsonObject json = (JsonObject)this.jsonHelper().toJsonObject(aggregateTransaction);
+        JsonObject json = (JsonObject)jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.AGGREGATE_BONDED.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(2, json.getJsonObject("transaction").getJsonArray("transactions").size());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateHashLockTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateHashLockTransaction() {
 
         AggregateTransaction aggregateTransaction =
             AggregateTransactionFactory
@@ -500,15 +497,14 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     signedTransaction)
                 .build();
 
-        JsonObject json = (JsonObject)this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject)jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.LOCK.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
         assertEquals(signedTransaction.getHash(), json.getJsonObject("transaction").getString("hash"));
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateRootNamespaceRegistrationTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateRootNamespaceRegistrationTransaction() {
 
         NamespaceRegistrationTransaction transaction =
             NamespaceRegistrationTransactionFactory
@@ -517,14 +513,13 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     BigInteger.valueOf(1000))
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.REGISTER_NAMESPACE.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateSubNamespaceRegistrationTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateSubNamespaceRegistrationTransaction() {
 
         NamespaceRegistrationTransaction transaction =
             NamespaceRegistrationTransactionFactory
@@ -533,14 +528,13 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     namespaceId)
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.REGISTER_NAMESPACE.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateAccountMetadataTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateAccountMetadataTransaction() {
 
         AccountMetadataTransaction transaction =
             AccountMetadataTransactionFactory
@@ -552,14 +546,13 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     "test-account-metadata")
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.ACCOUNT_METADATA_TRANSACTION.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateMosaicMetadataTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateMosaicMetadataTransaction() {
 
         MosaicMetadataTransaction transaction =
             MosaicMetadataTransactionFactory
@@ -572,14 +565,13 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     "test-mosaic-metadata")
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.MOSAIC_METADATA_TRANSACTION.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateNamespaceMetadataTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateNamespaceMetadataTransaction() {
 
         NamespaceMetadataTransaction transaction =
             NamespaceMetadataTransactionFactory
@@ -592,14 +584,13 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     "test-namespace-metadata")
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.NAMESPACE_METADATA_TRANSACTION.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateMosaicAddressRestrictionTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateMosaicAddressRestrictionTransaction() {
 
         MosaicAddressRestrictionTransaction transaction =
             MosaicAddressRestrictionTransactionFactory
@@ -611,14 +602,13 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     BigInteger.valueOf(8))
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.MOSAIC_ADDRESS_RESTRICTION.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void shouldCreateMosaicGlobalRestrictionTransaction(RepositoryType type) {
+    @Test
+    void shouldCreateMosaicGlobalRestrictionTransaction() {
 
         MosaicGlobalRestrictionTransaction transaction =
             MosaicGlobalRestrictionTransactionFactory
@@ -632,8 +622,22 @@ class TransactionToFromJsonIntegrationTest extends BaseIntegrationTest {
                     MosaicRestrictionType.GE)  // newRestrictionType
                 .build();
 
-        JsonObject json = (JsonObject) this.jsonHelper().toJsonObject(transaction);
+        JsonObject json = (JsonObject) jsonHelper.toJsonObject(transaction);
         assertEquals(TransactionType.MOSAIC_GLOBAL_RESTRICTION.getValue(), json.getJsonObject("transaction").getInteger("type").intValue());
-        assertNotNull(json.encodePrettily());
+        validateJsonPretty(json, transaction);
+    }
+
+    void validateJsonPretty(JsonObject jsonObject, Transaction transaction) {
+        // validate json string
+        String json = jsonObject.toString();
+        assertNotNull(json);
+        assertEquals(json, jsonHelper.toJSON(transaction));
+        // validate json pretty
+        String jsonPretty = jsonObject.encodePrettily();
+        String actual;
+        actual = jsonHelper.toJSONPretty(jsonObject.toString());
+        assertEquals(jsonPretty, actual);
+        actual = jsonHelper.toJSONPretty(jsonHelper.toJSONPretty(transaction));
+        assertEquals(jsonPretty, actual);
     }
 }
