@@ -89,6 +89,7 @@ import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Random;
 import org.apache.commons.codec.binary.Hex;
 import org.junit.jupiter.api.BeforeAll;
@@ -283,7 +284,8 @@ class TransactionModelToJsonTest {
         TransferTransaction transaction =
             TransferTransactionFactory
                 .create(NetworkType.MIJIN_TEST,
-                    recipientAddress,
+                    Optional.of(recipientAddress),
+                    Optional.empty(),
                     Arrays.asList(
                     NetworkHarvestMosaic.createAbsolute(BigInteger.valueOf(100)),
                     NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(100))),
@@ -358,7 +360,8 @@ class TransactionModelToJsonTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory
                 .create(NetworkType.MIJIN_TEST,
-                    recipientAddress,
+                    Optional.of(recipientAddress),
+                    Optional.empty(),
                     Arrays.asList(),
                     PlainMessage.create("test-message"))
                 .build();
@@ -391,7 +394,8 @@ class TransactionModelToJsonTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory
                 .create(NetworkType.MIJIN_TEST,
-                    recipientAddress,
+                    Optional.of(recipientAddress),
+                    Optional.empty(),
                     Arrays.asList(),
                     PlainMessage.create("test-message"))
                 .build();

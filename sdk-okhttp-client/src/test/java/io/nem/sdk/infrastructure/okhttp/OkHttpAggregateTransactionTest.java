@@ -90,7 +90,8 @@ public class OkHttpAggregateTransactionTest {
         TransferTransaction transferTx =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST),
+                Optional.of(new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST)),
+                Optional.empty(),
                 Collections.singletonList(
                     new Mosaic(new MosaicId(NetworkCurrencyMosaic.NAMESPACEID.getId()),
                         BigInteger.valueOf(10000000))),
@@ -115,7 +116,8 @@ public class OkHttpAggregateTransactionTest {
         TransferTransaction transferTx =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST),
+                Optional.of(new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST)),
+                Optional.empty(),
                 Collections.emptyList(),
                 new PlainMessage("test-message")
             ).build();

@@ -29,6 +29,7 @@ import io.nem.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Optional;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -53,8 +54,9 @@ class TransferTransactionTest {
 
         TransferTransaction transferTx =
             TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
-                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
-                    NetworkType.MIJIN_TEST),
+                Optional.of(new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
+                    NetworkType.MIJIN_TEST)),
+                Optional.empty(),
                 Arrays.asList(),
                 PlainMessage.Empty
             ).build();
@@ -79,7 +81,8 @@ class TransferTransactionTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                Optional.of(new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST)),
+                Optional.empty(),
                 Arrays.asList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
@@ -97,7 +100,8 @@ class TransferTransactionTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                Optional.of(new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST)),
+                Optional.empty(),
                 Arrays.asList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
@@ -115,7 +119,8 @@ class TransferTransactionTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                Optional.of(new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST)),
+                Optional.empty(),
                 Arrays.asList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
@@ -135,7 +140,8 @@ class TransferTransactionTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                Optional.of(new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST)),
+                Optional.empty(),
                 Arrays.asList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),

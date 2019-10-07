@@ -30,6 +30,7 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Utility main class that uses the nemesis address configured to generate new accounts necessary
@@ -54,7 +55,8 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                recipient.getAddress(),
+                Optional.of(recipient.getAddress()),
+                Optional.empty(),
                 Collections
                     .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(100))),
                 new PlainMessage("E2ETest:SetUpAccountsTool")

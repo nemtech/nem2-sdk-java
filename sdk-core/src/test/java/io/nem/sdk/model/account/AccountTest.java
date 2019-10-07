@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.nem.core.crypto.KeyPair;
-import io.nem.core.crypto.SignSchema;
 import io.nem.core.crypto.ed25519.Ed25519CryptoEngine;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.Mosaic;
@@ -32,6 +31,7 @@ import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -119,7 +119,8 @@ class AccountTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                Optional.of(new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST)),
+                Optional.empty(),
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),

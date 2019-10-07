@@ -80,6 +80,7 @@ import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 import org.apache.commons.codec.binary.Hex;
@@ -121,7 +122,8 @@ class E2EIntegrationTest extends BaseIntegrationTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                this.recipient,
+                Optional.of(this.recipient),
+                Optional.empty(),
                 Collections
                     .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
                 new PlainMessage("E2ETest:standaloneTransferTransaction:message")
@@ -148,7 +150,8 @@ class E2EIntegrationTest extends BaseIntegrationTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                this.recipient,
+                Optional.of(this.recipient),
+                Optional.empty(),
                 Collections
                     .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
                 /*new PlainMessage(
@@ -1017,7 +1020,8 @@ class E2EIntegrationTest extends BaseIntegrationTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                new Address("SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZY", NetworkType.MIJIN_TEST),
+                Optional.of(new Address("SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZY", NetworkType.MIJIN_TEST)),
+                Optional.empty(),
                 Collections
                     .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
                 PlainMessage.create("test-message")
