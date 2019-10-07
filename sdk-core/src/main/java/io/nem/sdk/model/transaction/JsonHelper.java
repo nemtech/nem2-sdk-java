@@ -159,26 +159,35 @@ public interface JsonHelper {
      */
     boolean contains(Object object, String... path);
 
+    /**
+     * Convert model object to JSON object.
+     *
+     * @param model
+     * @return Object
+     */
     Object toJsonObject(Object model);
 
     /**
-     * Convert transaction model to JSON string.
+     * Convert model object to JSON string.
      *
+     * @param model
      * @return String
      */
     String toJSON(Object model);
 
     /**
-     * Convert transaction model to JSON string in pretty format.
+     * Convert model object to JSON string in pretty format.
      *
+     * @param model
      * @return String
      */
     String toJSONPretty(Object model);
 
     /**
      * Pretty format a JSON string
+     *
      * @param jsonString
-     * @return
+     * @return String
      */
     String toJSONPretty(String jsonString);
 }

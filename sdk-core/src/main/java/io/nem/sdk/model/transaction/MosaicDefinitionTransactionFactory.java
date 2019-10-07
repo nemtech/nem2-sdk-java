@@ -62,6 +62,17 @@ public class MosaicDefinitionTransactionFactory extends
         this.blockDuration = blockDuration;
     }
 
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param mosaicNonce Mosaic nonce.
+     * @param mosaicId Mosaic id.
+     * @param mosaicFlags Mosaic flags.
+     * @param divisibility Divisibility.
+     * @param blockDuration Block duration.
+     * @return Mosaic definition transaction.
+     */
     public static MosaicDefinitionTransactionFactory create(NetworkType networkType, MosaicNonce mosaicNonce,
         MosaicId mosaicId, MosaicFlags mosaicFlags, int divisibility,
         BlockDuration blockDuration) {

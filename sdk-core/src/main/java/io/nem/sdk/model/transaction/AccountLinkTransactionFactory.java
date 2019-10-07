@@ -40,8 +40,16 @@ public class AccountLinkTransactionFactory extends TransactionFactory<AccountLin
         this.linkAction = linkAction;
     }
 
-    public static AccountLinkTransactionFactory create(NetworkType networkType, PublicAccount remoteAccount,
-        AccountLinkAction linkAction) {
+  /**
+   * Static create method for factory.
+   *
+   * @param networkType Network type.
+   * @param remoteAccount Remote account.
+   * @param linkAction Link action.
+   * @return Account link transaction.
+   */
+  public static AccountLinkTransactionFactory create(
+      NetworkType networkType, PublicAccount remoteAccount, AccountLinkAction linkAction) {
         return new AccountLinkTransactionFactory(networkType, remoteAccount, linkAction);
     }
 

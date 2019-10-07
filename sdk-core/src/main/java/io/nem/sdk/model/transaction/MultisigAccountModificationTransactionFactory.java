@@ -45,6 +45,15 @@ public class MultisigAccountModificationTransactionFactory extends
         this.modifications = modifications;
     }
 
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param minApprovalDelta Minimum approval delta.
+     * @param minRemovalDelta Minimum removal delta.
+     * @param modifications List of multisig account modifications.
+     * @return Multisig account modification transaction.
+     */
     public static MultisigAccountModificationTransactionFactory create(NetworkType networkType,
         int minApprovalDelta, int minRemovalDelta, List<MultisigCosignatoryModification> modifications) {
         return new MultisigAccountModificationTransactionFactory(networkType, (byte) minApprovalDelta, (byte) minRemovalDelta, modifications);

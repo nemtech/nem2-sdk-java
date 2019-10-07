@@ -44,6 +44,15 @@ public class HashLockTransactionFactory extends TransactionFactory<HashLockTrans
         this.signedTransaction = signedTransaction;
     }
 
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param mosaic Mosaic.
+     * @param duration Duration.
+     * @param signedTransaction Signed transaction.
+     * @return Hash lock transaction.
+     */
     public static HashLockTransactionFactory create(NetworkType networkType,
         Mosaic mosaic, BigInteger duration, SignedTransaction signedTransaction) {
         return new HashLockTransactionFactory(networkType, mosaic, duration, signedTransaction);

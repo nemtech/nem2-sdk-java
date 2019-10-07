@@ -65,6 +65,17 @@ public class MosaicAddressRestrictionTransactionFactory
         this.newRestrictionValue = newRestrictionValue;
     }
 
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param mosaicId Mosaic id.
+     * @param restrictionKey Restriction key.
+     * @param targetAddress Target address.
+     * @param previousRestrictionValue Previous restriction value.
+     * @param newRestrictionValue New restriction value.
+     * @return Mosaic address restriction transaction.
+     */
     public static MosaicAddressRestrictionTransactionFactory create(NetworkType networkType,
         MosaicId mosaicId,
         BigInteger restrictionKey,

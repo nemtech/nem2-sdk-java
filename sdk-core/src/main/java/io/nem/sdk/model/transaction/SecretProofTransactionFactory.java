@@ -61,6 +61,16 @@ public class SecretProofTransactionFactory extends TransactionFactory<SecretProo
         this.recipient = recipient;
     }
 
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param hashType Hash type.
+     * @param recipient Recipient address.
+     * @param secret The secret.
+     * @param proof The proof.
+     * @return Secret proof transaction.
+     */
     public static SecretProofTransactionFactory create(NetworkType networkType,
         LockHashAlgorithmType hashType, Address recipient, String secret, String proof) {
         return new SecretProofTransactionFactory(networkType, hashType, recipient, secret, proof);

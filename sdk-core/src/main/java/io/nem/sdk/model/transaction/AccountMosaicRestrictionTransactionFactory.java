@@ -43,6 +43,14 @@ public class AccountMosaicRestrictionTransactionFactory extends
         this.modifications = modifications;
     }
 
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param restrictionType Restriction type.
+     * @param modifications List of account mosaic restriction modifications.
+     * @return Account mosaic restriction transaction.
+     */
     public static AccountMosaicRestrictionTransactionFactory create(NetworkType networkType, AccountRestrictionType restrictionType,
         List<AccountRestrictionModification<MosaicId>> modifications) {
         return new AccountMosaicRestrictionTransactionFactory(networkType, restrictionType, modifications);

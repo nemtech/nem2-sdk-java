@@ -52,6 +52,15 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
         this.namespaceId = namespaceId;
     }
 
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param recipient Recipient address.
+     * @param mosaics List of mosaics.
+     * @param message Message.
+     * @return Transfer transaction.
+     */
     public static TransferTransactionFactory create(NetworkType networkType, Address recipient,
         List<Mosaic> mosaics, Message message) {
         return new TransferTransactionFactory(networkType, Optional.of(recipient), Optional.empty(),

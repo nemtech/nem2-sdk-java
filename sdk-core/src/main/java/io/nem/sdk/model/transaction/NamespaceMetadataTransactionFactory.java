@@ -48,6 +48,18 @@ public class NamespaceMetadataTransactionFactory extends
         this.targetNamespaceId = targetNamespaceId;
     }
 
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param targetAccount Target account.
+     * @param targetNamespaceId Target namespace id.
+     * @param scopedMetadataKey Scoped metadata key.
+     * @param valueSizeDelta Value size delta.
+     * @param valueSize Value size.
+     * @param value Value.
+     * @return Namespace metadata transaction.
+     */
     public static NamespaceMetadataTransactionFactory create(NetworkType networkType,
         PublicAccount targetAccount, NamespaceId targetNamespaceId, BigInteger scopedMetadataKey,
         int valueSizeDelta, int valueSize, String value) {

@@ -46,6 +46,15 @@ public class MosaicSupplyChangeTransactionFactory extends
         this.delta = delta;
     }
 
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param mosaicId Mosaic id.
+     * @param action Action.
+     * @param delta Delta.
+     * @return Mosaic supply change transaction.
+     */
     public static MosaicSupplyChangeTransactionFactory create(NetworkType networkType, MosaicId mosaicId,
         MosaicSupplyChangeActionType action, BigInteger delta) {
         return new MosaicSupplyChangeTransactionFactory(networkType, mosaicId, action, delta);

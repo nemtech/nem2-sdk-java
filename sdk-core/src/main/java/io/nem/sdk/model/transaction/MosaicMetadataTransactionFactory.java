@@ -48,6 +48,18 @@ public class MosaicMetadataTransactionFactory extends
         this.targetMosaicId = targetMosaicId;
     }
 
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param targetAccount Target account.
+     * @param targetMosaicId Target mosaic id.
+     * @param scopedMetadataKey Scoped metadata key.
+     * @param valueSizeDelta Value size delta.
+     * @param valueSize Value size.
+     * @param value Value.
+     * @return Mosaic metadata transaction.
+     */
     public static MosaicMetadataTransactionFactory create(NetworkType networkType,
         PublicAccount targetAccount, MosaicId targetMosaicId, BigInteger scopedMetadataKey,
         int valueSizeDelta, int valueSize, String value) {

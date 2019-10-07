@@ -40,6 +40,17 @@ public class AccountMetadataTransactionFactory extends
 
     }
 
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param targetAccount Target account.
+     * @param scopedMetadataKey Scoped metadata key.
+     * @param valueSizeDelta Value size delta.
+     * @param valueSize Value size.
+     * @param value Value.
+     * @return Account metadata transaction.
+     */
     public static AccountMetadataTransactionFactory create(NetworkType networkType,
         PublicAccount targetAccount, BigInteger scopedMetadataKey, int valueSizeDelta, int valueSize, String value) {
         return new AccountMetadataTransactionFactory(networkType, targetAccount, scopedMetadataKey, valueSizeDelta, valueSize, value);
