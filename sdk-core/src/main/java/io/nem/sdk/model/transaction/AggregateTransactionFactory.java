@@ -43,11 +43,27 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
     }
 
     /**
+     * Create an aggregate transaction factory that can be customized.
+     *
+     * @param type Transaction type.
+     * @param networkType Network type.
+     * @param innerTransactions List of inner transactions.
+     * @param cosignatures List of transaction cosigners signatures.
+     * @return The aggregate transaction factory
+     */
+    public static AggregateTransactionFactory create(TransactionType type,
+        NetworkType networkType,
+        List<Transaction> innerTransactions,
+        List<AggregateTransactionCosignature> cosignatures) {
+        return new AggregateTransactionFactory(type, networkType, innerTransactions, cosignatures);
+    }
+
+    /**
      * Create an aggregate complete transaction factory that can be customized.
      *
      * @param networkType The network type.
      * @param innerTransactions The list of inner innerTransactions.
-     * @return {@link AggregateTransaction}
+     * @return The aggregate transaction factory
      */
     public static AggregateTransactionFactory createComplete(NetworkType networkType,
         List<Transaction> innerTransactions) {
@@ -63,7 +79,7 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
      *
      * @param networkType The network type.
      * @param innerTransactions The list of inner innerTransactions.
-     * @return {@link AggregateTransaction}
+     * @return The aggregate transaction factory
      */
     public static AggregateTransactionFactory createBonded(NetworkType networkType,
         List<Transaction> innerTransactions) {
@@ -73,14 +89,6 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
             innerTransactions,
             new ArrayList<>());
     }
-
-    public static AggregateTransactionFactory create(TransactionType type,
-        NetworkType networkType,
-        List<Transaction> innerTransactions,
-        List<AggregateTransactionCosignature> cosignatures) {
-        return new AggregateTransactionFactory(type, networkType, innerTransactions, cosignatures);
-    }
-
 
     /**
      * Returns list of innerTransactions included in the aggregate transaction.
