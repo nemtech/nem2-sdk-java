@@ -34,7 +34,7 @@ class MosaicSupplyChangeTransactionTest {
     void createAMosaicSupplyChangeTransactionViaConstructor() {
 
         MosaicSupplyChangeTransaction mosaicSupplyChangeTx =
-            new MosaicSupplyChangeTransactionFactory(
+            MosaicSupplyChangeTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new MosaicId(new BigInteger("6300565133566699912")),
                 MosaicSupplyChangeActionType.INCREASE,
@@ -60,7 +60,7 @@ class MosaicSupplyChangeTransactionTest {
             "8900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904d42000000000000000001000000000000008869746e9b1a7057010a00000000000000";
 
         MosaicSupplyChangeTransaction mosaicSupplyChangeTransaction =
-            new MosaicSupplyChangeTransactionFactory(
+            MosaicSupplyChangeTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new MosaicId(new BigInteger("6300565133566699912")),
                 MosaicSupplyChangeActionType.INCREASE,

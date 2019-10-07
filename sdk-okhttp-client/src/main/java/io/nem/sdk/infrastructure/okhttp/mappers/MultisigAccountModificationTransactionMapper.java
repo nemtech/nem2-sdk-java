@@ -58,7 +58,7 @@ class MultisigAccountModificationTransactionMapper extends
                                     networkType)))
                     .collect(Collectors.toList());
 
-        return new MultisigAccountModificationTransactionFactory(
+        return MultisigAccountModificationTransactionFactory.create(
             networkType,
             transaction.getMinApprovalDelta().byteValue(),
             transaction.getMinRemovalDelta().byteValue(),

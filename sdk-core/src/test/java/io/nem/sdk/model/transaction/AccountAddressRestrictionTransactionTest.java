@@ -47,7 +47,7 @@ public class AccountAddressRestrictionTransactionTest {
             .createForAddress(AccountRestrictionModificationAction.ADD, account.getAddress());
         modifications.add(modification);
         AccountAddressRestrictionTransaction transaction =
-            new AccountAddressRestrictionTransactionFactory(
+            AccountAddressRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 AccountRestrictionType.ALLOW_INCOMING_ADDRESS,
                 modifications).deadline(new FakeDeadline()).build();
@@ -66,7 +66,7 @@ public class AccountAddressRestrictionTransactionTest {
         modifications.add(AccountRestrictionModification
             .createForAddress(AccountRestrictionModificationAction.ADD, account.getAddress()));
         AccountAddressRestrictionTransaction transaction =
-            new AccountAddressRestrictionTransactionFactory(
+            AccountAddressRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 AccountRestrictionType.ALLOW_INCOMING_ADDRESS,
                 modifications).deadline(new FakeDeadline()).signer(account.getPublicAccount())

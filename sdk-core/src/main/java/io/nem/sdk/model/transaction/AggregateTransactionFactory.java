@@ -31,7 +31,7 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
 
     private final List<AggregateTransactionCosignature> cosignatures;
 
-    public AggregateTransactionFactory(TransactionType type,
+    private AggregateTransactionFactory(TransactionType type,
         NetworkType networkType,
         List<Transaction> innerTransactions,
         List<AggregateTransactionCosignature> cosignatures) {
@@ -42,7 +42,6 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
         this.cosignatures = cosignatures;
     }
 
-
     /**
      * Create an aggregate complete transaction factory that can be customized.
      *
@@ -52,7 +51,7 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
      */
     public static AggregateTransactionFactory createComplete(NetworkType networkType,
         List<Transaction> innerTransactions) {
-        return new AggregateTransactionFactory(
+        return create(
             TransactionType.AGGREGATE_COMPLETE,
             networkType,
             innerTransactions,
@@ -68,11 +67,18 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
      */
     public static AggregateTransactionFactory createBonded(NetworkType networkType,
         List<Transaction> innerTransactions) {
-        return new AggregateTransactionFactory(
+        return create(
             TransactionType.AGGREGATE_BONDED,
             networkType,
             innerTransactions,
             new ArrayList<>());
+    }
+
+    public static AggregateTransactionFactory create(TransactionType type,
+        NetworkType networkType,
+        List<Transaction> innerTransactions,
+        List<AggregateTransactionCosignature> cosignatures) {
+        return new AggregateTransactionFactory(type, networkType, innerTransactions, cosignatures);
     }
 
 

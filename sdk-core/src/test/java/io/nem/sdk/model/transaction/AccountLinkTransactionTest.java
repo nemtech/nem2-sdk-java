@@ -40,7 +40,7 @@ public class AccountLinkTransactionTest {
     @Test
     void create() {
         AccountLinkTransaction transaction =
-            new AccountLinkTransactionFactory(
+            AccountLinkTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
                 AccountLinkAction.LINK).deadline(new FakeDeadline()).build();
@@ -55,7 +55,7 @@ public class AccountLinkTransactionTest {
 
 
         AccountLinkTransaction transaction =
-            new AccountLinkTransactionFactory(
+            AccountLinkTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
                 AccountLinkAction.LINK).signer(account.getPublicAccount())

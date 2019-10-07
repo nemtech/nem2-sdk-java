@@ -28,7 +28,7 @@ class MosaicGlobalRestrictionTransactionTest {
     @Test
     void createAMosaicGlobalRestrictionTransactionViaStaticConstructor() {
         MosaicGlobalRestrictionTransaction mosaicGlobalRestrictionTx =
-            new MosaicGlobalRestrictionTransactionFactory(
+            MosaicGlobalRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new MosaicId(new BigInteger("1")), // restrictedMosaicId
                 new MosaicId(new BigInteger("2")), // referenceMosaicId
@@ -55,7 +55,7 @@ class MosaicGlobalRestrictionTransactionTest {
     @Test
     void serializeAndSignTransaction() {
         MosaicGlobalRestrictionTransaction mosaicGlobalRestrictionTx =
-            new MosaicGlobalRestrictionTransactionFactory(
+            MosaicGlobalRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new MosaicId(new BigInteger("1")), // restricted MosaicId
                 new MosaicId(new BigInteger("2")), // referenceMosaicId

@@ -31,9 +31,7 @@ public class MultisigAccountModificationTransactionFactory extends
     private final byte minRemovalDelta;
     private final List<MultisigCosignatoryModification> modifications;
 
-
-    @SuppressWarnings("squid:S00107")
-    public MultisigAccountModificationTransactionFactory(
+    private MultisigAccountModificationTransactionFactory(
         NetworkType networkType,
         byte minApprovalDelta,
         byte minRemovalDelta,
@@ -56,7 +54,16 @@ public class MultisigAccountModificationTransactionFactory extends
      */
     public static MultisigAccountModificationTransactionFactory create(NetworkType networkType,
         int minApprovalDelta, int minRemovalDelta, List<MultisigCosignatoryModification> modifications) {
-        return new MultisigAccountModificationTransactionFactory(networkType, (byte) minApprovalDelta, (byte) minRemovalDelta, modifications);
+        return create(networkType, (byte) minApprovalDelta, (byte) minRemovalDelta, modifications);
+    }
+
+    public static MultisigAccountModificationTransactionFactory create(
+        NetworkType networkType,
+        byte minApprovalDelta,
+        byte minRemovalDelta,
+        List<MultisigCosignatoryModification> modifications) {
+        return new MultisigAccountModificationTransactionFactory(networkType, minApprovalDelta, minRemovalDelta,
+            modifications);
     }
 
     /**

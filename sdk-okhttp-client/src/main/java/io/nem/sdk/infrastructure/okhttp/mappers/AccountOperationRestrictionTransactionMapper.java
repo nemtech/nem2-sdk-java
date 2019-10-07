@@ -49,7 +49,7 @@ public class AccountOperationRestrictionTransactionMapper extends
             .rawValueOf(transaction.getRestrictionType().getValue());
         List<AccountRestrictionModification<TransactionType>> modifications = transaction
             .getModifications().stream().map(this::toModification).collect(Collectors.toList());
-        return new AccountOperationRestrictionTransactionFactory(networkType, restrictionType,
+        return AccountOperationRestrictionTransactionFactory.create(networkType, restrictionType,
             modifications);
     }
 

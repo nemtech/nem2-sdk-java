@@ -27,7 +27,7 @@ import java.math.BigInteger;
 public class AccountMetadataTransactionFactory extends
     MetadataTransactionFactory<AccountMetadataTransaction> {
 
-    public AccountMetadataTransactionFactory(
+    private AccountMetadataTransactionFactory(
         NetworkType networkType,
         PublicAccount targetAccount,
         BigInteger scopedMetadataKey,
@@ -36,8 +36,6 @@ public class AccountMetadataTransactionFactory extends
         String value) {
         super(TransactionType.ACCOUNT_METADATA_TRANSACTION, networkType, targetAccount,
             scopedMetadataKey, valueSizeDelta, valueSize, value);
-
-
     }
 
     /**

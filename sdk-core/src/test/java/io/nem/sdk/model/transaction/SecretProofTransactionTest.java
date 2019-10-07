@@ -57,7 +57,7 @@ public class SecretProofTransactionTest {
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
         String secretSeed = "9a493664";
         SecretProofTransaction secretProoftx =
-            new SecretProofTransactionFactory(
+            SecretProofTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 LockHashAlgorithmType.SHA3_256,
                 recipient,
@@ -76,7 +76,7 @@ public class SecretProofTransactionTest {
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
         String secretSeed = "9a493664";
         SecretProofTransaction secretProoftx =
-            new SecretProofTransactionFactory(NetworkType.MIJIN_TEST,
+            SecretProofTransactionFactory.create(NetworkType.MIJIN_TEST,
                 LockHashAlgorithmType.SHA3_256,
                 recipient,
                 secret,
@@ -97,7 +97,7 @@ public class SecretProofTransactionTest {
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
         String secretSeed = "9a493664";
         SecretProofTransaction secretProoftx =
-            new SecretProofTransactionFactory(
+            SecretProofTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 LockHashAlgorithmType.SHA3_256,
                 recipient,
@@ -122,7 +122,7 @@ public class SecretProofTransactionTest {
             IllegalArgumentException.class,
             () -> {
                 SecretProofTransaction secretProoftx =
-                    new SecretProofTransactionFactory(
+                    SecretProofTransactionFactory.create(
                         NetworkType.MIJIN_TEST,
                         LockHashAlgorithmType.SHA3_256,
                         recipient,

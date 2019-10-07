@@ -33,7 +33,7 @@ public class MosaicSupplyChangeTransactionFactory extends
     private final MosaicSupplyChangeActionType action;
     private final BigInteger delta;
 
-    public MosaicSupplyChangeTransactionFactory(
+    private MosaicSupplyChangeTransactionFactory(
         NetworkType networkType, MosaicId mosaicId,
         MosaicSupplyChangeActionType action,
         BigInteger delta) {

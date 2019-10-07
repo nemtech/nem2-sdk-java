@@ -50,7 +50,7 @@ public class MosaicAliasTransactionTest {
         MosaicId mosaicId = new MosaicId(BigInteger.TEN);
         NamespaceId namespaceId = NamespaceId.createFromName("anamespaced");
         MosaicAliasTransaction transaction =
-            new MosaicAliasTransactionFactory(
+            MosaicAliasTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 AliasAction.LINK,
                 namespaceId,
@@ -69,7 +69,7 @@ public class MosaicAliasTransactionTest {
         MosaicId mosaicId = new MosaicId(BigInteger.TEN);
         NamespaceId namespaceId = NamespaceId.createFromName("anamespaced");
         MosaicAliasTransaction transaction =
-            new MosaicAliasTransactionFactory(
+            MosaicAliasTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 AliasAction.LINK,
                 namespaceId,

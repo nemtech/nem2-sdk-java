@@ -31,8 +31,7 @@ public class AccountMosaicRestrictionTransactionFactory extends
 
     private final List<AccountRestrictionModification<MosaicId>> modifications;
 
-
-    public AccountMosaicRestrictionTransactionFactory(
+    private AccountMosaicRestrictionTransactionFactory(
         final NetworkType networkType,
         final AccountRestrictionType restrictionType,
         final List<AccountRestrictionModification<MosaicId>> modifications) {

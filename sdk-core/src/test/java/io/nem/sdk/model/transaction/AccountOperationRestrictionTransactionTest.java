@@ -47,7 +47,7 @@ public class AccountOperationRestrictionTransactionTest {
                 TransactionType.SECRET_PROOF);
         modifications.add(modification);
         AccountOperationRestrictionTransaction transaction =
-            new AccountOperationRestrictionTransactionFactory(
+            AccountOperationRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 AccountRestrictionType.ALLOW_OUTGOING_TRANSACTION_TYPE,
                 modifications).deadline(new FakeDeadline()).build();
@@ -69,7 +69,7 @@ public class AccountOperationRestrictionTransactionTest {
                 TransactionType.SECRET_PROOF);
         modifications.add(modification);
         AccountOperationRestrictionTransaction transaction =
-            new AccountOperationRestrictionTransactionFactory(
+            AccountOperationRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 AccountRestrictionType.ALLOW_INCOMING_MOSAIC,
                 modifications).signer(account.getPublicAccount()).deadline(new FakeDeadline())

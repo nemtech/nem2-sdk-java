@@ -35,7 +35,7 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
     private final Message message;
     private final Optional<NamespaceId> namespaceId;
 
-    public TransferTransactionFactory(
+    private TransferTransactionFactory(
         final NetworkType networkType,
         final Optional<Address> recipient,
         final Optional<NamespaceId> namespaceId,
@@ -63,8 +63,17 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
      */
     public static TransferTransactionFactory create(NetworkType networkType, Address recipient,
         List<Mosaic> mosaics, Message message) {
-        return new TransferTransactionFactory(networkType, Optional.of(recipient), Optional.empty(),
+        return create(networkType, Optional.of(recipient), Optional.empty(),
             mosaics, message);
+    }
+
+    public static TransferTransactionFactory create(
+        final NetworkType networkType,
+        final Optional<Address> recipient,
+        final Optional<NamespaceId> namespaceId,
+        final List<Mosaic> mosaics,
+        final Message message) {
+        return new TransferTransactionFactory(networkType, recipient, namespaceId, mosaics, message);
     }
 
     /**

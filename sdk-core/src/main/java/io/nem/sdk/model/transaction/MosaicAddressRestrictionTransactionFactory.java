@@ -35,17 +35,7 @@ public class MosaicAddressRestrictionTransactionFactory
     private final BigInteger previousRestrictionValue;
     private final BigInteger newRestrictionValue;
 
-    /**
-     * Create a mosaic address restriction transaction object with factory build and modifier methods.
-     *
-     * @param networkType {@link NetworkType}
-     * @param mosaicId {@link MosaicId}
-     * @param restrictionKey BigInteger
-     * @param targetAddress {@link Address}
-     * @param previousRestrictionValue BigInteger
-     * @param newRestrictionValue BigInteger
-     */
-    public MosaicAddressRestrictionTransactionFactory(
+    private MosaicAddressRestrictionTransactionFactory(
         NetworkType networkType,
         MosaicId mosaicId,
         BigInteger restrictionKey,
@@ -68,10 +58,10 @@ public class MosaicAddressRestrictionTransactionFactory
     /**
      * Static create method for factory.
      *
-     * @param networkType Network type.
-     * @param mosaicId Mosaic id.
+     * @param networkType {@link NetworkType}
+     * @param mosaicId {@link MosaicId}
      * @param restrictionKey Restriction key.
-     * @param targetAddress Target address.
+     * @param targetAddress {@link Address}
      * @param previousRestrictionValue Previous restriction value.
      * @param newRestrictionValue New restriction value.
      * @return Mosaic address restriction transaction.

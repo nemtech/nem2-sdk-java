@@ -30,8 +30,7 @@ public class AccountOperationRestrictionTransactionFactory extends
 
     private final List<AccountRestrictionModification<TransactionType>> modifications;
 
-    @SuppressWarnings("squid:S00107")
-    public AccountOperationRestrictionTransactionFactory(
+    private AccountOperationRestrictionTransactionFactory(
         final NetworkType networkType,
         final AccountRestrictionType restrictionType,
         final List<AccountRestrictionModification<TransactionType>> modifications) {

@@ -29,7 +29,7 @@ public class AccountLinkTransactionFactory extends TransactionFactory<AccountLin
     private final PublicAccount remoteAccount;
     private final AccountLinkAction linkAction;
 
-    public AccountLinkTransactionFactory(
+    private AccountLinkTransactionFactory(
         final NetworkType networkType,
         final PublicAccount remoteAccount,
         final AccountLinkAction linkAction) {

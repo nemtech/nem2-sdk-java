@@ -57,7 +57,7 @@ public class OkHttpAggregateTransactionTest {
     void createAAggregateTransactionViaStaticConstructor() {
 
         TransferTransaction transferTx =
-            new TransferTransactionFactory(
+            TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 Optional.of(new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
                     NetworkType.MIJIN_TEST)),

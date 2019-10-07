@@ -41,7 +41,7 @@ class SecretProofTransactionMapper extends
     @Override
     protected TransactionFactory<SecretProofTransaction> createFactory(NetworkType networkType,
         SecretProofTransactionDTO transaction) {
-        return new SecretProofTransactionFactory(
+        return SecretProofTransactionFactory.create(
             networkType,
             LockHashAlgorithmType.rawValueOf(transaction.getHashAlgorithm().getValue()),
             toAddressFromUnresolved(transaction.getRecipientAddress()),

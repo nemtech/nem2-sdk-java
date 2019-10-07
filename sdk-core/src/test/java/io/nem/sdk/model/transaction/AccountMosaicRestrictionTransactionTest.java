@@ -50,7 +50,7 @@ public class AccountMosaicRestrictionTransactionTest {
             .createForMosaic(AccountRestrictionModificationAction.ADD, mosaicId);
         modifications.add(modification);
         AccountMosaicRestrictionTransaction transaction =
-            new AccountMosaicRestrictionTransactionFactory(
+            AccountMosaicRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 AccountRestrictionType.ALLOW_INCOMING_MOSAIC,
                 modifications).deadline(new FakeDeadline()).build();
@@ -70,7 +70,7 @@ public class AccountMosaicRestrictionTransactionTest {
             .createForMosaic(AccountRestrictionModificationAction.ADD, mosaicId);
         modifications.add(modification);
         AccountMosaicRestrictionTransaction transaction =
-            new AccountMosaicRestrictionTransactionFactory(
+            AccountMosaicRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 AccountRestrictionType.ALLOW_INCOMING_MOSAIC,
                 modifications).deadline(new FakeDeadline()).signer(account.getPublicAccount())

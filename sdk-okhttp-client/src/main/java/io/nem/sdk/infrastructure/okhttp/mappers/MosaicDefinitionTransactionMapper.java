@@ -50,7 +50,7 @@ class MosaicDefinitionTransactionMapper extends
                 bitMapFlags.charAt(2) == '1',
                 bitMapFlags.charAt(1) == '1',
                 bitMapFlags.charAt(0) == '1');
-        return new MosaicDefinitionTransactionFactory(networkType,
+        return MosaicDefinitionTransactionFactory.create(networkType,
             MosaicNonce
                 .createFromBigInteger(transaction.getNonce()),
             toMosaicId(transaction.getId()),

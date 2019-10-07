@@ -187,7 +187,7 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
                 "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
 
         TransferTransaction transferTransaction =
-            new TransferTransactionFactory(NetworkType.MIJIN_TEST,
+            TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
                 Optional.of(address),
                 Optional.empty(),
                 Collections

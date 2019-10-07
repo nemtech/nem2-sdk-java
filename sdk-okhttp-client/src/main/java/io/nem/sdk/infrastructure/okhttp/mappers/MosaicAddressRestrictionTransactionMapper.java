@@ -42,7 +42,7 @@ class MosaicAddressRestrictionTransactionMapper extends
     @Override
     protected TransactionFactory<MosaicAddressRestrictionTransaction> createFactory(NetworkType networkType,
         MosaicAddressRestrictionTransactionDTO transaction) {
-        return new MosaicAddressRestrictionTransactionFactory(networkType,
+        return MosaicAddressRestrictionTransactionFactory.create(networkType,
             toMosaicId(transaction.getMosaicId()),
             new BigInteger(transaction.getRestrictionKey()),
             new Address(transaction.getTargetAddress(), networkType),

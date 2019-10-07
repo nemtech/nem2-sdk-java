@@ -48,7 +48,7 @@ class NamespaceRegistrationTransactionMapper extends
         NamespaceRegistrationType namespaceRegistrationType = NamespaceRegistrationType
             .rawValueOf(transaction.getRegistrationType().getValue());
 
-        return new NamespaceRegistrationTransactionFactory(networkType,
+        return NamespaceRegistrationTransactionFactory.create(networkType,
             transaction.getName(),
             toNamespaceId(transaction.getId()),
             namespaceRegistrationType,

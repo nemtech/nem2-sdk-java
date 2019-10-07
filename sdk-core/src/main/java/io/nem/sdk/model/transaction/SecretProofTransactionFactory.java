@@ -31,17 +31,7 @@ public class SecretProofTransactionFactory extends TransactionFactory<SecretProo
     private final String proof;
     private final Address recipient;
 
-    /**
-     * Constructor.
-     *
-     * @param networkType Network type.
-     * @param hashType Hash algorithm secret is generated with.
-     * @param recipient Address of recipient.
-     * @param secret Seed proof hashed.
-     * @param proof Seed proof
-     */
-
-    public SecretProofTransactionFactory(
+    private SecretProofTransactionFactory(
         final NetworkType networkType,
         final LockHashAlgorithmType hashType,
         final Address recipient,
@@ -65,10 +55,10 @@ public class SecretProofTransactionFactory extends TransactionFactory<SecretProo
      * Static create method for factory.
      *
      * @param networkType Network type.
-     * @param hashType Hash type.
+     * @param hashType Hash algorithm secret is generated with.
      * @param recipient Recipient address.
-     * @param secret The secret.
-     * @param proof The proof.
+     * @param secret Seed proof hashed.
+     * @param proof Seed proof
      * @return Secret proof transaction.
      */
     public static SecretProofTransactionFactory create(NetworkType networkType,

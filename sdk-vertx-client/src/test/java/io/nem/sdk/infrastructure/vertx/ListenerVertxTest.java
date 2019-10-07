@@ -315,7 +315,7 @@ public class ListenerVertxTest {
         List<MultisigCosignatoryModification> modifications = new ArrayList<>();
         modifications
             .add(new MultisigCosignatoryModification(modificationAction, cosignatoryPublicAccount));
-        MultisigAccountModificationTransactionFactory factory = new MultisigAccountModificationTransactionFactory(
+        MultisigAccountModificationTransactionFactory factory = MultisigAccountModificationTransactionFactory.create(
             NetworkType.MIJIN_TEST, (byte) 0, (byte) 0, modifications);
         if (signer != null) {
             factory.signer(signer);
@@ -402,7 +402,7 @@ public class ListenerVertxTest {
         List<AggregateTransactionCosignature> cosignatures = new ArrayList<>();
         cosignatures
             .add(new AggregateTransactionCosignature("Signature", consignauturePublicAccount));
-        AggregateTransactionFactory factory = new AggregateTransactionFactory(
+        AggregateTransactionFactory factory = AggregateTransactionFactory.create(
             TransactionType.AGGREGATE_COMPLETE, NetworkType.MIJIN_TEST,
             Collections.singletonList(anotherTransaction),
             cosignatures);
@@ -419,7 +419,7 @@ public class ListenerVertxTest {
                 "payload",
                 "8498B38D89C1DC8A448EA5824938FF828926CD9F7747B1844B59B4B6807E878B",
                 TransactionType.AGGREGATE_BONDED);
-        HashLockTransactionFactory factory = new HashLockTransactionFactory(
+        HashLockTransactionFactory factory = HashLockTransactionFactory.create(
             NetworkType.MIJIN_TEST, Mockito.mock(Mosaic.class),
             BigInteger.TEN, signedTransaction);
         if (signer != null) {

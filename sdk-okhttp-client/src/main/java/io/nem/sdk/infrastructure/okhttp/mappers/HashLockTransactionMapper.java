@@ -50,7 +50,7 @@ class HashLockTransactionMapper extends
         Mosaic mosaic = getMosaic(transaction.getMosaic());
         SignedTransaction signedTransaction = new SignedTransaction("", transaction.getHash(),
             TransactionType.AGGREGATE_BONDED);
-        return new HashLockTransactionFactory(networkType, mosaic, transaction.getDuration(),
+        return HashLockTransactionFactory.create(networkType, mosaic, transaction.getDuration(),
             signedTransaction);
     }
 }

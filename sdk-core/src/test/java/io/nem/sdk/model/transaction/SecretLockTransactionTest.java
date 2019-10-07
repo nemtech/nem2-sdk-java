@@ -52,7 +52,7 @@ public class SecretLockTransactionTest {
 
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
         SecretLockTransaction secretLocktx =
-            new SecretLockTransactionFactory(
+            SecretLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
@@ -72,7 +72,7 @@ public class SecretLockTransactionTest {
 
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
         SecretLockTransaction secretLocktx =
-            new SecretLockTransactionFactory(
+            SecretLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
@@ -94,7 +94,7 @@ public class SecretLockTransactionTest {
     void serializeAndSignTransaction() {
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
         SecretLockTransaction secretLocktx =
-            new SecretLockTransactionFactory(NetworkType.MIJIN_TEST,
+            SecretLockTransactionFactory.create(NetworkType.MIJIN_TEST,
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
@@ -118,7 +118,7 @@ public class SecretLockTransactionTest {
             IllegalArgumentException.class,
             () -> {
                 SecretLockTransaction secretLocktx =
-                    new SecretLockTransactionFactory(
+                    SecretLockTransactionFactory.create(
                         NetworkType.MIJIN_TEST,
                         NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
                         BigInteger.valueOf(100),

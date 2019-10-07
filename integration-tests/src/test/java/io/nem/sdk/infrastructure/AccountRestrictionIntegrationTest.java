@@ -17,17 +17,13 @@
 package io.nem.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.AccountRestrictions;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicNonce;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
 import io.nem.sdk.model.transaction.AccountMosaicRestrictionTransaction;
@@ -46,7 +42,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
@@ -198,7 +193,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
         List<AccountRestrictionModification<TransactionType>> modifications = new ArrayList<>();
         modifications.add(modification);
         AccountOperationRestrictionTransaction transaction =
-            new AccountOperationRestrictionTransactionFactory(
+            AccountOperationRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 accountRestrictionType
                 , modifications
@@ -225,7 +220,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
         List<AccountRestrictionModification<MosaicId>> modifications = new ArrayList<>();
         modifications.add(modification);
         AccountMosaicRestrictionTransaction transaction =
-            new AccountMosaicRestrictionTransactionFactory(
+            AccountMosaicRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 accountRestrictionType
                 , modifications
@@ -252,7 +247,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
         List<AccountRestrictionModification<Address>> modifications = new ArrayList<>();
         modifications.add(modification);
         AccountAddressRestrictionTransaction transaction =
-            new AccountAddressRestrictionTransactionFactory(
+            AccountAddressRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 accountRestrictionType
                 , modifications

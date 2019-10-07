@@ -37,7 +37,7 @@ public class NamespaceRegistrationTransactionFactory extends
     private final NamespaceRegistrationType namespaceRegistrationType;
 
 
-    public NamespaceRegistrationTransactionFactory(
+    private NamespaceRegistrationTransactionFactory(
         final NetworkType networkType,
         final String namespaceName,
         final NamespaceId namespaceId,
@@ -61,6 +61,28 @@ public class NamespaceRegistrationTransactionFactory extends
     }
 
     /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param namespaceName Namespace name.
+     * @param namespaceId Namespace id.
+     * @param namespaceRegistrationType Namespace registration type.
+     * @param duration Duration of the namespace.
+     * @param parentId Parent id.
+     * @return Register namespace transaction.
+     */
+    public static NamespaceRegistrationTransactionFactory create(
+        final NetworkType networkType,
+        final String namespaceName,
+        final NamespaceId namespaceId,
+        final NamespaceRegistrationType namespaceRegistrationType,
+        final Optional<BigInteger> duration,
+        final Optional<NamespaceId> parentId) {
+        return new NamespaceRegistrationTransactionFactory(networkType, namespaceName, namespaceId,
+            namespaceRegistrationType, duration, parentId);
+    }
+
+    /**
      * Creates a root namespace factory.
      *
      * @param networkType Network type.
@@ -73,18 +95,17 @@ public class NamespaceRegistrationTransactionFactory extends
         final String namespaceName,
         final BigInteger duration) {
         NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
-        return new NamespaceRegistrationTransactionFactory(networkType, namespaceName,
+        return create(networkType, namespaceName,
             namespaceId, NamespaceRegistrationType.ROOT_NAMESPACE, Optional.of(duration), Optional.empty());
     }
-
 
     /**
      * Create a sub namespace object.
      *
-     * @param namespaceName Namespace name.
-     * @param parentId Parent id name.
      * @param networkType Network type.
-     * @return instance of RegisterNamespaceTransaction
+     * @param namespaceName Namespace name.
+     * @param parentId Namespace parent id.
+     * @return Register namespace transaction.
      */
     public static NamespaceRegistrationTransactionFactory createSubNamespace(
         final NetworkType networkType,
@@ -92,11 +113,10 @@ public class NamespaceRegistrationTransactionFactory extends
         final NamespaceId parentId) {
         NamespaceId namespaceId = NamespaceId
             .createFromNameAndParentId(namespaceName, parentId.getId());
-        return new NamespaceRegistrationTransactionFactory(networkType, namespaceName, namespaceId,
+        return create(networkType, namespaceName, namespaceId,
             NamespaceRegistrationType.SUB_NAMESPACE, Optional.empty(),
             Optional.of(parentId));
     }
-
 
     /**
      * Returns namespace name.

@@ -34,7 +34,7 @@ public class MosaicMetadataTransactionFactory extends
      */
     private final MosaicId targetMosaicId;
 
-    public MosaicMetadataTransactionFactory(
+    private MosaicMetadataTransactionFactory(
         NetworkType networkType,
         PublicAccount targetAccount,
         MosaicId targetMosaicId,

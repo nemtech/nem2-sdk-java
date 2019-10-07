@@ -31,7 +31,7 @@ public class AccountAddressRestrictionTransactionFactory extends
 
     private final List<AccountRestrictionModification<Address>> modifications;
 
-    public AccountAddressRestrictionTransactionFactory(
+    private AccountAddressRestrictionTransactionFactory(
         final NetworkType networkType,
         final AccountRestrictionType restrictionType,
         final List<AccountRestrictionModification<Address>> modifications) {

@@ -47,7 +47,7 @@ public class MosaicMetadataTransactionTest {
     void shouldBuild() {
         MosaicId mosaicId = new MosaicId(BigInteger.valueOf(1000));
         MosaicMetadataTransaction transaction =
-            new MosaicMetadataTransactionFactory(
+            MosaicMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
                 mosaicId, BigInteger.TEN, 10, 20, "123ABC").deadline(new FakeDeadline()).build();
@@ -66,7 +66,7 @@ public class MosaicMetadataTransactionTest {
     void shouldGenerateBytes() {
         MosaicId mosaicId = new MosaicId(BigInteger.valueOf(1000));
         MosaicMetadataTransaction transaction =
-            new MosaicMetadataTransactionFactory(
+            MosaicMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
                 mosaicId, BigInteger.TEN, 10, 20, "123ABC").signer(account.getPublicAccount())

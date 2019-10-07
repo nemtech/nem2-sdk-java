@@ -30,7 +30,7 @@ public class HashLockTransactionFactory extends TransactionFactory<HashLockTrans
     private final BigInteger duration;
     private final SignedTransaction signedTransaction;
 
-    public HashLockTransactionFactory(
+    private HashLockTransactionFactory(
         NetworkType networkType,
         Mosaic mosaic,
         BigInteger duration,

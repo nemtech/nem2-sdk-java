@@ -34,7 +34,7 @@ public class SecretLockTransactionFactory extends TransactionFactory<SecretLockT
     private final String secret;
     private final Address recipient;
 
-    public SecretLockTransactionFactory(
+    private SecretLockTransactionFactory(
         NetworkType networkType,
         Mosaic mosaic,
         BigInteger duration,

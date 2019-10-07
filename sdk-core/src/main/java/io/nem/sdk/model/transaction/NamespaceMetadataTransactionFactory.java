@@ -34,7 +34,7 @@ public class NamespaceMetadataTransactionFactory extends
      */
     private final NamespaceId targetNamespaceId;
 
-    public NamespaceMetadataTransactionFactory(
+    private NamespaceMetadataTransactionFactory(
         NetworkType networkType,
         PublicAccount targetAccount,
         NamespaceId targetNamespaceId,

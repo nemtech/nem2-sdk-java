@@ -36,20 +36,7 @@ public class MosaicGlobalRestrictionTransactionFactory
     private final BigInteger newRestrictionValue;
     private final MosaicRestrictionType newRestrictionType;
 
-    /**
-     * Create a mosaic global restriction transaction object with factory build and modifier methods.
-     *
-     * @param networkType {@link NetworkType}
-     * @param mosaicId {@link MosaicId}
-     * @param referenceMosaicId {@link MosaicId}
-     * @param restrictionKey BigInteger
-     * @param previousRestrictionValue BigInteger
-     * @param previousRestrictionType {@link MosaicRestrictionType}
-     * @param newRestrictionValue BigInteger
-     * @param newRestrictionType {@link MosaicRestrictionType}
-     */
-    @SuppressWarnings("squid:S00107")
-    public MosaicGlobalRestrictionTransactionFactory(
+    private MosaicGlobalRestrictionTransactionFactory(
         NetworkType networkType,
         MosaicId mosaicId,
         MosaicId referenceMosaicId,
@@ -78,14 +65,14 @@ public class MosaicGlobalRestrictionTransactionFactory
     /**
      * Static create method for factory.
      *
-     * @param networkType Network type.
-     * @param mosaicId Mosaic id.
-     * @param referenceMosaicId Reference mosaic id.
+     * @param networkType {@link NetworkType}
+     * @param mosaicId {@link MosaicId}
+     * @param referenceMosaicId {@link MosaicId}
      * @param restrictionKey Restriction key.
      * @param previousRestrictionValue Previous restriction value.
-     * @param previousRestrictionType Previous restriction type.
+     * @param previousRestrictionType {@link MosaicRestrictionType}
      * @param newRestrictionValue New restriction value.
-     * @param newRestrictionType New restriction type.
+     * @param newRestrictionType {@link MosaicRestrictionType} New restriction type.
      * @return Mosaic global restriction transaction.
      */
     public static MosaicGlobalRestrictionTransactionFactory create (NetworkType networkType,

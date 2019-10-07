@@ -71,7 +71,7 @@ class TransferTransactionMapper extends
                         StandardCharsets.UTF_8));
         }
 
-        return new TransferTransactionFactory(networkType,
+        return TransferTransactionFactory.create(networkType,
             Optional.of(toAddressFromUnresolved(transaction.getRecipientAddress())),
             Optional.empty(),
             mosaics,
