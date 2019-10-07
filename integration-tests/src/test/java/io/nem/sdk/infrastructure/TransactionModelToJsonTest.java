@@ -149,6 +149,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -166,6 +167,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -183,6 +185,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -202,6 +205,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -216,6 +220,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -230,6 +235,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -246,6 +252,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -262,6 +269,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -276,6 +284,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -293,6 +302,7 @@ class TransactionModelToJsonTest {
                 .build();
         
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -314,6 +324,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -335,6 +346,7 @@ class TransactionModelToJsonTest {
                 .build();
         
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -352,6 +364,7 @@ class TransactionModelToJsonTest {
                 .build();
         
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -386,6 +399,7 @@ class TransactionModelToJsonTest {
                 .build();
         
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -420,6 +434,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -441,6 +456,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -454,6 +470,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -467,6 +484,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -483,6 +501,7 @@ class TransactionModelToJsonTest {
                 .build();
         
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -500,6 +519,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -517,6 +537,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -533,6 +554,7 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -551,5 +573,6 @@ class TransactionModelToJsonTest {
                 .build();
 
         assertEquals(jsonHelperJackson.toJSON(transaction), jsonHelperGson.toJSON(transaction));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 }

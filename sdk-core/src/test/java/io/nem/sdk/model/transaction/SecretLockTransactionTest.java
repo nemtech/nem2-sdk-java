@@ -51,7 +51,7 @@ public class SecretLockTransactionTest {
             "ca000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019052410000000000000000010000000000000044b262c46ceabb8580969800000000006400000000000000003fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe90e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac";
 
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
-        SecretLockTransaction secretLocktx =
+        SecretLockTransaction transaction =
             SecretLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
@@ -60,8 +60,9 @@ public class SecretLockTransactionTest {
                 secret,
                 Address.createFromRawAddress("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM"))
                 .deadline(new FakeDeadline()).build();
-        byte[] actual = secretLocktx.generateBytes();
+        byte[] actual = transaction.generateBytes();
         assertEquals(expected, Hex.toHexString(actual));
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -71,7 +72,7 @@ public class SecretLockTransactionTest {
             "7a0000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240190524144b262c46ceabb8580969800000000006400000000000000003fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe90e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac";
 
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
-        SecretLockTransaction secretLocktx =
+        SecretLockTransaction transaction =
             SecretLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
@@ -81,19 +82,20 @@ public class SecretLockTransactionTest {
                 Address.createFromRawAddress("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM"))
                 .deadline(new FakeDeadline()).build();
         byte[] actual =
-            secretLocktx
+            transaction
                 .toAggregate(
                     new PublicAccount(
                         "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
                         NetworkType.MIJIN_TEST))
-                .toAggregateTransactionBytes();
+                .serialize();
         assertEquals(expected, Hex.toHexString(actual));
+        assertEquals(true, transaction.isInnerTransaction());
     }
 
     @Test
     void serializeAndSignTransaction() {
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
-        SecretLockTransaction secretLocktx =
+        SecretLockTransaction transaction =
             SecretLockTransactionFactory.create(NetworkType.MIJIN_TEST,
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
@@ -101,7 +103,7 @@ public class SecretLockTransactionTest {
                 secret,
                 Address.createFromRawAddress("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM")
             ).deadline(new FakeDeadline()).build();
-        SignedTransaction signedTransaction = secretLocktx.signWith(account, generationHash);
+        SignedTransaction signedTransaction = transaction.signWith(account, generationHash);
         String payload = signedTransaction.getPayload();
         assertEquals(
             "44B262C46CEABB8580969800000000006400000000000000003FC8BA10229AB5778D05D9C4B7F56676A88B"
@@ -110,6 +112,7 @@ public class SecretLockTransactionTest {
         assertEquals(
             "DAF5D06A8C47C636E4C97B5AD3FCB82F2B9D2140A37FE5572A3065CF6D65642A",
             signedTransaction.getHash());
+        assertEquals(false, transaction.isInnerTransaction());
     }
 
     @Test
@@ -117,7 +120,7 @@ public class SecretLockTransactionTest {
         assertThrows(
             IllegalArgumentException.class,
             () -> {
-                SecretLockTransaction secretLocktx =
+                SecretLockTransaction transaction =
                     SecretLockTransactionFactory.create(
                         NetworkType.MIJIN_TEST,
                         NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),

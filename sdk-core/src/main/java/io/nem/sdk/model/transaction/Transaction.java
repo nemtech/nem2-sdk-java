@@ -45,6 +45,7 @@ public abstract class Transaction {
     private final Optional<String> signature;
     private final Optional<TransactionInfo> transactionInfo;
     private Optional<PublicAccount> signer;
+    private boolean isInnerTransaction = false;
 
     /**
      * Abstract constructors of all transactions.
@@ -156,6 +157,13 @@ public abstract class Transaction {
     }
 
     /**
+     * Returns true if transaction is an aggregate inner transaction.
+     *
+     * @return true if aggregate inner transaction; false otherwise.
+     */
+    public boolean isInnerTransaction() { return isInnerTransaction; }
+
+    /**
      * 
      * @return
      */
@@ -169,12 +177,12 @@ public abstract class Transaction {
 
     /**
      * Serialises a transaction model into binary (unsigned payload).
-     * Gets the serialised bytes for a transaction.
+     * Gets the serialised bytes for a transaction or an aggregate inner transaction.
      *
      * @return bytes of the transaction
      */
     public byte[] serialize() {
-        return this.generateBytes();
+        return (isInnerTransaction ? this.generateEmbeddedBytes() : this.generateBytes());
     }
 
     /**
@@ -217,7 +225,8 @@ public abstract class Transaction {
      *
      * @return transaction with signer serialized to be part of an aggregate transaction
      */
-    public byte[] toAggregateTransactionBytes() {
+    byte[] toAggregateTransactionBytes() {
+        this.isInnerTransaction = true;
         return this.generateEmbeddedBytes();
     }
 
@@ -228,6 +237,7 @@ public abstract class Transaction {
      * @return instance of Transaction with signer
      */
     public Transaction toAggregate(final PublicAccount signer) {
+        this.isInnerTransaction = true;
         this.signer = Optional.of(signer);
         return this;
     }
