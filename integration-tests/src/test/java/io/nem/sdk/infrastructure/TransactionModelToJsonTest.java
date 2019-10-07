@@ -346,8 +346,8 @@ class TransactionModelToJsonTest {
         MultisigAccountModificationTransaction transaction =
             MultisigAccountModificationTransactionFactory
                 .create(NetworkType.MIJIN_TEST,
-                    2,
-                    1,
+                    (byte) 2,
+                    (byte) 1,
                     Arrays.asList(multisigCosignatoryModification))
                 .build();
         
@@ -372,8 +372,8 @@ class TransactionModelToJsonTest {
         MultisigAccountModificationTransaction multisigAccountModificationTransaction =
             MultisigAccountModificationTransactionFactory
                 .create(NetworkType.MIJIN_TEST,
-                    2,
-                    1,
+                    (byte) 2,
+                    (byte) 1,
                     Arrays.asList(multisigCosignatoryModification))
                 .build();
 
@@ -406,8 +406,8 @@ class TransactionModelToJsonTest {
         MultisigAccountModificationTransaction multisigAccountModificationTransaction =
             MultisigAccountModificationTransactionFactory
                 .create(NetworkType.MIJIN_TEST,
-                    2,
-                    1,
+                    (byte) 2,
+                    (byte) 1,
                     Arrays.asList(multisigCosignatoryModification))
                 .build();
 
