@@ -66,7 +66,6 @@ public class MosaicMetadataTransactionFactory extends
         return new MosaicMetadataTransactionFactory(networkType, targetAccount, targetMosaicId, scopedMetadataKey, valueSizeDelta, valueSize, value);
     }
 
-
     public MosaicId getTargetMosaicId() {
         return targetMosaicId;
     }
