@@ -43,21 +43,6 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
     }
 
     /**
-     *
-     * @param type Transaction type.
-     * @param networkType Network type.
-     * @param innerTransactions List of inner transactions.
-     * @param cosignatures List of transaction cosigners signatures.
-     * @return The aggregate transaction factory
-     */
-    public static AggregateTransactionFactory create(TransactionType type,
-        NetworkType networkType,
-        List<Transaction> innerTransactions,
-        List<AggregateTransactionCosignature> cosignatures) {
-        return new AggregateTransactionFactory(type, networkType, innerTransactions, cosignatures);
-    }
-
-    /**
      * Create an aggregate complete transaction factory that can be customized.
      *
      * @param networkType The network type.
@@ -88,6 +73,14 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
             innerTransactions,
             new ArrayList<>());
     }
+
+    public static AggregateTransactionFactory create(TransactionType type,
+        NetworkType networkType,
+        List<Transaction> innerTransactions,
+        List<AggregateTransactionCosignature> cosignatures) {
+        return new AggregateTransactionFactory(type, networkType, innerTransactions, cosignatures);
+    }
+
 
     /**
      * Returns list of innerTransactions included in the aggregate transaction.

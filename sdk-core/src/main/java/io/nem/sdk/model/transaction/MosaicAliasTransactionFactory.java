@@ -32,6 +32,7 @@ public class MosaicAliasTransactionFactory extends TransactionFactory<MosaicAlia
     private final NamespaceId namespaceId;
     private final MosaicId mosaicId;
 
+
     private MosaicAliasTransactionFactory(
         final NetworkType networkType,
         final AliasAction aliasAction,

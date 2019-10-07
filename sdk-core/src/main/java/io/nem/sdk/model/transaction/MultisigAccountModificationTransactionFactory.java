@@ -52,6 +52,11 @@ public class MultisigAccountModificationTransactionFactory extends
      * @param modifications List of multisig account modifications.
      * @return Multisig account modification transaction.
      */
+    public static MultisigAccountModificationTransactionFactory create(NetworkType networkType,
+        int minApprovalDelta, int minRemovalDelta, List<MultisigCosignatoryModification> modifications) {
+        return create(networkType, (byte) minApprovalDelta, (byte) minRemovalDelta, modifications);
+    }
+
     public static MultisigAccountModificationTransactionFactory create(
         NetworkType networkType,
         byte minApprovalDelta,

@@ -61,6 +61,12 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
      * @param message Message.
      * @return Transfer transaction.
      */
+    public static TransferTransactionFactory create(NetworkType networkType, Address recipient,
+        List<Mosaic> mosaics, Message message) {
+        return create(networkType, Optional.of(recipient), Optional.empty(),
+            mosaics, message);
+    }
+
     public static TransferTransactionFactory create(
         final NetworkType networkType,
         final Optional<Address> recipient,
