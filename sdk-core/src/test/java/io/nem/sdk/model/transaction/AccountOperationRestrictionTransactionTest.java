@@ -17,7 +17,7 @@
 
 package io.nem.sdk.model.transaction;
 
-import io.nem.core.utils.HexEncoder;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.ArrayList;
@@ -76,10 +76,10 @@ public class AccountOperationRestrictionTransactionTest {
                 .build();
 
         String expected = "7d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001905043000000000000000001000000000000000201015242";
-        Assertions.assertEquals(expected, HexEncoder.getString(transaction.generateBytes()));
+        Assertions.assertEquals(expected, ConvertUtils.toHex(transaction.generateBytes()));
 
         String expectedEmbeddedHash = "2d0000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b24019050430201015242";
         Assertions.assertEquals(expectedEmbeddedHash,
-            HexEncoder.getString(transaction.generateEmbeddedBytes()));
+            ConvertUtils.toHex(transaction.generateEmbeddedBytes()));
     }
 }

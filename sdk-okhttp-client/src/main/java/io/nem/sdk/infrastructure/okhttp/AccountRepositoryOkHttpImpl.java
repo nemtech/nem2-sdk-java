@@ -19,16 +19,12 @@ package io.nem.sdk.infrastructure.okhttp;
 import static io.nem.core.utils.MapperUtils.toAddressFromUnresolved;
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
-import io.nem.core.crypto.PublicKey;
-import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.sdk.infrastructure.okhttp.mappers.TransactionMapper;
 import io.nem.sdk.model.account.AccountInfo;
 import io.nem.sdk.model.account.AccountNames;
-import io.nem.sdk.model.account.AccountRestriction;
-import io.nem.sdk.model.account.AccountRestrictions;
 import io.nem.sdk.model.account.AccountType;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.MultisigAccountGraphInfo;
@@ -37,7 +33,6 @@ import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.namespace.NamespaceName;
-import io.nem.sdk.model.transaction.AccountRestrictionType;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.openapi.okhttp_gson.api.AccountRoutesApi;
@@ -46,9 +41,6 @@ import io.nem.sdk.openapi.okhttp_gson.model.AccountDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountIds;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountNamesDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionsDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionsInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountsNamesDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MultisigAccountGraphInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MultisigAccountInfoDTO;
@@ -58,7 +50,6 @@ import io.reactivex.Observable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -92,20 +83,9 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
     }
 
     @Override
-    public Observable<List<AccountInfo>> getAccountsInfoFromAddresses(List<Address> addresses) {
+    public Observable<List<AccountInfo>> getAccountsInfo(List<Address> addresses) {
         AccountIds accountIds = new AccountIds()
             .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-        return getAccountsInfo(accountIds);
-    }
-
-    @Override
-    public Observable<List<AccountInfo>> getAccountsInfoFromPublicKeys(List<PublicKey> publicKeys) {
-        AccountIds accountIds = new AccountIds()
-            .addresses(publicKeys.stream().map(PublicKey::toString).collect(Collectors.toList()));
-        return getAccountsInfo(accountIds);
-    }
-
-    private Observable<List<AccountInfo>> getAccountsInfo(AccountIds accountIds) {
         Callable<List<AccountInfoDTO>> callback = () -> getClient()
             .getAccountsInfo(accountIds);
         return exceptionHandling(
@@ -115,17 +95,9 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
     }
 
     @Override
-    public Observable<List<AccountNames>> getAccountsNamesFromAddresses(List<Address> addresses) {
+    public Observable<List<AccountNames>> getAccountsNames(List<Address> addresses) {
         AccountIds accountIds = new AccountIds()
             .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-        return getAccountNames(accountIds);
-    }
-
-    @Override
-    public Observable<List<AccountNames>> getAccountsNamesFromPublicKeys(
-        List<PublicKey> publicKeys) {
-        AccountIds accountIds = new AccountIds()
-            .publicKeys(publicKeys.stream().map(PublicKey::toString).collect(Collectors.toList()));
         return getAccountNames(accountIds);
     }
 
@@ -333,50 +305,6 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
             dto.getMultisigPublicKeys().stream()
                 .map(multisigAccount -> new PublicAccount(multisigAccount, networkType))
                 .collect(Collectors.toList()));
-    }
-
-    @Override
-    public Observable<AccountRestrictions> getAccountRestrictions(Address address) {
-
-        Callable<AccountRestrictionsInfoDTO> callback = () -> getClient()
-            .getAccountRestrictions(address.plain());
-        return exceptionHandling(
-            call(callback).map(AccountRestrictionsInfoDTO::getAccountRestrictions)
-                .map(this::toAccountRestrictions));
-    }
-
-    @Override
-    public Observable<List<AccountRestrictions>> getAccountsRestrictions(
-        List<Address> addresses) {
-        AccountIds accountIds = new AccountIds()
-            .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-        return getAccountsRestrictions(accountIds);
-    }
-
-    private Observable<List<AccountRestrictions>> getAccountsRestrictions(AccountIds accountIds) {
-        Callable<List<AccountRestrictionsInfoDTO>> callback = () -> getClient()
-            .getAccountRestrictionsFromAccounts(accountIds);
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item)
-                .map(AccountRestrictionsInfoDTO::getAccountRestrictions)
-                .map(this::toAccountRestrictions)).toList().toObservable();
-    }
-
-
-    private AccountRestrictions toAccountRestrictions(AccountRestrictionsDTO dto) {
-        return new AccountRestrictions(MapperUtils.toAddressFromUnresolved(dto.getAddress()),
-            dto.getRestrictions().stream().map(this::toAccountRestriction).collect(
-                Collectors.toList()));
-    }
-
-    private AccountRestriction toAccountRestriction(AccountRestrictionDTO dto) {
-        AccountRestrictionType restrictionType = AccountRestrictionType
-            .rawValueOf(dto.getRestrictionType().getValue());
-        return new AccountRestriction(
-            restrictionType,
-            dto.getValues().stream().filter(Objects::nonNull).map(Object::toString)
-                .map(restrictionType.getTargetType()::fromString).collect(
-                Collectors.toList()));
     }
 
 

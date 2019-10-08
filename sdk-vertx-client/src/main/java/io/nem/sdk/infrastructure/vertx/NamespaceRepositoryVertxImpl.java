@@ -180,7 +180,7 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
 
     private NamespaceName toNamespaceName(NamespaceNameDTO dto) {
         return new NamespaceName(
-            toNamespaceId(dto.getNamespaceId()),
+            toNamespaceId(dto.getId()),
             dto.getName(), Optional.ofNullable(toNamespaceId(dto.getParentId())));
     }
 

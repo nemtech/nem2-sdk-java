@@ -114,6 +114,10 @@ public abstract class AbstractRepositoryOkHttpImpl {
         return queryParams.map(QueryParams::getId).orElse(null);
     }
 
+    protected String getOrder(Optional<QueryParams> queryParams) {
+        return queryParams.map(QueryParams::getOrder).orElse(null);
+    }
+
 
     public JsonHelper getJsonHelper() {
         return jsonHelper;

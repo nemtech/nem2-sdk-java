@@ -45,16 +45,17 @@ class NamespaceMetadataTransactionMapper extends
         PublicAccount targetAccount = PublicAccount
             .createFromPublicKey(transaction.getTargetPublicKey(), networkType);
         Integer valueSizeDelta = transaction.getValueSizeDelta();
-        BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey());
+        BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey(), 16);
         Integer valueSize = transaction.getValueSize();
         String value = transaction.getValue();
         NamespaceId targetNamespace = MapperUtils.toNamespaceId(transaction.getTargetNamespaceId());
-        return NamespaceMetadataTransactionFactory.create(networkType,
+        NamespaceMetadataTransactionFactory factory = NamespaceMetadataTransactionFactory.create(
+            networkType,
             targetAccount,
             targetNamespace,
             scopedMetaDataKey,
-            valueSizeDelta,
-            valueSize,
             value);
+        factory.valueSizeDelta(valueSizeDelta).valueSize(valueSize);
+        return factory;
     }
 }

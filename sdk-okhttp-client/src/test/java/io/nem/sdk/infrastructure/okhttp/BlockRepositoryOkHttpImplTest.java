@@ -139,7 +139,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
 
         BigInteger height = BigInteger.valueOf(10L);
         BlockInfo info = repository
-            .getBlocksByHeightWithLimit(height, 1, Optional.of(new QueryParams(10, "someId")))
+            .getBlocksByHeightWithLimit(height, 1, Optional.of(new QueryParams(10, "someId", "id")))
             .toFuture().get().get(0);
 
         Assertions.assertNotNull(info);

@@ -200,12 +200,12 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
         NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
         NamespaceNameDTO dto1 = new NamespaceNameDTO();
         dto1.setName("someName1");
-        dto1.setNamespaceId("1");
+        dto1.setId("1");
         dto1.setParentId("2");
 
         NamespaceNameDTO dto2 = new NamespaceNameDTO();
         dto2.setName("someName2");
-        dto2.setNamespaceId("3");
+        dto2.setId("3");
 
         mockRemoteCall(Arrays.asList(dto1, dto2));
 

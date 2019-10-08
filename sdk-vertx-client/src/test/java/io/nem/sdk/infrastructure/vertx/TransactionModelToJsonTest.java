@@ -545,8 +545,6 @@ class TransactionModelToJsonTest {
                 .create(NetworkType.MIJIN_TEST,
                     account.getPublicAccount(),
                     BigInteger.ONE,
-                    2,
-                    21,
                     "test-account-metadata")
                 .build();
 
@@ -564,8 +562,6 @@ class TransactionModelToJsonTest {
                     account.getPublicAccount(),
                     mosaicId,
                     BigInteger.ONE,
-                    2,
-                    21,
                     "test-mosaic-metadata")
                 .build();
 
@@ -583,8 +579,6 @@ class TransactionModelToJsonTest {
                     account.getPublicAccount(),
                     namespaceId,
                     BigInteger.ONE,
-                    2,
-                    21,
                     "test-namespace-metadata")
                 .build();
 
@@ -602,7 +596,6 @@ class TransactionModelToJsonTest {
                     mosaicId,
                     BigInteger.ONE,
                     account.getAddress(),
-                    BigInteger.valueOf(9),
                     BigInteger.valueOf(8))
                 .build();
 
@@ -618,10 +611,7 @@ class TransactionModelToJsonTest {
             MosaicGlobalRestrictionTransactionFactory
                 .create(NetworkType.MIJIN_TEST,
                     mosaicId, // restrictedMosaicId
-                    new MosaicId(new BigInteger("2")), // referenceMosaicId
                     BigInteger.valueOf(1),    // restrictionKey
-                    BigInteger.valueOf(9),    // previousRestrictionValue
-                    MosaicRestrictionType.EQ, // previousRestrictionType
                     BigInteger.valueOf(8),    // newRestrictionValue
                     MosaicRestrictionType.GE)  // newRestrictionType
                 .build();

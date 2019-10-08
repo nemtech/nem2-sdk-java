@@ -1,0 +1,163 @@
+/*
+ * Copyright 2019 NEM
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package io.nem.sdk.infrastructure;
+
+import io.nem.sdk.model.account.Account;
+import io.nem.sdk.model.metadata.Metadata;
+import io.nem.sdk.model.metadata.MetadataType;
+import io.nem.sdk.model.namespace.NamespaceId;
+import io.nem.sdk.model.transaction.AggregateTransaction;
+import io.nem.sdk.model.transaction.AggregateTransactionFactory;
+import io.nem.sdk.model.transaction.NamespaceMetadataTransaction;
+import io.nem.sdk.model.transaction.NamespaceMetadataTransactionFactory;
+import io.nem.sdk.model.transaction.NamespaceRegistrationTransaction;
+import io.nem.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
+import java.math.BigInteger;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+
+/**
+ * Integration tests around account metadata.
+ */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class    NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
+
+    //TODO use test account, not nemesis (getting Failure_Core_Insufficient_Balance errors when creating Namespace)
+    private Account testAccount = config().getNemesisAccount();
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    public void addMetadataToNamespace(RepositoryType type) throws InterruptedException {
+
+        NamespaceId targetNamespaceId = createNamespace(type);
+
+        System.out.println("Setting metadata " + targetNamespaceId.getIdAsHex());
+
+        String message = "This is the message in the Namespace!";
+        BigInteger key = BigInteger.TEN;
+        NamespaceMetadataTransaction transaction =
+            NamespaceMetadataTransactionFactory.create(
+                getNetworkType(), testAccount.getPublicAccount(), targetNamespaceId,
+                key, message
+            ).build();
+
+        AggregateTransaction aggregateTransaction = AggregateTransactionFactory
+            .createComplete(getNetworkType(),
+                Collections.singletonList(transaction.toAggregate(testAccount.getPublicAccount())))
+            .build();
+
+        AggregateTransaction announceCorrectly = announceAndValidate(type, testAccount,
+            aggregateTransaction);
+
+        Assertions
+            .assertEquals(testAccount.getPublicAccount(), announceCorrectly.getSigner().get());
+        Assertions.assertEquals(1, announceCorrectly.getInnerTransactions().size());
+        Assertions
+            .assertEquals(transaction.getType(),
+                announceCorrectly.getInnerTransactions().get(0).getType());
+        NamespaceMetadataTransaction processedTransaction = (NamespaceMetadataTransaction) announceCorrectly
+            .getInnerTransactions()
+            .get(0);
+
+        //TODO problem comparing namespaces, sometime they are negative big integers
+        Assertions.assertEquals(transaction.getTargetNamespaceId().getIdAsHex(),
+            processedTransaction.getTargetNamespaceId().getIdAsHex());
+        Assertions.assertEquals(transaction.getValueSizeDelta(),
+            processedTransaction.getValueSizeDelta());
+
+        Assertions.assertEquals(transaction.getScopedMetadataKey(),
+            processedTransaction.getScopedMetadataKey());
+
+        Assertions.assertEquals(transaction.getValueSize(), processedTransaction.getValueSize());
+
+        System.out.println("Metadata '" + message + "' stored!");
+
+        Thread.sleep(1000);
+
+        List<Metadata> metadata = get(getRepositoryFactory(type).createMetadataRepository()
+            .getNamespaceMetadata(targetNamespaceId,
+                Optional.empty()));
+
+        assertMetadata(transaction, metadata);
+
+        assertMetadata(transaction, get(getRepositoryFactory(type).createMetadataRepository()
+            .getNamespaceMetadataByKey(targetNamespaceId, key)));
+
+        assertMetadata(transaction,
+            Collections.singletonList(get(getRepositoryFactory(type).createMetadataRepository()
+                .getNamespaceMetadataByKeyAndSender(targetNamespaceId, key,
+                    testAccount.getPublicKey()))));
+
+        Assertions.assertEquals(message, processedTransaction.getValue());
+
+    }
+
+    private String assertMetadata(NamespaceMetadataTransaction transaction,
+        List<Metadata> metadata) {
+
+        Optional<Metadata> endpointMetadata = metadata.stream().filter(
+            m -> m.getMetadataEntry().getScopedMetadataKey()
+                .equals(transaction.getScopedMetadataKey()) &&
+                m.getMetadataEntry().getValueSize()
+                    .equals(transaction.getValueSize()) &&
+                m.getMetadataEntry().getMetadataType()
+                    .equals(MetadataType.NAMESPACE) &&
+                m.getMetadataEntry()
+                    .getTargetPublicKey().equals(testAccount.getPublicKey())).findFirst();
+
+        Assertions.assertTrue(endpointMetadata.isPresent());
+
+        Assertions.assertEquals(transaction.getTargetNamespaceId().getIdAsHex(),
+            endpointMetadata.get().getMetadataEntry().getTargetId().get().getIdAsHex());
+
+        Assertions.assertEquals(transaction.getValue(),
+            endpointMetadata.get().getMetadataEntry().getValue());
+        return endpointMetadata.get().getId();
+    }
+
+    public NamespaceId createNamespace(RepositoryType type) {
+
+        String namespaceName =
+            "namespace-for-metadata-integration-test-" + new Double(
+                Math.floor(Math.random() * 10000))
+                .intValue();
+
+        System.out.println("Creating namespace " + namespaceName);
+        NamespaceRegistrationTransaction namespaceRegistrationTransaction = NamespaceRegistrationTransactionFactory
+            .createRootNamespace(
+                getNetworkType(), namespaceName, BigInteger.valueOf(10)).build();
+
+        NamespaceRegistrationTransaction processedTransaction = announceAndValidate(type,
+            testAccount, namespaceRegistrationTransaction);
+
+        Assertions.assertEquals(namespaceRegistrationTransaction.getNamespaceId().getIdAsHex(),
+            processedTransaction.getNamespaceId().getIdAsHex());
+
+//TODO  https://nem.atlassian.net/browse/JS-52
+        Assertions.assertEquals(namespaceRegistrationTransaction.getNamespaceId().getIdAsHex(),
+            processedTransaction.getNamespaceId().getIdAsHex());
+
+        Assertions.assertEquals(namespaceRegistrationTransaction.getNamespaceName(),
+            processedTransaction.getNamespaceName());
+        return namespaceRegistrationTransaction.getNamespaceId();
+    }
+}

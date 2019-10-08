@@ -29,13 +29,26 @@ import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.AggregateTransaction;
+import io.nem.sdk.model.transaction.AggregateTransactionFactory;
+import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.sdk.model.transaction.JsonHelper;
+import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
+import io.nem.sdk.model.transaction.TransactionAnnounceResponse;
+import io.nem.sdk.model.transaction.TransactionInfo;
+import io.nem.sdk.model.transaction.TransactionStatusError;
+import io.nem.sdk.model.transaction.TransactionType;
 import io.reactivex.Observable;
+import java.math.BigInteger;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Abstract class for all the repository integration tests.
@@ -59,18 +72,39 @@ public abstract class BaseIntegrationTest {
 
     private static final Config CONFIG = Config.getInstance();
     private final NetworkType networkType = this.config().getNetworkType();
-    private final String generationHash = this.config().getGenerationHash();
     private final Long timeoutSeconds = this.config().getTimeoutSeconds();
     private final Map<RepositoryType, RepositoryFactory> repositoryFactoryMap = new HashMap<>();
     private final Map<RepositoryType, Listener> listenerMap = new HashMap<>();
     private final JsonHelper jsonHelper = new JsonHelperJackson2(
         JsonHelperJackson2.configureMapper(new ObjectMapper()));
+    private String generationHash = this.config().getGenerationHash();
+
+    @BeforeAll
+    void setUp() {
+        System.out.println("Running tests against server: " + config().getApiUrl());
+        generationHash = resolveGenerationHash();
+        System.out.println("Generation Hash: " + generationHash);
+    }
+
+    @BeforeEach
+    void coolDown() throws InterruptedException {
+        //To avoid rate-limiting errors from server. (5 per seconds)
+        Thread.sleep(500);
+    }
+
+    private String resolveGenerationHash() {
+        return Optional.ofNullable(this.config().getGenerationHash()).orElseGet(
+            () -> get(getRepositoryFactory(DEFAULT_REPOSITORY_TYPE).createBlockRepository()
+                .getBlockByHeight(
+                    BigInteger.ONE)).getGenerationHash());
+
+    }
 
     @AfterAll
     void tearDown() {
         listenerMap.values().forEach(Listener::close);
+        repositoryFactoryMap.values().forEach(RepositoryFactory::close);
     }
-
 
     private Listener createListener(RepositoryType type) {
         Listener listener = getRepositoryFactory(type).createListener();
@@ -185,27 +219,109 @@ public abstract class BaseIntegrationTest {
     }
 
 
-    void validateTransactionAnnounceCorrectly(Address address, String transactionHash,
-        RepositoryType type) {
-        Transaction transaction = get(
-            getListener(type).confirmed(address).take(1));
-        assertEquals(transactionHash, transaction.getTransactionInfo().get().getHash().get());
+    <T extends Transaction> T announceAggregateAndValidate(RepositoryType type, Account testAccount,
+        T transaction) {
+
+        System.out.println(
+            "Announcing Aggregate Transaction address: " + testAccount.getAddress().pretty()
+                + " Transaction: " + transaction.getType());
+        AggregateTransaction aggregateTransaction =
+            AggregateTransactionFactory.createComplete(
+                getNetworkType(),
+                Collections.singletonList(
+                    transaction.toAggregate(testAccount.getPublicAccount()))
+            ).build();
+
+        T announcedCorrectly = (T) announceAndValidate(
+            type, testAccount, aggregateTransaction).getInnerTransactions().get(0);
+        System.out.println("Transaction completed");
+        return announcedCorrectly;
     }
 
-    void validateAggregateBondedTransactionAnnounceCorrectly(Address address,
+
+    <T extends Transaction> T announceAndValidate(RepositoryType type, Account testAccount,
+        T transaction) {
+
+        if (transaction.getType() != TransactionType.AGGREGATE_COMPLETE) {
+            System.out
+                .println("Announcing Transaction address: " + testAccount.getAddress().pretty()
+                    + " Transaction: " + transaction.getType());
+        }
+        SignedTransaction signedTransaction = testAccount
+            .sign(transaction, getGenerationHash());
+
+        TransactionAnnounceResponse transactionAnnounceResponse =
+            get(getRepositoryFactory(type).createTransactionRepository()
+                .announce(signedTransaction));
+        assertEquals(
+            "packet 9 was pushed to the network via /transaction",
+            transactionAnnounceResponse.getMessage());
+
+        Transaction announceCorrectly = this
+            .validateTransactionAnnounceCorrectly(
+                testAccount.getAddress(), signedTransaction.getHash(), type);
+        Assertions.assertEquals(announceCorrectly.getType(), transaction.getType());
+        if (transaction.getType() != TransactionType.AGGREGATE_COMPLETE) {
+            System.out.println("Transaction completed");
+        }
+        return (T) announceCorrectly;
+    }
+
+
+    Transaction validateTransactionAnnounceCorrectly(Address address, String transactionHash,
+        RepositoryType type) {
+        Listener listener = getListener(type);
+        Observable<Transaction> observable = listener.confirmed(address)
+            .filter(t -> t.getTransactionInfo().flatMap(TransactionInfo::getHash)
+                .filter(s -> s.equals(transactionHash)).isPresent());
+        Transaction transaction = getTransactionOrFail(address, listener, observable);
+        assertEquals(transactionHash, transaction.getTransactionInfo().get().getHash().get());
+        return transaction;
+    }
+
+
+    AggregateTransaction validateAggregateBondedTransactionAnnounceCorrectly(Address address,
         String transactionHash, RepositoryType type) {
-        AggregateTransaction aggregateTransaction =
-            get(getListener(type).aggregateBondedAdded(address).take(1));
+        Listener listener = getListener(type);
+        Observable<AggregateTransaction> observable = listener.aggregateBondedAdded(address)
+            .filter(t -> t.getTransactionInfo().flatMap(TransactionInfo::getHash)
+                .filter(s -> s.equals(transactionHash)).isPresent());
+        AggregateTransaction aggregateTransaction = getTransactionOrFail(address, listener,
+            observable);
         assertEquals(transactionHash,
             aggregateTransaction.getTransactionInfo().get().getHash().get());
+        return aggregateTransaction;
     }
 
-    void validateAggregateBondedCosignatureTransactionAnnounceCorrectly(
+    CosignatureSignedTransaction validateAggregateBondedCosignatureTransactionAnnounceCorrectly(
         Address address, String transactionHash,
         RepositoryType type) {
-        String hash = get(
-            getListener(type).cosignatureAdded(address).take(getTimeoutSeconds(), TimeUnit.SECONDS))
-            .getParentHash();
-        assertEquals(transactionHash, hash);
+        Listener listener = getListener(type);
+        Observable<CosignatureSignedTransaction> observable = listener.cosignatureAdded(address)
+            .filter(t -> t.getParentHash().equals(transactionHash));
+        CosignatureSignedTransaction transaction = getTransactionOrFail(address, listener,
+            observable);
+        assertEquals(transactionHash, transaction.getParentHash());
+        return transaction;
     }
+
+    /**
+     * This method listens for the next object in observable but if a status error happens first it
+     * will raise an error. This speeds up the tests, if a transaction is not announced  correctly,
+     * the method will fail before timing out as it listens errors raised by the server.
+     */
+    private <T> T getTransactionOrFail(Address address, Listener listener,
+        Observable<T> observable) {
+        Observable<Object> errorOrTransactionObservable = Observable
+            .merge(observable, listener.status(address));
+        Object errorOrTransaction = get(errorOrTransactionObservable.take(1));
+        if (errorOrTransaction instanceof TransactionStatusError) {
+            throw new IllegalArgumentException(
+                "TransactionStatusError " + ((TransactionStatusError) errorOrTransaction)
+                    .getStatus());
+        }
+        return (T) errorOrTransaction;
+    }
+
+
 }

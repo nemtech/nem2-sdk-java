@@ -17,7 +17,7 @@
 package io.nem.core.crypto.ed25519.arithmetic;
 
 import io.nem.core.utils.ArrayUtils;
-import io.nem.core.utils.HexEncoder;
+import io.nem.core.utils.ConvertUtils;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -1028,6 +1028,6 @@ public class Ed25519EncodedFieldElement implements Serializable {
 
     @Override
     public String toString() {
-        return HexEncoder.getString(this.values);
+        return ConvertUtils.toHex(this.values);
     }
 }

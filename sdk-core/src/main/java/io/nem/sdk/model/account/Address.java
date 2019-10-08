@@ -190,4 +190,5 @@ public class Address {
     public int hashCode() {
         return Objects.hash(plainAddress, networkType);
     }
+
 }

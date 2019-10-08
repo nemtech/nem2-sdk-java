@@ -16,6 +16,8 @@
 
 package io.nem.sdk.infrastructure;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.sdk.api.DiagnosticRepository;
@@ -45,11 +47,12 @@ class DiagnosticRepositoryIntegrationTest extends BaseIntegrationTest {
     }
 
 
-    @BeforeAll
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
     void getServerInfo(RepositoryType type) {
         ServerInfo serverInfo = get(getDiagnosticRepository(type).getServerInfo());
 
-        assertTrue(!serverInfo.getRestVersion().equals(""));
-        assertTrue(!serverInfo.getSdkVersion().equals(""));
+        assertNotEquals("", serverInfo.getRestVersion());
+        assertNotEquals("", serverInfo.getSdkVersion());
     }
 }

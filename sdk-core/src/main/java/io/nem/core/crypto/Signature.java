@@ -17,7 +17,7 @@
 package io.nem.core.crypto;
 
 import io.nem.core.utils.ArrayUtils;
-import io.nem.core.utils.HexEncoder;
+import io.nem.core.utils.ConvertUtils;
 import java.math.BigInteger;
 import java.util.Arrays;
 
@@ -145,6 +145,6 @@ public class Signature {
 
     @Override
     public String toString() {
-        return HexEncoder.getString(this.getBytes());
+        return ConvertUtils.toHex(this.getBytes());
     }
 }

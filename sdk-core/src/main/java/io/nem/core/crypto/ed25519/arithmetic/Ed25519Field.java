@@ -17,7 +17,7 @@
 package io.nem.core.crypto.ed25519.arithmetic;
 
 import io.nem.core.utils.ArrayUtils;
-import io.nem.core.utils.HexEncoder;
+import io.nem.core.utils.ConvertUtils;
 import java.math.BigInteger;
 
 /**
@@ -36,7 +36,7 @@ public class Ed25519Field {
      */
     public static final BigInteger P =
         new BigInteger(
-            HexEncoder
+            ConvertUtils
                 .getBytes("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed"));
 
     public static final Ed25519FieldElement ZERO = getFieldElement(0);
@@ -50,7 +50,7 @@ public class Ed25519Field {
      */
     public static final Ed25519FieldElement I =
         new Ed25519EncodedFieldElement(
-            HexEncoder.getBytes(
+            ConvertUtils.getBytes(
                 "b0a00e4a271beec478e42fad0618432fa7d7fb3d99004d2b0bdfc14f8024832b"))
             .decode();
 

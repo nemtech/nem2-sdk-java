@@ -20,9 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.sdk.api.NamespaceRepository;
 import io.nem.sdk.api.RepositoryCallException;
-import io.nem.sdk.model.account.Address;
-import io.nem.sdk.model.account.PublicAccount;
-import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.namespace.NamespaceInfo;
@@ -40,14 +38,10 @@ import org.junit.jupiter.params.provider.EnumSource;
 //TODO Broken!!
 class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
 
-    private PublicAccount publicAccount;
     private NamespaceId namespaceId;
 
     @BeforeAll
     void setup() {
-        // String publicKey = "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF";
-        String publicKey = "F227B3268481DF7F9825CFB7C2051F441A9BC0C65FA0AA2CF3A438C4B3177B81";
-        publicAccount = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST);
         namespaceId = NetworkCurrencyMosaic.NAMESPACEID;
     }
 
@@ -55,38 +49,37 @@ class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
     @EnumSource(RepositoryType.class)
     void getNamespace(RepositoryType type) {
         NamespaceInfo namespaceInfo = get(getNamespaceRepository(type).getNamespace(namespaceId));
-
         assertEquals(new BigInteger("1"), namespaceInfo.getStartHeight());
-        assertEquals(new BigInteger("-1"), namespaceInfo.getEndHeight());
-        assertEquals(BigInteger.valueOf(3294802500L), namespaceId.getId());
+//        assertEquals(namespaceId, namespaceInfo.getId());
+        assertEquals(namespaceId.getIdAsHex(), namespaceInfo.getId().getIdAsHex());
         assertEquals(namespaceId.getIdAsLong(), namespaceInfo.getLevels().get(1).getIdAsLong());
     }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getNamespacesFromAccount(RepositoryType type) {
+        Account account = config().getNemesisAccount();
         List<NamespaceInfo> namespacesInfo =
-            get(getNamespaceRepository(type).getNamespacesFromAccount(publicAccount.getAddress()));
+            get(getNamespaceRepository(type).getNamespacesFromAccount(account.getAddress()));
 
-        assertEquals(1, namespacesInfo.size());
-        assertEquals(new BigInteger("1"), namespacesInfo.get(0).getStartHeight());
-        assertEquals(new BigInteger("-1"), namespacesInfo.get(0).getEndHeight());
-        assertEquals(namespaceId.getIdAsLong(),
-            namespacesInfo.get(0).getLevels().get(0).getIdAsLong());
+        namespacesInfo.forEach(n -> {
+            Assertions.assertEquals(account.getPublicAccount(), n.getOwner());
+        });
     }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getNamespacesFromAccounts(RepositoryType type) {
+        Account account = config().getNemesisAccount();
         List<NamespaceInfo> namespacesInfo = get(getNamespaceRepository(type)
             .getNamespacesFromAccounts(
                 Collections.singletonList(
-                    Address.createFromRawAddress("SARNASAS2BIAB6LMFA3FPMGBPGIJGK6IJETM3ZSP"))));
+                    account.getAddress())));
 
-        assertEquals(1, namespacesInfo.size());
-        assertEquals(new BigInteger("1"), namespacesInfo.get(0).getStartHeight());
-        assertEquals(new BigInteger("-1"), namespacesInfo.get(0).getEndHeight());
-        assertEquals(namespaceId, namespacesInfo.get(0).getLevels().get(0).getIdAsLong());
+        namespacesInfo.forEach(n -> {
+            Assertions.assertEquals(account.getPublicAccount(), n.getOwner());
+        });
+
     }
 
     @ParameterizedTest
@@ -96,9 +89,14 @@ class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
             get(getNamespaceRepository(type)
                 .getNamespaceNames(Collections.singletonList(namespaceId)));
 
-        assertEquals(1, namespaceNames.size());
-        assertEquals("nem", namespaceNames.get(0).getName());
-        assertEquals(namespaceId, namespaceNames.get(0).getNamespaceId());
+        Assertions.assertEquals(2, namespaceNames.size());
+        Assertions.assertEquals("currency", namespaceNames.get(0).getName());
+        Assertions.assertTrue(namespaceNames.get(0).getParentId().isPresent());
+
+        Assertions.assertEquals("cat", namespaceNames.get(1).getName());
+        Assertions.assertFalse(namespaceNames.get(1).getParentId().isPresent());
+
+
     }
 
     @ParameterizedTest

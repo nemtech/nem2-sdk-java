@@ -12,7 +12,7 @@
 package io.nem.sdk.model.transaction;
 
 import io.nem.core.utils.ByteUtils;
-import io.nem.core.utils.HexEncoder;
+import io.nem.core.utils.ConvertUtils;
 import java.math.BigInteger;
 import java.util.Optional;
 
@@ -42,7 +42,7 @@ public interface UInt64Id {
      */
     default String getIdAsHex() {
         byte[] bytes = ByteUtils.bigIntToBytes(getId());
-        return HexEncoder.getString(bytes);
+        return ConvertUtils.toHex(bytes);
     }
 
     /**

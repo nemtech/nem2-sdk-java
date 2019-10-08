@@ -1,7 +1,6 @@
 package io.nem.sdk.infrastructure;
 
 import io.nem.sdk.model.account.Account;
-import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.vertx.core.json.JsonObject;
 import java.io.File;
@@ -101,6 +100,10 @@ public class Config {
 
     public Account getTestAccount2() {
         return getAccount("testAccount2");
+    }
+
+    public Account getCosignatory3Account() {
+        return getAccount("cosignatory3Account");
     }
 
     private Account getAccount(String accountName) {

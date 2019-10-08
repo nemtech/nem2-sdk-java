@@ -31,12 +31,10 @@ public class AccountMetadataTransactionFactory extends
         NetworkType networkType,
         PublicAccount targetAccount,
         BigInteger scopedMetadataKey,
-        int valueSizeDelta,
-        int valueSize,
         String value) {
         super(TransactionType.ACCOUNT_METADATA_TRANSACTION, networkType, targetAccount,
-            scopedMetadataKey, valueSizeDelta, valueSize, value);
-    }
+            scopedMetadataKey, value);
+        };
 
     /**
      * Static create method for factory.
@@ -44,14 +42,12 @@ public class AccountMetadataTransactionFactory extends
      * @param networkType Network type.
      * @param targetAccount Target account.
      * @param scopedMetadataKey Scoped metadata key.
-     * @param valueSizeDelta Value size delta.
-     * @param valueSize Value size.
      * @param value Value.
      * @return Account metadata transaction.
      */
     public static AccountMetadataTransactionFactory create(NetworkType networkType,
-        PublicAccount targetAccount, BigInteger scopedMetadataKey, int valueSizeDelta, int valueSize, String value) {
-        return new AccountMetadataTransactionFactory(networkType, targetAccount, scopedMetadataKey, valueSizeDelta, valueSize, value);
+        PublicAccount targetAccount, BigInteger scopedMetadataKey, String value) {
+        return new AccountMetadataTransactionFactory(networkType, targetAccount, scopedMetadataKey, value);
     }
 
     @Override

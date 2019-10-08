@@ -19,7 +19,7 @@ package io.nem.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import io.nem.core.utils.HexEncoder;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -60,7 +60,7 @@ class HashLockTransactionTest {
                 BigInteger.valueOf(100),
                 signedTransaction).deadline(new FakeDeadline()).build();
         byte[] actual = transaction.generateBytes();
-        assertEquals(expected, HexEncoder.getString(actual));
+        assertEquals(expected, ConvertUtils.toHex(actual));
         assertEquals(false, transaction.isInnerTransaction());
     }
 
@@ -88,7 +88,7 @@ class HashLockTransactionTest {
                         "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
                         NetworkType.MIJIN_TEST))
                 .serialize();
-        assertEquals(expected, HexEncoder.getString(actual));
+        assertEquals(expected, ConvertUtils.toHex(actual));
         assertEquals(true, transaction.isInnerTransaction());
     }
 

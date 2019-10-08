@@ -20,11 +20,13 @@ import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.BlockRepository;
 import io.nem.sdk.api.ChainRepository;
 import io.nem.sdk.api.DiagnosticRepository;
+import io.nem.sdk.api.MetadataRepository;
 import io.nem.sdk.api.MosaicRepository;
 import io.nem.sdk.api.NamespaceRepository;
 import io.nem.sdk.api.NetworkRepository;
 import io.nem.sdk.api.NodeRepository;
 import io.nem.sdk.api.RepositoryFactory;
+import io.nem.sdk.api.RestrictionRepository;
 import io.nem.sdk.api.TransactionRepository;
 import io.nem.sdk.infrastructure.Listener;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
@@ -34,8 +36,11 @@ import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.DateTypeAdapter;
 import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.LocalDateTypeAdapter;
 import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.OffsetDateTimeTypeAdapter;
 import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.SqlDateTypeAdapter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import okhttp3.OkHttpClient;
+import org.apache.commons.io.IOUtils;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.OffsetDateTime;
 
@@ -121,7 +126,25 @@ public class RepositoryFactoryOkHttpImpl implements RepositoryFactory {
     }
 
     @Override
+    public MetadataRepository createMetadataRepository() {
+        return new MetadataRepositoryOkHttpImpl(apiClient);
+    }
+
+    @Override
+    public RestrictionRepository createRestrictionRepository() {
+        return new RestrictionRepositoryOkHttpImpl(apiClient);
+    }
+
+    @Override
     public Listener createListener() {
         return new ListenerOkHttp(apiClient.getHttpClient(), baseUrl, apiClient.getJSON());
+    }
+
+    @Override
+    public void close() {
+        OkHttpClient client = apiClient.getHttpClient();
+        client.dispatcher().executorService().shutdown();
+        client.connectionPool().evictAll();
+        IOUtils.closeQuietly(client.cache());
     }
 }

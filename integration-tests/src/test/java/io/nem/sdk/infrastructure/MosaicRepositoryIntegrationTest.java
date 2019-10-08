@@ -20,9 +20,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.sdk.api.MosaicRepository;
 import io.nem.sdk.api.RepositoryCallException;
+import io.nem.sdk.model.account.Account;
+import io.nem.sdk.model.blockchain.BlockDuration;
+import io.nem.sdk.model.mosaic.MosaicFlags;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicInfo;
 import io.nem.sdk.model.mosaic.MosaicNames;
+import io.nem.sdk.model.mosaic.MosaicNonce;
+import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
+import io.nem.sdk.model.transaction.MosaicDefinitionTransaction;
+import io.nem.sdk.model.transaction.MosaicDefinitionTransactionFactory;
 import io.nem.sdk.model.transaction.UInt64Id;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -38,15 +45,15 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
 
-    List<UInt64Id> mosaicIds = new ArrayList<>();
-    private MosaicId mosaicId, mosaicId2;
+    private Account testAccount = config().getNemesisAccount();
+    private List<UInt64Id> mosaicIds = new ArrayList<>();
+    private MosaicId mosaicId;
 
     @BeforeAll
-    void setup() {
-        mosaicId = new MosaicId("27d29cc897bbe161"); // currency mosaic id
-        mosaicId2 = new MosaicId("7db6ea8a3f189370"); // harvesting mosaic id
+    void setup() throws InterruptedException {
+        mosaicId = createMosaic(DEFAULT_REPOSITORY_TYPE, testAccount);
         mosaicIds.add(mosaicId);
-        mosaicIds.add(mosaicId2);
+        Thread.sleep(1000);
     }
 
     @ParameterizedTest
@@ -82,51 +89,26 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
         assertEquals(mosaicIds.get(0).getIdAsHex(), mosaicsInfo.get(0).getMosaicId().getIdAsHex());
     }
 
-  /*    @ParameterizedTest
+    @ParameterizedTest
     @EnumSource(RepositoryType.class)
-  void getMosaicViaNamespaceId() throws ExecutionException, InterruptedException {
-      MosaicInfo mosaicInfo = mosaicRepository
-              .getMosaic(NetworkCurrencyMosaic.NAMESPACEID)
-              .toFuture()
-              .get();
+    void getMosaicViaNamespaceId(RepositoryType type) {
+        MosaicInfo mosaicInfo = get(
+            getMosaicRepository(type).getMosaic(NetworkCurrencyMosaic.NAMESPACEID));
 
-      assertEquals(new BigInteger("1"), mosaicInfo.getHeight());
-      assertEquals(NetworkCurrencyMosaic.NAMESPACEID, mosaicInfo.getMosaicId());
-  }
+        assertEquals(new BigInteger("1"), mosaicInfo.getStartHeight());
+        assertEquals(NetworkCurrencyMosaic.NAMESPACEID, mosaicInfo.getMosaicId());
+    }
 
-  @ParameterizedTest
+    @ParameterizedTest
     @EnumSource(RepositoryType.class)
-  void getMosaicsViaNamespaceId() throws ExecutionException, InterruptedException {
-      List<MosaicInfo> mosaicsInfo = mosaicRepository
-              .getMosaics(Collections.singletonList(NetworkCurrencyMosaic.NAMESPACEID))
-              .toFuture()
-              .get();
+    void getMosaicsViaNamespaceId(RepositoryType type) {
 
-      assertEquals(NetworkCurrencyMosaic.NAMESPACEID, mosaicsInfo.get(0).getMosaicId());
-  }
+        List<MosaicInfo> mosaicsInfo = get(
+            getMosaicRepository(type)
+                .getMosaics(Collections.singletonList(NetworkCurrencyMosaic.NAMESPACEID)));
 
-  @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-  void getMosaicsFromNamespace() throws ExecutionException, InterruptedException {
-      List<MosaicInfo> mosaicsInfo = mosaicRepository
-              .getMosaicsFromNamespace(NetworkCurrencyMosaic.NAMESPACEID)
-              .toFuture()
-              .get();
-
-      assertEquals(NetworkCurrencyMosaic.NAMESPACEID, mosaicsInfo.get(0).getMosaicId());
-  }
-
-  @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-  void getMosaicsNames() throws ExecutionException, InterruptedException {
-      List<MosaicName> mosaicNames = mosaicRepository
-              .getMosaicsNames(Collections.singletonList(NetworkCurrencyMosaic.NAMESPACEID))
-              .toFuture()
-              .get();
-
-      assertEquals("xem", mosaicNames.get(0).getName());
-      assertEquals(NetworkCurrencyMosaic.NAMESPACEID, mosaicNames.get(0).getMosaicId());
-  }*/
+        assertEquals(NetworkCurrencyMosaic.NAMESPACEID, mosaicsInfo.get(0).getMosaicId());
+    }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
@@ -137,5 +119,24 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
         Assertions.assertEquals(
             "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'aaaaae18be375da2'",
             exception.getMessage());
+    }
+
+    private MosaicId createMosaic(RepositoryType type, Account testAccount) {
+        MosaicNonce nonce = MosaicNonce.createRandom();
+        MosaicId mosaicId = MosaicId.createFromNonce(nonce, testAccount.getPublicAccount());
+
+        System.out.println(mosaicId.getIdAsHex());
+
+        MosaicDefinitionTransaction mosaicDefinitionTransaction =
+            MosaicDefinitionTransactionFactory.create(getNetworkType(),
+                nonce,
+                mosaicId,
+                MosaicFlags.create(true, true, true),
+                4, new BlockDuration(100)).build();
+
+        MosaicDefinitionTransaction validateTransaction = announceAndValidate(type,
+            testAccount, mosaicDefinitionTransaction);
+        Assertions.assertEquals(mosaicId, validateTransaction.getMosaicId());
+        return mosaicId;
     }
 }

@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Stream;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -121,10 +121,10 @@ class NamespaceIdTest {
         NamespaceId test = NamespaceId.createFromName("subnem");
         NamespaceId test2 = NamespaceId.createFromName("subnem");
         NamespaceId test3 = NamespaceId.createFromName("another");
-        Assert.assertEquals(test, test2);
-        Assert.assertNotEquals(test, test3);
-        Assert.assertNotEquals("NotANamespaceId", test3);
-        Assert.assertNotEquals(test3, "NotANamespaceId");
+        Assertions.assertEquals(test, test2);
+        Assertions.assertNotEquals(test, test3);
+        Assertions.assertNotEquals("NotANamespaceId", test3);
+        Assertions.assertNotEquals(test3, "NotANamespaceId");
 
     }
 
@@ -134,8 +134,8 @@ class NamespaceIdTest {
         NamespaceId test = NamespaceId.createFromName("subnem");
         NamespaceId test2 = NamespaceId.createFromName("subnem");
         NamespaceId test3 = NamespaceId.createFromName("another");
-        Assert.assertEquals(test.hashCode(), test2.hashCode());
-        Assert.assertNotEquals(test.hashCode(), test3.hashCode());
+        Assertions.assertEquals(test.hashCode(), test2.hashCode());
+        Assertions.assertNotEquals(test.hashCode(), test3.hashCode());
 
     }
 }

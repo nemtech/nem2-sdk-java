@@ -31,23 +31,25 @@ class MosaicGlobalRestrictionTransactionTest {
             MosaicGlobalRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new MosaicId(new BigInteger("1")), // restrictedMosaicId
-                new MosaicId(new BigInteger("2")), // referenceMosaicId
                 BigInteger.valueOf(1),    // restrictionKey
-                BigInteger.valueOf(9),    // previousRestrictionValue
-                MosaicRestrictionType.EQ, // previousRestrictionType
                 BigInteger.valueOf(8),    // newRestrictionValue
                 MosaicRestrictionType.GE  // newRestrictionType
-            ).build();
+            ).referenceMosaicId(new MosaicId(new BigInteger("2")))
+                .previousRestrictionValue(BigInteger.valueOf(9))
+                .previousRestrictionType(MosaicRestrictionType.EQ).build();
 
         assertEquals(NetworkType.MIJIN_TEST, mosaicGlobalRestrictionTx.getNetworkType());
         assertTrue(1 == mosaicGlobalRestrictionTx.getVersion());
-        assertTrue(LocalDateTime.now().isBefore(mosaicGlobalRestrictionTx.getDeadline().getLocalDateTime()));
+        assertTrue(LocalDateTime.now()
+            .isBefore(mosaicGlobalRestrictionTx.getDeadline().getLocalDateTime()));
         assertEquals(BigInteger.valueOf(0), mosaicGlobalRestrictionTx.getMaxFee());
         assertEquals(new BigInteger("1"), mosaicGlobalRestrictionTx.getMosaicId().getId());
         assertEquals(new BigInteger("2"), mosaicGlobalRestrictionTx.getReferenceMosaicId().getId());
         assertEquals(BigInteger.valueOf(1), mosaicGlobalRestrictionTx.getRestrictionKey());
-        assertEquals(BigInteger.valueOf(9), mosaicGlobalRestrictionTx.getPreviousRestrictionValue());
-        assertEquals(MosaicRestrictionType.EQ, mosaicGlobalRestrictionTx.getPreviousRestrictionType());
+        assertEquals(BigInteger.valueOf(9),
+            mosaicGlobalRestrictionTx.getPreviousRestrictionValue());
+        assertEquals(MosaicRestrictionType.EQ,
+            mosaicGlobalRestrictionTx.getPreviousRestrictionType());
         assertEquals(BigInteger.valueOf(8), mosaicGlobalRestrictionTx.getNewRestrictionValue());
         assertEquals(MosaicRestrictionType.GE, mosaicGlobalRestrictionTx.getNewRestrictionType());
     }
@@ -58,17 +60,18 @@ class MosaicGlobalRestrictionTransactionTest {
             MosaicGlobalRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new MosaicId(new BigInteger("1")), // restricted MosaicId
-                new MosaicId(new BigInteger("2")), // referenceMosaicId
                 BigInteger.valueOf(1),    // restrictionKey
-                BigInteger.valueOf(9),    // previousRestrictionValue
-                MosaicRestrictionType.EQ, // previousRestrictionType
                 BigInteger.valueOf(8),    // newRestrictionValue
                 MosaicRestrictionType.GE  // newRestrictionType
-            ).build();
+            ).referenceMosaicId(new MosaicId(new BigInteger("2")))
+                .previousRestrictionValue(BigInteger.valueOf(9))
+                .previousRestrictionType(MosaicRestrictionType.EQ).build();
 
-        SignedTransaction signedTransaction = mosaicGlobalRestrictionTx.signWith(account, generationHash);
+        SignedTransaction signedTransaction = mosaicGlobalRestrictionTx
+            .signWith(account, generationHash);
 
-        assertEquals("010000000000000002000000000000000100000000000000090000000000000001080000000000000006",
+        assertEquals(
+            "010000000000000002000000000000000100000000000000090000000000000001080000000000000006",
             signedTransaction.getPayload().substring(240));
     }
 }

@@ -27,9 +27,16 @@ public class QueryParams {
 
     private final String id;
 
-    public QueryParams(Integer pageSize, String id) {
+    private final String order;
+
+    public QueryParams(Integer pageSize, String id, String order) {
         this.pageSize = pageSize != null && (pageSize >= 10 && pageSize <= 100) ? pageSize : 10;
         this.id = id;
+        this.order = order;
+    }
+
+    public QueryParams(Integer pageSize, String id) {
+        this(pageSize, id, null);
     }
 
     /**
@@ -51,11 +58,13 @@ public class QueryParams {
     }
 
     /**
-     * Converts query params into url params.
+     * Return the field used to sort the results. Example 'id' . If prefixed with '-', the order
+     * will be reversed. Example '-id'.
      *
-     * @return params in url format
+     * @return the field used to sort the results
      */
-    public String toUrl() {
-        return "?pageSize=" + pageSize + ((id != null && !id.isEmpty()) ? "&id=" + id : "");
+    public String getOrder() {
+        return order;
     }
+
 }

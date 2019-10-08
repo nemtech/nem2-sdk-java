@@ -17,7 +17,7 @@
 
 package io.nem.sdk.model.transaction;
 
-import io.nem.core.utils.HexEncoder;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
@@ -77,10 +77,10 @@ public class AccountMosaicRestrictionTransactionTest {
                 .build();
 
         String expected = "830000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000190504200000000000000000100000000000000020101e803000000000000";
-        Assertions.assertEquals(expected, HexEncoder.getString(transaction.generateBytes()));
+        Assertions.assertEquals(expected, ConvertUtils.toHex(transaction.generateBytes()));
 
         String expectedEmbeddedHash = "330000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401905042020101e803000000000000";
         Assertions.assertEquals(expectedEmbeddedHash,
-            HexEncoder.getString(transaction.generateEmbeddedBytes()));
+            ConvertUtils.toHex(transaction.generateEmbeddedBytes()));
     }
 }

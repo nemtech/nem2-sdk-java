@@ -38,17 +38,18 @@ public abstract class MetadataTransactionFactory<T extends MetadataTransaction> 
      */
     private final BigInteger scopedMetadataKey;
     /**
-     * Change in value size in bytes.
+     * Change in value size in bytes. Defaulted to the size of the encoded value.
      */
-    private final int valueSizeDelta;
+    private int valueSizeDelta;
 
     /**
-     * Value size in bytes.
+     * Value size in bytes. Defaulted to the size of the encoded value.
      */
-    private final int valueSize;
+    private int valueSize;
 
     /**
      * When there is an existing value, the new value is calculated as xor(previous-value, value).
+     * It can be a plain text.
      */
     private final String value;
 
@@ -57,22 +58,19 @@ public abstract class MetadataTransactionFactory<T extends MetadataTransaction> 
         NetworkType networkType,
         PublicAccount targetAccount,
         BigInteger scopedMetadataKey,
-        int valueSizeDelta,
-        int valueSize,
         String value) {
         super(transactionType, networkType);
 
         Validate.notNull(targetAccount, "TargetAccount must not be null");
         Validate.notNull(scopedMetadataKey, "ScopedMetadataKey must not be null");
-        Validate.notNull(valueSizeDelta, "ValueSizeDelta must not be null");
-        Validate.notNull(valueSize, "ValueSize must not be null");
         Validate.notNull(value, "Value must not be null");
 
         this.targetAccount = targetAccount;
         this.scopedMetadataKey = scopedMetadataKey;
-        this.valueSizeDelta = valueSizeDelta;
-        this.valueSize = valueSize;
         this.value = value;
+        int defaultSize = MetadataTransaction.toByteArray(value).length;
+        this.valueSize = defaultSize;
+        this.valueSizeDelta = defaultSize;
     }
 
     public PublicAccount getTargetAccount() {
@@ -90,6 +88,31 @@ public abstract class MetadataTransactionFactory<T extends MetadataTransaction> 
     public int getValueSize() {
         return valueSize;
     }
+
+    /**
+     * This builder method set the value sizeof the transaction. It's mostly used by the internal
+     * transaction mapper when processing a Metadata Transaction JSON payload.
+     *
+     * @param valueSize the new value size, mostly provided by JSON rest payload.
+     * @return this factory.
+     */
+    public MetadataTransactionFactory<T> valueSize(int valueSize) {
+        this.valueSize = valueSize;
+        return this;
+    }
+
+    /**
+     * Use this method when you want to update/modify a metadata. The value size delta needs to be
+     * provided in order to update the existing metadata correctly.
+     *
+     * @param valueSizeDelta the new value size delta
+     * @return this factory.
+     */
+    public MetadataTransactionFactory<T> valueSizeDelta(int valueSizeDelta) {
+        this.valueSizeDelta = valueSizeDelta;
+        return this;
+    }
+
 
     public String getValue() {
         return value;

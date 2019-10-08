@@ -10,12 +10,13 @@ tags:
   - name: Block routes
   - name: Chain routes
   - name: Diagnostic routes
+  - name: Metadata routes
   - name: Mosaic routes
   - name: Namespace routes
-  - name: Transaction routes
   - name: Network routes
   - name: Node routes
-  - name: Metadata routes
+  - name: Restriction routes
+  - name: Transaction routes
 paths:
   "/account/{accountId}":
     get:
@@ -189,10 +190,10 @@ paths:
                   $ref: "#/components/schemas/TransactionInfoDTO"
         "409":
           $ref : "#/components/responses/InvalidArgument"
-  "/account/{accountId}/restrictions":
+  "/restrictions/account/{accountId}":
     get:
       tags:
-        - Account routes
+        - Restriction routes
       summary: Get the account restrictions
       description: |
         Returns the account restrictions for a given account.
@@ -210,10 +211,10 @@ paths:
           $ref: "#/components/responses/ResourceNotFound"
         "409":
           $ref : "#/components/responses/InvalidArgument"
-  /account/restrictions:
+  /restrictions/account:
     post:
       tags:
-        - Account routes
+        - Restriction routes
       summary: Get account restrictions for given array of addresses
       description: Returns the account restrictions for a given array of addresses.
       operationId: getAccountRestrictionsFromAccounts
@@ -229,6 +230,94 @@ paths:
                 description: Array of account restrictions.
                 items:
                   $ref: "#/components/schemas/AccountRestrictionsInfoDTO"
+        "400":
+          $ref : "#/components/responses/InvalidContent"
+        "409":
+          $ref : "#/components/responses/InvalidArgument"
+  "/restrictions/mosaic/{mosaicId}":
+    get:
+      tags:
+        - Restriction routes
+      summary: Get mosaic global restriction for a given mosaic identifier.
+      description: Get mosaic global restriction.
+      operationId: getMosaicGlobalRestriction
+      parameters:
+        - $ref: "#/components/parameters/mosaicId"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MosaicGlobalRestrictionDTO"
+        "404":
+          $ref: "#/components/responses/ResourceNotFound"
+        "409":
+          $ref: "#/components/responses/InvalidArgument"
+    post:
+      tags:
+        - Restriction routes
+      summary: Get mosaic address restrictions for a given mosaic and account identifiers array.
+      description: Get mosaic address restrictions.
+      operationId: getMosaicAddressRestrictions
+      parameters:
+        - $ref: "#/components/parameters/mosaicId"
+      requestBody:
+        $ref: "#/components/requestBodies/accountIds"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                description: Array of mosaics address restrictions.
+                items:
+                  $ref: "#/components/schemas/MosaicAddressRestrictionDTO"
+        "400":
+          $ref : "#/components/responses/InvalidContent"
+        "409":
+          $ref : "#/components/responses/InvalidArgument"
+  "/restrictions/mosaic/{mosaicId}/address/{accountId}":
+    get:
+      tags:
+        - Restriction routes
+      summary: Get mosaic address restrictions for a given mosaic and account identifier.
+      description: Get mosaic address restriction.
+      operationId: getMosaicAddressRestriction
+      parameters:
+        - $ref: "#/components/parameters/mosaicId"
+        - $ref: "#/components/parameters/accountId"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MosaicAddressRestrictionDTO"
+        "404":
+          $ref: "#/components/responses/ResourceNotFound"
+        "409":
+          $ref: "#/components/responses/InvalidArgument"
+  /restrictions/mosaic:
+    post:
+      tags:
+        - Restriction routes
+      summary: Get mosaic global restrictions for an array of mosaics.
+      description: Get mosaic global restrictions.
+      operationId: getMosaicGlobalRestrictions
+      requestBody:
+        $ref: "#/components/requestBodies/mosaicIds"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                description: Array of mosaics global restrictions.
+                items:
+                  $ref: "#/components/schemas/MosaicGlobalRestrictionDTO"
         "400":
           $ref : "#/components/responses/InvalidContent"
         "409":
@@ -841,7 +930,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NodeTimeDTO"
-  "/account/{accountId}/metadata":
+  "/metadata/account/{accountId}":
     get:
       tags:
         - Metadata routes
@@ -864,7 +953,7 @@ paths:
           description: resource not found
         "409":
           description: invalid argument
-  "/mosaic/{mosaicId}/metadata":
+  "/metadata/mosaic/{mosaicId}":
     get:
       tags:
         - Metadata routes
@@ -887,7 +976,7 @@ paths:
           description: resource not found
         "409":
           description: invalid argument
-  "/namespace/{namespaceId}/metadata":
+  "/metadata/namespace/{namespaceId}":
     get:
       tags:
         - Metadata routes
@@ -910,7 +999,7 @@ paths:
           description: resource not found
         "409":
           description: invalid argument
-  "/account/{accountId}/metadata/{key}":
+  "/metadata/account/{accountId}/key/{key}":
     get:
       tags:
         - Metadata routes
@@ -931,7 +1020,7 @@ paths:
           description: resource not found
         "409":
           description: invalid argument
-  "/mosaic/{mosaicId}/metadata/{key}":
+  "/metadata/mosaic/{mosaicId}/key/{key}":
     get:
       tags:
         - Metadata routes
@@ -952,7 +1041,7 @@ paths:
           description: resource not found
         "409":
           description: invalid argument
-  "/namespace/{namespaceId}/metadata/{key}":
+  "/metadata/namespace/{namespaceId}/key/{key}":
     get:
       tags:
         - Metadata routes
@@ -973,7 +1062,7 @@ paths:
           description: resource not found
         "409":
           description: invalid argument
-  "/account/{accountId}/metadata/{key}/sender/{publicKey}":
+  "/metadata/account/{accountId}/key/{key}/sender/{publicKey}":
     get:
       tags:
         - Metadata routes
@@ -995,7 +1084,7 @@ paths:
           description: resource not found
         "409":
           description: invalid argument
-  "/mosaic/{mosaicId}/metadata/{key}/sender/{publicKey}":
+  "/metadata/mosaic/{mosaicId}/key/{key}/sender/{publicKey}":
     get:
       tags:
         - Metadata routes
@@ -1017,7 +1106,7 @@ paths:
           description: resource not found
         "409":
           description: invalid argument
-  "/namespace/{namespaceId}/metadata/{key}/sender/{publicKey}":
+  "/metadata/namespace/{namespaceId}/key/{key}/sender/{publicKey}":
     get:
       tags:
         - Metadata routes
@@ -1442,6 +1531,16 @@ components:
         * 0  - Decrease.
         * 1  - Increase.
       example: 0
+    # Enumerations - Mosaic restriction entry type
+    MosaicRestrictionEntryTypeEnum:
+      type: integer
+      format: int32
+      enum:
+        - 0
+        - 1
+      description: |
+        - 0 - Mosaic address restriction.
+        - 1 - Mosaic global restriction.
     # Enumerations - Multisig
     CosignatoryModificationActionEnum:
       type: integer
@@ -1513,9 +1612,9 @@ components:
         - 8515
         - 8776
         - 9032
-        - 12616
         - 8786
         - 9042
+        - 12616
         - 12626
         - 16717
         - 16718
@@ -3164,6 +3263,100 @@ components:
       allOf:
         - $ref: "#/components/schemas/EmbeddedTransactionDTO"
         - $ref: "#/components/schemas/MosaicGlobalRestrictionTransactionBodyDTO"
+    MosaicRestrictionKey:
+      type: string
+      format: hex
+      description: Restriction key.
+      example: 0DC67FBE1CAD29E3
+    MosaicGlobalRestrictionEntryRestrictionDTO:
+      type: object
+      required:
+        - referenceMosaicId
+        - restrictionValue
+        - restrictionType
+      properties:
+        referenceMosaicId:
+          $ref: "#/components/schemas/MosaicId"
+        restrictionValue:
+          type: string
+          description: Restriction value.
+        restrictionType:
+          $ref: "#/components/schemas/MosaicRestrictionTypeEnum"
+    MosaicGlobalRestrictionEntryDTO:
+      type: object
+      required:
+        - key
+        - restriction
+      properties:
+        key:
+          $ref: "#/components/schemas/MosaicRestrictionKey"
+        restriction:
+          $ref: "#/components/schemas/MosaicGlobalRestrictionEntryRestrictionDTO"
+    MosaicGlobalRestrictionEntryWrapperDTO:
+      type: object
+      required:
+        - compositeHash
+        - entryType
+        - mosaicId
+        - restrictions
+      properties:
+        compositeHash:
+          $ref: "#/components/schemas/Hash256"
+        entryType:
+          $ref: "#/components/schemas/MosaicRestrictionEntryTypeEnum"
+        mosaicId:
+          $ref: "#/components/schemas/MosaicId"
+        restrictions:
+          type: array
+          items:
+            $ref: "#/components/schemas/MosaicGlobalRestrictionEntryDTO"
+    MosaicGlobalRestrictionDTO:
+      type: object
+      required:
+        - mosaicRestrictionEntry
+      properties:
+        mosaicRestrictionEntry:
+          $ref: "#/components/schemas/MosaicGlobalRestrictionEntryWrapperDTO"
+    MosaicAddressRestrictionEntryDTO:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          $ref: "#/components/schemas/MosaicRestrictionKey"
+        value:
+          type: string
+          description: Restriction value.
+    MosaicAddressRestrictionEntryWrapperDTO:
+      type: object
+      required:
+        - compositeHash
+        - entryType
+        - mosaicId
+        - targetAddress
+        - restrictions
+      properties:
+        compositeHash:
+          $ref: "#/components/schemas/Hash256"
+        entryType:
+          $ref: "#/components/schemas/MosaicRestrictionEntryTypeEnum"
+        mosaicId:
+          $ref: "#/components/schemas/MosaicId"
+        targetAddress:
+          $ref: "#/components/schemas/Address"
+        restrictions:
+          type: array
+          items:
+            $ref: "#/components/schemas/MosaicAddressRestrictionEntryDTO"
+    MosaicAddressRestrictionDTO:
+      type: object
+      required:
+        - mosaicRestrictionEntry
+      properties:
+        mosaicRestrictionEntry:
+          $ref: "#/components/schemas/MosaicAddressRestrictionEntryWrapperDTO"
+
     # Schemas - Transfer
     MessageDTO:
       type: object
@@ -3220,20 +3413,13 @@ components:
     MetadataDTO:
       type: object
       required:
-        - meta
-        - metadataEntry
-      properties:
-        meta:
-          $ref: "#/components/schemas/MetadataMetaDTO"
-        metadataEntry:
-          $ref: "#/components/schemas/MetadataEntryDTO"
-    MetadataMetaDTO:
-      type: object
-      required:
         - id
+        - metadataEntry
       properties:
         id:
           type: string
+        metadataEntry:
+          $ref: "#/components/schemas/MetadataEntryDTO"
     MetadataEntryDTO:
       type: object
       required:

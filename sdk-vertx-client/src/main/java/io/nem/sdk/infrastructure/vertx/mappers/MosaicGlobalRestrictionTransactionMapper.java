@@ -36,11 +36,13 @@ class MosaicGlobalRestrictionTransactionMapper extends
     AbstractTransactionMapper<MosaicGlobalRestrictionTransactionDTO, MosaicGlobalRestrictionTransaction> {
 
     public MosaicGlobalRestrictionTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.MOSAIC_GLOBAL_RESTRICTION, MosaicGlobalRestrictionTransactionDTO.class);
+        super(jsonHelper, TransactionType.MOSAIC_GLOBAL_RESTRICTION,
+            MosaicGlobalRestrictionTransactionDTO.class);
     }
 
     @Override
-    protected TransactionFactory<MosaicGlobalRestrictionTransaction> createFactory(NetworkType networkType,
+    protected TransactionFactory<MosaicGlobalRestrictionTransaction> createFactory(
+        NetworkType networkType,
         MosaicGlobalRestrictionTransactionDTO transaction) {
 
         byte prevRestrictionType = transaction.getPreviousRestrictionType().getValue().byteValue();
@@ -48,12 +50,11 @@ class MosaicGlobalRestrictionTransactionMapper extends
 
         return MosaicGlobalRestrictionTransactionFactory.create(networkType,
             toMosaicId(transaction.getMosaicId()),
-            toMosaicId(transaction.getReferenceMosaicId()),
             new BigInteger(transaction.getRestrictionKey()),
-            new BigInteger(transaction.getPreviousRestrictionValue()),
-            MosaicRestrictionType.rawValueOf(prevRestrictionType),
             new BigInteger(transaction.getNewRestrictionValue()),
             MosaicRestrictionType.rawValueOf(newRestrictionType)
-        );
+        ).referenceMosaicId(toMosaicId(transaction.getReferenceMosaicId()))
+            .previousRestrictionValue(new BigInteger(transaction.getPreviousRestrictionValue()))
+            .previousRestrictionType(MosaicRestrictionType.rawValueOf(prevRestrictionType));
     }
 }

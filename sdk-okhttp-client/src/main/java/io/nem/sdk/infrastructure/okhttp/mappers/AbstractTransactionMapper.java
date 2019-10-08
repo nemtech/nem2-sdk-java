@@ -95,7 +95,8 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
 
     protected final T basicMap(TransactionInfo transactionInfo, Object transactionDto) {
         D transaction = getJsonHelper().convert(transactionDto, transactionDtoClass);
-        TransactionDTO transactionDTO = getJsonHelper().convert(transactionDto, TransactionDTO.class);
+        TransactionDTO transactionDTO = getJsonHelper()
+            .convert(transactionDto, TransactionDTO.class);
         NetworkType networkType = extractNetworkType(transactionDTO.getVersion());
         TransactionFactory<T> factory = createFactory(networkType, transaction);
         factory.version(extractTransactionVersion(transactionDTO.getVersion()));
@@ -111,14 +112,16 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
         if (transactionDTO.getMaxFee() != null) {
             factory.maxFee(transactionDTO.getMaxFee());
         }
-        factory.transactionInfo(transactionInfo);
+        if (transactionInfo != null) {
+            factory.transactionInfo(transactionInfo);
+        }
         return factory.build();
     }
 
     protected abstract TransactionFactory<T> createFactory(NetworkType networkType, D transaction);
 
     protected TransactionInfo createTransactionInfo(TransactionMetaDTO meta) {
-        return TransactionInfo.create(meta.getHeight(),
+        return meta == null ? null : TransactionInfo.create(meta.getHeight(),
             meta.getIndex(),
             meta.getId(),
             meta.getHash(),
@@ -126,7 +129,7 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
     }
 
     protected TransactionInfo createTransactionInfo(EmbeddedTransactionMetaDTO meta) {
-        return TransactionInfo.createAggregate(
+        return meta == null ? null : TransactionInfo.createAggregate(
             meta.getHeight(),
             meta.getIndex(),
             meta.getId(),

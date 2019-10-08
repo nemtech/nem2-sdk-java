@@ -41,7 +41,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit Tests for {@link NetworkRepositoryVertxImpl}
+ * Unit Tests for {@link BlockRepositoryVertxImpl}
  *
  * @author Fernando Boucquez
  */
@@ -139,7 +139,8 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
 
         BigInteger height = BigInteger.valueOf(10L);
         BlockInfo info = repository
-            .getBlocksByHeightWithLimit(height, 1, Optional.of(new QueryParams(10, "someId")))
+            .getBlocksByHeightWithLimit(height, 1,
+                Optional.of(new QueryParams(10, "someId", "someOrder")))
             .toFuture().get().get(0);
 
         Assertions.assertNotNull(info);

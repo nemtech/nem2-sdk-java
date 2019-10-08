@@ -49,18 +49,20 @@ class MosaicAddressRestrictionTransactionTest {
                 new MosaicId(new BigInteger("0")), // restricted MosaicId
                 BigInteger.valueOf(1), // restrictionKey
                 account.getAddress(),  // targetAddress
-                BigInteger.valueOf(9), // previousRestrictionValue
+                // previousRestrictionValue
                 BigInteger.valueOf(8)  // newRestrictionValue
-            ).build();
+            ).previousRestrictionValue(BigInteger.valueOf(9)).build();
 
         assertEquals(NetworkType.MIJIN_TEST, mosaicAddressRestrictionTx.getNetworkType());
         assertTrue(1 == mosaicAddressRestrictionTx.getVersion());
-        assertTrue(LocalDateTime.now().isBefore(mosaicAddressRestrictionTx.getDeadline().getLocalDateTime()));
+        assertTrue(LocalDateTime.now()
+            .isBefore(mosaicAddressRestrictionTx.getDeadline().getLocalDateTime()));
         assertEquals(BigInteger.valueOf(0), mosaicAddressRestrictionTx.getMaxFee());
         assertEquals(new BigInteger("0"), mosaicAddressRestrictionTx.getMosaicId().getId());
         assertEquals(BigInteger.valueOf(1), mosaicAddressRestrictionTx.getRestrictionKey());
         assertEquals(account.getAddress(), mosaicAddressRestrictionTx.getTargetAddress());
-        assertEquals(BigInteger.valueOf(9), mosaicAddressRestrictionTx.getPreviousRestrictionValue());
+        assertEquals(BigInteger.valueOf(9),
+            mosaicAddressRestrictionTx.getPreviousRestrictionValue());
         assertEquals(BigInteger.valueOf(8), mosaicAddressRestrictionTx.getNewRestrictionValue());
     }
 
@@ -72,13 +74,14 @@ class MosaicAddressRestrictionTransactionTest {
                 new MosaicId(new BigInteger("1")), // restricted MosaicId
                 BigInteger.valueOf(1), // restrictionKey
                 account.getAddress(),  // targetAddress
-                BigInteger.valueOf(9), // previousRestrictionValue
                 BigInteger.valueOf(8)  // newRestrictionValue
-            ).build();
+            ).previousRestrictionValue(BigInteger.valueOf(9)).build();
 
-        SignedTransaction signedTransaction = mosaicAddressRestrictionTx.signWith(account, generationHash);
+        SignedTransaction signedTransaction = mosaicAddressRestrictionTx
+            .signWith(account, generationHash);
 
         assertEquals("0100000000000000010000000000000090A75B6B63D31BDA93808727940F24699AE" +
-            "CDDF17C568508BA09000000000000000800000000000000", signedTransaction.getPayload().substring(240));
+                "CDDF17C568508BA09000000000000000800000000000000",
+            signedTransaction.getPayload().substring(240));
     }
 }

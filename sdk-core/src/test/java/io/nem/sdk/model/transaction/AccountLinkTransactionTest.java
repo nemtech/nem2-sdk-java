@@ -18,7 +18,7 @@ package io.nem.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.nem.core.utils.HexEncoder;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.blockchain.NetworkType;
 import org.junit.jupiter.api.Assertions;
@@ -62,10 +62,10 @@ public class AccountLinkTransactionTest {
                 .deadline(new FakeDeadline()).build();
 
         String expected = "9900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904c41000000000000000001000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401";
-        Assertions.assertEquals(expected, HexEncoder.getString(transaction.generateBytes()));
+        Assertions.assertEquals(expected, ConvertUtils.toHex(transaction.generateBytes()));
 
         String expectedEmbeddedHash = "490000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401904c419a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401";
         Assertions.assertEquals(expectedEmbeddedHash,
-            HexEncoder.getString(transaction.generateEmbeddedBytes()));
+            ConvertUtils.toHex(transaction.generateEmbeddedBytes()));
     }
 }

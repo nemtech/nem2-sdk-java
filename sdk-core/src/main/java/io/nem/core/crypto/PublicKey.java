@@ -16,7 +16,7 @@
 
 package io.nem.core.crypto;
 
-import io.nem.core.utils.HexEncoder;
+import io.nem.core.utils.ConvertUtils;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -44,7 +44,7 @@ public class PublicKey {
      */
     public static PublicKey fromHexString(final String hex) {
         try {
-            return new PublicKey(HexEncoder.getBytes(hex));
+            return new PublicKey(ConvertUtils.getBytes(hex));
         } catch (final IllegalArgumentException e) {
             throw new CryptoException(e);
         }
@@ -87,6 +87,6 @@ public class PublicKey {
 
     @Override
     public String toString() {
-        return HexEncoder.getString(this.value).toUpperCase();
+        return ConvertUtils.toHex(this.value).toUpperCase();
     }
 }

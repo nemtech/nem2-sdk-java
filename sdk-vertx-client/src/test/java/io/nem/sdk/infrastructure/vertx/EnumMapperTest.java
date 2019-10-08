@@ -88,6 +88,20 @@ public class EnumMapperTest {
     }
 
     @Test
+    public void shouldAccountRestrictionTypeEnumMapToAccountRestrictionType() {
+        Arrays.stream(AccountRestrictionTypeEnum.values()).forEach(
+            v -> Assertions.assertNotNull(AccountRestrictionType.rawValueOf(v.getValue())));
+    }
+
+    @Test
+    public void shouldAccountRestrictionTypeMapToAccountRestrictionType() {
+        Arrays.stream(AccountRestrictionType.values()).forEach(
+            v -> Assertions
+                .assertNotNull(AccountRestrictionTypeEnum.fromValue((int) v.getValue())));
+
+    }
+
+    @Test
     void testFromAccountLinkActionEnumToAccountLinkAction() {
         Set<Integer> existingValues = new HashSet<>();
         Arrays.stream(AccountLinkActionEnum.values()).forEach(v -> {

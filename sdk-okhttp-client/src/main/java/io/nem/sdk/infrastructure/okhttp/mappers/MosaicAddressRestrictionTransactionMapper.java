@@ -36,17 +36,19 @@ class MosaicAddressRestrictionTransactionMapper extends
     AbstractTransactionMapper<MosaicAddressRestrictionTransactionDTO, MosaicAddressRestrictionTransaction> {
 
     public MosaicAddressRestrictionTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.MOSAIC_ADDRESS_RESTRICTION, MosaicAddressRestrictionTransactionDTO.class);
+        super(jsonHelper, TransactionType.MOSAIC_ADDRESS_RESTRICTION,
+            MosaicAddressRestrictionTransactionDTO.class);
     }
 
     @Override
-    protected TransactionFactory<MosaicAddressRestrictionTransaction> createFactory(NetworkType networkType,
+    protected TransactionFactory<MosaicAddressRestrictionTransaction> createFactory(
+        NetworkType networkType,
         MosaicAddressRestrictionTransactionDTO transaction) {
         return MosaicAddressRestrictionTransactionFactory.create(networkType,
             toMosaicId(transaction.getMosaicId()),
             new BigInteger(transaction.getRestrictionKey()),
             new Address(transaction.getTargetAddress(), networkType),
-            new BigInteger(transaction.getPreviousRestrictionValue()),
-            new BigInteger(transaction.getNewRestrictionValue()));
+            new BigInteger(transaction.getNewRestrictionValue()))
+            .previousRestrictionValue(new BigInteger(transaction.getPreviousRestrictionValue()));
     }
 }

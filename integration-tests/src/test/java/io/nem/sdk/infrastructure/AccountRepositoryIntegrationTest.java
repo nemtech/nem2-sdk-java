@@ -20,25 +20,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.nem.core.crypto.PublicKey;
 import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.api.RepositoryCallException;
+import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.AccountInfo;
 import io.nem.sdk.model.account.AccountNames;
 import io.nem.sdk.model.account.AccountType;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.MultisigAccountGraphInfo;
 import io.nem.sdk.model.account.MultisigAccountInfo;
-import io.nem.sdk.model.account.PublicAccount;
-import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
@@ -61,7 +58,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
             get(this.getAccountRepository(type)
                 .getAccountInfo(this.getTestAccount().getPublicAccount().getAddress()));
 
-        assertEquals(getTestAccount().getPublicKey(), accountInfo.getPublicKey());
+        assertEquals(this.getTestAccount().getPublicKey(), accountInfo.getPublicKey());
         assertEquals(AccountType.UNLINKED, accountInfo.getAccountType());
     }
 
@@ -70,11 +67,11 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
     void getAccountsInfoFromAddresses(RepositoryType type) {
         List<AccountInfo> accountInfos =
             get(this.getAccountRepository(type)
-                .getAccountsInfoFromAddresses(
+                .getAccountsInfo(
                     Collections.singletonList(this.getTestAccountAddress())));
 
         assertEquals(1, accountInfos.size());
-        assertEquals(getTestAccount().getPublicKey(), accountInfos.get(0).getPublicKey());
+        assertEquals(this.getTestAccount().getAddress(), accountInfos.get(0).getAddress());
         assertEquals(AccountType.UNLINKED, accountInfos.get(0).getAccountType());
     }
 
@@ -82,46 +79,23 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
     @EnumSource(RepositoryType.class)
     void getAccountsNamesFromAddresses(RepositoryType type) {
         List<AccountNames> accountNames = get(
-            this.getAccountRepository(type).getAccountsNamesFromAddresses(
+            this.getAccountRepository(type).getAccountsNames(
                 Collections.singletonList(this.getTestAccountAddress())));
 
         assertEquals(1, accountNames.size());
-        assertEquals(getTestAccountAddress(),
-            accountNames.get(0).getAddress());
+        assertEquals(this.config().getTestAccountAddress(),
+            accountNames.get(0).getAddress().plain());
         assertNotNull(accountNames.get(0).getNames());
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getAccountsInfoFromPublicKeys(RepositoryType type) {
-        List<AccountInfo> accountInfos = get(this.getAccountRepository(type)
-            .getAccountsInfoFromPublicKeys(Collections.singletonList(
-                PublicKey.fromHexString(getTestAccount().getPublicKey()))));
-
-        assertEquals(1, accountInfos.size());
-        assertEquals(getTestAccount().getPublicKey(), accountInfos.get(0).getPublicKey());
-    }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void getAccountsNamesFromPublicKeys(RepositoryType type) {
-        List<AccountNames> accountNames = get(this.getAccountRepository(type)
-            .getAccountsNamesFromPublicKeys(Collections.singletonList(
-                PublicKey.fromHexString(getTestAccount().getPublicKey())))
-        );
-
-        assertEquals(1, accountNames.size());
-        assertEquals(this.getTestAccountAddress(), accountNames.get(0).getAddress());
-        assertEquals(0, accountNames.get(0).getNames().size());
-    }
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    public void getAccountInfoNotExisting(RepositoryType type) {
+    void getAccountInfoNotExisting(RepositoryType type) {
         AccountRepository accountHttp = getRepositoryFactory(type).createAccountRepository();
         Address addressObject = Address
             .createFromPublicKey("67F69FA4BFCD158F6E1AF1ABC82F725F5C5C4710D6E29217B12BE66397435DFB",
-                NetworkType.MIJIN_TEST);
+                getNetworkType());
 
         RepositoryCallException exception = Assertions
             .assertThrows(RepositoryCallException.class,
@@ -133,16 +107,14 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void getMultisigAccountInfo(RepositoryType type)
-        throws ExecutionException, InterruptedException {
+    void getMultisigAccountInfo(RepositoryType type) {
         MultisigAccountInfo multisigAccountInfo = get(this.getAccountRepository(type)
             .getMultisigAccountInfo(
                 Address.createFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX"))
         );
-
         assertEquals(
             "B694186EE4AB0558CA4AFCFDD43B42114AE71094F5A1FC4A913FE9971CACD21D",
-            multisigAccountInfo.getAccount().getPublicKey());
+            multisigAccountInfo.getAccount().getPublicKey().toString());
     }
 
     @ParameterizedTest
@@ -160,53 +132,49 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void transactions(RepositoryType type) {
-        List<Transaction> transactions = get(
-            this.getAccountRepository(type).transactions(this.getTestPublicAccount()));
-        assertTrue(transactions.size() > 0);
-    }
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
     void transactionsWithPagination(RepositoryType type) {
+        Account account = this.config().getTestAccount();
         List<Transaction> transactions = get(
-            this.getAccountRepository(type).transactions(this.getTestPublicAccount()));
+            this.getAccountRepository(type).transactions(account.getPublicAccount()));
 
-        assertEquals(10, transactions.size());
+        Assertions.assertTrue(transactions.size() > 1);
 
         List<Transaction> nextTransactions =
             get(this.getAccountRepository(type)
                 .transactions(
-                    this.getTestPublicAccount(),
-                    new QueryParams(11,
+                    account.getPublicAccount(),
+                    new QueryParams(transactions.size() - 1,
                         transactions.get(0).getTransactionInfo().get().getId().get())));
 
-        assertEquals(11, nextTransactions.size());
+        assertEquals(transactions.size() - 1, nextTransactions.size());
+
         assertEquals(
             transactions.get(1).getTransactionInfo().get().getHash(),
             nextTransactions.get(0).getTransactionInfo().get().getHash());
+
     }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void transactionsWithPaginationManyTransactions(RepositoryType type) {
         //Testing that many transaction can be at at least parsed.
-        PublicAccount publicAccount = this.getTestPublicAccount();
-        System.out.println(publicAccount.getPublicKey());
         List<Transaction> transactions =
             get(this.getAccountRepository(type)
-                .transactions(publicAccount, new QueryParams(100, null)));
+                .transactions(this.getTestPublicAccount(), new QueryParams(100, null)));
         assertTrue(transactions.size() <= 100);
 
-        System.out.println(transactions.size());
-        transactions.forEach(this::assertTransaction);
+        transactions.forEach(transaction -> assertTransaction(transaction, false));
     }
 
-    private void assertTransaction(Transaction transaction) {
+    private void assertTransaction(Transaction transaction, boolean outgoingTransactions) {
 
         Assert.assertNotNull(transaction.getType());
         Assert.assertTrue(transaction.getTransactionInfo().isPresent());
         Assert.assertEquals(getNetworkType(), transaction.getNetworkType());
+        if (outgoingTransactions) {
+            Assert.assertEquals(getTestAccount().getAddress(),
+                transaction.getSigner().get().getAddress());
+        }
 
         Assert.assertTrue(transaction.getSignature().isPresent());
         Assert.assertTrue(transaction.getSignatureBytes().isPresent());
@@ -222,17 +190,19 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
         List<Transaction> transactions = get(
             this.getAccountRepository(type).incomingTransactions(this.getTestPublicAccount()));
 
-        // TODO generate incoming transactions in order to test non-zero incoming transactions size
-        assertEquals(0, transactions.size());
+        transactions.forEach(transaction -> assertTransaction(transaction, false));
     }
+
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void outgoingTransactions(RepositoryType type) {
         List<Transaction> transactions = get(
             this.getAccountRepository(type).outgoingTransactions(this.getTestPublicAccount()));
-        assertEquals(10, transactions.size());
+        System.out.println(transactions.size());
+        transactions.forEach(transaction -> assertTransaction(transaction, true));
     }
+
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)

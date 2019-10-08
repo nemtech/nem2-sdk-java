@@ -16,7 +16,7 @@
 
 package io.nem.core.crypto;
 
-import io.nem.core.utils.HexEncoder;
+import io.nem.core.utils.ConvertUtils;
 import java.math.BigInteger;
 
 /**
@@ -43,7 +43,7 @@ public class PrivateKey {
      */
     public static PrivateKey fromHexString(final String hex) {
         try {
-            return new PrivateKey(new BigInteger(HexEncoder.getBytes(hex)));
+            return new PrivateKey(new BigInteger(ConvertUtils.getBytes(hex)));
         } catch (final IllegalArgumentException e) {
             throw new CryptoException(e);
         }
@@ -93,6 +93,6 @@ public class PrivateKey {
 
     @Override
     public String toString() {
-        return HexEncoder.getString(this.value.toByteArray());
+        return ConvertUtils.toHex(this.value.toByteArray());
     }
 }

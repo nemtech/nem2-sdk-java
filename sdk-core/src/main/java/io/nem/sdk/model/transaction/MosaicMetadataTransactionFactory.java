@@ -39,11 +39,9 @@ public class MosaicMetadataTransactionFactory extends
         PublicAccount targetAccount,
         MosaicId targetMosaicId,
         BigInteger scopedMetadataKey,
-        int valueSizeDelta,
-        int valueSize,
         String value) {
         super(TransactionType.MOSAIC_METADATA_TRANSACTION, networkType, targetAccount,
-            scopedMetadataKey, valueSizeDelta, valueSize, value);
+            scopedMetadataKey, value);
         Validate.notNull(targetMosaicId, "TargetMosaicId must not be null");
         this.targetMosaicId = targetMosaicId;
     }
@@ -55,15 +53,12 @@ public class MosaicMetadataTransactionFactory extends
      * @param targetAccount Target account.
      * @param targetMosaicId Target mosaic id.
      * @param scopedMetadataKey Scoped metadata key.
-     * @param valueSizeDelta Value size delta.
-     * @param valueSize Value size.
      * @param value Value.
      * @return Mosaic metadata transaction.
      */
     public static MosaicMetadataTransactionFactory create(NetworkType networkType,
-        PublicAccount targetAccount, MosaicId targetMosaicId, BigInteger scopedMetadataKey,
-        int valueSizeDelta, int valueSize, String value) {
-        return new MosaicMetadataTransactionFactory(networkType, targetAccount, targetMosaicId, scopedMetadataKey, valueSizeDelta, valueSize, value);
+        PublicAccount targetAccount, MosaicId targetMosaicId, BigInteger scopedMetadataKey, String value) {
+        return new MosaicMetadataTransactionFactory(networkType, targetAccount, targetMosaicId, scopedMetadataKey, value);
     }
 
     public MosaicId getTargetMosaicId() {

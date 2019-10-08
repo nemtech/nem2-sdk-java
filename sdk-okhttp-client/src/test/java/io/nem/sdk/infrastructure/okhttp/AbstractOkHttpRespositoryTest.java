@@ -63,7 +63,7 @@ public abstract class AbstractOkHttpRespositoryTest {
     }
 
     protected String encodeAddress(Address address) {
-        return Hex.encodeHexString(new Base32().decode(address.plain()));
+        return address.encoded();
     }
 
     /**

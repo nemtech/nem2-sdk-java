@@ -62,4 +62,5 @@ public class Mosaic {
     public BigInteger getAmount() {
         return amount;
     }
+
 }

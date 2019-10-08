@@ -43,14 +43,15 @@ class AccountMetadataTransactionMapper extends
         PublicAccount targetAccount = PublicAccount
             .createFromPublicKey(transaction.getTargetPublicKey(), networkType);
         Integer valueSizeDelta = transaction.getValueSizeDelta();
-        BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey());
+        BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey(), 16);
         Integer valueSize = transaction.getValueSize();
         String value = transaction.getValue();
-        return AccountMetadataTransactionFactory.create(networkType,
+        AccountMetadataTransactionFactory factory = AccountMetadataTransactionFactory.create(
+            networkType,
             targetAccount,
             scopedMetaDataKey,
-            valueSizeDelta,
-            valueSize,
             value);
+        factory.valueSizeDelta(valueSizeDelta).valueSize(valueSize);
+        return factory;
     }
 }

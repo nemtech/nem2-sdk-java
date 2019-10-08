@@ -144,7 +144,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
 
     private NamespaceName toNamespaceName(NamespaceNameDTO dto) {
         return new NamespaceName(
-            toNamespaceId(dto.getNamespaceId()),
+            toNamespaceId(dto.getId()),
             dto.getName(), Optional.ofNullable(toNamespaceId(dto.getParentId())));
     }
 

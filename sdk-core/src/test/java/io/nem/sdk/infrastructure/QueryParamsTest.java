@@ -17,6 +17,7 @@
 package io.nem.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.sdk.api.QueryParams;
@@ -26,50 +27,26 @@ class QueryParamsTest {
 
     @Test
     void shouldCreateQueryParamsViaCostructor() {
-        QueryParams queryParams = new QueryParams(15, "5A2139FC71C1B9000147D624");
-        assertTrue(15 == queryParams.getPageSize());
+        QueryParams queryParams = new QueryParams(15, "5A2139FC71C1B9000147D624", "someId");
+        assertEquals(15, (int) queryParams.getPageSize());
         assertEquals("5A2139FC71C1B9000147D624", queryParams.getId());
+        assertEquals("someId", queryParams.getOrder());
     }
 
     @Test
     void shouldChangePageSizeTo10WhenSettingNegativeValue() {
         QueryParams queryParams = new QueryParams(-1, "5A2139FC71C1B9000147D624");
-        assertTrue(10 == queryParams.getPageSize());
+        assertEquals(10, (int) queryParams.getPageSize());
+        assertEquals("5A2139FC71C1B9000147D624", queryParams.getId());
+        assertNull(queryParams.getOrder());
     }
 
     @Test
     void shouldChangePageSizeTo10WhenSettingValue1000() {
-        QueryParams queryParams = new QueryParams(1000, "5A2139FC71C1B9000147D624");
-        assertTrue(10 == queryParams.getPageSize());
+        QueryParams queryParams = new QueryParams(1000, "5A2139FC71C1B9000147D624", "AnotherId");
+        assertEquals(10, (int) queryParams.getPageSize());
+        assertEquals("5A2139FC71C1B9000147D624", queryParams.getId());
+        assertEquals("AnotherId", queryParams.getOrder());
     }
 
-    @Test
-    void shouldGenerateCorrectQueryParamsUrlWhenIdNullAndPageSizeNull() {
-        QueryParams queryParams = new QueryParams(null, null);
-        assertEquals("?pageSize=10", queryParams.toUrl());
-    }
-
-    @Test
-    void shouldGenerateCorrectQueryParamsUrlWhenIdEmptyStringAndPageSizeNull() {
-        QueryParams queryParams = new QueryParams(null, "");
-        assertEquals("?pageSize=10", queryParams.toUrl());
-    }
-
-    @Test
-    void shouldGenerateCorrectQueryParamsUrlWhenIdNotNullAndPageSizeNull() {
-        QueryParams queryParams = new QueryParams(15, null);
-        assertEquals("?pageSize=15", queryParams.toUrl());
-    }
-
-    @Test
-    void shouldGenerateCorrectQueryParamsUrlWhenIdNullAndPageSizeNotNull() {
-        QueryParams queryParams = new QueryParams(null, "5A2139FC71C1B9000147D624");
-        assertEquals("?pageSize=10&id=5A2139FC71C1B9000147D624", queryParams.toUrl());
-    }
-
-    @Test
-    void shouldGenerateCorrectQueryParamUrlWhenIdNotNullAndPageSizeNotNull() {
-        QueryParams queryParams = new QueryParams(15, "5A2139FC71C1B9000147D624");
-        assertEquals("?pageSize=15&id=5A2139FC71C1B9000147D624", queryParams.toUrl());
-    }
 }

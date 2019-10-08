@@ -16,10 +16,8 @@
 
 package io.nem.sdk.api;
 
-import io.nem.core.crypto.PublicKey;
 import io.nem.sdk.model.account.AccountInfo;
 import io.nem.sdk.model.account.AccountNames;
-import io.nem.sdk.model.account.AccountRestrictions;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.MultisigAccountGraphInfo;
 import io.nem.sdk.model.account.MultisigAccountInfo;
@@ -50,15 +48,7 @@ public interface AccountRepository {
      * @param addresses {@link List} of {@link Address}
      * @return Observable {@link List} of {@link AccountInfo}
      */
-    Observable<List<AccountInfo>> getAccountsInfoFromAddresses(List<Address> addresses);
-
-    /**
-     * Gets AccountsInfo for different accounts based on their public keys.
-     *
-     * @param publicKeys {@link List} of {@link PublicKey}
-     * @return Observable {@link List} of {@link AccountInfo}
-     */
-    Observable<List<AccountInfo>> getAccountsInfoFromPublicKeys(List<PublicKey> publicKeys);
+    Observable<List<AccountInfo>> getAccountsInfo(List<Address> addresses);
 
     /**
      * Gets AccountNames for different accounts based on their addresses. The names are namespaces
@@ -67,16 +57,7 @@ public interface AccountRepository {
      * @param addresses {@link List} of {@link Address}
      * @return Observable {@link List} of {@link AccountNames}
      */
-    Observable<List<AccountNames>> getAccountsNamesFromAddresses(List<Address> addresses);
-
-    /**
-     * Gets AccountNames for different accounts based on their public keys. The names are namespaces
-     * linked using address aliases.
-     *
-     * @param publicKeys {@link List} of {@link PublicKey}
-     * @return Observable {@link List} of {@link AccountNames}
-     */
-    Observable<List<AccountNames>> getAccountsNamesFromPublicKeys(List<PublicKey> publicKeys);
+    Observable<List<AccountNames>> getAccountsNames(List<Address> addresses);
 
     /**
      * Gets a MultisigAccountInfo for an account.
@@ -93,22 +74,6 @@ public interface AccountRepository {
      * @return Observable {@link MultisigAccountGraphInfo}
      */
     Observable<MultisigAccountGraphInfo> getMultisigAccountGraphInfo(Address address);
-
-    /**
-     * Returns the account restrictions for a given account.
-     *
-     * @param address the address
-     * @return Observable of {@link AccountRestrictions}
-     */
-    Observable<AccountRestrictions> getAccountRestrictions(Address address);
-
-    /**
-     * Returns the account restrictions for a given array of addresses.
-     *
-     * @param addresses {@link List} of {@link Address}
-     * @return Observable {@link List} of {@link AccountRestrictions}
-     */
-    Observable<List<AccountRestrictions>> getAccountsRestrictions(List<Address> addresses);
 
     /**
      * Gets an list of confirmed transactions for which an account is signer or receiver.

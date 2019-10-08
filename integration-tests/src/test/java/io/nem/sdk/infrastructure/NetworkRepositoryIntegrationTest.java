@@ -32,7 +32,7 @@ class NetworkRepositoryIntegrationTest extends BaseIntegrationTest {
     @EnumSource(RepositoryType.class)
     void testNetworkType(RepositoryType type) {
         NetworkType networkType = get(getNetworkRepository(type).getNetworkType());
-        assertEquals(NetworkType.MIJIN_TEST, networkType);
+        assertEquals(getNetworkType(), networkType);
     }
 
     private NetworkRepository getNetworkRepository(RepositoryType type) {

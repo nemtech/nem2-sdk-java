@@ -19,7 +19,7 @@ package io.nem.sdk.infrastructure.vertx.mappers;
 
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
-import io.nem.sdk.model.account.Address;
+import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.MosaicAddressRestrictionTransaction;
@@ -36,17 +36,19 @@ class MosaicAddressRestrictionTransactionMapper extends
     AbstractTransactionMapper<MosaicAddressRestrictionTransactionDTO, MosaicAddressRestrictionTransaction> {
 
     public MosaicAddressRestrictionTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.MOSAIC_ADDRESS_RESTRICTION, MosaicAddressRestrictionTransactionDTO.class);
+        super(jsonHelper, TransactionType.MOSAIC_ADDRESS_RESTRICTION,
+            MosaicAddressRestrictionTransactionDTO.class);
     }
 
     @Override
-    protected TransactionFactory<MosaicAddressRestrictionTransaction> createFactory(NetworkType networkType,
+    protected TransactionFactory<MosaicAddressRestrictionTransaction> createFactory(
+        NetworkType networkType,
         MosaicAddressRestrictionTransactionDTO transaction) {
         return MosaicAddressRestrictionTransactionFactory.create(networkType,
             toMosaicId(transaction.getMosaicId()),
             new BigInteger(transaction.getRestrictionKey()),
-            new Address(transaction.getTargetAddress(), networkType),
-            new BigInteger(transaction.getPreviousRestrictionValue()),
-            new BigInteger(transaction.getNewRestrictionValue()));
+            MapperUtils.toAddressFromUnresolved(transaction.getTargetAddress()),
+            new BigInteger(transaction.getNewRestrictionValue())).previousRestrictionValue(
+            new BigInteger(transaction.getPreviousRestrictionValue()));
     }
 }

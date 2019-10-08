@@ -31,28 +31,35 @@ public class ListenerForTests extends BaseIntegrationTest {
     }
 
     private void run() throws ExecutionException, InterruptedException {
-        Account account = getTestAccount();
+        setUp();
         Listener listener = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE).createListener();
         listener.open().get();
-        listener.newBlock()
-            .subscribe(c -> System.out.println("New Block: " + c.getType() + " " + c.getHash()));
-        listenToAccount(account, listener);
+        listenToAccount("Test Account 1", config().getTestAccount(), listener);
+        listenToAccount("Test Account 2", config().getTestAccount2(), listener);
+        listenToAccount("Cosignatory Account", config().getCosignatoryAccount(), listener);
+        listenToAccount("Cosignatory Account 2", config().getCosignatory2Account(), listener);
+        listenToAccount("Multisign Account 2", config().getMultisigAccount(), listener);
+        listenToAccount("Nemesis Account", config().getNemesisAccount(), listener);
     }
 
-    private void listenToAccount(Account account, Listener listener) {
-        System.out.println("Listening for transaction of account " + account.getAddress().plain());
+    private void listenToAccount(String accountDescription, Account account, Listener listener) {
+        System.out.println("Listening for transaction of account " + account.getAddress().plain()
+            + ". " + accountDescription);
 
         listener.unconfirmedAdded(account.getAddress())
-            .subscribe(c -> System.out.println("Received unconfirmedAdded transaction " + c));
+            .subscribe(c -> System.out
+                .println(accountDescription + " received unconfirmedAdded transaction " + c));
 
         listener.confirmed(account.getAddress())
-            .subscribe(c -> System.out.println("Received confirmed transaction " + c));
+            .subscribe(c -> System.out
+                .println(accountDescription + " received confirmed transaction " + c));
 
         listener.cosignatureAdded(account.getAddress())
-            .subscribe(c -> System.out.println("Received cosignatureAdded transaction " + c));
+            .subscribe(c -> System.out
+                .println(accountDescription + " Received cosignatureAdded transaction " + c));
 
         listener.status(account.getAddress())
-            .subscribe(c -> System.out.println("Error: " + c.getStatus()));
+            .subscribe(c -> System.out.println(accountDescription + " Error: " + c.getStatus()));
     }
 
 }

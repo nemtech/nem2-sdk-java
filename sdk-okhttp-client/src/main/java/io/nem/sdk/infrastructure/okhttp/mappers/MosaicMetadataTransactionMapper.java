@@ -45,16 +45,17 @@ class MosaicMetadataTransactionMapper extends
         PublicAccount targetAccount = PublicAccount
             .createFromPublicKey(transaction.getTargetPublicKey(), networkType);
         Integer valueSizeDelta = transaction.getValueSizeDelta();
-        BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey());
+        BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey(), 16);
         Integer valueSize = transaction.getValueSize();
         String value = transaction.getValue();
         MosaicId targetMosaic = MapperUtils.toMosaicId(transaction.getTargetMosaicId());
-        return MosaicMetadataTransactionFactory.create(networkType,
+        MosaicMetadataTransactionFactory factory = MosaicMetadataTransactionFactory.create(
+            networkType,
             targetAccount,
             targetMosaic,
             scopedMetaDataKey,
-            valueSizeDelta,
-            valueSize,
             value);
+        factory.valueSizeDelta(valueSizeDelta).valueSize(valueSize);
+        return factory;
     }
 }

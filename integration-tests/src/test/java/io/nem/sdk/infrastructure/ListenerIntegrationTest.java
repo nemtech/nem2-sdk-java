@@ -46,7 +46,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -61,29 +60,12 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
 
     private static final TimeUnit TIMEOUT_UNIT = TimeUnit.SECONDS;
 
-    private Account account;
-    private Account multisigAccount;
-    private Account cosignatoryAccount;
-    private Account cosignatoryAccount2;
-    private String generationHash;
+    private Account account = config().getTestAccount();
+    private Account multisigAccount = config().getMultisigAccount();
+    private Account cosignatoryAccount = config().getCosignatoryAccount();
+    private Account cosignatoryAccount2 = config().getCosignatory2Account();
+    private String generationHash = this.getGenerationHash();
 
-    @BeforeAll
-    void setup() {
-        account = this.getTestAccount();
-        multisigAccount =
-            new Account(
-                "5edebfdbeb32e9146d05ffd232c8af2cf9f396caf9954289daa0362d097fff3b",
-                NetworkType.MIJIN_TEST);
-        cosignatoryAccount =
-            new Account(
-                "2a2b1f5d366a5dd5dc56c3c757cf4fe6c66e2787087692cf329d7a49a594658b",
-                NetworkType.MIJIN_TEST);
-        cosignatoryAccount2 =
-            new Account(
-                "b8afae6f4ad13a1b8aad047b488e0738a437c7389d4ff30c359ac068910c1d59",
-                NetworkType.MIJIN);
-        generationHash = this.getGenerationHash();
-    }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)

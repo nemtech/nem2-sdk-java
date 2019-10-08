@@ -19,7 +19,7 @@ package io.nem.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.nem.core.utils.HexEncoder;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.namespace.NamespaceId;
@@ -146,7 +146,7 @@ class NamespaceRegistrationTransactionTest {
 
         byte[] actual = namespaceRegistrationTransaction.generateBytes();
 
-        assertEquals(expected, HexEncoder.getString(actual));
+        assertEquals(expected, ConvertUtils.toHex(actual));
     }
 
     @Test
@@ -163,6 +163,6 @@ class NamespaceRegistrationTransactionTest {
                 .deadline(new FakeDeadline()).build();
 
         byte[] actual = namespaceRegistrationTransaction.generateBytes();
-        assertEquals(expected, HexEncoder.getString(actual));
+        assertEquals(expected, ConvertUtils.toHex(actual));
     }
 }

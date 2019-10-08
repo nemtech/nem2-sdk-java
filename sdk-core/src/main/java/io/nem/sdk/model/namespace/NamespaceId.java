@@ -125,4 +125,5 @@ public class NamespaceId implements UInt64Id {
     public int hashCode() {
         return Objects.hash(id);
     }
+
 }

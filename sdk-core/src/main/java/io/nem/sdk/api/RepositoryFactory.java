@@ -17,6 +17,7 @@
 package io.nem.sdk.api;
 
 import io.nem.sdk.infrastructure.Listener;
+import java.io.Closeable;
 
 /**
  * A repository factory allows clients to create repositories to access NEM Server without knowing
@@ -24,7 +25,7 @@ import io.nem.sdk.infrastructure.Listener;
  *
  * @author Fernando Boucquez
  */
-public interface RepositoryFactory {
+public interface RepositoryFactory extends Closeable {
 
     /**
      * @return a newly created {@link AccountRepository}
@@ -72,8 +73,23 @@ public interface RepositoryFactory {
     TransactionRepository createTransactionRepository();
 
     /**
+     * @return a newly created {@link MetadataRepository}
+     */
+    MetadataRepository createMetadataRepository();
+
+    /**
+     * @return a newly created {@link RestrictionRepository}
+     */
+    RestrictionRepository createRestrictionRepository();
+
+    /**
      * @return a newly created {@link Listener}
      */
     Listener createListener();
+
+    /**
+     * It closes the underling connection if necessary.
+     */
+    void close();
 
 }

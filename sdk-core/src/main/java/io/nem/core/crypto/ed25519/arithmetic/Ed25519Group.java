@@ -16,7 +16,7 @@
 
 package io.nem.core.crypto.ed25519.arithmetic;
 
-import io.nem.core.utils.HexEncoder;
+import io.nem.core.utils.ConvertUtils;
 import java.math.BigInteger;
 
 /**
@@ -54,7 +54,7 @@ public class Ed25519Group {
 
     private static Ed25519GroupElement getBasePoint() {
         final byte[] rawEncodedGroupElement =
-            HexEncoder.getBytes("5866666666666666666666666666666666666666666666666666666666666666");
+            ConvertUtils.getBytes("5866666666666666666666666666666666666666666666666666666666666666");
         final Ed25519GroupElement basePoint =
             new Ed25519EncodedGroupElement(rawEncodedGroupElement).decode();
         basePoint.precomputeForScalarMultiplication();

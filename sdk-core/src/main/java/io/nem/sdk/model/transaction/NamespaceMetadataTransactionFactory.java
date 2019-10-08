@@ -39,11 +39,9 @@ public class NamespaceMetadataTransactionFactory extends
         PublicAccount targetAccount,
         NamespaceId targetNamespaceId,
         BigInteger scopedMetadataKey,
-        int valueSizeDelta,
-        int valueSize,
         String value) {
         super(TransactionType.NAMESPACE_METADATA_TRANSACTION, networkType, targetAccount,
-            scopedMetadataKey, valueSizeDelta, valueSize, value);
+            scopedMetadataKey, value);
         Validate.notNull(targetNamespaceId, "TargetNamespaceId must not be null");
         this.targetNamespaceId = targetNamespaceId;
     }
@@ -55,15 +53,12 @@ public class NamespaceMetadataTransactionFactory extends
      * @param targetAccount Target account.
      * @param targetNamespaceId Target namespace id.
      * @param scopedMetadataKey Scoped metadata key.
-     * @param valueSizeDelta Value size delta.
-     * @param valueSize Value size.
      * @param value Value.
      * @return Namespace metadata transaction.
      */
     public static NamespaceMetadataTransactionFactory create(NetworkType networkType,
-        PublicAccount targetAccount, NamespaceId targetNamespaceId, BigInteger scopedMetadataKey,
-        int valueSizeDelta, int valueSize, String value) {
-        return new NamespaceMetadataTransactionFactory(networkType, targetAccount, targetNamespaceId, scopedMetadataKey, valueSizeDelta, valueSize, value);
+        PublicAccount targetAccount, NamespaceId targetNamespaceId, BigInteger scopedMetadataKey, String value) {
+        return new NamespaceMetadataTransactionFactory(networkType, targetAccount, targetNamespaceId, scopedMetadataKey, value);
     }
 
     public NamespaceId getTargetNamespaceId() {

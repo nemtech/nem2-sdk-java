@@ -29,35 +29,36 @@ public class MosaicGlobalRestrictionTransactionFactory
     extends TransactionFactory<MosaicGlobalRestrictionTransaction> {
 
     private final MosaicId mosaicId;
-    private final MosaicId referenceMosaicId;
     private final BigInteger restrictionKey;
-    private final BigInteger previousRestrictionValue;
-    private final MosaicRestrictionType previousRestrictionType;
     private final BigInteger newRestrictionValue;
     private final MosaicRestrictionType newRestrictionType;
+    private BigInteger previousRestrictionValue = BigInteger.ZERO;
+    private MosaicRestrictionType previousRestrictionType = MosaicRestrictionType.NONE;
+    private MosaicId referenceMosaicId = new MosaicId(BigInteger.ZERO);
 
+    /**
+     * Create a mosaic global restriction transaction object with factory build and modifier
+     * methods.
+     *
+     * @param networkType {@link NetworkType}
+     * @param mosaicId {@link MosaicId}
+     * @param restrictionKey BigInteger
+     * @param newRestrictionValue BigInteger
+     * @param newRestrictionType {@link MosaicRestrictionType}
+     */
     private MosaicGlobalRestrictionTransactionFactory(
         NetworkType networkType,
         MosaicId mosaicId,
-        MosaicId referenceMosaicId,
         BigInteger restrictionKey,
-        BigInteger previousRestrictionValue,
-        MosaicRestrictionType previousRestrictionType,
         BigInteger newRestrictionValue,
         MosaicRestrictionType newRestrictionType) {
         super(TransactionType.MOSAIC_GLOBAL_RESTRICTION, networkType);
         Validate.notNull(mosaicId, "RestrictedMosaicId must not be null");
-        Validate.notNull(referenceMosaicId, "ReferenceMosaicId must not be null");
         Validate.notNull(restrictionKey, "RestrictionKey must not be null");
-        Validate.notNull(previousRestrictionValue, "PreviousRestrictionValue must not be null");
-        Validate.notNull(previousRestrictionType, "PreviousRestrictionType must not be null");
         Validate.notNull(newRestrictionValue, "NewRestrictionValue must not be null");
         Validate.notNull(newRestrictionType, "NewRestrictionType must not be null");
         this.mosaicId = mosaicId;
-        this.referenceMosaicId = referenceMosaicId;
         this.restrictionKey = restrictionKey;
-        this.previousRestrictionValue = previousRestrictionValue;
-        this.previousRestrictionType = previousRestrictionType;
         this.newRestrictionValue = newRestrictionValue;
         this.newRestrictionType = newRestrictionType;
     }
@@ -67,23 +68,17 @@ public class MosaicGlobalRestrictionTransactionFactory
      *
      * @param networkType {@link NetworkType}
      * @param mosaicId {@link MosaicId}
-     * @param referenceMosaicId {@link MosaicId}
      * @param restrictionKey Restriction key.
-     * @param previousRestrictionValue Previous restriction value.
-     * @param previousRestrictionType {@link MosaicRestrictionType}
      * @param newRestrictionValue New restriction value.
      * @param newRestrictionType {@link MosaicRestrictionType} New restriction type.
      * @return Mosaic global restriction transaction.
      */
     public static MosaicGlobalRestrictionTransactionFactory create (NetworkType networkType,
         MosaicId mosaicId,
-        MosaicId referenceMosaicId,
         BigInteger restrictionKey,
-        BigInteger previousRestrictionValue,
-        MosaicRestrictionType previousRestrictionType,
         BigInteger newRestrictionValue,
         MosaicRestrictionType newRestrictionType) {
-        return new MosaicGlobalRestrictionTransactionFactory(networkType, mosaicId, referenceMosaicId, restrictionKey, previousRestrictionValue, previousRestrictionType, newRestrictionValue, newRestrictionType);
+        return new MosaicGlobalRestrictionTransactionFactory(networkType, mosaicId, restrictionKey, newRestrictionValue, newRestrictionType);
     }
 
     @Override
@@ -132,7 +127,9 @@ public class MosaicGlobalRestrictionTransactionFactory
      *
      * @return {@link MosaicRestrictionType}
      */
-    public MosaicRestrictionType getPreviousRestrictionType() { return  previousRestrictionType; }
+    public MosaicRestrictionType getPreviousRestrictionType() {
+        return previousRestrictionType;
+    }
 
     public BigInteger getNewRestrictionValue() {
         return newRestrictionValue;
@@ -143,5 +140,45 @@ public class MosaicGlobalRestrictionTransactionFactory
      *
      * @return {@link MosaicRestrictionType}
      */
-    public MosaicRestrictionType getNewRestrictionType() { return  newRestrictionType; }
+    public MosaicRestrictionType getNewRestrictionType() {
+        return newRestrictionType;
+    }
+
+    /**
+     * This method sets referenceMosaicId.
+     *
+     * @param referenceMosaicId the new referenceMosaicId
+     * @return this factory.
+     */
+    public MosaicGlobalRestrictionTransactionFactory referenceMosaicId(MosaicId referenceMosaicId) {
+        Validate.notNull(previousRestrictionValue, "ReferenceMosaicId must not be null");
+        this.referenceMosaicId = referenceMosaicId;
+        return this;
+    }
+
+    /**
+     * This method changes previousRestrictionType.
+     *
+     * @param previousRestrictionType the new previousRestrictionType
+     * @return this factory.
+     */
+    public MosaicGlobalRestrictionTransactionFactory previousRestrictionType(
+        MosaicRestrictionType previousRestrictionType) {
+        Validate.notNull(previousRestrictionType, "PreviousRestrictionType must not be null");
+        this.previousRestrictionType = previousRestrictionType;
+        return this;
+    }
+
+    /**
+     * This method changes previousRestrictionValue.
+     *
+     * @param previousRestrictionValue the new previousRestrictionValue
+     * @return this factory.
+     */
+    public MosaicGlobalRestrictionTransactionFactory previousRestrictionValue(
+        BigInteger previousRestrictionValue) {
+        Validate.notNull(previousRestrictionValue, "PreviousRestrictionValue must not be null");
+        this.previousRestrictionValue = previousRestrictionValue;
+        return this;
+    }
 }

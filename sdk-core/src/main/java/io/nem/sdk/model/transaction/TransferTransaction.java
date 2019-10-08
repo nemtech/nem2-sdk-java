@@ -202,13 +202,4 @@ public class TransferTransaction extends Transaction {
         return namespaceIdAlias;
     }
 
-    @Override
-    public String toString() {
-        return "TransferTransaction{" +
-            "recipient=" + recipient +
-            ", mosaics=" + mosaics +
-            ", message=" + message +
-            ", namespaceId=" + namespaceId +
-            '}';
-    }
 }

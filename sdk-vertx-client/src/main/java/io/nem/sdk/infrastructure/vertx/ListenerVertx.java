@@ -19,24 +19,17 @@ package io.nem.sdk.infrastructure.vertx;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nem.sdk.infrastructure.Listener;
 import io.nem.sdk.infrastructure.ListenerBase;
-import io.nem.sdk.infrastructure.ListenerChannel;
 import io.nem.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.sdk.infrastructure.vertx.mappers.TransactionMapper;
 import io.nem.sdk.model.blockchain.BlockInfo;
-import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
-import io.nem.sdk.model.transaction.Deadline;
-import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.Transaction;
-import io.nem.sdk.model.transaction.TransactionStatusError;
 import io.nem.sdk.openapi.vertx.model.BlockInfoDTO;
 import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
-import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.RequestOptions;
 import io.vertx.core.http.WebSocket;
 import io.vertx.core.json.Json;
-import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
@@ -72,17 +65,6 @@ public class ListenerVertx extends ListenerBase implements Listener {
         }
         this.httpClient = httpClient;
         this.transactionMapper = new GeneralTransactionMapper(getJsonHelper());
-    }
-
-    /**
-     * @param url of the host
-     */
-    public ListenerVertx(String url) {
-        this(createHttpClient(), url);
-    }
-
-    private static HttpClient createHttpClient() {
-        return Vertx.vertx().createHttpClient();
     }
 
     /**

@@ -16,7 +16,7 @@
 
 package io.nem.sdk.model.mosaic;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ class MosaicTest {
     void createANewMosaicViaConstructor() {
         MosaicId mosaicId = new MosaicId(new BigInteger("-3087871471161192663"));
         Mosaic mosaic = new Mosaic(mosaicId, BigInteger.valueOf(24));
-        assertTrue(mosaic.getId().equals(mosaicId));
-        assertTrue(mosaic.getAmount().equals(BigInteger.valueOf(24)));
+        assertEquals(mosaicId, mosaic.getId());
+        assertEquals(BigInteger.valueOf(24), mosaic.getAmount());
     }
 }

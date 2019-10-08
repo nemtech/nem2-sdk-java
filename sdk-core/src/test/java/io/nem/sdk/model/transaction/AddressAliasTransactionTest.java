@@ -17,7 +17,7 @@
 
 package io.nem.sdk.model.transaction;
 
-import io.nem.core.utils.HexEncoder;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.namespace.AliasAction;
@@ -50,10 +50,10 @@ public class AddressAliasTransactionTest {
             .transactionInfo(transactionInfo).signature("signing").deadline(new FakeDeadline()).maxFee(fee).build();
 
         String expectedHash = "9a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904e4201000000000000000100000000000000014bfa5f372d55b3849049e14bebca93758eb36805bae760a57239976f009a545cad";
-        Assertions.assertEquals(expectedHash, HexEncoder.getString(transaction.generateBytes()));
+        Assertions.assertEquals(expectedHash, ConvertUtils.toHex(transaction.generateBytes()));
 
         String expectedEmbeddedHash = "4a00000068b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b76301904e42014bfa5f372d55b3849049e14bebca93758eb36805bae760a57239976f009a545cad";
         Assertions.assertEquals(expectedEmbeddedHash,
-            HexEncoder.getString(transaction.generateEmbeddedBytes()));
+            ConvertUtils.toHex(transaction.generateEmbeddedBytes()));
     }
 }

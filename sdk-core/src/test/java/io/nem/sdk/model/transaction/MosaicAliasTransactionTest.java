@@ -19,7 +19,7 @@ package io.nem.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.nem.core.utils.HexEncoder;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
@@ -77,11 +77,11 @@ public class MosaicAliasTransactionTest {
             ).signer(account.getPublicAccount()).deadline(new FakeDeadline()).build();
 
         String expectedHash = "8900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904e430000000000000000010000000000000001a487791451fdf1b60a00000000000000";
-        Assertions.assertEquals(expectedHash, HexEncoder.getString(transaction.generateBytes()));
+        Assertions.assertEquals(expectedHash, ConvertUtils.toHex(transaction.generateBytes()));
 
         String expectedEmbeddedHash = "390000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401904e4301a487791451fdf1b60a00000000000000";
         Assertions.assertEquals(expectedEmbeddedHash,
-            HexEncoder.getString(transaction.generateEmbeddedBytes()));
+            ConvertUtils.toHex(transaction.generateEmbeddedBytes()));
 
     }
 }

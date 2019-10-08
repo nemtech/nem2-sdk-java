@@ -16,44 +16,39 @@
 
 package io.nem.core.utils;
 
+import java.math.BigInteger;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class HexEncoderTest {
+public class ConvertUtilsTest {
 
     // region getBytes
 
     private static void assertGetBytesConversion(final String input, final byte[] expectedOutput) {
         // Act:
-        final byte[] output = HexEncoder.getBytes(input);
+        final byte[] output = ConvertUtils.getBytes(input);
 
         // Assert:
         Assert.assertThat(output, IsEqual.equalTo(expectedOutput));
     }
 
-    private static void assertTryGetBytesConversion(final String input,
-        final byte[] expectedOutput) {
-        // Act:
-        final byte[] output = HexEncoder.tryGetBytes(input);
-
-        // Assert:
-        Assert.assertThat(output, IsEqual.equalTo(expectedOutput));
-    }
 
     private static void assertGetStringConversion(final byte[] input, final String expectedOutput) {
         // Act:
-        final String output = HexEncoder.getString(input);
+        final String output = ConvertUtils.toHex(input);
 
         // Assert:
         Assert.assertThat(output, IsEqual.equalTo(expectedOutput));
     }
 
-  /*@Test
-  public void getBytesCannotConvertMalformedStringToByteArray() {
-  	// Act:
-  	ExceptionAssert.assertThrows(v -> HexEncoder.getBytes("4e454g465457"), IllegalArgumentException.class);
-  }*/
+    @Test
+    public void getBytesCannotConvertMalformedStringToByteArray() {
+        // Act:
+        Assertions.assertThrows(IllegalArgumentException.class,
+            () -> ConvertUtils.getBytes("4e454g465457"));
+    }
 
     @Test
     public void getBytesCanConvertValidStringToByteArray() {
@@ -80,29 +75,31 @@ public class HexEncoderTest {
     @Test
     public void tryGetBytesCanConvertValidStringToByteArray() {
         // Assert:
-        assertTryGetBytesConversion("4e454d465457", new byte[]{0x4e, 0x45, 0x4d, 0x46, 0x54, 0x57});
+        assertGetBytesConversion("4e454d465457", new byte[]{0x4e, 0x45, 0x4d, 0x46, 0x54, 0x57});
     }
 
     @Test
     public void tryGetBytesCanConvertValidStringWithOddLengthToByteArray() {
         // Assert:
-        assertTryGetBytesConversion("e454d465457", new byte[]{0x0e, 0x45, 0x4d, 0x46, 0x54, 0x57});
+        assertGetBytesConversion("e454d465457", new byte[]{0x0e, 0x45, 0x4d, 0x46, 0x54, 0x57});
     }
 
     @Test
     public void tryGetBytesCanConvertValidStringWithLeadingZerosToByteArray() {
         // Assert:
-        assertTryGetBytesConversion("00000d465457", new byte[]{0x00, 0x00, 0x0d, 0x46, 0x54, 0x57});
+        assertGetBytesConversion("00000d465457", new byte[]{0x00, 0x00, 0x0d, 0x46, 0x54, 0x57});
     }
 
-    // endregion
-
-    // region getString
 
     @Test
     public void tryGetBytesCannotConvertMalformedStringToByteArray() {
         // Assert:
-        assertTryGetBytesConversion("4e454g465457", null);
+        IllegalArgumentException exception = Assertions
+            .assertThrows(IllegalArgumentException.class, () ->
+                assertGetBytesConversion("4e454g465457", null));
+        Assertions.assertEquals(
+            "org.apache.commons.codec.DecoderException: Illegal hexadecimal character g at index 5",
+            exception.getMessage());
     }
 
     @Test
@@ -123,5 +120,22 @@ public class HexEncoderTest {
         assertGetStringConversion(new byte[]{}, "");
     }
 
-    // endregion
+    @Test
+    public void fromStringToHexToString() {
+        // Assert:
+        String message = "Some message 汉字";
+
+        Assertions.assertEquals(message,
+            ConvertUtils.fromHexString(ConvertUtils.fromStringToHex(message)));
+    }
+
+    @Test
+    public void toSize16Hex() {
+        Assertions.assertEquals("000000000000000a",
+            ConvertUtils.toSize16Hex(BigInteger.TEN));
+
+        Assertions.assertEquals("00000000000186a0",
+            ConvertUtils.toSize16Hex(BigInteger.valueOf(100000)));
+    }
+
 }

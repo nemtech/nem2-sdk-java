@@ -60,7 +60,7 @@ public abstract class AbstractVertxRespositoryTest {
     }
 
     protected String encodeAddress(Address address) {
-        return Hex.encodeHexString(new Base32().decode(address.plain()));
+        return address.encoded();
     }
 
     /**

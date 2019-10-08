@@ -21,7 +21,7 @@ import io.nem.core.crypto.CryptoEngines;
 import io.nem.core.crypto.DsaSigner;
 import io.nem.core.crypto.Hashes;
 import io.nem.core.crypto.Signature;
-import io.nem.core.utils.HexEncoder;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -197,7 +197,7 @@ public abstract class Transaction {
         final DsaSigner theSigner = CryptoEngines.defaultEngine()
             .createDsaSigner(account.getKeyPair(), getNetworkType().resolveSignSchema());
         final byte[] bytes = this.generateBytes();
-        final byte[] generationHashBytes = HexEncoder.getBytes(generationHash);
+        final byte[] generationHashBytes = ConvertUtils.getBytes(generationHash);
         final byte[] signingBytes = new byte[bytes.length + generationHashBytes.length - 100];
         System.arraycopy(generationHashBytes, 0, signingBytes, 0, generationHashBytes.length);
         System.arraycopy(bytes, 100, signingBytes, generationHashBytes.length, bytes.length - 100);

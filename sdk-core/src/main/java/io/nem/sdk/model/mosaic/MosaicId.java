@@ -122,13 +122,6 @@ public class MosaicId implements UInt64Id {
         return Objects.hash(id);
     }
 
-    @Override
-    public String toString() {
-        return "MosaicId{" +
-            "id=" + id +
-            ", fullName=" + fullName +
-            '}';
-    }
 }
 
 
