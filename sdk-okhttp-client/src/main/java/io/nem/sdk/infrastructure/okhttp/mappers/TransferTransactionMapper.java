@@ -33,7 +33,6 @@ import io.nem.sdk.openapi.okhttp_gson.model.TransferTransactionDTO;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -72,8 +71,7 @@ class TransferTransactionMapper extends
         }
 
         return TransferTransactionFactory.create(networkType,
-            Optional.of(toAddressFromUnresolved(transaction.getRecipientAddress())),
-            Optional.empty(),
+            toAddressFromUnresolved(transaction.getRecipientAddress()),
             mosaics,
             message);
     }

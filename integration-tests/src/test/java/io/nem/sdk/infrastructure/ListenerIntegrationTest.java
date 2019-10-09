@@ -41,7 +41,6 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -251,8 +250,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                Optional.of(this.getRecipient()),
-                Optional.empty(),
+                this.getRecipient(),
                 Arrays.asList(),
                 PlainMessage.create("test-message")
             ).build();
@@ -274,8 +272,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         throws ExecutionException, InterruptedException, TimeoutException {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
-                Optional.of(new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST)),
-                Optional.empty(),
+                new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST),
                 Collections.singletonList(
                     NetworkCurrencyMosaic.createRelative(new BigInteger("100000000000"))),
                 PlainMessage.create("test-message")
@@ -293,8 +290,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         throws ExecutionException, InterruptedException, TimeoutException {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
-                Optional.of(new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST)),
-                Optional.empty(),
+                new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST),
                 Arrays.asList(),
                 PlainMessage.create("test-message")
             ).build();

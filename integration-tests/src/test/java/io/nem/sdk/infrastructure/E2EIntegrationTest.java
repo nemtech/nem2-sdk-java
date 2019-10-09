@@ -16,27 +16,17 @@
 
 package io.nem.sdk.infrastructure;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import io.nem.core.crypto.Hashes;
 import io.nem.sdk.api.TransactionRepository;
 import io.nem.sdk.model.account.Account;
-import io.nem.sdk.model.account.AccountInfo;
-import io.nem.sdk.model.account.AccountNames;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.BlockDuration;
 import io.nem.sdk.model.mosaic.MosaicFlags;
 import io.nem.sdk.model.mosaic.MosaicId;
-import io.nem.sdk.model.mosaic.MosaicNames;
 import io.nem.sdk.model.mosaic.MosaicNonce;
 import io.nem.sdk.model.mosaic.MosaicSupplyChangeActionType;
 import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
-import io.nem.sdk.model.namespace.AliasAction;
 import io.nem.sdk.model.namespace.NamespaceId;
-import io.nem.sdk.model.namespace.NamespaceName;
-import io.nem.sdk.model.transaction.AddressAliasTransaction;
-import io.nem.sdk.model.transaction.AddressAliasTransactionFactory;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.CosignatoryModificationActionType;
@@ -47,8 +37,6 @@ import io.nem.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.sdk.model.transaction.LockHashAlgorithmType;
 import io.nem.sdk.model.transaction.MosaicAddressRestrictionTransaction;
 import io.nem.sdk.model.transaction.MosaicAddressRestrictionTransactionFactory;
-import io.nem.sdk.model.transaction.MosaicAliasTransaction;
-import io.nem.sdk.model.transaction.MosaicAliasTransactionFactory;
 import io.nem.sdk.model.transaction.MosaicDefinitionTransaction;
 import io.nem.sdk.model.transaction.MosaicDefinitionTransactionFactory;
 import io.nem.sdk.model.transaction.MosaicGlobalRestrictionTransaction;
@@ -72,12 +60,8 @@ import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
 import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import java.util.Random;
-import java.util.stream.Collectors;
 import org.apache.commons.codec.binary.Hex;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -115,8 +99,7 @@ class E2EIntegrationTest extends BaseIntegrationTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 getNetworkType(),
-                Optional.of(this.recipient),
-                Optional.empty(),
+                this.recipient,
                 Collections
                     .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
                 new PlainMessage("E2ETest:standaloneTransferTransaction:message")
@@ -131,8 +114,7 @@ class E2EIntegrationTest extends BaseIntegrationTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 getNetworkType(),
-                Optional.of(this.recipient),
-                Optional.empty(),
+                this.recipient,
                 Collections
                     .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
                 /*new PlainMessage(
@@ -712,8 +694,7 @@ class E2EIntegrationTest extends BaseIntegrationTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 getNetworkType(),
-                Optional.of(new Address("SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZY", getNetworkType())),
-                Optional.empty(),
+                new Address("SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZY", getNetworkType()),
                 Collections
                     .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
                 PlainMessage.create("test-message")

@@ -33,7 +33,7 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
     private final Optional<Address> recipient;
     private final List<Mosaic> mosaics;
     private final Message message;
-    private final Optional<NamespaceId> namespaceId;
+    private Optional<NamespaceId> namespaceId;
 
     private TransferTransactionFactory(
         final NetworkType networkType,
@@ -63,11 +63,39 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
      */
     public static TransferTransactionFactory create(
         final NetworkType networkType,
-        final Optional<Address> recipient,
-        final Optional<NamespaceId> namespaceId,
+        final Address recipient,
         final List<Mosaic> mosaics,
         final Message message) {
-        return new TransferTransactionFactory(networkType, recipient, namespaceId, mosaics, message);
+        return new TransferTransactionFactory(networkType, Optional.of(recipient), Optional.empty(), mosaics, message);
+    }
+
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param namespaceId Namespace id.
+     * @param mosaics List of mosaics.
+     * @param message Message.
+     * @return Transfer transaction.
+     */
+    public static TransferTransactionFactory createWithNamespaceId(
+        final NetworkType networkType,
+        final NamespaceId namespaceId,
+        final List<Mosaic> mosaics,
+        final Message message) {
+        return new TransferTransactionFactory(networkType, Optional.empty(), Optional.of(namespaceId), mosaics, message);
+    }
+
+    /**
+     * Builder method used to change the default namespaceId.
+     *
+     * @param namespaceId a new namespaceId
+     * @return this factory to continue building the transaction.
+     */
+    public TransferTransactionFactory namespaceId(NamespaceId namespaceId) {
+        Validate.notNull(namespaceId, "NamespaceId must not be null");
+        this.namespaceId = Optional.of(namespaceId);
+        return this;
     }
 
     /**

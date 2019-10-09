@@ -41,7 +41,6 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Optional;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,9 +58,7 @@ public class OkHttpAggregateTransactionTest {
         TransferTransaction transferTx =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                Optional.of(new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
-                    NetworkType.MIJIN_TEST)),
-                Optional.empty(),
+                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST),
                 Collections.emptyList(),
                 PlainMessage.Empty).build();
 
@@ -90,8 +87,7 @@ public class OkHttpAggregateTransactionTest {
         TransferTransaction transferTx =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                Optional.of(new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST)),
-                Optional.empty(),
+                new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST),
                 Collections.singletonList(
                     new Mosaic(new MosaicId(NetworkCurrencyMosaic.NAMESPACEID.getId()),
                         BigInteger.valueOf(10000000))),
@@ -116,8 +112,7 @@ public class OkHttpAggregateTransactionTest {
         TransferTransaction transferTx =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                Optional.of(new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST)),
-                Optional.empty(),
+                new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST),
                 Collections.emptyList(),
                 new PlainMessage("test-message")
             ).build();

@@ -45,7 +45,7 @@ public abstract class Transaction {
     private final Optional<String> signature;
     private final Optional<TransactionInfo> transactionInfo;
     private Optional<PublicAccount> signer;
-    private boolean isInnerTransaction = false;
+    private Optional<Boolean> innerTransaction = Optional.empty();
 
     /**
      * Abstract constructors of all transactions.
@@ -60,7 +60,6 @@ public abstract class Transaction {
         this.signer = factory.getSigner();
         this.transactionInfo = factory.getTransactionInfo();
     }
-
 
     /**
      * Generates hash for a serialized transaction payload.
@@ -157,13 +156,6 @@ public abstract class Transaction {
     }
 
     /**
-     * Returns true if transaction is an aggregate inner transaction.
-     *
-     * @return true if aggregate inner transaction; false otherwise.
-     */
-    public boolean isInnerTransaction() { return isInnerTransaction; }
-
-    /**
      * 
      * @return
      */
@@ -182,6 +174,7 @@ public abstract class Transaction {
      * @return bytes of the transaction
      */
     public byte[] serialize() {
+        boolean isInnerTransaction = innerTransaction.isPresent() ? innerTransaction.get() : false;
         return (isInnerTransaction ? this.generateEmbeddedBytes() : this.generateBytes());
     }
 
@@ -226,7 +219,7 @@ public abstract class Transaction {
      * @return transaction with signer serialized to be part of an aggregate transaction
      */
     byte[] toAggregateTransactionBytes() {
-        this.isInnerTransaction = true;
+        this.innerTransaction = Optional.of(Boolean.TRUE);
         return this.generateEmbeddedBytes();
     }
 
@@ -237,7 +230,7 @@ public abstract class Transaction {
      * @return instance of Transaction with signer
      */
     public Transaction toAggregate(final PublicAccount signer) {
-        this.isInnerTransaction = true;
+        this.innerTransaction = Optional.of(Boolean.TRUE);
         this.signer = Optional.of(signer);
         return this;
     }

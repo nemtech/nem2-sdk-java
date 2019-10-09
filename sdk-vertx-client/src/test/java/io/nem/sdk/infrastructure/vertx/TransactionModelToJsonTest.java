@@ -19,7 +19,6 @@ package io.nem.sdk.infrastructure.vertx;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nem.core.crypto.Hashes;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
@@ -89,7 +88,6 @@ import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import io.vertx.core.json.JsonObject;
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Random;
 import org.apache.commons.codec.binary.Hex;
 import org.junit.jupiter.api.BeforeAll;
@@ -117,8 +115,7 @@ class TransactionModelToJsonTest {
 
     @BeforeAll
     void setup() {
-        ObjectMapper objectMapper = JsonHelperJackson2.configureMapper(new ObjectMapper());
-        jsonHelper = new JsonHelperJackson2(objectMapper);
+        jsonHelper = new JsonHelperJackson2();
 
         generationHash = "A94B1BE81F1D4C95D6D252AD7BA3FFFB1674991FD880B7A57DC3180AF8D69C32";
 
@@ -320,8 +317,7 @@ class TransactionModelToJsonTest {
         TransferTransaction transaction =
             TransferTransactionFactory
                 .create(NetworkType.MIJIN_TEST,
-                    Optional.of(recipientAddress),
-                    Optional.empty(),
+                    recipientAddress,
                     Arrays.asList(
                     NetworkHarvestMosaic.createAbsolute(BigInteger.valueOf(100)),
                     NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(100))),
@@ -415,8 +411,7 @@ class TransactionModelToJsonTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory
                 .create(NetworkType.MIJIN_TEST,
-                    Optional.of(recipientAddress),
-                    Optional.empty(),
+                    recipientAddress,
                     Arrays.asList(),
                     PlainMessage.create("test-message"))
                 .build();
@@ -452,8 +447,7 @@ class TransactionModelToJsonTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory
                 .create(NetworkType.MIJIN_TEST,
-                    Optional.of(recipientAddress),
-                    Optional.empty(),
+                    recipientAddress,
                     Arrays.asList(),
                     PlainMessage.create("test-message"))
                 .build();

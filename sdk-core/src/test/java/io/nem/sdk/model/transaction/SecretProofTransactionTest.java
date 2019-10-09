@@ -65,7 +65,7 @@ public class SecretProofTransactionTest {
                 secretSeed).deadline(new FakeDeadline()).build();
         byte[] actual = transaction.generateBytes();
         assertEquals(expected, Hex.toHexString(actual));
-        assertEquals(false, transaction.isInnerTransaction());
+
     }
 
     @Test
@@ -91,7 +91,7 @@ public class SecretProofTransactionTest {
                         NetworkType.MIJIN_TEST))
                 .serialize();
         assertEquals(expected, Hex.toHexString(actual));
-        assertEquals(true, transaction.isInnerTransaction());
+
     }
 
     @Test
@@ -113,7 +113,7 @@ public class SecretProofTransactionTest {
         assertEquals(
             "E0FB9BF47C70A411EB77AD4683FA33E823A403BC04ECD0D50F85143BBE2C3229",
             signedTransaction.getHash());
-        assertEquals(false, transaction.isInnerTransaction());
+
     }
 
     @Test

@@ -22,6 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.nem.sdk.model.transaction.JsonHelper;
+import io.nem.sdk.openapi.okhttp_gson.invoker.JSON;
 import java.math.BigInteger;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,11 +34,27 @@ import org.apache.commons.lang3.StringUtils;
 public class JsonHelperGson implements JsonHelper {
 
     private final Gson objectMapper;
+    private final Gson prettyObjectMapper;
 
-    public JsonHelperGson(Gson objectMapper) {
-        this.objectMapper = objectMapper;
+    public JsonHelperGson() {
+        this(JsonHelperGson.createGson(false),
+            JsonHelperGson.createGson(true));
     }
 
+    public JsonHelperGson(Gson objectMapper) {
+        this(objectMapper, JsonHelperGson.createGson(true));
+    }
+
+    public JsonHelperGson(Gson objectMapper, Gson prettyObjectMapper) {
+        this.objectMapper = objectMapper;
+        this.prettyObjectMapper = prettyObjectMapper;
+    }
+
+    public static final Gson createGson(boolean pretty) {
+        GsonBuilder builder = JSON.createGson();
+        if (pretty) builder.setPrettyPrinting();
+        return builder.create();
+    }
 
     @Override
     public <T> T parse(final String string, final Class<T> clazz) {
@@ -67,7 +84,6 @@ public class JsonHelperGson implements JsonHelper {
             throw new IllegalArgumentException(e.getMessage(), e);
         }
     }
-
 
     private static IllegalArgumentException handleException(Exception e) {
         return new IllegalArgumentException(e.getMessage(), e);
@@ -148,7 +164,6 @@ public class JsonHelperGson implements JsonHelper {
         return child != null && !child.isJsonNull();
     }
 
-
     private JsonElement getNode(final JsonObject parent, final String... path) {
         JsonElement child = parent;
         if (child == null) {
@@ -186,18 +201,13 @@ public class JsonHelperGson implements JsonHelper {
 
     @Override
     public String toJSONPretty(Object object) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(toJsonObject(object));
+        return prettyObjectMapper.toJson(toJsonObject(object));
     }
 
     @Override
     public String toJSONPretty(String jsonString) {
         JsonParser parser = new JsonParser();
         JsonObject json = parser.parse(jsonString).getAsJsonObject();
-
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String prettyJson = gson.toJson(json);
-
-        return prettyJson;
+        return prettyObjectMapper.toJson(json);
     }
 }

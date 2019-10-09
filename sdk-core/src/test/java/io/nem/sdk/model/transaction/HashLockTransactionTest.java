@@ -61,7 +61,7 @@ class HashLockTransactionTest {
                 signedTransaction).deadline(new FakeDeadline()).build();
         byte[] actual = transaction.generateBytes();
         assertEquals(expected, ConvertUtils.toHex(actual));
-        assertEquals(false, transaction.isInnerTransaction());
+
     }
 
     @Test
@@ -89,7 +89,7 @@ class HashLockTransactionTest {
                         NetworkType.MIJIN_TEST))
                 .serialize();
         assertEquals(expected, ConvertUtils.toHex(actual));
-        assertEquals(true, transaction.isInnerTransaction());
+
     }
 
     @Test
@@ -116,7 +116,7 @@ class HashLockTransactionTest {
         assertEquals(
             "11533C71C8A6F9A86E041AD6EE3B1CBA81FA9E7DDF93AEFB9EB7ACA153BB3E2C",
             lockFundsTransactionSigned.getHash());
-        assertEquals(false, transaction.isInnerTransaction());
+
     }
 
     @Test

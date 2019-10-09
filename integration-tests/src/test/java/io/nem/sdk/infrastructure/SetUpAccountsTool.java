@@ -38,7 +38,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 
@@ -115,8 +114,7 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 getNetworkType(),
-                Optional.of(recipient.getAddress()),
-                Optional.empty(),
+                recipient.getAddress(),
                 Collections
                     .singletonList(NetworkCurrencyMosaic.createAbsolute(amount)),
                 new PlainMessage("E2ETest:SetUpAccountsTool")

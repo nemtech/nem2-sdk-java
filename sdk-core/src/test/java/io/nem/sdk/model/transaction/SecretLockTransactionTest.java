@@ -62,7 +62,7 @@ public class SecretLockTransactionTest {
                 .deadline(new FakeDeadline()).build();
         byte[] actual = transaction.generateBytes();
         assertEquals(expected, Hex.toHexString(actual));
-        assertEquals(false, transaction.isInnerTransaction());
+
     }
 
     @Test
@@ -89,7 +89,7 @@ public class SecretLockTransactionTest {
                         NetworkType.MIJIN_TEST))
                 .serialize();
         assertEquals(expected, Hex.toHexString(actual));
-        assertEquals(true, transaction.isInnerTransaction());
+
     }
 
     @Test
@@ -112,7 +112,7 @@ public class SecretLockTransactionTest {
         assertEquals(
             "DAF5D06A8C47C636E4C97B5AD3FCB82F2B9D2140A37FE5572A3065CF6D65642A",
             signedTransaction.getHash());
-        assertEquals(false, transaction.isInnerTransaction());
+
     }
 
     @Test

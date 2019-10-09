@@ -35,7 +35,6 @@ import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.nem.sdk.openapi.vertx.model.TransactionStatusDTO;
 import java.math.BigInteger;
 import java.util.Collections;
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -187,8 +186,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                Optional.of(recipientAddress),
-                Optional.empty(),
+                recipientAddress,
                 Collections
                     .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
                 new PlainMessage("E2ETest:standaloneTransferTransaction:message")

@@ -53,7 +53,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -304,8 +303,7 @@ public class ListenerVertxTest {
     private TransferTransaction transferTransaction(PublicAccount signer, Address recipient) {
         TransferTransactionFactory factory = TransferTransactionFactory
             .create(NetworkType.MIJIN_TEST,
-                Optional.of(recipient),
-                Optional.empty(),
+                recipient,
                 Collections.emptyList(),
                 PlainMessage.Empty);
         if (signer != null) {

@@ -29,7 +29,6 @@ import io.nem.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Optional;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -54,9 +53,7 @@ class TransferTransactionTest {
 
         TransferTransaction transaction =
             TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
-                Optional.of(new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
-                    NetworkType.MIJIN_TEST)),
-                Optional.empty(),
+                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST),
                 Arrays.asList(),
                 PlainMessage.Empty
             ).build();
@@ -70,7 +67,7 @@ class TransferTransactionTest {
             transaction.getRecipient().get());
         assertEquals(0, transaction.getMosaics().size());
         assertNotNull(transaction.getMessage());
-        assertEquals(false, transaction.isInnerTransaction());
+
     }
 
     @Test
@@ -82,15 +79,14 @@ class TransferTransactionTest {
         TransferTransaction transaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                Optional.of(new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST)),
-                Optional.empty(),
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
                 Arrays.asList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
                 PlainMessage.Empty).deadline(new FakeDeadline()).build();
         byte[] actual = transaction.generateBytes();
         assertEquals(expected, Hex.toHexString(actual));
-        assertEquals(false, transaction.isInnerTransaction());
+
     }
 
     @Test
@@ -102,15 +98,14 @@ class TransferTransactionTest {
         TransferTransaction transaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                Optional.of(new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST)),
-                Optional.empty(),
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
                 Arrays.asList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
                 PlainMessage.Empty).deadline(new FakeDeadline()).build();
         byte[] actual = transaction.serialize();
         assertEquals(expected, Hex.toHexString(actual));
-        assertEquals(false, transaction.isInnerTransaction());
+
     }
 
     @Test
@@ -122,8 +117,7 @@ class TransferTransactionTest {
         TransferTransaction transaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                Optional.of(new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST)),
-                Optional.empty(),
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
                 Arrays.asList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
@@ -138,7 +132,6 @@ class TransferTransactionTest {
         byte[] actual = aggregateTransaction.serialize();
 
         assertEquals(expected, Hex.toHexString(actual));
-        assertEquals(true, aggregateTransaction.isInnerTransaction());
     }
 
     @Test
@@ -146,8 +139,7 @@ class TransferTransactionTest {
         TransferTransaction transaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                Optional.of(new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST)),
-                Optional.empty(),
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
                 Arrays.asList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
@@ -161,6 +153,6 @@ class TransferTransactionTest {
         assertEquals(
             "B54321C382FA3CC53EB6559FDDE03832898E7E89C8F90C10DF8567AD41A926A2",
             signedTransaction.getHash());
-        assertEquals(false, transaction.isInnerTransaction());
+
     }
 }

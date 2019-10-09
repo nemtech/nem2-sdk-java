@@ -36,10 +36,13 @@ public class JsonHelperJackson2 implements JsonHelper {
 
     private final ObjectMapper objectMapper;
 
+    public JsonHelperJackson2() {
+        this.objectMapper = configureMapper(new ObjectMapper());
+    }
+
     public JsonHelperJackson2(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
-
 
     @SuppressWarnings("squid:CallToDeprecatedMethod")
     public static ObjectMapper configureMapper(ObjectMapper objectMapper) {

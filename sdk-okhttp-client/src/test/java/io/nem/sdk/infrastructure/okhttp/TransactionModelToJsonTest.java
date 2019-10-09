@@ -90,7 +90,6 @@ import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Random;
 import org.apache.commons.codec.binary.Hex;
 import org.junit.jupiter.api.BeforeAll;
@@ -120,7 +119,7 @@ class TransactionModelToJsonTest {
     @BeforeAll
     void setup() {
         gson = new GsonBuilder().setPrettyPrinting().create();
-        jsonHelper = new JsonHelperGson(gson);
+        jsonHelper = new JsonHelperGson();
 
         generationHash = "A94B1BE81F1D4C95D6D252AD7BA3FFFB1674991FD880B7A57DC3180AF8D69C32";
 
@@ -320,8 +319,7 @@ class TransactionModelToJsonTest {
         TransferTransaction transaction =
             TransferTransactionFactory
                 .create(NetworkType.MIJIN_TEST,
-                    Optional.of(recipientAddress),
-                    Optional.empty(),
+                    recipientAddress,
                     Arrays.asList(
                     NetworkHarvestMosaic.createAbsolute(BigInteger.valueOf(100)),
                     NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(100))),
@@ -415,8 +413,7 @@ class TransactionModelToJsonTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory
                 .create(NetworkType.MIJIN_TEST,
-                    Optional.of(recipientAddress),
-                    Optional.empty(),
+                    recipientAddress,
                     Arrays.asList(),
                     PlainMessage.create("test-message"))
                 .build();
@@ -452,8 +449,7 @@ class TransactionModelToJsonTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory
                 .create(NetworkType.MIJIN_TEST,
-                    Optional.of(recipientAddress),
-                    Optional.empty(),
+                    recipientAddress,
                     Arrays.asList(),
                     PlainMessage.create("test-message"))
                 .build();
@@ -623,15 +619,15 @@ class TransactionModelToJsonTest {
 
     void validateJsonPretty(JsonObject jsonObject, Transaction transaction) {
         // validate json string
-        String json = jsonObject.toString();
-        assertNotNull(json);
-        assertEquals(json, jsonHelper.toJSON(transaction));
+        String jsonOneLine = jsonObject.toString();
+        assertNotNull(jsonOneLine);
+        assertEquals(jsonOneLine, jsonHelper.toJSON(transaction));
         // validate json pretty
         String jsonPretty = gson.toJson(jsonObject);
         String actual;
-        actual = jsonHelper.toJSONPretty(jsonObject.toString());
+        actual = jsonHelper.toJSONPretty(transaction);
         assertEquals(jsonPretty, actual);
-        actual = jsonHelper.toJSONPretty(jsonHelper.toJSONPretty(transaction));
+        actual = jsonHelper.toJSONPretty(jsonOneLine);
         assertEquals(jsonPretty, actual);
     }
 }
