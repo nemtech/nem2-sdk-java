@@ -1,0 +1,4 @@
+io.nem.sdk.openapi.okhttp_gson.api
+io.nem.sdk.openapi.okhttp_gson.invoker
+io.nem.sdk.openapi.okhttp_gson.invoker.auth
+io.nem.sdk.openapi.okhttp_gson.model
