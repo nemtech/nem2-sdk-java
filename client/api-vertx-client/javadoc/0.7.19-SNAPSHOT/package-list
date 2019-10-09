@@ -1,0 +1,5 @@
+io.nem.sdk.openapi.vertx.api
+io.nem.sdk.openapi.vertx.api.rxjava
+io.nem.sdk.openapi.vertx.invoker
+io.nem.sdk.openapi.vertx.invoker.auth
+io.nem.sdk.openapi.vertx.model
