@@ -17,13 +17,19 @@
 
 package io.nem.sdk.model.transaction;
 
+import io.nem.core.crypto.PrivateKey;
+import io.nem.core.crypto.PublicKey;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.message.Message;
+import io.nem.sdk.model.message.PersistentHarvestingDelegationMessage;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.namespace.NamespaceId;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.math3.analysis.function.Add;
 
 /**
  * Factory of {@link TransferTransaction}
@@ -56,6 +62,27 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
         List<Mosaic> mosaics, Message message) {
         return new TransferTransactionFactory(networkType, Optional.of(recipient), Optional.empty(),
             mosaics, message);
+    }
+
+    /**
+     * Creates a TransferTransactionFactory with special message payload for persistent harvesting
+     * delegation unlocking
+     *
+     * @param networkType The network type.
+     * @param senderPrivateKey The sender's private key
+     * @param harvesterPublicKey The harvester public key
+     * @return {@link TransferTransactionFactory}
+     */
+    public static TransferTransactionFactory createPersistentDelegationRequestTransaction(
+        NetworkType networkType,
+        PrivateKey senderPrivateKey,
+        PublicKey harvesterPublicKey) {
+        PersistentHarvestingDelegationMessage message = PersistentHarvestingDelegationMessage
+            .create(senderPrivateKey, harvesterPublicKey, networkType);
+        return new TransferTransactionFactory(networkType,
+            Optional.of(Address.createFromPublicKey(harvesterPublicKey.toHex(), networkType)),
+            Optional.empty(),
+            Collections.emptyList(), message);
     }
 
     /**

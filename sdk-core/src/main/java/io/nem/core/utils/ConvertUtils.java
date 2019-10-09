@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  * Static class that contains utility functions for converting hex strings to and from bytes.
@@ -67,6 +68,21 @@ public class ConvertUtils {
     }
 
     /**
+     * Converts an hex back to an byte array.
+     *
+     * @param hexString the hex string input
+     * @return the byte array.
+     */
+    public static byte[] fromHex(String hexString) {
+        final Hex codec = new Hex();
+        try {
+            return codec.decode(StringEncoder.getBytes(hexString));
+        } catch (DecoderException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
      * Converts hex string to a plain string
      *
      * @param hexString The input string.
@@ -76,20 +92,8 @@ public class ConvertUtils {
         if (hexString == null) {
             return null;
         }
-        byte[] bytes = getBytes(hexString);
-        return new String(bytes, StandardCharsets.UTF_8);
+        return StringEncoder.getString(fromHex(hexString));
     }
-
-    /**
-     * Converts a number to hex padding zeros up to size 16.
-     *
-     * @param number The input string.
-     * @return the hex 16 characters
-     */
-    public static String toSize16Hex(final BigInteger number) {
-        return String.format("%016x", number);
-    }
-
 
     /**
      * Converts plain string to an hex string
@@ -101,7 +105,19 @@ public class ConvertUtils {
         if (plainText == null) {
             return null;
         }
-        return toHex(plainText.getBytes(StandardCharsets.UTF_8));
+        return toHex(StringEncoder.getBytes(plainText));
     }
+
+
+    /**
+     * Converts a number to hex padding zeros up to size 16.
+     *
+     * @param number The input string.
+     * @return the hex 16 characters
+     */
+    public static String toSize16Hex(final BigInteger number) {
+        return String.format("%016x", number);
+    }
+
 
 }

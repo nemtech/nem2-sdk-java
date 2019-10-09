@@ -23,7 +23,7 @@ import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
-import io.nem.sdk.model.transaction.PlainMessage;
+import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionAnnounceResponse;

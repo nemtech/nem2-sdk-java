@@ -520,7 +520,8 @@ public class TransactionMapperOkHttpTest {
 
         Assertions.assertEquals(1, transaction.getValueSizeDelta());
         Assertions.assertEquals(BigInteger.valueOf(3), transaction.getScopedMetadataKey());
-        Assertions.assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
+        Assertions
+            .assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
         Assertions.assertEquals("0003070467832aaa", transaction.getTargetMosaicId().getIdAsHex());
     }
 
@@ -543,7 +544,8 @@ public class TransactionMapperOkHttpTest {
 
         Assertions.assertEquals(1, transaction.getValueSizeDelta());
         Assertions.assertEquals(BigInteger.valueOf(3), transaction.getScopedMetadataKey());
-        Assertions.assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
+        Assertions
+            .assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
         Assertions
             .assertEquals("0003070467832aaa", transaction.getTargetNamespaceId().getIdAsHex());
     }
@@ -567,7 +569,8 @@ public class TransactionMapperOkHttpTest {
 
         Assertions.assertEquals(1, transaction.getValueSizeDelta());
         Assertions.assertEquals(BigInteger.valueOf(3), transaction.getScopedMetadataKey());
-        Assertions.assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
+        Assertions
+            .assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
     }
 
     @Test
@@ -733,7 +736,7 @@ public class TransactionMapperOkHttpTest {
             transaction.getMessage().getPayload());
 
         assertEquals((int) transferTransaction.getMessage().getType().getValue(),
-            transaction.getMessage().getType());
+            transaction.getMessage().getType().getValue());
     }
 
     void validateNamespaceCreationTx(
