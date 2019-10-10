@@ -127,7 +127,7 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
         System.out.println(mosaicId.getIdAsHex());
 
         MosaicDefinitionTransaction mosaicDefinitionTransaction =
-            new MosaicDefinitionTransactionFactory(getNetworkType(),
+            MosaicDefinitionTransactionFactory.create(getNetworkType(),
                 nonce,
                 mosaicId,
                 MosaicFlags.create(true, true, true),

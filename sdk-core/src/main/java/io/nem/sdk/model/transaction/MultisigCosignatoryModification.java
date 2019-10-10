@@ -36,6 +36,11 @@ public class MultisigCosignatoryModification {
         this.cosignatoryPublicAccount = cosignatoryPublicAccount;
     }
 
+    public static MultisigCosignatoryModification create(CosignatoryModificationActionType modificationAction,
+        PublicAccount cosignatoryPublicAccount) {
+        return new MultisigCosignatoryModification(modificationAction, cosignatoryPublicAccount);
+    }
+
     /**
      * Returns multisig modification type.
      *

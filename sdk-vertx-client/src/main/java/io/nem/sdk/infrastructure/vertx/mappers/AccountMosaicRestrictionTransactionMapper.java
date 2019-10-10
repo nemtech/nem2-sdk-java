@@ -53,7 +53,7 @@ public class AccountMosaicRestrictionTransactionMapper extends
             .rawValueOf(transaction.getRestrictionType().getValue());
         List<AccountRestrictionModification<MosaicId>> modifications = transaction
             .getModifications().stream().map(this::toModification).collect(Collectors.toList());
-        return new AccountMosaicRestrictionTransactionFactory(networkType, restrictionType,
+        return AccountMosaicRestrictionTransactionFactory.create(networkType, restrictionType,
             modifications);
     }
 

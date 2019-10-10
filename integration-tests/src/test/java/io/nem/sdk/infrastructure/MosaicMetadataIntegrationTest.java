@@ -55,7 +55,7 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
         String message = "This is the message in the mosaic!";
         BigInteger key = BigInteger.TEN;
         MosaicMetadataTransaction transaction =
-            new MosaicMetadataTransactionFactory(
+            MosaicMetadataTransactionFactory.create(
                 getNetworkType(), testAccount.getPublicAccount(), targetMosaicId,
                 key, message
             ).build();
@@ -135,7 +135,7 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
         MosaicId mosaicId = MosaicId.createFromNonce(nonce, testAccount.getPublicAccount());
 
         MosaicDefinitionTransaction mosaicDefinitionTransaction =
-            new MosaicDefinitionTransactionFactory(getNetworkType(),
+            MosaicDefinitionTransactionFactory.create(getNetworkType(),
                 nonce,
                 mosaicId,
                 MosaicFlags.create(true, true, true),

@@ -43,7 +43,7 @@ class MosaicSupplyChangeTransactionMapper extends
     @Override
     protected TransactionFactory<MosaicSupplyChangeTransaction> createFactory(
         NetworkType networkType, MosaicSupplyChangeTransactionDTO transaction) {
-        return new MosaicSupplyChangeTransactionFactory(networkType,
+        return MosaicSupplyChangeTransactionFactory.create(networkType,
             toMosaicId(transaction.getMosaicId()),
             MosaicSupplyChangeActionType.rawValueOf(transaction.getAction().getValue()),
             transaction.getDelta());

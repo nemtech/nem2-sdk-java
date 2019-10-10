@@ -42,7 +42,7 @@ class AccountLinkTransactionMapper extends
         AccountLinkTransactionDTO dto) {
         PublicAccount remoteAccount = PublicAccount
             .createFromPublicKey(dto.getRemotePublicKey(), networkType);
-        return new AccountLinkTransactionFactory(networkType,
+        return AccountLinkTransactionFactory.create(networkType,
             remoteAccount,
             AccountLinkAction.rawValueOf(dto.getLinkAction().getValue()));
     }

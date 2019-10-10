@@ -43,7 +43,7 @@ class MosaicAddressRestrictionTransactionMapper extends
     protected TransactionFactory<MosaicAddressRestrictionTransaction> createFactory(
         NetworkType networkType,
         MosaicAddressRestrictionTransactionDTO transaction) {
-        return new MosaicAddressRestrictionTransactionFactory(networkType,
+        return MosaicAddressRestrictionTransactionFactory.create(networkType,
             toMosaicId(transaction.getMosaicId()),
             MapperUtils.fromHex(transaction.getRestrictionKey()),
             MapperUtils.toAddressFromUnresolved(transaction.getTargetAddress()),

@@ -99,8 +99,8 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
         }
 
         System.out.println("Creating multisg account");
-        MultisigAccountModificationTransaction convertIntoMultisigTransaction = new MultisigAccountModificationTransactionFactory(
-            getNetworkType(), (byte) 1, (byte) 1, Arrays.stream(accounts)
+        MultisigAccountModificationTransaction convertIntoMultisigTransaction = MultisigAccountModificationTransactionFactory
+            .create(getNetworkType(), (byte) 2, (byte) 1, Arrays.stream(accounts)
             .map(a -> new MultisigCosignatoryModification(CosignatoryModificationActionType.ADD,
                 a.getPublicAccount())).collect(Collectors.toList())).build();
 
@@ -167,12 +167,22 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
         }
     }
 
-
     void printAccount(Account account) {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("privateKey", account.getPrivateKey());
         map.put("publicKey", account.getPublicKey());
         map.put("address", account.getAddress().plain());
         System.out.println(jsonHelper().print(map));
+    }
+
+    protected void hashLock(RepositoryType type, Account account,
+        SignedTransaction signedTransaction) {
+        HashLockTransaction hashLockTransaction = HashLockTransactionFactory.create(
+                getNetworkType(),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                BigInteger.valueOf(100),
+                signedTransaction)
+            .build();
+        announceAndValidate(type, account, hashLockTransaction);
     }
 }

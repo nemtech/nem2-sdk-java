@@ -49,7 +49,7 @@ class MosaicMetadataTransactionMapper extends
         Integer valueSize = transaction.getValueSize();
         String value = ConvertUtils.fromHexToString(transaction.getValue());
         MosaicId targetMosaic = MapperUtils.toMosaicId(transaction.getTargetMosaicId());
-        MosaicMetadataTransactionFactory factory = new MosaicMetadataTransactionFactory(
+        MosaicMetadataTransactionFactory factory = MosaicMetadataTransactionFactory.create(
             networkType,
             targetAccount,
             targetMosaic,

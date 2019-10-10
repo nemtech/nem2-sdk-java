@@ -52,7 +52,7 @@ public class AccountMetadataIntegrationTest extends BaseIntegrationTest {
                 .plain());
 
         AccountMetadataTransaction transaction =
-            new AccountMetadataTransactionFactory(
+            AccountMetadataTransactionFactory.create(
                 getNetworkType(), testAccount.getPublicAccount(),
                 key,
                 message

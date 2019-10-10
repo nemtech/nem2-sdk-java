@@ -48,7 +48,7 @@ public abstract class MetadataTransactionFactory<T extends MetadataTransaction> 
      */
     private final String value;
 
-    public MetadataTransactionFactory(
+    MetadataTransactionFactory(
         TransactionType transactionType,
         NetworkType networkType,
         PublicAccount targetAccount,

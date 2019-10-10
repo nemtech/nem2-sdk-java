@@ -23,6 +23,8 @@ import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.message.PlainMessage;
+import io.nem.sdk.model.transaction.HashLockTransaction;
+import io.nem.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
@@ -70,10 +72,18 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
             signedTransaction.getHash(), type);
     }
 
-
-
     private TransactionRepository getTransactionRepository(
         RepositoryType type) {
         return getRepositoryFactory(type).createTransactionRepository();
+    }
+
+    protected void hashLock(RepositoryType type, Account account,
+        SignedTransaction signedTransaction) {
+        HashLockTransaction hashLockTransaction =
+            HashLockTransactionFactory.create(getNetworkType(),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                BigInteger.valueOf(100),
+                signedTransaction).build();
+        announceAndValidate(type, account, hashLockTransaction);
     }
 }

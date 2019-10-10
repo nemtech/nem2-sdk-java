@@ -46,7 +46,7 @@ class AccountMetadataTransactionMapper extends
         Integer valueSizeDelta = transaction.getValueSizeDelta();
         BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey(), 16);
         String value = ConvertUtils.fromHexToString(transaction.getValue());
-        AccountMetadataTransactionFactory factory = new AccountMetadataTransactionFactory(
+        AccountMetadataTransactionFactory factory = AccountMetadataTransactionFactory.create(
             networkType,
             targetAccount,
             scopedMetaDataKey,

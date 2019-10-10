@@ -201,8 +201,8 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
         List<AccountRestrictionModification<TransactionType>> modifications = new ArrayList<>();
         modifications.add(modification);
         AccountOperationRestrictionTransaction transaction =
-            new AccountOperationRestrictionTransactionFactory(
-                getNetworkType(),
+            AccountOperationRestrictionTransactionFactory.create(
+               getNetworkType(),
                 accountRestrictionType
                 , modifications
             ).build();
@@ -225,7 +225,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
         List<AccountRestrictionModification<MosaicId>> modifications = new ArrayList<>();
         modifications.add(modification);
         AccountMosaicRestrictionTransaction transaction =
-            new AccountMosaicRestrictionTransactionFactory(
+            AccountMosaicRestrictionTransactionFactory.create(
                 getNetworkType(),
                 accountRestrictionType
                 , modifications
@@ -249,7 +249,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
         List<AccountRestrictionModification<Address>> modifications = new ArrayList<>();
         modifications.add(modification);
         AccountAddressRestrictionTransaction transaction =
-            new AccountAddressRestrictionTransactionFactory(
+            AccountAddressRestrictionTransactionFactory.create(
                 getNetworkType(),
                 accountRestrictionType
                 , modifications

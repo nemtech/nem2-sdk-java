@@ -62,7 +62,7 @@ public class AddressAliasTransactionIntegrationTest extends BaseIntegrationTest 
         sleep(1000);
 
         AddressAliasTransaction addressAliasTransaction =
-            new AddressAliasTransactionFactory(getNetworkType(),
+            AddressAliasTransactionFactory.create(getNetworkType(),
                 AliasAction.LINK,
                 rootNamespaceId,
                 account.getAddress()

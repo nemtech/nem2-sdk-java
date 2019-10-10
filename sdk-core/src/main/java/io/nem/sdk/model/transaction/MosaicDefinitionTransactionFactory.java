@@ -36,17 +36,7 @@ public class MosaicDefinitionTransactionFactory extends
     private final int divisibility;
     private final BlockDuration blockDuration;
 
-    /**
-     * Create a mosaic definition transaction object with factory build and modifier methods.
-     *
-     * @param networkType {@link NetworkType}
-     * @param mosaicNonce {@link MosaicNonce}
-     * @param mosaicId {@link MosaicId}
-     * @param mosaicFlags {@link MosaicFlags}
-     * @param divisibility int
-     * @param blockDuration {@link BlockDuration}
-     */
-    public MosaicDefinitionTransactionFactory(NetworkType networkType, MosaicNonce mosaicNonce,
+    private MosaicDefinitionTransactionFactory(NetworkType networkType, MosaicNonce mosaicNonce,
         MosaicId mosaicId, MosaicFlags mosaicFlags, int divisibility,
         BlockDuration blockDuration) {
         super(TransactionType.MOSAIC_DEFINITION, networkType);
@@ -60,6 +50,23 @@ public class MosaicDefinitionTransactionFactory extends
         this.mosaicFlags = mosaicFlags;
         this.divisibility = divisibility;
         this.blockDuration = blockDuration;
+    }
+
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType {@link NetworkType}
+     * @param mosaicNonce {@link MosaicNonce}
+     * @param mosaicId {@link MosaicId}
+     * @param mosaicFlags {@link MosaicFlags}
+     * @param divisibility Divisibility
+     * @param blockDuration {@link BlockDuration}
+     * @return Mosaic definition transaction.
+     */
+    public static MosaicDefinitionTransactionFactory create(NetworkType networkType, MosaicNonce mosaicNonce,
+        MosaicId mosaicId, MosaicFlags mosaicFlags, int divisibility,
+        BlockDuration blockDuration) {
+        return new MosaicDefinitionTransactionFactory(networkType, mosaicNonce, mosaicId, mosaicFlags, divisibility, blockDuration);
     }
 
     /**

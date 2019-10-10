@@ -31,8 +31,7 @@ public class AccountMosaicRestrictionTransactionFactory extends
 
     private final List<AccountRestrictionModification<MosaicId>> modifications;
 
-
-    public AccountMosaicRestrictionTransactionFactory(
+    private AccountMosaicRestrictionTransactionFactory(
         final NetworkType networkType,
         final AccountRestrictionType restrictionType,
         final List<AccountRestrictionModification<MosaicId>> modifications) {
@@ -41,6 +40,19 @@ public class AccountMosaicRestrictionTransactionFactory extends
         Validate.notNull(modifications, "Modifications must not be null");
         this.restrictionType = restrictionType;
         this.modifications = modifications;
+    }
+
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param restrictionType Restriction type.
+     * @param modifications List of account mosaic restriction modifications.
+     * @return Account mosaic restriction transaction.
+     */
+    public static AccountMosaicRestrictionTransactionFactory create(NetworkType networkType, AccountRestrictionType restrictionType,
+        List<AccountRestrictionModification<MosaicId>> modifications) {
+        return new AccountMosaicRestrictionTransactionFactory(networkType, restrictionType, modifications);
     }
 
     /**

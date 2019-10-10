@@ -59,7 +59,7 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
         MosaicId mosaicId = MosaicId.createFromNonce(nonce, this.account.getPublicAccount());
 
         MosaicDefinitionTransaction mosaicDefinitionTransaction =
-            new MosaicDefinitionTransactionFactory(
+            MosaicDefinitionTransactionFactory.create(
                 getNetworkType(),
                 nonce,
                 mosaicId,
@@ -80,7 +80,7 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
         MosaicId mosaicId = MosaicId.createFromNonce(nonce, this.account.getPublicAccount());
 
         MosaicDefinitionTransaction mosaicDefinitionTransaction =
-            new MosaicDefinitionTransactionFactory(
+            MosaicDefinitionTransactionFactory.create(
                 getNetworkType(),
                 nonce,
                 mosaicId,
@@ -100,7 +100,7 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
         MosaicId mosaicId = createMosaic(type);
 
         MosaicSupplyChangeTransaction mosaicSupplyChangeTransaction =
-            new MosaicSupplyChangeTransactionFactory(getNetworkType(),
+            MosaicSupplyChangeTransactionFactory.create(getNetworkType(),
                 mosaicId,
                 MosaicSupplyChangeActionType.INCREASE,
                 BigInteger.valueOf(11)
@@ -117,7 +117,7 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
         MosaicId mosaicId = createMosaic(type);
 
         MosaicSupplyChangeTransaction mosaicSupplyChangeTransaction =
-            new MosaicSupplyChangeTransactionFactory(
+            MosaicSupplyChangeTransactionFactory.create(
                 getNetworkType(),
                 mosaicId,
                 MosaicSupplyChangeActionType.INCREASE,

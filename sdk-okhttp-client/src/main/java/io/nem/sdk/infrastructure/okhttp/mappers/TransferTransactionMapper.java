@@ -37,7 +37,6 @@ import io.nem.sdk.openapi.okhttp_gson.model.TransferTransactionDTO;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -70,9 +69,8 @@ class TransferTransactionMapper extends
                 MessageType.rawValueOf(m.getType().getValue()),
                 m.getPayload())).orElse(PlainMessage.Empty);
 
-        return new TransferTransactionFactory(networkType,
-            Optional.of(toAddressFromUnresolved(transaction.getRecipientAddress())),
-            Optional.empty(),
+        return TransferTransactionFactory.create(networkType,
+            toAddressFromUnresolved(transaction.getRecipientAddress()),
             mosaics,
             message);
     }

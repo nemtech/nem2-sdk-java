@@ -50,7 +50,7 @@ class HashLockTransactionMapper extends
         HashLockTransactionDTO transaction) {
         SignedTransaction signedTransaction = new SignedTransaction("", transaction.getHash(),
             TransactionType.AGGREGATE_BONDED);
-        return new HashLockTransactionFactory(networkType, getMosaic(transaction),
+        return HashLockTransactionFactory.create(networkType, getMosaic(transaction),
             transaction.getDuration(),
             signedTransaction);
     }

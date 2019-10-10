@@ -49,7 +49,7 @@ class SecretLockTransactionMapper extends
             new Mosaic(
                 toMosaicId(transaction.getMosaicId()),
                 transaction.getAmount());
-        return new SecretLockTransactionFactory(
+        return SecretLockTransactionFactory.create(
             networkType,
             mosaic,
             transaction.getDuration(),

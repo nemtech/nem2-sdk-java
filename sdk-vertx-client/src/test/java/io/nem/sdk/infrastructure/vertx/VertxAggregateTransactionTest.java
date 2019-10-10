@@ -58,8 +58,7 @@ public class VertxAggregateTransactionTest {
 
         TransferTransaction transferTx =
             TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
-                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
-                    NetworkType.MIJIN_TEST),
+                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST),
                 Collections.emptyList(),
                 PlainMessage.Empty).build();
 

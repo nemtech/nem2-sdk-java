@@ -47,7 +47,7 @@ class AddressAliasTransactionMapper extends
         NamespaceId namespaceId = MapperUtils.toNamespaceId(transaction.getNamespaceId());
         AliasAction aliasAction = AliasAction
             .rawValueOf(transaction.getAliasAction().getValue().byteValue());
-        return new AddressAliasTransactionFactory(
+        return AddressAliasTransactionFactory.create(
             networkType,
             aliasAction,
             namespaceId,

@@ -54,7 +54,7 @@ public class NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
         String message = "This is the message in the Namespace!";
         BigInteger key = BigInteger.TEN;
         NamespaceMetadataTransaction transaction =
-            new NamespaceMetadataTransactionFactory(
+            NamespaceMetadataTransactionFactory.create(
                 getNetworkType(), testAccount.getPublicAccount(), targetNamespaceId,
                 key, message
             ).build();

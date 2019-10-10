@@ -44,7 +44,7 @@ class MosaicAddressRestrictionTransactionTest {
     @Test
     void createAMosaicAddressRestrictionTransactionViaStaticConstructor() {
         MosaicAddressRestrictionTransaction mosaicAddressRestrictionTx =
-            new MosaicAddressRestrictionTransactionFactory(
+            MosaicAddressRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new MosaicId(new BigInteger("0")), // restricted MosaicId
                 BigInteger.valueOf(1), // restrictionKey
@@ -69,7 +69,7 @@ class MosaicAddressRestrictionTransactionTest {
     @Test
     void serializeAndSignTransaction() {
         MosaicAddressRestrictionTransaction mosaicAddressRestrictionTx =
-            new MosaicAddressRestrictionTransactionFactory(
+            MosaicAddressRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new MosaicId(new BigInteger("1")), // restricted MosaicId
                 BigInteger.valueOf(1), // restrictionKey

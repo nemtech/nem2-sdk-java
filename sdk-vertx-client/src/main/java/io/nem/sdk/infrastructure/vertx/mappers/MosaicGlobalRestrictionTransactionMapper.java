@@ -50,7 +50,7 @@ class MosaicGlobalRestrictionTransactionMapper extends
         byte prevRestrictionType = transaction.getPreviousRestrictionType().getValue().byteValue();
         byte newRestrictionType = transaction.getNewRestrictionType().getValue().byteValue();
 
-        return new MosaicGlobalRestrictionTransactionFactory(networkType,
+        return MosaicGlobalRestrictionTransactionFactory.create(networkType,
             toMosaicId(transaction.getMosaicId()),
             MapperUtils.fromHex(transaction.getRestrictionKey()),
             transaction.getNewRestrictionValue(),

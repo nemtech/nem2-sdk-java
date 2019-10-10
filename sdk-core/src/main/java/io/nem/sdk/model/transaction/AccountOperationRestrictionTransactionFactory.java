@@ -30,8 +30,7 @@ public class AccountOperationRestrictionTransactionFactory extends
 
     private final List<AccountRestrictionModification<TransactionType>> modifications;
 
-    @SuppressWarnings("squid:S00107")
-    public AccountOperationRestrictionTransactionFactory(
+    private AccountOperationRestrictionTransactionFactory(
         final NetworkType networkType,
         final AccountRestrictionType restrictionType,
         final List<AccountRestrictionModification<TransactionType>> modifications) {
@@ -42,6 +41,18 @@ public class AccountOperationRestrictionTransactionFactory extends
         this.modifications = modifications;
     }
 
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param restrictionType Restriction type.
+     * @param modifications List of account operation restriction modifications.
+     * @return Account operation restriction transaction.
+     */
+    public static AccountOperationRestrictionTransactionFactory create(NetworkType networkType, AccountRestrictionType restrictionType,
+        List<AccountRestrictionModification<TransactionType>> modifications) {
+        return new AccountOperationRestrictionTransactionFactory(networkType, restrictionType, modifications);
+    }
 
     /**
      * Get account restriction type

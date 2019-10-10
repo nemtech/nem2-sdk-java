@@ -46,7 +46,7 @@ class MosaicDefinitionTransactionMapper extends
         MosaicDefinitionTransactionDTO transaction) {
         MosaicFlags mosaicFlags =
             MosaicFlags.create(transaction.getFlags().intValue());
-        return new MosaicDefinitionTransactionFactory(networkType,
+        return MosaicDefinitionTransactionFactory.create(networkType,
             MosaicNonce.createFromBigInteger(transaction.getNonce()),
             toMosaicId(transaction.getId()),
             mosaicFlags, transaction.getDivisibility(),

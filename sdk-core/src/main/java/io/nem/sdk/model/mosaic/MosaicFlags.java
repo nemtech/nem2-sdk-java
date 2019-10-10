@@ -128,8 +128,6 @@ public class MosaicFlags {
      * @return the merged flags in a int.
      */
     public int getValue() {
-        return (this.supplyMutable ? 1 : 0) + (this.transferable ? 2 : 0) + (this.restrictable ? 4
-            : 0);
+        return (this.supplyMutable ? 1 : 0) + (this.transferable ? 2 : 0) + (this.restrictable ? 4 : 0);
     }
-
 }

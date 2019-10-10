@@ -46,7 +46,7 @@ public class AccountMetadataTransactionTest {
     @Test
     void shouldBuild() {
         AccountMetadataTransaction transaction =
-            new AccountMetadataTransactionFactory(
+            AccountMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
                 BigInteger.TEN, "123BAC").valueSizeDelta(10)
@@ -65,7 +65,7 @@ public class AccountMetadataTransactionTest {
     @Test
     void shouldGenerateBytes() {
         AccountMetadataTransaction transaction =
-            new AccountMetadataTransactionFactory(
+            AccountMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
                 BigInteger.TEN, "123BAC").valueSizeDelta(10)

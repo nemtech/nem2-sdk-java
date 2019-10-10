@@ -76,7 +76,7 @@ class AggregateTransactionMapper extends
                     .collect(Collectors.toList());
         }
 
-        return new AggregateTransactionFactory(getTransactionType(), networkType, transactions,
+        return AggregateTransactionFactory.create(getTransactionType(), networkType, transactions,
             cosignatures);
     }
 

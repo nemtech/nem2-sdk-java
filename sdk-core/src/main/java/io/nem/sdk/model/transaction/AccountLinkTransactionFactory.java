@@ -29,7 +29,7 @@ public class AccountLinkTransactionFactory extends TransactionFactory<AccountLin
     private final PublicAccount remoteAccount;
     private final AccountLinkAction linkAction;
 
-    public AccountLinkTransactionFactory(
+    private AccountLinkTransactionFactory(
         final NetworkType networkType,
         final PublicAccount remoteAccount,
         final AccountLinkAction linkAction) {
@@ -38,6 +38,19 @@ public class AccountLinkTransactionFactory extends TransactionFactory<AccountLin
         Validate.notNull(linkAction, "LinkAction must not be null");
         this.remoteAccount = remoteAccount;
         this.linkAction = linkAction;
+    }
+
+  /**
+   * Static create method for factory.
+   *
+   * @param networkType Network type.
+   * @param remoteAccount Remote account.
+   * @param linkAction Link action.
+   * @return Account link transaction.
+   */
+  public static AccountLinkTransactionFactory create(
+      NetworkType networkType, PublicAccount remoteAccount, AccountLinkAction linkAction) {
+        return new AccountLinkTransactionFactory(networkType, remoteAccount, linkAction);
     }
 
     /**

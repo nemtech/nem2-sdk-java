@@ -52,4 +52,11 @@ public class BlockDuration {
     public long getDuration() {
         return duration;
     }
+
+    /**
+     * Returns the duration as string.
+     *
+     * @return String duration
+     */
+    public String toString() { return Long.toString(duration); }
 }

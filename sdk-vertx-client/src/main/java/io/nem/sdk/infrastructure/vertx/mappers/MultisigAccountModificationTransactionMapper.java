@@ -52,7 +52,7 @@ class MultisigAccountModificationTransactionMapper extends
                 : transaction.getModifications().stream().map(m -> toModification(networkType, m))
                     .collect(Collectors.toList());
 
-        return new MultisigAccountModificationTransactionFactory(
+        return MultisigAccountModificationTransactionFactory.create(
             networkType,
             transaction.getMinApprovalDelta().byteValue(),
             transaction.getMinRemovalDelta().byteValue(),

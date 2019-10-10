@@ -46,7 +46,7 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
         String secret = Hex.encodeHexString(result);
         Address recipient = config().getTestAccount2().getAddress();
         SecretLockTransaction secretLockTransaction =
-            new SecretLockTransactionFactory(getNetworkType(),
+            SecretLockTransactionFactory.create(getNetworkType(),
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
@@ -66,7 +66,7 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
         String secret = Hex.encodeHexString(result);
         Address recipient = config().getTestAccount2().getAddress();
         SecretLockTransaction transaction =
-            new SecretLockTransactionFactory(
+            SecretLockTransactionFactory.create(
                 getNetworkType(),
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
@@ -89,7 +89,7 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
         String proof = Hex.encodeHexString(secretBytes);
         Address recipient = config().getTestAccount2().getAddress();
         SecretLockTransaction secretLockTransaction =
-            new SecretLockTransactionFactory(
+            SecretLockTransactionFactory.create(
                 getNetworkType(),
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
@@ -101,7 +101,7 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
         announceAndValidate(type, account, secretLockTransaction);
 
         SecretProofTransaction secretProofTransaction =
-            new SecretProofTransactionFactory(
+            SecretProofTransactionFactory.create(
                 getNetworkType(),
                 LockHashAlgorithmType.SHA3_256,
                 recipient,
@@ -121,7 +121,7 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
         String proof = Hex.encodeHexString(secretBytes);
         Address recipient = config().getTestAccount2().getAddress();
         SecretLockTransaction secretLockTransaction =
-            new SecretLockTransactionFactory(
+            SecretLockTransactionFactory.create(
                 getNetworkType(),
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
@@ -132,7 +132,7 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
         announceAndValidate(type, account, secretLockTransaction);
 
         SecretProofTransaction secretProofTransaction =
-            new SecretProofTransactionFactory(getNetworkType(),
+            SecretProofTransactionFactory.create(getNetworkType(),
                 LockHashAlgorithmType.SHA3_256,
                 recipient,
                 secret,

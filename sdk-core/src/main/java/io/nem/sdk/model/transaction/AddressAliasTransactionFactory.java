@@ -32,14 +32,7 @@ public class AddressAliasTransactionFactory extends TransactionFactory<AddressAl
     private final NamespaceId namespaceId;
     private final Address address;
 
-    /**
-     * @param networkType Network type.
-     * @param aliasAction Alias action.
-     * @param namespaceId Namespace id.
-     * @param address Address of the account.
-     */
-
-    public AddressAliasTransactionFactory(
+    private AddressAliasTransactionFactory(
         final NetworkType networkType,
         final AliasAction aliasAction,
         final NamespaceId namespaceId,
@@ -51,6 +44,19 @@ public class AddressAliasTransactionFactory extends TransactionFactory<AddressAl
         this.aliasAction = aliasAction;
         this.namespaceId = namespaceId;
         this.address = address;
+    }
+
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param aliasAction Alias action.
+     * @param namespaceId Namespace id.
+     * @param address Address.
+     * @return Address alias transaction.
+     */
+    public static AddressAliasTransactionFactory create(NetworkType networkType, AliasAction aliasAction, NamespaceId namespaceId, Address address) {
+        return new AddressAliasTransactionFactory(networkType, aliasAction, namespaceId, address);
     }
 
     /**

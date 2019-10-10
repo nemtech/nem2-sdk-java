@@ -34,7 +34,7 @@ public class SecretLockTransactionFactory extends TransactionFactory<SecretLockT
     private final String secret;
     private final Address recipient;
 
-    public SecretLockTransactionFactory(
+    private SecretLockTransactionFactory(
         NetworkType networkType,
         Mosaic mosaic,
         BigInteger duration,
@@ -55,6 +55,22 @@ public class SecretLockTransactionFactory extends TransactionFactory<SecretLockT
         this.hashAlgorithm = hashAlgorithm;
         this.secret = secret;
         this.recipient = recipient;
+    }
+
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param mosaic Mosaic.
+     * @param duration Duration.
+     * @param hashAlgorithm Hash algorithm.
+     * @param secret Secret.
+     * @param recipient Recipient.
+     * @return Secret lock transaction.
+     */
+    public static SecretLockTransactionFactory create(NetworkType networkType, Mosaic mosaic,
+        BigInteger duration, LockHashAlgorithmType hashAlgorithm, String secret, Address recipient) {
+        return new SecretLockTransactionFactory(networkType, mosaic, duration, hashAlgorithm, secret, recipient);
     }
 
     /**

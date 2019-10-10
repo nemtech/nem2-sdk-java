@@ -28,12 +28,9 @@ import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
-import io.nem.sdk.model.transaction.HashLockTransaction;
-import io.nem.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
@@ -92,7 +89,7 @@ public abstract class BaseIntegrationTest {
     @BeforeEach
     void coolDown() throws InterruptedException {
         //To avoid rate-limiting errors from server. (5 per seconds)
-        sleep(500);
+        Thread.sleep(500);
     }
 
     private String resolveGenerationHash() {
@@ -175,6 +172,18 @@ public abstract class BaseIntegrationTest {
         return this.config().getTestAccount().getAddress();
     }
 
+    public Account getTestMultisigAccount() {
+        return this.config().getMultisigAccount();
+    }
+
+    public Account getTestCosignatoryAccount() {
+        return this.config().getCosignatoryAccount();
+    }
+
+    public Account getTestCosignatoryAccount2() {
+        return this.config().getCosignatory2Account();
+    }
+
     public Address getRecipient() {
         return this.config().getTestAccount2().getAddress();
     }
@@ -255,7 +264,6 @@ public abstract class BaseIntegrationTest {
         if (transaction.getType() != TransactionType.AGGREGATE_COMPLETE) {
             System.out.println("Transaction completed");
         }
-
         return (T) announceCorrectly;
     }
 
@@ -272,14 +280,29 @@ public abstract class BaseIntegrationTest {
     }
 
 
-    protected void hashLock(RepositoryType type, Account account,
-        SignedTransaction signedTransaction) {
-        HashLockTransaction hashLockTransaction =
-            new HashLockTransactionFactory(getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
-                BigInteger.valueOf(100),
-                signedTransaction).build();
-        announceAndValidate(type, account, hashLockTransaction);
+    AggregateTransaction validateAggregateBondedTransactionAnnounceCorrectly(Address address,
+        String transactionHash, RepositoryType type) {
+        Listener listener = getListener(type);
+        Observable<AggregateTransaction> observable = listener.aggregateBondedAdded(address)
+            .filter(t -> t.getTransactionInfo().flatMap(TransactionInfo::getHash)
+                .filter(s -> s.equals(transactionHash)).isPresent());
+        AggregateTransaction aggregateTransaction = getTransactionOrFail(address, listener,
+            observable);
+        assertEquals(transactionHash,
+            aggregateTransaction.getTransactionInfo().get().getHash().get());
+        return aggregateTransaction;
+    }
+
+    CosignatureSignedTransaction validateAggregateBondedCosignatureTransactionAnnounceCorrectly(
+        Address address, String transactionHash,
+        RepositoryType type) {
+        Listener listener = getListener(type);
+        Observable<CosignatureSignedTransaction> observable = listener.cosignatureAdded(address)
+            .filter(t -> t.getParentHash().equals(transactionHash));
+        CosignatureSignedTransaction transaction = getTransactionOrFail(address, listener,
+            observable);
+        assertEquals(transactionHash, transaction.getParentHash());
+        return transaction;
     }
 
     /**

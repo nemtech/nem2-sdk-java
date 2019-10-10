@@ -47,7 +47,7 @@ public class NamespaceMetadataTransactionTest {
     void shouldBuild() {
         NamespaceId namespaceId = NamespaceId.createFromId(BigInteger.valueOf(1000));
         NamespaceMetadataTransaction transaction =
-            new NamespaceMetadataTransactionFactory(
+            NamespaceMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
                 namespaceId, BigInteger.TEN, "ABC123").valueSizeDelta(10)
@@ -66,7 +66,7 @@ public class NamespaceMetadataTransactionTest {
     void shouldGenerateBytes() {
         NamespaceId namespaceId = NamespaceId.createFromId(BigInteger.valueOf(1000));
         NamespaceMetadataTransaction transaction =
-            new NamespaceMetadataTransactionFactory(
+            NamespaceMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
                 namespaceId, BigInteger.TEN, "ABC123").valueSizeDelta(10)

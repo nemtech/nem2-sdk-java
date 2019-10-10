@@ -45,6 +45,7 @@ public abstract class Transaction {
     private final Optional<String> signature;
     private final Optional<TransactionInfo> transactionInfo;
     private Optional<PublicAccount> signer;
+    private Optional<Boolean> innerTransaction = Optional.empty();
 
     /**
      * Abstract constructors of all transactions.
@@ -59,7 +60,6 @@ public abstract class Transaction {
         this.signer = factory.getSigner();
         this.transactionInfo = factory.getTransactionInfo();
     }
-
 
     /**
      * Generates hash for a serialized transaction payload.
@@ -156,14 +156,29 @@ public abstract class Transaction {
     }
 
     /**
+     * Generate bytes for a specific transaction.
      *
+     * @return
      */
     abstract byte[] generateBytes();
 
     /**
-     * Geneterate the
+     * Generate bytes for a specific inner transaction.
+     *
+     * @return bytes of the transaction
      */
     abstract byte[] generateEmbeddedBytes();
+
+    /**
+     * Serialises a transaction model into binary (unsigned payload).
+     * Gets the serialised bytes for a transaction or an aggregate inner transaction.
+     *
+     * @return bytes of the transaction
+     */
+    public byte[] serialize() {
+        boolean isInnerTransaction = innerTransaction.isPresent() ? innerTransaction.get() : false;
+        return (isInnerTransaction ? this.generateEmbeddedBytes() : this.generateBytes());
+    }
 
     /**
      * Serialize and sign transaction creating a new SignedTransaction.
@@ -206,6 +221,7 @@ public abstract class Transaction {
      * @return transaction with signer serialized to be part of an aggregate transaction
      */
     byte[] toAggregateTransactionBytes() {
+        this.innerTransaction = Optional.of(Boolean.TRUE);
         return this.generateEmbeddedBytes();
     }
 
@@ -216,6 +232,7 @@ public abstract class Transaction {
      * @return instance of Transaction with signer
      */
     public Transaction toAggregate(final PublicAccount signer) {
+        this.innerTransaction = Optional.of(Boolean.TRUE);
         this.signer = Optional.of(signer);
         return this;
     }
@@ -272,7 +289,7 @@ public abstract class Transaction {
      *
      * @return Version of the transaction
      */
-    public short getNetworkVersion() {
+    protected short getNetworkVersion() {
         return (short) getTransactionVersion();
     }
 

@@ -49,7 +49,7 @@ class NamespaceMetadataTransactionMapper extends
         BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey(), 16);
         String value = ConvertUtils.fromHexToString(transaction.getValue());
         NamespaceId targetNamespace = MapperUtils.toNamespaceId(transaction.getTargetNamespaceId());
-        NamespaceMetadataTransactionFactory factory = new NamespaceMetadataTransactionFactory(
+        NamespaceMetadataTransactionFactory factory = NamespaceMetadataTransactionFactory.create(
             networkType,
             targetAccount,
             targetNamespace,

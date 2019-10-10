@@ -27,15 +27,27 @@ import java.math.BigInteger;
 public class AccountMetadataTransactionFactory extends
     MetadataTransactionFactory<AccountMetadataTransaction> {
 
-    public AccountMetadataTransactionFactory(
+    private AccountMetadataTransactionFactory(
         NetworkType networkType,
         PublicAccount targetAccount,
         BigInteger scopedMetadataKey,
         String value) {
         super(TransactionType.ACCOUNT_METADATA_TRANSACTION, networkType, targetAccount,
             scopedMetadataKey, value);
+        };
 
-
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param targetAccount Target account.
+     * @param scopedMetadataKey Scoped metadata key.
+     * @param value Value.
+     * @return Account metadata transaction.
+     */
+    public static AccountMetadataTransactionFactory create(NetworkType networkType,
+        PublicAccount targetAccount, BigInteger scopedMetadataKey, String value) {
+        return new AccountMetadataTransactionFactory(networkType, targetAccount, scopedMetadataKey, value);
     }
 
     @Override

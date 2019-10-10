@@ -45,7 +45,7 @@ public class LockFundsTransactionIntegrationTest extends BaseIntegrationTest {
             .sign(aggregateTransaction, getGenerationHash());
 
         HashLockTransaction hashLockTransaction =
-            new HashLockTransactionFactory(getNetworkType(),
+            HashLockTransactionFactory.create(getNetworkType(),
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 signedTransaction
@@ -64,7 +64,7 @@ public class LockFundsTransactionIntegrationTest extends BaseIntegrationTest {
         SignedTransaction signedTransaction = this.account
             .sign(aggregateTransaction, getGenerationHash());
         HashLockTransaction hashLockTransaction =
-            new HashLockTransactionFactory(
+            HashLockTransactionFactory.create(
                 getNetworkType(),
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),

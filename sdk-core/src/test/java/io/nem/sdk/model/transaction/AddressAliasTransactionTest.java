@@ -45,7 +45,7 @@ public class AddressAliasTransactionTest {
                 "3D28C804EDD07D5A728E5C5FFEC01AB07AFA5766AE6997B38526D36015A4D006",
                 "5A0069D83F17CF0001777E55");
 
-        AddressAliasTransaction transaction = new AddressAliasTransactionFactory(networkType,
+        AddressAliasTransaction transaction = AddressAliasTransactionFactory.create(networkType,
             AliasAction.LINK, namespaceId, signature.getAddress()).signer(signature)
             .transactionInfo(transactionInfo).signature("signing").deadline(new FakeDeadline()).maxFee(fee).build();
 

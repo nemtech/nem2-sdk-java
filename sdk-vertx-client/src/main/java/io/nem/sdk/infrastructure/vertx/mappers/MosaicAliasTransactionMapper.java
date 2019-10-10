@@ -47,7 +47,7 @@ class MosaicAliasTransactionMapper extends
         NamespaceId namespaceId = MapperUtils.toNamespaceId(transaction.getNamespaceId());
         AliasAction aliasAction = AliasAction
             .rawValueOf(transaction.getAliasAction().getValue().byteValue());
-        return new MosaicAliasTransactionFactory(
+        return MosaicAliasTransactionFactory.create(
             networkType,
             aliasAction,
             namespaceId,

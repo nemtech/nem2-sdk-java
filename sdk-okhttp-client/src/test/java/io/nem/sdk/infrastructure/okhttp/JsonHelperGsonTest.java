@@ -16,7 +16,6 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import io.nem.sdk.model.transaction.JsonHelper;
 import java.math.BigInteger;
@@ -40,7 +39,7 @@ public class JsonHelperGsonTest {
     }
 
     @Test
-    public void shouldFailtWhenParsingInvalid() {
+    public void shouldFailWhenParsingInvalid() {
         Assertions.assertEquals("java.io.EOFException: End of input at line 1 column 2 path $.",
             Assertions.assertThrows(IllegalArgumentException.class,
                 () -> jsonHelper.parse("{", Car.class)).getMessage());

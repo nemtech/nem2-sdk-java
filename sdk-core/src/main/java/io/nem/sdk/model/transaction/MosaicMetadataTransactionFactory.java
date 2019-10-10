@@ -34,7 +34,7 @@ public class MosaicMetadataTransactionFactory extends
      */
     private final MosaicId targetMosaicId;
 
-    public MosaicMetadataTransactionFactory(
+    private MosaicMetadataTransactionFactory(
         NetworkType networkType,
         PublicAccount targetAccount,
         MosaicId targetMosaicId,
@@ -46,6 +46,20 @@ public class MosaicMetadataTransactionFactory extends
         this.targetMosaicId = targetMosaicId;
     }
 
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param targetAccount Target account.
+     * @param targetMosaicId Target mosaic id.
+     * @param scopedMetadataKey Scoped metadata key.
+     * @param value Value.
+     * @return Mosaic metadata transaction.
+     */
+    public static MosaicMetadataTransactionFactory create(NetworkType networkType,
+        PublicAccount targetAccount, MosaicId targetMosaicId, BigInteger scopedMetadataKey, String value) {
+        return new MosaicMetadataTransactionFactory(networkType, targetAccount, targetMosaicId, scopedMetadataKey, value);
+    }
 
     public MosaicId getTargetMosaicId() {
         return targetMosaicId;

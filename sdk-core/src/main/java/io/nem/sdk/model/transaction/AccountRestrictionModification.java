@@ -38,7 +38,7 @@ public class AccountRestrictionModification<T> {
     }
 
     /**
-     * @return AccountRestrictionModification {@link Address}
+     * @return AccountRestrictionModification {@link MosaicId}
      */
     public static AccountRestrictionModification<MosaicId> createForMosaic(
         AccountRestrictionModificationAction modificationType, MosaicId mosaicId) {

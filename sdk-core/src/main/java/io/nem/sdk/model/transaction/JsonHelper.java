@@ -166,4 +166,5 @@ public interface JsonHelper {
      * @return if there is a attribute set in the object following the giving path.
      */
     boolean contains(Object object, String... path);
+
 }

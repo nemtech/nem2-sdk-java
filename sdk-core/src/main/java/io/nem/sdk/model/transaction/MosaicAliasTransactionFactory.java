@@ -32,14 +32,7 @@ public class MosaicAliasTransactionFactory extends TransactionFactory<MosaicAlia
     private final NamespaceId namespaceId;
     private final MosaicId mosaicId;
 
-    /**
-     * @param networkType Network type.
-     * @param aliasAction Alias action.
-     * @param namespaceId Namespace id.
-     * @param mosaicId Mosaic id.
-     */
-    @SuppressWarnings("squid:S00107")
-    public MosaicAliasTransactionFactory(
+    private MosaicAliasTransactionFactory(
         final NetworkType networkType,
         final AliasAction aliasAction,
         final NamespaceId namespaceId,
@@ -53,6 +46,18 @@ public class MosaicAliasTransactionFactory extends TransactionFactory<MosaicAlia
         this.mosaicId = mosaicId;
     }
 
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param aliasAction Alias action.
+     * @param namespaceId Namespace id.
+     * @param mosaicId Mosaic id.
+     * @return Mosaic alias transaction.
+     */
+    public static MosaicAliasTransactionFactory create(NetworkType networkType, AliasAction aliasAction, NamespaceId namespaceId, MosaicId mosaicId) {
+        return new MosaicAliasTransactionFactory(networkType, aliasAction, namespaceId, mosaicId);
+    }
 
     /**
      * Gets the alias action.

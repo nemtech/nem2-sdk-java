@@ -34,7 +34,7 @@ class MultisigAccountModificationTransactionTest {
     @Test
     void createAMultisigModificationTransactionViaConstructor() {
         MultisigAccountModificationTransaction multisigAccountModificationTransaction =
-            new MultisigAccountModificationTransactionFactory(
+            MultisigAccountModificationTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 (byte) 2,
                 (byte) 1,
@@ -76,7 +76,7 @@ class MultisigAccountModificationTransactionTest {
         String expected =
             "bd00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001905541000000000000000001000000000000000102020168b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b76301cf893ffcc47c33e7f68ab1db56365c156b0736824a0c1e273f9e00b8df8f01eb";
         MultisigAccountModificationTransaction multisigAccountModificationTransaction =
-            new MultisigAccountModificationTransactionFactory(
+            MultisigAccountModificationTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 (byte) 2,
                 (byte) 1,

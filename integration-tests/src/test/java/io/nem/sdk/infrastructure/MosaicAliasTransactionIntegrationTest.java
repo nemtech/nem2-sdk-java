@@ -74,7 +74,7 @@ public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
         sleep(1000);
 
         MosaicAliasTransaction addressAliasTransaction =
-            new MosaicAliasTransactionFactory(
+            MosaicAliasTransactionFactory.create(
                 getNetworkType(),
                 AliasAction.LINK,
                 rootNamespaceId,
@@ -100,7 +100,7 @@ public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
         MosaicId mosaicId = MosaicId.createFromNonce(nonce, account.getPublicAccount());
 
         MosaicDefinitionTransaction mosaicDefinitionTransaction =
-            new MosaicDefinitionTransactionFactory(getNetworkType(),
+            MosaicDefinitionTransactionFactory.create(getNetworkType(),
                 nonce,
                 mosaicId,
                 MosaicFlags.create(true, true, true),

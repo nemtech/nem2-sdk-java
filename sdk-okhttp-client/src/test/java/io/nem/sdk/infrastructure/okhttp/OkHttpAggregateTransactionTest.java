@@ -40,7 +40,6 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Optional;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,11 +55,9 @@ public class OkHttpAggregateTransactionTest {
     void createAAggregateTransactionViaStaticConstructor() {
 
         TransferTransaction transferTx =
-            new TransferTransactionFactory(
+            TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                Optional.of(new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
-                    NetworkType.MIJIN_TEST)),
-                Optional.empty(),
+                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST),
                 Collections.emptyList(),
                 PlainMessage.Empty).build();
 

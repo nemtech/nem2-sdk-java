@@ -55,7 +55,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
         BigInteger originalValue = BigInteger.valueOf(20);
         MosaicRestrictionType originalRestrictionType = MosaicRestrictionType.GE;
         MosaicGlobalRestrictionTransaction createTransaction =
-            new MosaicGlobalRestrictionTransactionFactory(
+            MosaicGlobalRestrictionTransactionFactory.create(
                 getNetworkType(),
                 mosaicId,
                 restrictionKey,
@@ -84,7 +84,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
 
         // 6) Modifying the restriction by sending a new transaction with the previous values.
         MosaicGlobalRestrictionTransaction updateTransaction =
-            new MosaicGlobalRestrictionTransactionFactory(
+            MosaicGlobalRestrictionTransactionFactory.create(
                 getNetworkType(),
                 mosaicId,
                 restrictionKey,
@@ -166,7 +166,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
         System.out.println(mosaicId.getIdAsHex());
 
         MosaicDefinitionTransaction mosaicDefinitionTransaction =
-            new MosaicDefinitionTransactionFactory(getNetworkType(),
+            MosaicDefinitionTransactionFactory.create(getNetworkType(),
                 nonce,
                 mosaicId,
                 MosaicFlags.create(true, true, true),

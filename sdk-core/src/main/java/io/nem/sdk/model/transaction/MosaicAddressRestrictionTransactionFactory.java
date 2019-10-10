@@ -45,7 +45,7 @@ public class MosaicAddressRestrictionTransactionFactory
      * @param targetAddress {@link Address}
      * @param newRestrictionValue BigInteger
      */
-    public MosaicAddressRestrictionTransactionFactory(
+    private MosaicAddressRestrictionTransactionFactory(
         NetworkType networkType,
         MosaicId mosaicId,
         BigInteger restrictionKey,
@@ -60,6 +60,24 @@ public class MosaicAddressRestrictionTransactionFactory
         this.restrictionKey = restrictionKey;
         this.targetAddress = targetAddress;
         this.newRestrictionValue = newRestrictionValue;
+    }
+
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType {@link NetworkType}
+     * @param mosaicId {@link MosaicId}
+     * @param restrictionKey Restriction key.
+     * @param targetAddress {@link Address}
+     * @param newRestrictionValue New restriction value.
+     * @return Mosaic address restriction transaction.
+     */
+    public static MosaicAddressRestrictionTransactionFactory create(NetworkType networkType,
+        MosaicId mosaicId,
+        BigInteger restrictionKey,
+        Address targetAddress,
+        BigInteger newRestrictionValue) {
+        return new MosaicAddressRestrictionTransactionFactory(networkType, mosaicId, restrictionKey, targetAddress, newRestrictionValue);
     }
 
     @Override

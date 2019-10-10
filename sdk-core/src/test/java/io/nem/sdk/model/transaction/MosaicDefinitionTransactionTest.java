@@ -36,7 +36,7 @@ class MosaicDefinitionTransactionTest {
     @Test
     void createAMosaicCreationTransactionViaStaticConstructor() {
         MosaicDefinitionTransaction mosaicCreationTx =
-            new MosaicDefinitionTransactionFactory(NetworkType.MIJIN_TEST,
+            MosaicDefinitionTransactionFactory.create(NetworkType.MIJIN_TEST,
                 MosaicNonce.createFromBigInteger(new BigInteger("0")),
                 new MosaicId(new BigInteger("0")),
                 MosaicFlags.create(true, true, true),
@@ -61,7 +61,7 @@ class MosaicDefinitionTransactionTest {
         String expected =
             "8e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904d410000000000000000010000000000000000000000000000000000000007041027000000000000";
         MosaicDefinitionTransaction mosaicDefinitionTransaction =
-            new MosaicDefinitionTransactionFactory(NetworkType.MIJIN_TEST,
+            MosaicDefinitionTransactionFactory.create(NetworkType.MIJIN_TEST,
                 MosaicNonce.createFromBigInteger(new BigInteger("0")),
                 new MosaicId(new BigInteger("0")),
                 MosaicFlags.create(true, true, true),
@@ -98,7 +98,7 @@ class MosaicDefinitionTransactionTest {
                 "5A0069D83F17CF0001777E55");
 
         MosaicDefinitionTransaction mosaicCreationTx =
-            new MosaicDefinitionTransactionFactory(networkType,
+            MosaicDefinitionTransactionFactory.create(networkType,
                 mosaicNonce,
                 mosaicId,
                 mosaicFlags,
