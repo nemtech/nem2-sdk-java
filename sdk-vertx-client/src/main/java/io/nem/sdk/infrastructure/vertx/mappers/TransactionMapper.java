@@ -45,6 +45,22 @@ public interface TransactionMapper {
     Transaction map(TransactionInfoDTO transactionInfoDTO);
 
     /**
+     * It maps an inner transaction to an embedded DTO transaction.
+     *
+     * @param transaction the transaction.
+     * @return the {@link EmbeddedTransactionInfoDTO}
+     */
+    EmbeddedTransactionInfoDTO mapToEmbedded(Transaction transaction);
+
+    /**
+     *  It maps an transaction to an DTO transaction.
+     *
+     * @param transaction the the general transaction
+     * @return the {@link TransactionInfoDTO}
+     */
+    TransactionInfoDTO map(Transaction transaction);
+
+    /**
      * The type of transactions this mapper supports.
      *
      * @return the supported transaction type or null if supports all.

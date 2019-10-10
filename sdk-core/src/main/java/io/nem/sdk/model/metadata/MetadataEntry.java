@@ -72,6 +72,7 @@ public class MetadataEntry {
      */
     private final Optional<UInt64Id> targetId;
 
+    @SuppressWarnings("squid:S00107")
     public MetadataEntry(String compositeHash, String senderPublicKey, String targetPublicKey,
         BigInteger scopedMetadataKey, MetadataType metadataType, Integer valueSize,
         String value, Optional<String> targetId) {

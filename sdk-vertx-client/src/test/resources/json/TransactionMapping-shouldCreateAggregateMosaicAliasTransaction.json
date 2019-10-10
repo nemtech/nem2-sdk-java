@@ -1,7 +1,7 @@
 {
   "meta": {
     "hash": "671653C94E2254F2A23EFEDB15D67C38332AED1FBD24B063C0A8E675582B6A96",
-    "height": 18160,
+    "height": "18160",
     "id": "5A0069D83F17CF0001777E55",
     "index": 0,
     "merkleComponentHash": "81E5E7AE49998802DABC816EC10158D3A7879702FF29084C2C992CD1289877A7"
@@ -30,9 +30,9 @@
           "signerPublicKey": "69970C5FB7A72662A6457504851DC11B10B19EB8A7D8C5E22301F1DC7492F292",
           "version": 36865,
           "type": 17230,
-          "namespaceId": "1177402691AAA",
-          "action": 1,
-          "mosaicId": "3248159581AAA"
+          "namespaceId": "0001177402691aaa",
+          "aliasAction": 0,
+          "mosaicId": "0003248159581aaa"
         }
       }
     ],

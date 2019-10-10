@@ -60,6 +60,14 @@ public class Deadline {
     }
 
     /**
+     * @return the BigInteger representation of the duration.
+     */
+    public BigInteger toBigInteger() {
+        return BigInteger
+            .valueOf(instant.toEpochMilli() - Deadline.TIMESTAMP_NEMSIS_BLOCK.toEpochMilli());
+    }
+
+    /**
      * Create deadline model.
      *
      * @param units int

@@ -39,10 +39,9 @@ import org.junit.jupiter.params.provider.EnumSource;
  * Integration tests around account metadata.
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class    NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
+public class NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
 
-    //TODO use test account, not nemesis (getting Failure_Core_Insufficient_Balance errors when creating Namespace)
-    private Account testAccount = config().getNemesisAccount();
+    private Account testAccount = config().getDefaultAccount();
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
@@ -87,11 +86,9 @@ public class    NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
         Assertions.assertEquals(transaction.getScopedMetadataKey(),
             processedTransaction.getScopedMetadataKey());
 
-        Assertions.assertEquals(transaction.getValueSize(), processedTransaction.getValueSize());
-
         System.out.println("Metadata '" + message + "' stored!");
 
-        Thread.sleep(1000);
+        sleep(1000);
 
         List<Metadata> metadata = get(getRepositoryFactory(type).createMetadataRepository()
             .getNamespaceMetadata(targetNamespaceId,
@@ -117,8 +114,6 @@ public class    NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
         Optional<Metadata> endpointMetadata = metadata.stream().filter(
             m -> m.getMetadataEntry().getScopedMetadataKey()
                 .equals(transaction.getScopedMetadataKey()) &&
-                m.getMetadataEntry().getValueSize()
-                    .equals(transaction.getValueSize()) &&
                 m.getMetadataEntry().getMetadataType()
                     .equals(MetadataType.NAMESPACE) &&
                 m.getMetadataEntry()

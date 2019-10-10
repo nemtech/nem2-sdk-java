@@ -50,17 +50,16 @@ public class NamespaceMetadataTransactionTest {
             NamespaceMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
-                namespaceId, BigInteger.TEN, "ABC123").valueSize(20).valueSizeDelta(10)
+                namespaceId, BigInteger.TEN, "ABC123").valueSizeDelta(10)
                 .deadline(new FakeDeadline()).build();
         assertEquals("ABC123", transaction.getValue());
         assertEquals(namespaceId, transaction.getTargetNamespaceId());
         assertEquals(NetworkType.MIJIN_TEST, transaction.getNetworkType());
         assertEquals(10, transaction.getValueSizeDelta());
-        assertEquals(20, transaction.getValueSize());
         assertEquals(BigInteger.TEN, transaction.getScopedMetadataKey());
 
         assertEquals(account.getPublicKey(),
-            transaction.getTargetAccount().getPublicKey().toString());
+            transaction.getTargetAccount().getPublicKey().toHex());
     }
 
     @Test
@@ -70,7 +69,7 @@ public class NamespaceMetadataTransactionTest {
             NamespaceMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
-                namespaceId, BigInteger.TEN, "ABC123").valueSize(20).valueSizeDelta(10)
+                namespaceId, BigInteger.TEN, "ABC123").valueSizeDelta(10)
                 .signer(account.getPublicAccount())
                 .deadline(new FakeDeadline()).build();
 

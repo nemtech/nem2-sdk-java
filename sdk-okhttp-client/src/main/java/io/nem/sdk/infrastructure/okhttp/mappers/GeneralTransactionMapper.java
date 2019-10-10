@@ -1,18 +1,17 @@
 /*
- * Copyright 2019. NEM
+ * Copyright 2019 NEM
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
+ * Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.nem.sdk.infrastructure.okhttp.mappers;
@@ -24,6 +23,7 @@ import io.nem.sdk.openapi.okhttp_gson.model.EmbeddedTransactionInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.util.EnumMap;
 import java.util.Map;
+import org.apache.commons.lang3.Validate;
 
 /**
  * Entry point for the transaction mapping. This mapper should support all the known transactions.
@@ -39,6 +39,7 @@ public class GeneralTransactionMapper implements TransactionMapper {
 
     public GeneralTransactionMapper(JsonHelper jsonHelper) {
         this.jsonHelper = jsonHelper;
+        Validate.notNull(jsonHelper, "jsonHelper must not be null");
         register(new AccountLinkTransactionMapper(jsonHelper));
         register(new AddressAliasTransactionMapper(jsonHelper));
         register(new HashLockTransactionMapper(jsonHelper));
@@ -58,6 +59,7 @@ public class GeneralTransactionMapper implements TransactionMapper {
         register(new AccountAddressRestrictionTransactionMapper(jsonHelper));
         register(new AccountMosaicRestrictionTransactionMapper(jsonHelper));
         register(new AccountOperationRestrictionTransactionMapper(jsonHelper));
+
         register(
             new AggregateTransactionMapper(jsonHelper, TransactionType.AGGREGATE_BONDED, this));
         register(
@@ -74,12 +76,26 @@ public class GeneralTransactionMapper implements TransactionMapper {
 
     @Override
     public Transaction map(EmbeddedTransactionInfoDTO transactionInfoDTO) {
+        Validate.notNull(transactionInfoDTO, "transactionInfoDTO must not be null");
         return resolveMapper(transactionInfoDTO).map(transactionInfoDTO);
     }
 
     @Override
     public Transaction map(TransactionInfoDTO transactionInfoDTO) {
+        Validate.notNull(transactionInfoDTO, "transactionInfoDTO must not be null");
         return resolveMapper(transactionInfoDTO).map(transactionInfoDTO);
+    }
+
+    @Override
+    public EmbeddedTransactionInfoDTO mapToEmbedded(Transaction transaction) {
+        Validate.notNull(transaction, "transaction must not be null");
+        return resolveMapper(transaction.getType()).mapToEmbedded(transaction);
+    }
+
+    @Override
+    public TransactionInfoDTO map(Transaction transaction) {
+        Validate.notNull(transaction, "transaction must not be null");
+        return resolveMapper(transaction.getType()).map(transaction);
     }
 
     @Override
@@ -95,7 +111,12 @@ public class GeneralTransactionMapper implements TransactionMapper {
                 "Transaction cannot be mapped, object does not not have transaction type.");
         }
         TransactionType transactionType = TransactionType.rawValueOf(type);
+        return resolveMapper(transactionType);
+    }
+
+    private TransactionMapper resolveMapper(TransactionType transactionType) {
         TransactionMapper mapper = transactionMappers.get(transactionType);
+
         if (mapper == null) {
             throw new UnsupportedOperationException(
                 "Unimplemented Transaction type " + transactionType);

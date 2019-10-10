@@ -121,10 +121,6 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
     public Observable<List<AccountInfo>> getAccountsInfo(List<Address> addresses) {
         AccountIds accountIds = new AccountIds()
             .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-        return getAccountsinfo(accountIds);
-    }
-
-    private Observable<List<AccountInfo>> getAccountsinfo(AccountIds accountIds) {
         Consumer<Handler<AsyncResult<List<AccountInfoDTO>>>> callback = handler -> getClient()
             .getAccountsInfo(accountIds, handler);
         return exceptionHandling(
@@ -187,7 +183,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         PublicAccount publicAccount, Optional<QueryParams> queryParams) {
 
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.transactions(publicAccount.getPublicKey().toString(),
+            client.transactions(publicAccount.getPublicKey().toHex(),
                 getPageSize(queryParams),
                 getId(queryParams),
                 null,
@@ -213,7 +209,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         PublicAccount publicAccount, Optional<QueryParams> queryParams) {
 
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.incomingTransactions(publicAccount.getPublicKey().toString(),
+            client.incomingTransactions(publicAccount.getPublicKey().toHex(),
                 getPageSize(queryParams),
                 getId(queryParams),
                 null,
@@ -239,7 +235,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         PublicAccount publicAccount, Optional<QueryParams> queryParams) {
 
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.outgoingTransactions(publicAccount.getPublicKey().toString(),
+            client.outgoingTransactions(publicAccount.getPublicKey().toHex(),
                 getPageSize(queryParams),
                 getId(queryParams),
                 null,
@@ -272,7 +268,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         PublicAccount publicAccount, Optional<QueryParams> queryParams) {
 
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.partialTransactions(publicAccount.getPublicKey().toString(),
+            client.partialTransactions(publicAccount.getPublicKey().toHex(),
                 getPageSize(queryParams),
                 getId(queryParams),
                 null,
@@ -298,7 +294,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
     private Observable<List<Transaction>> unconfirmedTransactions(
         PublicAccount publicAccount, Optional<QueryParams> queryParams) {
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.unconfirmedTransactions(publicAccount.getPublicKey().toString(),
+            client.unconfirmedTransactions(publicAccount.getPublicKey().toHex(),
                 getPageSize(queryParams),
                 getId(queryParams),
                 null,

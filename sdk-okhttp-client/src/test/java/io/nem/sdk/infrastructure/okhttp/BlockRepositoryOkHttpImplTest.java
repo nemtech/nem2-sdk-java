@@ -88,10 +88,10 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
         Assertions.assertNotNull(info);
 
         Assertions.assertEquals(blockDto.getBeneficiaryPublicKey(),
-            info.getBeneficiaryPublicAccount().getPublicKey().toString());
+            info.getBeneficiaryPublicAccount().getPublicKey().toHex());
 
         Assertions.assertEquals(blockDto.getSignerPublicKey(),
-            info.getSignerPublicAccount().getPublicKey().toString());
+            info.getSignerPublicAccount().getPublicKey().toHex());
 
         Assertions.assertEquals(16716, info.getType());
         Assertions.assertEquals(3, info.getVersion().intValue());
@@ -145,10 +145,10 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
         Assertions.assertNotNull(info);
 
         Assertions.assertEquals(blockDto.getBeneficiaryPublicKey(),
-            info.getBeneficiaryPublicAccount().getPublicKey().toString());
+            info.getBeneficiaryPublicAccount().getPublicKey().toHex());
 
         Assertions.assertEquals(blockDto.getSignerPublicKey(),
-            info.getSignerPublicAccount().getPublicKey().toString());
+            info.getSignerPublicAccount().getPublicKey().toHex());
 
         Assertions.assertEquals(16716, info.getType());
         Assertions.assertEquals(3, info.getVersion().intValue());

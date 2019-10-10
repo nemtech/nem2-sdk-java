@@ -72,7 +72,10 @@ public class ConvertUtils {
      * @param hexString The input string.
      * @return The output plain string.
      */
-    public static String fromHexString(final String hexString) {
+    public static String fromHexToString(final String hexString) {
+        if (hexString == null) {
+            return null;
+        }
         byte[] bytes = getBytes(hexString);
         return new String(bytes, StandardCharsets.UTF_8);
     }
@@ -95,6 +98,9 @@ public class ConvertUtils {
      * @return The output hex string.
      */
     public static String fromStringToHex(final String plainText) {
+        if (plainText == null) {
+            return null;
+        }
         return toHex(plainText.getBytes(StandardCharsets.UTF_8));
     }
 

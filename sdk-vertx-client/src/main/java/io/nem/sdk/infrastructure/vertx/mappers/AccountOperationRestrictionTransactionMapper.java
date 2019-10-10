@@ -26,7 +26,10 @@ import io.nem.sdk.model.transaction.AccountRestrictionType;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.openapi.vertx.model.AccountOperationRestrictionModificationDTO;
-import io.nem.sdk.openapi.vertx.model.AccountOperationRestrictionTransactionBodyDTO;
+import io.nem.sdk.openapi.vertx.model.AccountOperationRestrictionTransactionDTO;
+import io.nem.sdk.openapi.vertx.model.AccountRestrictionModificationActionEnum;
+import io.nem.sdk.openapi.vertx.model.AccountRestrictionTypeEnum;
+import io.nem.sdk.openapi.vertx.model.TransactionTypeEnum;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,17 +37,17 @@ import java.util.stream.Collectors;
  * DTO mapper of {@link AccountOperationRestrictionTransaction}.
  */
 public class AccountOperationRestrictionTransactionMapper extends
-    AbstractTransactionMapper<AccountOperationRestrictionTransactionBodyDTO, AccountOperationRestrictionTransaction> {
+    AbstractTransactionMapper<AccountOperationRestrictionTransactionDTO, AccountOperationRestrictionTransaction> {
 
     public AccountOperationRestrictionTransactionMapper(
         JsonHelper jsonHelper) {
         super(jsonHelper, TransactionType.ACCOUNT_OPERATION_RESTRICTION,
-            AccountOperationRestrictionTransactionBodyDTO.class);
+            AccountOperationRestrictionTransactionDTO.class);
     }
 
     @Override
     protected AccountOperationRestrictionTransactionFactory createFactory(
-        NetworkType networkType, AccountOperationRestrictionTransactionBodyDTO transaction) {
+        NetworkType networkType, AccountOperationRestrictionTransactionDTO transaction) {
         AccountRestrictionType restrictionType = AccountRestrictionType
             .rawValueOf(transaction.getRestrictionType().getValue());
         List<AccountRestrictionModification<TransactionType>> modifications = transaction
@@ -53,6 +56,7 @@ public class AccountOperationRestrictionTransactionMapper extends
             modifications);
     }
 
+
     private AccountRestrictionModification<TransactionType> toModification(
         AccountOperationRestrictionModificationDTO dto) {
         AccountRestrictionModificationAction modificationAction = AccountRestrictionModificationAction
@@ -60,5 +64,24 @@ public class AccountOperationRestrictionTransactionMapper extends
         return AccountRestrictionModification
             .createForTransactionType(modificationAction,
                 TransactionType.rawValueOf(dto.getValue().getValue()));
+    }
+
+    @Override
+    protected void copyToDto(AccountOperationRestrictionTransaction transaction,
+        AccountOperationRestrictionTransactionDTO dto) {
+        dto.setRestrictionType(
+            AccountRestrictionTypeEnum.fromValue(transaction.getRestrictionType().getValue()));
+        dto.setModifications(transaction.getModifications().stream().map(this::toModification)
+            .collect(Collectors.toList()));
+    }
+
+
+    private AccountOperationRestrictionModificationDTO toModification(
+        AccountRestrictionModification<TransactionType> model) {
+        AccountOperationRestrictionModificationDTO dto = new AccountOperationRestrictionModificationDTO();
+        dto.setModificationAction(AccountRestrictionModificationActionEnum
+            .fromValue((int) model.getModificationAction().getValue()));
+        dto.setValue(TransactionTypeEnum.fromValue(model.getValue().getValue()));
+        return dto;
     }
 }

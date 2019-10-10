@@ -17,6 +17,7 @@
 
 package io.nem.sdk.infrastructure.vertx.mappers;
 
+import io.nem.core.crypto.PublicKey;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.Deadline;
@@ -30,8 +31,6 @@ import io.nem.sdk.openapi.vertx.model.EmbeddedTransactionMetaDTO;
 import io.nem.sdk.openapi.vertx.model.TransactionDTO;
 import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.nem.sdk.openapi.vertx.model.TransactionMetaDTO;
-import java.util.Collections;
-import java.util.Map;
 
 /**
  * Abstract transaction mapper for the transaction mappers that support a specific type of
@@ -55,45 +54,20 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
         this.transactionDtoClass = transactionDtoClass;
     }
 
-    /**
-     * Performs some patches so catapult 5 and 6 are a bit more compatible.
-     *
-     * It quite likely that this method is going to be removed.
-     *
-     * @param transaction the transaction to be patched.
-     */
-    private void patchTransaction(Object transaction) {
-        //Version 5 vs 6 workarounds
-        if (transaction instanceof Map) {
-            Map<String, Object> transactionMap = (Map<String, Object>) transaction;
-            if (transactionMap.containsKey("mosaicId")) {
-                transactionMap.put("mosaic",
-                    Collections.singletonMap("id", transactionMap.get("mosaicId")));
-            }
-            if (transactionMap.containsKey("action")) {
-                transactionMap.put("aliasAction", transactionMap.get("action"));
-            }
-            if (transactionMap.containsKey("mosaicNonce")) {
-                transactionMap.put("nonce", transactionMap.get("mosaicNonce"));
-            }
-        }
-    }
 
     @Override
     public Transaction map(EmbeddedTransactionInfoDTO transactionInfoDTO) {
-        patchTransaction(transactionInfoDTO.getTransaction());
         TransactionInfo transactionInfo = createTransactionInfo(transactionInfoDTO.getMeta());
-        return basicMap(transactionInfo, transactionInfoDTO.getTransaction());
+        return createModel(transactionInfo, transactionInfoDTO.getTransaction());
     }
 
     @Override
     public Transaction map(TransactionInfoDTO transactionInfoDTO) {
-        patchTransaction(transactionInfoDTO.getTransaction());
         TransactionInfo transactionInfo = createTransactionInfo(transactionInfoDTO.getMeta());
-        return basicMap(transactionInfo, transactionInfoDTO.getTransaction());
+        return createModel(transactionInfo, transactionInfoDTO.getTransaction());
     }
 
-    protected final T basicMap(TransactionInfo transactionInfo, Object transactionDto) {
+    protected final T createModel(TransactionInfo transactionInfo, Object transactionDto) {
         D transaction = getJsonHelper().convert(transactionDto, transactionDtoClass);
         TransactionDTO transactionDTO = getJsonHelper()
             .convert(transactionDto, TransactionDTO.class);
@@ -143,6 +117,72 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
             meta.getAggregateId());
     }
 
+    @Override
+    public EmbeddedTransactionInfoDTO mapToEmbedded(Transaction transaction) {
+        EmbeddedTransactionInfoDTO dto = new EmbeddedTransactionInfoDTO();
+        dto.setMeta(createTransactionInfoEmbedded(transaction));
+        dto.setTransaction(mapTransaction(transaction, true));
+        return dto;
+    }
+
+
+    private EmbeddedTransactionMetaDTO createTransactionInfoEmbedded(Transaction transaction) {
+        return transaction.getTransactionInfo().map(i -> {
+            EmbeddedTransactionMetaDTO dto = new EmbeddedTransactionMetaDTO();
+            dto.setHeight(i.getHeight());
+            dto.setAggregateHash(i.getAggregateHash().orElse(null));
+            dto.setId(i.getId().orElse(null));
+            dto.setIndex(i.getIndex().orElse(null));
+            dto.setAggregateId(i.getAggregateId().orElse(null));
+            return dto;
+        }).orElse(null);
+    }
+
+    private TransactionMetaDTO createTransactionInfo(Transaction transaction) {
+        return transaction.getTransactionInfo().map(i -> {
+            TransactionMetaDTO dto = new TransactionMetaDTO();
+            dto.setHeight(i.getHeight());
+            dto.setHash(i.getHash().orElse(null));
+            dto.setId(i.getId().orElse(null));
+            dto.setIndex(i.getIndex().orElse(null));
+            dto.setMerkleComponentHash(i.getMerkleComponentHash().orElse(null));
+            return dto;
+        }).orElse(null);
+    }
+
+
+    @Override
+    public TransactionInfoDTO map(Transaction transaction) {
+        TransactionInfoDTO dto = new TransactionInfoDTO();
+        dto.setMeta(createTransactionInfo(transaction));
+        dto.setTransaction(mapTransaction(transaction, false));
+        return dto;
+    }
+
+    private D mapTransaction(Transaction transaction, boolean embedded) {
+
+        TransactionDTO dto = new TransactionDTO();
+        dto.setSignerPublicKey(
+            transaction.getSigner().map(PublicAccount::getPublicKey).map(PublicKey::toHex)
+                .orElse(null));
+
+        dto.setVersion(transaction.getTransactionVersion());
+        dto.setType(transaction.getType().getValue());
+
+        if (!embedded) {
+            dto.setMaxFee(transaction.getMaxFee());
+            dto.setDeadline(transaction.getDeadline().toBigInteger());
+            dto.setSignature(transaction.getSignature().orElse(null));
+        }
+
+        D specificDto = getJsonHelper().parse(getJsonHelper().print(dto), transactionDtoClass);
+        copyToDto((T) transaction, specificDto);
+        return specificDto;
+    }
+
+
+    protected abstract void copyToDto(T transaction, D dto);
+
     protected Integer extractTransactionVersion(int version) {
         return (int) Long.parseLong(Integer.toHexString(version).substring(2, 4), 16);
     }
@@ -152,6 +192,7 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
         return NetworkType.rawValueOf(networkType);
     }
 
+
     public JsonHelper getJsonHelper() {
         return jsonHelper;
     }
@@ -160,4 +201,5 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
     public TransactionType getTransactionType() {
         return transactionType;
     }
+
 }

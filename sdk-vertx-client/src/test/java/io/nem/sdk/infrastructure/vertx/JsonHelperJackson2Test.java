@@ -69,6 +69,20 @@ public class JsonHelperJackson2Test {
     }
 
     @Test
+    public void shouldParsePrettyPrintedObject() {
+        Car car = new Car("Renault", "Scenic", 2005);
+        String json = jsonHelper.prettyPrint(car);
+
+        Assertions.assertNotNull(json);
+        Assertions.assertTrue(json.contains("Renault"));
+
+        Car parsedCar = jsonHelper.parse(json, Car.class);
+        Assertions.assertEquals(car, parsedCar);
+        Assertions.assertEquals(BigInteger.valueOf(2005), parsedCar.getYear());
+
+    }
+
+    @Test
     public void shouldParsePrintedConvertObject() {
         Car car = new Car("Renault", "Scenic", 2005);
         String json = jsonHelper.print(car);

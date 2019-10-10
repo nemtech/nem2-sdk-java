@@ -47,7 +47,7 @@ public class AccountLinkTransactionTest {
         assertEquals(AccountLinkAction.LINK, transaction.getLinkAction());
         assertEquals(
             "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
-            transaction.getRemoteAccount().getPublicKey().toString());
+            transaction.getRemoteAccount().getPublicKey().toHex());
     }
 
     @Test

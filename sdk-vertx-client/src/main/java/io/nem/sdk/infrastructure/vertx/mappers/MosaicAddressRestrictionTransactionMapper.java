@@ -17,6 +17,7 @@
 
 package io.nem.sdk.infrastructure.vertx.mappers;
 
+import static io.nem.core.utils.MapperUtils.getIdAsHex;
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.core.utils.MapperUtils;
@@ -27,7 +28,6 @@ import io.nem.sdk.model.transaction.MosaicAddressRestrictionTransactionFactory;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.openapi.vertx.model.MosaicAddressRestrictionTransactionDTO;
-import java.math.BigInteger;
 
 /**
  * Mosaic address restriction transaction mapper.
@@ -46,9 +46,20 @@ class MosaicAddressRestrictionTransactionMapper extends
         MosaicAddressRestrictionTransactionDTO transaction) {
         return MosaicAddressRestrictionTransactionFactory.create(networkType,
             toMosaicId(transaction.getMosaicId()),
-            new BigInteger(transaction.getRestrictionKey()),
+            MapperUtils.fromHex(transaction.getRestrictionKey()),
             MapperUtils.toAddressFromUnresolved(transaction.getTargetAddress()),
-            new BigInteger(transaction.getNewRestrictionValue())).previousRestrictionValue(
-            new BigInteger(transaction.getPreviousRestrictionValue()));
+            transaction.getNewRestrictionValue()).previousRestrictionValue(
+            transaction.getPreviousRestrictionValue());
+    }
+
+    @Override
+    protected void copyToDto(MosaicAddressRestrictionTransaction transaction,
+        MosaicAddressRestrictionTransactionDTO dto) {
+        dto.setMosaicId(getIdAsHex(transaction.getMosaicId()));
+        dto.setRestrictionKey(transaction.getRestrictionKey().toString(16));
+        dto.setTargetAddress(transaction.getTargetAddress().encoded());
+        dto.setPreviousRestrictionValue(transaction.getPreviousRestrictionValue());
+        dto.setNewRestrictionValue(transaction.getNewRestrictionValue());
+
     }
 }

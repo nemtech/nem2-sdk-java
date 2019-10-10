@@ -29,7 +29,7 @@
         "transaction": {
           "delta": "100000",
           "action": 1,
-          "mosaicId": "3070467832AAA",
+          "mosaicId": "0003070467832aaa",
           "signerPublicKey": "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
           "type": 16973,
           "version": 36867

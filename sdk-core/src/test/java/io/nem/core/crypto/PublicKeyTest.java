@@ -89,7 +89,7 @@ public class PublicKeyTest {
     public void toStringReturnsHexRepresentation() {
         // Assert:
         Assert.assertThat(
-            new PublicKey(TEST_BYTES).toString().toUpperCase(),
+            new PublicKey(TEST_BYTES).toHex().toUpperCase(),
             IsEqual.equalTo("22ab71".toUpperCase()));
     }
 

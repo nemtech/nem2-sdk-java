@@ -59,15 +59,12 @@ public class MosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imp
 
     @Override
     public Observable<MosaicInfo> getMosaic(UInt64Id mosaicId) {
-
         Callable<MosaicInfoDTO> callback = () -> getClient().getMosaic(mosaicId.getIdAsHex());
         return exceptionHandling(call(callback).map(this::createMosaicInfo));
     }
 
-
     @Override
     public Observable<List<MosaicInfo>> getMosaics(List<UInt64Id> ids) {
-
         MosaicIds mosaicIds = new MosaicIds();
         mosaicIds.mosaicIds(ids.stream()
             .map(UInt64Id::getIdAsHex)
@@ -105,7 +102,6 @@ public class MosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imp
             dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
     }
 
-
     private MosaicInfo createMosaicInfo(MosaicInfoDTO mosaicInfoDTO) {
         NetworkType networkType = getNetworkTypeBlocking();
         return MosaicInfo.create(
@@ -120,11 +116,6 @@ public class MosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imp
     }
 
     private MosaicFlags extractMosaicFlags(MosaicDTO mosaicDTO) {
-        String flags = "00" + Integer.toBinaryString(mosaicDTO.getFlags());
-        String bitMapFlags = flags.substring(flags.length() - 3);
-        return MosaicFlags.create(
-            bitMapFlags.charAt(2) == '1',
-            bitMapFlags.charAt(1) == '1',
-            bitMapFlags.charAt(0) == '1');
+        return MosaicFlags.create(mosaicDTO.getFlags());
     }
 }

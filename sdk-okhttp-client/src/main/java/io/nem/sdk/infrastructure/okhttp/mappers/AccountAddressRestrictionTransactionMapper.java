@@ -1,18 +1,17 @@
 /*
- * Copyright 2019. NEM
+ * Copyright 2019 NEM
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
+ * Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.nem.sdk.infrastructure.okhttp.mappers;
@@ -28,7 +27,9 @@ import io.nem.sdk.model.transaction.AccountRestrictionType;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountAddressRestrictionModificationDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountAddressRestrictionTransactionBodyDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.AccountAddressRestrictionTransactionDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionModificationActionEnum;
+import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionTypeEnum;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,17 +37,17 @@ import java.util.stream.Collectors;
  * DTO mapper of {@link AccountAddressRestrictionTransaction}.
  */
 public class AccountAddressRestrictionTransactionMapper extends
-    AbstractTransactionMapper<AccountAddressRestrictionTransactionBodyDTO, AccountAddressRestrictionTransaction> {
+    AbstractTransactionMapper<AccountAddressRestrictionTransactionDTO, AccountAddressRestrictionTransaction> {
 
     public AccountAddressRestrictionTransactionMapper(
         JsonHelper jsonHelper) {
         super(jsonHelper, TransactionType.ACCOUNT_ADDRESS_RESTRICTION,
-            AccountAddressRestrictionTransactionBodyDTO.class);
+            AccountAddressRestrictionTransactionDTO.class);
     }
 
     @Override
     protected AccountAddressRestrictionTransactionFactory createFactory(
-        NetworkType networkType, AccountAddressRestrictionTransactionBodyDTO transaction) {
+        NetworkType networkType, AccountAddressRestrictionTransactionDTO transaction) {
         AccountRestrictionType restrictionType = AccountRestrictionType
             .rawValueOf(transaction.getRestrictionType().getValue());
         List<AccountRestrictionModification<Address>> modifications = transaction
@@ -62,5 +63,26 @@ public class AccountAddressRestrictionTransactionMapper extends
         return AccountRestrictionModification
             .createForAddress(modificationAction,
                 MapperUtils.toAddressFromUnresolved(dto.getValue()));
+    }
+
+    @Override
+    protected void copyToDto(
+        AccountAddressRestrictionTransaction transaction,
+        AccountAddressRestrictionTransactionDTO dto) {
+        dto.setRestrictionType(
+            AccountRestrictionTypeEnum.fromValue(transaction.getRestrictionType().getValue()));
+        dto.setModifications(
+            transaction.getModifications().stream().map(this::toModification).collect(
+                Collectors.toList()));
+    }
+
+    private AccountAddressRestrictionModificationDTO toModification(
+        AccountRestrictionModification<Address> source) {
+        AccountRestrictionModificationActionEnum modificationAction = AccountRestrictionModificationActionEnum
+            .fromValue((int) source.getModificationAction().getValue());
+        AccountAddressRestrictionModificationDTO target = new AccountAddressRestrictionModificationDTO();
+        target.setModificationAction(modificationAction);
+        target.setValue(source.getValue().encoded());
+        return target;
     }
 }

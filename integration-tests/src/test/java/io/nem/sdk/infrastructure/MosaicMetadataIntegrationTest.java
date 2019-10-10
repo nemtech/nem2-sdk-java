@@ -44,8 +44,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
 
-    //TODO use test account, not nemesis (getting Failure_Core_Insufficient_Balance errors when creating Mosaic)
-    private Account testAccount = config().getNemesisAccount();
+    private Account testAccount = config().getDefaultAccount();
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
@@ -88,9 +87,7 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
         Assertions.assertEquals(transaction.getScopedMetadataKey(),
             processedTransaction.getScopedMetadataKey());
 
-        Assertions.assertEquals(transaction.getValueSize(), processedTransaction.getValueSize());
-
-        Thread.sleep(2000);
+        sleep(2000);
         List<Metadata> metadata = get(getRepositoryFactory(type).createMetadataRepository()
             .getMosaicMetadata(targetMosaicId,
                 Optional.empty()));
@@ -116,8 +113,6 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
         Optional<Metadata> endpointMetadata = metadata.stream().filter(
             m -> m.getMetadataEntry().getScopedMetadataKey()
                 .equals(transaction.getScopedMetadataKey()) &&
-                m.getMetadataEntry().getValueSize()
-                    .equals(transaction.getValueSize()) &&
                 m.getMetadataEntry().getMetadataType()
                     .equals(MetadataType.MOSAIC) &&
                 m.getMetadataEntry()

@@ -28,15 +28,12 @@
         },
         "transaction": {
           "name": "0unius",
-          "id": "1970060410AA",
+          "id": "00001970060410aa",
           "registrationType": 1,
-          "parentId": "3316183705AA",
+          "parentId": "00003316183705aa",
           "signerPublicKey": "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
           "type": 16718,
-          "version": 36867,
-          "maxFee": "0",
-          "deadline": "326662557811",
-          "signature": "939673209A13FF82397578D22CC96EB8516A6760C894D9B7535E3A1E068007B9255CFA9A914C97142A7AE18533E381C846B69D2AE0D60D1DC8A55AD120E2B606"
+          "version": 36867
         }
       }
     ],

@@ -41,10 +41,6 @@ public abstract class MetadataTransaction extends Transaction {
      */
     private final int valueSizeDelta;
 
-    /**
-     * Value size in bytes.
-     */
-    private final int valueSize;
 
     /**
      * When there is an existing value, the new value is calculated as xor(previous-value, value).
@@ -63,7 +59,6 @@ public abstract class MetadataTransaction extends Transaction {
         this.targetAccount = factory.getTargetAccount();
         this.scopedMetadataKey = factory.getScopedMetadataKey();
         this.valueSizeDelta = factory.getValueSizeDelta();
-        this.valueSize = factory.getValueSize();
         this.value = factory.getValue();
     }
 
@@ -78,10 +73,6 @@ public abstract class MetadataTransaction extends Transaction {
 
     public int getValueSizeDelta() {
         return valueSizeDelta;
-    }
-
-    public int getValueSize() {
-        return valueSize;
     }
 
     public String getValue() {

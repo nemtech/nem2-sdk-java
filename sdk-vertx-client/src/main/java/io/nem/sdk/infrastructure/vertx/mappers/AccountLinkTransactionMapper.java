@@ -24,6 +24,7 @@ import io.nem.sdk.model.transaction.AccountLinkTransaction;
 import io.nem.sdk.model.transaction.AccountLinkTransactionFactory;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.TransactionType;
+import io.nem.sdk.openapi.vertx.model.AccountLinkActionEnum;
 import io.nem.sdk.openapi.vertx.model.AccountLinkTransactionDTO;
 
 /**
@@ -38,12 +39,19 @@ class AccountLinkTransactionMapper extends
 
     @Override
     protected AccountLinkTransactionFactory createFactory(NetworkType networkType,
-        AccountLinkTransactionDTO transaction) {
+        AccountLinkTransactionDTO dto) {
         PublicAccount remoteAccount = PublicAccount
-            .createFromPublicKey(transaction.getRemotePublicKey(), networkType);
+            .createFromPublicKey(dto.getRemotePublicKey(), networkType);
         return AccountLinkTransactionFactory.create(networkType,
             remoteAccount,
-            AccountLinkAction.rawValueOf(transaction.getLinkAction().getValue()));
+            AccountLinkAction.rawValueOf(dto.getLinkAction().getValue()));
+    }
+
+    @Override
+    protected void copyToDto(AccountLinkTransaction transaction, AccountLinkTransactionDTO dto) {
+        dto.setRemotePublicKey(transaction.getRemoteAccount().getPublicKey().toHex());
+        dto.setLinkAction(
+            AccountLinkActionEnum.fromValue((int) transaction.getLinkAction().getValue()));
     }
 
 }

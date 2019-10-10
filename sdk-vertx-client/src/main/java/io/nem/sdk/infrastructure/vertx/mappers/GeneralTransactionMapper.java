@@ -24,6 +24,7 @@ import io.nem.sdk.openapi.vertx.model.EmbeddedTransactionInfoDTO;
 import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
 import java.util.EnumMap;
 import java.util.Map;
+import org.apache.commons.lang3.Validate;
 
 /**
  * Entry point for the transaction mapping. This mapper should support all the known transactions.
@@ -39,6 +40,7 @@ public class GeneralTransactionMapper implements TransactionMapper {
 
     public GeneralTransactionMapper(JsonHelper jsonHelper) {
         this.jsonHelper = jsonHelper;
+        Validate.notNull(jsonHelper, "jsonHelper must not be null");
         register(new AccountLinkTransactionMapper(jsonHelper));
         register(new AddressAliasTransactionMapper(jsonHelper));
         register(new HashLockTransactionMapper(jsonHelper));
@@ -75,12 +77,26 @@ public class GeneralTransactionMapper implements TransactionMapper {
 
     @Override
     public Transaction map(EmbeddedTransactionInfoDTO transactionInfoDTO) {
+        Validate.notNull(transactionInfoDTO, "transactionInfoDTO must not be null");
         return resolveMapper(transactionInfoDTO).map(transactionInfoDTO);
     }
 
     @Override
     public Transaction map(TransactionInfoDTO transactionInfoDTO) {
+        Validate.notNull(transactionInfoDTO, "transactionInfoDTO must not be null");
         return resolveMapper(transactionInfoDTO).map(transactionInfoDTO);
+    }
+
+    @Override
+    public EmbeddedTransactionInfoDTO mapToEmbedded(Transaction transaction) {
+        Validate.notNull(transaction, "transaction must not be null");
+        return resolveMapper(transaction.getType()).mapToEmbedded(transaction);
+    }
+
+    @Override
+    public TransactionInfoDTO map(Transaction transaction) {
+        Validate.notNull(transaction, "transaction must not be null");
+        return resolveMapper(transaction.getType()).map(transaction);
     }
 
     @Override
@@ -96,6 +112,10 @@ public class GeneralTransactionMapper implements TransactionMapper {
                 "Transaction cannot be mapped, object does not not have transaction type.");
         }
         TransactionType transactionType = TransactionType.rawValueOf(type);
+        return resolveMapper(transactionType);
+    }
+
+    private TransactionMapper resolveMapper(TransactionType transactionType) {
         TransactionMapper mapper = transactionMappers.get(transactionType);
         if (mapper == null) {
             throw new UnsupportedOperationException(

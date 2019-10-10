@@ -31,10 +31,8 @@
           "version": 36867,
           "type": 16712,
           "duration": "100",
-          "mosaic": {
-            "amount": "10000000",
-            "id": "3646934825FFF"
-          },
+          "amount": "10000000",
+          "mosaicId": "0003646934825fff",
           "hash": "49E9F58867FB9399F32316B99CCBC301A5790E5E0605E25F127D28CEF99740A3"
         }
       }

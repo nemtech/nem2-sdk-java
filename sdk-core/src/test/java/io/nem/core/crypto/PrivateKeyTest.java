@@ -137,8 +137,8 @@ public class PrivateKeyTest {
     @Test
     public void toStringReturnsHexRepresentation() {
         // Assert:
-        Assert.assertThat(PrivateKey.fromHexString("2275").toString(), IsEqual.equalTo("2275"));
-        Assert.assertThat(PrivateKey.fromDecimalString("2275").toString(), IsEqual.equalTo("08e3"));
+        Assert.assertThat(PrivateKey.fromHexString("2275").toHex(), IsEqual.equalTo("2275"));
+        Assert.assertThat(PrivateKey.fromDecimalString("2275").toHex(), IsEqual.equalTo("08e3"));
     }
 
     // endregion

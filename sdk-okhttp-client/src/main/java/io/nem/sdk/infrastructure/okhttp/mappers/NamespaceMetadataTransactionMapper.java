@@ -1,22 +1,22 @@
 /*
- * Copyright 2019. NEM
+ * Copyright 2019 NEM
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
+ * Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.nem.sdk.infrastructure.okhttp.mappers;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -29,7 +29,7 @@ import io.nem.sdk.openapi.okhttp_gson.model.NamespaceMetadataTransactionDTO;
 import java.math.BigInteger;
 
 /**
- * Namespace metadata transaction mapper
+ * Namespace metadata transaction mapper.
  */
 class NamespaceMetadataTransactionMapper extends
     AbstractTransactionMapper<NamespaceMetadataTransactionDTO, NamespaceMetadataTransaction> {
@@ -47,7 +47,7 @@ class NamespaceMetadataTransactionMapper extends
         Integer valueSizeDelta = transaction.getValueSizeDelta();
         BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey(), 16);
         Integer valueSize = transaction.getValueSize();
-        String value = transaction.getValue();
+        String value = ConvertUtils.fromHexToString(transaction.getValue());
         NamespaceId targetNamespace = MapperUtils.toNamespaceId(transaction.getTargetNamespaceId());
         NamespaceMetadataTransactionFactory factory = NamespaceMetadataTransactionFactory.create(
             networkType,
@@ -55,7 +55,18 @@ class NamespaceMetadataTransactionMapper extends
             targetNamespace,
             scopedMetaDataKey,
             value);
-        factory.valueSizeDelta(valueSizeDelta).valueSize(valueSize);
+        factory.valueSizeDelta(valueSizeDelta);
         return factory;
+    }
+
+    @Override
+    protected void copyToDto(NamespaceMetadataTransaction transaction,
+        NamespaceMetadataTransactionDTO dto) {
+        dto.setTargetPublicKey(transaction.getTargetAccount().getPublicKey().toHex());
+        dto.setTargetNamespaceId(MapperUtils.getIdAsHex(transaction.getTargetNamespaceId()));
+        dto.setScopedMetadataKey(transaction.getScopedMetadataKey().toString());
+        dto.setValue(ConvertUtils.fromStringToHex(transaction.getValue()));
+        dto.setValueSizeDelta(transaction.getValueSizeDelta());
+
     }
 }

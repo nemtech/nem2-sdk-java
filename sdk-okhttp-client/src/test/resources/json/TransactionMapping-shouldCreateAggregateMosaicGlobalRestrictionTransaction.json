@@ -28,9 +28,7 @@
         },
         "transaction": {
           "nonce": 0,
-          "id": "3248159581",
-          "name": "ie7rfaqxiorum1jor",
-          "parentId": "3316183705",
+          "id": "0000003248159581",
           "flags": 7,
           "divisibility": 6,
           "duration": "1000",

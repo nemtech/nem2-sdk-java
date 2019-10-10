@@ -58,7 +58,7 @@ class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getNamespacesFromAccount(RepositoryType type) {
-        Account account = config().getNemesisAccount();
+        Account account = config().getDefaultAccount();
         List<NamespaceInfo> namespacesInfo =
             get(getNamespaceRepository(type).getNamespacesFromAccount(account.getAddress()));
 
@@ -70,7 +70,7 @@ class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getNamespacesFromAccounts(RepositoryType type) {
-        Account account = config().getNemesisAccount();
+        Account account = config().getDefaultAccount();
         List<NamespaceInfo> namespacesInfo = get(getNamespaceRepository(type)
             .getNamespacesFromAccounts(
                 Collections.singletonList(

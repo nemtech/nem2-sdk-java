@@ -20,6 +20,7 @@ package io.nem.core.utils;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.namespace.NamespaceId;
+import io.nem.sdk.model.transaction.UInt64Id;
 import java.math.BigInteger;
 
 /**
@@ -82,5 +83,16 @@ public class MapperUtils {
      */
     public static BigInteger fromHex(String hex) {
         return new BigInteger(hex, 16);
+    }
+
+
+    /**
+     * Converts a namespace or a mosaic id to hex
+     *
+     * @param id the id. It may be null.
+     * @return the hex or null if the parameter is null
+     */
+    public static String getIdAsHex(UInt64Id id) {
+        return id == null ? null : id.getIdAsHex();
     }
 }

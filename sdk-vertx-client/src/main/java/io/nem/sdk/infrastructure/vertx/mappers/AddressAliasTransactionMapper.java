@@ -17,6 +17,7 @@
 
 package io.nem.sdk.infrastructure.vertx.mappers;
 
+import static io.nem.core.utils.MapperUtils.getIdAsHex;
 import static io.nem.core.utils.MapperUtils.toAddressFromUnresolved;
 
 import io.nem.core.utils.MapperUtils;
@@ -28,6 +29,7 @@ import io.nem.sdk.model.transaction.AddressAliasTransactionFactory;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.openapi.vertx.model.AddressAliasTransactionDTO;
+import io.nem.sdk.openapi.vertx.model.AliasActionEnum;
 
 /**
  * Account alias transaction mapper.
@@ -51,5 +53,13 @@ class AddressAliasTransactionMapper extends
             aliasAction,
             namespaceId,
             toAddressFromUnresolved(transaction.getAddress()));
+    }
+
+    @Override
+    protected void copyToDto(AddressAliasTransaction transaction, AddressAliasTransactionDTO dto) {
+        dto.setAddress(transaction.getAddress().encoded());
+        dto.setNamespaceId(getIdAsHex(transaction.getNamespaceId()));
+        dto.setAliasAction(
+            AliasActionEnum.fromValue((int) transaction.getAliasAction().getValue()));
     }
 }

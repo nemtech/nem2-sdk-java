@@ -63,7 +63,7 @@ public class BalanceTransferReceiptTest {
         assertNull(balanceTransferReceipt.getSize());
         assertEquals(ReceiptVersion.BALANCE_TRANSFER, balanceTransferReceipt.getVersion());
         assertEquals(
-            balanceTransferReceipt.getSender().getPublicKey().toString().toUpperCase(),
+            balanceTransferReceipt.getSender().getPublicKey().toHex().toUpperCase(),
             account.getPublicKey().toUpperCase());
         assertEquals(
             "SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
@@ -88,7 +88,7 @@ public class BalanceTransferReceiptTest {
         assertNull(balanceTransferReceipt.getSize());
         assertEquals(ReceiptVersion.BALANCE_TRANSFER, balanceTransferReceipt.getVersion());
         assertEquals(
-            balanceTransferReceipt.getSender().getPublicKey().toString().toUpperCase(),
+            balanceTransferReceipt.getSender().getPublicKey().toHex().toUpperCase(),
             account.getPublicKey().toUpperCase());
         assertEquals(balanceTransferReceipt.getRecipient().getAliasValue(), recipientAddress);
         assertEquals(
@@ -111,7 +111,7 @@ public class BalanceTransferReceiptTest {
         assertNull(balanceTransferReceipt.getSize());
         assertEquals(ReceiptVersion.BALANCE_TRANSFER, balanceTransferReceipt.getVersion());
         assertEquals(
-            balanceTransferReceipt.getSender().getPublicKey().toString().toUpperCase(),
+            balanceTransferReceipt.getSender().getPublicKey().toHex().toUpperCase(),
             account.getPublicKey().toUpperCase());
         assertEquals(
             "SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
@@ -136,7 +136,7 @@ public class BalanceTransferReceiptTest {
         assertNull(balanceTransferReceipt.getSize());
         assertEquals(ReceiptVersion.BALANCE_TRANSFER, balanceTransferReceipt.getVersion());
         assertEquals(
-            balanceTransferReceipt.getSender().getPublicKey().toString().toUpperCase(),
+            balanceTransferReceipt.getSender().getPublicKey().toHex().toUpperCase(),
             account.getPublicKey().toUpperCase());
         assertEquals(balanceTransferReceipt.getRecipient().getAliasValue(), recipientAddress);
         assertEquals("85BBEA6CC462B244",

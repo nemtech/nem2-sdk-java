@@ -30,9 +30,9 @@
           "signerPublicKey": "69970C5FB7A72662A6457504851DC11B10B19EB8A7D8C5E22301F1DC7492F292",
           "version": 36865,
           "type": 16974,
-          "namespaceId": "1177402691AAA",
-          "action": 1,
-          "address": "90E7C99F0DAD20AD199EBDF13B1F3793C9B0501A34C6F66AE0"
+          "namespaceId": "0001177402691aaa",
+          "aliasAction": 1,
+          "address": "90e7c99f0dad20ad199ebdf13b1f3793c9b0501a34c6f66ae0"
         }
       }
     ],

@@ -126,7 +126,21 @@ public class ConvertUtilsTest {
         String message = "Some message 汉字";
 
         Assertions.assertEquals(message,
-            ConvertUtils.fromHexString(ConvertUtils.fromStringToHex(message)));
+            ConvertUtils.fromHexToString(ConvertUtils.fromStringToHex(message)));
+
+        Assertions.assertNull(ConvertUtils.fromHexToString(null));
+        Assertions.assertNull(ConvertUtils.fromStringToHex(null));
+    }
+
+    @Test
+    public void fromHex() {
+        // Assert:
+        String message = "This is the message for this account! 汉字89664";
+
+        Assertions.assertEquals(message,
+            ConvertUtils.fromHexToString(
+                "5468697320697320746865206D65737361676520666F722074686973206163636F756E742120E6B189E5AD973839363634"));
+
     }
 
     @Test

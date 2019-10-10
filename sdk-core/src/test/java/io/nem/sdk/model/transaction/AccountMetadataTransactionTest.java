@@ -49,17 +49,16 @@ public class AccountMetadataTransactionTest {
             AccountMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
-                BigInteger.TEN, "123BAC").valueSize(20).valueSizeDelta(10)
+                BigInteger.TEN, "123BAC").valueSizeDelta(10)
                 .deadline(new FakeDeadline()).build();
 
         assertEquals("123BAC", transaction.getValue());
         assertEquals(NetworkType.MIJIN_TEST, transaction.getNetworkType());
         assertEquals(10, transaction.getValueSizeDelta());
-        assertEquals(20, transaction.getValueSize());
         assertEquals(BigInteger.TEN, transaction.getScopedMetadataKey());
 
         assertEquals(account.getPublicKey(),
-            transaction.getTargetAccount().getPublicKey().toString());
+            transaction.getTargetAccount().getPublicKey().toHex());
 
     }
 
@@ -69,7 +68,7 @@ public class AccountMetadataTransactionTest {
             AccountMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
-                BigInteger.TEN, "123BAC").valueSize(20).valueSizeDelta(10)
+                BigInteger.TEN, "123BAC").valueSizeDelta(10)
                 .signer(account.getPublicAccount())
                 .deadline(new FakeDeadline()).build();
 

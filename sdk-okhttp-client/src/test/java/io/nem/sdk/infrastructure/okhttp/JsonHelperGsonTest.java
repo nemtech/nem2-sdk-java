@@ -16,7 +16,6 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import io.nem.sdk.model.transaction.JsonHelper;
 import java.math.BigInteger;
@@ -36,8 +35,7 @@ public class JsonHelperGsonTest {
 
     @BeforeEach
     public void setUp() {
-        Gson gon = new Gson();
-        jsonHelper = new JsonHelperGson(gon);
+        jsonHelper = new JsonHelperGson();
     }
 
     @Test
@@ -59,6 +57,20 @@ public class JsonHelperGsonTest {
     public void shouldParsePrintedObject() {
         Car car = new Car("Renault", "Scenic", 2005);
         String json = jsonHelper.print(car);
+
+        Assertions.assertNotNull(json);
+        Assertions.assertTrue(json.contains("Renault"));
+
+        Car parsedCar = jsonHelper.parse(json, Car.class);
+        Assertions.assertEquals(car, parsedCar);
+        Assertions.assertEquals(BigInteger.valueOf(2005), parsedCar.getYear());
+
+    }
+
+    @Test
+    public void shouldParsePrettyPrintedObject() {
+        Car car = new Car("Renault", "Scenic", 2005);
+        String json = jsonHelper.prettyPrint(car);
 
         Assertions.assertNotNull(json);
         Assertions.assertTrue(json.contains("Renault"));

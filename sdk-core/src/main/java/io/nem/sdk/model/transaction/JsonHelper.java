@@ -41,6 +41,14 @@ public interface JsonHelper {
     String print(Object object);
 
     /**
+     * It serializes an object into pretty json string.
+     *
+     * @param object the object (json native object, MAP or DTO)
+     * @return the string or null if the object is null.
+     */
+    String prettyPrint(Object object);
+
+    /**
      * It parse a json string into a an object of the underlying implementation (e.g. gson
      * JsonObject or jackson ObjectNode)
      *
@@ -159,35 +167,4 @@ public interface JsonHelper {
      */
     boolean contains(Object object, String... path);
 
-    /**
-     * Convert model object to JSON object.
-     *
-     * @param model
-     * @return Object
-     */
-    Object toJsonObject(Object model);
-
-    /**
-     * Convert model object to JSON string.
-     *
-     * @param model
-     * @return String
-     */
-    String toJSON(Object model);
-
-    /**
-     * Convert model object to JSON string in pretty format.
-     *
-     * @param model
-     * @return String
-     */
-    String toJSONPretty(Object model);
-
-    /**
-     * Pretty format a JSON string
-     *
-     * @param jsonString
-     * @return String
-     */
-    String toJSONPretty(String jsonString);
 }

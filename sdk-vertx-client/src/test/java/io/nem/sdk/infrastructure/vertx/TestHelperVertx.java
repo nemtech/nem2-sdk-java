@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -52,15 +53,20 @@ public class TestHelperVertx {
         return loadResource(resourceName, TransactionInfoDTO.class);
     }
 
-    private static <T> T loadResource(String resourceName, Class<T> clazz) {
+    public static <T> T loadResource(String resourceName, Class<T> clazz) {
+        return jsonHelper.parse(loadResource(resourceName), clazz);
+    }
+
+    public static String loadResource(String resourceName) {
+
+        String resName = "json/" + resourceName;
         try (InputStream resourceAsStream = TestHelperVertx.class.getClassLoader()
-            .getResourceAsStream("json/" + resourceName)) {
-            return jsonHelper.parse(IOUtils.toString(resourceAsStream), clazz);
+            .getResourceAsStream(resName)) {
+            return IOUtils.toString(resourceAsStream, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new IllegalStateException(
                 "Cannot open resource " + resourceName + ". Error: " + ExceptionUtils.getMessage(e),
                 e);
         }
     }
-
 }

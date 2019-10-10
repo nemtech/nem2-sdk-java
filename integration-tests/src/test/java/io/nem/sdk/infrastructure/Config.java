@@ -67,16 +67,9 @@ public class Config {
         return this.config.getLong("timeoutSeconds");
     }
 
-
-    public String getTestAccountAddress() {
-        return this.config.getJsonObject("testAccount").getString("address");
-    }
-
-
     public Account getMultisigAccount() {
         return getAccount("multisigAccount");
     }
-
 
     public Account getCosignatoryAccount() {
         return getAccount("cosignatoryAccount");
@@ -88,6 +81,11 @@ public class Config {
 
     public Account getHarvestingAccount() {
         return getAccount("harvestingAccount");
+    }
+
+    public Account getDefaultAccount() {
+        //TODO - Replace with getTestAccount once it doesn't run out of currency.
+        return getNemesisAccount();
     }
 
     public Account getNemesisAccount() {

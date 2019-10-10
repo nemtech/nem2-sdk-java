@@ -88,6 +88,12 @@ public interface RepositoryFactory extends Closeable {
     Listener createListener();
 
     /**
+     * @return it creates a new {@link JsonSerialization} that allows you serialize model objects
+     * using the generated json dto objects from the open api spec.
+     */
+    JsonSerialization createJsonSerialization();
+
+    /**
      * It closes the underling connection if necessary.
      */
     void close();

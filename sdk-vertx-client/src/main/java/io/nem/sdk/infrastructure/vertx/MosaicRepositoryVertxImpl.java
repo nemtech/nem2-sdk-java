@@ -123,11 +123,6 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl imple
     }
 
     public static MosaicFlags extractMosaicFlags(MosaicDTO mosaicDTO) {
-        String flags = "00" + Integer.toBinaryString(mosaicDTO.getFlags().intValue());
-        String bitMapFlags = flags.substring(flags.length() - 3);
-        return MosaicFlags.create(
-            bitMapFlags.charAt(2) == '1',
-            bitMapFlags.charAt(1) == '1',
-            bitMapFlags.charAt(0) == '1');
+        return MosaicFlags.create(mosaicDTO.getFlags().intValue());
     }
 }

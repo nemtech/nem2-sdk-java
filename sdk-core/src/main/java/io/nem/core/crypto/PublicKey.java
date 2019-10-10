@@ -85,8 +85,11 @@ public class PublicKey {
         return Arrays.hashCode(value);
     }
 
-    @Override
-    public String toString() {
+    /**
+     * @return the hex representation of the public key.
+     */
+    public String toHex() {
         return ConvertUtils.toHex(this.value).toUpperCase();
     }
+
 }

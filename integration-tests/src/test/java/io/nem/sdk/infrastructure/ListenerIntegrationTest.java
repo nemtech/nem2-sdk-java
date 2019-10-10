@@ -37,6 +37,7 @@ import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionStatusError;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
+import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
@@ -114,13 +115,13 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         throws ExecutionException, InterruptedException, TimeoutException {
         Listener listener = getRepositoryFactory(type).createListener();
         listener.open().get();
+        Address recipient = this.getRecipient();
+        Observable<Transaction> recipientConfirmedListener = listener.confirmed(recipient);
 
         SignedTransaction signedTransaction = this.announceStandaloneTransferTransaction(type);
 
         Transaction transaction =
-            listener
-                .confirmed(Address.createFromRawAddress("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC"))
-                .take(1).toFuture().get(TIMEOUT, TIMEOUT_UNIT);
+            recipientConfirmedListener.take(1).toFuture().get(TIMEOUT, TIMEOUT_UNIT);
         assertEquals(
             signedTransaction.getHash(), transaction.getTransactionInfo().get().getHash().get());
     }
@@ -245,8 +246,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         assertEquals(signedTransaction.getHash(), transactionHash.getHash());
     }
 
-    private SignedTransaction announceStandaloneTransferTransaction(RepositoryType type)
-        throws ExecutionException, InterruptedException, TimeoutException {
+    private SignedTransaction announceStandaloneTransferTransaction(RepositoryType type) {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
@@ -256,9 +256,8 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
             ).build();
 
         SignedTransaction signedTransaction = this.account
-            .sign(transferTransaction, generationHash);
-        getTransactionRepository(type).announce(signedTransaction).toFuture()
-            .get(TIMEOUT, TIMEOUT_UNIT);
+            .sign(transferTransaction, getGenerationHash());
+        get(getTransactionRepository(type).announce(signedTransaction));
         return signedTransaction;
     }
 
@@ -279,7 +278,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
             ).build();
 
         SignedTransaction signedTransaction = this.account
-            .sign(transferTransaction, generationHash);
+            .sign(transferTransaction, getGenerationHash());
         getTransactionRepository(type).announce(signedTransaction).toFuture()
             .get(TIMEOUT, TIMEOUT_UNIT);
         return signedTransaction;
@@ -303,7 +302,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
                 .build();
 
         SignedTransaction signedTransaction =
-            this.cosignatoryAccount.sign(aggregateTransaction, generationHash);
+            this.cosignatoryAccount.sign(aggregateTransaction, getGenerationHash());
 
         getTransactionRepository(type).announceAggregateBonded(signedTransaction).toFuture()
             .get(TIMEOUT, TIMEOUT_UNIT);

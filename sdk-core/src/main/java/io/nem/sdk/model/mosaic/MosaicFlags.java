@@ -38,9 +38,10 @@ public class MosaicFlags {
      */
     private final boolean transferable;
     /**
-     * Not all the mosaics of a given network will be subject to mosaic restrictions. The feature will only affect
-     * those to which the issuer adds the "restrictable" property explicitly at the moment of its creation. This
-     * property appears disabled by default, as it is undesirable for autonomous tokens like the public network currency.
+     * Not all the mosaics of a given network will be subject to mosaic restrictions. The feature
+     * will only affect those to which the issuer adds the "restrictable" property explicitly at the
+     * moment of its creation. This property appears disabled by default, as it is undesirable for
+     * autonomous tokens like the public network currency.
      */
     private final boolean restrictable;
 
@@ -51,6 +52,22 @@ public class MosaicFlags {
         this.supplyMutable = supplyMutable;
         this.transferable = transferable;
         this.restrictable = restrictable;
+    }
+
+    /**
+     * Creates a mosaic from the configurable byte value.
+     *
+     * @return Mosaic flags.
+     */
+    public static MosaicFlags create(
+        int flags) {
+        String flagsString = "00" + Integer.toBinaryString(flags);
+        String bitMapFlags = flagsString.substring(flagsString.length() - 3);
+        return
+            MosaicFlags.create(
+                bitMapFlags.charAt(2) == '1',
+                bitMapFlags.charAt(1) == '1',
+                bitMapFlags.charAt(0) == '1');
     }
 
     /**
@@ -76,15 +93,6 @@ public class MosaicFlags {
     public static MosaicFlags create(
         boolean supplyMutable, boolean transferable) {
         return new MosaicFlags(supplyMutable, transferable, false);
-    }
-
-    /**
-     * Gets the consolidated mosaic flags value.
-     *
-     * @return long
-     */
-    public long getValue() {
-        return (this.supplyMutable ? 1 : 0) + (this.transferable ? 2 : 0) + (this.restrictable ? 4 : 0);
     }
 
     /**
@@ -114,4 +122,12 @@ public class MosaicFlags {
         return restrictable;
     }
 
+    /**
+     * Gets the consolidated mosaic flags value.
+     *
+     * @return the merged flags in a int.
+     */
+    public int getValue() {
+        return (this.supplyMutable ? 1 : 0) + (this.transferable ? 2 : 0) + (this.restrictable ? 4 : 0);
+    }
 }

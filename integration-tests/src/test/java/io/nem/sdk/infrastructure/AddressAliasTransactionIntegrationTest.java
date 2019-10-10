@@ -46,7 +46,7 @@ public class AddressAliasTransactionIntegrationTest extends BaseIntegrationTest 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void sendAddressAliasTransaction(RepositoryType type) throws InterruptedException {
-        Account account = config().getNemesisAccount();
+        Account account = config().getDefaultAccount();
         String namespaceName =
             "test-root-namespace-for-address-alias-" + new Double(Math.floor(Math.random() * 10000))
                 .intValue();
@@ -59,7 +59,7 @@ public class AddressAliasTransactionIntegrationTest extends BaseIntegrationTest 
 
         NamespaceId rootNamespaceId = announceAggregateAndValidate(type, account,
             namespaceRegistrationTransaction).getNamespaceId();
-        Thread.sleep(1000);
+        sleep(1000);
 
         AddressAliasTransaction addressAliasTransaction =
             AddressAliasTransactionFactory.create(getNetworkType(),
@@ -77,7 +77,7 @@ public class AddressAliasTransactionIntegrationTest extends BaseIntegrationTest 
 
         announceAndValidate(type, account, aggregateTransaction2);
 
-        Thread.sleep(1000);
+        sleep(1000);
 
         List<AccountNames> accountNames = get(getRepositoryFactory(type).createAccountRepository()
             .getAccountsNames(Collections.singletonList(account.getAddress())));

@@ -21,6 +21,7 @@ import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.BlockRepository;
 import io.nem.sdk.api.ChainRepository;
 import io.nem.sdk.api.DiagnosticRepository;
+import io.nem.sdk.api.JsonSerialization;
 import io.nem.sdk.api.MetadataRepository;
 import io.nem.sdk.api.MosaicRepository;
 import io.nem.sdk.api.NamespaceRepository;
@@ -39,7 +40,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
@@ -150,6 +150,11 @@ public class RepositoryFactoryVertxImpl implements RepositoryFactory {
     @Override
     public Listener createListener() {
         return new ListenerVertx(vertx.createHttpClient(), baseUrl);
+    }
+
+    @Override
+    public JsonSerialization createJsonSerialization() {
+        return new JsonSerializationVertx(apiClient.getObjectMapper());
     }
 
     @Override

@@ -56,7 +56,7 @@ public class KeyPairVectorTester extends AbstractVectorTester {
             .fromPrivate(PrivateKey.fromHexString(SignSchema.reverse(privateKey)),
                 SignSchema.KECCAK);
         Assertions
-            .assertEquals(publicKey.toUpperCase(), keyPair.getPublicKey().toString().toUpperCase());
+            .assertEquals(publicKey.toUpperCase(), keyPair.getPublicKey().toHex().toUpperCase());
     }
 
     @ParameterizedTest
@@ -65,7 +65,7 @@ public class KeyPairVectorTester extends AbstractVectorTester {
         KeyPair keyPair = KeyPair
             .fromPrivate(PrivateKey.fromHexString(privateKey), SignSchema.SHA3);
         Assertions
-            .assertEquals(publicKey.toUpperCase(), keyPair.getPublicKey().toString().toUpperCase());
+            .assertEquals(publicKey.toUpperCase(), keyPair.getPublicKey().toHex().toUpperCase());
     }
 
 

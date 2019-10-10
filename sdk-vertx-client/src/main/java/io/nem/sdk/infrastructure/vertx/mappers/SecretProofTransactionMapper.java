@@ -20,12 +20,13 @@ package io.nem.sdk.infrastructure.vertx.mappers;
 import static io.nem.core.utils.MapperUtils.toAddressFromUnresolved;
 
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.transaction.LockHashAlgorithmType;
 import io.nem.sdk.model.transaction.JsonHelper;
+import io.nem.sdk.model.transaction.LockHashAlgorithmType;
 import io.nem.sdk.model.transaction.SecretProofTransaction;
 import io.nem.sdk.model.transaction.SecretProofTransactionFactory;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
+import io.nem.sdk.openapi.vertx.model.LockHashAlgorithmEnum;
 import io.nem.sdk.openapi.vertx.model.SecretProofTransactionDTO;
 
 /**
@@ -47,6 +48,14 @@ class SecretProofTransactionMapper extends
             toAddressFromUnresolved(transaction.getRecipientAddress()),
             transaction.getSecret(),
             transaction.getProof());
+    }
+
+    @Override
+    protected void copyToDto(SecretProofTransaction transaction, SecretProofTransactionDTO dto) {
+        dto.setHashAlgorithm(LockHashAlgorithmEnum.fromValue(transaction.getHashType().getValue()));
+        dto.setRecipientAddress(transaction.getRecipient().encoded());
+        dto.setSecret(transaction.getSecret());
+        dto.setProof(transaction.getProof());
     }
 
 }

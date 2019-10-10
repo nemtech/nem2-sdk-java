@@ -50,17 +50,16 @@ public class MosaicMetadataTransactionTest {
             MosaicMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
-                mosaicId, BigInteger.TEN, "123ABC").valueSize(20).valueSizeDelta(10)
+                mosaicId, BigInteger.TEN, "123ABC").valueSizeDelta(10)
                 .deadline(new FakeDeadline()).build();
         assertEquals("123ABC", transaction.getValue());
         assertEquals(mosaicId, transaction.getTargetMosaicId());
         assertEquals(NetworkType.MIJIN_TEST, transaction.getNetworkType());
         assertEquals(10, transaction.getValueSizeDelta());
-        assertEquals(20, transaction.getValueSize());
         assertEquals(BigInteger.TEN, transaction.getScopedMetadataKey());
 
         assertEquals(account.getPublicKey(),
-            transaction.getTargetAccount().getPublicKey().toString());
+            transaction.getTargetAccount().getPublicKey().toHex());
     }
 
     @Test
@@ -70,7 +69,7 @@ public class MosaicMetadataTransactionTest {
             MosaicMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
-                mosaicId, BigInteger.TEN, "123ABC").valueSize(20).valueSizeDelta(10)
+                mosaicId, BigInteger.TEN, "123ABC").valueSizeDelta(10)
                 .signer(account.getPublicAccount())
                 .deadline(new FakeDeadline()).build();
 

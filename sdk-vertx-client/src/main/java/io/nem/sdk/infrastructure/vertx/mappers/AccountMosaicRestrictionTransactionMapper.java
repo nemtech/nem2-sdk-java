@@ -28,7 +28,9 @@ import io.nem.sdk.model.transaction.AccountRestrictionType;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.openapi.vertx.model.AccountMosaicRestrictionModificationDTO;
-import io.nem.sdk.openapi.vertx.model.AccountMosaicRestrictionTransactionBodyDTO;
+import io.nem.sdk.openapi.vertx.model.AccountMosaicRestrictionTransactionDTO;
+import io.nem.sdk.openapi.vertx.model.AccountRestrictionModificationActionEnum;
+import io.nem.sdk.openapi.vertx.model.AccountRestrictionTypeEnum;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,17 +38,17 @@ import java.util.stream.Collectors;
  * DTO mapper of {@link AccountMosaicRestrictionTransaction}.
  */
 public class AccountMosaicRestrictionTransactionMapper extends
-    AbstractTransactionMapper<AccountMosaicRestrictionTransactionBodyDTO, AccountMosaicRestrictionTransaction> {
+    AbstractTransactionMapper<AccountMosaicRestrictionTransactionDTO, AccountMosaicRestrictionTransaction> {
 
     public AccountMosaicRestrictionTransactionMapper(
         JsonHelper jsonHelper) {
         super(jsonHelper, TransactionType.ACCOUNT_MOSAIC_RESTRICTION,
-            AccountMosaicRestrictionTransactionBodyDTO.class);
+            AccountMosaicRestrictionTransactionDTO.class);
     }
 
     @Override
     protected AccountMosaicRestrictionTransactionFactory createFactory(
-        NetworkType networkType, AccountMosaicRestrictionTransactionBodyDTO transaction) {
+        NetworkType networkType, AccountMosaicRestrictionTransactionDTO transaction) {
         AccountRestrictionType restrictionType = AccountRestrictionType
             .rawValueOf(transaction.getRestrictionType().getValue());
         List<AccountRestrictionModification<MosaicId>> modifications = transaction
@@ -62,4 +64,24 @@ public class AccountMosaicRestrictionTransactionMapper extends
         return AccountRestrictionModification
             .createForMosaic(modificationAction, MapperUtils.toMosaicId(dto.getValue()));
     }
+
+    @Override
+    protected void copyToDto(AccountMosaicRestrictionTransaction transaction,
+        AccountMosaicRestrictionTransactionDTO dto) {
+        dto.setRestrictionType(
+            AccountRestrictionTypeEnum.fromValue(transaction.getRestrictionType().getValue()));
+        dto.setModifications(transaction.getModifications().stream().map(this::toModification)
+            .collect(Collectors.toList()));
+    }
+
+
+    private AccountMosaicRestrictionModificationDTO toModification(
+        AccountRestrictionModification<MosaicId> model) {
+        AccountMosaicRestrictionModificationDTO dto = new AccountMosaicRestrictionModificationDTO();
+        dto.setModificationAction(AccountRestrictionModificationActionEnum
+            .fromValue((int) model.getModificationAction().getValue()));
+        dto.setValue(MapperUtils.getIdAsHex(model.getValue()));
+        return dto;
+    }
+
 }

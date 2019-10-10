@@ -18,7 +18,6 @@ package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.core.utils.ConvertUtils;
 import io.nem.core.utils.MapperUtils;
-import io.nem.sdk.api.MetadataRepository;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.metadata.Metadata;
 import io.nem.sdk.model.mosaic.MosaicId;
@@ -174,7 +173,7 @@ public class MetadataRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
             MetadataTypeEnum
                 .fromValue(result.getMetadataEntry().getMetadataType().getValue()));
 
-        Assertions.assertEquals(ConvertUtils.fromHexString(expected.getMetadataEntry().getValue()),
+        Assertions.assertEquals(ConvertUtils.fromHexToString(expected.getMetadataEntry().getValue()),
             result.getMetadataEntry().getValue());
 
         if (expected.getMetadataEntry().getTargetId() != null) {

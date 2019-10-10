@@ -27,7 +27,7 @@ The script will:
 # Notes:
 
 * Running the generator is not required to build [nem2-sdk-java](https://github.com/nemtech/nem2-sdk-java) . The generated libs are published into the maven central repository.  The nem2-sdk-java depends on those libraries like any other third party dependency.
-* The generated lib version (artifact version) should be consistent with the openapi3 YAML. Current version is 0.7.18 so the generated libraries should have the version 0.7.18. If the descriptor changes and the version is updated, the libraries should be upgraded, regenerated and deployed.
+* The generated lib version (artifact version) should be consistent with the openapi3 YAML. Current version is 0.7.19 so the generated libraries should have the version 0.7.19. If the descriptor changes and the version is updated, the libraries should be upgraded, regenerated and deployed.
 * The generator uses a patched version of the descriptor due to the AnyOf open [API bug](https://github.com/OpenAPITools/openapi-generator/issues/634)
 * There is a small tune in the generation that uses BigInteger attributes instead of String when the field is a String number. The tune is by using ``typeMappings =  ["x-number-string": "java.math.BigInteger"]`` and by replacing the string type to ``x-number-string`` in the ``openapi3-any-of-patch.yaml``.
 * Generated code must not be changed not committed!!! target folder is gitignored. If there is something wrong with the generated code, you need to [customize the generator](https://openapi-generator.tech/docs/customization.html)

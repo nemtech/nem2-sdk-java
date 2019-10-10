@@ -324,4 +324,8 @@ public abstract class BaseIntegrationTest {
     }
 
 
+    @SuppressWarnings("squid:S2925")
+    protected void sleep(long time) throws InterruptedException {
+        Thread.sleep(time);
+    }
 }

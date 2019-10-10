@@ -156,14 +156,16 @@ public abstract class Transaction {
     }
 
     /**
-     * 
+     * Generate bytes for a specific transaction.
+     *
      * @return
      */
     abstract byte[] generateBytes();
 
     /**
-     * 
-     * @return
+     * Generate bytes for a specific inner transaction.
+     *
+     * @return bytes of the transaction
      */
     abstract byte[] generateEmbeddedBytes();
 
@@ -292,7 +294,7 @@ public abstract class Transaction {
     }
 
     /**
-     * Gets the version of the transaction to use in JSON.
+     * Gets the version of the transaction using the open api format.
      *
      * @return Version of the transaction
      */

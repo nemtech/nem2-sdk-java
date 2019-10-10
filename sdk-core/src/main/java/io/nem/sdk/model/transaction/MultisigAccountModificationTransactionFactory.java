@@ -27,8 +27,8 @@ import org.apache.commons.lang3.Validate;
 public class MultisigAccountModificationTransactionFactory extends
     TransactionFactory<MultisigAccountModificationTransaction> {
 
-    private final byte minApprovalDelta;
-    private final byte minRemovalDelta;
+    private final int minApprovalDelta;
+    private final int minRemovalDelta;
     private final List<MultisigCosignatoryModification> modifications;
 
     private MultisigAccountModificationTransactionFactory(
@@ -67,7 +67,7 @@ public class MultisigAccountModificationTransactionFactory extends
      *
      * @return byte
      */
-    public byte getMinApprovalDelta() {
+    public int getMinApprovalDelta() {
         return minApprovalDelta;
     }
 
@@ -77,7 +77,7 @@ public class MultisigAccountModificationTransactionFactory extends
      *
      * @return byte
      */
-    public byte getMinRemovalDelta() {
+    public int getMinRemovalDelta() {
         return minRemovalDelta;
     }
 

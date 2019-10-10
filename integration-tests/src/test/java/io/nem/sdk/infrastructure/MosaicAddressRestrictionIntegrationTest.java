@@ -42,8 +42,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest {
 
-    //TODO user regular test account, not nemesis.
-    private Account testAccount = config().getNemesisAccount();
+    private Account testAccount = config().getDefaultAccount();
     private Account testAccount2 = config().getTestAccount2();
 
     @ParameterizedTest
@@ -51,10 +50,12 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
     void createMosaicAddressRestrictionAndValidateEndpoints(RepositoryType type)
         throws InterruptedException {
 
+        //1) Create a mosaic
         MosaicId mosaicId = createMosaic(type, testAccount);
 
         BigInteger restrictionKey = BigInteger.valueOf(60642);
 
+        //2) Create a global restriction on the mosaic
         MosaicGlobalRestrictionTransaction mosaicGlobalRestrictionTransaction =
             MosaicGlobalRestrictionTransactionFactory.create(
                 getNetworkType(),
@@ -67,66 +68,97 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
         announceAndValidate(
             type, testAccount, mosaicGlobalRestrictionTransaction);
 
-        BigInteger newRestrictionValue = BigInteger.valueOf(30);
+        //3)Create a new MosaicAddressRestrictionTransaction
+        BigInteger originalRestrictionValue = BigInteger.valueOf(30);
 
-        MosaicAddressRestrictionTransaction mosaicAddressRestrictionTransaction =
+        MosaicAddressRestrictionTransaction crateTransaction =
             MosaicAddressRestrictionTransactionFactory.create(
                 getNetworkType(),
                 mosaicId,
                 restrictionKey,
                 testAccount2.getAddress(),
-                newRestrictionValue
+                originalRestrictionValue
             ).build();
 
-        MosaicAddressRestrictionTransaction processedTransaction = announceAggregateAndValidate(
-            type, testAccount, mosaicAddressRestrictionTransaction);
+        //4)Announce and validate
+        assertTransaction(crateTransaction, announceAggregateAndValidate(
+            type, testAccount, crateTransaction));
 
-        Assertions.assertEquals(mosaicAddressRestrictionTransaction.getMosaicId(),
-            processedTransaction.getMosaicId());
-
-        Assertions.assertEquals(mosaicAddressRestrictionTransaction.getNewRestrictionValue(),
-            processedTransaction.getNewRestrictionValue());
-
-        Assertions.assertEquals(mosaicAddressRestrictionTransaction.getPreviousRestrictionValue(),
-            processedTransaction.getPreviousRestrictionValue());
-
-        Assertions.assertEquals(mosaicAddressRestrictionTransaction.getRestrictionKey(),
-            processedTransaction.getRestrictionKey());
-
-        Thread.sleep(1000);
+        //5) Validate that endpoints have the data.
+        sleep(1000);
 
         RestrictionRepository restrictionRepository = getRepositoryFactory(type)
             .createRestrictionRepository();
 
-        assertMosaicAddressRestriction(mosaicAddressRestrictionTransaction, get(
+        assertMosaicAddressRestriction(crateTransaction, get(
             restrictionRepository
                 .getMosaicAddressRestriction(mosaicId, testAccount2.getAddress())));
 
-        assertMosaicAddressRestriction(mosaicAddressRestrictionTransaction, get(
+        assertMosaicAddressRestriction(crateTransaction, get(
             restrictionRepository
                 .getMosaicAddressRestrictions(mosaicId,
                     Collections.singletonList(testAccount2.getAddress()))).get(0));
 
+        //6) Update the restriction
+        MosaicAddressRestrictionTransaction updateTransaction =
+            MosaicAddressRestrictionTransactionFactory.create(
+                getNetworkType(),
+                mosaicId,
+                restrictionKey,
+                testAccount2.getAddress(),
+                BigInteger.valueOf(40)
+            ).previousRestrictionValue(originalRestrictionValue).build();
+
+        //7) Announce and validate.
+        assertTransaction(updateTransaction, announceAggregateAndValidate(
+            type, testAccount, updateTransaction));
+
+        sleep(1000);
+
+        //8) Validates that the endpoints have the new values
+        assertMosaicAddressRestriction(updateTransaction, get(
+            restrictionRepository
+                .getMosaicAddressRestriction(mosaicId, testAccount2.getAddress())));
+
+        assertMosaicAddressRestriction(updateTransaction, get(
+            restrictionRepository
+                .getMosaicAddressRestrictions(mosaicId,
+                    Collections.singletonList(testAccount2.getAddress()))).get(0));
+
+
+    }
+
+    private void assertTransaction(
+        MosaicAddressRestrictionTransaction expectedTransaction,
+        MosaicAddressRestrictionTransaction processedTransaction) {
+        Assertions.assertEquals(expectedTransaction.getMosaicId(),
+            processedTransaction.getMosaicId());
+
+        Assertions.assertEquals(expectedTransaction.getNewRestrictionValue(),
+            processedTransaction.getNewRestrictionValue());
+
+        Assertions.assertEquals(expectedTransaction.getPreviousRestrictionValue(),
+            processedTransaction.getPreviousRestrictionValue());
+
+        Assertions.assertEquals(expectedTransaction.getRestrictionKey(),
+            processedTransaction.getRestrictionKey());
     }
 
     private void assertMosaicAddressRestriction(
-        MosaicAddressRestrictionTransaction mosaicAddressRestrictionTransaction,
-        MosaicAddressRestriction mosaicAddressRestriction) {
+        MosaicAddressRestrictionTransaction transaction,
+        MosaicAddressRestriction restriction) {
 
-        BigInteger restrictionKey = mosaicAddressRestrictionTransaction.getRestrictionKey();
-        BigInteger newRestrictionValue = mosaicAddressRestrictionTransaction
+        BigInteger restrictionKey = transaction.getRestrictionKey();
+        BigInteger newRestrictionValue = transaction
             .getNewRestrictionValue();
 
-        Assertions.assertEquals(mosaicAddressRestrictionTransaction.getTargetAddress(),
-            mosaicAddressRestriction.getTargetAddress());
-        Assertions.assertEquals(1, mosaicAddressRestriction.getRestrictions().size());
-        Assertions.assertEquals(newRestrictionValue,
-            mosaicAddressRestriction.getRestrictions().get(restrictionKey)
-        );
+        Assertions.assertEquals(transaction.getTargetAddress(), restriction.getTargetAddress());
+        Assertions.assertEquals(1, restriction.getRestrictions().size());
         Assertions
-            .assertEquals(mosaicAddressRestrictionTransaction.getNewRestrictionValue(),
-                mosaicAddressRestriction.getRestrictions().get(restrictionKey)
-            );
+            .assertEquals(newRestrictionValue, restriction.getRestrictions().get(restrictionKey));
+
+        Assertions.assertEquals(transaction.getNewRestrictionValue(),
+            restriction.getRestrictions().get(restrictionKey));
     }
 
     private MosaicId createMosaic(RepositoryType type, Account testAccount) {

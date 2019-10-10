@@ -16,7 +16,7 @@ task clean(type: Delete) {
 }
 
 ext {
-    artifactVersion = '0.7.18-SNAPSHOT'
+    artifactVersion = "0.7.19-SNAPSHOT"
 }
 
 //NOTE - For some reason the library field is ignored. I had to create a configFile per library.

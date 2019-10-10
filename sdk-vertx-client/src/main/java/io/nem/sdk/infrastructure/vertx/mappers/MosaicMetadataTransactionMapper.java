@@ -17,6 +17,7 @@
 
 package io.nem.sdk.infrastructure.vertx.mappers;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -46,8 +47,7 @@ class MosaicMetadataTransactionMapper extends
             .createFromPublicKey(transaction.getTargetPublicKey(), networkType);
         Integer valueSizeDelta = transaction.getValueSizeDelta();
         BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey(), 16);
-        Integer valueSize = transaction.getValueSize();
-        String value = transaction.getValue();
+        String value = ConvertUtils.fromHexToString(transaction.getValue());
         MosaicId targetMosaic = MapperUtils.toMosaicId(transaction.getTargetMosaicId());
         MosaicMetadataTransactionFactory factory = MosaicMetadataTransactionFactory.create(
             networkType,
@@ -55,7 +55,17 @@ class MosaicMetadataTransactionMapper extends
             targetMosaic,
             scopedMetaDataKey,
             value);
-        factory.valueSizeDelta(valueSizeDelta).valueSize(valueSize);
+        factory.valueSizeDelta(valueSizeDelta);
         return factory;
+    }
+
+    @Override
+    protected void copyToDto(MosaicMetadataTransaction transaction,
+        MosaicMetadataTransactionDTO dto) {
+        dto.setTargetPublicKey(transaction.getTargetAccount().getPublicKey().toHex());
+        dto.setTargetMosaicId(MapperUtils.getIdAsHex(transaction.getTargetMosaicId()));
+        dto.setScopedMetadataKey(transaction.getScopedMetadataKey().toString());
+        dto.setValue(ConvertUtils.fromStringToHex(transaction.getValue()));
+        dto.setValueSizeDelta(transaction.getValueSizeDelta());
     }
 }

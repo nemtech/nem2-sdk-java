@@ -17,9 +17,10 @@
 package io.nem.sdk.model.mosaic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.math.BigInteger;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class MosaicFlagsTest {
@@ -31,6 +32,7 @@ class MosaicFlagsTest {
         assertTrue(mosaicFlags.isSupplyMutable());
         assertTrue(mosaicFlags.isTransferable());
         assertTrue(mosaicFlags.isRestrictable());
+        assertEquals(7, mosaicFlags.getValue());
     }
 
     @Test
@@ -39,6 +41,14 @@ class MosaicFlagsTest {
             MosaicFlags.create(true, true);
         assertTrue(mosaicFlags.isSupplyMutable());
         assertTrue(mosaicFlags.isTransferable());
-        assertTrue(!mosaicFlags.isRestrictable());
+        assertFalse(mosaicFlags.isRestrictable());
+        assertEquals(3, mosaicFlags.getValue());
+    }
+
+    @Test
+    void shouldParseIntFlagValue() {
+        for (int i = 0; i < 8; i++) {
+            Assertions.assertEquals(i, MosaicFlags.create(i).getValue());
+        }
     }
 }

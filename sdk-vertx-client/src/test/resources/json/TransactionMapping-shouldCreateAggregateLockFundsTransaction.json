@@ -1,7 +1,7 @@
 {
   "meta": {
     "hash": "671653C94E2254F2A23EFEDB15D67C38332AED1FBD24B063C0A8E675582B6A96",
-    "height": 18160,
+    "height": "18160",
     "id": "5A0069D83F17CF0001777E55",
     "index": 0,
     "merkleComponentHash": "81E5E7AE49998802DABC816EC10158D3A7879702FF29084C2C992CD1289877A7"
@@ -22,7 +22,7 @@
         "meta": {
           "aggregateHash": "3D28C804EDD07D5A728E5C5FFEC01AB07AFA5766AE6997B38526D36015A4D006",
           "aggregateId": "5A0069D83F17CF0001777E55",
-          "height": 18160,
+          "height": "18160",
           "id": "5A0069D83F17CF0001777E56",
           "index": 0
         },
@@ -31,10 +31,8 @@
           "version": 36867,
           "type": 16712,
           "duration": "100",
-          "mosaic": {
-            "amount": "10000000",
-            "id": "3646934825FFF"
-          },
+          "amount": "10000000",
+          "mosaicId": "0003646934825fff",
           "hash": "49E9F58867FB9399F32316B99CCBC301A5790E5E0605E25F127D28CEF99740A3"
         }
       }

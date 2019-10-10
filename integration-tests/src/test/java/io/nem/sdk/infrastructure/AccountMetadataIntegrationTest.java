@@ -48,7 +48,8 @@ public class AccountMetadataIntegrationTest extends BaseIntegrationTest {
 
         String message = "This is the message for this account! 汉字" + key;
         System.out.println(
-            "Storing message '" + message + "' in account metadata " + testAccount.getAddress());
+            "Storing message '" + message + "' in account metadata " + testAccount.getAddress()
+                .plain());
 
         AccountMetadataTransaction transaction =
             AccountMetadataTransactionFactory.create(
@@ -81,9 +82,7 @@ public class AccountMetadataIntegrationTest extends BaseIntegrationTest {
         Assertions.assertEquals(transaction.getScopedMetadataKey(),
             processedTransaction.getScopedMetadataKey());
 
-        Assertions.assertEquals(transaction.getValueSize(), processedTransaction.getValueSize());
-
-        Thread.sleep(2000L);
+        sleep(2000);
 
         Metadata metadata = assertMetadata(transaction,
             get(getRepositoryFactory(type).createMetadataRepository()
@@ -102,14 +101,13 @@ public class AccountMetadataIntegrationTest extends BaseIntegrationTest {
         Assertions.assertEquals(message, processedTransaction.getValue());
     }
 
+
     private Metadata assertMetadata(AccountMetadataTransaction transaction,
         List<Metadata> metadata) {
 
         Optional<Metadata> endpointMetadata = metadata.stream().filter(
             m -> m.getMetadataEntry().getScopedMetadataKey()
                 .equals(transaction.getScopedMetadataKey()) &&
-                m.getMetadataEntry().getValueSize()
-                    .equals(transaction.getValueSize()) &&
                 m.getMetadataEntry().getMetadataType()
                     .equals(MetadataType.ACCOUNT) &&
                 m.getMetadataEntry()

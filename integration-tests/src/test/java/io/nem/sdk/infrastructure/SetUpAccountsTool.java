@@ -18,13 +18,17 @@ package io.nem.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.AccountInfo;
+import io.nem.sdk.model.account.MultisigAccountInfo;
 import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.CosignatoryModificationActionType;
+import io.nem.sdk.model.transaction.HashLockTransaction;
+import io.nem.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
 import io.nem.sdk.model.transaction.MultisigCosignatoryModification;
@@ -47,7 +51,7 @@ import org.junit.jupiter.api.Assertions;
  */
 public class SetUpAccountsTool extends BaseIntegrationTest {
 
-    public static final int AMOUNT_PER_TRANSFER = 10000;
+    public static final long AMOUNT_PER_TRANSFER = 10000000;
 
     private final RepositoryType type = DEFAULT_REPOSITORY_TYPE;
 
@@ -58,19 +62,43 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
     private void createAccounts() {
         setUp();
 
-        sendMosaicFromNemesis(config().getTestAccount());
-        sendMosaicFromNemesis(config().getTestAccount2());
-        sendMosaicFromNemesis(config().getCosignatoryAccount());
-        sendMosaicFromNemesis(config().getCosignatory2Account());
-        sendMosaicFromNemesis(config().getCosignatory3Account());
-        sendMosaicFromNemesis(config().getMultisigAccount());
-        //TODO Failure_Core_Insufficient_Balance error!
-        createMultisigAccount(config().getMultisigAccount(), config().getCosignatoryAccount(),
-            config().getCosignatory2Account());
-        tearDown();
+        try {
+            sendMosaicFromNemesis(config().getTestAccount(), true);
+            sendMosaicFromNemesis(config().getTestAccount2(), true);
+            sendMosaicFromNemesis(config().getCosignatoryAccount(), true);
+            sendMosaicFromNemesis(config().getCosignatory2Account(), true);
+            sendMosaicFromNemesis(config().getCosignatory3Account(), true);
+            sendMosaicFromNemesis(config().getMultisigAccount(), true);
+            //TODO Failure_Core_Insufficient_Balance error!
+            createMultisigAccount(config().getMultisigAccount(), config().getCosignatoryAccount(),
+                config().getCosignatory2Account());
+        } finally {
+            tearDown();
+        }
     }
 
     private void createMultisigAccount(Account multisigAccount, Account... accounts) {
+
+        AccountRepository accountRepository = getRepositoryFactory(type)
+            .createAccountRepository();
+
+        AccountInfo accountInfo = get(
+            accountRepository.getAccountInfo(multisigAccount.getAddress()));
+        System.out.println(jsonHelper().print(accountInfo));
+
+        try {
+            MultisigAccountInfo multisigAccountInfo = get(
+                accountRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
+
+            System.out.println(
+                "Multisig account with address " + multisigAccount.getAddress() + " already exist");
+            System.out.println(jsonHelper().print(multisigAccountInfo));
+            return;
+        } catch (RepositoryCallException e) {
+            System.out.println(
+                "Multisig account with address " + multisigAccount.getAddress()
+                    + " does not exist. Creating");
+        }
 
         System.out.println("Creating multisg account");
         MultisigAccountModificationTransaction convertIntoMultisigTransaction = MultisigAccountModificationTransactionFactory
@@ -84,23 +112,28 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
                 convertIntoMultisigTransaction.toAggregate(multisigAccount.getPublicAccount()))
         ).build();
 
-        SignedTransaction signedTransaction = multisigAccount
-            .signTransactionWithCosignatories(aggregateTransaction, Arrays.asList(accounts),
+        SignedTransaction signedTransaction = aggregateTransaction
+            .signTransactionWithCosigners(multisigAccount, Arrays.asList(accounts),
                 getGenerationHash());
+
+        hashLock(type, multisigAccount, signedTransaction);
 
         TransactionAnnounceResponse transactionAnnounceResponse =
             get(getRepositoryFactory(type).createTransactionRepository()
                 .announce(signedTransaction));
+
         assertEquals(
             "packet 9 was pushed to the network via /transaction",
             transactionAnnounceResponse.getMessage());
 
-        validateTransactionAnnounceCorrectly(multisigAccount.getAddress(), signedTransaction.getHash(), type);
+        validateTransactionAnnounceCorrectly(multisigAccount.getAddress(),
+            signedTransaction.getHash(), type);
+
 
     }
 
-    private void sendMosaicFromNemesis(Account recipient) {
-        if (hasMosaic(recipient)) {
+    private void sendMosaicFromNemesis(Account recipient, boolean force) {
+        if (hasMosaic(recipient) && !force) {
             System.out.println("Ignoring recipient. It has the mosaic already: ");
             printAccount(recipient);
             return;
@@ -136,12 +169,22 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
         }
     }
 
-
     void printAccount(Account account) {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("privateKey", account.getPrivateKey());
         map.put("publicKey", account.getPublicKey());
         map.put("address", account.getAddress().plain());
         System.out.println(jsonHelper().print(map));
+    }
+
+    protected void hashLock(RepositoryType type, Account account,
+        SignedTransaction signedTransaction) {
+        HashLockTransaction hashLockTransaction = HashLockTransactionFactory.create(
+                getNetworkType(),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                BigInteger.valueOf(100),
+                signedTransaction)
+            .build();
+        announceAndValidate(type, account, hashLockTransaction);
     }
 }

@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "hash": "68E5080173C82EF2F64E98E292F717404E4F2CBD1EEB30E1EFD9A7ED1F5AB418",
+    "height": "1168",
+    "merkleComponentHash": "68E5080173C82EF2F64E98E292F717404E4F2CBD1EEB30E1EFD9A7ED1F5AB418"
+  },
+  "transaction": {
+    "deadline": "110764358842",
+    "maxFee": "0",
+    "signature": "8B15BCD9ED9D685420D88F38174996FCE107C8CF8EBDC56046E8A88D6A4F0C0566050BCC87F78487383C2CACB2AC6F469538CCE8FBEF8D570295CFC7A16EB009",
+    "signerPublicKey": "5D03190865D3A1AA4093D1E7F82975A434844927E47AADEB1A19BB94F8FC8EF0",
+    "transactions": [
+      {
+        "transaction": {
+          "mosaicId": "6542a217a3d0ec30",
+          "newRestrictionValue": "30",
+          "previousRestrictionValue": "18446744073709551615",
+          "restrictionKey": "abc60642",
+          "signerPublicKey": "5D03190865D3A1AA4093D1E7F82975A434844927E47AADEB1A19BB94F8FC8EF0",
+          "targetAddress": "90e6ff7755a80b6aa935a5c31b6d3d0cfaf82e06bf2b9cc9e0",
+          "type": 16977,
+          "version": 36865
+        }
+      }
+    ],
+    "type": 16705,
+    "version": 36865
+  }
+}

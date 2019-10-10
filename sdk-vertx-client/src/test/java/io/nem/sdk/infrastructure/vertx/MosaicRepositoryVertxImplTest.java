@@ -105,7 +105,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
         Assertions.assertEquals(mosaicDto.getRevision(), mosaicInfo.getRevision());
         Assertions
             .assertEquals(mosaicDto.getOwnerPublicKey(),
-                mosaicInfo.getOwner().getPublicKey().toString());
+                mosaicInfo.getOwner().getPublicKey().toHex());
 
         Assertions.assertFalse(mosaicInfo.isTransferable());
         Assertions.assertEquals(6, mosaicInfo.getDivisibility());
@@ -140,7 +140,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
         Assertions.assertEquals(mosaicDto.getRevision(), mosaicInfo.getRevision());
         Assertions
             .assertEquals(mosaicDto.getOwnerPublicKey(),
-                mosaicInfo.getOwner().getPublicKey().toString());
+                mosaicInfo.getOwner().getPublicKey().toHex());
 
         Assertions.assertFalse(mosaicInfo.isTransferable());
         Assertions.assertEquals(6, mosaicInfo.getDivisibility());

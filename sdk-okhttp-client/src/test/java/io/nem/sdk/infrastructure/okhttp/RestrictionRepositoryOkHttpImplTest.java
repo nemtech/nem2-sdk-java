@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.AccountRestrictions;
 import io.nem.sdk.model.account.Address;
@@ -37,6 +38,7 @@ import io.nem.sdk.openapi.okhttp_gson.model.MosaicGlobalRestrictionEntryDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MosaicGlobalRestrictionEntryRestrictionDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MosaicGlobalRestrictionEntryWrapperDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MosaicRestrictionEntryTypeEnum;
+import io.nem.sdk.openapi.okhttp_gson.model.MosaicRestrictionTypeEnum;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -137,7 +139,7 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         dto.setMosaicRestrictionEntry(wrapperDTO);
 
         MosaicAddressRestrictionEntryDTO entryDTO = new MosaicAddressRestrictionEntryDTO();
-        entryDTO.setKey("1111");
+        entryDTO.setKey(ConvertUtils.toSize16Hex(BigInteger.valueOf(1111)));
         entryDTO.setValue("2222");
         List<MosaicAddressRestrictionEntryDTO> restrictions = new ArrayList<>();
         restrictions.add(entryDTO);
@@ -145,7 +147,7 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         wrapperDTO.setCompositeHash("compositeHash");
         wrapperDTO.setMosaicId(mosaicId.getIdAsHex());
         wrapperDTO.setRestrictions(restrictions);
-        wrapperDTO.setEntryType(0);
+        wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_0);
         wrapperDTO.setTargetAddress(address.encoded());
 
         List<MosaicAddressRestrictionDTO> list = new ArrayList<>();
@@ -184,9 +186,9 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         dto.setMosaicRestrictionEntry(wrapperDTO);
 
         MosaicGlobalRestrictionEntryDTO entryDTO = new MosaicGlobalRestrictionEntryDTO();
-        entryDTO.setKey("1111");
+        entryDTO.setKey(ConvertUtils.toSize16Hex(BigInteger.valueOf(1111)));
         MosaicGlobalRestrictionEntryRestrictionDTO entryRestrictionDto = new MosaicGlobalRestrictionEntryRestrictionDTO();
-        entryRestrictionDto.setRestrictionType(5);
+        entryRestrictionDto.setRestrictionType(MosaicRestrictionTypeEnum.NUMBER_5);
         entryRestrictionDto.setReferenceMosaicId("456");
         entryRestrictionDto.setRestrictionValue("3333");
         entryDTO.setRestriction(entryRestrictionDto);
@@ -241,9 +243,9 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         dto.setMosaicRestrictionEntry(wrapperDTO);
 
         MosaicGlobalRestrictionEntryDTO entryDTO = new MosaicGlobalRestrictionEntryDTO();
-        entryDTO.setKey("1111");
+        entryDTO.setKey(ConvertUtils.toSize16Hex(BigInteger.valueOf(1111)));
         MosaicGlobalRestrictionEntryRestrictionDTO entryRestrictionDto = new MosaicGlobalRestrictionEntryRestrictionDTO();
-        entryRestrictionDto.setRestrictionType(5);
+        entryRestrictionDto.setRestrictionType(MosaicRestrictionTypeEnum.NUMBER_5);
         entryRestrictionDto.setReferenceMosaicId("456");
         entryRestrictionDto.setRestrictionValue("3333");
         entryDTO.setRestriction(entryRestrictionDto);
@@ -299,7 +301,7 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         dto.setMosaicRestrictionEntry(wrapperDTO);
 
         MosaicAddressRestrictionEntryDTO entryDTO = new MosaicAddressRestrictionEntryDTO();
-        entryDTO.setKey("1111");
+        entryDTO.setKey(ConvertUtils.toSize16Hex(BigInteger.valueOf(1111)));
         entryDTO.setValue("2222");
         List<MosaicAddressRestrictionEntryDTO> restrictions = new ArrayList<>();
         restrictions.add(entryDTO);
@@ -307,7 +309,7 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         wrapperDTO.setCompositeHash("compositeHash");
         wrapperDTO.setMosaicId(mosaicId.getIdAsHex());
         wrapperDTO.setRestrictions(restrictions);
-        wrapperDTO.setEntryType(0);
+        wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_0);
         wrapperDTO.setTargetAddress(address.encoded());
 
         mockRemoteCall(dto);

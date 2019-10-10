@@ -17,6 +17,7 @@
 
 package io.nem.sdk.infrastructure.vertx.mappers;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.AccountMetadataTransaction;
@@ -44,14 +45,23 @@ class AccountMetadataTransactionMapper extends
             .createFromPublicKey(transaction.getTargetPublicKey(), networkType);
         Integer valueSizeDelta = transaction.getValueSizeDelta();
         BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey(), 16);
-        Integer valueSize = transaction.getValueSize();
-        String value = transaction.getValue();
+        String value = ConvertUtils.fromHexToString(transaction.getValue());
         AccountMetadataTransactionFactory factory = AccountMetadataTransactionFactory.create(
             networkType,
             targetAccount,
             scopedMetaDataKey,
             value);
-        factory.valueSizeDelta(valueSizeDelta).valueSize(valueSize);
+        factory.valueSizeDelta(valueSizeDelta);
         return factory;
+    }
+
+    @Override
+    protected void copyToDto(AccountMetadataTransaction transaction,
+        AccountMetadataTransactionDTO dto) {
+
+        dto.setTargetPublicKey(transaction.getTargetAccount().getPublicKey().toHex());
+        dto.setValueSizeDelta(transaction.getValueSizeDelta());
+        dto.setScopedMetadataKey(transaction.getScopedMetadataKey().toString(16));
+        dto.setValue(ConvertUtils.fromStringToHex(transaction.getValue()));
     }
 }

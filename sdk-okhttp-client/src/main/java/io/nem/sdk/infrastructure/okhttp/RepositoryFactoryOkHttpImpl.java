@@ -20,6 +20,7 @@ import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.BlockRepository;
 import io.nem.sdk.api.ChainRepository;
 import io.nem.sdk.api.DiagnosticRepository;
+import io.nem.sdk.api.JsonSerialization;
 import io.nem.sdk.api.MetadataRepository;
 import io.nem.sdk.api.MosaicRepository;
 import io.nem.sdk.api.NamespaceRepository;
@@ -30,19 +31,8 @@ import io.nem.sdk.api.RestrictionRepository;
 import io.nem.sdk.api.TransactionRepository;
 import io.nem.sdk.infrastructure.Listener;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
-import io.nem.sdk.openapi.okhttp_gson.invoker.JSON;
-import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.ByteArrayAdapter;
-import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.DateTypeAdapter;
-import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.LocalDateTypeAdapter;
-import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.OffsetDateTimeTypeAdapter;
-import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.SqlDateTypeAdapter;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Date;
 import okhttp3.OkHttpClient;
 import org.apache.commons.io.IOUtils;
-import org.threeten.bp.LocalDate;
-import org.threeten.bp.OffsetDateTime;
 
 /**
  * Vertx implementation of a {@link RepositoryFactory}
@@ -61,23 +51,7 @@ public class RepositoryFactoryOkHttpImpl implements RepositoryFactory {
         this.baseUrl = baseUrl;
         this.apiClient = new ApiClient();
         this.apiClient.setBasePath(baseUrl);
-
-        JSON json = apiClient.getJSON();
-
-        DateTypeAdapter dateTypeAdapter = new DateTypeAdapter();
-        SqlDateTypeAdapter sqlDateTypeAdapter = new SqlDateTypeAdapter();
-        OffsetDateTimeTypeAdapter offsetDateTimeTypeAdapter = new OffsetDateTimeTypeAdapter();
-        LocalDateTypeAdapter localDateTypeAdapter = json.new LocalDateTypeAdapter();
-        ByteArrayAdapter byteArrayAdapter = json.new ByteArrayAdapter();
-
-        json.setGson(JSON.createGson().registerTypeHierarchyAdapter(
-            Collection.class, new CollectionAdapter())
-            .registerTypeAdapter(Date.class, dateTypeAdapter)
-            .registerTypeAdapter(java.sql.Date.class, sqlDateTypeAdapter)
-            .registerTypeAdapter(OffsetDateTime.class, offsetDateTimeTypeAdapter)
-            .registerTypeAdapter(LocalDate.class, localDateTypeAdapter)
-            .registerTypeAdapter(byte[].class, byteArrayAdapter)
-            .create());
+        apiClient.getJSON().setGson(JsonHelperGson.creatGson(false));
     }
 
     @Override
@@ -138,6 +112,11 @@ public class RepositoryFactoryOkHttpImpl implements RepositoryFactory {
     @Override
     public Listener createListener() {
         return new ListenerOkHttp(apiClient.getHttpClient(), baseUrl, apiClient.getJSON());
+    }
+
+    @Override
+    public JsonSerialization createJsonSerialization() {
+        return new JsonSerializationOkHttp(apiClient.getJSON().getGson());
     }
 
     @Override

@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 0.7.18
+  version: 0.7.19
   title: Catapult REST Endpoints
   license:
     name: Apache 2.0
@@ -1329,14 +1329,6 @@ components:
       type: x-number-string
       description: Probability of an account to harvest the next block.
       example: 0
-    PublicKey:
-      type: string
-      example: AC1A6E1D8DE5B17D2C6B1293F1CAD3829EEACF38D09311BB3C8E5A880092DE26
-    MosaicId:
-      type: string
-      format: hex
-      description: Mosaic identifier.
-      example: 0DC67FBE1CAD29E3
     ModelError:
       type: object
       required:
@@ -1347,11 +1339,29 @@ components:
           type: string
         message:
           type: string
+    MetadataKey:
+      type: string
+      format: hex
+      description: Metadata key scoped to source, target and type.
+      example: 0DC67FBE1CAD29E3
+    MosaicId:
+      type: string
+      format: hex
+      description: Mosaic identifier.
+      example: 0DC67FBE1CAD29E3
+    MosaicRestrictionKey:
+      type: string
+      format: hex
+      description: Restriction key.
+      example: 0DC67FBE1CAD29E3
     NamespaceId:
       type: string
       format: hex
       description: Namespace identifier.
       example: 85BBEA6CC462B244
+    PublicKey:
+      type: string
+      example: AC1A6E1D8DE5B17D2C6B1293F1CAD3829EEACF38D09311BB3C8E5A880092DE26
     Score:
       type: x-number-string
       description: |
@@ -2232,12 +2242,15 @@ components:
     HashLockTransactionBodyDTO:
       type: object
       required:
-        - mosaic
+        - mosaicId
+        - amount
         - duration
         - hash
       properties:
-        mosaic:
-          $ref: "#/components/schemas/Mosaic"
+        mosaicId:
+          $ref: "#/components/schemas/MosaicId"
+        amount:
+          $ref: "#/components/schemas/Amount"
         duration:
           $ref: "#/components/schemas/BlockDuration"
         hash:
@@ -2571,16 +2584,11 @@ components:
           $ref: "#/components/schemas/PublicKey"
           description: Metadata target public key.
         scopedMetadataKey:
-          type: string
-          description: Metadata key scoped to source, target and type.
+          $ref: "#/components/schemas/MetadataKey"
         valueSizeDelta:
           type: integer
           format: int32
           description: Change in value size in bytes.
-        valueSize:
-          type: integer
-          format: int32
-          description: Value size in bytes.
         value:
           type: string
           format: hex
@@ -2591,7 +2599,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/TransactionDTO"
         - $ref: "#/components/schemas/AccountMetadataTransactionBodyDTO"
-    EmbeddedAccountMetadataTransactionTransactionDTO:
+    EmbeddedAccountMetadataTransactionDTO:
       allOf:
         - $ref: "#/components/schemas/EmbeddedTransactionDTO"
         - $ref: "#/components/schemas/AccountMetadataTransactionBodyDTO"
@@ -2607,10 +2615,8 @@ components:
       properties:
         targetPublicKey:
           $ref: "#/components/schemas/PublicKey"
-          description: Metadata target public key.
         scopedMetadataKey:
-          type: string
-          description: Metadata key scoped to source, target and type.
+          $ref: "#/components/schemas/MetadataKey"
         targetMosaicId:
           $ref: "#/components/schemas/UnresolvedMosaicId"
         valueSizeDelta:
@@ -2631,7 +2637,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/TransactionDTO"
         - $ref: "#/components/schemas/MosaicMetadataTransactionBodyDTO"
-    EmbeddedMosaicMetadataTransactionTransactionDTO:
+    EmbeddedMosaicMetadataTransactionDTO:
       allOf:
         - $ref: "#/components/schemas/EmbeddedTransactionDTO"
         - $ref: "#/components/schemas/MosaicMetadataTransactionBodyDTO"
@@ -2647,10 +2653,8 @@ components:
       properties:
         targetPublicKey:
           $ref: "#/components/schemas/PublicKey"
-          description: Metadata target public key.
         scopedMetadataKey:
-          type: string
-          description: Metadata key scoped to source, target and type.
+          $ref: "#/components/schemas/MetadataKey"
         targetNamespaceId:
           $ref: "#/components/schemas/NamespaceId"
         valueSizeDelta:
@@ -2671,7 +2675,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/TransactionDTO"
         - $ref: "#/components/schemas/NamespaceMetadataTransactionBodyDTO"
-    EmbeddedNamespaceMetadataTransactionTransactionDTO:
+    EmbeddedNamespaceMetadataTransactionDTO:
       allOf:
         - $ref: "#/components/schemas/EmbeddedTransactionDTO"
         - $ref: "#/components/schemas/NamespaceMetadataTransactionBodyDTO"
@@ -3156,15 +3160,14 @@ components:
         mosaicId:
           $ref: "#/components/schemas/UnresolvedMosaicId"
         restrictionKey:
-          type: string
-          description: Restriction key relative to the reference mosaic identifier.
+          $ref: "#/components/schemas/MosaicRestrictionKey"
         targetAddress:
           $ref: "#/components/schemas/UnresolvedAddress"
         previousRestrictionValue:
-          type: string
+          type: x-number-string
           description: Previous restriction value.
         newRestrictionValue:
-          type: string
+          type: x-number-string
           description: New restriction value.
     MosaicAddressRestrictionTransactionDTO:
       type: object
@@ -3193,15 +3196,14 @@ components:
         referenceMosaicId:
           $ref: "#/components/schemas/UnresolvedMosaicId"
         restrictionKey:
-          type: string
-          description: Restriction key relative to the reference mosaic identifier.
+          $ref: "#/components/schemas/MosaicRestrictionKey"
         previousRestrictionValue:
-          type: string
+          type: x-number-string
           description: Previous restriction value.
         previousRestrictionType:
           $ref: "#/components/schemas/MosaicRestrictionTypeEnum"
         newRestrictionValue:
-          type: string
+          type: x-number-string
           description: New restriction value.
         newRestrictionType:
           $ref: "#/components/schemas/MosaicRestrictionTypeEnum"
@@ -3229,7 +3231,7 @@ components:
           type: string
           description: Restriction value.
         restrictionType:
-          type: integer
+          $ref: "#/components/schemas/MosaicRestrictionTypeEnum"
     MosaicGlobalRestrictionEntryDTO:
       type: object
       required:
@@ -3237,9 +3239,7 @@ components:
         - restriction
       properties:
         key:
-          type: string
-          description: Restriction key.
-          example: 0DC67FBE1CAD29E3
+          $ref: "#/components/schemas/MosaicRestrictionKey"
         restriction:
           $ref: "#/components/schemas/MosaicGlobalRestrictionEntryRestrictionDTO"
     MosaicGlobalRestrictionEntryWrapperDTO:
@@ -3274,9 +3274,7 @@ components:
         - value
       properties:
         key:
-          type: string
-          description: Restriction key.
-          example: 0DC67FBE1CAD29E3
+          $ref: "#/components/schemas/MosaicRestrictionKey"
         value:
           type: string
           description: Restriction value.
@@ -3292,7 +3290,7 @@ components:
         compositeHash:
           $ref: "#/components/schemas/Hash256"
         entryType:
-          type: integer
+          $ref: "#/components/schemas/MosaicRestrictionEntryTypeEnum"
         mosaicId:
           $ref: "#/components/schemas/MosaicId"
         targetAddress:
@@ -3390,8 +3388,7 @@ components:
         targetPublicKey:
           $ref: "#/components/schemas/PublicKey"
         scopedMetadataKey:
-          type: string
-          format: hex
+          $ref: "#/components/schemas/MetadataKey"
         targetId:
           type: object
         metadataType:
@@ -3399,8 +3396,11 @@ components:
         valueSize:
           type: integer
           format: int32
+          description: Size of value property.
         value:
           type: string
+          format: hex
+          description: Metadata value.
 
     # Request bodies
     accountIds:

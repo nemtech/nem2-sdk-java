@@ -32,9 +32,7 @@ import io.nem.sdk.model.account.MultisigAccountGraphInfo;
 import io.nem.sdk.model.account.MultisigAccountInfo;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.Transaction;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
@@ -65,10 +63,11 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getAccountsInfoFromAddresses(RepositoryType type) {
+        Address address = this.config().getTestAccount().getAddress();
         List<AccountInfo> accountInfos =
             get(this.getAccountRepository(type)
                 .getAccountsInfo(
-                    Collections.singletonList(this.getTestAccountAddress())));
+                    Collections.singletonList(address)));
 
         assertEquals(1, accountInfos.size());
         assertEquals(this.getTestAccount().getAddress(), accountInfos.get(0).getAddress());
@@ -78,13 +77,15 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getAccountsNamesFromAddresses(RepositoryType type) {
+        Address accountAddress = this.config().getTestAccount().getAddress();
         List<AccountNames> accountNames = get(
             this.getAccountRepository(type).getAccountsNames(
-                Collections.singletonList(this.getTestAccountAddress())));
+                Collections.singletonList(accountAddress)));
 
+        System.out.println(jsonHelper().print(accountNames));
         assertEquals(1, accountNames.size());
-        assertEquals(this.config().getTestAccountAddress(),
-            accountNames.get(0).getAddress().plain());
+        assertEquals(accountAddress,
+            accountNames.get(0).getAddress());
         assertNotNull(accountNames.get(0).getNames());
     }
 
@@ -110,11 +111,24 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
     void getMultisigAccountInfo(RepositoryType type) {
         MultisigAccountInfo multisigAccountInfo = get(this.getAccountRepository(type)
             .getMultisigAccountInfo(
-                Address.createFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX"))
+                config().getMultisigAccount().getAddress())
         );
         assertEquals(
-            "B694186EE4AB0558CA4AFCFDD43B42114AE71094F5A1FC4A913FE9971CACD21D",
-            multisigAccountInfo.getAccount().getPublicKey().toString());
+            config().getMultisigAccount().getPublicKey(),
+            multisigAccountInfo.getAccount().getPublicKey().toHex());
+
+        Assertions.assertTrue(multisigAccountInfo.isMultisig());
+        Assertions.assertEquals(2, multisigAccountInfo.getCosignatories().size());
+        Assertions.assertEquals(config().getCosignatory2Account().getAddress(),
+            multisigAccountInfo.getCosignatories().get(0).getAddress());
+
+        Assertions.assertEquals(config().getCosignatoryAccount().getAddress(),
+            multisigAccountInfo.getCosignatories().get(1).getAddress());
+
+        Assertions.assertEquals(1,
+            multisigAccountInfo.getMinApproval());
+        Assertions.assertEquals(1,
+            multisigAccountInfo.getMinRemoval());
     }
 
     @ParameterizedTest
@@ -122,12 +136,28 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
     void getMultisigAccountGraphInfo(RepositoryType type) {
         MultisigAccountGraphInfo multisigAccountGraphInfos = get(this.getAccountRepository(type)
             .getMultisigAccountGraphInfo(
-                Address.createFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX"))
+                config().getMultisigAccount().getAddress())
         );
 
-        assertEquals(
-            new HashSet<>(Arrays.asList(-2, -1, 0, 1)),
-            multisigAccountGraphInfos.getLevelsNumber());
+        assertEquals(2,
+            multisigAccountGraphInfos.getLevelsNumber().size());
+
+        assertEquals(2,
+            multisigAccountGraphInfos.getMultisigAccounts().size());
+
+        assertEquals(1,
+            multisigAccountGraphInfos.getMultisigAccounts().get(0).size());
+
+        assertEquals(1,
+            multisigAccountGraphInfos.getMultisigAccounts().get(0).size());
+
+        assertEquals(2,
+            multisigAccountGraphInfos.getMultisigAccounts().get(1).size());
+
+        assertEquals(config().getMultisigAccount().getAddress(),
+            multisigAccountGraphInfos.getMultisigAccounts().get(0).get(0).getAccount()
+                .getAddress());
+
     }
 
     @ParameterizedTest
@@ -139,6 +169,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
 
         Assertions.assertTrue(transactions.size() > 1);
 
+        System.out.println(transactions.size());
         List<Transaction> nextTransactions =
             get(this.getAccountRepository(type)
                 .transactions(
@@ -146,8 +177,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
                     new QueryParams(transactions.size() - 1,
                         transactions.get(0).getTransactionInfo().get().getId().get())));
 
-        assertEquals(transactions.size() - 1, nextTransactions.size());
-
+        System.out.println(nextTransactions.size());
         assertEquals(
             transactions.get(1).getTransactionInfo().get().getHash(),
             nextTransactions.get(0).getTransactionInfo().get().getHash());

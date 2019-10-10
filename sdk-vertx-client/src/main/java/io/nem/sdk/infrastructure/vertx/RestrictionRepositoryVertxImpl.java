@@ -157,7 +157,7 @@ public class RestrictionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
         MosaicGlobalRestrictionEntryWrapperDTO dto = mosaicGlobalRestrictionDTO
             .getMosaicRestrictionEntry();
         Map<BigInteger, MosaicGlobalRestrictionItem> restrictions = dto.getRestrictions().stream()
-            .collect(Collectors.toMap(e -> toBigInteger(e.getKey()),
+            .collect(Collectors.toMap(e -> MapperUtils.fromHex(e.getKey()),
                 e -> toMosaicGlobalRestrictionItem(e.getRestriction())));
 
         return new MosaicGlobalRestriction(dto.getCompositeHash(),
@@ -170,7 +170,7 @@ public class RestrictionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
         MosaicGlobalRestrictionEntryRestrictionDTO dto) {
         return new MosaicGlobalRestrictionItem(MapperUtils.toMosaicId(dto.getReferenceMosaicId()),
             toBigInteger(dto.getRestrictionValue()),
-            MosaicRestrictionType.rawValueOf(dto.getRestrictionType().byteValue()));
+            MosaicRestrictionType.rawValueOf(dto.getRestrictionType().getValue().byteValue()));
     }
 
     private MosaicAddressRestriction toMosaicAddressRestriction(
@@ -178,11 +178,11 @@ public class RestrictionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
         MosaicAddressRestrictionEntryWrapperDTO dto = mosaicAddressRestrictionDTO
             .getMosaicRestrictionEntry();
         Map<BigInteger, BigInteger> restrictions = dto.getRestrictions().stream()
-            .collect(Collectors.toMap(e -> toBigInteger(e.getKey()),
+            .collect(Collectors.toMap(e -> MapperUtils.fromHex(e.getKey()),
                 e -> toBigInteger(e.getValue())));
 
         return new MosaicAddressRestriction(dto.getCompositeHash(),
-            MosaicRestrictionEntryType.rawValueOf(dto.getEntryType()),
+            MosaicRestrictionEntryType.rawValueOf(dto.getEntryType().getValue()),
             MapperUtils.toMosaicId(dto.getMosaicId()), MapperUtils
             .toAddressFromUnresolved(dto.getTargetAddress()),
             restrictions);

@@ -77,7 +77,7 @@ public class DsaSignerVectorTester extends AbstractVectorTester {
         // Assert:
         Assertions.assertTrue(signer.verify(input, signatureObject));
         Assertions.assertEquals(signature.toUpperCase(), signatureObject.toString().toUpperCase());
-        Assertions.assertEquals(publicKey.toUpperCase(), keyPair.getPublicKey().toString());
+        Assertions.assertEquals(publicKey.toUpperCase(), keyPair.getPublicKey().toHex());
         Assertions.assertEquals(length, input.length);
 
     }

@@ -37,8 +37,8 @@ import java.util.List;
  */
 public class MultisigAccountModificationTransaction extends Transaction {
 
-    private final byte minApprovalDelta;
-    private final byte minRemovalDelta;
+    private final int minApprovalDelta;
+    private final int minRemovalDelta;
     private final List<MultisigCosignatoryModification> modifications;
 
     public MultisigAccountModificationTransaction(
@@ -55,7 +55,7 @@ public class MultisigAccountModificationTransaction extends Transaction {
      *
      * @return byte
      */
-    public byte getMinApprovalDelta() {
+    public int getMinApprovalDelta() {
         return minApprovalDelta;
     }
 
@@ -65,7 +65,7 @@ public class MultisigAccountModificationTransaction extends Transaction {
      *
      * @return byte
      */
-    public byte getMinRemovalDelta() {
+    public int getMinRemovalDelta() {
         return minRemovalDelta;
     }
 
@@ -96,8 +96,8 @@ public class MultisigAccountModificationTransaction extends Transaction {
                 getEntityTypeDto(),
                 new AmountDto(getMaxFee().longValue()),
                 new TimestampDto(getDeadline().getInstant()),
-                getMinRemovalDelta(),
-                getMinApprovalDelta(),
+                (byte) getMinRemovalDelta(),
+                (byte) getMinApprovalDelta(),
                 getModificationBuilder());
         return txBuilder.serialize();
     }
@@ -113,8 +113,8 @@ public class MultisigAccountModificationTransaction extends Transaction {
                 new KeyDto(getRequiredSignerBytes()),
                 getNetworkVersion(),
                 getEntityTypeDto(),
-                getMinRemovalDelta(),
-                getMinApprovalDelta(),
+                (byte) getMinRemovalDelta(),
+                (byte) getMinApprovalDelta(),
                 getModificationBuilder());
         return txBuilder.serialize();
     }

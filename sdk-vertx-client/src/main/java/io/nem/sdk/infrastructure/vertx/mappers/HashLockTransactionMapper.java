@@ -19,6 +19,7 @@ package io.nem.sdk.infrastructure.vertx.mappers;
 
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.transaction.HashLockTransaction;
@@ -39,18 +40,26 @@ class HashLockTransactionMapper extends
         super(jsonHelper, TransactionType.LOCK, HashLockTransactionDTO.class);
     }
 
-    private Mosaic getMosaic(io.nem.sdk.openapi.vertx.model.Mosaic mosaic) {
-        return new Mosaic(toMosaicId(mosaic.getId()),
+    private Mosaic getMosaic(HashLockTransactionDTO mosaic) {
+        return new Mosaic(toMosaicId(mosaic.getMosaicId()),
             mosaic.getAmount());
     }
 
     @Override
     protected TransactionFactory<HashLockTransaction> createFactory(NetworkType networkType,
         HashLockTransactionDTO transaction) {
-        Mosaic mosaic = getMosaic(transaction.getMosaic());
         SignedTransaction signedTransaction = new SignedTransaction("", transaction.getHash(),
             TransactionType.AGGREGATE_BONDED);
-        return HashLockTransactionFactory.create(networkType, mosaic, transaction.getDuration(),
+        return HashLockTransactionFactory.create(networkType, getMosaic(transaction),
+            transaction.getDuration(),
             signedTransaction);
+    }
+
+    @Override
+    protected void copyToDto(HashLockTransaction transaction, HashLockTransactionDTO dto) {
+        dto.setMosaicId(MapperUtils.getIdAsHex(transaction.getMosaic().getId()));
+        dto.setAmount(transaction.getMosaic().getAmount());
+        dto.setDuration(transaction.getDuration());
+        dto.setHash(transaction.getSignedTransaction().getHash());
     }
 }

@@ -171,7 +171,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
     private boolean hasRestriction(RepositoryType type, Account testAccount,
         AccountRestrictionType restrictionType, Object value) {
         try {
-            Thread.sleep(2000);//Need to wait?
+            sleep(2000);//Need to wait?
             AccountRestrictions restrictions = get(
                 getRepositoryFactory(type).createRestrictionRepository()
                     .getAccountRestrictions(testAccount.getAddress()));

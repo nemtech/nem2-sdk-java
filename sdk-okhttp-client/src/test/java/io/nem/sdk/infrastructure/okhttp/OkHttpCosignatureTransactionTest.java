@@ -39,7 +39,7 @@ public class OkHttpCosignatureTransactionTest {
     static Account account;
 
 
-    private final JsonHelper jsonHelper = new JsonHelperGson(new JSON().getGson());
+    private final JsonHelper jsonHelper = new JsonHelperGson();
 
     @BeforeAll
     public static void setup() {

@@ -62,7 +62,7 @@ class MultisigAccountModificationTransactionTest {
                 .get(0)
                 .getCosignatoryPublicAccount()
                 .getPublicKey()
-                .toString()
+                .toHex()
                 .toUpperCase());
         assertEquals(
             CosignatoryModificationActionType.ADD,

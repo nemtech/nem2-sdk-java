@@ -59,7 +59,7 @@ public class BalanceChangeReceiptTest {
         assertNull(balanceChangeReceipt.getSize());
         assertEquals(ReceiptVersion.BALANCE_CHANGE, balanceChangeReceipt.getVersion());
         assertEquals(
-            balanceChangeReceipt.getAccount().getPublicKey().toString().toUpperCase(),
+            balanceChangeReceipt.getAccount().getPublicKey().toHex().toUpperCase(),
             account.getPublicKey().toUpperCase());
         assertEquals("85BBEA6CC462B244",
             balanceChangeReceipt.getMosaicId().getIdAsHex().toUpperCase());
@@ -80,7 +80,7 @@ public class BalanceChangeReceiptTest {
         assertNull(balanceChangeReceipt.getSize());
         assertEquals(ReceiptVersion.BALANCE_CHANGE, balanceChangeReceipt.getVersion());
         assertEquals(
-            balanceChangeReceipt.getAccount().getPublicKey().toString().toUpperCase(),
+            balanceChangeReceipt.getAccount().getPublicKey().toHex().toUpperCase(),
             account.getPublicKey().toUpperCase());
         assertEquals("85BBEA6CC462B244",
             balanceChangeReceipt.getMosaicId().getIdAsHex().toUpperCase()
@@ -102,7 +102,7 @@ public class BalanceChangeReceiptTest {
         assertNull(balanceChangeReceipt.getSize());
         assertEquals(ReceiptVersion.BALANCE_CHANGE, balanceChangeReceipt.getVersion());
         assertEquals(
-            balanceChangeReceipt.getAccount().getPublicKey().toString().toUpperCase(),
+            balanceChangeReceipt.getAccount().getPublicKey().toHex().toUpperCase(),
             account.getPublicKey().toUpperCase());
         assertEquals("85BBEA6CC462B244",
             balanceChangeReceipt.getMosaicId().getIdAsHex().toUpperCase()
@@ -124,7 +124,7 @@ public class BalanceChangeReceiptTest {
         assertNull(balanceChangeReceipt.getSize());
         assertEquals(ReceiptVersion.BALANCE_CHANGE, balanceChangeReceipt.getVersion());
         assertEquals(
-            balanceChangeReceipt.getAccount().getPublicKey().toString().toUpperCase(),
+            balanceChangeReceipt.getAccount().getPublicKey().toHex().toUpperCase(),
             account.getPublicKey().toUpperCase());
         assertEquals("85BBEA6CC462B244",
             balanceChangeReceipt.getMosaicId().getIdAsHex().toUpperCase()
@@ -146,7 +146,7 @@ public class BalanceChangeReceiptTest {
         assertNull(balanceChangeReceipt.getSize());
         assertEquals(ReceiptVersion.BALANCE_CHANGE, balanceChangeReceipt.getVersion());
         assertEquals(
-            balanceChangeReceipt.getAccount().getPublicKey().toString().toUpperCase(),
+            balanceChangeReceipt.getAccount().getPublicKey().toHex().toUpperCase(),
             account.getPublicKey().toUpperCase());
         assertEquals("85BBEA6CC462B244",
             balanceChangeReceipt.getMosaicId().getIdAsHex().toUpperCase()
@@ -168,7 +168,7 @@ public class BalanceChangeReceiptTest {
         assertNull(balanceChangeReceipt.getSize());
         assertEquals(ReceiptVersion.BALANCE_CHANGE, balanceChangeReceipt.getVersion());
         assertEquals(
-            balanceChangeReceipt.getAccount().getPublicKey().toString().toUpperCase(),
+            balanceChangeReceipt.getAccount().getPublicKey().toHex().toUpperCase(),
             account.getPublicKey().toUpperCase());
         assertEquals("85BBEA6CC462B244",
             balanceChangeReceipt.getMosaicId().getIdAsHex().toUpperCase()
@@ -190,7 +190,7 @@ public class BalanceChangeReceiptTest {
         assertNull(balanceChangeReceipt.getSize());
         assertEquals(ReceiptVersion.BALANCE_CHANGE, balanceChangeReceipt.getVersion());
         assertEquals(
-            balanceChangeReceipt.getAccount().getPublicKey().toString().toUpperCase(),
+            balanceChangeReceipt.getAccount().getPublicKey().toHex().toUpperCase(),
             account.getPublicKey().toUpperCase());
         assertEquals("85BBEA6CC462B244",
             balanceChangeReceipt.getMosaicId().getIdAsHex().toUpperCase()

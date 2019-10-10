@@ -173,7 +173,7 @@ public class MetadataRepositoryVertxImplTest extends AbstractVertxRespositoryTes
             MetadataTypeEnum
                 .fromValue(result.getMetadataEntry().getMetadataType().getValue()));
 
-        Assertions.assertEquals(ConvertUtils.fromHexString(expected.getMetadataEntry().getValue()),
+        Assertions.assertEquals(ConvertUtils.fromHexToString(expected.getMetadataEntry().getValue()),
             result.getMetadataEntry().getValue());
 
         if (expected.getMetadataEntry().getTargetId() != null) {
@@ -188,8 +188,6 @@ public class MetadataRepositoryVertxImplTest extends AbstractVertxRespositoryTes
                 .assertFalse(result.getMetadataEntry().getTargetId().isPresent());
         }
 
-        Assertions.assertEquals(expected.getMetadataEntry().getValueSize(),
-            result.getMetadataEntry().getValueSize());
     }
 
     private MetadataEntriesDTO getMetadataEntriesDTO() {
@@ -223,7 +221,6 @@ public class MetadataRepositoryVertxImplTest extends AbstractVertxRespositoryTes
         metadataEntry.setTargetId(targetId);
         metadataEntry.setTargetPublicKey("targetPublicKey " + name);
         metadataEntry.setValue(ConvertUtils.fromStringToHex(name + " message"));
-        metadataEntry.setValueSize(10);
         dto.setMetadataEntry(metadataEntry);
         return dto;
     }

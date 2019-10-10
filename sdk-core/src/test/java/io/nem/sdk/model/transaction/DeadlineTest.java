@@ -18,9 +18,11 @@ package io.nem.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class DeadlineTest {
@@ -49,5 +51,11 @@ class DeadlineTest {
         assertTrue(
             now.plusMinutes(2 * 60 + 2).isAfter(deadline.getLocalDateTime()),
             "now plus 2 hours and 2 seconds is after deadline localtime");
+    }
+
+    @Test
+    void fromToBigInteger() {
+        BigInteger originalValue = BigInteger.valueOf(System.currentTimeMillis());
+        Assertions.assertEquals(originalValue, new Deadline(originalValue).toBigInteger());
     }
 }

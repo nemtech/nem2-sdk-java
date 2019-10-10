@@ -28,7 +28,9 @@ import io.nem.sdk.model.transaction.AccountRestrictionType;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.openapi.vertx.model.AccountAddressRestrictionModificationDTO;
-import io.nem.sdk.openapi.vertx.model.AccountAddressRestrictionTransactionBodyDTO;
+import io.nem.sdk.openapi.vertx.model.AccountAddressRestrictionTransactionDTO;
+import io.nem.sdk.openapi.vertx.model.AccountRestrictionModificationActionEnum;
+import io.nem.sdk.openapi.vertx.model.AccountRestrictionTypeEnum;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,17 +38,17 @@ import java.util.stream.Collectors;
  * DTO mapper of {@link AccountAddressRestrictionTransaction}.
  */
 public class AccountAddressRestrictionTransactionMapper extends
-    AbstractTransactionMapper<AccountAddressRestrictionTransactionBodyDTO, AccountAddressRestrictionTransaction> {
+    AbstractTransactionMapper<AccountAddressRestrictionTransactionDTO, AccountAddressRestrictionTransaction> {
 
     public AccountAddressRestrictionTransactionMapper(
         JsonHelper jsonHelper) {
         super(jsonHelper, TransactionType.ACCOUNT_ADDRESS_RESTRICTION,
-            AccountAddressRestrictionTransactionBodyDTO.class);
+            AccountAddressRestrictionTransactionDTO.class);
     }
 
     @Override
     protected AccountAddressRestrictionTransactionFactory createFactory(
-        NetworkType networkType, AccountAddressRestrictionTransactionBodyDTO transaction) {
+        NetworkType networkType, AccountAddressRestrictionTransactionDTO transaction) {
         AccountRestrictionType restrictionType = AccountRestrictionType
             .rawValueOf(transaction.getRestrictionType().getValue());
         List<AccountRestrictionModification<Address>> modifications = transaction
@@ -62,5 +64,26 @@ public class AccountAddressRestrictionTransactionMapper extends
         return AccountRestrictionModification
             .createForAddress(modificationAction,
                 MapperUtils.toAddressFromUnresolved(dto.getValue()));
+    }
+
+    @Override
+    protected void copyToDto(
+        AccountAddressRestrictionTransaction transaction,
+        AccountAddressRestrictionTransactionDTO dto) {
+        dto.setRestrictionType(
+            AccountRestrictionTypeEnum.fromValue(transaction.getRestrictionType().getValue()));
+        dto.setModifications(
+            transaction.getModifications().stream().map(this::toModification).collect(
+                Collectors.toList()));
+    }
+
+    private AccountAddressRestrictionModificationDTO toModification(
+        AccountRestrictionModification<Address> source) {
+        AccountRestrictionModificationActionEnum modificationAction = AccountRestrictionModificationActionEnum
+            .fromValue((int) source.getModificationAction().getValue());
+        AccountAddressRestrictionModificationDTO target = new AccountAddressRestrictionModificationDTO();
+        target.setModificationAction(modificationAction);
+        target.setValue(source.getValue().encoded());
+        return target;
     }
 }

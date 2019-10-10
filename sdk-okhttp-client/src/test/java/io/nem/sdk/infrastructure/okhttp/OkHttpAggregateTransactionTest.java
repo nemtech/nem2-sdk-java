@@ -50,7 +50,7 @@ public class OkHttpAggregateTransactionTest {
     private final String generationHash =
         "57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6";
 
-    private final JsonHelper jsonHelper = new JsonHelperGson(new JSON().getGson());
+    private final JsonHelper jsonHelper = new JsonHelperGson();
 
     @Test
     void createAAggregateTransactionViaStaticConstructor() {

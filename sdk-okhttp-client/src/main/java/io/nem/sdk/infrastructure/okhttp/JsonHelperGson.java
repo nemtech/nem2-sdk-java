@@ -20,16 +20,30 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.internal.LinkedTreeMap;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.openapi.okhttp_gson.invoker.JSON;
+import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.ByteArrayAdapter;
+import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.DateTypeAdapter;
+import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.LocalDateTypeAdapter;
+import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.OffsetDateTimeTypeAdapter;
+import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.SqlDateTypeAdapter;
+import java.lang.reflect.Type;
 import java.math.BigInteger;
+import java.util.Collection;
+import java.util.Date;
+import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.OffsetDateTime;
 
 /**
  * Created by fernando on 06/08/19.
  *
- * @author Fernando Boucquez, Ravi Shanker
+ * @author Fernando Boucquez
  */
 public class JsonHelperGson implements JsonHelper {
 
@@ -37,12 +51,12 @@ public class JsonHelperGson implements JsonHelper {
     private final Gson prettyObjectMapper;
 
     public JsonHelperGson() {
-        this(JsonHelperGson.createGson(false),
-            JsonHelperGson.createGson(true));
+        this(JsonHelperGson.creatGson(false),
+            JsonHelperGson.creatGson(true));
     }
 
     public JsonHelperGson(Gson objectMapper) {
-        this(objectMapper, JsonHelperGson.createGson(true));
+        this(objectMapper, JsonHelperGson.creatGson(true));
     }
 
     public JsonHelperGson(Gson objectMapper, Gson prettyObjectMapper) {
@@ -50,9 +64,27 @@ public class JsonHelperGson implements JsonHelper {
         this.prettyObjectMapper = prettyObjectMapper;
     }
 
-    public static final Gson createGson(boolean pretty) {
-        GsonBuilder builder = JSON.createGson();
-        if (pretty) builder.setPrettyPrinting();
+
+    public static final Gson creatGson(boolean pretty) {
+        JSON json = new JSON();
+        DateTypeAdapter dateTypeAdapter = new DateTypeAdapter();
+        SqlDateTypeAdapter sqlDateTypeAdapter = new SqlDateTypeAdapter();
+        OffsetDateTimeTypeAdapter offsetDateTimeTypeAdapter = new OffsetDateTimeTypeAdapter();
+        LocalDateTypeAdapter localDateTypeAdapter = json.new LocalDateTypeAdapter();
+        ByteArrayAdapter byteArrayAdapter = json.new ByteArrayAdapter();
+        GsonBuilder builder = JSON.createGson().registerTypeHierarchyAdapter(
+            Collection.class, new CollectionAdapter())
+            .registerTypeAdapter(LinkedTreeMap.class, new SortedJsonSerializer())
+            .registerTypeAdapter(BigInteger.class, new BigIntegerJsonSerializer())
+            .registerTypeAdapter(Double.class, new DoubleJsonSerializer())
+            .registerTypeAdapter(Date.class, dateTypeAdapter)
+            .registerTypeAdapter(java.sql.Date.class, sqlDateTypeAdapter)
+            .registerTypeAdapter(OffsetDateTime.class, offsetDateTimeTypeAdapter)
+            .registerTypeAdapter(LocalDate.class, localDateTypeAdapter)
+            .registerTypeAdapter(byte[].class, byteArrayAdapter);
+        if (pretty) {
+            builder.setPrettyPrinting();
+        }
         return builder.create();
     }
 
@@ -84,6 +116,19 @@ public class JsonHelperGson implements JsonHelper {
             throw new IllegalArgumentException(e.getMessage(), e);
         }
     }
+
+    @Override
+    public String prettyPrint(Object object) {
+        try {
+            if (object == null) {
+                return null;
+            }
+            return prettyObjectMapper.toJson(object);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }
+    }
+
 
     private static IllegalArgumentException handleException(Exception e) {
         return new IllegalArgumentException(e.getMessage(), e);
@@ -164,6 +209,7 @@ public class JsonHelperGson implements JsonHelper {
         return child != null && !child.isJsonNull();
     }
 
+
     private JsonElement getNode(final JsonObject parent, final String... path) {
         JsonElement child = parent;
         if (child == null) {
@@ -189,25 +235,36 @@ public class JsonHelperGson implements JsonHelper {
         return child;
     }
 
-    @Override
-    public JsonObject toJsonObject(Object object) {
-        return ModelToJSON.convert(object);
+    private static class BigIntegerJsonSerializer implements JsonSerializer<BigInteger> {
+
+        @Override
+        public JsonElement serialize(BigInteger src, Type typeOfSrc,
+            JsonSerializationContext context) {
+            return new JsonPrimitive(src.toString());
+        }
     }
 
-    @Override
-    public String toJSON(Object object) {
-        return toJsonObject(object).toString();
+    private static class DoubleJsonSerializer implements JsonSerializer<Double> {
+
+        @Override
+        public JsonElement serialize(Double src, Type typeOfSrc,
+            JsonSerializationContext context) {
+            return new JsonPrimitive(src.longValue());
+        }
     }
 
-    @Override
-    public String toJSONPretty(Object object) {
-        return prettyObjectMapper.toJson(toJsonObject(object));
-    }
 
-    @Override
-    public String toJSONPretty(String jsonString) {
-        JsonParser parser = new JsonParser();
-        JsonObject json = parser.parse(jsonString).getAsJsonObject();
-        return prettyObjectMapper.toJson(json);
+    private static class SortedJsonSerializer implements JsonSerializer<LinkedTreeMap> {
+
+        @Override
+        public JsonElement serialize(LinkedTreeMap foo, Type type,
+            JsonSerializationContext context) {
+            JsonObject object = new JsonObject();
+            TreeSet sorted = new TreeSet(foo.keySet());
+            for (Object key : sorted) {
+                object.add((String) key, context.serialize(foo.get(key)));
+            }
+            return object;
+        }
     }
 }

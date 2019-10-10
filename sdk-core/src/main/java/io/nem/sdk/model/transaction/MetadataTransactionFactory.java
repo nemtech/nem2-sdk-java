@@ -43,11 +43,6 @@ public abstract class MetadataTransactionFactory<T extends MetadataTransaction> 
     private int valueSizeDelta;
 
     /**
-     * Value size in bytes. Defaulted to the size of the encoded value.
-     */
-    private int valueSize;
-
-    /**
      * When there is an existing value, the new value is calculated as xor(previous-value, value).
      * It can be a plain text.
      */
@@ -69,7 +64,6 @@ public abstract class MetadataTransactionFactory<T extends MetadataTransaction> 
         this.scopedMetadataKey = scopedMetadataKey;
         this.value = value;
         int defaultSize = MetadataTransaction.toByteArray(value).length;
-        this.valueSize = defaultSize;
         this.valueSizeDelta = defaultSize;
     }
 
@@ -83,22 +77,6 @@ public abstract class MetadataTransactionFactory<T extends MetadataTransaction> 
 
     public int getValueSizeDelta() {
         return valueSizeDelta;
-    }
-
-    public int getValueSize() {
-        return valueSize;
-    }
-
-    /**
-     * This builder method set the value sizeof the transaction. It's mostly used by the internal
-     * transaction mapper when processing a Metadata Transaction JSON payload.
-     *
-     * @param valueSize the new value size, mostly provided by JSON rest payload.
-     * @return this factory.
-     */
-    public MetadataTransactionFactory<T> valueSize(int valueSize) {
-        this.valueSize = valueSize;
-        return this;
     }
 
     /**
