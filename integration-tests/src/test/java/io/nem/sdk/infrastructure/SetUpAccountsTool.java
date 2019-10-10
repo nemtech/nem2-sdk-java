@@ -27,6 +27,8 @@ import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.CosignatoryModificationActionType;
+import io.nem.sdk.model.transaction.HashLockTransaction;
+import io.nem.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
 import io.nem.sdk.model.transaction.MultisigCosignatoryModification;
@@ -67,9 +69,10 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
             sendMosaicFromNemesis(config().getCosignatory2Account(), true);
             sendMosaicFromNemesis(config().getCosignatory3Account(), true);
             sendMosaicFromNemesis(config().getMultisigAccount(), true);
-            //TODO Failure_Core_Insufficient_Balance error!
-            createMultisigAccount(config().getMultisigAccount(), config().getCosignatoryAccount(),
-                config().getCosignatory2Account());
+            createMultisigAccount(config().getMultisigAccount(),
+                config().getCosignatoryAccount(),
+                config().getCosignatory2Account()
+            );
         } finally {
             tearDown();
         }
@@ -101,8 +104,8 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
         System.out.println("Creating multisg account");
         MultisigAccountModificationTransaction convertIntoMultisigTransaction = MultisigAccountModificationTransactionFactory
             .create(getNetworkType(), (byte) 2, (byte) 1, Arrays.stream(accounts)
-            .map(a -> new MultisigCosignatoryModification(CosignatoryModificationActionType.ADD,
-                a.getPublicAccount())).collect(Collectors.toList())).build();
+                .map(a -> new MultisigCosignatoryModification(CosignatoryModificationActionType.ADD,
+                    a.getPublicAccount())).collect(Collectors.toList())).build();
 
         AggregateTransaction aggregateTransaction = AggregateTransactionFactory.createBonded(
             getNetworkType(),
@@ -178,10 +181,10 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
     protected void hashLock(RepositoryType type, Account account,
         SignedTransaction signedTransaction) {
         HashLockTransaction hashLockTransaction = HashLockTransactionFactory.create(
-                getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
-                BigInteger.valueOf(100),
-                signedTransaction)
+            getNetworkType(),
+            NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+            BigInteger.valueOf(100),
+            signedTransaction)
             .build();
         announceAndValidate(type, account, hashLockTransaction);
     }
