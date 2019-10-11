@@ -96,12 +96,12 @@ public class AggregateTransaction extends Transaction {
                     final byte[] signatureBytes = ConvertUtils.getBytes(cosignature.getSignature());
                     final ByteBuffer signerBuffer = ByteBuffer.wrap(signerBytes);
                     final ByteBuffer signatureBuffer = ByteBuffer.wrap(signatureBytes);
-
                     final CosignatureBuilder cosignatureBuilder = CosignatureBuilder
                         .create(new KeyDto(signerBuffer),
                             new SignatureDto(signatureBuffer));
+                    byte[] consignaturePayload = cosignatureBuilder.serialize();
                     cosignaturesBytes = ArrayUtils
-                        .addAll(transactionsBytes, cosignatureBuilder.serialize());
+                        .addAll(cosignaturesBytes, consignaturePayload);
                 }
                 final ByteBuffer cosignaturesBuffer = ByteBuffer.wrap(cosignaturesBytes);
 

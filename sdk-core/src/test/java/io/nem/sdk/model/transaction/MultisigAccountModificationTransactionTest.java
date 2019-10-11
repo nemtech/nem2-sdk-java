@@ -19,6 +19,7 @@ package io.nem.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
@@ -29,7 +30,11 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class MultisigAccountModificationTransactionTest {
+class MultisigAccountModificationTransactionTest extends AbstractTransactionTester {
+
+    private static Account account = new Account(
+        "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
+        NetworkType.MIJIN_TEST);
 
     @Test
     void createAMultisigModificationTransactionViaConstructor() {
@@ -66,16 +71,15 @@ class MultisigAccountModificationTransactionTest {
                 .toUpperCase());
         assertEquals(
             CosignatoryModificationActionType.ADD,
-            multisigAccountModificationTransaction.getModifications().get(0).getModificationAction());
+            multisigAccountModificationTransaction.getModifications().get(0)
+                .getModificationAction());
     }
 
     @Test
     @DisplayName("Serialization")
     void serialization() {
         // Generated at nem2-library-js/test/transactions/ModifyMultisigAccountTransaction.spec.js
-        String expected =
-            "bd00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001905541000000000000000001000000000000000102020168b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b76301cf893ffcc47c33e7f68ab1db56365c156b0736824a0c1e273f9e00b8df8f01eb";
-        MultisigAccountModificationTransaction multisigAccountModificationTransaction =
+        MultisigAccountModificationTransaction transaction =
             MultisigAccountModificationTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 (byte) 2,
@@ -91,9 +95,16 @@ class MultisigAccountModificationTransactionTest {
                         PublicAccount.createFromPublicKey(
                             "cf893ffcc47c33e7f68ab1db56365c156b0736824a0c1e273f9e00b8df8f01eb",
                             NetworkType.MIJIN_TEST)))
-            ).deadline(new FakeDeadline()).build();
+            ).signer(account.getPublicAccount()).deadline(new FakeDeadline()).build();
 
-        byte[] actual = multisigAccountModificationTransaction.generateBytes();
-        assertEquals(expected, Hex.toHexString(actual));
+        String expected =
+            "bd00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001905541000000000000000001000000000000000102020168b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b76301cf893ffcc47c33e7f68ab1db56365c156b0736824a0c1e273f9e00b8df8f01eb";
+
+        assertSerialization(expected, transaction);
+
+        String expectedEmbedded =
+            "6d0000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b24019055410102020168b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b76301cf893ffcc47c33e7f68ab1db56365c156b0736824a0c1e273f9e00b8df8f01eb";
+
+        assertEmbeddedSerialization(expectedEmbedded, transaction);
     }
 }

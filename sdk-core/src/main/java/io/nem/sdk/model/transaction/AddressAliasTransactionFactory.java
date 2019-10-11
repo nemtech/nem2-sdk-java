@@ -55,7 +55,8 @@ public class AddressAliasTransactionFactory extends TransactionFactory<AddressAl
      * @param address Address.
      * @return Address alias transaction.
      */
-    public static AddressAliasTransactionFactory create(NetworkType networkType, AliasAction aliasAction, NamespaceId namespaceId, Address address) {
+    public static AddressAliasTransactionFactory create(NetworkType networkType,
+        AliasAction aliasAction, NamespaceId namespaceId, Address address) {
         return new AddressAliasTransactionFactory(networkType, aliasAction, namespaceId, address);
     }
 

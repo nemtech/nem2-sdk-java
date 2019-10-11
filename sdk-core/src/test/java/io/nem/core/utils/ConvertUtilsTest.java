@@ -16,6 +16,7 @@
 
 package io.nem.core.utils;
 
+import io.nem.sdk.infrastructure.SerializationUtils;
 import java.math.BigInteger;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
@@ -45,14 +46,14 @@ public class ConvertUtilsTest {
     }
 
     @Test
-    public void getBytesCannotConvertMalformedStringToByteArray() {
+    void getBytesCannotConvertMalformedStringToByteArray() {
         // Act:
         Assertions.assertThrows(IllegalArgumentException.class,
             () -> ConvertUtils.getBytes("4e454g465457"));
     }
 
     @Test
-    public void getBytesCanConvertValidStringToByteArray() {
+    void getBytesCanConvertValidStringToByteArray() {
         // Assert:
         assertGetBytesConversion("4e454d465457", new byte[]{0x4e, 0x45, 0x4d, 0x46, 0x54, 0x57});
     }
@@ -62,38 +63,38 @@ public class ConvertUtilsTest {
     // region tryGetBytes
 
     @Test
-    public void getBytesCanConvertValidStringWithOddLengthToByteArray() {
+    void getBytesCanConvertValidStringWithOddLengthToByteArray() {
         // Assert:
         assertGetBytesConversion("e454d465457", new byte[]{0x0e, 0x45, 0x4d, 0x46, 0x54, 0x57});
     }
 
     @Test
-    public void getBytesCanConvertValidStringWithLeadingZerosToByteArray() {
+    void getBytesCanConvertValidStringWithLeadingZerosToByteArray() {
         // Assert:
         assertGetBytesConversion("00000d465457", new byte[]{0x00, 0x00, 0x0d, 0x46, 0x54, 0x57});
     }
 
     @Test
-    public void tryGetBytesCanConvertValidStringToByteArray() {
+    void tryGetBytesCanConvertValidStringToByteArray() {
         // Assert:
         assertGetBytesConversion("4e454d465457", new byte[]{0x4e, 0x45, 0x4d, 0x46, 0x54, 0x57});
     }
 
     @Test
-    public void tryGetBytesCanConvertValidStringWithOddLengthToByteArray() {
+    void tryGetBytesCanConvertValidStringWithOddLengthToByteArray() {
         // Assert:
         assertGetBytesConversion("e454d465457", new byte[]{0x0e, 0x45, 0x4d, 0x46, 0x54, 0x57});
     }
 
     @Test
-    public void tryGetBytesCanConvertValidStringWithLeadingZerosToByteArray() {
+    void tryGetBytesCanConvertValidStringWithLeadingZerosToByteArray() {
         // Assert:
         assertGetBytesConversion("00000d465457", new byte[]{0x00, 0x00, 0x0d, 0x46, 0x54, 0x57});
     }
 
 
     @Test
-    public void tryGetBytesCannotConvertMalformedStringToByteArray() {
+    void tryGetBytesCannotConvertMalformedStringToByteArray() {
         // Assert:
         IllegalArgumentException exception = Assertions
             .assertThrows(IllegalArgumentException.class, () ->
@@ -104,25 +105,25 @@ public class ConvertUtilsTest {
     }
 
     @Test
-    public void getStringCanConvertBytesToHexString() {
+    void getStringCanConvertBytesToHexString() {
         // Assert:
         assertGetStringConversion(new byte[]{0x4e, 0x45, 0x4d, 0x46, 0x54, 0x57}, "4e454d465457");
     }
 
     @Test
-    public void getStringCanConvertBytesWithLeadingZerosToHexString() {
+    void getStringCanConvertBytesWithLeadingZerosToHexString() {
         // Assert:
         assertGetStringConversion(new byte[]{0x00, 0x00, 0x0d, 0x46, 0x54, 0x57}, "00000d465457");
     }
 
     @Test
-    public void getStringCanConvertEmptyBytesToHexString() {
+    void getStringCanConvertEmptyBytesToHexString() {
         // Assert:
         assertGetStringConversion(new byte[]{}, "");
     }
 
     @Test
-    public void fromStringToHexToString() {
+    void fromStringToHexToString() {
         // Assert:
         String message = "Some message 汉字";
 
@@ -134,7 +135,7 @@ public class ConvertUtilsTest {
     }
 
     @Test
-    public void fromHex() {
+    void fromHex() {
         // Assert:
         String message = "This is the message for this account! 汉字89664";
 
@@ -145,12 +146,33 @@ public class ConvertUtilsTest {
     }
 
     @Test
-    public void toSize16Hex() {
+    void toSize16Hex() {
         Assertions.assertEquals("000000000000000a",
             ConvertUtils.toSize16Hex(BigInteger.TEN));
 
         Assertions.assertEquals("00000000000186a0",
             ConvertUtils.toSize16Hex(BigInteger.valueOf(100000)));
+    }
+
+
+    @Test
+    void testToBigIntegerFromLong() {
+
+        BigInteger biggerThanLongInteger = BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.TEN);
+
+        Assertions.assertEquals("9223372036854775817", biggerThanLongInteger.toString());
+
+        //It overflows.
+        Assertions.assertEquals(-9223372036854775799L, biggerThanLongInteger.longValue());
+
+        //Then, BigInteger is negative.
+        Assertions.assertEquals("-9223372036854775799",
+            BigInteger.valueOf(biggerThanLongInteger.longValue()).toString());
+
+        //It doesn't overflow.
+        Assertions.assertEquals("9223372036854775817",
+            ConvertUtils.toUnsignedBigInteger(biggerThanLongInteger.longValue()).toString());
+
     }
 
 }

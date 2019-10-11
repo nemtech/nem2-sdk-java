@@ -28,24 +28,18 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class SecretProofTransactionTest {
+class SecretProofTransactionTest extends AbstractTransactionTester {
 
-    static Account account;
-    static String generationHash;
-    static Address recipient;
+    private static String generationHash = "57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6";
 
-    @BeforeAll
-    public static void setup() {
-        account =
-            new Account(
-                "787225aaff3d2c71f4ffa32d4f19ec4922f3cd869747f267378f81f8e3fcb12d",
-                NetworkType.MIJIN_TEST);
-        generationHash = "57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6";
-        recipient =
-            Address.createFromPublicKey(
-                "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf",
-                NetworkType.MIJIN_TEST);
-    }
+    private static Account account = new Account(
+        "787225aaff3d2c71f4ffa32d4f19ec4922f3cd869747f267378f81f8e3fcb12d",
+        NetworkType.MIJIN_TEST);
+
+
+    private static Address recipient = Address.createFromPublicKey(
+        "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf",
+        NetworkType.MIJIN_TEST);
 
     @Test
     @DisplayName("Serialization")
@@ -63,8 +57,8 @@ public class SecretProofTransactionTest {
                 recipient,
                 secret,
                 secretSeed).deadline(new FakeDeadline()).build();
-        byte[] actual = transaction.generateBytes();
-        assertEquals(expected, Hex.toHexString(actual));
+
+        assertSerialization(expected, transaction);
 
     }
 
@@ -75,22 +69,22 @@ public class SecretProofTransactionTest {
             "680000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401905242003fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe9022d04812d05000f96c283657b0c17990932bc84926cde64f04009a493664";
 
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
-        String secretSeed = "9a493664";
+        String proof = "9a493664";
         SecretProofTransaction transaction =
             SecretProofTransactionFactory.create(NetworkType.MIJIN_TEST,
                 LockHashAlgorithmType.SHA3_256,
                 recipient,
                 secret,
-                secretSeed
+                proof
             ).deadline(new FakeDeadline()).build();
-        byte[] actual =
-            transaction
-                .toAggregate(
-                    new PublicAccount(
-                        "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
-                        NetworkType.MIJIN_TEST))
-                .serialize();
-        assertEquals(expected, Hex.toHexString(actual));
+
+        transaction
+            .toAggregate(
+                new PublicAccount(
+                    "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
+                    NetworkType.MIJIN_TEST));
+
+        assertEmbeddedSerialization(expected, transaction);
 
     }
 

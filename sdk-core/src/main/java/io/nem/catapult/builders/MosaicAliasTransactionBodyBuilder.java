@@ -23,7 +23,7 @@ package io.nem.catapult.builders;
 import java.io.DataInput;
 
 /** Binary layout for an mosaic alias transaction. */
-final class MosaicAliasTransactionBodyBuilder {
+public final class MosaicAliasTransactionBodyBuilder {
     /** Alias action. */
     private final AliasActionDto aliasAction;
     /** Identifier of the namespace that will become an alias. */

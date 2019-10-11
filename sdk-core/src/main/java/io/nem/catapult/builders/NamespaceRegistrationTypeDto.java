@@ -90,4 +90,8 @@ public enum NamespaceRegistrationTypeDto {
             dataOutputStream.writeByte(this.value);
         });
     }
+
+    public byte getValue() {
+        return value;
+    }
 }

@@ -23,7 +23,7 @@ package io.nem.catapult.builders;
 import java.io.DataInput;
 
 /** Binary layout for an account link transaction. */
-final class AccountLinkTransactionBodyBuilder {
+public final class AccountLinkTransactionBodyBuilder {
     /** Remote account public key. */
     private final KeyDto remoteAccountPublicKey;
     /** Account link action. */

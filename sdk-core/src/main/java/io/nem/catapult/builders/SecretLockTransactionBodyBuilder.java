@@ -23,7 +23,7 @@ package io.nem.catapult.builders;
 import java.io.DataInput;
 
 /** Binary layout for a secret lock transaction. */
-final class SecretLockTransactionBodyBuilder {
+public final class SecretLockTransactionBodyBuilder {
     /** Locked mosaic. */
     private final UnresolvedMosaicBuilder mosaic;
     /** Number of blocks for which a lock should be valid. */

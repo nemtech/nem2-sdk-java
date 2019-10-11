@@ -18,10 +18,28 @@ package io.nem.sdk.api;
 
 import io.nem.sdk.model.transaction.Transaction;
 
+
+/**
+ * This interface allow users to serialize and deserialize transaction using the catapult binary
+ * format.
+ */
 public interface BinarySerialization {
 
+    /**
+     * It serializes a transaction into a byte array using the catapult buffer format.
+     *
+     * @param transaction the transaction
+     * @return the byte array.
+     */
     byte[] serialize(Transaction transaction);
 
+
+    /**
+     * It deserializes the catapult buffer payload into a transaction.
+     *
+     * @param payload the byte array payload
+     * @return the transaction.
+     */
     Transaction deserialize(byte[] payload);
 
 }

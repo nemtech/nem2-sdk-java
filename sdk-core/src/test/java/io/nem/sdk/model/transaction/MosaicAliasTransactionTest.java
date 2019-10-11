@@ -33,17 +33,12 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for the {@link MosaicAliasTransaction} and the factory.
  **/
-public class MosaicAliasTransactionTest {
+public class MosaicAliasTransactionTest extends AbstractTransactionTester {
 
-    private static Account account;
-
-    @BeforeAll
-    public static void setup() {
-        account =
-            new Account(
-                "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
-                NetworkType.MIJIN_TEST);
-    }
+    private static Account account =
+        new Account(
+            "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
+            NetworkType.MIJIN_TEST);
 
     @Test
     void shouldBuild() {
@@ -65,7 +60,7 @@ public class MosaicAliasTransactionTest {
     }
 
     @Test
-    void shouldGenerateBytes() {
+    void serialize() {
         MosaicId mosaicId = new MosaicId(BigInteger.TEN);
         NamespaceId namespaceId = NamespaceId.createFromName("anamespaced");
         MosaicAliasTransaction transaction =
@@ -77,11 +72,10 @@ public class MosaicAliasTransactionTest {
             ).signer(account.getPublicAccount()).deadline(new FakeDeadline()).build();
 
         String expectedHash = "8900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904e430000000000000000010000000000000001a487791451fdf1b60a00000000000000";
-        Assertions.assertEquals(expectedHash, ConvertUtils.toHex(transaction.generateBytes()));
+        assertSerialization(expectedHash, transaction);
 
         String expectedEmbeddedHash = "390000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401904e4301a487791451fdf1b60a00000000000000";
-        Assertions.assertEquals(expectedEmbeddedHash,
-            ConvertUtils.toHex(transaction.generateEmbeddedBytes()));
+        assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
 
     }
 }

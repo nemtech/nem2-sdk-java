@@ -24,7 +24,7 @@ import java.io.DataInput;
 import java.util.EnumSet;
 
 /** Binary layout for a mosaic definition transaction. */
-final class MosaicDefinitionTransactionBodyBuilder {
+public final class MosaicDefinitionTransactionBodyBuilder {
     /** Mosaic nonce. */
     private final MosaicNonceDto nonce;
     /** Mosaic identifier. */

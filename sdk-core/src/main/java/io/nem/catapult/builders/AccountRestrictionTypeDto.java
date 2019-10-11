@@ -109,4 +109,8 @@ public enum AccountRestrictionTypeDto {
             dataOutputStream.writeByte(this.value);
         });
     }
+
+    public byte getValue() {
+        return value;
+    }
 }

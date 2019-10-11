@@ -24,7 +24,7 @@ import java.io.DataInput;
 import java.nio.ByteBuffer;
 
 /** Binary layout for a namespace registration transaction. */
-final class NamespaceRegistrationTransactionBodyBuilder {
+public final class NamespaceRegistrationTransactionBodyBuilder {
     /** Namespace registration type. */
     private final NamespaceRegistrationTypeDto registrationType;
     /** Namespace duration. */

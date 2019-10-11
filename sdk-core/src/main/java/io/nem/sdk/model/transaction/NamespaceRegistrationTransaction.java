@@ -24,6 +24,7 @@ import io.nem.catapult.builders.NamespaceIdDto;
 import io.nem.catapult.builders.NamespaceRegistrationTransactionBuilder;
 import io.nem.catapult.builders.SignatureDto;
 import io.nem.catapult.builders.TimestampDto;
+import io.nem.core.utils.StringEncoder;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.namespace.NamespaceRegistrationType;
 import java.math.BigInteger;
@@ -187,7 +188,6 @@ public class NamespaceRegistrationTransaction extends Transaction {
      * @return Name buffer.
      */
     private ByteBuffer getNameBuffer() {
-        final byte[] nameBytes = namespaceName.getBytes(StandardCharsets.UTF_8);
-        return ByteBuffer.wrap(nameBytes);
+        return ByteBuffer.wrap(StringEncoder.getBytes(namespaceName));
     }
 }

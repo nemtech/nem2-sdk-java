@@ -24,7 +24,7 @@ import java.io.DataInput;
 import java.nio.ByteBuffer;
 
 /** Binary layout for a secret proof transaction. */
-final class SecretProofTransactionBodyBuilder {
+public final class SecretProofTransactionBodyBuilder {
     /** Hash algorithm. */
     private final LockHashAlgorithmDto hashAlgorithm;
     /** Secret. */

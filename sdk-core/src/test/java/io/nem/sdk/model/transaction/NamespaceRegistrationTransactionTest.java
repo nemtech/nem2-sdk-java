@@ -30,7 +30,11 @@ import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class NamespaceRegistrationTransactionTest {
+class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
+
+    private static Account account = new Account(
+        "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
+        NetworkType.MIJIN_TEST);
 
     private final String publicKey =
         "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf";
@@ -136,33 +140,40 @@ class NamespaceRegistrationTransactionTest {
     @DisplayName("Serialization root namespace")
     void serializationRootNamespace() {
         // Generated at nem2-library-js/test/transactions/RegisterNamespaceTransaction.spec.js
-        String expected =
-            "9600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904e41000000000000000001000000000000000010270000000000007ee9b3b8afdf53c00c6e65776e616d657370616365";
-        NamespaceRegistrationTransaction namespaceRegistrationTransaction =
+        NamespaceRegistrationTransaction transaction =
             NamespaceRegistrationTransactionFactory.createRootNamespace(
                 NetworkType.MIJIN_TEST, "newnamespace", BigInteger.valueOf(10000))
-                .deadline(new FakeDeadline())
+                .deadline(new FakeDeadline()).signer(account.getPublicAccount())
                 .build();
 
-        byte[] actual = namespaceRegistrationTransaction.generateBytes();
+        String expected =
+            "9600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904e41000000000000000001000000000000000010270000000000007ee9b3b8afdf53c00c6e65776e616d657370616365";
+        assertSerialization(expected, transaction);
 
-        assertEquals(expected, ConvertUtils.toHex(actual));
+        String expectedEmbedded =
+            "460000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401904e410010270000000000007ee9b3b8afdf53c00c6e65776e616d657370616365";
+        assertEmbeddedSerialization(expectedEmbedded, transaction);
+
     }
 
     @Test
     @DisplayName("Serialization sub namespace")
     void serializationSubNamespace() {
         // Generated at nem2-library-js/test/transactions/RegisterNamespaceTransaction.spec.js
-        String expected =
-            "9600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904e4100000000000000000100000000000000017ee9b3b8afdf53400312981b7879a3f10c7375626e616d657370616365";
-        NamespaceRegistrationTransaction namespaceRegistrationTransaction =
+        NamespaceRegistrationTransaction transaction =
             NamespaceRegistrationTransactionFactory.createSubNamespace(
                 NetworkType.MIJIN_TEST,
                 "subnamespace",
                 NamespaceId.createFromId(new BigInteger("4635294387305441662")))
+                .signer(account.getPublicAccount())
                 .deadline(new FakeDeadline()).build();
 
-        byte[] actual = namespaceRegistrationTransaction.generateBytes();
-        assertEquals(expected, ConvertUtils.toHex(actual));
+        String expected =
+            "9600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904e4100000000000000000100000000000000017ee9b3b8afdf53400312981b7879a3f10c7375626e616d657370616365";
+        assertSerialization(expected, transaction);
+
+        String expectedEmbedded =
+            "460000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401904e41017ee9b3b8afdf53400312981b7879a3f10c7375626e616d657370616365";
+        assertEmbeddedSerialization(expectedEmbedded, transaction);
     }
 }

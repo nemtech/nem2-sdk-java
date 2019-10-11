@@ -100,4 +100,8 @@ public enum MosaicRestrictionTypeDto {
             dataOutputStream.writeByte(this.value);
         });
     }
+
+    public byte getValue() {
+        return value;
+    }
 }

@@ -23,7 +23,7 @@ package io.nem.catapult.builders;
 import java.io.DataInput;
 
 /** Binary layout for a mosaic supply change transaction. */
-final class MosaicSupplyChangeTransactionBodyBuilder {
+public final class MosaicSupplyChangeTransactionBodyBuilder {
     /** Affected mosaic identifier. */
     private final UnresolvedMosaicIdDto mosaicId;
     /** Supply change action. */

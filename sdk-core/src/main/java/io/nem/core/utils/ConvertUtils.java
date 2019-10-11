@@ -16,6 +16,7 @@
 
 package io.nem.core.utils;
 
+import io.nem.sdk.infrastructure.SerializationUtils;
 import java.math.BigInteger;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
@@ -24,6 +25,13 @@ import org.apache.commons.codec.binary.Hex;
  * Static class that contains utility functions for converting hex strings to and from bytes.
  */
 public class ConvertUtils {
+
+    /**
+     * Mask used to fix overflowed longs when they are converted to BigInteger.
+     */
+    private static final BigInteger UNSIGNED_LONG_MASK = BigInteger.ONE.shiftLeft(Long.SIZE)
+        .subtract(BigInteger.ONE);
+
 
     /**
      * Private constructor of this utility class.
@@ -115,6 +123,18 @@ public class ConvertUtils {
      */
     public static String toSize16Hex(final BigInteger number) {
         return String.format("%016x", number);
+    }
+
+
+    /**
+     * It converts a signed long into an unsigned BigInteger. It fixes overflow problems that could
+     * happen when working with unsigned int 64.
+     *
+     * @param value the value, positive or negative.
+     * @return the positive {@link BigInteger}.
+     */
+    public static BigInteger toUnsignedBigInteger(long value) {
+        return BigInteger.valueOf(value).and(UNSIGNED_LONG_MASK);
     }
 
 

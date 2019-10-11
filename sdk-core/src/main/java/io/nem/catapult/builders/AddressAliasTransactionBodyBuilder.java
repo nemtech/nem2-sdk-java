@@ -23,7 +23,7 @@ package io.nem.catapult.builders;
 import java.io.DataInput;
 
 /** Binary layout for an address alias transaction. */
-final class AddressAliasTransactionBodyBuilder {
+public final class AddressAliasTransactionBodyBuilder {
     /** Alias action. */
     private final AliasActionDto aliasAction;
     /** Identifier of the namespace that will become an alias. */

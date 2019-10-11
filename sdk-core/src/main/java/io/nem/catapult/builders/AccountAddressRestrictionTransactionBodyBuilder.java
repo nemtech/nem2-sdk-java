@@ -24,7 +24,7 @@ import java.io.DataInput;
 import java.util.ArrayList;
 
 /** Binary layout for an account address restriction transaction. */
-final class AccountAddressRestrictionTransactionBodyBuilder {
+public final class AccountAddressRestrictionTransactionBodyBuilder {
     /** Account restriction type. */
     private final AccountRestrictionTypeDto restrictionType;
     /** Account restriction modifications. */

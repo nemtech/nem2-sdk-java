@@ -26,7 +26,7 @@ import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class AddressAliasTransactionTest {
+public class AddressAliasTransactionTest extends AbstractTransactionTester {
 
     @Test
     void shouldSerialize() {
@@ -47,13 +47,13 @@ public class AddressAliasTransactionTest {
 
         AddressAliasTransaction transaction = AddressAliasTransactionFactory.create(networkType,
             AliasAction.LINK, namespaceId, signature.getAddress()).signer(signature)
-            .transactionInfo(transactionInfo).signature("signing").deadline(new FakeDeadline()).maxFee(fee).build();
+            .transactionInfo(transactionInfo).signature("signing").deadline(new FakeDeadline())
+            .maxFee(fee).build();
 
         String expectedHash = "9a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904e4201000000000000000100000000000000014bfa5f372d55b3849049e14bebca93758eb36805bae760a57239976f009a545cad";
-        Assertions.assertEquals(expectedHash, ConvertUtils.toHex(transaction.generateBytes()));
+        assertSerialization(expectedHash, transaction);
 
         String expectedEmbeddedHash = "4a00000068b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b76301904e42014bfa5f372d55b3849049e14bebca93758eb36805bae760a57239976f009a545cad";
-        Assertions.assertEquals(expectedEmbeddedHash,
-            ConvertUtils.toHex(transaction.generateEmbeddedBytes()));
+        assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
     }
 }

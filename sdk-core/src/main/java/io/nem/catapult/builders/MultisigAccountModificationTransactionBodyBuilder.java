@@ -24,7 +24,7 @@ import java.io.DataInput;
 import java.util.ArrayList;
 
 /** Binary layout for a multisig account modification transaction. */
-final class MultisigAccountModificationTransactionBodyBuilder {
+public final class MultisigAccountModificationTransactionBodyBuilder {
     /** Relative change of the minimal number of cosignatories required when removing an account. */
     private final byte minRemovalDelta;
     /** Relative change of the minimal number of cosignatories required when approving a transaction. */

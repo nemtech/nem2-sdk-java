@@ -27,17 +27,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class AccountAddressRestrictionTransactionTest {
+public class AccountAddressRestrictionTransactionTest extends AbstractTransactionTester {
 
-    static Account account;
+    static Account account =
+        new Account(
+            "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
+            NetworkType.MIJIN_TEST);
 
-    @BeforeAll
-    public static void setup() {
-        account =
-            new Account(
-                "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
-                NetworkType.MIJIN_TEST);
-    }
 
     @Test
     void create() {
@@ -51,7 +47,8 @@ public class AccountAddressRestrictionTransactionTest {
                 NetworkType.MIJIN_TEST,
                 AccountRestrictionType.ALLOW_INCOMING_ADDRESS,
                 modifications).deadline(new FakeDeadline()).build();
-        Assertions.assertEquals(AccountRestrictionType.ALLOW_INCOMING_ADDRESS, transaction.getRestrictionType());
+        Assertions.assertEquals(AccountRestrictionType.ALLOW_INCOMING_ADDRESS,
+            transaction.getRestrictionType());
         Assertions.assertEquals(modifications, transaction.getModifications());
         Assertions.assertEquals(AccountRestrictionModificationAction.ADD,
             modification.getModificationAction());
@@ -71,14 +68,14 @@ public class AccountAddressRestrictionTransactionTest {
                 AccountRestrictionType.ALLOW_INCOMING_ADDRESS,
                 modifications).deadline(new FakeDeadline()).signer(account.getPublicAccount())
                 .build();
-        Assertions.assertEquals(AccountRestrictionType.ALLOW_INCOMING_ADDRESS, transaction.getRestrictionType());
+        Assertions.assertEquals(AccountRestrictionType.ALLOW_INCOMING_ADDRESS,
+            transaction.getRestrictionType());
         Assertions.assertEquals(modifications, transaction.getModifications());
 
         String expected = "94000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019050410000000000000000010000000000000001010190018141b12dedd54d4e74b80f5c45266983131e03b5d7d54f";
-        Assertions.assertEquals(expected, ConvertUtils.toHex(transaction.generateBytes()));
+        assertSerialization(expected, transaction);
 
         String expectedEmbeddedHash = "440000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240190504101010190018141b12dedd54d4e74b80f5c45266983131e03b5d7d54f";
-        Assertions.assertEquals(expectedEmbeddedHash,
-            ConvertUtils.toHex(transaction.generateEmbeddedBytes()));
+        assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
     }
 }

@@ -90,4 +90,8 @@ public enum AliasActionDto {
             dataOutputStream.writeByte(this.value);
         });
     }
+
+    public byte getValue() {
+        return value;
+    }
 }

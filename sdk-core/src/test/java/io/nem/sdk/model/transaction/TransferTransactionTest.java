@@ -43,7 +43,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class TransferTransactionTest {
+class TransferTransactionTest extends AbstractTransactionTester {
 
     static Account account;
     static String generationHash;
@@ -94,8 +94,7 @@ class TransferTransactionTest {
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
                 PlainMessage.Empty).deadline(new FakeDeadline()).build();
-        byte[] actual = transaction.generateBytes();
-        assertEquals(expected, Hex.toHexString(actual));
+        assertSerialization(expected, transaction);
 
     }
 
@@ -114,12 +113,7 @@ class TransferTransactionTest {
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
                 new PlainMessage("Some Message 漢字")).deadline(new FakeDeadline()).build();
 
-        assertEquals(expected, Hex.toHexString(transaction.serialize()));
-
-        BinarySerialization serialization = new BinarySerializationImpl();
-
-        Transaction copy = serialization.deserialize(transaction.serialize());
-        assertEquals(expected, Hex.toHexString(copy.serialize()));
+        assertSerialization(expected, transaction);
 
     }
 
@@ -144,9 +138,7 @@ class TransferTransactionTest {
                     "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
                     NetworkType.MIJIN_TEST));
 
-        byte[] actual = aggregateTransaction.serialize();
-
-        assertEquals(expected, Hex.toHexString(actual));
+        assertEmbeddedSerialization(expected, aggregateTransaction);
 
     }
 
@@ -214,6 +206,20 @@ class TransferTransactionTest {
             .getMessage();
         Assertions.assertEquals(remoteProxy.getPrivateKey().toHex().toUpperCase(),
             message.decryptPayload(sender.getPublicKey(), recipient.getPrivateKey(), networkType));
+
+        byte[] actual = transferTransaction.serialize();
+
+        BinarySerialization serialization = new BinarySerializationImpl();
+
+        TransferTransaction deserialized = (TransferTransaction) serialization.deserialize(actual);
+
+        assertEquals(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,
+            deserialized.getMessage().getType());
+        PersistentHarvestingDelegationMessage deserializedMessage = (PersistentHarvestingDelegationMessage) deserialized
+            .getMessage();
+        Assertions.assertEquals(remoteProxy.getPrivateKey().toHex().toUpperCase(),
+            deserializedMessage
+                .decryptPayload(sender.getPublicKey(), recipient.getPrivateKey(), networkType));
 
     }
 }

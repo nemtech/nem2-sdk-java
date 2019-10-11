@@ -18,8 +18,10 @@
 package io.nem.sdk.model.blockchain;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 public class BlockDuration {
+
     /**
      * The duration in blocks a mosaic will be available. After the duration finishes mosaic is
      * inactive and can be renewed. Duration is required when defining the mosaic
@@ -58,5 +60,24 @@ public class BlockDuration {
      *
      * @return String duration
      */
-    public String toString() { return Long.toString(duration); }
+    public String toString() {
+        return Long.toString(duration);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        BlockDuration that = (BlockDuration) o;
+        return duration == that.duration;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(duration);
+    }
 }

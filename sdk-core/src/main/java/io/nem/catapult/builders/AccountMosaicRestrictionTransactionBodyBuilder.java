@@ -24,7 +24,7 @@ import java.io.DataInput;
 import java.util.ArrayList;
 
 /** Binary layout for an account mosaic restriction transaction. */
-final class AccountMosaicRestrictionTransactionBodyBuilder {
+public final class AccountMosaicRestrictionTransactionBodyBuilder {
     /** Account restriction type. */
     private final AccountRestrictionTypeDto restrictionType;
     /** Account restriction modifications. */

@@ -23,7 +23,7 @@ package io.nem.catapult.builders;
 import java.io.DataInput;
 
 /** Binary layout for a hash lock transaction. */
-final class HashLockTransactionBodyBuilder {
+public final class HashLockTransactionBodyBuilder {
     /** Lock mosaic. */
     private final UnresolvedMosaicBuilder mosaic;
     /** Number of blocks for which a lock should be valid. */

@@ -17,6 +17,7 @@
 
 package io.nem.sdk.model.transaction;
 
+import io.nem.core.utils.StringEncoder;
 import io.nem.sdk.model.account.PublicAccount;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -95,6 +96,6 @@ public abstract class MetadataTransaction extends Transaction {
      * @return the array representation.
      */
     public static byte[] toByteArray(String value) {
-        return value.getBytes(StandardCharsets.UTF_8);
+        return StringEncoder.getBytes(value);
     }
 }

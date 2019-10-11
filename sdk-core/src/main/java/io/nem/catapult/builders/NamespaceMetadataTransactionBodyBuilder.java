@@ -24,7 +24,7 @@ import java.io.DataInput;
 import java.nio.ByteBuffer;
 
 /** Binary layout for a namespace metadata transaction. */
-final class NamespaceMetadataTransactionBodyBuilder {
+public final class NamespaceMetadataTransactionBodyBuilder {
     /** Metadata target public key. */
     private final KeyDto targetPublicKey;
     /** Metadata key scoped to source, target and type. */

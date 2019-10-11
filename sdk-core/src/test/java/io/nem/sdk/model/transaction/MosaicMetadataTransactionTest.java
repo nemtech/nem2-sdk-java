@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for the {@link MosaicMetadataTransaction} and the factory.
  **/
-public class MosaicMetadataTransactionTest {
+public class MosaicMetadataTransactionTest extends AbstractTransactionTester {
 
     private static Account account;
 
@@ -74,10 +74,9 @@ public class MosaicMetadataTransactionTest {
                 .deadline(new FakeDeadline()).build();
 
         String expectedHash = "b200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904442000000000000000001000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240a00000000000000e8030000000000000a000600313233414243";
-        Assertions.assertEquals(expectedHash, ConvertUtils.toHex(transaction.generateBytes()));
+        assertSerialization(expectedHash, transaction);
 
         String expectedEmbeddedHash = "620000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b24019044429a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240a00000000000000e8030000000000000a000600313233414243";
-        Assertions.assertEquals(expectedEmbeddedHash,
-            ConvertUtils.toHex(transaction.generateEmbeddedBytes()));
+        assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
     }
 }

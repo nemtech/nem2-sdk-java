@@ -19,6 +19,7 @@ package io.nem.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.BlockDuration;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -31,37 +32,12 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class MosaicDefinitionTransactionTest {
+class MosaicDefinitionTransactionTest extends AbstractTransactionTester {
 
     @Test
     void createAMosaicCreationTransactionViaStaticConstructor() {
-        MosaicDefinitionTransaction mosaicCreationTx =
-            MosaicDefinitionTransactionFactory.create(NetworkType.MIJIN_TEST,
-                MosaicNonce.createFromBigInteger(new BigInteger("0")),
-                new MosaicId(new BigInteger("0")),
-                MosaicFlags.create(true, true, true),
-                3, new BlockDuration(10)
-            ).build();
-
-        assertEquals(NetworkType.MIJIN_TEST, mosaicCreationTx.getNetworkType());
-        assertTrue(1 == mosaicCreationTx.getVersion());
-        assertTrue(LocalDateTime.now().isBefore(mosaicCreationTx.getDeadline().getLocalDateTime()));
-        assertEquals(BigInteger.valueOf(0), mosaicCreationTx.getMaxFee());
-        assertEquals(new BigInteger("0"), mosaicCreationTx.getMosaicId().getId());
-        assertEquals(true, mosaicCreationTx.getMosaicFlags().isSupplyMutable());
-        assertEquals(true, mosaicCreationTx.getMosaicFlags().isTransferable());
-        assertEquals(true, mosaicCreationTx.getMosaicFlags().isRestrictable());
-        assertEquals(3, mosaicCreationTx.getDivisibility());
-        assertEquals(new BlockDuration(10).getDuration(), mosaicCreationTx.getBlockDuration().getDuration());
-    }
-
-    @Test
-    @DisplayName("Serialization")
-    void serialization() {
-        String expected =
-            "8e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904d410000000000000000010000000000000000000000000000000000000007041027000000000000";
-        MosaicDefinitionTransaction mosaicDefinitionTransaction =
-            MosaicDefinitionTransactionFactory.create(NetworkType.MIJIN_TEST,
+        MosaicDefinitionTransaction mosaicCreationTx = MosaicDefinitionTransactionFactory
+            .create(NetworkType.MIJIN_TEST,
                 MosaicNonce.createFromBigInteger(new BigInteger("0")),
                 new MosaicId(new BigInteger("0")),
                 MosaicFlags.create(true, true, true),
@@ -69,22 +45,49 @@ class MosaicDefinitionTransactionTest {
             ).deadline(new FakeDeadline()
             ).build();
 
-        byte[] actual = mosaicDefinitionTransaction.generateBytes();
-        assertEquals(expected, Hex.toHexString(actual));
+        assertEquals(NetworkType.MIJIN_TEST, mosaicCreationTx.getNetworkType());
+        assertEquals(1, (int) mosaicCreationTx.getVersion());
+        assertTrue(LocalDateTime.now().isBefore(mosaicCreationTx.getDeadline().getLocalDateTime()));
+        assertEquals(BigInteger.valueOf(0), mosaicCreationTx.getMaxFee());
+        assertEquals(new BigInteger("0"), mosaicCreationTx.getMosaicId().getId());
+        assertTrue(mosaicCreationTx.getMosaicFlags().isSupplyMutable());
+        assertTrue(mosaicCreationTx.getMosaicFlags().isTransferable());
+        assertTrue(mosaicCreationTx.getMosaicFlags().isRestrictable());
+        assertEquals(4, mosaicCreationTx.getDivisibility());
+        assertEquals(new BlockDuration(10000),
+            mosaicCreationTx.getBlockDuration());
     }
+
+
+    @Test
+    @DisplayName("Serialization")
+    void serialization() {
+        String expected =
+            "8e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904d410000000000000000010000000000000000000000000000000000000005041027000000000000";
+        MosaicDefinitionTransaction transaction = MosaicDefinitionTransactionFactory
+            .create(NetworkType.MIJIN_TEST,
+                MosaicNonce.createFromBigInteger(new BigInteger("0")),
+                new MosaicId(new BigInteger("0")),
+                MosaicFlags.create(true, false, true),
+                4, new BlockDuration(10000)
+            ).deadline(new FakeDeadline()
+            ).build();
+        assertSerialization(expected, transaction);
+    }
+
 
     @Test
     @DisplayName("SerializationEmbeddedBytes")
     void shouldGenerateEmbeddedBytes() {
         String expected =
-            "3e00000068b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b76301904d4100000000000000000000000007030a00000000000000";
+            "3e00000068b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b76301904d4100000000000000000000000002030a00000000000000";
 
         NetworkType networkType = NetworkType.MIJIN_TEST;
         MosaicId mosaicId = new MosaicId(new BigInteger("0"));
         BigInteger fee = BigInteger.ONE;
         MosaicNonce mosaicNonce = MosaicNonce.createFromBigInteger(new BigInteger("0"));
         MosaicFlags mosaicFlags = MosaicFlags
-            .create(true, true, true);
+            .create(false, true, false);
 
         PublicAccount signature = PublicAccount.createFromPublicKey(
             "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b763",
@@ -97,7 +100,7 @@ class MosaicDefinitionTransactionTest {
                 "3D28C804EDD07D5A728E5C5FFEC01AB07AFA5766AE6997B38526D36015A4D006",
                 "5A0069D83F17CF0001777E55");
 
-        MosaicDefinitionTransaction mosaicCreationTx =
+        MosaicDefinitionTransaction transaction =
             MosaicDefinitionTransactionFactory.create(networkType,
                 mosaicNonce,
                 mosaicId,
@@ -110,7 +113,7 @@ class MosaicDefinitionTransactionTest {
                 .transactionInfo(transactionInfo)
                 .build();
 
-        byte[] actual = mosaicCreationTx.generateEmbeddedBytes();
-        assertEquals(expected, Hex.toHexString(actual));
+        assertEmbeddedSerialization(expected, transaction);
     }
+
 }

@@ -90,4 +90,8 @@ public enum CosignatoryModificationActionDto {
             dataOutputStream.writeByte(this.value);
         });
     }
+
+    public byte getValue() {
+        return value;
+    }
 }

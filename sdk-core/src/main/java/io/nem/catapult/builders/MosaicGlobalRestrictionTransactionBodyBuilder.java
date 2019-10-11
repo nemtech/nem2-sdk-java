@@ -23,7 +23,7 @@ package io.nem.catapult.builders;
 import java.io.DataInput;
 
 /** Binary layout for a mosaic global restriction transaction. */
-final class MosaicGlobalRestrictionTransactionBodyBuilder {
+public final class MosaicGlobalRestrictionTransactionBodyBuilder {
     /** Identifier of the mosaic being restricted. */
     private final UnresolvedMosaicIdDto mosaicId;
     /** Identifier of the mosaic providing the restriction key. */

@@ -24,7 +24,7 @@ import java.io.DataInput;
 import java.nio.ByteBuffer;
 
 /** Binary layout for a mosaic metadata transaction. */
-final class MosaicMetadataTransactionBodyBuilder {
+public final class MosaicMetadataTransactionBodyBuilder {
     /** Metadata target public key. */
     private final KeyDto targetPublicKey;
     /** Metadata key scoped to source, target and type. */
