@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.nio.ByteBuffer;
 
 /** Binary layout for a transfer transaction. */
-final class TransferTransactionBodyBuilder {
+public final class TransferTransactionBodyBuilder {
     /** Transaction recipient. */
     private final UnresolvedAddressDto recipient;
     /** Transaction message. */

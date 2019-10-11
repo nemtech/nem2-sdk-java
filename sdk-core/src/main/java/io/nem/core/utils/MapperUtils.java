@@ -18,6 +18,7 @@
 package io.nem.core.utils;
 
 import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.UInt64Id;
@@ -95,4 +96,15 @@ public class MapperUtils {
     public static String getIdAsHex(UInt64Id id) {
         return id == null ? null : id.getIdAsHex();
     }
+
+
+    public static Integer extractTransactionVersion(int version) {
+        return (int) Long.parseLong(Integer.toHexString(version).substring(2, 4), 16);
+    }
+
+    public static NetworkType extractNetworkType(int version) {
+        int networkType = (int) Long.parseLong(Integer.toHexString(version).substring(0, 2), 16);
+        return NetworkType.rawValueOf(networkType);
+    }
+
 }

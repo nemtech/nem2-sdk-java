@@ -20,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.sdk.api.BinarySerialization;
+import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
@@ -53,7 +55,8 @@ class TransferTransactionTest {
 
         TransferTransaction transaction =
             TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
-                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST),
+                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
+                    NetworkType.MIJIN_TEST),
                 Arrays.asList(),
                 PlainMessage.Empty
             ).build();
@@ -94,7 +97,7 @@ class TransferTransactionTest {
     void serialization() {
         // Generated at nem2-library-js/test/transactions/TransferTransaction.spec.js
         String expected =
-            "a5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019054410000000000000000010000000000000090e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac01000100672b0000ce5600006400000000000000";
+            "b8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019054410000000000000000010000000000000090e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac14000100536f6d65204d65737361676520e6bca2e5ad97672b0000ce5600006400000000000000";
         TransferTransaction transaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
@@ -102,9 +105,14 @@ class TransferTransactionTest {
                 Arrays.asList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
-                PlainMessage.Empty).deadline(new FakeDeadline()).build();
-        byte[] actual = transaction.serialize();
-        assertEquals(expected, Hex.toHexString(actual));
+                new PlainMessage("Some Message 漢字")).deadline(new FakeDeadline()).build();
+
+        assertEquals(expected, Hex.toHexString(transaction.serialize()));
+
+        BinarySerialization serialization = new BinarySerializationImpl();
+
+        Transaction copy = serialization.deserialize(transaction.serialize());
+        assertEquals(expected, Hex.toHexString(copy.serialize()));
 
     }
 
@@ -125,13 +133,14 @@ class TransferTransactionTest {
 
         Transaction aggregateTransaction =
             transaction.toAggregate(
-                    new PublicAccount(
-                        "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
-                        NetworkType.MIJIN_TEST));
+                new PublicAccount(
+                    "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
+                    NetworkType.MIJIN_TEST));
 
         byte[] actual = aggregateTransaction.serialize();
 
         assertEquals(expected, Hex.toHexString(actual));
+
     }
 
     @Test
@@ -153,6 +162,7 @@ class TransferTransactionTest {
         assertEquals(
             "B54321C382FA3CC53EB6559FDDE03832898E7E89C8F90C10DF8567AD41A926A2",
             signedTransaction.getHash());
+
 
     }
 }

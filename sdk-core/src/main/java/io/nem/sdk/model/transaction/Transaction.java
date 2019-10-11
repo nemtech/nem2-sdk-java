@@ -45,7 +45,7 @@ public abstract class Transaction {
     private final Optional<String> signature;
     private final Optional<TransactionInfo> transactionInfo;
     private Optional<PublicAccount> signer;
-    private Optional<Boolean> innerTransaction = Optional.empty();
+    private Boolean innerTransaction = false;
 
     /**
      * Abstract constructors of all transactions.
@@ -157,8 +157,6 @@ public abstract class Transaction {
 
     /**
      * Generate bytes for a specific transaction.
-     *
-     * @return
      */
     abstract byte[] generateBytes();
 
@@ -170,14 +168,13 @@ public abstract class Transaction {
     abstract byte[] generateEmbeddedBytes();
 
     /**
-     * Serialises a transaction model into binary (unsigned payload).
-     * Gets the serialised bytes for a transaction or an aggregate inner transaction.
+     * Serialises a transaction model into binary (unsigned payload). Gets the serialised bytes for
+     * a transaction or an aggregate inner transaction.
      *
      * @return bytes of the transaction
      */
     public byte[] serialize() {
-        boolean isInnerTransaction = innerTransaction.isPresent() ? innerTransaction.get() : false;
-        return (isInnerTransaction ? this.generateEmbeddedBytes() : this.generateBytes());
+        return innerTransaction ? this.generateEmbeddedBytes() : this.generateBytes();
     }
 
     /**
@@ -221,7 +218,7 @@ public abstract class Transaction {
      * @return transaction with signer serialized to be part of an aggregate transaction
      */
     byte[] toAggregateTransactionBytes() {
-        this.innerTransaction = Optional.of(Boolean.TRUE);
+        this.innerTransaction = true;
         return this.generateEmbeddedBytes();
     }
 
@@ -232,7 +229,7 @@ public abstract class Transaction {
      * @return instance of Transaction with signer
      */
     public Transaction toAggregate(final PublicAccount signer) {
-        this.innerTransaction = Optional.of(Boolean.TRUE);
+        this.innerTransaction = true;
         this.signer = Optional.of(signer);
         return this;
     }

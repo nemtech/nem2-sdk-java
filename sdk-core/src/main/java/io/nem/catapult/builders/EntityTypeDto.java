@@ -170,4 +170,8 @@ public enum EntityTypeDto {
                 dataOutputStream.writeShort(Short.reverseBytes(this.value));
             });
     }
+
+    public short getValue() {
+        return value;
+    }
 }
