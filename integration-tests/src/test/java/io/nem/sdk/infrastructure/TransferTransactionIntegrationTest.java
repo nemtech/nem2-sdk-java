@@ -141,7 +141,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.createPersistentDelegationRequestTransaction(
                 getNetworkType(),
-                senderKeyPair.getPrivateKey(),
+                senderKeyPair.getPrivateKey(), senderKeyPair.getPrivateKey(),
                 recipientKeyPair.getPublicKey()
             ).build();
 

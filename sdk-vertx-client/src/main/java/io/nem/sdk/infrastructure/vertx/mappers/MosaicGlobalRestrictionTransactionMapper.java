@@ -52,7 +52,7 @@ class MosaicGlobalRestrictionTransactionMapper extends
 
         return MosaicGlobalRestrictionTransactionFactory.create(networkType,
             toMosaicId(transaction.getMosaicId()),
-            MapperUtils.fromHex(transaction.getRestrictionKey()),
+            MapperUtils.fromHexToBigInteger(transaction.getRestrictionKey()),
             transaction.getNewRestrictionValue(),
             MosaicRestrictionType.rawValueOf(newRestrictionType)
         ).referenceMosaicId(toMosaicId(transaction.getReferenceMosaicId()))

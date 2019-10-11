@@ -60,7 +60,8 @@ class TransferTransactionTest {
 
         TransferTransaction transaction =
             TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
-                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST),
+                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
+                    NetworkType.MIJIN_TEST),
                 Arrays.asList(),
                 PlainMessage.Empty
             ).build();
@@ -132,9 +133,9 @@ class TransferTransactionTest {
 
         Transaction aggregateTransaction =
             transaction.toAggregate(
-                    new PublicAccount(
-                        "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
-                        NetworkType.MIJIN_TEST));
+                new PublicAccount(
+                    "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
+                    NetworkType.MIJIN_TEST));
 
         byte[] actual = aggregateTransaction.serialize();
 
@@ -167,6 +168,10 @@ class TransferTransactionTest {
     void createPersistentDelegationRequestTransaction() {
         NetworkType networkType = NetworkType.MIJIN_TEST;
 
+        KeyPair remoteProxy = KeyPair.fromPrivate(PrivateKey
+                .fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C111"),
+            networkType.resolveSignSchema());
+
         KeyPair sender = KeyPair.fromPrivate(PrivateKey
                 .fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C108"),
             networkType.resolveSignSchema());
@@ -176,7 +181,9 @@ class TransferTransactionTest {
 
         TransferTransaction transferTransaction =
             TransferTransactionFactory
-                .createPersistentDelegationRequestTransaction(networkType, sender.getPrivateKey(),
+                .createPersistentDelegationRequestTransaction(networkType,
+                    remoteProxy.getPrivateKey(),
+                    sender.getPrivateKey(),
                     recipient.getPublicKey()
                 ).deadline(new FakeDeadline()).build();
 
@@ -196,7 +203,8 @@ class TransferTransactionTest {
 
         PersistentHarvestingDelegationMessage message = (PersistentHarvestingDelegationMessage) transferTransaction
             .getMessage();
-        Assertions.assertEquals(recipient.getPublicKey().toHex(),
+        Assertions.assertEquals(remoteProxy.getPrivateKey().toHex().toUpperCase(),
             message.decryptPayload(sender.getPublicKey(), recipient.getPrivateKey(), networkType));
+
     }
 }

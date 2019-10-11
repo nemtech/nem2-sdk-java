@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.math3.analysis.function.Add;
 
 /**
  * Factory of {@link TransferTransaction}
@@ -72,7 +71,8 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
         final Address recipient,
         final List<Mosaic> mosaics,
         final Message message) {
-        return new TransferTransactionFactory(networkType, Optional.of(recipient), Optional.empty(), mosaics, message);
+        return new TransferTransactionFactory(networkType, Optional.of(recipient), Optional.empty(),
+            mosaics, message);
     }
 
     /**
@@ -89,7 +89,8 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
         final NamespaceId namespaceId,
         final List<Mosaic> mosaics,
         final Message message) {
-        return new TransferTransactionFactory(networkType, Optional.empty(), Optional.of(namespaceId), mosaics, message);
+        return new TransferTransactionFactory(networkType, Optional.empty(),
+            Optional.of(namespaceId), mosaics, message);
     }
 
     /**
@@ -109,16 +110,18 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
      * delegation unlocking
      *
      * @param networkType The network type.
+     * @param remoteProxyPrivateKey the remote’s account proxy private key.
      * @param senderPrivateKey The sender's private key
      * @param harvesterPublicKey The harvester public key
      * @return {@link TransferTransactionFactory}
      */
     public static TransferTransactionFactory createPersistentDelegationRequestTransaction(
         NetworkType networkType,
+        PrivateKey remoteProxyPrivateKey,
         PrivateKey senderPrivateKey,
         PublicKey harvesterPublicKey) {
         PersistentHarvestingDelegationMessage message = PersistentHarvestingDelegationMessage
-            .create(senderPrivateKey, harvesterPublicKey, networkType);
+            .create(remoteProxyPrivateKey, senderPrivateKey, harvesterPublicKey, networkType);
         return new TransferTransactionFactory(networkType,
             Optional.of(Address.createFromPublicKey(harvesterPublicKey.toHex(), networkType)),
             Optional.empty(),

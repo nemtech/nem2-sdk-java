@@ -37,8 +37,8 @@ import java.util.List;
  */
 public class MultisigAccountModificationTransaction extends Transaction {
 
-    private final int minApprovalDelta;
-    private final int minRemovalDelta;
+    private final byte minApprovalDelta;
+    private final byte minRemovalDelta;
     private final List<MultisigCosignatoryModification> modifications;
 
     public MultisigAccountModificationTransaction(
@@ -55,7 +55,7 @@ public class MultisigAccountModificationTransaction extends Transaction {
      *
      * @return byte
      */
-    public int getMinApprovalDelta() {
+    public byte getMinApprovalDelta() {
         return minApprovalDelta;
     }
 
@@ -65,7 +65,7 @@ public class MultisigAccountModificationTransaction extends Transaction {
      *
      * @return byte
      */
-    public int getMinRemovalDelta() {
+    public byte getMinRemovalDelta() {
         return minRemovalDelta;
     }
 

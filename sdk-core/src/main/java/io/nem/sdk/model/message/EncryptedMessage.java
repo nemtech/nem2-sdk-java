@@ -92,7 +92,7 @@ public class EncryptedMessage extends Message {
         KeyPair recipient = KeyPair.fromPrivate(recipientPrivateKey, signSchema);
         BlockCipher blockCipher = engine
             .createBlockCipher(sender, recipient, signSchema);
-        return StringEncoder.getString(blockCipher.decrypt(ConvertUtils.fromHex(getPayload())));
+        return StringEncoder.getString(blockCipher.decrypt(ConvertUtils.fromHexToBytes(getPayload())));
     }
 
 }

@@ -737,7 +737,7 @@ public class TransactionMapperVertxTest {
         List<Mosaic> mosaicsDTO = transferTransaction.getMosaics();
         if (mosaicsDTO != null && mosaicsDTO.size() > 0) {
             assertEquals(
-                MapperUtils.fromHex(mosaicsDTO.get(0).getId()),
+                MapperUtils.fromHexToBigInteger(mosaicsDTO.get(0).getId()),
                 transaction.getMosaics().get(0).getId().getId());
             assertEquals(
                 mosaicsDTO.get(0).getAmount(),
@@ -767,7 +767,7 @@ public class TransactionMapperVertxTest {
             registerNamespaceTransaction.getName(),
             transaction.getNamespaceName());
         assertEquals(
-            MapperUtils.fromHex(registerNamespaceTransaction.getId()),
+            MapperUtils.fromHexToBigInteger(registerNamespaceTransaction.getId()),
             transaction.getNamespaceId().getId());
 
         if (transaction.getNamespaceRegistrationType()
@@ -777,7 +777,7 @@ public class TransactionMapperVertxTest {
                 transaction.getDuration().get());
         } else {
             assertEquals(
-                MapperUtils.fromHex(registerNamespaceTransaction.getParentId()),
+                MapperUtils.fromHexToBigInteger(registerNamespaceTransaction.getParentId()),
                 transaction.getParentId().get().getId());
         }
     }
@@ -806,7 +806,7 @@ public class TransactionMapperVertxTest {
         MosaicSupplyChangeTransaction transaction, TransactionInfoDTO transactionDTO) {
         MosaicSupplyChangeTransactionDTO mosaicSupplyChangeTransaction = jsonHelper
             .convert(transactionDTO.getTransaction(), MosaicSupplyChangeTransactionDTO.class);
-        assertEquals(MapperUtils.fromHex(mosaicSupplyChangeTransaction.getMosaicId()),
+        assertEquals(MapperUtils.fromHexToBigInteger(mosaicSupplyChangeTransaction.getMosaicId()),
             transaction.getMosaicId().getId());
         assertEquals(mosaicSupplyChangeTransaction.getDelta(), transaction.getDelta());
         assertEquals(transaction.getAction().getValue(),
@@ -843,7 +843,7 @@ public class TransactionMapperVertxTest {
             .convert(transactionDTO.getTransaction(), HashLockTransactionDTO.class);
 
         assertEquals(
-            MapperUtils.fromHex(hashLockTransactionDTO.getMosaicId()),
+            MapperUtils.fromHexToBigInteger(hashLockTransactionDTO.getMosaicId()),
             transaction.getMosaic().getId().getId());
         assertEquals(
             hashLockTransactionDTO.getAmount(),
@@ -861,7 +861,7 @@ public class TransactionMapperVertxTest {
         SecretLockTransactionDTO secretLockTransaction = jsonHelper
             .convert(transactionDTO.getTransaction(), SecretLockTransactionDTO.class);
         assertEquals(
-            MapperUtils.fromHex(secretLockTransaction.getMosaicId()),
+            MapperUtils.fromHexToBigInteger(secretLockTransaction.getMosaicId()),
             transaction.getMosaic().getId().getId());
         assertEquals(
             secretLockTransaction.getAmount(),

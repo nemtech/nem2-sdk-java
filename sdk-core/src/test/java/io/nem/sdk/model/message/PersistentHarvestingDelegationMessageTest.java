@@ -29,11 +29,13 @@ public class PersistentHarvestingDelegationMessageTest {
     @Test
     public void testCreateEncryptedMessage() {
         NetworkType networkType = NetworkType.MIJIN_TEST;
+        KeyPair proxy = KeyPair.random(networkType.resolveSignSchema());
         KeyPair sender = KeyPair.random(networkType.resolveSignSchema());
         KeyPair harvester = KeyPair.random(networkType.resolveSignSchema());
 
         PersistentHarvestingDelegationMessage encryptedMessage = PersistentHarvestingDelegationMessage
-            .create(sender.getPrivateKey(), harvester.getPublicKey(), networkType);
+            .create(proxy.getPrivateKey(), sender.getPrivateKey(), harvester.getPublicKey(),
+                networkType);
 
         Assertions.assertEquals(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,
             encryptedMessage.getType());
@@ -41,7 +43,7 @@ public class PersistentHarvestingDelegationMessageTest {
         String plainMessage = encryptedMessage
             .decryptPayload(sender.getPublicKey(), harvester.getPrivateKey(), networkType);
 
-        Assertions.assertEquals(harvester.getPublicKey().toHex(), plainMessage);
+        Assertions.assertEquals(proxy.getPrivateKey().toHex().toUpperCase(), plainMessage);
     }
 
 

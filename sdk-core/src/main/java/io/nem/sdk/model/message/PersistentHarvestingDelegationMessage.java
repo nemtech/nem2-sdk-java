@@ -34,7 +34,8 @@ public class PersistentHarvestingDelegationMessage extends Message {
     }
 
     /**
-     * Helper constructor that allow users to create an encrypted Persistent Harvesting Delegation Message
+     * Helper constructor that allow users to create an encrypted Persistent Harvesting Delegation
+     * Message
      *
      * Note, the strategy to encrypt and decrypt should be shared between the different SDKs. A
      * client may send a transaction using a sdk and the recipient may be using a different one.
@@ -44,12 +45,14 @@ public class PersistentHarvestingDelegationMessage extends Message {
      * "plain text" string - utf8 byte array - encrypted byte array - hex string (the encrypted
      * message string)
      *
+     * @param remoteProxyPrivateKey the remote’s account proxy private key.
      * @param senderPrivateKey Sender private key
      * @param recipientPublicKey Recipient public key
      * @param networkType Catapult network type
      * @return {@link PersistentHarvestingDelegationMessage}
      */
-    public static PersistentHarvestingDelegationMessage create(PrivateKey senderPrivateKey,
+    public static PersistentHarvestingDelegationMessage create(PrivateKey remoteProxyPrivateKey,
+        PrivateKey senderPrivateKey,
         PublicKey recipientPublicKey,
         NetworkType networkType) {
 
@@ -62,7 +65,7 @@ public class PersistentHarvestingDelegationMessage extends Message {
                 recipient, signSchema);
 
         String payload = MessageMarker.PERSISTENT_DELEGATION_UNLOCK + ConvertUtils
-            .toHex(blockCipher.encrypt(StringEncoder.getBytes(recipientPublicKey.toHex())));
+            .toHex(blockCipher.encrypt(StringEncoder.getBytes(remoteProxyPrivateKey.toHex())));
 
         return new PersistentHarvestingDelegationMessage(payload.toUpperCase());
     }
@@ -88,7 +91,8 @@ public class PersistentHarvestingDelegationMessage extends Message {
             .createBlockCipher(sender, recipient, signSchema);
 
         return StringEncoder.getString(blockCipher.decrypt(ConvertUtils
-            .fromHex(getPayload().substring(MessageMarker.PERSISTENT_DELEGATION_UNLOCK.length()))))
+            .fromHexToBytes(
+                getPayload().substring(MessageMarker.PERSISTENT_DELEGATION_UNLOCK.length()))))
             .toUpperCase();
     }
 

@@ -17,10 +17,8 @@
 package io.nem.core.utils;
 
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  * Static class that contains utility functions for converting hex strings to and from bytes.
@@ -73,7 +71,7 @@ public class ConvertUtils {
      * @param hexString the hex string input
      * @return the byte array.
      */
-    public static byte[] fromHex(String hexString) {
+    public static byte[] fromHexToBytes(String hexString) {
         final Hex codec = new Hex();
         try {
             return codec.decode(StringEncoder.getBytes(hexString));
@@ -92,7 +90,7 @@ public class ConvertUtils {
         if (hexString == null) {
             return null;
         }
-        return StringEncoder.getString(fromHex(hexString));
+        return StringEncoder.getString(fromHexToBytes(hexString));
     }
 
     /**

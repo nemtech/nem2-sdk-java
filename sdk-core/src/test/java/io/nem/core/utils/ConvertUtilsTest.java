@@ -41,7 +41,7 @@ public class ConvertUtilsTest {
 
         // Assert:
         Assert.assertThat(output, IsEqual.equalTo(expectedOutput));
-        Assert.assertThat(input, IsEqual.equalTo(ConvertUtils.fromHex(output)));
+        Assert.assertThat(input, IsEqual.equalTo(ConvertUtils.fromHexToBytes(output)));
     }
 
     @Test

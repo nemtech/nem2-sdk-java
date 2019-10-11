@@ -42,7 +42,7 @@ public class MapperUtils {
      * @return a namespace id from the hex number or null if the hex is null
      */
     public static NamespaceId toNamespaceId(String hex) {
-        return hex == null ? null : NamespaceId.createFromId(fromHex(hex));
+        return hex == null ? null : NamespaceId.createFromId(fromHexToBigInteger(hex));
     }
 
     /**
@@ -52,7 +52,7 @@ public class MapperUtils {
      * @return a {@link MosaicId} from the hex number or null if the hex is null
      */
     public static MosaicId toMosaicId(String hex) {
-        return hex == null ? null : new MosaicId(fromHex(hex));
+        return hex == null ? null : new MosaicId(fromHexToBigInteger(hex));
     }
 
     /**
@@ -81,7 +81,7 @@ public class MapperUtils {
      * @param hex the hex string with the id
      * @return a {@link BigInteger} from the hex number or null if the hex is null
      */
-    public static BigInteger fromHex(String hex) {
+    public static BigInteger fromHexToBigInteger(String hex) {
         return new BigInteger(hex, 16);
     }
 
