@@ -19,6 +19,7 @@ package io.nem.sdk.model.transaction;
 
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.message.Message;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.namespace.NamespaceId;
 import java.util.List;

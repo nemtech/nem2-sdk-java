@@ -32,7 +32,7 @@ import io.nem.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
 import io.nem.sdk.model.transaction.MultisigCosignatoryModification;
-import io.nem.sdk.model.transaction.PlainMessage;
+import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.TransactionAnnounceResponse;
 import io.nem.sdk.model.transaction.TransferTransaction;

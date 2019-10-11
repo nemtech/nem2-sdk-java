@@ -19,7 +19,7 @@ package io.nem.sdk.infrastructure;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
-import io.nem.sdk.model.transaction.PlainMessage;
+import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;

@@ -26,6 +26,7 @@ import io.nem.catapult.builders.UnresolvedAddressDto;
 import io.nem.catapult.builders.UnresolvedMosaicBuilder;
 import io.nem.catapult.builders.UnresolvedMosaicIdDto;
 import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.message.Message;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.namespace.NamespaceId;
 import java.nio.ByteBuffer;
@@ -164,7 +165,7 @@ public class TransferTransaction extends Transaction {
      * @return Message buffer.
      */
     private ByteBuffer getMessageBuffer() {
-        final byte byteMessageType = (byte) message.getType();
+        final byte byteMessageType = (byte) message.getType().getValue();
         final byte[] bytePayload = message.getPayload().getBytes(StandardCharsets.UTF_8);
         final ByteBuffer messageBuffer =
             ByteBuffer.allocate(bytePayload.length + 1 /* for the message type */);

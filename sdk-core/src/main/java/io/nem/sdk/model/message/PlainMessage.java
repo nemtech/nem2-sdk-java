@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.nem.sdk.model.transaction;
+package io.nem.sdk.model.message;
 
 /**
  * The plain message model defines a plain string. When sending it to the network we transform the
@@ -35,7 +35,7 @@ public class PlainMessage extends Message {
      * @param payload plain message payload
      */
     public PlainMessage(String payload) {
-        super(0, payload);
+        super(MessageType.PLAIN_MESSAGE, payload);
     }
 
     /**
@@ -45,6 +45,16 @@ public class PlainMessage extends Message {
      * @return instance of PlainMessage
      */
     public static PlainMessage create(String payload) {
+        return new PlainMessage(payload);
+    }
+
+    /**
+     * Create a plain message object from binary payload.
+     *
+     * @param payload plain message payload
+     * @return instance of PlainMessage
+     */
+    public static PlainMessage createFromPayload(String payload) {
         return new PlainMessage(payload);
     }
 }

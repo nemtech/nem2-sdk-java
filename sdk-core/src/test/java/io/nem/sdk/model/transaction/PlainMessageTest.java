@@ -19,6 +19,8 @@ package io.nem.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.sdk.model.message.MessageType;
+import io.nem.sdk.model.message.PlainMessage;
 import org.junit.jupiter.api.Test;
 
 class PlainMessageTest {
@@ -27,13 +29,13 @@ class PlainMessageTest {
     void shouldCreatePlainMessageViaConstructor() {
         PlainMessage plainMessage = new PlainMessage("test-message");
         assertEquals("test-message", plainMessage.getPayload());
-        assertTrue(0 == plainMessage.getType());
+        assertTrue(MessageType.PLAIN_MESSAGE == plainMessage.getType());
     }
 
     @Test
     void shouldCreatePlainMessageViaStaticConstructor() {
         PlainMessage plainMessage = PlainMessage.create("test-message");
         assertEquals("test-message", plainMessage.getPayload());
-        assertTrue(0 == plainMessage.getType());
+        assertTrue(MessageType.PLAIN_MESSAGE == plainMessage.getType());
     }
 }

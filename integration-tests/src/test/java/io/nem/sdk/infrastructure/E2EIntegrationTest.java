@@ -49,7 +49,7 @@ import io.nem.sdk.model.transaction.MultisigAccountModificationTransactionFactor
 import io.nem.sdk.model.transaction.MultisigCosignatoryModification;
 import io.nem.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
-import io.nem.sdk.model.transaction.PlainMessage;
+import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.transaction.SecretLockTransaction;
 import io.nem.sdk.model.transaction.SecretLockTransactionFactory;
 import io.nem.sdk.model.transaction.SecretProofTransaction;

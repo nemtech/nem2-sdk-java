@@ -749,7 +749,7 @@ public class TransactionMapperVertxTest {
             transaction.getMessage().getPayload());
 
         assertEquals((int) transferTransaction.getMessage().getType().getValue(),
-            transaction.getMessage().getType());
+            transaction.getMessage().getType().getValue());
     }
 
     void validateNamespaceCreationTx(

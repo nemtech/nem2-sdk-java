@@ -50,7 +50,6 @@ import io.nem.sdk.model.transaction.SecretProofTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.model.transaction.TransferTransaction;
-import io.nem.sdk.openapi.okhttp_gson.invoker.JSON;
 import io.nem.sdk.openapi.okhttp_gson.model.AggregateTransactionBodyDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.HashLockTransactionDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.Mosaic;
@@ -733,7 +732,7 @@ public class TransactionMapperOkHttpTest {
             transaction.getMessage().getPayload());
 
         assertEquals((int) transferTransaction.getMessage().getType().getValue(),
-            transaction.getMessage().getType());
+            transaction.getMessage().getType().getValue());
     }
 
     void validateNamespaceCreationTx(

@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package io.nem.sdk.model.transaction;
+package io.nem.sdk.model.message;
 
 /**
  * An abstract message class that serves as the base class of all message types.
  */
 public abstract class Message {
 
-    private final int type;
+    private final MessageType type;
     private final String payload;
 
-    public Message(int type, String payload) {
+    public Message(MessageType type, String payload) {
         this.type = type;
         this.payload = payload;
     }
@@ -32,9 +32,9 @@ public abstract class Message {
     /**
      * Returns message type.
      *
-     * @return int
+     * @return Message type
      */
-    public int getType() {
+    public MessageType getType() {
         return type;
     }
 
