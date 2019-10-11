@@ -22,16 +22,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.sdk.api.BinarySerialization;
 import io.nem.sdk.infrastructure.BinarySerializationImpl;
+import io.nem.core.crypto.KeyPair;
+import io.nem.core.crypto.PrivateKey;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.message.MessageType;
+import io.nem.sdk.model.message.PersistentHarvestingDelegationMessage;
+import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import org.bouncycastle.util.encoders.Hex;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,7 +69,7 @@ class TransferTransactionTest {
             ).build();
 
         assertEquals(NetworkType.MIJIN_TEST, transaction.getNetworkType());
-        assertTrue(1 == transaction.getVersion());
+        assertEquals(1, (int) transaction.getVersion());
         assertTrue(LocalDateTime.now().isBefore(transaction.getDeadline().getLocalDateTime()));
         assertEquals(BigInteger.valueOf(0), transaction.getMaxFee());
         assertEquals(
@@ -102,7 +109,7 @@ class TransferTransactionTest {
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
-                Arrays.asList(
+                Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
                 new PlainMessage("Some Message 漢字")).deadline(new FakeDeadline()).build();
@@ -126,7 +133,7 @@ class TransferTransactionTest {
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
-                Arrays.asList(
+                Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
                 PlainMessage.Empty).deadline(new FakeDeadline()).build();
@@ -149,7 +156,7 @@ class TransferTransactionTest {
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
-                Arrays.asList(
+                Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
                 PlainMessage.Empty).deadline(new FakeDeadline()).build();
@@ -163,6 +170,50 @@ class TransferTransactionTest {
             "B54321C382FA3CC53EB6559FDDE03832898E7E89C8F90C10DF8567AD41A926A2",
             signedTransaction.getHash());
 
+
+    }
+
+    @Test
+    void createPersistentDelegationRequestTransaction() {
+        NetworkType networkType = NetworkType.MIJIN_TEST;
+
+        KeyPair remoteProxy = KeyPair.fromPrivate(PrivateKey
+                .fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C111"),
+            networkType.resolveSignSchema());
+
+        KeyPair sender = KeyPair.fromPrivate(PrivateKey
+                .fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C108"),
+            networkType.resolveSignSchema());
+        KeyPair recipient = KeyPair.fromPrivate(PrivateKey
+                .fromHexString("B72F2950498111BADF276D6D9D5E345F04E0D5C9B8342DA983C3395B4CF18F08"),
+            networkType.resolveSignSchema());
+
+        TransferTransaction transferTransaction =
+            TransferTransactionFactory
+                .createPersistentDelegationRequestTransaction(networkType,
+                    remoteProxy.getPrivateKey(),
+                    sender.getPrivateKey(),
+                    recipient.getPublicKey()
+                ).deadline(new FakeDeadline()).build();
+
+        assertEquals(NetworkType.MIJIN_TEST, transferTransaction.getNetworkType());
+        assertEquals(1, (int) transferTransaction.getVersion());
+        assertTrue(
+            LocalDateTime.now().isBefore(transferTransaction.getDeadline().getLocalDateTime()));
+        assertEquals(BigInteger.valueOf(0), transferTransaction.getMaxFee());
+        assertEquals(
+            Address.createFromPublicKey(recipient.getPublicKey().toHex(), networkType),
+            transferTransaction.getRecipient().get());
+        assertEquals(0, transferTransaction.getMosaics().size());
+        assertNotNull(transferTransaction.getMessage());
+        assertEquals(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,
+            transferTransaction.getMessage().getType());
+        assertNotNull(transferTransaction.getMessage().getPayload());
+
+        PersistentHarvestingDelegationMessage message = (PersistentHarvestingDelegationMessage) transferTransaction
+            .getMessage();
+        Assertions.assertEquals(remoteProxy.getPrivateKey().toHex().toUpperCase(),
+            message.decryptPayload(sender.getPublicKey(), recipient.getPrivateKey(), networkType));
 
     }
 }

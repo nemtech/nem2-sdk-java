@@ -292,7 +292,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
         Assertions.assertNotNull(linkedMosaicId);
 
-        Assertions.assertEquals(MapperUtils.fromHex("528280977531AAA"), linkedMosaicId.getId());
+        Assertions.assertEquals(MapperUtils.fromHexToBigInteger("528280977531AAA"), linkedMosaicId.getId());
     }
 
 

@@ -23,10 +23,11 @@ import static io.nem.core.utils.MapperUtils.toMosaicId;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.message.Message;
+import io.nem.sdk.model.message.MessageType;
+import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.transaction.JsonHelper;
-import io.nem.sdk.model.transaction.Message;
-import io.nem.sdk.model.transaction.PlainMessage;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.model.transaction.TransferTransaction;
@@ -37,8 +38,8 @@ import io.nem.sdk.openapi.vertx.model.TransferTransactionDTO;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Transfer transaction mapper.
@@ -65,14 +66,10 @@ class TransferTransactionMapper extends
                     .collect(Collectors.toList());
         }
 
-        Message message = PlainMessage.Empty;
-        if (transaction.getMessage() != null) {
-            message =
-                new PlainMessage(
-                    new String(
-                        Hex.decode(transaction.getMessage().getPayload()),
-                        StandardCharsets.UTF_8));
-        }
+        Message message = Optional.ofNullable(transaction.getMessage())
+            .map(m -> Message.createFromPayload(
+                MessageType.rawValueOf(m.getType().getValue()),
+                m.getPayload())).orElse(PlainMessage.Empty);
 
         return TransferTransactionFactory.create(networkType,
             toAddressFromUnresolved(transaction.getRecipientAddress()),

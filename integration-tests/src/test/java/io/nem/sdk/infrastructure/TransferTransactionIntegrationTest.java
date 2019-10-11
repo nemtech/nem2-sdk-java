@@ -16,10 +16,18 @@
 
 package io.nem.sdk.infrastructure;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import io.nem.core.crypto.KeyPair;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.message.MessageType;
+import io.nem.sdk.model.message.PersistentHarvestingDelegationMessage;
 import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
-import io.nem.sdk.model.transaction.PlainMessage;
+import io.nem.sdk.model.message.EncryptedMessage;
+import io.nem.sdk.model.message.Message;
+import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
@@ -75,21 +83,93 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    public void standaloneTransferTransaction(RepositoryType type) {
+    public void standaloneTransferTransactionEncryptedMessage(RepositoryType type)
+        throws InterruptedException {
         Address recipient = getRecipient();
-        String message = "E2ETest:standaloneTransferTransaction:message";
+        String message = "E2ETest:standaloneTransferTransaction:message 漢字";
+
+        NetworkType networkType = getNetworkType();
+        KeyPair senderKeyPair = KeyPair.random(networkType.resolveSignSchema());
+        KeyPair recipientKeyPair = KeyPair.random(networkType.resolveSignSchema());
+
+        Message encryptedMessage = EncryptedMessage
+            .create(message, senderKeyPair.getPrivateKey(), recipientKeyPair.getPublicKey(),
+                networkType);
+
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 getNetworkType(),
                 recipient,
                 Collections
                     .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
-                new PlainMessage(message)
+                encryptedMessage
             ).build();
 
-        TransferTransaction processed = announceAndValidate(type, this.account,
-            transferTransaction);
-        Assertions.assertEquals(message, processed.getMessage().getPayload());
+        TransferTransaction processed = announceAndValidate(type, account, transferTransaction);
+
+        assertEncryptedMessageTransaction(message, senderKeyPair, recipientKeyPair, processed);
+        sleep(1000);
+
+        TransferTransaction restTransaction = (TransferTransaction) get(
+            getRepositoryFactory(type).createTransactionRepository()
+                .getTransaction(processed.getTransactionInfo().get().getHash().get()));
+
+        assertEncryptedMessageTransaction(message, senderKeyPair, recipientKeyPair,
+            restTransaction);
+    }
+
+    private void assertEncryptedMessageTransaction(String message,
+        KeyPair senderKeyPair, KeyPair recipientKeyPair, TransferTransaction transaction) {
+        Assertions.assertTrue(transaction.getMessage() instanceof EncryptedMessage);
+        Assertions.assertNotEquals(message, transaction.getMessage().getPayload());
+        String decryptedMessage = ((EncryptedMessage) transaction.getMessage())
+            .decryptPayload(senderKeyPair.getPublicKey(), recipientKeyPair.getPrivateKey(),
+                getNetworkType());
+        Assertions.assertNotNull(message, decryptedMessage);
+    }
+
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    public void standaloneCreatePersistentDelegationRequestTransaction(RepositoryType type)
+        throws InterruptedException {
+
+        NetworkType networkType = getNetworkType();
+        KeyPair senderKeyPair = KeyPair.random(networkType.resolveSignSchema());
+        KeyPair recipientKeyPair = KeyPair.random(networkType.resolveSignSchema());
+
+        TransferTransaction transferTransaction =
+            TransferTransactionFactory.createPersistentDelegationRequestTransaction(
+                getNetworkType(),
+                senderKeyPair.getPrivateKey(), senderKeyPair.getPrivateKey(),
+                recipientKeyPair.getPublicKey()
+            ).build();
+
+        TransferTransaction processed = announceAndValidate(type, account, transferTransaction);
+
+        assertPersistentDelegationTransaction(senderKeyPair, recipientKeyPair, processed);
+        sleep(1000);
+
+        TransferTransaction restTransaction = (TransferTransaction) get(
+            getRepositoryFactory(type).createTransactionRepository()
+                .getTransaction(processed.getTransactionInfo().get().getHash().get()));
+
+        assertPersistentDelegationTransaction(senderKeyPair, recipientKeyPair, restTransaction);
+    }
+
+    private void assertPersistentDelegationTransaction(
+        KeyPair senderKeyPair, KeyPair recipientKeyPair, TransferTransaction transaction) {
+
+        String message = recipientKeyPair.getPublicKey().toHex();
+        Assertions
+            .assertTrue(transaction.getMessage() instanceof PersistentHarvestingDelegationMessage);
+        Assertions.assertNotEquals(message, transaction.getMessage().getPayload());
+        Assertions.assertEquals(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,
+            transaction.getMessage().getType());
+        String decryptedMessage = ((PersistentHarvestingDelegationMessage) transaction.getMessage())
+            .decryptPayload(senderKeyPair.getPublicKey(), recipientKeyPair.getPrivateKey(),
+                getNetworkType());
+        Assertions.assertNotNull(message, decryptedMessage);
     }
 
 }
