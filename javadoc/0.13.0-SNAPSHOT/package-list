@@ -12,6 +12,7 @@ io.nem.sdk.infrastructure.vertx
 io.nem.sdk.infrastructure.vertx.mappers
 io.nem.sdk.model.account
 io.nem.sdk.model.blockchain
+io.nem.sdk.model.message
 io.nem.sdk.model.metadata
 io.nem.sdk.model.mosaic
 io.nem.sdk.model.namespace
