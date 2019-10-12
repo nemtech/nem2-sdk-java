@@ -17,13 +17,11 @@
 
 package io.nem.sdk.model.transaction;
 
-import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.namespace.AliasAction;
 import io.nem.sdk.model.namespace.NamespaceId;
 import java.math.BigInteger;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class AddressAliasTransactionTest extends AbstractTransactionTester {

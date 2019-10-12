@@ -17,10 +17,7 @@
 
 package io.nem.sdk.model.transaction;
 
-import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
-import java.math.BigInteger;
-import java.util.Optional;
 
 public class FakeTransferTransactionFactory extends TransactionFactory<FakeTransferTransaction> {
 

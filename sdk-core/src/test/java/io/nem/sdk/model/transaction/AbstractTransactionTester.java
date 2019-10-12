@@ -21,9 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.model.account.Account;
-import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Collections;
 import org.bouncycastle.util.encoders.Hex;
 

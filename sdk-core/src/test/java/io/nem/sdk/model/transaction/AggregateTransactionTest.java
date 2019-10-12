@@ -16,10 +16,6 @@
 
 package io.nem.sdk.model.transaction;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import io.nem.sdk.api.BinarySerialization;
-import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
@@ -31,9 +27,7 @@ import io.nem.sdk.model.mosaic.MosaicSupplyChangeActionType;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class AggregateTransactionTest extends AbstractTransactionTester {

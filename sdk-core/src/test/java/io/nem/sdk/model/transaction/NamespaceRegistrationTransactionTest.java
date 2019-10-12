@@ -19,7 +19,6 @@ package io.nem.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.namespace.NamespaceId;

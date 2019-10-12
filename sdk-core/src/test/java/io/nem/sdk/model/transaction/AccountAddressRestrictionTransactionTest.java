@@ -17,14 +17,12 @@
 
 package io.nem.sdk.model.transaction;
 
-import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class AccountAddressRestrictionTransactionTest extends AbstractTransactionTester {

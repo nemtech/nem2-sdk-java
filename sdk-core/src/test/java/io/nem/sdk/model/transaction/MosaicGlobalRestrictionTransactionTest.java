@@ -8,7 +8,6 @@ import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class MosaicGlobalRestrictionTransactionTest extends AbstractTransactionTester {
