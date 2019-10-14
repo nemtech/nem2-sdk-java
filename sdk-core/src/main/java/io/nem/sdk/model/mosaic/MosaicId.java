@@ -16,9 +16,10 @@
 
 package io.nem.sdk.model.mosaic;
 
+import io.nem.core.utils.ByteUtils;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.transaction.IdGenerator;
-import io.nem.sdk.model.transaction.UInt64Id;
 import java.math.BigInteger;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,7 +29,7 @@ import java.util.Optional;
  *
  * @since 1.0
  */
-public class MosaicId implements UInt64Id {
+public class MosaicId implements UnresolvedMosaicId {
 
     private final BigInteger id;
 
@@ -40,9 +41,7 @@ public class MosaicId implements UInt64Id {
      * @throws IllegalIdentifierException MosaicId identifier
      */
     public MosaicId(String hex) {
-        if (!hex.matches("^[0-9A-Fa-f]{16}$")) {
-            throw new IllegalIdentifierException(hex + " is an invalid hex string");
-        }
+        ConvertUtils.validateIsHexString(hex, 16);
         this.id = new BigInteger(hex, 16);
         this.fullName = Optional.empty();
     }
@@ -68,7 +67,6 @@ public class MosaicId implements UInt64Id {
      * Create MosaicId from a MosaicNonce and a PublicAccount
      */
     public static MosaicId createFromNonce(MosaicNonce mosaicNonce, PublicAccount owner) {
-
         return new MosaicId(mosaicNonce, owner);
     }
 
@@ -120,6 +118,17 @@ public class MosaicId implements UInt64Id {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    /**
+     * Gets the id as a hexadecimal string.
+     *
+     * @return Hex id.
+     */
+    @Override
+    public String getIdAsHex() {
+        byte[] bytes = ByteUtils.bigIntToBytes(getId());
+        return ConvertUtils.toHex(bytes);
     }
 
 }

@@ -27,11 +27,8 @@ import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicInfo;
 import io.nem.sdk.model.mosaic.MosaicNames;
 import io.nem.sdk.model.mosaic.MosaicNonce;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.MosaicDefinitionTransaction;
 import io.nem.sdk.model.transaction.MosaicDefinitionTransactionFactory;
-import io.nem.sdk.model.transaction.UInt64Id;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,12 +38,11 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-//TODO BROKEN!
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
 
     private Account testAccount = config().getDefaultAccount();
-    private List<UInt64Id> mosaicIds = new ArrayList<>();
+    private List<MosaicId> mosaicIds = new ArrayList<>();
     private MosaicId mosaicId;
 
     @BeforeAll
@@ -85,28 +81,7 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
         List<MosaicInfo> mosaicsInfo = get(getMosaicRepository(type).getMosaics(mosaicIds));
 
         assertEquals(mosaicIds.size(), mosaicsInfo.size());
-        assertEquals(mosaicIds.get(0).getIdAsHex(), mosaicsInfo.get(0).getMosaicId().getIdAsHex());
-    }
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getMosaicViaNamespaceId(RepositoryType type) {
-        MosaicInfo mosaicInfo = get(
-            getMosaicRepository(type).getMosaic(NetworkCurrencyMosaic.NAMESPACEID));
-
-        assertEquals(new BigInteger("1"), mosaicInfo.getStartHeight());
-        assertEquals(NetworkCurrencyMosaic.NAMESPACEID, mosaicInfo.getMosaicId());
-    }
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getMosaicsViaNamespaceId(RepositoryType type) {
-
-        List<MosaicInfo> mosaicsInfo = get(
-            getMosaicRepository(type)
-                .getMosaics(Collections.singletonList(NetworkCurrencyMosaic.NAMESPACEID)));
-
-        assertEquals(NetworkCurrencyMosaic.NAMESPACEID, mosaicsInfo.get(0).getMosaicId());
+        assertEquals(mosaicIds.get(0), mosaicsInfo.get(0).getMosaicId());
     }
 
     @ParameterizedTest

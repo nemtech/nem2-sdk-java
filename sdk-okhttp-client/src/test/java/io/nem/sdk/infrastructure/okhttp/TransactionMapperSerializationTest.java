@@ -69,7 +69,6 @@ public class TransactionMapperSerializationTest {
             .parse(json, TransactionInfoDTO.class);
 
         Transaction transactionModel = transactionMapper.map(originalTransactionInfo);
-        System.out.println(transactionModel.getType());
         Assertions.assertNotNull(transactionModel);
 
         TransactionInfoDTO mappedTransactionInfo = transactionMapper.map(transactionModel);

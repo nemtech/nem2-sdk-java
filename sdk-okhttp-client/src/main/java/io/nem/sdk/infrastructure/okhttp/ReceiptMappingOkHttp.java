@@ -16,8 +16,8 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
-import static io.nem.core.utils.MapperUtils.toAddress;
-import static io.nem.core.utils.MapperUtils.toAddressFromUnresolved;
+import static io.nem.core.utils.MapperUtils.toAddressFromEncoded;
+import static io.nem.core.utils.MapperUtils.toAddressFromRawAddress;
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.core.utils.MapperUtils;
@@ -83,12 +83,12 @@ public class ReceiptMappingOkHttp {
         ResolutionStatementBodyDTO statement = receiptDto.getStatement();
         return new ResolutionStatement<>(
             statement.getHeight(),
-            toAddressFromUnresolved(statement.getUnresolved().toString()),
+            toAddressFromEncoded(statement.getUnresolved().toString()),
             statement.getResolutionEntries().stream()
                 .map(
                     entry ->
                         new ResolutionEntry<>(
-                            new AddressAlias(toAddress(entry.getResolved().toString())),
+                            new AddressAlias(toAddressFromRawAddress(entry.getResolved().toString())),
                             new ReceiptSource(entry.getSource().getPrimaryId(),
                                 entry.getSource().getSecondaryId()),
                             ReceiptType.ADDRESS_ALIAS_RESOLUTION))
@@ -179,7 +179,7 @@ public class ReceiptMappingOkHttp {
         BalanceTransferReceiptDTO receipt, NetworkType networkType) {
         return new BalanceTransferReceipt<>(
             PublicAccount.createFromPublicKey(receipt.getSenderPublicKey(), networkType),
-            MapperUtils.toAddressFromUnresolved(receipt.getRecipientAddress()),
+            MapperUtils.toAddressFromEncoded(receipt.getRecipientAddress()),
             new MosaicId(receipt.getMosaicId()),
             receipt.getAmount(),
             ReceiptType.rawValueOf(receipt.getType().getValue()),

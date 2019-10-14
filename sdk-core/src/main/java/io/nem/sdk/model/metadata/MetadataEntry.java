@@ -17,9 +17,6 @@
 package io.nem.sdk.model.metadata;
 
 import io.nem.core.utils.MapperUtils;
-import io.nem.sdk.model.mosaic.MosaicId;
-import io.nem.sdk.model.namespace.NamespaceId;
-import io.nem.sdk.model.transaction.UInt64Id;
 import java.math.BigInteger;
 import java.util.Optional;
 
@@ -70,7 +67,7 @@ public class MetadataEntry {
      *
      * {@link io.nem.sdk.model.namespace.NamespaceId} (when metadata type is MOSAIC)
      */
-    private final Optional<UInt64Id> targetId;
+    private final Optional<Object> targetId;
 
     @SuppressWarnings("squid:S00107")
     public MetadataEntry(String compositeHash, String senderPublicKey, String targetPublicKey,
@@ -86,7 +83,7 @@ public class MetadataEntry {
         this.targetId = resolveTargetId(targetId, metadataType);
     }
 
-    private Optional<UInt64Id> resolveTargetId(Optional<String> targetId,
+    private Optional<Object> resolveTargetId(Optional<String> targetId,
         MetadataType metadataType) {
         if (!targetId.isPresent() && metadataType == MetadataType.ACCOUNT) {
             return Optional.empty();
@@ -128,7 +125,7 @@ public class MetadataEntry {
         return value;
     }
 
-    public Optional<UInt64Id> getTargetId() {
+    public Optional<Object> getTargetId() {
         return targetId;
     }
 }

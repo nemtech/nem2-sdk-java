@@ -51,7 +51,7 @@ public class MetadataRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
 
     @Test
     public void shouldGetAccountMetadata() throws Exception {
-        Address address = MapperUtils.toAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = MapperUtils.toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
         MetadataEntriesDTO dto = getMetadataEntriesDTO();
         mockRemoteCall(dto);
         List<Metadata> resultList = repository.getAccountMetadata(address, Optional.empty())
@@ -61,7 +61,7 @@ public class MetadataRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
 
     @Test
     public void shouldGetAccountMetadataByKey() throws Exception {
-        Address address = MapperUtils.toAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = MapperUtils.toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
         MetadataEntriesDTO dto = getMetadataEntriesDTO();
         mockRemoteCall(dto);
         List<Metadata> resultList = repository.getAccountMetadataByKey(address, BigInteger.TEN)
@@ -71,7 +71,7 @@ public class MetadataRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
 
     @Test
     public void shouldGetAccountMetadataByKeyAndSender() throws Exception {
-        Address address = MapperUtils.toAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = MapperUtils.toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
         MetadataDTO expected = createMetadataDto(ConvertUtils.toSize16Hex(BigInteger.TEN),
             MetadataTypeEnum.NUMBER_1, "11111");
         mockRemoteCall(expected);
@@ -179,10 +179,17 @@ public class MetadataRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
         if (expected.getMetadataEntry().getTargetId() != null) {
             Assertions
                 .assertTrue(result.getMetadataEntry().getTargetId().isPresent());
-            Assertions
-                .assertEquals(
-                    new BigInteger(expected.getMetadataEntry().getTargetId().toString(), 16),
-                    result.getMetadataEntry().getTargetId().get().getId());
+            BigInteger expectedTargetId = new BigInteger(
+                expected.getMetadataEntry().getTargetId().toString(), 16);
+            if (expected.getMetadataEntry().getMetadataType() == MetadataTypeEnum.NUMBER_1) {
+                Assertions.assertEquals(expectedTargetId,
+                    ((MosaicId) result.getMetadataEntry().getTargetId().get()).getId());
+            }
+
+            if (expected.getMetadataEntry().getMetadataType() == MetadataTypeEnum.NUMBER_2) {
+                Assertions.assertEquals(expectedTargetId,
+                    ((NamespaceId) result.getMetadataEntry().getTargetId().get()).getId());
+            }
         } else {
             Assertions
                 .assertFalse(result.getMetadataEntry().getTargetId().isPresent());

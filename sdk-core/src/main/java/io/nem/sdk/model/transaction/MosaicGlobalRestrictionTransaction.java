@@ -25,7 +25,7 @@ import io.nem.catapult.builders.MosaicRestrictionTypeDto;
 import io.nem.catapult.builders.SignatureDto;
 import io.nem.catapult.builders.TimestampDto;
 import io.nem.catapult.builders.UnresolvedMosaicIdDto;
-import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
@@ -47,8 +47,8 @@ import java.nio.ByteBuffer;
  */
 public class MosaicGlobalRestrictionTransaction extends Transaction {
 
-    private final MosaicId mosaicId;
-    private final MosaicId referenceMosaicId;
+    private final UnresolvedMosaicId mosaicId;
+    private final UnresolvedMosaicId referenceMosaicId;
     private final BigInteger restrictionKey;
     private final BigInteger previousRestrictionValue;
     private final MosaicRestrictionType previousRestrictionType;
@@ -74,18 +74,18 @@ public class MosaicGlobalRestrictionTransaction extends Transaction {
     /**
      * Returns the mosaic id.
      *
-     * @return {@link MosaicId}
+     * @return {@link UnresolvedMosaicId}
      */
-    public MosaicId getMosaicId() {
+    public UnresolvedMosaicId getMosaicId() {
         return mosaicId;
     }
 
     /**
      * Returns the reference mosaic id.
      *
-     * @return {@link MosaicId}
+     * @return {@link UnresolvedMosaicId}
      */
-    public MosaicId getReferenceMosaicId() {
+    public UnresolvedMosaicId getReferenceMosaicId() {
         return referenceMosaicId;
     }
 

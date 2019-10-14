@@ -26,7 +26,8 @@ import io.nem.catapult.builders.TimestampDto;
 import io.nem.catapult.builders.UnresolvedAddressDto;
 import io.nem.catapult.builders.UnresolvedMosaicIdDto;
 import io.nem.sdk.model.account.Address;
-import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.account.UnresolvedAddress;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
@@ -45,9 +46,9 @@ import java.nio.ByteBuffer;
  */
 public class MosaicAddressRestrictionTransaction extends Transaction {
 
-    private final MosaicId mosaicId;
+    private final UnresolvedMosaicId mosaicId;
     private final BigInteger restrictionKey;
-    private final Address targetAddress;
+    private final UnresolvedAddress targetAddress;
     private final BigInteger previousRestrictionValue;
     private final BigInteger newRestrictionValue;
 
@@ -68,9 +69,9 @@ public class MosaicAddressRestrictionTransaction extends Transaction {
     /**
      * Returns the mosaic id.
      *
-     * @return {@link MosaicId}
+     * @return {@link UnresolvedMosaicId}
      */
-    public MosaicId getMosaicId() {
+    public UnresolvedMosaicId getMosaicId() {
         return mosaicId;
     }
 
@@ -88,7 +89,7 @@ public class MosaicAddressRestrictionTransaction extends Transaction {
      *
      * @return {@link Address}
      */
-    public Address getTargetAddress() {
+    public UnresolvedAddress getTargetAddress() {
         return targetAddress;
     }
 

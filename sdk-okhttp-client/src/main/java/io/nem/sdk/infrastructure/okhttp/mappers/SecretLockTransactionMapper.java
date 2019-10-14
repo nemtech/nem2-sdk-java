@@ -16,7 +16,6 @@
 
 package io.nem.sdk.infrastructure.okhttp.mappers;
 
-import static io.nem.core.utils.MapperUtils.toAddressFromUnresolved;
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.core.utils.MapperUtils;
@@ -54,7 +53,7 @@ class SecretLockTransactionMapper extends
             transaction.getDuration(),
             LockHashAlgorithmType.rawValueOf(transaction.getHashAlgorithm().getValue()),
             transaction.getSecret(),
-            toAddressFromUnresolved(transaction.getRecipientAddress()));
+            MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()));
     }
 
     @Override

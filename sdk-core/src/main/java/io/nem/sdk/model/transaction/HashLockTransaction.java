@@ -106,7 +106,7 @@ public class HashLockTransaction extends Transaction {
                 new AmountDto(getMaxFee().longValue()),
                 new TimestampDto(getDeadline().getInstant()),
                 UnresolvedMosaicBuilder.create(
-                    new UnresolvedMosaicIdDto(getMosaic().getId().getId().longValue()),
+                    new UnresolvedMosaicIdDto(getMosaic().getId().getIdAsLong()),
                     new AmountDto(getMosaic().getAmount().longValue())),
                 new BlockDurationDto(getDuration().longValue()),
                 new Hash256Dto(getHashBuffer()));
@@ -126,7 +126,7 @@ public class HashLockTransaction extends Transaction {
                 getNetworkVersion(),
                 getEntityTypeDto(),
                 UnresolvedMosaicBuilder.create(
-                    new UnresolvedMosaicIdDto(getMosaic().getId().getId().longValue()),
+                    new UnresolvedMosaicIdDto(getMosaic().getId().getIdAsLong()),
                     new AmountDto(getMosaic().getAmount().longValue())),
                 new BlockDurationDto(getDuration().longValue()),
                 new Hash256Dto(getHashBuffer()));

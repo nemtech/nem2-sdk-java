@@ -23,6 +23,7 @@ import io.nem.sdk.model.metadata.MetadataType;
 import io.nem.sdk.model.mosaic.MosaicFlags;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicNonce;
+import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.MosaicDefinitionTransaction;
@@ -51,12 +52,14 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
     public void addMetadataToMosaic(RepositoryType type) throws InterruptedException {
 
         MosaicId targetMosaicId = createMosaic(type);
+        NamespaceId alias = setMosaicAlias(type, targetMosaicId,
+            "mosaicalias" + targetMosaicId.getIdAsHex().toLowerCase());
 
         String message = "This is the message in the mosaic!";
         BigInteger key = BigInteger.TEN;
         MosaicMetadataTransaction transaction =
             MosaicMetadataTransactionFactory.create(
-                getNetworkType(), testAccount.getPublicAccount(), targetMosaicId,
+                getNetworkType(), testAccount.getPublicAccount(), alias,
                 key, message
             ).build();
 
@@ -92,22 +95,23 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
             .getMosaicMetadata(targetMosaicId,
                 Optional.empty()));
 
-        assertMetadata(transaction, metadata);
+        assertMetadata(targetMosaicId, transaction, metadata);
 
-        assertMetadata(transaction, get(getRepositoryFactory(type).createMetadataRepository()
-            .getMosaicMetadataByKey(targetMosaicId, key)));
+        assertMetadata(targetMosaicId, transaction,
+            get(getRepositoryFactory(type).createMetadataRepository()
+                .getMosaicMetadataByKey(targetMosaicId, key)));
 
-        assertMetadata(transaction,
+        assertMetadata(targetMosaicId, transaction,
             Collections.singletonList(get(getRepositoryFactory(type).createMetadataRepository()
                 .getMosaicMetadataByKeyAndSender(targetMosaicId, key,
                     testAccount.getPublicKey()))));
 
-        assertMetadata(transaction, metadata);
+        assertMetadata(targetMosaicId, transaction, metadata);
         Assertions.assertEquals(message, processedTransaction.getValue());
     }
 
 
-    private String assertMetadata(MosaicMetadataTransaction transaction,
+    private String assertMetadata(MosaicId targetMosaicId, MosaicMetadataTransaction transaction,
         List<Metadata> metadata) {
 
         Optional<Metadata> endpointMetadata = metadata.stream().filter(
@@ -121,8 +125,8 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
         Assertions.assertTrue(endpointMetadata.isPresent());
         System.out.println(endpointMetadata.get().getId());
 
-        Assertions.assertEquals(transaction.getTargetMosaicId().getIdAsHex(),
-            endpointMetadata.get().getMetadataEntry().getTargetId().get().getIdAsHex());
+        Assertions.assertEquals(targetMosaicId,
+            endpointMetadata.get().getMetadataEntry().getTargetId().get());
 
         Assertions.assertEquals(transaction.getValue(),
             endpointMetadata.get().getMetadataEntry().getValue());

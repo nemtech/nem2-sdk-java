@@ -175,4 +175,58 @@ public class ConvertUtilsTest {
 
     }
 
+    @Test
+    void testIsHexString() {
+        Assertions.assertTrue(ConvertUtils.isHexString("026ee415fc15"));
+        Assertions.assertTrue(ConvertUtils.isHexString("abcdef0123456789ABCDEF"));
+        Assertions.assertFalse(ConvertUtils.isHexString("abcdef012345G789ABCDEF")); //G char
+        Assertions.assertFalse(ConvertUtils.isHexString("026ee415fc1")); //ODD
+        Assertions.assertFalse(ConvertUtils.isHexString(null)); //Null
+    }
+
+    @Test
+    void validateIsHexString() {
+        assertIsHexString("026ee415fc15", null, null);
+        assertIsHexString("abcdef0123456789ABCDEF", null, null);
+
+        assertIsHexString("026ee415fc15", 12, null);
+        assertIsHexString("abcdef0123456789ABCDEF", 22, null);
+
+        assertIsHexString("026ee415fc15", 4, "026ee415fc15 is not an hex of size 4");
+        assertIsHexString("abcdef0123456789ABCDEF", 4,
+            "abcdef0123456789ABCDEF is not an hex of size 4");
+
+        assertIsHexString("abcdef012345G789ABCDEF", null, "abcdef012345G789ABCDEF is not a valid hex");
+        assertIsHexString("026ee415fc1", null, "026ee415fc1 is not a valid hex");
+        assertIsHexString(null, null, "Null is not a valid hex");
+
+        assertIsHexString("abcdef012345G789ABCDEF", 2, "abcdef012345G789ABCDEF is not a valid hex");
+        assertIsHexString("026ee415fc1", 2, "026ee415fc1 is not a valid hex");
+        assertIsHexString(null, 2, "Null is not a valid hex");
+
+    }
+
+    @Test
+    void reverseHex() {
+        String hex = "d9e338f78767ed95";
+        String reverseHex = ConvertUtils.reverseHexString(hex);
+        Assertions.assertEquals("95ed6787f738e3d9",reverseHex);
+        Assertions.assertEquals(hex,ConvertUtils.reverseHexString(reverseHex));
+    }
+
+    private void assertIsHexString(String input, Integer size, String errorMessage) {
+        try {
+            if (size == null) {
+                ConvertUtils.validateIsHexString(input);
+            } else {
+                ConvertUtils.validateIsHexString(input, size);
+            }
+            Assertions.assertNull(errorMessage);
+        } catch (IllegalArgumentException e) {
+            Assertions.assertEquals(errorMessage, e.getMessage());
+        }
+
+    }
+
+
 }

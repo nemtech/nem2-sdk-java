@@ -24,7 +24,7 @@ import io.nem.catapult.builders.MosaicSupplyChangeTransactionBuilder;
 import io.nem.catapult.builders.SignatureDto;
 import io.nem.catapult.builders.TimestampDto;
 import io.nem.catapult.builders.UnresolvedMosaicIdDto;
-import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.mosaic.MosaicSupplyChangeActionType;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -37,7 +37,7 @@ import java.nio.ByteBuffer;
  */
 public class MosaicSupplyChangeTransaction extends Transaction {
 
-    private final MosaicId mosaicId;
+    private final UnresolvedMosaicId mosaicId;
     private final MosaicSupplyChangeActionType action;
     private final BigInteger delta;
 
@@ -53,7 +53,7 @@ public class MosaicSupplyChangeTransaction extends Transaction {
      *
      * @return BigInteger
      */
-    public MosaicId getMosaicId() {
+    public UnresolvedMosaicId getMosaicId() {
         return mosaicId;
     }
 

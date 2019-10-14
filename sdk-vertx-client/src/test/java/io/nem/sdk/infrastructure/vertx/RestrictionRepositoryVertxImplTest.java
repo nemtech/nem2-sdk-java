@@ -121,7 +121,7 @@ public class RestrictionRepositoryVertxImplTest extends AbstractVertxRespository
         Assertions.assertEquals(AccountRestrictionType.ALLOW_INCOMING_ADDRESS,
             accountRestrictions.getRestrictions().get(0).getRestrictionType());
         Assertions.assertEquals(Collections.singletonList(MapperUtils
-                .toAddressFromUnresolved("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142")),
+                .toUnresolvedAddress("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142")),
             accountRestrictions.getRestrictions().get(0).getValues());
 
     }
@@ -140,7 +140,7 @@ public class RestrictionRepositoryVertxImplTest extends AbstractVertxRespository
         dto.setMosaicRestrictionEntry(wrapperDTO);
 
         MosaicAddressRestrictionEntryDTO entryDTO = new MosaicAddressRestrictionEntryDTO();
-        entryDTO.setKey(ConvertUtils.toSize16Hex(BigInteger.valueOf(1111)));
+        entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
         entryDTO.setValue("2222");
         List<MosaicAddressRestrictionEntryDTO> restrictions = new ArrayList<>();
         restrictions.add(entryDTO);
@@ -188,7 +188,7 @@ public class RestrictionRepositoryVertxImplTest extends AbstractVertxRespository
         dto.setMosaicRestrictionEntry(wrapperDTO);
 
         MosaicGlobalRestrictionEntryDTO entryDTO = new MosaicGlobalRestrictionEntryDTO();
-        entryDTO.setKey(ConvertUtils.toSize16Hex(BigInteger.valueOf(1111)));
+        entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
         MosaicGlobalRestrictionEntryRestrictionDTO entryRestrictionDto = new MosaicGlobalRestrictionEntryRestrictionDTO();
         entryRestrictionDto.setRestrictionType(MosaicRestrictionTypeEnum.NUMBER_5);
         entryRestrictionDto.setReferenceMosaicId("456");
@@ -248,7 +248,7 @@ public class RestrictionRepositoryVertxImplTest extends AbstractVertxRespository
         dto.setMosaicRestrictionEntry(wrapperDTO);
 
         MosaicGlobalRestrictionEntryDTO entryDTO = new MosaicGlobalRestrictionEntryDTO();
-        entryDTO.setKey(ConvertUtils.toSize16Hex(BigInteger.valueOf(1111)));
+        entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
         MosaicGlobalRestrictionEntryRestrictionDTO entryRestrictionDto = new MosaicGlobalRestrictionEntryRestrictionDTO();
         entryRestrictionDto.setRestrictionType(MosaicRestrictionTypeEnum.NUMBER_5);
         entryRestrictionDto.setReferenceMosaicId("456");
@@ -306,7 +306,7 @@ public class RestrictionRepositoryVertxImplTest extends AbstractVertxRespository
         dto.setMosaicRestrictionEntry(wrapperDTO);
 
         MosaicAddressRestrictionEntryDTO entryDTO = new MosaicAddressRestrictionEntryDTO();
-        entryDTO.setKey(ConvertUtils.toSize16Hex(BigInteger.valueOf(1111)));
+        entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
         entryDTO.setValue("2222");
         List<MosaicAddressRestrictionEntryDTO> restrictions = new ArrayList<>();
         restrictions.add(entryDTO);

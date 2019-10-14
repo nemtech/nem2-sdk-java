@@ -121,8 +121,8 @@ public class NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
 
         Assertions.assertTrue(endpointMetadata.isPresent());
 
-        Assertions.assertEquals(transaction.getTargetNamespaceId().getIdAsHex(),
-            endpointMetadata.get().getMetadataEntry().getTargetId().get().getIdAsHex());
+        Assertions.assertEquals(transaction.getTargetNamespaceId(),
+            endpointMetadata.get().getMetadataEntry().getTargetId().get());
 
         Assertions.assertEquals(transaction.getValue(),
             endpointMetadata.get().getMetadataEntry().getValue());

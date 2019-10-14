@@ -98,13 +98,13 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
     public void shouldGetAccountsRestrictionsFromAddresses() throws Exception {
         Address address =
             Address.createFromEncoded(
-                "9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142");
+                "9050b9837efab4bbe8a4b9bb32d812f9885c00d8fc1650e142");
 
         AccountRestrictionsDTO dto = new AccountRestrictionsDTO();
         dto.setAddress(address.encoded());
         AccountRestrictionDTO restriction = new AccountRestrictionDTO();
         restriction.setRestrictionType(AccountRestrictionTypeEnum.NUMBER_1);
-        restriction.setValues(Arrays.asList("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142"));
+        restriction.setValues(Arrays.asList("9050b9837efab4bbe8a4b9bb32d812f9885c00d8fc1650e142"));
         dto.setRestrictions(Collections.singletonList(restriction));
 
         AccountRestrictionsInfoDTO info = new AccountRestrictionsInfoDTO();
@@ -120,7 +120,7 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         Assertions.assertEquals(AccountRestrictionType.ALLOW_INCOMING_ADDRESS,
             accountRestrictions.getRestrictions().get(0).getRestrictionType());
         Assertions.assertEquals(Collections.singletonList(MapperUtils
-                .toAddressFromUnresolved("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142")),
+                .toUnresolvedAddress("9050b9837efab4bbe8a4b9bb32d812f9885c00d8fc1650e142")),
             accountRestrictions.getRestrictions().get(0).getValues());
 
     }
@@ -139,7 +139,7 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         dto.setMosaicRestrictionEntry(wrapperDTO);
 
         MosaicAddressRestrictionEntryDTO entryDTO = new MosaicAddressRestrictionEntryDTO();
-        entryDTO.setKey(ConvertUtils.toSize16Hex(BigInteger.valueOf(1111)));
+        entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
         entryDTO.setValue("2222");
         List<MosaicAddressRestrictionEntryDTO> restrictions = new ArrayList<>();
         restrictions.add(entryDTO);
@@ -172,7 +172,8 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         Assertions.assertEquals(address, mosaicAddressRestriction.getTargetAddress());
         Assertions.assertEquals(1, mosaicAddressRestriction.getRestrictions().size());
         Assertions
-            .assertEquals(BigInteger.valueOf(2222), mosaicAddressRestriction.getRestrictions().get(BigInteger.valueOf(1111)));
+            .assertEquals(BigInteger.valueOf(2222),
+                mosaicAddressRestriction.getRestrictions().get(BigInteger.valueOf(1111)));
 
     }
 
@@ -186,7 +187,7 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         dto.setMosaicRestrictionEntry(wrapperDTO);
 
         MosaicGlobalRestrictionEntryDTO entryDTO = new MosaicGlobalRestrictionEntryDTO();
-        entryDTO.setKey(ConvertUtils.toSize16Hex(BigInteger.valueOf(1111)));
+        entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
         MosaicGlobalRestrictionEntryRestrictionDTO entryRestrictionDto = new MosaicGlobalRestrictionEntryRestrictionDTO();
         entryRestrictionDto.setRestrictionType(MosaicRestrictionTypeEnum.NUMBER_5);
         entryRestrictionDto.setReferenceMosaicId("456");
@@ -222,14 +223,17 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         Assertions.assertEquals(1, mosaicGlobalRestriction.getRestrictions().size());
         Assertions
             .assertEquals(BigInteger.valueOf(3333),
-                mosaicGlobalRestriction.getRestrictions().get(BigInteger.valueOf(1111)).getRestrictionValue());
+                mosaicGlobalRestriction.getRestrictions().get(BigInteger.valueOf(1111))
+                    .getRestrictionValue());
         Assertions
             .assertEquals("0000000000000456",
-                mosaicGlobalRestriction.getRestrictions().get(BigInteger.valueOf(1111)).getReferenceMosaicId()
+                mosaicGlobalRestriction.getRestrictions().get(BigInteger.valueOf(1111))
+                    .getReferenceMosaicId()
                     .getIdAsHex());
         Assertions
             .assertEquals(MosaicRestrictionType.GT,
-                mosaicGlobalRestriction.getRestrictions().get(BigInteger.valueOf(1111)).getRestrictionType());
+                mosaicGlobalRestriction.getRestrictions().get(BigInteger.valueOf(1111))
+                    .getRestrictionType());
 
     }
 
@@ -243,7 +247,7 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         dto.setMosaicRestrictionEntry(wrapperDTO);
 
         MosaicGlobalRestrictionEntryDTO entryDTO = new MosaicGlobalRestrictionEntryDTO();
-        entryDTO.setKey(ConvertUtils.toSize16Hex(BigInteger.valueOf(1111)));
+        entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
         MosaicGlobalRestrictionEntryRestrictionDTO entryRestrictionDto = new MosaicGlobalRestrictionEntryRestrictionDTO();
         entryRestrictionDto.setRestrictionType(MosaicRestrictionTypeEnum.NUMBER_5);
         entryRestrictionDto.setReferenceMosaicId("456");
@@ -301,7 +305,7 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         dto.setMosaicRestrictionEntry(wrapperDTO);
 
         MosaicAddressRestrictionEntryDTO entryDTO = new MosaicAddressRestrictionEntryDTO();
-        entryDTO.setKey(ConvertUtils.toSize16Hex(BigInteger.valueOf(1111)));
+        entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
         entryDTO.setValue("2222");
         List<MosaicAddressRestrictionEntryDTO> restrictions = new ArrayList<>();
         restrictions.add(entryDTO);

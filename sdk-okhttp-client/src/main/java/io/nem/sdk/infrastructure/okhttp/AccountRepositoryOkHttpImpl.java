@@ -16,9 +16,9 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
-import static io.nem.core.utils.MapperUtils.toAddressFromUnresolved;
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
@@ -116,7 +116,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
      * @return {@link AccountNames}
      */
     private AccountNames toAccountNames(AccountNamesDTO dto) {
-        return new AccountNames(toAddressFromUnresolved(dto.getAddress()),
+        return new AccountNames(MapperUtils.toAddressFromEncoded(dto.getAddress()),
             dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
     }
 
@@ -280,7 +280,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
 
     private AccountInfo toAccountInfo(AccountDTO accountDTO) {
         return new AccountInfo(
-            toAddressFromUnresolved(accountDTO.getAddress()),
+            MapperUtils.toAddressFromEncoded(accountDTO.getAddress()),
             accountDTO.getAddressHeight(),
             accountDTO.getPublicKey(),
             accountDTO.getPublicKeyHeight(),

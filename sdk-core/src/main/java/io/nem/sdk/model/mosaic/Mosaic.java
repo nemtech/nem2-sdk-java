@@ -16,7 +16,6 @@
 
 package io.nem.sdk.model.mosaic;
 
-import io.nem.sdk.model.transaction.UInt64Id;
 import java.math.BigInteger;
 
 /**
@@ -27,10 +26,11 @@ import java.math.BigInteger;
  */
 public class Mosaic {
 
-    private final UInt64Id id;
+    private final UnresolvedMosaicId id;
+
     private final BigInteger amount;
 
-    public Mosaic(UInt64Id id, BigInteger amount) {
+    public Mosaic(UnresolvedMosaicId id, BigInteger amount) {
         this.id = id;
         this.amount = amount;
     }
@@ -40,7 +40,7 @@ public class Mosaic {
      *
      * @return mosaic identifier
      */
-    public UInt64Id getId() {
+    public UnresolvedMosaicId getId() {
         return id;
     }
 

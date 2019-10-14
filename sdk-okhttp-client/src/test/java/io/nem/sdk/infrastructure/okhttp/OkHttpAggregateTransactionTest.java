@@ -140,7 +140,7 @@ public class OkHttpAggregateTransactionTest {
 
         assertEquals("2d010000", signedTransaction.getPayload().substring(0, 8));
         assertEquals("5100000051000000", signedTransaction.getPayload().substring(240, 256));
-        // assertEquals("039054419050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1420D000000746573742D6D65737361676568B3FBB18729C1FDE225C57F8CE080FA828F0067E451A3FD81FA628842B0B763", signedTransaction.getPayload().substring(320, 474));
+        // assertEquals("039054419050b9837efab4bbe8a4b9bb32d812f9885c00d8fc1650e1420D000000746573742D6D65737361676568B3FBB18729C1FDE225C57F8CE080FA828F0067E451A3FD81FA628842B0B763", signedTransaction.getPayload().substring(320, 474));
 
     }
 

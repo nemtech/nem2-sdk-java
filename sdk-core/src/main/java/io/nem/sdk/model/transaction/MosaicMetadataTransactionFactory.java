@@ -19,7 +19,7 @@ package io.nem.sdk.model.transaction;
 
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import java.math.BigInteger;
 import org.apache.commons.lang3.Validate;
 
@@ -32,12 +32,12 @@ public class MosaicMetadataTransactionFactory extends
     /**
      * Metadata target mosaic id.
      */
-    private final MosaicId targetMosaicId;
+    private final UnresolvedMosaicId targetMosaicId;
 
     private MosaicMetadataTransactionFactory(
         NetworkType networkType,
         PublicAccount targetAccount,
-        MosaicId targetMosaicId,
+        UnresolvedMosaicId targetMosaicId,
         BigInteger scopedMetadataKey,
         String value) {
         super(TransactionType.MOSAIC_METADATA_TRANSACTION, networkType, targetAccount,
@@ -57,11 +57,11 @@ public class MosaicMetadataTransactionFactory extends
      * @return Mosaic metadata transaction.
      */
     public static MosaicMetadataTransactionFactory create(NetworkType networkType,
-        PublicAccount targetAccount, MosaicId targetMosaicId, BigInteger scopedMetadataKey, String value) {
+        PublicAccount targetAccount, UnresolvedMosaicId targetMosaicId, BigInteger scopedMetadataKey, String value) {
         return new MosaicMetadataTransactionFactory(networkType, targetAccount, targetMosaicId, scopedMetadataKey, value);
     }
 
-    public MosaicId getTargetMosaicId() {
+    public UnresolvedMosaicId getTargetMosaicId() {
         return targetMosaicId;
     }
 

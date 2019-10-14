@@ -18,7 +18,7 @@
 package io.nem.sdk.model.transaction;
 
 import io.nem.sdk.model.account.Account;
-import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +36,8 @@ public class AccountAddressRestrictionTransactionTest extends AbstractTransactio
     @Test
     void create() {
 
-        final List<AccountRestrictionModification<Address>> modifications = new ArrayList<>();
-        AccountRestrictionModification<Address> modification = AccountRestrictionModification
+        final List<AccountRestrictionModification<UnresolvedAddress>> modifications = new ArrayList<>();
+        AccountRestrictionModification<UnresolvedAddress> modification = AccountRestrictionModification
             .createForAddress(AccountRestrictionModificationAction.ADD, account.getAddress());
         modifications.add(modification);
         AccountAddressRestrictionTransaction transaction =
@@ -57,7 +57,7 @@ public class AccountAddressRestrictionTransactionTest extends AbstractTransactio
     @Test
     void shouldGenerateBytes() {
 
-        final List<AccountRestrictionModification<Address>> modifications = new ArrayList<>();
+        final List<AccountRestrictionModification<UnresolvedAddress>> modifications = new ArrayList<>();
         modifications.add(AccountRestrictionModification
             .createForAddress(AccountRestrictionModificationAction.ADD, account.getAddress()));
         AccountAddressRestrictionTransaction transaction =

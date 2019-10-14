@@ -31,10 +31,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  *
  * @since 1.0
  */
-public class Address {
-
+public class Address implements UnresolvedAddress {
 
     private final String plainAddress;
+
     private final NetworkType networkType;
 
     /**
@@ -69,17 +69,25 @@ public class Address {
      * @return {@link Address}
      */
     public static Address createFromRawAddress(String rawAddress) {
-        char addressNetwork = rawAddress.charAt(0);
-        if (addressNetwork == 'N') {
-            return new Address(rawAddress, NetworkType.MAIN_NET);
-        } else if (addressNetwork == 'T') {
-            return new Address(rawAddress, NetworkType.TEST_NET);
-        } else if (addressNetwork == 'M') {
-            return new Address(rawAddress, NetworkType.MIJIN);
-        } else if (addressNetwork == 'S') {
-            return new Address(rawAddress, NetworkType.MIJIN_TEST);
+        String addressTrimAndUpperCase = rawAddress
+            .trim()
+            .toUpperCase()
+            .replace("-", "");
+        if (addressTrimAndUpperCase.length() != 40) {
+            throw new IllegalArgumentException(
+                "Address " + addressTrimAndUpperCase + " has to be 40 characters long.");
         }
-        throw new IllegalArgumentException(rawAddress + " is an invalid address.");
+        char addressNetwork = addressTrimAndUpperCase.charAt(0);
+        if (addressNetwork == 'N') {
+            return new Address(addressTrimAndUpperCase, NetworkType.MAIN_NET);
+        } else if (addressNetwork == 'T') {
+            return new Address(addressTrimAndUpperCase, NetworkType.TEST_NET);
+        } else if (addressNetwork == 'M') {
+            return new Address(addressTrimAndUpperCase, NetworkType.MIJIN);
+        } else if (addressNetwork == 'S') {
+            return new Address(addressTrimAndUpperCase, NetworkType.MIJIN_TEST);
+        }
+        throw new IllegalArgumentException(addressTrimAndUpperCase + " is an invalid address.");
     }
 
     /**
@@ -96,15 +104,6 @@ public class Address {
             throw new IllegalArgumentException(
                 encodedAddress + " could not be decoded. " + ExceptionUtils.getMessage(e), e);
         }
-    }
-
-    /**
-     * Returns the encoded address.
-     *
-     * @return the encoded plain address.
-     */
-    public String encoded() {
-        return Hex.encodeHexString(new Base32().decode(plainAddress));
     }
 
     /**
@@ -141,11 +140,22 @@ public class Address {
     /**
      * Gets address as byte buffer.
      *
-     * @return Byte buffer.
+     * @return Byte buffer used for serialization.
      */
+    @Override
     public ByteBuffer getByteBuffer() {
-        return ByteBuffer.wrap(new Base32().decode(plain().getBytes(StandardCharsets.UTF_8)));
+        return ByteBuffer.wrap(new Base32().decode(plain()));
     }
+
+    /**
+     * Returns the encoded address.
+     *
+     * @return the encoded plain address.
+     */
+    public String encoded() {
+        return Hex.encodeHexString(new Base32().decode(plain()));
+    }
+
 
     /**
      * Get address in pretty format ex: SB3KUB-HATFCP-V7UZQL-WAQ2EU-R6SIHB-SBEOED-DDF3.

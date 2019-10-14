@@ -21,8 +21,10 @@ import io.nem.sdk.api.RestrictionRepository;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.AccountRestrictions;
 import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicNonce;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
 import io.nem.sdk.model.transaction.AccountMosaicRestrictionTransaction;
@@ -218,11 +220,11 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
     }
 
     private void sendAccountRestrictionMosaic(RepositoryType type,
-        AccountRestrictionModification<MosaicId> modification,
+        AccountRestrictionModification<UnresolvedMosaicId> modification,
         AccountRestrictionType accountRestrictionType) {
 
         Account testAccount = getTestAccount();
-        List<AccountRestrictionModification<MosaicId>> modifications = new ArrayList<>();
+        List<AccountRestrictionModification<UnresolvedMosaicId>> modifications = new ArrayList<>();
         modifications.add(modification);
         AccountMosaicRestrictionTransaction transaction =
             AccountMosaicRestrictionTransactionFactory.create(
@@ -242,11 +244,11 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
     }
 
     private void sendAccountRestrictionAddress(RepositoryType type,
-        AccountRestrictionModification<Address> modification,
+        AccountRestrictionModification<UnresolvedAddress> modification,
         AccountRestrictionType accountRestrictionType) {
 
         Account testAccount = getTestAccount();
-        List<AccountRestrictionModification<Address>> modifications = new ArrayList<>();
+        List<AccountRestrictionModification<UnresolvedAddress>> modifications = new ArrayList<>();
         modifications.add(modification);
         AccountAddressRestrictionTransaction transaction =
             AccountAddressRestrictionTransactionFactory.create(

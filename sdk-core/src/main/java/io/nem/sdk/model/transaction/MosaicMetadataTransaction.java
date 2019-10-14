@@ -24,7 +24,7 @@ import io.nem.catapult.builders.MosaicMetadataTransactionBuilder;
 import io.nem.catapult.builders.SignatureDto;
 import io.nem.catapult.builders.TimestampDto;
 import io.nem.catapult.builders.UnresolvedMosaicIdDto;
-import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import java.nio.ByteBuffer;
 
 /**
@@ -35,7 +35,7 @@ public class MosaicMetadataTransaction extends MetadataTransaction {
     /**
      * Metadata target mosaic id.
      */
-    private final MosaicId targetMosaicId;
+    private final UnresolvedMosaicId targetMosaicId;
 
     /**
      * Constructor
@@ -48,7 +48,7 @@ public class MosaicMetadataTransaction extends MetadataTransaction {
     }
 
 
-    public MosaicId getTargetMosaicId() {
+    public UnresolvedMosaicId getTargetMosaicId() {
         return targetMosaicId;
     }
 

@@ -16,9 +16,9 @@
 
 package io.nem.sdk.api;
 
+import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicInfo;
 import io.nem.sdk.model.mosaic.MosaicNames;
-import io.nem.sdk.model.transaction.UInt64Id;
 import io.reactivex.Observable;
 import java.util.List;
 
@@ -32,27 +32,27 @@ public interface MosaicRepository {
     /**
      * Gets a MosaicInfo for a given mosaicId
      *
-     * @param mosaicId {@link java.math.BigInteger}
+     * @param mosaicId {@link MosaicId}
      * @return Observable of {@link MosaicInfo}
      */
-    Observable<MosaicInfo> getMosaic(UInt64Id mosaicId);
+    Observable<MosaicInfo> getMosaic(MosaicId mosaicId);
 
     /**
      * Gets MosaicInfo for different mosaicIds.
      *
-     * @param mosaicIds {@link List} of {@link java.math.BigInteger}
+     * @param mosaicIds {@link List} of {@link MosaicId}
      * @return {@link Observable} of {@link MosaicInfo} List
      */
-    Observable<List<MosaicInfo>> getMosaics(List<UInt64Id> mosaicIds);
+    Observable<List<MosaicInfo>> getMosaics(List<MosaicId> mosaicIds);
 
     /**
      * Gets MosaicNames for different accounts. The names are namespaces linked using mosaic
      * aliases.
      *
-     * @param mosaicIds {@link List} of {@link java.math.BigInteger}
+     * @param mosaicIds {@link List} of {@link MosaicId}
      * @return {@link Observable} of {@link MosaicNames} List
      */
 
-    Observable<List<MosaicNames>> getMosaicsNames(List<UInt64Id> mosaicIds);
+    Observable<List<MosaicNames>> getMosaicsNames(List<MosaicId> mosaicIds);
 
 }

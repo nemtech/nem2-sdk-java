@@ -22,6 +22,7 @@ import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.MosaicMetadataTransaction;
 import io.nem.sdk.model.transaction.MosaicMetadataTransactionFactory;
@@ -48,7 +49,8 @@ class MosaicMetadataTransactionMapper extends
         Integer valueSizeDelta = transaction.getValueSizeDelta();
         BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey(), 16);
         String value = ConvertUtils.fromHexToString(transaction.getValue());
-        MosaicId targetMosaic = MapperUtils.toMosaicId(transaction.getTargetMosaicId());
+        UnresolvedMosaicId targetMosaic = MapperUtils
+            .toUnresolvedMosaicId(transaction.getTargetMosaicId());
         MosaicMetadataTransactionFactory factory = MosaicMetadataTransactionFactory.create(
             networkType,
             targetAccount,

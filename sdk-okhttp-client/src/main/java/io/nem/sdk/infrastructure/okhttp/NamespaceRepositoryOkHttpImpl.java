@@ -33,7 +33,6 @@ import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.namespace.NamespaceInfo;
 import io.nem.sdk.model.namespace.NamespaceName;
 import io.nem.sdk.model.namespace.NamespaceRegistrationType;
-import io.nem.sdk.model.transaction.UInt64Id;
 import io.nem.sdk.openapi.okhttp_gson.api.NamespaceRoutesApi;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountIds;
@@ -131,7 +130,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
     public Observable<List<NamespaceName>> getNamespaceNames(List<NamespaceId> namespaceIds) {
 
         NamespaceIds ids = new NamespaceIds()
-            .namespaceIds(namespaceIds.stream().map(UInt64Id::getIdAsHex)
+            .namespaceIds(namespaceIds.stream().map(NamespaceId::getIdAsHex)
                 .collect(Collectors.toList()));
 
         Callable<List<NamespaceNameDTO>> callback = () ->
@@ -270,8 +269,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
     private Address toAddress(NamespaceDTO namespaceDTO) {
         if (namespaceDTO.getAlias() != null && AliasType.ADDRESS.getValue()
             .equals(namespaceDTO.getAlias().getType().getValue())) {
-            return MapperUtils.toAddress(namespaceDTO.getAlias().getAddress());
-
+            return MapperUtils.toAddressFromRawAddress(namespaceDTO.getAlias().getAddress());
         } else {
             return null;
         }

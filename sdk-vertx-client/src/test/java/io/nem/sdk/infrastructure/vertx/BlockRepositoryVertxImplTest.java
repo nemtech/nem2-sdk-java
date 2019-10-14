@@ -17,6 +17,7 @@
 package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.sdk.api.QueryParams;
+import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.BlockInfo;
 import io.nem.sdk.model.blockchain.MerkelProofInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -235,8 +236,9 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
         Assertions.assertEquals(1, info.getAddressResolutionStatements().size());
         Assertions.assertEquals(BigInteger.valueOf(6L),
             info.getAddressResolutionStatements().get(0).getHeight());
-        Assertions.assertEquals("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC",
-            info.getAddressResolutionStatements().get(0).getUnresolved().plain());
+        Assertions
+            .assertEquals(Address.createFromRawAddress("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC"),
+                info.getAddressResolutionStatements().get(0).getUnresolved());
 
         Assertions.assertEquals(1, info.getMosaicResolutionStatement().size());
         Assertions.assertEquals(BigInteger.valueOf(7L),

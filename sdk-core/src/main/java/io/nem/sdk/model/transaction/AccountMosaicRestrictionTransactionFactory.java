@@ -17,7 +17,7 @@
 package io.nem.sdk.model.transaction;
 
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 
@@ -29,12 +29,12 @@ public class AccountMosaicRestrictionTransactionFactory extends
 
     private final AccountRestrictionType restrictionType;
 
-    private final List<AccountRestrictionModification<MosaicId>> modifications;
+    private final List<AccountRestrictionModification<UnresolvedMosaicId>> modifications;
 
     private AccountMosaicRestrictionTransactionFactory(
         final NetworkType networkType,
         final AccountRestrictionType restrictionType,
-        final List<AccountRestrictionModification<MosaicId>> modifications) {
+        final List<AccountRestrictionModification<UnresolvedMosaicId>> modifications) {
         super(TransactionType.ACCOUNT_MOSAIC_RESTRICTION, networkType);
         Validate.notNull(restrictionType, "RestrictionType must not be null");
         Validate.notNull(modifications, "Modifications must not be null");
@@ -51,7 +51,7 @@ public class AccountMosaicRestrictionTransactionFactory extends
      * @return Account mosaic restriction transaction.
      */
     public static AccountMosaicRestrictionTransactionFactory create(NetworkType networkType, AccountRestrictionType restrictionType,
-        List<AccountRestrictionModification<MosaicId>> modifications) {
+        List<AccountRestrictionModification<UnresolvedMosaicId>> modifications) {
         return new AccountMosaicRestrictionTransactionFactory(networkType, restrictionType, modifications);
     }
 
@@ -67,9 +67,9 @@ public class AccountMosaicRestrictionTransactionFactory extends
     /**
      * Get account mosaic restriction modifications
      *
-     * @return list of {@link AccountRestrictionModification} with {@link MosaicId}
+     * @return list of {@link AccountRestrictionModification} with {@link UnresolvedMosaicId}
      */
-    public List<AccountRestrictionModification<MosaicId>> getModifications() {
+    public List<AccountRestrictionModification<UnresolvedMosaicId>> getModifications() {
         return this.modifications;
     }
 

@@ -18,7 +18,7 @@ package io.nem.sdk.infrastructure.okhttp.mappers;
 
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.transaction.AccountMosaicRestrictionTransaction;
 import io.nem.sdk.model.transaction.AccountMosaicRestrictionTransactionFactory;
 import io.nem.sdk.model.transaction.AccountRestrictionModification;
@@ -50,13 +50,13 @@ public class AccountMosaicRestrictionTransactionMapper extends
         NetworkType networkType, AccountMosaicRestrictionTransactionDTO transaction) {
         AccountRestrictionType restrictionType = AccountRestrictionType
             .rawValueOf(transaction.getRestrictionType().getValue());
-        List<AccountRestrictionModification<MosaicId>> modifications = transaction
+        List<AccountRestrictionModification<UnresolvedMosaicId>> modifications = transaction
             .getModifications().stream().map(this::toModification).collect(Collectors.toList());
         return AccountMosaicRestrictionTransactionFactory.create(networkType, restrictionType,
             modifications);
     }
 
-    private AccountRestrictionModification<MosaicId> toModification(
+    private AccountRestrictionModification<UnresolvedMosaicId> toModification(
         AccountMosaicRestrictionModificationDTO dto) {
         AccountRestrictionModificationAction modificationAction = AccountRestrictionModificationAction
             .rawValueOf(dto.getModificationAction().getValue().byteValue());
@@ -75,7 +75,7 @@ public class AccountMosaicRestrictionTransactionMapper extends
 
 
     private AccountMosaicRestrictionModificationDTO toModification(
-        AccountRestrictionModification<MosaicId> model) {
+        AccountRestrictionModification<UnresolvedMosaicId> model) {
         AccountMosaicRestrictionModificationDTO dto = new AccountMosaicRestrictionModificationDTO();
         dto.setModificationAction(AccountRestrictionModificationActionEnum
             .fromValue((int) model.getModificationAction().getValue()));

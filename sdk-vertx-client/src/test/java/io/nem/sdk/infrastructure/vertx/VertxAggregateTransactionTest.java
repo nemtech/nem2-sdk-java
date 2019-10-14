@@ -51,14 +51,16 @@ public class VertxAggregateTransactionTest {
     private final String generationHash =
         "57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6";
 
-    private final JsonHelper jsonHelper = new JsonHelperJackson2(Json.mapper);
+    private final JsonHelper jsonHelper = new JsonHelperJackson2(
+        JsonHelperJackson2.configureMapper(Json.mapper));
 
     @Test
     void createAAggregateTransactionViaStaticConstructor() {
 
         TransferTransaction transferTx =
             TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
-                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST),
+                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
+                    NetworkType.MIJIN_TEST),
                 Collections.emptyList(),
                 PlainMessage.Empty).build();
 

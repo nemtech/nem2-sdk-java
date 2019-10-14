@@ -16,7 +16,7 @@
 
 package io.nem.sdk.infrastructure.vertx;
 
-import static io.nem.core.utils.MapperUtils.toAddressFromUnresolved;
+import static io.nem.core.utils.MapperUtils.toAddressFromEncoded;
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.sdk.api.AccountRepository;
@@ -113,7 +113,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
      */
     private AccountNames toAccountNames(AccountNamesDTO dto) {
         return new AccountNames(
-            toAddressFromUnresolved(dto.getAddress()),
+            toAddressFromEncoded(dto.getAddress()),
             dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
     }
 
@@ -307,7 +307,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
 
     private AccountInfo toAccountInfo(AccountDTO accountDTO) {
         return new AccountInfo(
-            toAddressFromUnresolved(accountDTO.getAddress()),
+            toAddressFromEncoded(accountDTO.getAddress()),
             accountDTO.getAddressHeight(),
             accountDTO.getPublicKey(),
             accountDTO.getPublicKeyHeight(),

@@ -80,13 +80,13 @@ public class ReceiptMappingVertx {
         ResolutionStatementBodyDTO statement = receiptDto.getStatement();
         return new ResolutionStatement<>(
             statement.getHeight(),
-            MapperUtils.toAddressFromUnresolved(statement.getUnresolved().toString()),
+            MapperUtils.toAddressFromEncoded(statement.getUnresolved().toString()),
             statement.getResolutionEntries().stream()
                 .map(
                     entry ->
                         new ResolutionEntry<>(
                             new AddressAlias(
-                                MapperUtils.toAddress(entry.getResolved().toString())),
+                                MapperUtils.toAddressFromEncoded(entry.getResolved().toString())),
                             new ReceiptSource(
                                 entry.getSource().getPrimaryId(),
                                 entry.getSource().getSecondaryId()),
@@ -172,7 +172,7 @@ public class ReceiptMappingVertx {
         BalanceTransferReceiptDTO receipt, NetworkType networkType) {
         return new BalanceTransferReceipt<>(
             PublicAccount.createFromPublicKey(receipt.getSenderPublicKey(), networkType),
-            MapperUtils.toAddressFromUnresolved(receipt.getRecipientAddress()),
+            MapperUtils.toAddressFromEncoded(receipt.getRecipientAddress()),
             new MosaicId(receipt.getMosaicId()),
             receipt.getAmount(),
             ReceiptType.rawValueOf(receipt.getType().getValue()),

@@ -51,10 +51,10 @@ public enum AccountRestrictionTargetType {
     public Object fromString(String value) {
         try {
             if (this == ADDRESS) {
-                return MapperUtils.toAddressFromUnresolved(value);
+                return MapperUtils.toUnresolvedAddress(value);
             }
             if (this == MOSAIC_ID) {
-                return MapperUtils.toMosaicId(value);
+                return MapperUtils.toUnresolvedMosaicId(value);
             }
             if (this == TRANSACTION_TYPE) {
                 // https://stackoverflow.com/questions/15507997/how-to-prevent-gson-from-expressing-integers-as-floats/15508288

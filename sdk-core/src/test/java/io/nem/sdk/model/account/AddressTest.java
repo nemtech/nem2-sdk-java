@@ -221,11 +221,20 @@ class AddressTest {
     }
 
     @Test
-    void createFromRawAddressShouldFailWhenInvalidSuffix() {
-        Assertions.assertEquals("X is an invalid address.", assertThrows(
+    void createFromRawAddressShouldFailWhenInvalidSize() {
+        Assertions.assertEquals("Address X has to be 40 characters long.", assertThrows(
             IllegalArgumentException.class,
             () -> {
                 Address.createFromRawAddress("X");
+            }).getMessage());
+    }
+
+    @Test
+    void createFromRawAddressShouldFailWhenInvalidSuffix() {
+        Assertions.assertEquals("ADRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZY is an invalid address.", assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+                Address.createFromRawAddress("ADRDGF-TDLLCB-67D4HP-GIMIHP-NSRYRJ-RT7DOB-GWZY");
             }).getMessage());
     }
 

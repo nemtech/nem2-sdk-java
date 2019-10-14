@@ -27,16 +27,20 @@ import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
+import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.message.MessageType;
 import io.nem.sdk.model.message.PersistentHarvestingDelegationMessage;
 import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
+import io.nem.sdk.model.namespace.NamespaceId;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -63,7 +67,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
             TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
                 new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
                     NetworkType.MIJIN_TEST),
-                Arrays.asList(),
+                Collections.emptyList(),
                 PlainMessage.Empty
             ).build();
 
@@ -73,7 +77,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
         assertEquals(BigInteger.valueOf(0), transaction.getMaxFee());
         assertEquals(
             new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST),
-            transaction.getRecipient().get());
+            transaction.getRecipient());
         assertEquals(0, transaction.getMosaics().size());
         assertNotNull(transaction.getMessage());
 
@@ -89,7 +93,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
-                Arrays.asList(
+                Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
                 PlainMessage.Empty).deadline(new FakeDeadline()).build();
@@ -111,6 +115,34 @@ class TransferTransactionTest extends AbstractTransactionTester {
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
                 new PlainMessage("Some Message 漢字")).deadline(new FakeDeadline()).build();
+
+        assertSerialization(expected, transaction);
+
+    }
+
+    @Test
+    @DisplayName("Serialization-public-namespace-recipient")
+    void serializationNamespaceRecipient() {
+        String expected =
+            "b800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001905441000000000000000001000000000000009151776168d24257d80000000000000000000000000000000014000100536f6d65204d65737361676520e6bca2e5ad97672b0000ce5600006400000000000000";
+        NamespaceId recipient = NamespaceId.createFromName("nem.owner");
+
+        Assertions.assertEquals("d85742d268617751",
+            recipient.getIdAsHex());
+
+        Assertions.assertEquals("9151776168d24257d800000000000000000000000000000000",
+            recipient.encoded());
+
+        TransferTransaction transaction =
+            TransferTransactionFactory.create(
+                NetworkType.MIJIN_TEST,
+                recipient,
+                Collections.singletonList(
+                    new Mosaic(
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
+                new PlainMessage("Some Message 漢字")).deadline(new FakeDeadline()).build();
+
+        Assertions.assertEquals(recipient.encoded(), transaction.getRecipient().encoded());
 
         assertSerialization(expected, transaction);
 
@@ -165,6 +197,30 @@ class TransferTransactionTest extends AbstractTransactionTester {
     }
 
     @Test
+    void serializeNamespaceTransaction() {
+        NamespaceId namespaceId = NamespaceId.createFromName("testaccount2");
+        Assertions.assertEquals("e7ca7e22727ddd88", namespaceId.getIdAsHex());
+        TransferTransaction transaction =
+            TransferTransactionFactory.create(
+                NetworkType.MIJIN_TEST,
+                namespaceId,
+                Collections.singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.ONE)),
+                PlainMessage.create("test-message")).deadline(new Deadline(BigInteger.ONE)).build();
+
+        byte[] payload = transaction.serialize();
+        String payloadHex = Hex.toHexString(payload);
+
+        TransferTransaction newTransaction = (TransferTransaction) new BinarySerializationImpl()
+            .deserialize(payload);
+        String newPayloadHex = Hex.toHexString(newTransaction.serialize());
+
+        Assertions.assertEquals(transaction.getRecipient().encoded(),
+            newTransaction.getRecipient().encoded());
+
+        Assertions.assertEquals(payloadHex, newPayloadHex);
+    }
+
+    @Test
     void createPersistentDelegationRequestTransaction() {
         NetworkType networkType = NetworkType.MIJIN_TEST;
 
@@ -194,7 +250,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
         assertEquals(BigInteger.valueOf(0), transferTransaction.getMaxFee());
         assertEquals(
             Address.createFromPublicKey(recipient.getPublicKey().toHex(), networkType),
-            transferTransaction.getRecipient().get());
+            transferTransaction.getRecipient());
         assertEquals(0, transferTransaction.getMosaics().size());
         assertNotNull(transferTransaction.getMessage());
         assertEquals(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,

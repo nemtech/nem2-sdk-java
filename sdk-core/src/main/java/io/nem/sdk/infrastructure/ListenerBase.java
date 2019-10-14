@@ -243,8 +243,7 @@ public abstract class ListenerBase implements Listener {
         }
 
         if (transaction instanceof TransferTransaction) {
-            return ((TransferTransaction) transaction)
-                .getRecipient().filter(r -> r.equals(address)).isPresent();
+            return ((TransferTransaction) transaction).getRecipient().equals(address);
         }
 
         if (transaction instanceof MultisigAccountModificationTransaction) {

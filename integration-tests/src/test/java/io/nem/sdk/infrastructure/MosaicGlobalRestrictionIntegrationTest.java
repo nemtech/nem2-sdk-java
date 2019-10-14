@@ -23,6 +23,8 @@ import io.nem.sdk.model.blockchain.BlockDuration;
 import io.nem.sdk.model.mosaic.MosaicFlags;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicNonce;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
+import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.restriction.MosaicGlobalRestriction;
 import io.nem.sdk.model.transaction.MosaicDefinitionTransaction;
 import io.nem.sdk.model.transaction.MosaicDefinitionTransactionFactory;
@@ -41,6 +43,8 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
 
     Account testAccount = config().getDefaultAccount();
 
+    BigInteger restrictionKey = BigInteger.valueOf(11111);
+
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void createMosaicGlobalRestrictionAndValidateEndpoints(RepositoryType type)
@@ -48,7 +52,8 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
 
         //1) Create a new mosaic
         MosaicId mosaicId = createMosaic(type);
-        BigInteger restrictionKey = BigInteger.valueOf(60641);
+        NamespaceId mosaicAlias = setMosaicAlias(type, mosaicId,
+            ("mosaicAlias" + mosaicId.getIdAsHex()).toLowerCase());
 
         //2) Create a restriction on the mosaic
 
@@ -57,7 +62,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
         MosaicGlobalRestrictionTransaction createTransaction =
             MosaicGlobalRestrictionTransactionFactory.create(
                 getNetworkType(),
-                mosaicId,
+                mosaicAlias,
                 restrictionKey,
                 originalValue,
                 originalRestrictionType
@@ -93,13 +98,11 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
             ).previousRestrictionType(originalRestrictionType)
                 .previousRestrictionValue(originalValue).build();
 
-
         //7) Announcing the update restriction transaction and checking the processed one.
         MosaicGlobalRestrictionTransaction processedUpdateTransaction = announceAndValidate(
             type, testAccount, updateTransaction);
 
         assertTransaction(updateTransaction, processedUpdateTransaction);
-
 
         //8) Validating that the endpoints show the new value and type.
         sleep(1000);
@@ -113,10 +116,12 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
 
     }
 
-    private void assertTransaction(MosaicGlobalRestrictionTransaction expectedTransaction,
+    private void assertTransaction(
+        MosaicGlobalRestrictionTransaction expectedTransaction,
         MosaicGlobalRestrictionTransaction processedTransaction) {
-        Assertions.assertEquals(expectedTransaction.getMosaicId(),
-            processedTransaction.getMosaicId());
+
+        Assertions.assertEquals(expectedTransaction.getMosaicId().getId(),
+            processedTransaction.getMosaicId().getId());
 
         Assertions.assertEquals(expectedTransaction.getReferenceMosaicId(),
             processedTransaction.getReferenceMosaicId());
@@ -145,7 +150,14 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
         BigInteger newRestrictionValue = mosaicGlobalRestrictionTransaction
             .getNewRestrictionValue();
 
+        Assertions.assertEquals(restrictionKey,
+            mosaicGlobalRestrictionTransaction.getRestrictionKey());
+
         Assertions.assertEquals(1, mosaicGlobalRestriction.getRestrictions().size());
+
+        Assertions.assertEquals(Collections.singleton(restrictionKey),
+            mosaicGlobalRestriction.getRestrictions().keySet());
+
         Assertions.assertEquals(newRestrictionValue,
             mosaicGlobalRestriction.getRestrictions().get(restrictionKey)
                 .getRestrictionValue());

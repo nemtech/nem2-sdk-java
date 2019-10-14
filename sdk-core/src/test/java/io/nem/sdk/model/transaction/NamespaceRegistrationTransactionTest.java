@@ -99,7 +99,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
             namespaceRegistrationTransaction.getNamespaceRegistrationType());
         assertEquals(Optional.empty(), namespaceRegistrationTransaction.getDuration());
         assertEquals(
-            new BigInteger("-883935687755742574"),
+            new BigInteger("17562808385953809042"),
             namespaceRegistrationTransaction.getNamespaceId().getId());
     }
 
@@ -128,7 +128,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
             namespaceRegistrationTransaction.getNamespaceRegistrationType());
         assertEquals(Optional.empty(), namespaceRegistrationTransaction.getDuration());
         assertEquals(
-            new BigInteger("-883935687755742574"),
+            new BigInteger("17562808385953809042"),
             namespaceRegistrationTransaction.getNamespaceId().getId());
         assertEquals(
             new BigInteger("18426354100860810573"),

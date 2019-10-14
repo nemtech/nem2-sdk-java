@@ -17,7 +17,8 @@
 package io.nem.sdk.infrastructure.okhttp.mappers;
 
 import io.nem.core.utils.MapperUtils;
-import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.account.UnresolvedAddress;
+import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
@@ -50,19 +51,19 @@ public class AccountAddressRestrictionTransactionMapper extends
         NetworkType networkType, AccountAddressRestrictionTransactionDTO transaction) {
         AccountRestrictionType restrictionType = AccountRestrictionType
             .rawValueOf(transaction.getRestrictionType().getValue());
-        List<AccountRestrictionModification<Address>> modifications = transaction
+        List<AccountRestrictionModification<UnresolvedAddress>> modifications = transaction
             .getModifications().stream().map(this::toModification).collect(Collectors.toList());
         return AccountAddressRestrictionTransactionFactory.create(networkType, restrictionType,
             modifications);
     }
 
-    private AccountRestrictionModification<Address> toModification(
+    private AccountRestrictionModification<UnresolvedAddress> toModification(
         AccountAddressRestrictionModificationDTO dto) {
         AccountRestrictionModificationAction modificationAction = AccountRestrictionModificationAction
             .rawValueOf(dto.getModificationAction().getValue().byteValue());
         return AccountRestrictionModification
             .createForAddress(modificationAction,
-                MapperUtils.toAddressFromUnresolved(dto.getValue()));
+                MapperUtils.toUnresolvedAddress(dto.getValue()));
     }
 
     @Override
@@ -77,7 +78,7 @@ public class AccountAddressRestrictionTransactionMapper extends
     }
 
     private AccountAddressRestrictionModificationDTO toModification(
-        AccountRestrictionModification<Address> source) {
+        AccountRestrictionModification<UnresolvedAddress> source) {
         AccountRestrictionModificationActionEnum modificationAction = AccountRestrictionModificationActionEnum
             .fromValue((int) source.getModificationAction().getValue());
         AccountAddressRestrictionModificationDTO target = new AccountAddressRestrictionModificationDTO();

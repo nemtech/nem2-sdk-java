@@ -21,11 +21,11 @@ import static io.nem.core.utils.MapperUtils.toMosaicId;
 import io.nem.sdk.api.MosaicRepository;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicInfo;
 import io.nem.sdk.model.mosaic.MosaicNames;
 import io.nem.sdk.model.mosaic.MosaicFlags;
 import io.nem.sdk.model.namespace.NamespaceName;
-import io.nem.sdk.model.transaction.UInt64Id;
 import io.nem.sdk.openapi.vertx.api.MosaicRoutesApi;
 import io.nem.sdk.openapi.vertx.api.MosaicRoutesApiImpl;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
@@ -62,7 +62,7 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl imple
     }
 
     @Override
-    public Observable<MosaicInfo> getMosaic(UInt64Id mosaicId) {
+    public Observable<MosaicInfo> getMosaic(MosaicId mosaicId) {
 
         Consumer<Handler<AsyncResult<MosaicInfoDTO>>> callback = handler -> getClient()
             .getMosaic((mosaicId.getIdAsHex()), handler);
@@ -70,11 +70,11 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl imple
     }
 
     @Override
-    public Observable<List<MosaicInfo>> getMosaics(List<UInt64Id> ids) {
+    public Observable<List<MosaicInfo>> getMosaics(List<MosaicId> ids) {
 
         MosaicIds mosaicIds = new MosaicIds();
         mosaicIds.mosaicIds(ids.stream()
-            .map(UInt64Id::getIdAsHex)
+            .map(MosaicId::getIdAsHex)
             .collect(Collectors.toList()));
         Consumer<Handler<AsyncResult<List<MosaicInfoDTO>>>> callback = handler -> getClient()
             .getMosaics(mosaicIds, handler);
@@ -97,10 +97,10 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl imple
     }
 
     @Override
-    public Observable<List<MosaicNames>> getMosaicsNames(List<UInt64Id> ids) {
+    public Observable<List<MosaicNames>> getMosaicsNames(List<MosaicId> ids) {
         MosaicIds mosaicIds = new MosaicIds();
         mosaicIds.mosaicIds(ids.stream()
-            .map(UInt64Id::getIdAsHex)
+            .map(MosaicId::getIdAsHex)
             .collect(Collectors.toList()));
         Consumer<Handler<AsyncResult<MosaicsNamesDTO>>> callback = handler -> getClient()
             .getMosaicsNames(mosaicIds, handler);

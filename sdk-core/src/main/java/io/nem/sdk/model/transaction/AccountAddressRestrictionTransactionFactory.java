@@ -16,7 +16,8 @@
  */
 package io.nem.sdk.model.transaction;
 
-import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.account.UnresolvedAddress;
+import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -29,12 +30,12 @@ public class AccountAddressRestrictionTransactionFactory extends
 
     private final AccountRestrictionType restrictionType;
 
-    private final List<AccountRestrictionModification<Address>> modifications;
+    private final List<AccountRestrictionModification<UnresolvedAddress>> modifications;
 
     private AccountAddressRestrictionTransactionFactory(
         final NetworkType networkType,
         final AccountRestrictionType restrictionType,
-        final List<AccountRestrictionModification<Address>> modifications) {
+        final List<AccountRestrictionModification<UnresolvedAddress>> modifications) {
         super(TransactionType.ACCOUNT_ADDRESS_RESTRICTION, networkType);
         Validate.notNull(restrictionType, "RestrictionType must not be null");
         Validate.notNull(modifications, "Modifications must not be null");
@@ -50,9 +51,11 @@ public class AccountAddressRestrictionTransactionFactory extends
      * @param modifications List of account address restriction modifications.
      * @return Account address restriction transaction.
      */
-    public static AccountAddressRestrictionTransactionFactory create(NetworkType networkType, AccountRestrictionType restrictionType,
-        List<AccountRestrictionModification<Address>> modifications) {
-        return new AccountAddressRestrictionTransactionFactory(networkType, restrictionType, modifications);
+    public static AccountAddressRestrictionTransactionFactory create(NetworkType networkType,
+        AccountRestrictionType restrictionType,
+        List<AccountRestrictionModification<UnresolvedAddress>> modifications) {
+        return new AccountAddressRestrictionTransactionFactory(networkType, restrictionType,
+            modifications);
     }
 
     /**
@@ -69,7 +72,7 @@ public class AccountAddressRestrictionTransactionFactory extends
      *
      * @return List of {@link AccountRestrictionModification}
      */
-    public List<AccountRestrictionModification<Address>> getModifications() {
+    public List<AccountRestrictionModification<UnresolvedAddress>> getModifications() {
         return this.modifications;
     }
 

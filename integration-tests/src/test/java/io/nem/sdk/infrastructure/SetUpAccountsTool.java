@@ -63,12 +63,24 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
         setUp();
 
         try {
-            sendMosaicFromNemesis(config().getTestAccount(), true);
-            sendMosaicFromNemesis(config().getTestAccount2(), true);
-            sendMosaicFromNemesis(config().getCosignatoryAccount(), true);
-            sendMosaicFromNemesis(config().getCosignatory2Account(), true);
-            sendMosaicFromNemesis(config().getCosignatory3Account(), true);
-            sendMosaicFromNemesis(config().getMultisigAccount(), true);
+            sendMosaicFromNemesis(config().getTestAccount(), false);
+            setAddressAlias(type, config().getTestAccount().getAddress(), "testaccount");
+
+            sendMosaicFromNemesis(config().getTestAccount2(), false);
+            setAddressAlias(type, config().getTestAccount2().getAddress(), "testaccount2");
+
+            sendMosaicFromNemesis(config().getCosignatoryAccount(), false);
+            setAddressAlias(type, config().getCosignatoryAccount().getAddress(), "cosignatory-account");
+
+            sendMosaicFromNemesis(config().getCosignatory2Account(), false);
+            setAddressAlias(type, config().getCosignatory2Account().getAddress(), "cosignatory-account2");
+
+            sendMosaicFromNemesis(config().getCosignatory3Account(), false);
+            setAddressAlias(type, config().getCosignatory3Account().getAddress(), "cosignatory-account3");
+
+            sendMosaicFromNemesis(config().getMultisigAccount(), false);
+            setAddressAlias(type, config().getMultisigAccount().getAddress(), "nemesis-account");
+
             createMultisigAccount(config().getMultisigAccount(),
                 config().getCosignatoryAccount(),
                 config().getCosignatory2Account()
@@ -157,6 +169,7 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
         TransferTransaction processedTransaction = announceAndValidate(type, nemesisAccount,
             transferTransaction);
         Assertions.assertEquals(amount, processedTransaction.getMosaics().get(0).getAmount());
+
     }
 
     private boolean hasMosaic(Account recipient) {

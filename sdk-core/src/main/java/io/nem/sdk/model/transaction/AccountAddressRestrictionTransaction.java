@@ -25,7 +25,8 @@ import io.nem.catapult.builders.KeyDto;
 import io.nem.catapult.builders.SignatureDto;
 import io.nem.catapult.builders.TimestampDto;
 import io.nem.catapult.builders.UnresolvedAddressDto;
-import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.account.UnresolvedAddress;
+import io.nem.sdk.model.account.UnresolvedAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class AccountAddressRestrictionTransaction extends Transaction {
 
     private final AccountRestrictionType restrictionType;
 
-    private final List<AccountRestrictionModification<Address>> modifications;
+    private final List<AccountRestrictionModification<UnresolvedAddress>> modifications;
 
     AccountAddressRestrictionTransaction(
         AccountAddressRestrictionTransactionFactory factory) {
@@ -57,7 +58,7 @@ public class AccountAddressRestrictionTransaction extends Transaction {
      *
      * @return List of {@link AccountRestrictionModification}
      */
-    public List<AccountRestrictionModification<Address>> getModifications() {
+    public List<AccountRestrictionModification<UnresolvedAddress>> getModifications() {
         return this.modifications;
     }
 
@@ -108,7 +109,7 @@ public class AccountAddressRestrictionTransaction extends Transaction {
     private ArrayList<AccountAddressRestrictionModificationBuilder> getModificationBuilder() {
         final ArrayList<AccountAddressRestrictionModificationBuilder> modificationBuilder =
             new ArrayList<>(modifications.size());
-        for (AccountRestrictionModification<Address> accountRestrictionModification : modifications) {
+        for (AccountRestrictionModification<UnresolvedAddress> accountRestrictionModification : modifications) {
             final ByteBuffer addressByteBuffer =
                 accountRestrictionModification.getValue().getByteBuffer();
             final AccountAddressRestrictionModificationBuilder builder =

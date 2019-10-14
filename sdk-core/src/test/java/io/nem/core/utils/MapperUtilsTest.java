@@ -18,7 +18,14 @@
 package io.nem.core.utils;
 
 import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.account.UnresolvedAddress;
+import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.namespace.NamespaceId;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Random;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,20 +41,20 @@ public class MapperUtilsTest {
 
     @Test
     void shouldMapToAddress() {
-        Assertions.assertNull(MapperUtils.toAddress(null));
+        Assertions.assertNull(MapperUtils.toAddressFromRawAddress(null));
         Address address = MapperUtils
-            .toAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+            .toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
         Assertions.assertNotNull(address);
         Assert.assertEquals("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX", address.plain());
         Assert.assertEquals("SBCPGZ-3S2SCC-3YHBBT-YDCUZV-4ZZEPH-M2KGCP-4QXX", address.pretty());
     }
 
     @Test
-    void shouldMapToAddressFromUnresolved() {
+    void toAddressFromEncoded() {
 
-        Assertions.assertNull(MapperUtils.toAddressFromUnresolved(null));
+        Assertions.assertNull(MapperUtils.toAddressFromEncoded(null));
         Address address = MapperUtils
-            .toAddressFromUnresolved("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142");
+            .toAddressFromEncoded("9050b9837efab4bbe8a4b9bb32d812f9885c00d8fc1650e142");
         Assertions.assertNotNull(
             address);
 
@@ -62,4 +69,74 @@ public class MapperUtilsTest {
             .assertEquals(BigInteger.valueOf(1194684), MapperUtils.toMosaicId("123ABC").getId());
     }
 
+    @Test
+    void extractTransactionVersion() {
+        Assertions
+            .assertEquals(1, MapperUtils.extractTransactionVersion(36865).intValue());
+    }
+
+    @Test
+    void extractNetworkType() {
+        Assertions
+            .assertEquals(NetworkType.MIJIN_TEST, MapperUtils.extractNetworkType(36865));
+    }
+
+
+    @Test
+    void toUnresolvedAddress() {
+
+        NamespaceId namespaceId = NamespaceId.createFromName("some.name");
+
+        Assertions.assertEquals("91d9e338f78767ed9500000000000000000000000000000000", namespaceId.encoded());
+        Assertions
+            .assertEquals(namespaceId.encoded(),
+                MapperUtils.toUnresolvedAddress(namespaceId.encoded()).encoded());
+
+        Address address = Address.createFromRawAddress("MCTVW23D2MN5VE4AQ4TZIDZENGNOZXPRPR72DYSX");
+        Assertions.assertNull(MapperUtils.toUnresolvedAddress(null));
+
+        Assertions.assertEquals(address, MapperUtils.toUnresolvedAddress(address.encoded()));
+
+        address = Address
+            .createFromRawAddress("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC");
+
+        Assertions
+            .assertEquals(address,
+                MapperUtils.toUnresolvedAddress(address.encoded()));
+    }
+
+
+    @Test
+    void toUnresolvedAddressZeroPadded() {
+
+        UnresolvedAddress actual = MapperUtils
+            .toUnresolvedAddress("01E7CA7E22727DDD8800000000000000000000000000000000");
+        Assertions.assertTrue(actual instanceof NamespaceId);
+    }
+
+    @Test
+    void toUnresolvedMosaicId() {
+        MosaicId mosaicId = new MosaicId("11F4B1B3AC033DB5");
+        NamespaceId namespaceId = NamespaceId.createFromName("some.name123");
+
+        Assertions.assertNull(MapperUtils.toUnresolvedMosaicId(null));
+        Assertions.assertEquals(mosaicId, MapperUtils.toUnresolvedMosaicId(mosaicId.getIdAsHex()));
+        Assertions
+            .assertEquals(namespaceId, MapperUtils.toUnresolvedMosaicId(namespaceId.getIdAsHex()));
+
+        Assertions
+            .assertEquals(new NamespaceId("9a52fde35777cd4f"),
+                MapperUtils.toUnresolvedMosaicId("9a52fde35777cd4f"));
+
+
+    }
+
+    @Test
+    public void givenUsingPlainJava_whenGeneratingRandomStringUnbounded_thenCorrect() {
+        byte[] array = new byte[7]; // length is bounded by 7
+        new Random().nextBytes(array);
+        String generatedString = new String(array, StandardCharsets.UTF_8);
+
+        Assertions.assertNotNull(generatedString);
+    }
 }

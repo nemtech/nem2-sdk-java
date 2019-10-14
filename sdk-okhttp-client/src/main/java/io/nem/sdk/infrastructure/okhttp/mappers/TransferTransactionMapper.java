@@ -16,17 +16,15 @@
 
 package io.nem.sdk.infrastructure.okhttp.mappers;
 
-import static io.nem.core.utils.MapperUtils.toAddressFromUnresolved;
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.core.utils.MapperUtils;
-import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.mosaic.Mosaic;
-import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.message.Message;
 import io.nem.sdk.model.message.MessageType;
 import io.nem.sdk.model.message.PlainMessage;
+import io.nem.sdk.model.mosaic.Mosaic;
+import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.model.transaction.TransferTransaction;
@@ -71,7 +69,7 @@ class TransferTransactionMapper extends
                 m.getPayload())).orElse(PlainMessage.Empty);
 
         return TransferTransactionFactory.create(networkType,
-            toAddressFromUnresolved(transaction.getRecipientAddress()),
+            MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()),
             mosaics,
             message);
     }
@@ -101,7 +99,7 @@ class TransferTransactionMapper extends
                     transaction.getMessage().getPayload().getBytes(StandardCharsets.UTF_8)));
 
         }
-        dto.setRecipientAddress(transaction.getRecipient().map(Address::encoded).orElse(null));
+        dto.setRecipientAddress(transaction.getRecipient().encoded());
         dto.setMosaics(mosaics);
         dto.setMessage(message);
 

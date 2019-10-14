@@ -20,6 +20,7 @@ package io.nem.sdk.model.transaction;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,13 +34,13 @@ public class AccountMosaicRestrictionTransactionTest extends AbstractTransaction
             "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
             NetworkType.MIJIN_TEST);
 
-    static MosaicId mosaicId = new MosaicId(BigInteger.valueOf(1000));
+    static UnresolvedMosaicId mosaicId = new MosaicId(BigInteger.valueOf(1000));
 
 
     @Test
     void create() {
-        final List<AccountRestrictionModification<MosaicId>> modifications = new ArrayList<>();
-        AccountRestrictionModification<MosaicId> modification = AccountRestrictionModification
+        final List<AccountRestrictionModification<UnresolvedMosaicId>> modifications = new ArrayList<>();
+        AccountRestrictionModification<UnresolvedMosaicId> modification = AccountRestrictionModification
             .createForMosaic(AccountRestrictionModificationAction.ADD, mosaicId);
         modifications.add(modification);
         AccountMosaicRestrictionTransaction transaction =
@@ -59,8 +60,8 @@ public class AccountMosaicRestrictionTransactionTest extends AbstractTransaction
     @Test
     void shouldGenerateBytes() {
 
-        final List<AccountRestrictionModification<MosaicId>> modifications = new ArrayList<>();
-        AccountRestrictionModification<MosaicId> modification = AccountRestrictionModification
+        final List<AccountRestrictionModification<UnresolvedMosaicId>> modifications = new ArrayList<>();
+        AccountRestrictionModification<UnresolvedMosaicId> modification = AccountRestrictionModification
             .createForMosaic(AccountRestrictionModificationAction.ADD, mosaicId);
         modifications.add(modification);
         AccountMosaicRestrictionTransaction transaction =

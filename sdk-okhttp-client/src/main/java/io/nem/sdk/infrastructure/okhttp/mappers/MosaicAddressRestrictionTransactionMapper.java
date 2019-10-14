@@ -18,6 +18,7 @@ package io.nem.sdk.infrastructure.okhttp.mappers;
 
 import static io.nem.core.utils.MapperUtils.getIdAsHex;
 import static io.nem.core.utils.MapperUtils.toMosaicId;
+import static io.nem.core.utils.MapperUtils.toUnresolvedMosaicId;
 
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -44,9 +45,9 @@ class MosaicAddressRestrictionTransactionMapper extends
         NetworkType networkType,
         MosaicAddressRestrictionTransactionDTO transaction) {
         return MosaicAddressRestrictionTransactionFactory.create(networkType,
-            toMosaicId(transaction.getMosaicId()),
+            toUnresolvedMosaicId(transaction.getMosaicId()),
             MapperUtils.fromHexToBigInteger(transaction.getRestrictionKey()),
-            MapperUtils.toAddressFromUnresolved(transaction.getTargetAddress()),
+            MapperUtils.toUnresolvedAddress(transaction.getTargetAddress()),
             transaction.getNewRestrictionValue())
             .previousRestrictionValue(transaction.getPreviousRestrictionValue());
     }

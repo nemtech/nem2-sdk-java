@@ -20,11 +20,11 @@ import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.api.MosaicRepository;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicInfo;
 import io.nem.sdk.model.mosaic.MosaicNames;
 import io.nem.sdk.model.mosaic.MosaicFlags;
 import io.nem.sdk.model.namespace.NamespaceName;
-import io.nem.sdk.model.transaction.UInt64Id;
 import io.nem.sdk.openapi.okhttp_gson.api.MosaicRoutesApi;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.sdk.openapi.okhttp_gson.model.MosaicDTO;
@@ -58,16 +58,16 @@ public class MosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imp
 
 
     @Override
-    public Observable<MosaicInfo> getMosaic(UInt64Id mosaicId) {
+    public Observable<MosaicInfo> getMosaic(MosaicId mosaicId) {
         Callable<MosaicInfoDTO> callback = () -> getClient().getMosaic(mosaicId.getIdAsHex());
         return exceptionHandling(call(callback).map(this::createMosaicInfo));
     }
 
     @Override
-    public Observable<List<MosaicInfo>> getMosaics(List<UInt64Id> ids) {
+    public Observable<List<MosaicInfo>> getMosaics(List<MosaicId> ids) {
         MosaicIds mosaicIds = new MosaicIds();
         mosaicIds.mosaicIds(ids.stream()
-            .map(UInt64Id::getIdAsHex)
+            .map(MosaicId::getIdAsHex)
             .collect(Collectors.toList()));
         Callable<List<MosaicInfoDTO>> callback = () -> getClient()
             .getMosaics(mosaicIds);
@@ -77,10 +77,10 @@ public class MosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imp
     }
 
     @Override
-    public Observable<List<MosaicNames>> getMosaicsNames(List<UInt64Id> ids) {
+    public Observable<List<MosaicNames>> getMosaicsNames(List<MosaicId> ids) {
         MosaicIds mosaicIds = new MosaicIds();
         mosaicIds.mosaicIds(ids.stream()
-            .map(UInt64Id::getIdAsHex)
+            .map(MosaicId::getIdAsHex)
             .collect(Collectors.toList()));
         Callable<MosaicsNamesDTO> callback = () -> getClient()
             .getMosaicsNames(mosaicIds);

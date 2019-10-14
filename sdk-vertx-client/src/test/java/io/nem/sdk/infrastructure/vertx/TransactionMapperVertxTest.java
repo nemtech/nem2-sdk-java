@@ -110,6 +110,17 @@ public class TransactionMapperVertxTest {
     }
 
     @Test
+    void shouldCreateAggregateTransferTransactionUsingAlias() {
+        TransactionInfoDTO aggregateTransferTransactionDTO = loadTransactionInfoDTO(
+            "shouldCreateAggregateTransferTransactionUsingAlias.json"
+        );
+
+        Transaction aggregateTransferTransaction = map(aggregateTransferTransactionDTO);
+        validateAggregateTransaction((AggregateTransaction) aggregateTransferTransaction,
+            aggregateTransferTransactionDTO);
+    }
+
+    @Test
     void shouldCreateStandaloneRootNamespaceCreationTransaction() {
         TransactionInfoDTO namespaceCreationTransactionDTO =
             loadTransactionInfoDTO("shouldCreateStandaloneRootNamespaceCreationTransaction.json"
@@ -583,8 +594,9 @@ public class TransactionMapperVertxTest {
         Assertions.assertEquals(AccountRestrictionType.ALLOW_INCOMING_ADDRESS,
             transaction.getRestrictionType());
         Assertions.assertEquals(1, transaction.getModifications().size());
-        Assertions.assertEquals("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC",
-            transaction.getModifications().get(0).getValue().plain());
+        Assertions
+            .assertEquals(Address.createFromRawAddress("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC"),
+                transaction.getModifications().get(0).getValue());
         Assertions.assertEquals(
             AccountRestrictionModificationAction.ADD,
             transaction.getModifications().get(0).getModificationAction());
@@ -730,9 +742,9 @@ public class TransactionMapperVertxTest {
             .convert(transactionDTO.getTransaction(), TransferTransactionDTO.class);
 
         assertEquals(
-            Address.createFromEncoded(
+            MapperUtils.toUnresolvedAddress(
                 transferTransaction.getRecipientAddress()),
-            transaction.getRecipient().get());
+            transaction.getRecipient());
 
         List<Mosaic> mosaicsDTO = transferTransaction.getMosaics();
         if (mosaicsDTO != null && mosaicsDTO.size() > 0) {

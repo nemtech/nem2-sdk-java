@@ -159,7 +159,7 @@ class IdGeneratorTest {
         BigInteger id = IdGenerator.generateNamespaceId("nem");
         BigInteger id2 = IdGenerator.generateNamespaceId("nem", BigInteger.valueOf(0));
         assertEquals(1, ids.size());
-        assertEquals(new BigInteger("-8884663987180930485"), ids.get(0));
+        assertEquals(new BigInteger("9562080086528621131"), ids.get(0));
         assertEquals(id, ids.get(0));
         assertEquals(id, id2);
     }
@@ -169,8 +169,8 @@ class IdGeneratorTest {
         List<BigInteger> ids = IdGenerator.generateNamespacePath("nem.subnem");
 
         assertEquals(2, ids.size());
-        assertEquals(new BigInteger("-8884663987180930485"), ids.get(0));
-        assertEquals(new BigInteger("-2006071407024327758"), ids.get(1));
+        assertEquals(new BigInteger("9562080086528621131"), ids.get(0));
+        assertEquals(new BigInteger("16440672666685223858"), ids.get(1));
     }
 
     @Test

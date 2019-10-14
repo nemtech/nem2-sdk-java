@@ -34,7 +34,6 @@ import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.namespace.NamespaceInfo;
 import io.nem.sdk.model.namespace.NamespaceName;
 import io.nem.sdk.model.namespace.NamespaceRegistrationType;
-import io.nem.sdk.model.transaction.UInt64Id;
 import io.nem.sdk.openapi.vertx.api.NamespaceRoutesApi;
 import io.nem.sdk.openapi.vertx.api.NamespaceRoutesApiImpl;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
@@ -137,7 +136,7 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
 
         NamespaceIds ids = new NamespaceIds()
             .namespaceIds(namespaceIds.stream()
-                .map(UInt64Id::getIdAsHex)
+                .map(NamespaceId::getIdAsHex)
                 .collect(Collectors.toList()));
 
         Consumer<Handler<AsyncResult<List<NamespaceNameDTO>>>> callback = handler ->
@@ -237,7 +236,7 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
             .equals(namespaceDTO.getAlias().getType().getValue())) {
             String rawAddress = namespaceDTO.getAlias().getAddress();
             if (rawAddress != null) {
-                address = MapperUtils.toAddress(rawAddress);
+                address = MapperUtils.toAddressFromRawAddress(rawAddress);
             }
         }
         return address;

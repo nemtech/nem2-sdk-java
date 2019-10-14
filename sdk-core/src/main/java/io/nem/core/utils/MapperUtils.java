@@ -18,11 +18,15 @@
 package io.nem.core.utils;
 
 import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.namespace.NamespaceId;
-import io.nem.sdk.model.transaction.UInt64Id;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Utility class for mappers.
@@ -37,7 +41,7 @@ public class MapperUtils {
     }
 
     /**
-     * Creates a {@link NamespaceId} from the provided hex number.
+     * Creates a {@link NamespaceId} from the provided hex string.
      *
      * @param hex the hex string with the id
      * @return a namespace id from the hex number or null if the hex is null
@@ -47,7 +51,7 @@ public class MapperUtils {
     }
 
     /**
-     * Creates a {@link MosaicId} from the provided hex number.
+     * Creates a {@link MosaicId} from the provided hex string.
      *
      * @param hex the hex string with the id
      * @return a {@link MosaicId} from the hex number or null if the hex is null
@@ -57,13 +61,42 @@ public class MapperUtils {
     }
 
     /**
-     * Creates a {@link Address} from an unresolved address.
+     * Creates a {@link MosaicId} or {@link NamespaceId }from the provided hex string.
      *
-     * @param unresolvedAddress the unresolvedAddress
-     * @return a {@link Address} from the unresolved  address or null if the parameter is null
+     * @param hex the hex string with the id
+     * @return a {@link UnresolvedMosaicId} from the hex number or null if the hex is null
      */
-    public static Address toAddressFromUnresolved(String unresolvedAddress) {
-        return unresolvedAddress != null ? Address.createFromEncoded(unresolvedAddress) : null;
+    public static UnresolvedMosaicId toUnresolvedMosaicId(String hex) {
+        if (hex == null) {
+            return null;
+        }
+        if ((ConvertUtils.getBytes(hex)[0] & 128) == 128) {
+            return toNamespaceId(hex);
+        } else {
+            return toMosaicId(hex);
+        }
+    }
+
+    /**
+     * Creates a {@link MosaicId} or {@link Address }from the provided hex string.
+     *
+     * @param hex the hex string with the id
+     * @return a {@link UnresolvedAddress} from the hex number or null if the hex is null
+     */
+    public static UnresolvedAddress toUnresolvedAddress(String hex) {
+        if (hex == null) {
+            return null;
+        }
+        // If bit 0 of byte 0 is not set (like in 0x90), then it is a regular address.
+        // Else (e.g. 0x91) it represents a namespace id which starts at byte 1.
+        byte bit0 = ConvertUtils.getBytes(hex.substring(1, 3))[0];
+        if ((bit0 & 16) == 16) {
+            // namespaceId encoded hexadecimal notation provided
+            // only 8 bytes are relevant to resolve the NamespaceId
+            return MapperUtils.toNamespaceId(ConvertUtils.reverseHexString(hex.substring(2, 18)));
+        } else {
+            return Address.createFromEncoded(hex);
+        }
     }
 
     /**
@@ -72,7 +105,7 @@ public class MapperUtils {
      * @param rawAddress the rawAddress
      * @return a {@link Address} from the raw address or null if the parameter is null
      */
-    public static Address toAddress(String rawAddress) {
+    public static Address toAddressFromRawAddress(String rawAddress) {
         return rawAddress != null ? Address.createFromRawAddress(rawAddress) : null;
     }
 
@@ -87,12 +120,22 @@ public class MapperUtils {
     }
 
     /**
+     * Creates a {@link Address} from an unresolved address.
+     *
+     * @param unresolvedAddress the unresolvedAddress
+     * @return a {@link Address} from the unresolved  address or null if the parameter is null
+     */
+    public static Address toAddressFromEncoded(String unresolvedAddress) {
+        return unresolvedAddress != null ? Address.createFromEncoded(unresolvedAddress) : null;
+    }
+
+    /**
      * Converts a namespace or a mosaic id to hex
      *
      * @param id the id. It may be null.
      * @return the hex or null if the parameter is null
      */
-    public static String getIdAsHex(UInt64Id id) {
+    public static String getIdAsHex(UnresolvedMosaicId id) {
         return id == null ? null : id.getIdAsHex();
     }
 

@@ -26,12 +26,15 @@ import io.nem.catapult.builders.UnresolvedAddressDto;
 import io.nem.catapult.builders.UnresolvedMosaicBuilder;
 import io.nem.catapult.builders.UnresolvedMosaicIdDto;
 import io.nem.core.utils.ConvertUtils;
+import io.nem.core.utils.MapperUtils;
 import io.nem.core.utils.StringEncoder;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
+import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.namespace.NamespaceId;
 import java.io.ByteArrayInputStream;
 import java.io.DataInput;
@@ -81,7 +84,7 @@ public class SerializationUtils {
      * @param dto the catbuffer {@link UnresolvedMosaicIdDto}.
      * @return the model {@link MosaicId}
      */
-    public static MosaicId toMosaicId(UnresolvedMosaicIdDto dto) {
+    public static UnresolvedMosaicId toMosaicId(UnresolvedMosaicIdDto dto) {
         return new MosaicId(toUnsignedBigInteger(dto.getUnresolvedMosaicId()));
     }
 
@@ -111,8 +114,8 @@ public class SerializationUtils {
      * @param dto the catbuffer {@link UnresolvedAddressDto}.
      * @return the model {@link Address}
      */
-    public static Address toAddress(UnresolvedAddressDto dto) {
-        return Address.createFromEncoded(ConvertUtils.toHex(dto.getUnresolvedAddress().array()));
+    public static UnresolvedAddress toAddress(UnresolvedAddressDto dto) {
+        return MapperUtils.toUnresolvedAddress(ConvertUtils.toHex(dto.getUnresolvedAddress().array()));
     }
 
 

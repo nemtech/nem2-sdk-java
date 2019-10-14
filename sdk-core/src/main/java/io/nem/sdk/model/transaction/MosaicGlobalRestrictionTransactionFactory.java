@@ -19,6 +19,7 @@ package io.nem.sdk.model.transaction;
 
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import java.math.BigInteger;
 import org.apache.commons.lang3.Validate;
 
@@ -28,27 +29,27 @@ import org.apache.commons.lang3.Validate;
 public class MosaicGlobalRestrictionTransactionFactory
     extends TransactionFactory<MosaicGlobalRestrictionTransaction> {
 
-    private final MosaicId mosaicId;
+    private final UnresolvedMosaicId mosaicId;
     private final BigInteger restrictionKey;
     private final BigInteger newRestrictionValue;
     private final MosaicRestrictionType newRestrictionType;
     private BigInteger previousRestrictionValue = BigInteger.ZERO;
     private MosaicRestrictionType previousRestrictionType = MosaicRestrictionType.NONE;
-    private MosaicId referenceMosaicId = new MosaicId(BigInteger.ZERO);
+    private UnresolvedMosaicId referenceMosaicId = new MosaicId(BigInteger.ZERO);
 
     /**
      * Create a mosaic global restriction transaction object with factory build and modifier
      * methods.
      *
      * @param networkType {@link NetworkType}
-     * @param mosaicId {@link MosaicId}
+     * @param mosaicId {@link UnresolvedMosaicId}
      * @param restrictionKey BigInteger
      * @param newRestrictionValue BigInteger
      * @param newRestrictionType {@link MosaicRestrictionType}
      */
     private MosaicGlobalRestrictionTransactionFactory(
         NetworkType networkType,
-        MosaicId mosaicId,
+        UnresolvedMosaicId mosaicId,
         BigInteger restrictionKey,
         BigInteger newRestrictionValue,
         MosaicRestrictionType newRestrictionType) {
@@ -67,18 +68,19 @@ public class MosaicGlobalRestrictionTransactionFactory
      * Static create method for factory.
      *
      * @param networkType {@link NetworkType}
-     * @param mosaicId {@link MosaicId}
+     * @param mosaicId {@link UnresolvedMosaicId}
      * @param restrictionKey Restriction key.
      * @param newRestrictionValue New restriction value.
      * @param newRestrictionType {@link MosaicRestrictionType} New restriction type.
      * @return Mosaic global restriction transaction.
      */
-    public static MosaicGlobalRestrictionTransactionFactory create (NetworkType networkType,
-        MosaicId mosaicId,
+    public static MosaicGlobalRestrictionTransactionFactory create(NetworkType networkType,
+        UnresolvedMosaicId mosaicId,
         BigInteger restrictionKey,
         BigInteger newRestrictionValue,
         MosaicRestrictionType newRestrictionType) {
-        return new MosaicGlobalRestrictionTransactionFactory(networkType, mosaicId, restrictionKey, newRestrictionValue, newRestrictionType);
+        return new MosaicGlobalRestrictionTransactionFactory(networkType, mosaicId, restrictionKey,
+            newRestrictionValue, newRestrictionType);
     }
 
     @Override
@@ -89,18 +91,18 @@ public class MosaicGlobalRestrictionTransactionFactory
     /**
      * Returns the mosaic id.
      *
-     * @return {@link MosaicId}
+     * @return {@link UnresolvedMosaicId}
      */
-    public MosaicId getMosaicId() {
+    public UnresolvedMosaicId getMosaicId() {
         return mosaicId;
     }
 
     /**
      * Returns the reference mosaic id.
      *
-     * @return {@link MosaicId}
+     * @return {@link UnresolvedMosaicId}
      */
-    public MosaicId getReferenceMosaicId() {
+    public UnresolvedMosaicId getReferenceMosaicId() {
         return referenceMosaicId;
     }
 
@@ -150,7 +152,7 @@ public class MosaicGlobalRestrictionTransactionFactory
      * @param referenceMosaicId the new referenceMosaicId
      * @return this factory.
      */
-    public MosaicGlobalRestrictionTransactionFactory referenceMosaicId(MosaicId referenceMosaicId) {
+    public MosaicGlobalRestrictionTransactionFactory referenceMosaicId(UnresolvedMosaicId referenceMosaicId) {
         Validate.notNull(previousRestrictionValue, "ReferenceMosaicId must not be null");
         this.referenceMosaicId = referenceMosaicId;
         return this;

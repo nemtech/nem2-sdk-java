@@ -103,7 +103,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
         resolveNetworkType();
 
-        Address address = MapperUtils.toAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = MapperUtils.toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
         NamespaceMetaDTO meta = new NamespaceMetaDTO();

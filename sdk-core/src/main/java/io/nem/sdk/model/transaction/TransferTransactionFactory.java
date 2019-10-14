@@ -20,14 +20,13 @@ package io.nem.sdk.model.transaction;
 import io.nem.core.crypto.PrivateKey;
 import io.nem.core.crypto.PublicKey;
 import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.message.Message;
 import io.nem.sdk.model.message.PersistentHarvestingDelegationMessage;
 import io.nem.sdk.model.mosaic.Mosaic;
-import io.nem.sdk.model.namespace.NamespaceId;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -35,26 +34,22 @@ import org.apache.commons.lang3.Validate;
  */
 public class TransferTransactionFactory extends TransactionFactory<TransferTransaction> {
 
-    private final Optional<Address> recipient;
+    private final UnresolvedAddress recipient;
     private final List<Mosaic> mosaics;
     private final Message message;
-    private Optional<NamespaceId> namespaceId;
 
     private TransferTransactionFactory(
         final NetworkType networkType,
-        final Optional<Address> recipient,
-        final Optional<NamespaceId> namespaceId,
+        final UnresolvedAddress recipient,
         final List<Mosaic> mosaics,
         final Message message) {
         super(TransactionType.TRANSFER, networkType);
         Validate.notNull(recipient, "Recipient must not be null");
         Validate.notNull(mosaics, "Mosaics must not be null");
         Validate.notNull(message, "Message must not be null");
-        Validate.notNull(namespaceId, "NamespaceId must not be null");
         this.recipient = recipient;
         this.mosaics = mosaics;
         this.message = message;
-        this.namespaceId = namespaceId;
     }
 
     /**
@@ -68,41 +63,10 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
      */
     public static TransferTransactionFactory create(
         final NetworkType networkType,
-        final Address recipient,
+        final UnresolvedAddress recipient,
         final List<Mosaic> mosaics,
         final Message message) {
-        return new TransferTransactionFactory(networkType, Optional.of(recipient), Optional.empty(),
-            mosaics, message);
-    }
-
-    /**
-     * Static create method for factory.
-     *
-     * @param networkType Network type.
-     * @param namespaceId Namespace id.
-     * @param mosaics List of mosaics.
-     * @param message Message.
-     * @return Transfer transaction.
-     */
-    public static TransferTransactionFactory createWithNamespaceId(
-        final NetworkType networkType,
-        final NamespaceId namespaceId,
-        final List<Mosaic> mosaics,
-        final Message message) {
-        return new TransferTransactionFactory(networkType, Optional.empty(),
-            Optional.of(namespaceId), mosaics, message);
-    }
-
-    /**
-     * Builder method used to change the default namespaceId.
-     *
-     * @param namespaceId a new namespaceId
-     * @return this factory to continue building the transaction.
-     */
-    public TransferTransactionFactory namespaceId(NamespaceId namespaceId) {
-        Validate.notNull(namespaceId, "NamespaceId must not be null");
-        this.namespaceId = Optional.of(namespaceId);
-        return this;
+        return new TransferTransactionFactory(networkType, recipient, mosaics, message);
     }
 
     /**
@@ -123,8 +87,7 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
         PersistentHarvestingDelegationMessage message = PersistentHarvestingDelegationMessage
             .create(remoteProxyPrivateKey, senderPrivateKey, harvesterPublicKey, networkType);
         return new TransferTransactionFactory(networkType,
-            Optional.of(Address.createFromPublicKey(harvesterPublicKey.toHex(), networkType)),
-            Optional.empty(),
+            Address.createFromPublicKey(harvesterPublicKey.toHex(), networkType),
             Collections.emptyList(), message);
     }
 
@@ -133,17 +96,8 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
      *
      * @return recipient address
      */
-    public Optional<Address> getRecipient() {
+    public UnresolvedAddress getRecipient() {
         return recipient;
-    }
-
-    /**
-     * Gets namespace id alias for the address of the recipient.
-     *
-     * @return Namespace id.
-     */
-    public Optional<NamespaceId> getNamespaceId() {
-        return namespaceId;
     }
 
     /**

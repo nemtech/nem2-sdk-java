@@ -16,8 +16,7 @@
 
 package io.nem.sdk.infrastructure.okhttp.mappers;
 
-import static io.nem.core.utils.MapperUtils.toAddressFromUnresolved;
-
+import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.LockHashAlgorithmType;
@@ -44,7 +43,7 @@ class SecretProofTransactionMapper extends
         return SecretProofTransactionFactory.create(
             networkType,
             LockHashAlgorithmType.rawValueOf(transaction.getHashAlgorithm().getValue()),
-            toAddressFromUnresolved(transaction.getRecipientAddress()),
+            MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()),
             transaction.getSecret(),
             transaction.getProof());
     }

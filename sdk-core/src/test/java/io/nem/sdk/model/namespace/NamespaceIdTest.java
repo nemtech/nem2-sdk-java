@@ -53,7 +53,7 @@ class NamespaceIdTest {
     @Test
     void createANamespaceIdFromRootNamespaceNameViaConstructor() {
         NamespaceId namespaceId = NamespaceId.createFromName("nem");
-        assertEquals(namespaceId.getId(), new BigInteger("-8884663987180930485"));
+        assertEquals(namespaceId.getId(), new BigInteger("9562080086528621131"));
         assertEquals("nem", namespaceId.getFullName().get());
     }
 
@@ -62,14 +62,14 @@ class NamespaceIdTest {
     void createANamespaceIdFromSubNamespacePathViaConstructor() {
         NamespaceId test = NamespaceId.createFromName("subnem");
         NamespaceId namespaceId = NamespaceId.createFromName("nem.subnem");
-        assertEquals(namespaceId.getId(), new BigInteger("-2006071407024327758"));
+        assertEquals(new BigInteger("16440672666685223858"), namespaceId.getId());
         assertEquals("nem.subnem", namespaceId.getFullName().get());
     }
 
     @Test
     void createANamespaceIdFromSubNamespaceNameAndParentNamespaceNameViaConstructor() {
         NamespaceId namespaceId = NamespaceId.createFromNameAndParentName("subnem", "nem");
-        assertEquals(namespaceId.getId(), new BigInteger("-2006071407024327758"));
+        assertEquals(new BigInteger("16440672666685223858"), namespaceId.getId());
         assertEquals("nem.subnem", namespaceId.getFullName().get());
     }
 
@@ -81,7 +81,7 @@ class NamespaceIdTest {
         NamespaceId namespaceId2 = NamespaceId
             .createFromNameAndParentId("subsubnem", parentId.getId());
 
-        assertEquals(new BigInteger("-7854685081223350562"), namespaceId.getId());
+        assertEquals(new BigInteger("10592058992486201054"), namespaceId.getId());
         assertEquals("nem.subnem.subsubnem", namespaceId.getFullName().get());
         assertEquals(namespaceId2.getId(), namespaceId.getId());
     }
@@ -90,15 +90,15 @@ class NamespaceIdTest {
     void createASubNamespaceIdFromSubNamespaceNameAndParentIdViaConstructor() {
         NamespaceId namespaceId = NamespaceId
             .createFromNameAndParentId("subnem", new BigInteger("-8884663987180930485"));
-        assertEquals(namespaceId.getId(), new BigInteger("-2006071407024327758"));
+        assertEquals(new BigInteger("16440672666685223858"), namespaceId.getId());
         assertEquals("subnem", namespaceId.getFullName().get());
     }
 
     @Test
     void createNamespacePathArray() {
         List<BigInteger> path = NamespaceId.getNamespacePath("nem.subnem");
-        assertEquals(path.get(0), new BigInteger("-8884663987180930485"));
-        assertEquals(path.get(1), new BigInteger("-2006071407024327758"));
+        assertEquals(new BigInteger("9562080086528621131"), path.get(0));
+        assertEquals(new BigInteger("16440672666685223858"), path.get(1));
     }
 
     @Test

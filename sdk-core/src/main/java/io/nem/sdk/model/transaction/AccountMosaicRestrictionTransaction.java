@@ -25,7 +25,7 @@ import io.nem.catapult.builders.KeyDto;
 import io.nem.catapult.builders.SignatureDto;
 import io.nem.catapult.builders.TimestampDto;
 import io.nem.catapult.builders.UnresolvedMosaicIdDto;
-import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ import java.util.List;
 public class AccountMosaicRestrictionTransaction extends Transaction {
 
     private final AccountRestrictionType restrictionType;
-    private final List<AccountRestrictionModification<MosaicId>> modifications;
+    private final List<AccountRestrictionModification<UnresolvedMosaicId>> modifications;
 
     public AccountMosaicRestrictionTransaction(
         AccountMosaicRestrictionTransactionFactory factory) {
@@ -54,9 +54,9 @@ public class AccountMosaicRestrictionTransaction extends Transaction {
     /**
      * Get account mosaic restriction modifications
      *
-     * @return list of {@link AccountRestrictionModification} with {@link MosaicId}
+     * @return list of {@link AccountRestrictionModification} with {@link UnresolvedMosaicId}
      */
-    public List<AccountRestrictionModification<MosaicId>> getModifications() {
+    public List<AccountRestrictionModification<UnresolvedMosaicId>> getModifications() {
         return this.modifications;
     }
 
@@ -107,7 +107,7 @@ public class AccountMosaicRestrictionTransaction extends Transaction {
     private ArrayList<AccountMosaicRestrictionModificationBuilder> getModificationBuilder() {
         final ArrayList<AccountMosaicRestrictionModificationBuilder> modificationBuilder =
             new ArrayList<>(modifications.size());
-        for (AccountRestrictionModification<MosaicId> accountRestrictionModification : modifications) {
+        for (AccountRestrictionModification<UnresolvedMosaicId> accountRestrictionModification : modifications) {
             final AccountMosaicRestrictionModificationBuilder builder =
                 AccountMosaicRestrictionModificationBuilder.create(
                     AccountRestrictionModificationActionDto.rawValueOf(

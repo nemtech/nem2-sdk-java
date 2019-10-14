@@ -17,11 +17,10 @@
 
 package io.nem.sdk.infrastructure.vertx.mappers;
 
-import static io.nem.core.utils.MapperUtils.toAddressFromUnresolved;
 import static io.nem.core.utils.MapperUtils.toMosaicId;
+import static io.nem.core.utils.MapperUtils.toUnresolvedAddress;
 
 import io.nem.core.utils.MapperUtils;
-import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.message.Message;
 import io.nem.sdk.model.message.MessageType;
@@ -72,7 +71,7 @@ class TransferTransactionMapper extends
                 m.getPayload())).orElse(PlainMessage.Empty);
 
         return TransferTransactionFactory.create(networkType,
-            toAddressFromUnresolved(transaction.getRecipientAddress()),
+            toUnresolvedAddress(transaction.getRecipientAddress()),
             mosaics,
             message);
     }
@@ -102,7 +101,7 @@ class TransferTransactionMapper extends
                     transaction.getMessage().getPayload().getBytes(StandardCharsets.UTF_8)));
 
         }
-        dto.setRecipientAddress(transaction.getRecipient().map(Address::encoded).orElse(null));
+        dto.setRecipientAddress(transaction.getRecipient().encoded());
         dto.setMosaics(mosaics);
         dto.setMessage(message);
 

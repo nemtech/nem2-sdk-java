@@ -16,7 +16,8 @@
 package io.nem.sdk.model.transaction;
 
 import io.nem.sdk.model.account.Address;
-import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.account.UnresolvedAddress;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 
 public class AccountRestrictionModification<T> {
 
@@ -32,16 +33,16 @@ public class AccountRestrictionModification<T> {
     /**
      * @return AccountRestrictionModification of {@link Address}
      */
-    public static AccountRestrictionModification<Address> createForAddress(
-        AccountRestrictionModificationAction modificationType, Address address) {
+    public static AccountRestrictionModification<UnresolvedAddress> createForAddress(
+        AccountRestrictionModificationAction modificationType, UnresolvedAddress address) {
         return new AccountRestrictionModification<>(modificationType, address);
     }
 
     /**
-     * @return AccountRestrictionModification {@link MosaicId}
+     * @return AccountRestrictionModification {@link UnresolvedMosaicId}
      */
-    public static AccountRestrictionModification<MosaicId> createForMosaic(
-        AccountRestrictionModificationAction modificationType, MosaicId mosaicId) {
+    public static AccountRestrictionModification<UnresolvedMosaicId> createForMosaic(
+        AccountRestrictionModificationAction modificationType, UnresolvedMosaicId mosaicId) {
         return new AccountRestrictionModification<>(modificationType, mosaicId);
     }
 

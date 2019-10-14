@@ -25,13 +25,24 @@ import io.nem.sdk.infrastructure.okhttp.RepositoryFactoryOkHttpImpl;
 import io.nem.sdk.infrastructure.vertx.JsonHelperJackson2;
 import io.nem.sdk.infrastructure.vertx.RepositoryFactoryVertxImpl;
 import io.nem.sdk.model.account.Account;
+import io.nem.sdk.model.account.AccountNames;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.MosaicNames;
+import io.nem.sdk.model.namespace.AliasAction;
+import io.nem.sdk.model.namespace.NamespaceId;
+import io.nem.sdk.model.transaction.AddressAliasTransaction;
+import io.nem.sdk.model.transaction.AddressAliasTransactionFactory;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.sdk.model.transaction.JsonHelper;
+import io.nem.sdk.model.transaction.MosaicAliasTransaction;
+import io.nem.sdk.model.transaction.MosaicAliasTransactionFactory;
+import io.nem.sdk.model.transaction.NamespaceRegistrationTransaction;
+import io.nem.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionAnnounceResponse;
@@ -40,8 +51,10 @@ import io.nem.sdk.model.transaction.TransactionStatusError;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.reactivex.Observable;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -188,6 +201,7 @@ public abstract class BaseIntegrationTest {
         return this.config().getTestAccount2().getAddress();
     }
 
+
     public String getGenerationHash() {
         return generationHash;
     }
@@ -328,4 +342,97 @@ public abstract class BaseIntegrationTest {
     protected void sleep(long time) throws InterruptedException {
         Thread.sleep(time);
     }
+
+
+    protected NamespaceId setAddressAlias(RepositoryType type, Address address,
+        String namespaceName) {
+
+        NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
+
+        Account nemesisAccount = config().getNemesisAccount();
+
+        List<AccountNames> accountNames = get(
+            getRepositoryFactory(type).createAccountRepository().getAccountsNames(
+                Collections.singletonList(address)));
+
+        if (!accountNames.stream().anyMatch(
+            an -> an.getNames().stream().anyMatch(
+                ns -> ns.getName().equals(namespaceName) && ns.getNamespaceId()
+                    .equals(namespaceId)))) {
+            System.out.println(namespaceName + " Alias not found, recreating");
+            return namespaceId;
+
+        } else {
+            System.out.println(namespaceName + " found, reusing it.");
+        }
+
+        System.out.println(
+            "Setting up namespace " + namespaceName);
+        NamespaceRegistrationTransaction namespaceRegistrationTransaction =
+            NamespaceRegistrationTransactionFactory.createRootNamespace(
+                getNetworkType(),
+                namespaceName,
+                BigInteger.valueOf(100)).build();
+
+        NamespaceId rootNamespaceId = announceAggregateAndValidate(type, nemesisAccount,
+            namespaceRegistrationTransaction).getNamespaceId();
+
+        System.out.println(
+            "Setting account alias " + address.plain() + " alias: " + namespaceName);
+        AddressAliasTransaction aliasTransaction =
+            AddressAliasTransactionFactory.create(getNetworkType(),
+                AliasAction.LINK,
+                rootNamespaceId,
+                address
+            ).build();
+
+        announceAggregateAndValidate(type, nemesisAccount, aliasTransaction);
+        return rootNamespaceId;
+    }
+
+    protected NamespaceId setMosaicAlias(
+        RepositoryType type, MosaicId mosaicId,
+        String namespaceName) {
+        Account nemesisAccount = config().getNemesisAccount();
+        NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
+        List<MosaicNames> mosaicNames = get(
+            getRepositoryFactory(type).createMosaicRepository().getMosaicsNames(
+                Collections.singletonList(mosaicId)));
+
+        if (!mosaicNames.stream().anyMatch(
+            an -> an.getNames().stream().anyMatch(
+                ns -> ns.getName().equals(namespaceName) && ns.getNamespaceId()
+                    .equals(namespaceId)))) {
+            System.out.println(namespaceName + " Alias not found, recreating");
+            return namespaceId;
+
+        } else {
+            System.out.println(namespaceName + " found, reusing it.");
+        }
+
+        System.out.println(
+            "Setting up namespace " + namespaceName);
+        NamespaceRegistrationTransaction namespaceRegistrationTransaction =
+            NamespaceRegistrationTransactionFactory.createRootNamespace(
+                getNetworkType(),
+                namespaceName,
+                BigInteger.valueOf(100)).build();
+
+        NamespaceId rootNamespaceId = announceAggregateAndValidate(type, nemesisAccount,
+            namespaceRegistrationTransaction).getNamespaceId();
+
+        System.out.println(
+            "Setting mosaic alias " + mosaicId.getIdAsHex() + " alias: " + namespaceName);
+
+        MosaicAliasTransaction aliasTransaction =
+            MosaicAliasTransactionFactory.create(getNetworkType(),
+                AliasAction.LINK,
+                rootNamespaceId,
+                mosaicId
+            ).build();
+
+        announceAggregateAndValidate(type, nemesisAccount, aliasTransaction);
+        return rootNamespaceId;
+    }
+
 }

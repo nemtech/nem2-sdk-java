@@ -18,6 +18,7 @@ package io.nem.sdk.model.transaction;
 
 import io.nem.core.crypto.Hashes;
 import io.nem.core.utils.ByteUtils;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.mosaic.IllegalIdentifierException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -73,7 +74,8 @@ public class IdGenerator {
         final byte[] hash = IdGenerator
             .getHashInLittleEndian(parentIdBuffer.array(), namespaceName.getBytes());
         // Set the high bit for namespace id
-        return BigInteger.valueOf(ByteBuffer.wrap(hash).getLong() | ID_GENERATOR_FLAG);
+        return ConvertUtils
+            .toUnsignedBigInteger(ByteBuffer.wrap(hash).getLong() | ID_GENERATOR_FLAG);
     }
 
     /**

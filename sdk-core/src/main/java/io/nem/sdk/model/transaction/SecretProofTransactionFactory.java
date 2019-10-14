@@ -17,7 +17,7 @@
 
 package io.nem.sdk.model.transaction;
 
-import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
 import org.apache.commons.lang3.Validate;
 
@@ -29,12 +29,12 @@ public class SecretProofTransactionFactory extends TransactionFactory<SecretProo
     private final LockHashAlgorithmType hashType;
     private final String secret;
     private final String proof;
-    private final Address recipient;
+    private final UnresolvedAddress recipient;
 
     private SecretProofTransactionFactory(
         final NetworkType networkType,
         final LockHashAlgorithmType hashType,
-        final Address recipient,
+        final UnresolvedAddress recipient,
         final String secret,
         final String proof) {
         super(TransactionType.SECRET_PROOF, networkType);
@@ -62,7 +62,7 @@ public class SecretProofTransactionFactory extends TransactionFactory<SecretProo
      * @return Secret proof transaction.
      */
     public static SecretProofTransactionFactory create(NetworkType networkType,
-        LockHashAlgorithmType hashType, Address recipient, String secret, String proof) {
+        LockHashAlgorithmType hashType, UnresolvedAddress recipient, String secret, String proof) {
         return new SecretProofTransactionFactory(networkType, hashType, recipient, secret, proof);
     }
 
@@ -96,7 +96,7 @@ public class SecretProofTransactionFactory extends TransactionFactory<SecretProo
     /**
      * @return the recipient
      */
-    public Address getRecipient() {
+    public UnresolvedAddress getRecipient() {
         return recipient;
     }
 
