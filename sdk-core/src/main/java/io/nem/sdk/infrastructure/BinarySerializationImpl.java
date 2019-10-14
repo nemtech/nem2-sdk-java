@@ -117,6 +117,9 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  */
 public class BinarySerializationImpl implements BinarySerialization {
 
+    /**
+     * The deserializers, one per {@link TransactionType} must be registered.
+     */
     private final Map<TransactionType, TransactionDeserializer> deserializers = new HashMap<>();
 
     public BinarySerializationImpl() {
@@ -160,12 +163,26 @@ public class BinarySerializationImpl implements BinarySerialization {
         return mapper;
     }
 
+    /**
+     * Serialization basic implementation, it just delegates the work to the transactions.
+     *
+     * @param transaction the transaction
+     * @return the serialized transaction.
+     */
     @Override
     public byte[] serialize(Transaction transaction) {
         Validate.notNull(transaction, "Transaction must not be null");
         return transaction.serialize();
     }
 
+    /**
+     * Deserialization of transactions. All the code related to the deserialization is handled in
+     * the class and its helpers. Transaction Model Objects are not polluted with deserialization
+     * functionality.
+     *
+     * @param payload the byte array payload
+     * @return the {@link Transaction}
+     */
     @Override
     public Transaction deserialize(byte[] payload) {
         Validate.notNull(payload, "Payload must not be null");
@@ -210,17 +227,36 @@ public class BinarySerializationImpl implements BinarySerialization {
     }
 
 
+    /**
+     * Interface of the deserializer helper classes that know how to deserialize one type of
+     * transaction from a payload.
+     */
     interface TransactionDeserializer {
 
+        /**
+         * @return the {@link TransactionType} of the transaction this helper handles.
+         */
         TransactionType getTransactionType();
 
+        /**
+         * Subclasses would need to create the {@link TransactionFactory} for the handled {@link
+         * TransactionType} with just the specific transaction values. Common values like maxFee and
+         * deadline are handled at top level, subclasses won't need to duplicate the deserialization
+         * efforts.
+         *
+         * @param networkType the network type
+         * @param stream the stream containing just the specific transaction values in the right
+         * order.
+         * @param originalPayload the full original payload, used when deserializing Aggregate
+         * Transactions.
+         * @return the TransactionFactory of the transaction type this object handles.
+         */
         TransactionFactory fromStream(NetworkType networkType, DataInput stream,
             byte[] originalPayload);
 
     }
 
     private static class TransferTransactionDeserializer implements TransactionDeserializer {
-
 
         @Override
         public TransactionType getTransactionType() {
@@ -245,7 +281,6 @@ public class BinarySerializationImpl implements BinarySerialization {
             Message message = Message.createFromPayload(messageType, messageHex);
             return TransferTransactionFactory.create(networkType,
                 recipient, mosaics, message);
-
 
         }
 
@@ -420,7 +455,8 @@ public class BinarySerializationImpl implements BinarySerialization {
             Optional<BigInteger> duration =
                 namespaceRegistrationType == NamespaceRegistrationType.ROOT_NAMESPACE ? Optional
                     .ofNullable(builder.getDuration()).map(
-                        BlockDurationDto::getBlockDuration).map(SerializationUtils::toUnsignedBigInteger)
+                        BlockDurationDto::getBlockDuration)
+                    .map(SerializationUtils::toUnsignedBigInteger)
                     : Optional.empty();
 
             Optional<NamespaceId> parentId =
@@ -553,7 +589,8 @@ public class BinarySerializationImpl implements BinarySerialization {
             BigInteger duration = SerializationUtils
                 .toUnsignedBigInteger(builder.getDuration().getBlockDuration());
             SignedTransaction signedTransaction = new SignedTransaction(null,
-                SerializationUtils.toHexString(builder.getHash()), TransactionType.AGGREGATE_BONDED);
+                SerializationUtils.toHexString(builder.getHash()),
+                TransactionType.AGGREGATE_BONDED);
             return HashLockTransactionFactory
                 .create(networkType, mosaic, duration, signedTransaction);
         }

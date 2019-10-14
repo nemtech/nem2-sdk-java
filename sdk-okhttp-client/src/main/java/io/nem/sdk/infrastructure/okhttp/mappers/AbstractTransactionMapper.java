@@ -181,6 +181,14 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
     }
 
 
+    /**
+     * Subclasses need to map the values from the transaction model to the transaction dto. Only the
+     * specific fields need to be mapped, not the common like maxFee or deadline as they are done in
+     * this abstract class.
+     *
+     * @param transaction the transaction model
+     * @param dto the transaction dto.
+     */
     protected abstract void copyToDto(T transaction, D dto);
 
 

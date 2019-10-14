@@ -91,6 +91,9 @@ public enum AliasActionDto {
         });
     }
 
+    /**
+     * @return the catbuffer byte value.
+     */
     public byte getValue() {
         return value;
     }

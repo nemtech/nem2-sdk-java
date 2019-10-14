@@ -86,7 +86,6 @@ public class MapperUtils {
         return new BigInteger(hex, 16);
     }
 
-
     /**
      * Converts a namespace or a mosaic id to hex
      *
@@ -98,10 +97,22 @@ public class MapperUtils {
     }
 
 
+    /**
+     * Extracts the transaction version from the version in dto/buffer transactions.
+     *
+     * @param version the network version
+     * @return the transaction version.
+     */
     public static Integer extractTransactionVersion(int version) {
         return (int) Long.parseLong(Integer.toHexString(version).substring(2, 4), 16);
     }
 
+    /**
+     * Extracts the network type from the version in dto/buffer transactions.
+     *
+     * @param version the network version
+     * @return the network type.
+     */
     public static NetworkType extractNetworkType(int version) {
         int networkType = (int) Long.parseLong(Integer.toHexString(version).substring(0, 2), 16);
         return NetworkType.rawValueOf(networkType);

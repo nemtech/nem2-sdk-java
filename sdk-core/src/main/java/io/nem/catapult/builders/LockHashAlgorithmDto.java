@@ -95,6 +95,9 @@ public enum LockHashAlgorithmDto {
         });
     }
 
+    /**
+     * @return the catbuffer byte value.
+     */
     public byte getValue() {
         return value;
     }

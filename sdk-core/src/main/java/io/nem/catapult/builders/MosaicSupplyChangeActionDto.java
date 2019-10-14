@@ -91,6 +91,9 @@ public enum MosaicSupplyChangeActionDto {
         });
     }
 
+    /**
+     * @return the catbuffer byte value.
+     */
     public byte getValue() {
         return value;
     }

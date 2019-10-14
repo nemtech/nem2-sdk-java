@@ -26,7 +26,7 @@ import java.util.Collections;
 import org.bouncycastle.util.encoders.Hex;
 
 /**
- * Supper class of all transaction unit tests.
+ * Super class of all transaction unit tests.
  */
 abstract class AbstractTransactionTester {
 
