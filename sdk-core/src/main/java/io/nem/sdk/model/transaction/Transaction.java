@@ -302,15 +302,6 @@ public abstract class Transaction {
     }
 
     /**
-     * Returns the transaction signature (missing if part of an aggregate transaction).
-     *
-     * @return transaction signature
-     */
-    public Optional<String> getSignatureBytes() {
-        return getSignature();
-    }
-
-    /**
      * Returns (optionally) the transaction creator public account.
      *
      * @return an optional of the signer public account

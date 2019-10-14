@@ -110,9 +110,14 @@ class TransferTransactionTest extends AbstractTransactionTester {
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
-                new PlainMessage("Some Message 漢字")).deadline(new FakeDeadline()).build();
+                new PlainMessage("Some Message 漢字")).signer(account.getPublicAccount())
+                .deadline(new FakeDeadline()).build();
 
         assertSerialization(expected, transaction);
+
+        String embeddedExpected = "680000001026d70e1954775749c6811084d6450a3184d977383f0e4282cd47118af377550190544190e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac14000100536f6d65204d65737361676520e6bca2e5ad97672b0000ce5600006400000000000000";
+
+        assertEmbeddedSerialization(embeddedExpected, transaction);
 
     }
 

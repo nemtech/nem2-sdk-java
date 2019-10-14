@@ -207,7 +207,6 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
         }
 
         Assert.assertTrue(transaction.getSignature().isPresent());
-        Assert.assertTrue(transaction.getSignatureBytes().isPresent());
         Assert.assertNotNull(transaction.getMaxFee());
         Assert.assertNotNull(transaction.getVersion());
         Assert.assertNotNull(transaction.getDeadline());
