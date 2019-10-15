@@ -33,6 +33,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -151,7 +152,7 @@ public class TransferTransaction extends Transaction {
             new ArrayList<>(mosaics.size());
         //Sort mosaics first
         final List<Mosaic> sortedMosaics = mosaics.stream()
-            .sorted((m1, m2) -> Long.compareUnsigned(m1.getId().getIdAsLong(), m2.getId().getIdAsLong()))
+            .sorted(Comparator.comparing(m -> m.getId().getId()))
             .collect(Collectors.toList());
 
         for (final Mosaic mosaic : sortedMosaics) {
