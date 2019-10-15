@@ -20,6 +20,8 @@ package io.nem.core.utils;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
+import java.util.Arrays;
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -67,13 +69,35 @@ public class MapperUtilsTest {
     @Test
     void extractTransactionVersion() {
         Assertions
-            .assertEquals(1, MapperUtils.extractTransactionVersion(36865).intValue());
+            .assertEquals(1, MapperUtils.extractTransactionVersion(36865));
+        Assertions
+            .assertEquals(11, MapperUtils.extractTransactionVersion(36875));
     }
 
     @Test
     void extractNetworkType() {
         Assertions
             .assertEquals(NetworkType.MIJIN_TEST, MapperUtils.extractNetworkType(36865));
+    }
+
+    @Test
+    void toNetworkVersion() {
+        Assertions
+            .assertEquals(36865, MapperUtils.toNetworkVersion(NetworkType.MIJIN_TEST, 1));
+
+        Arrays.stream(NetworkType.values()).forEach(networkType -> {
+            int version = RandomUtils.nextInt(1, 100);
+
+            Assertions.assertEquals(networkType,
+                MapperUtils.extractNetworkType(MapperUtils.toNetworkVersion(networkType,
+                    version)));
+
+            Assertions.assertEquals(version,
+                MapperUtils.extractTransactionVersion(MapperUtils.toNetworkVersion(networkType,
+                    version)));
+        });
+
+
     }
 
 }
