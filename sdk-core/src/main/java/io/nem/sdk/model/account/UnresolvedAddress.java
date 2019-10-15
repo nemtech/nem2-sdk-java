@@ -26,12 +26,8 @@ import java.nio.ByteBuffer;
 public interface UnresolvedAddress {
 
     /**
-     * @return the byte buffer user for serialization.
-     */
-    ByteBuffer getByteBuffer();
-
-    /**
-     * @return the encoded address.
+     * @return the encoded address or namespace id. Note that namespace id get the hex reversed and
+     * zero padded. See {@link io.nem.sdk.infrastructure.SerializationUtils}
      */
     String encoded();
 

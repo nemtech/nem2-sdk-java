@@ -25,6 +25,7 @@ import io.nem.catapult.builders.TransferTransactionBuilder;
 import io.nem.catapult.builders.UnresolvedAddressDto;
 import io.nem.catapult.builders.UnresolvedMosaicBuilder;
 import io.nem.catapult.builders.UnresolvedMosaicIdDto;
+import io.nem.sdk.infrastructure.SerializationUtils;
 import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.message.Message;
 import io.nem.sdk.model.mosaic.Mosaic;
@@ -104,7 +105,8 @@ public class TransferTransaction extends Transaction {
                 getEntityTypeDto(),
                 new AmountDto(getMaxFee().longValue()),
                 new TimestampDto(getDeadline().getInstant()),
-                new UnresolvedAddressDto(getUnresolveAddressBuffer()),
+                new UnresolvedAddressDto(
+                    SerializationUtils.fromUnresolvedAddressToByteBuffer(getRecipient())),
                 getMessageBuffer(),
                 getUnresolvedMosaicArray());
         return txBuilder.serialize();
@@ -122,7 +124,8 @@ public class TransferTransaction extends Transaction {
                 new KeyDto(getRequiredSignerBytes()),
                 getNetworkVersion(),
                 getEntityTypeDto(),
-                new UnresolvedAddressDto(getUnresolveAddressBuffer()),
+                new UnresolvedAddressDto(
+                    SerializationUtils.fromUnresolvedAddressToByteBuffer(getRecipient())),
                 getMessageBuffer(),
                 getUnresolvedMosaicArray());
         return txBuilder.serialize();
@@ -166,17 +169,5 @@ public class TransferTransaction extends Transaction {
         messageBuffer.put(bytePayload);
         return messageBuffer;
     }
-
-    /**
-     * Gets unresolve address buffer.
-     *
-     * @return Unresolve address buffer
-     */
-    private ByteBuffer getUnresolveAddressBuffer() {
-
-        return getRecipient().getByteBuffer();
-    }
-
-
 
 }

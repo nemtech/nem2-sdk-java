@@ -41,6 +41,9 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import org.apache.commons.codec.binary.Base32;
+import org.apache.commons.lang3.Validate;
 
 /**
  * Utility class used to serialize/deserialize catbuffer values.
@@ -116,6 +119,29 @@ public class SerializationUtils {
      */
     public static UnresolvedAddress toAddress(UnresolvedAddressDto dto) {
         return MapperUtils.toUnresolvedAddress(ConvertUtils.toHex(dto.getUnresolvedAddress().array()));
+    }
+
+    /**
+     * It serializes a UnresolvedAddress to a xx
+     */
+    public static ByteBuffer fromUnresolvedAddressToByteBuffer(
+        UnresolvedAddress unresolvedAddress) {
+        Validate.notNull(unresolvedAddress, "unresolvedAddress must not be null");
+
+        if (unresolvedAddress instanceof NamespaceId) {
+            final ByteBuffer namespaceIdAlias = ByteBuffer.allocate(25);
+            final byte firstByte = (byte) 0x91;
+            namespaceIdAlias.order(ByteOrder.LITTLE_ENDIAN);
+            namespaceIdAlias.put(firstByte);
+            namespaceIdAlias.putLong(((NamespaceId) unresolvedAddress).getIdAsLong());
+            return ByteBuffer.wrap(namespaceIdAlias.array());
+        }
+
+        if (unresolvedAddress instanceof Address) {
+            return ByteBuffer.wrap(new Base32().decode(((Address) unresolvedAddress).plain()));
+        }
+        throw new IllegalArgumentException(
+            "Unexpected UnresolvedAddress type " + unresolvedAddress.getClass());
     }
 
 
@@ -199,4 +225,6 @@ public class SerializationUtils {
     public static String toString(ByteBuffer buffer) {
         return StringEncoder.getString(buffer.array());
     }
+
+
 }

@@ -28,6 +28,7 @@ import io.nem.catapult.builders.TimestampDto;
 import io.nem.catapult.builders.UnresolvedAddressDto;
 import io.nem.catapult.builders.UnresolvedMosaicBuilder;
 import io.nem.catapult.builders.UnresolvedMosaicIdDto;
+import io.nem.sdk.infrastructure.SerializationUtils;
 import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.mosaic.Mosaic;
 import java.math.BigInteger;
@@ -127,7 +128,8 @@ public class SecretLockTransaction extends Transaction {
                 new BlockDurationDto(duration.longValue()),
                 LockHashAlgorithmDto.rawValueOf((byte) hashAlgorithm.getValue()),
                 new Hash256Dto(getSecretBuffer()),
-                new UnresolvedAddressDto(getRecipient().getByteBuffer()));
+                new UnresolvedAddressDto(
+                    SerializationUtils.fromUnresolvedAddressToByteBuffer(getRecipient())));
         return txBuilder.serialize();
     }
 
@@ -149,7 +151,8 @@ public class SecretLockTransaction extends Transaction {
                 new BlockDurationDto(duration.longValue()),
                 LockHashAlgorithmDto.rawValueOf((byte) hashAlgorithm.getValue()),
                 new Hash256Dto(getSecretBuffer()),
-                new UnresolvedAddressDto(getRecipient().getByteBuffer()));
+                new UnresolvedAddressDto(
+                    SerializationUtils.fromUnresolvedAddressToByteBuffer(getRecipient())));
         return txBuilder.serialize();
     }
 

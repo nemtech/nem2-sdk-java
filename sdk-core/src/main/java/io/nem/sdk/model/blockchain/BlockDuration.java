@@ -64,6 +64,13 @@ public class BlockDuration {
         return Long.toString(duration);
     }
 
+    /**
+     * It compares this {@link BlockDuration} to another object. Returns true if the object is a
+     * {@link BlockDuration} with the same duration number.
+     *
+     * @param o the object to be compared.
+     * @return true is o is an {@link BlockDuration} with the same duration. False otherwise
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {

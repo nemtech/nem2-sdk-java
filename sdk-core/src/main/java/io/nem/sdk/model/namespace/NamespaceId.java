@@ -16,16 +16,14 @@
 
 package io.nem.sdk.model.namespace;
 
-import io.nem.core.utils.Base32Encoder;
 import io.nem.core.utils.ByteUtils;
 import io.nem.core.utils.ConvertUtils;
+import io.nem.sdk.infrastructure.SerializationUtils;
 import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.mosaic.IllegalIdentifierException;
 import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.transaction.IdGenerator;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -143,24 +141,11 @@ public class NamespaceId implements UnresolvedMosaicId, UnresolvedAddress {
         return Objects.hash(id);
     }
 
-    /**
-     * Gets the namespace id as unresolved address as ByteBuffer.
-     *
-     * @return Unresolved address buffer.
-     */
-    @Override
-    public ByteBuffer getByteBuffer() {
-        final ByteBuffer namespaceIdAlias = ByteBuffer.allocate(25);
-        final byte firstByte = (byte) 0x91;
-        namespaceIdAlias.order(ByteOrder.LITTLE_ENDIAN);
-        namespaceIdAlias.put(firstByte);
-        namespaceIdAlias.putLong(getIdAsLong());
-        return ByteBuffer.wrap(namespaceIdAlias.array());
-    }
 
     @Override
     public String encoded() {
-        return ConvertUtils.toHex(getByteBuffer().array());
+        return ConvertUtils
+            .toHex(SerializationUtils.fromUnresolvedAddressToByteBuffer(this).array());
     }
 
     /**

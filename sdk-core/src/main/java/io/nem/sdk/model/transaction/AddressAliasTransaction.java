@@ -25,6 +25,7 @@ import io.nem.catapult.builders.KeyDto;
 import io.nem.catapult.builders.NamespaceIdDto;
 import io.nem.catapult.builders.SignatureDto;
 import io.nem.catapult.builders.TimestampDto;
+import io.nem.sdk.infrastructure.SerializationUtils;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.namespace.AliasAction;
 import io.nem.sdk.model.namespace.NamespaceId;
@@ -97,7 +98,7 @@ public class AddressAliasTransaction extends Transaction {
                 new TimestampDto(getDeadline().getInstant()),
                 AliasActionDto.rawValueOf(getAliasAction().getValue()),
                 new NamespaceIdDto(getNamespaceId().getIdAsLong()),
-                new AddressDto(getAddress().getByteBuffer()));
+                new AddressDto(SerializationUtils.fromUnresolvedAddressToByteBuffer(getAddress())));
         return txBuilder.serialize();
     }
 
@@ -115,7 +116,7 @@ public class AddressAliasTransaction extends Transaction {
                 getEntityTypeDto(),
                 AliasActionDto.rawValueOf(getAliasAction().getValue()),
                 new NamespaceIdDto(getNamespaceId().getIdAsLong()),
-                new AddressDto(getAddress().getByteBuffer()));
+                new AddressDto(SerializationUtils.fromUnresolvedAddressToByteBuffer(getAddress())));
         return txBuilder.serialize();
     }
 }

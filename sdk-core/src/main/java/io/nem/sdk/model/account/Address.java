@@ -18,8 +18,6 @@ package io.nem.sdk.model.account;
 
 import io.nem.core.crypto.RawAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base32;
@@ -137,15 +135,6 @@ public class Address implements UnresolvedAddress {
         return networkType;
     }
 
-    /**
-     * Gets address as byte buffer.
-     *
-     * @return Byte buffer used for serialization.
-     */
-    @Override
-    public ByteBuffer getByteBuffer() {
-        return ByteBuffer.wrap(new Base32().decode(plain()));
-    }
 
     /**
      * Returns the encoded address.

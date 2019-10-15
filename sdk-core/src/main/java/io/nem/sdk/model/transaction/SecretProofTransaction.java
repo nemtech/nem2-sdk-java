@@ -25,6 +25,7 @@ import io.nem.catapult.builders.SecretProofTransactionBuilder;
 import io.nem.catapult.builders.SignatureDto;
 import io.nem.catapult.builders.TimestampDto;
 import io.nem.catapult.builders.UnresolvedAddressDto;
+import io.nem.sdk.infrastructure.SerializationUtils;
 import io.nem.sdk.model.account.UnresolvedAddress;
 import java.nio.ByteBuffer;
 import org.bouncycastle.util.encoders.Hex;
@@ -102,7 +103,8 @@ public class SecretProofTransaction extends Transaction {
                 new TimestampDto(getDeadline().getInstant()),
                 LockHashAlgorithmDto.rawValueOf((byte) hashType.getValue()),
                 new Hash256Dto(getSecretBuffer()),
-                new UnresolvedAddressDto(this.recipient.getByteBuffer()),
+                new UnresolvedAddressDto(
+                    SerializationUtils.fromUnresolvedAddressToByteBuffer(this.getRecipient())),
                 getProofBuffer());
         return txBuilder.serialize();
     }
@@ -128,7 +130,8 @@ public class SecretProofTransaction extends Transaction {
                 getEntityTypeDto(),
                 LockHashAlgorithmDto.rawValueOf((byte) hashType.getValue()),
                 new Hash256Dto(getSecretBuffer()),
-                new UnresolvedAddressDto(this.recipient.getByteBuffer()),
+                new UnresolvedAddressDto(
+                    SerializationUtils.fromUnresolvedAddressToByteBuffer(this.getRecipient())),
                 getProofBuffer());
         return txBuilder.serialize();
     }

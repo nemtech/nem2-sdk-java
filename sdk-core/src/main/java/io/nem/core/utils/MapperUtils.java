@@ -24,9 +24,6 @@ import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.namespace.NamespaceId;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Utility class for mappers.
@@ -98,6 +95,7 @@ public class MapperUtils {
             return Address.createFromEncoded(hex);
         }
     }
+
 
     /**
      * Creates a {@link Address} from the provided raw address.

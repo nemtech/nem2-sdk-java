@@ -186,18 +186,6 @@ public class ConvertUtils {
         }
     }
 
-    /**
-     * Reversed conversion of an hex string to a new hex
-     *
-     * @param hex the hex string.
-     * @return the new hex string.
-     */
-    public static String reverseHexString(String hex) {
-        final ByteBuffer namespaceIdAlias = ByteBuffer.allocate(hex.length() / 2);
-        namespaceIdAlias.order(ByteOrder.LITTLE_ENDIAN);
-        namespaceIdAlias.putLong(new BigInteger(hex, 16).longValue());
-        return Hex.encodeHexString(namespaceIdAlias.array());
-    }
 
     /**
      * Validates that an input is a valid hex and of the given size. If not, it raises a {@link
@@ -213,5 +201,18 @@ public class ConvertUtils {
         if (size != null && input.length() != size) {
             throw new IllegalArgumentException(input + " is not an hex of size " + size);
         }
+    }
+
+    /**
+     * Reversed conversion of an hex string to a new hex
+     *
+     * @param hex the hex string.
+     * @return the new hex string.
+     */
+    public static String reverseHexString(String hex) {
+        final ByteBuffer byteBuffer = ByteBuffer.allocate(hex.length() / 2);
+        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        byteBuffer.putLong(new BigInteger(hex, 16).longValue());
+        return Hex.encodeHexString(byteBuffer.array());
     }
 }
