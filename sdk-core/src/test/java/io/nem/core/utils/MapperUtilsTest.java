@@ -23,7 +23,6 @@ import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.namespace.NamespaceId;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import org.junit.Assert;
@@ -87,7 +86,8 @@ public class MapperUtilsTest {
 
         NamespaceId namespaceId = NamespaceId.createFromName("some.name");
 
-        Assertions.assertEquals("91d9e338f78767ed9500000000000000000000000000000000", namespaceId.encoded());
+        Assertions.assertEquals("91d9e338f78767ed9500000000000000000000000000000000",
+            namespaceId.encoded());
         Assertions
             .assertEquals(namespaceId.encoded(),
                 MapperUtils.toUnresolvedAddress(namespaceId.encoded()).encoded());
@@ -128,7 +128,6 @@ public class MapperUtilsTest {
             .assertEquals(new NamespaceId("9a52fde35777cd4f"),
                 MapperUtils.toUnresolvedMosaicId("9a52fde35777cd4f"));
 
-
     }
 
     @Test
@@ -136,7 +135,7 @@ public class MapperUtilsTest {
         byte[] array = new byte[7]; // length is bounded by 7
         new Random().nextBytes(array);
         String generatedString = new String(array, StandardCharsets.UTF_8);
-
         Assertions.assertNotNull(generatedString);
     }
+
 }
