@@ -22,6 +22,7 @@ import io.nem.core.crypto.DsaSigner;
 import io.nem.core.crypto.Hashes;
 import io.nem.core.crypto.Signature;
 import io.nem.core.utils.ConvertUtils;
+import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -293,21 +294,7 @@ public abstract class Transaction {
      * @return Version of the transaction
      */
     public int getTransactionVersion() {
-        return (int)
-            Long.parseLong(
-                Integer.toHexString(getNetworkType().getValue())
-                    + "0"
-                    + Integer.toHexString(getVersion()),
-                16);
-    }
-
-    /**
-     * Returns the transaction signature (missing if part of an aggregate transaction).
-     *
-     * @return transaction signature
-     */
-    public Optional<String> getSignatureBytes() {
-        return getSignature();
+        return MapperUtils.toNetworkVersion(getNetworkType(), getVersion());
     }
 
     /**

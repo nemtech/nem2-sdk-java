@@ -43,6 +43,7 @@ import io.nem.catapult.builders.NamespaceMetadataTransactionBodyBuilder;
 import io.nem.catapult.builders.NamespaceRegistrationTransactionBodyBuilder;
 import io.nem.catapult.builders.SecretLockTransactionBodyBuilder;
 import io.nem.catapult.builders.SecretProofTransactionBodyBuilder;
+import io.nem.catapult.builders.SignatureDto;
 import io.nem.catapult.builders.TransactionBuilder;
 import io.nem.catapult.builders.TransferTransactionBodyBuilder;
 import io.nem.core.utils.ConvertUtils;
@@ -200,11 +201,26 @@ public class BinarySerializationImpl implements BinarySerialization {
             SerializationUtils.toUnsignedBigInteger(builder.getDeadline().getTimestamp()));
         TransactionFactory<?> factory = resolveMapper(transactionType)
             .fromStream(networkType, stream, payload);
-        factory.signer(SerializationUtils.toPublicAccount(builder.getSigner(), networkType));
         factory.version(version);
         factory.maxFee(SerializationUtils.toUnsignedBigInteger(builder.getFee()));
         factory.deadline(deadline);
+        if (!areAllZeros(builder.getSignature().getSignature().array())) {
+            factory.signature(SerializationUtils.toHexString(builder.getSignature()));
+        }
+        if (!areAllZeros(builder.getSigner().getKey().array())) {
+            factory.signer(SerializationUtils.toPublicAccount(builder.getSigner(), networkType));
+        }
+
         return factory.build();
+    }
+
+    private boolean areAllZeros(byte[] array) {
+        for (byte b : array) {
+            if (b != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

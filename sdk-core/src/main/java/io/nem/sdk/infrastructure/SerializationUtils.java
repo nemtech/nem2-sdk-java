@@ -22,6 +22,7 @@ import io.nem.catapult.builders.Hash256Dto;
 import io.nem.catapult.builders.KeyDto;
 import io.nem.catapult.builders.MosaicIdDto;
 import io.nem.catapult.builders.NamespaceIdDto;
+import io.nem.catapult.builders.SignatureDto;
 import io.nem.catapult.builders.UnresolvedAddressDto;
 import io.nem.catapult.builders.UnresolvedMosaicBuilder;
 import io.nem.catapult.builders.UnresolvedMosaicIdDto;
@@ -214,6 +215,15 @@ public class SerializationUtils {
      */
     public static String toHexString(Hash256Dto dto) {
         return ConvertUtils.toHex(dto.getHash256().array());
+    }
+    /**
+     * It extracts the hex string from the {@link SignatureDto}
+     *
+     * @param dto the {@link SignatureDto}
+     * @return the hex string.
+     */
+    public static String toHexString(SignatureDto dto) {
+        return ConvertUtils.toHex(dto.getSignature().array());
     }
 
     /**

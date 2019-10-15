@@ -144,8 +144,8 @@ public class MapperUtils {
      * @param version the network version
      * @return the transaction version.
      */
-    public static Integer extractTransactionVersion(int version) {
-        return (int) Long.parseLong(Integer.toHexString(version).substring(2, 4), 16);
+    public static int extractTransactionVersion(int version) {
+        return version & 0x00ff;
     }
 
     /**
@@ -155,8 +155,18 @@ public class MapperUtils {
      * @return the network type.
      */
     public static NetworkType extractNetworkType(int version) {
-        int networkType = (int) Long.parseLong(Integer.toHexString(version).substring(0, 2), 16);
-        return NetworkType.rawValueOf(networkType);
+        return NetworkType.rawValueOf(version >> 8);
+    }
+
+    /**
+     * Generates the networkVersion from the network type and transaction version.
+     *
+     * @param networkType the {@link NetworkType}
+     * @param version the version.
+     * @return network version
+     */
+    public static int toNetworkVersion(NetworkType networkType, int version) {
+        return (networkType.getValue() << 8) + version;
     }
 
 }

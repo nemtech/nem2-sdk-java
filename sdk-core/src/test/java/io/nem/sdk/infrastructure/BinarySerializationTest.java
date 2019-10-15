@@ -17,12 +17,16 @@
 package io.nem.sdk.infrastructure;
 
 
+import io.nem.core.utils.ConvertUtils;
+import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.transaction.FakeDeadline;
+import io.nem.sdk.model.transaction.SignedTransaction;
+import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
@@ -30,6 +34,8 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.bouncycastle.util.encoders.Hex;
+import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +43,12 @@ import org.junit.jupiter.api.Test;
  * Test of {@link BinarySerializationImpl}
  */
 class BinarySerializationTest {
+
+    private static String generationHash = "57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6";
+
+    private static Account account = new Account(
+        "787225aaff3d2c71f4ffa32d4f19ec4922f3cd869747f267378f81f8e3fcb12d",
+        NetworkType.MIJIN_TEST);
 
     @Test
     void testAllTransactionAreHandled() {
@@ -79,6 +91,48 @@ class BinarySerializationTest {
 
         Assertions.assertEquals("Some Message",
             deserializedTransaction.getMessage().getPayload());
+    }
+
+    @Test
+    void testSignature() {
+        BinarySerializationImpl binarySerialization = new BinarySerializationImpl();
+        TransferTransaction transaction =
+            TransferTransactionFactory.create(
+                NetworkType.MIJIN_TEST,
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                Arrays.asList(
+                    new Mosaic(
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
+                new PlainMessage("Some Message")).deadline(new FakeDeadline()).build();
+
+        SignedTransaction signedTransaction = transaction.signWith(account, generationHash);
+
+        String signature = signedTransaction.getPayload().substring(8, 128 + 8);
+
+        //If we deserialize the signed transaction, we get everything back, include the signer and signature
+
+        byte[] payloadWithSignatureAndSigner = ConvertUtils
+            .getBytes(signedTransaction.getPayload());
+
+        TransferTransaction deserialized = (TransferTransaction) binarySerialization
+            .deserialize(payloadWithSignatureAndSigner);
+
+
+        Assertions.assertTrue(deserialized.getSignature().isPresent());
+        Assertions.assertTrue(deserialized.getSigner().isPresent());
+        Assert.assertEquals(signature, deserialized.getSignature().get().toUpperCase());
+        Assert.assertEquals(account.getPublicAccount(), deserialized.getSigner().get());
+
+        //Test that the payload is the same, just without the signature and signer.
+        byte[] payloadWithoutSignatureAndSigner = binarySerialization.serialize(transaction);
+        Assertions.assertEquals(Hex.toHexString(payloadWithoutSignatureAndSigner).substring(200),
+            Hex.toHexString(payloadWithSignatureAndSigner).substring(200));
+
+        Transaction deserializeWithoutSignature = binarySerialization
+            .deserialize(payloadWithoutSignatureAndSigner);
+
+        Assertions.assertFalse(deserializeWithoutSignature.getSignature().isPresent());
+        Assertions.assertFalse(deserializeWithoutSignature.getSigner().isPresent());
 
     }
 
