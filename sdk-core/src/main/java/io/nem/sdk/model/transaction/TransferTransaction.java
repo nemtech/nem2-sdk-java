@@ -33,8 +33,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * The transfer transactions object contain data about transfers of mosaics and message to another
@@ -148,7 +150,12 @@ public class TransferTransaction extends Transaction {
         // Create Mosaics
         final ArrayList<UnresolvedMosaicBuilder> unresolvedMosaicArrayList =
             new ArrayList<>(mosaics.size());
-        for (final Mosaic mosaic : mosaics) {
+        //Sort mosaics first
+        final List<Mosaic> sortedMosaics = mosaics.stream()
+            .sorted(Comparator.comparing(m -> m.getId().getId()))
+            .collect(Collectors.toList());
+
+        for (final Mosaic mosaic : sortedMosaics) {
             final UnresolvedMosaicBuilder mosaicBuilder =
                 UnresolvedMosaicBuilder.create(
                     new UnresolvedMosaicIdDto(mosaic.getId().getId().longValue()),
