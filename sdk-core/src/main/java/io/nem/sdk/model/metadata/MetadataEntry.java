@@ -68,7 +68,7 @@ public class MetadataEntry {
      *
      * {@link io.nem.sdk.model.namespace.NamespaceId} (when metadata type is NAMESPACE)
      */
-    private final Optional<UnresolvedMosaicId> targetId;
+    private final Optional<Object> targetId;
 
     @SuppressWarnings("squid:S00107")
     public MetadataEntry(String compositeHash, String senderPublicKey, String targetPublicKey,
@@ -84,7 +84,7 @@ public class MetadataEntry {
         this.targetId = resolveTargetId(targetId, metadataType);
     }
 
-    private Optional<UnresolvedMosaicId> resolveTargetId(Optional<String> targetId,
+    private Optional<Object> resolveTargetId(Optional<String> targetId,
         MetadataType metadataType) {
         if (!targetId.isPresent() && metadataType == MetadataType.ACCOUNT) {
             return Optional.empty();
@@ -126,7 +126,8 @@ public class MetadataEntry {
         return value;
     }
 
-    public Optional<UnresolvedMosaicId> getTargetId() {
+    public Optional<Object> getTargetId() {
         return targetId;
     }
+
 }
