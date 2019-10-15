@@ -18,6 +18,7 @@
 package io.nem.core.utils;
 
 import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
@@ -60,6 +61,19 @@ public class MapperUtilsTest {
         Assertions.assertNull(MapperUtils.toMosaicId(null));
         Assertions
             .assertEquals(BigInteger.valueOf(1194684), MapperUtils.toMosaicId("123ABC").getId());
+    }
+
+
+    @Test
+    void extractTransactionVersion() {
+        Assertions
+            .assertEquals(1, MapperUtils.extractTransactionVersion(36865).intValue());
+    }
+
+    @Test
+    void extractNetworkType() {
+        Assertions
+            .assertEquals(NetworkType.MIJIN_TEST, MapperUtils.extractNetworkType(36865));
     }
 
 }
