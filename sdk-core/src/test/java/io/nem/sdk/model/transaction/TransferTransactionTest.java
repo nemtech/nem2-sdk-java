@@ -24,6 +24,8 @@ import io.nem.core.crypto.KeyPair;
 import io.nem.core.crypto.PrivateKey;
 import io.nem.sdk.api.BinarySerialization;
 import io.nem.sdk.infrastructure.BinarySerializationImpl;
+import io.nem.core.utils.ByteUtils;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
@@ -38,8 +40,10 @@ import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.namespace.NamespaceId;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -276,5 +280,62 @@ class TransferTransactionTest extends AbstractTransactionTester {
             deserializedMessage
                 .decryptPayload(sender.getPublicKey(), recipient.getPrivateKey(), networkType));
 
+    }
+
+    @Test
+    void mosaicArrayToBeSorted() {
+        ArrayList<Mosaic> mosaics = new ArrayList();
+        mosaics.add(new Mosaic(
+            new MosaicId(new BigInteger("200")), BigInteger.valueOf(1)));
+        mosaics.add(new Mosaic(
+            new MosaicId(new BigInteger("100")), BigInteger.valueOf(2)));
+
+        TransferTransaction transaction =
+            TransferTransactionFactory.create(
+                NetworkType.MIJIN_TEST,
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                mosaics,
+                PlainMessage.Empty).deadline(new FakeDeadline()).build();
+
+        assertEquals(mosaics.get(0).getId().getIdAsLong(), new BigInteger("200").longValue());
+        assertEquals(mosaics.get(1).getId().getIdAsLong(), new BigInteger("100").longValue());
+        SignedTransaction signedTransaction = transaction.signWith(account, generationHash);
+        String payload = signedTransaction.getPayload();
+
+        assertEquals(mosaics.get(1).getId().getIdAsHex(),
+            ConvertUtils.toHex(ByteUtils.reverseCopy(ConvertUtils.getBytes(payload.substring(298, 314)))));
+        assertEquals(mosaics.get(0).getId().getIdAsHex(),
+            ConvertUtils.toHex(ByteUtils.reverseCopy(ConvertUtils.getBytes(payload.substring(330, 346)))));
+    }
+
+    @Test
+    void mosaicArrayToBeSortedHex() {
+        ArrayList<Mosaic> mosaics = new ArrayList();
+        mosaics.add(new Mosaic(
+            new MosaicId("D525AD41D95FCF29"), BigInteger.valueOf(1)));
+        mosaics.add(new Mosaic(
+            new MosaicId("77A1969932D987D7"), BigInteger.valueOf(2)));
+        mosaics.add(new Mosaic(
+            new MosaicId("67F2B76F28BD36BA"), BigInteger.valueOf(3)));
+
+        TransferTransaction transaction =
+            TransferTransactionFactory.create(
+                NetworkType.MIJIN_TEST,
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                mosaics,
+                PlainMessage.Empty).deadline(new FakeDeadline()).build();
+
+        assertEquals(mosaics.get(0).getId().getIdAsHex().toUpperCase(), "D525AD41D95FCF29");
+        assertEquals(mosaics.get(1).getId().getIdAsHex().toUpperCase(), "77A1969932D987D7");
+        assertEquals(mosaics.get(2).getId().getIdAsHex().toUpperCase(), "67F2B76F28BD36BA");
+        SignedTransaction signedTransaction = transaction.signWith(account, generationHash);
+        String payload = signedTransaction.getPayload();
+
+        assertEquals(mosaics.get(2).getId().getIdAsHex(),
+            ConvertUtils.toHex(ByteUtils.reverseCopy(ConvertUtils.getBytes(payload.substring(298, 314)))));
+        assertEquals(mosaics.get(1).getId().getIdAsHex(),
+            ConvertUtils.toHex(ByteUtils.reverseCopy(ConvertUtils.getBytes(payload.substring(330, 346)))));
+        assertEquals(mosaics.get(0).getId().getIdAsHex(),
+            ConvertUtils.toHex(ByteUtils.reverseCopy(ConvertUtils.getBytes(payload.substring(362, 378)))));
     }
 }

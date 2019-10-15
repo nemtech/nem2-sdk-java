@@ -31,6 +31,7 @@ import io.nem.sdk.model.mosaic.Mosaic;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -135,7 +136,12 @@ public class TransferTransaction extends Transaction {
         // Create Mosaics
         final ArrayList<UnresolvedMosaicBuilder> unresolvedMosaicArrayList =
             new ArrayList<>(mosaics.size());
-        for (final Mosaic mosaic : mosaics) {
+        //Sort mosaics first
+        final List<Mosaic> sortedMosaics = mosaics.stream()
+            .sorted(Comparator.comparing(m -> m.getId().getId()))
+            .collect(Collectors.toList());
+
+        for (final Mosaic mosaic : sortedMosaics) {
             final UnresolvedMosaicBuilder mosaicBuilder =
                 UnresolvedMosaicBuilder.create(
                     new UnresolvedMosaicIdDto(mosaic.getId().getIdAsLong()),
