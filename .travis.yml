@@ -11,9 +11,9 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-install:
-  - ./gradlew -b ./openapi-generator/build.gradle clean generate
-  - ./gradlew -b ./openapi-generator/build.gradle install
+#install:
+#  - ./gradlew -b ./openapi-generator/build.gradle clean generate
+#  - ./gradlew -b ./openapi-generator/build.gradle install
 script:
   - ./gradlew install jacocoTestReport coveralls -x javadoc
 deploy:
