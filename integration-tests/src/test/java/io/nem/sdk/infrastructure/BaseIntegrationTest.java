@@ -355,15 +355,15 @@ public abstract class BaseIntegrationTest {
             getRepositoryFactory(type).createAccountRepository().getAccountsNames(
                 Collections.singletonList(address)));
 
-        if (!accountNames.stream().anyMatch(
+        if (accountNames.stream().anyMatch(
             an -> an.getNames().stream().anyMatch(
                 ns -> ns.getName().equals(namespaceName) && ns.getNamespaceId()
                     .equals(namespaceId)))) {
-            System.out.println(namespaceName + " Alias not found, recreating");
+            System.out.println(namespaceName + " ADDRESS Alias found, reusing it.");
             return namespaceId;
 
         } else {
-            System.out.println(namespaceName + " found, reusing it.");
+            System.out.println(namespaceName + " ADDRESS Alias not found, CREATING MOSAIC ALIAS");
         }
 
         System.out.println(
@@ -399,15 +399,14 @@ public abstract class BaseIntegrationTest {
             getRepositoryFactory(type).createMosaicRepository().getMosaicsNames(
                 Collections.singletonList(mosaicId)));
 
-        if (!mosaicNames.stream().anyMatch(
+        if (mosaicNames.stream().anyMatch(
             an -> an.getNames().stream().anyMatch(
                 ns -> ns.getName().equals(namespaceName) && ns.getNamespaceId()
                     .equals(namespaceId)))) {
-            System.out.println(namespaceName + " Alias not found, recreating");
+            System.out.println(namespaceName + " MOSAIC Alias found, reusing it.");
             return namespaceId;
-
         } else {
-            System.out.println(namespaceName + " found, reusing it.");
+            System.out.println(namespaceName + " MOSAIC Alias not found, CREATING MOSAIC ALIAS");
         }
 
         System.out.println(

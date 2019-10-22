@@ -34,6 +34,9 @@ import org.junit.jupiter.api.Test;
 
 public class ResolutionStatementTest {
 
+
+    private static NetworkType networkType = NetworkType.MIJIN_TEST;
+
     static Address address;
     static MosaicId mosaicId;
     static NamespaceId namespaceId;
@@ -44,7 +47,7 @@ public class ResolutionStatementTest {
     @BeforeAll
     public static void setup() {
         address = new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
-            NetworkType.MIJIN_TEST);
+            networkType);
         mosaicId = new MosaicId("85BBEA6CC462B244");
         namespaceId = NamespaceId.createFromName("money");
         receiptSource = new ReceiptSource(1, 1);
@@ -139,7 +142,7 @@ public class ResolutionStatementTest {
         MosaicResolutionStatement resolutionStatement = new MosaicResolutionStatement(
             BigInteger.TEN, mosaicId, resolutionEntries);
 
-        String hash = resolutionStatement.generateHash();
+        String hash = resolutionStatement.generateHash(networkType);
 
         assertFalse(hash.isEmpty());
         assertEquals(hash, "C965152CBD197283CC9F7AFD7F8C4C3FF03B0B54FCE7C8F4820F966AB0591A5C");

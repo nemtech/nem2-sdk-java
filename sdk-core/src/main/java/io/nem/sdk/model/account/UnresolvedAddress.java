@@ -16,6 +16,8 @@
 
 package io.nem.sdk.model.account;
 
+import io.nem.sdk.model.blockchain.NetworkType;
+
 /**
  * Unresolved address is used when the referenced account can be accessed via an {@link Address} or
  * a {@link io.nem.sdk.model.namespace.NamespaceId}
@@ -23,9 +25,10 @@ package io.nem.sdk.model.account;
 public interface UnresolvedAddress {
 
     /**
+     * @param networkType the network type.
      * @return the encoded address or namespace id. Note that namespace id get the hex reversed and
      * zero padded. See {@link io.nem.sdk.infrastructure.SerializationUtils}
      */
-    String encoded();
+    String encoded(NetworkType networkType);
 
 }

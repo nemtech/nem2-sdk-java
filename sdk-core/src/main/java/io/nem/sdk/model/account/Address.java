@@ -139,6 +139,17 @@ public class Address implements UnresolvedAddress {
     /**
      * Returns the encoded address.
      *
+     * @param networkType the network type.
+     * @return the encoded plain address.
+     */
+    @Override
+    public String encoded(NetworkType networkType) {
+        return encoded();
+    }
+
+    /**
+     * Returns the encoded address.
+     *
      * @return the encoded plain address.
      */
     public String encoded() {

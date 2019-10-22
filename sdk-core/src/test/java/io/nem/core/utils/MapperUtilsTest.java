@@ -33,6 +33,8 @@ import org.junit.jupiter.api.Test;
 
 public class MapperUtilsTest {
 
+    private NetworkType networkType = NetworkType.MIJIN_TEST;
+
     @Test
     void shouldMapToNamespaceId() {
         Assertions.assertNull(MapperUtils.toNamespaceId(null));
@@ -112,22 +114,24 @@ public class MapperUtilsTest {
         NamespaceId namespaceId = NamespaceId.createFromName("some.name");
 
         Assertions.assertEquals("91d9e338f78767ed9500000000000000000000000000000000",
-            namespaceId.encoded());
+            namespaceId.encoded(networkType));
         Assertions
-            .assertEquals(namespaceId.encoded(),
-                MapperUtils.toUnresolvedAddress(namespaceId.encoded()).encoded());
+            .assertEquals(namespaceId.encoded(networkType),
+                MapperUtils.toUnresolvedAddress(namespaceId.encoded(networkType)).encoded(
+                    networkType));
 
         Address address = Address.createFromRawAddress("MCTVW23D2MN5VE4AQ4TZIDZENGNOZXPRPR72DYSX");
         Assertions.assertNull(MapperUtils.toUnresolvedAddress(null));
 
-        Assertions.assertEquals(address, MapperUtils.toUnresolvedAddress(address.encoded()));
+        Assertions.assertEquals(address, MapperUtils.toUnresolvedAddress(address.encoded(
+            networkType)));
 
         address = Address
             .createFromRawAddress("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC");
 
         Assertions
             .assertEquals(address,
-                MapperUtils.toUnresolvedAddress(address.encoded()));
+                MapperUtils.toUnresolvedAddress(address.encoded(networkType)));
     }
 
 

@@ -55,7 +55,7 @@ class AddressAliasTransactionMapper extends
 
     @Override
     protected void copyToDto(AddressAliasTransaction transaction, AddressAliasTransactionDTO dto) {
-        dto.setAddress(transaction.getAddress().encoded());
+        dto.setAddress(transaction.getAddress().encoded(transaction.getNetworkType()));
         dto.setNamespaceId(getIdAsHex(transaction.getNamespaceId()));
         dto.setAliasAction(
             AliasActionEnum.fromValue((int) transaction.getAliasAction().getValue()));

@@ -477,7 +477,8 @@ public class BinarySerializationImpl implements BinarySerialization {
             return TransferTransactionBodyBuilder.create(
                 new UnresolvedAddressDto(
                     SerializationUtils
-                        .fromUnresolvedAddressToByteBuffer(transaction.getRecipient())),
+                        .fromUnresolvedAddressToByteBuffer(transaction.getRecipient(),
+                            transaction.getNetworkType())),
                 getMessageBuffer(transaction),
                 getUnresolvedMosaicArray(transaction)).serialize();
 
@@ -815,7 +816,8 @@ public class BinarySerializationImpl implements BinarySerialization {
             NamespaceRegistrationType namespaceRegistrationType = NamespaceRegistrationType
                 .rawValueOf(builder.getRegistrationType().getValue());
             String namespaceName = StringEncoder.getString(builder.getName().array());
-            NamespaceId namespaceId = SerializationUtils.toNamespaceId(builder.getId());
+            NamespaceId namespaceId = SerializationUtils
+                .toNamespaceId(builder.getId());
 
             Optional<BigInteger> duration =
                 namespaceRegistrationType == NamespaceRegistrationType.ROOT_NAMESPACE ? Optional
@@ -827,7 +829,8 @@ public class BinarySerializationImpl implements BinarySerialization {
             Optional<NamespaceId> parentId =
                 namespaceRegistrationType == NamespaceRegistrationType.SUB_NAMESPACE ? Optional
                     .of(builder.getParentId())
-                    .map(SerializationUtils::toNamespaceId) : Optional.empty();
+                    .map((NamespaceIdDto dto) -> SerializationUtils.toNamespaceId(dto))
+                    : Optional.empty();
 
             return NamespaceRegistrationTransactionFactory
                 .create(networkType, namespaceName, namespaceId, namespaceRegistrationType,
@@ -908,7 +911,8 @@ public class BinarySerializationImpl implements BinarySerialization {
                 new Hash256Dto(getSecretBuffer(transaction)),
                 new UnresolvedAddressDto(
                     SerializationUtils
-                        .fromUnresolvedAddressToByteBuffer(transaction.getRecipient())))
+                        .fromUnresolvedAddressToByteBuffer(transaction.getRecipient(),
+                            transaction.getNetworkType())))
                 .serialize();
         }
 
@@ -962,7 +966,8 @@ public class BinarySerializationImpl implements BinarySerialization {
                 new Hash256Dto(getSecretBuffer(transaction)),
                 new UnresolvedAddressDto(
                     SerializationUtils
-                        .fromUnresolvedAddressToByteBuffer(transaction.getRecipient())),
+                        .fromUnresolvedAddressToByteBuffer(transaction.getRecipient(),
+                            transaction.getNetworkType())),
                 getProofBuffer(transaction)).serialize();
         }
 
@@ -1011,7 +1016,8 @@ public class BinarySerializationImpl implements BinarySerialization {
                 .loadFromBinary(stream);
 
             AliasAction aliasAction = AliasAction.rawValueOf(builder.getAliasAction().getValue());
-            NamespaceId namespaceId = SerializationUtils.toNamespaceId(builder.getNamespaceId());
+            NamespaceId namespaceId = SerializationUtils
+                .toNamespaceId(builder.getNamespaceId());
             Address address = SerializationUtils.toAddress(builder.getAddress());
 
             return AddressAliasTransactionFactory
@@ -1024,7 +1030,8 @@ public class BinarySerializationImpl implements BinarySerialization {
                 AliasActionDto.rawValueOf(transaction.getAliasAction().getValue()),
                 new NamespaceIdDto(transaction.getNamespaceId().getIdAsLong()),
                 new AddressDto(SerializationUtils
-                    .fromUnresolvedAddressToByteBuffer(transaction.getAddress()))).serialize();
+                    .fromUnresolvedAddressToByteBuffer(transaction.getAddress(),
+                        transaction.getNetworkType()))).serialize();
         }
     }
 
@@ -1171,7 +1178,8 @@ public class BinarySerializationImpl implements BinarySerialization {
                 final ByteBuffer addressByteBuffer =
                     SerializationUtils
                         .fromUnresolvedAddressToByteBuffer(
-                            accountRestrictionModification.getValue());
+                            accountRestrictionModification.getValue(),
+                            transaction.getNetworkType());
                 final AccountAddressRestrictionModificationBuilder builder =
                     AccountAddressRestrictionModificationBuilder.create(
                         AccountRestrictionModificationActionDto.rawValueOf(
@@ -1373,7 +1381,8 @@ public class BinarySerializationImpl implements BinarySerialization {
                 transaction.getRestrictionKey().longValue(),
                 new UnresolvedAddressDto(
                     SerializationUtils
-                        .fromUnresolvedAddressToByteBuffer(transaction.getTargetAddress())),
+                        .fromUnresolvedAddressToByteBuffer(transaction.getTargetAddress(),
+                            transaction.getNetworkType())),
                 transaction.getPreviousRestrictionValue().longValue(),
                 transaction.getNewRestrictionValue().longValue()
             ).serialize();

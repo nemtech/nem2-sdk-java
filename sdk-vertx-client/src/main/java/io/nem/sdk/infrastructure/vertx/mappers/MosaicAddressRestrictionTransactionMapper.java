@@ -18,7 +18,6 @@
 package io.nem.sdk.infrastructure.vertx.mappers;
 
 import static io.nem.core.utils.MapperUtils.getIdAsHex;
-import static io.nem.core.utils.MapperUtils.toMosaicId;
 import static io.nem.core.utils.MapperUtils.toUnresolvedMosaicId;
 
 import io.nem.core.utils.MapperUtils;
@@ -58,7 +57,7 @@ class MosaicAddressRestrictionTransactionMapper extends
         MosaicAddressRestrictionTransactionDTO dto) {
         dto.setMosaicId(getIdAsHex(transaction.getMosaicId()));
         dto.setRestrictionKey(transaction.getRestrictionKey().toString(16));
-        dto.setTargetAddress(transaction.getTargetAddress().encoded());
+        dto.setTargetAddress(transaction.getTargetAddress().encoded(transaction.getNetworkType()));
         dto.setPreviousRestrictionValue(transaction.getPreviousRestrictionValue());
         dto.setNewRestrictionValue(transaction.getNewRestrictionValue());
 

@@ -73,17 +73,19 @@ public class AccountAddressRestrictionTransactionMapper extends
         dto.setRestrictionType(
             AccountRestrictionTypeEnum.fromValue(transaction.getRestrictionType().getValue()));
         dto.setModifications(
-            transaction.getModifications().stream().map(this::toModification).collect(
+            transaction.getModifications().stream().map(
+                source -> toModification(source, transaction.getNetworkType())).collect(
                 Collectors.toList()));
     }
 
     private AccountAddressRestrictionModificationDTO toModification(
-        AccountRestrictionModification<UnresolvedAddress> source) {
+        AccountRestrictionModification<UnresolvedAddress> source,
+        NetworkType networkType) {
         AccountRestrictionModificationActionEnum modificationAction = AccountRestrictionModificationActionEnum
             .fromValue((int) source.getModificationAction().getValue());
         AccountAddressRestrictionModificationDTO target = new AccountAddressRestrictionModificationDTO();
         target.setModificationAction(modificationAction);
-        target.setValue(source.getValue().encoded());
+        target.setValue(source.getValue().encoded(networkType));
         return target;
     }
 }

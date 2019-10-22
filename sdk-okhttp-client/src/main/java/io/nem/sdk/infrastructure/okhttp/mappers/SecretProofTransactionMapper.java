@@ -51,7 +51,7 @@ class SecretProofTransactionMapper extends
     @Override
     protected void copyToDto(SecretProofTransaction transaction, SecretProofTransactionDTO dto) {
         dto.setHashAlgorithm(LockHashAlgorithmEnum.fromValue(transaction.getHashType().getValue()));
-        dto.setRecipientAddress(transaction.getRecipient().encoded());
+        dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));
         dto.setSecret(transaction.getSecret());
         dto.setProof(transaction.getProof());
     }

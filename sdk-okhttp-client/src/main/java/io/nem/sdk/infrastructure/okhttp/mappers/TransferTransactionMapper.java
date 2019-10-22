@@ -99,7 +99,7 @@ class TransferTransactionMapper extends
                     transaction.getMessage().getPayload().getBytes(StandardCharsets.UTF_8)));
 
         }
-        dto.setRecipientAddress(transaction.getRecipient().encoded());
+        dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));
         dto.setMosaics(mosaics);
         dto.setMessage(message);
 

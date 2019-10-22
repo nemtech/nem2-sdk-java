@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.model.account.Account;
+import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Random;
@@ -32,6 +33,8 @@ import org.bouncycastle.util.encoders.Hex;
  */
 abstract class AbstractTransactionTester {
 
+
+    public static NetworkType networkType = NetworkType.MIJIN_TEST;
 
     private BinarySerializationImpl binarySerialization = new BinarySerializationImpl();
 

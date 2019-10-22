@@ -19,7 +19,6 @@ package io.nem.sdk.infrastructure.vertx.mappers;
 
 import static io.nem.core.utils.MapperUtils.getIdAsHex;
 import static io.nem.core.utils.MapperUtils.toAddressFromEncoded;
-import static io.nem.core.utils.MapperUtils.toAddressFromRawAddress;
 
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.blockchain.NetworkType;

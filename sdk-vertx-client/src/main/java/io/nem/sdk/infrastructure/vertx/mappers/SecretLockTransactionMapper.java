@@ -65,7 +65,7 @@ class SecretLockTransactionMapper extends
         dto.setHashAlgorithm(
             LockHashAlgorithmEnum.fromValue(transaction.getHashAlgorithm().getValue()));
         dto.setSecret(transaction.getSecret());
-        dto.setRecipientAddress(transaction.getRecipient().encoded());
+        dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));
     }
 
 }

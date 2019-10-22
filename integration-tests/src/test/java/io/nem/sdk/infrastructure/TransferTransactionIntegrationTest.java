@@ -19,10 +19,7 @@ package io.nem.sdk.infrastructure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.core.crypto.KeyPair;
-import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.Account;
-import io.nem.sdk.model.account.AccountNames;
-import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.message.MessageType;
@@ -35,9 +32,7 @@ import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -95,7 +90,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
 
         NamespaceId recipient = setAddressAlias(type, getRecipient(), namespaceName);
         Assertions.assertEquals("9188dd7d72227ecae700000000000000000000000000000000",
-            recipient.encoded());
+            recipient.encoded(getNetworkType()));
         String message = "E2ETest:standaloneTransferTransaction:message 漢字";
 
         NetworkType networkType = getNetworkType();
@@ -135,7 +130,9 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
     private void assertTransferTransactions(TransferTransaction expected,
         TransferTransaction processed) {
         Assertions
-            .assertEquals(expected.getRecipient().encoded(), processed.getRecipient().encoded());
+            .assertEquals(expected.getRecipient().encoded(getNetworkType()),
+                processed.getRecipient().encoded(
+                    getNetworkType()));
         Assertions.assertEquals(expected.getRecipient(), processed.getRecipient());
         Assertions.assertEquals(expected.getMessage().getType(), processed.getMessage().getType());
         Assertions

@@ -29,12 +29,14 @@ public class ReceiptMappingOkHttpTest {
 
     private final JsonHelper jsonHelper = new JsonHelperGson();
 
+    private NetworkType networkType = NetworkType.MIJIN_TEST;
+
     @Test
     public void getMosaicResolutionStatementHash() {
         Statement statement = getStatement();
         Assertions
             .assertEquals("99381CE398D3AAE110FC97E984D7D35A710A5C525A4F959EC8916B382DE78A63",
-                statement.getMosaicResolutionStatement().get(0).generateHash());
+                statement.getMosaicResolutionStatement().get(0).generateHash(networkType));
     }
 
     @Test
@@ -50,7 +52,7 @@ public class ReceiptMappingOkHttpTest {
         Statement statement = getStatement();
         Assertions
             .assertEquals("6967470641BC527768CDC29998F4A3350813FDF2E40D1C97AB0BBA36B9AF649E",
-                statement.getAddressResolutionStatements().get(0).generateHash());
+                statement.getAddressResolutionStatements().get(0).generateHash(networkType));
     }
 
     private Statement getStatement() {

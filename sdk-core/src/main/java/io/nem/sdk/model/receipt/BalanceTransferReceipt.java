@@ -131,7 +131,8 @@ public class BalanceTransferReceipt extends Receipt {
      */
     public byte[] serialize() {
         ByteBuffer recipientBytes = SerializationUtils
-            .fromUnresolvedAddressToByteBuffer(getRecipient());
+            .fromUnresolvedAddressToByteBuffer(getRecipient(),
+                getSender().getAddress().getNetworkType());
         final ByteBuffer buffer = ByteBuffer.allocate(52 + recipientBytes.remaining());
         buffer.putShort(Short.reverseBytes((short) getVersion().getValue()));
         buffer.putShort(Short.reverseBytes((short) getType().getValue()));

@@ -57,7 +57,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
         account =
             new Account(
                 "787225aaff3d2c71f4ffa32d4f19ec4922f3cd869747f267378f81f8e3fcb12d",
-                NetworkType.MIJIN_TEST);
+                networkType);
         generationHash = "57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6";
     }
 
@@ -67,7 +67,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
         TransferTransaction transaction =
             TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
                 new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
-                    NetworkType.MIJIN_TEST),
+                    networkType),
                 Collections.emptyList(),
                 PlainMessage.Empty
             ).build();
@@ -77,7 +77,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
         assertTrue(LocalDateTime.now().isBefore(transaction.getDeadline().getLocalDateTime()));
         assertEquals(BigInteger.valueOf(0), transaction.getMaxFee());
         assertEquals(
-            new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST),
+            new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", networkType),
             transaction.getRecipient());
         assertEquals(0, transaction.getMosaics().size());
         assertNotNull(transaction.getMessage());
@@ -92,8 +92,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
             "a5000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019054410000000000000000010000000000000090e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac01000100672b0000ce5600006400000000000000";
         TransferTransaction transaction =
             TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                networkType,
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", networkType),
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
@@ -110,8 +110,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
             "b8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001026d70e1954775749c6811084d6450a3184d977383f0e4282cd47118af37755019054410000000000000000010000000000000090e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac14000100536f6d65204d65737361676520e6bca2e5ad97672b0000ce5600006400000000000000";
         TransferTransaction transaction =
             TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                networkType,
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", networkType),
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
@@ -137,18 +137,19 @@ class TransferTransactionTest extends AbstractTransactionTester {
             recipient.getIdAsHex());
 
         Assertions.assertEquals("9151776168d24257d800000000000000000000000000000000",
-            recipient.encoded());
+            recipient.encoded(networkType));
 
         TransferTransaction transaction =
             TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
+                networkType,
                 recipient,
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
                 new PlainMessage("Some Message 漢字")).deadline(new FakeDeadline()).build();
 
-        Assertions.assertEquals(recipient.encoded(), transaction.getRecipient().encoded());
+        Assertions.assertEquals(recipient.encoded(networkType), transaction.getRecipient().encoded(
+            networkType));
 
         assertSerialization(expected, transaction);
 
@@ -162,8 +163,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
 
         TransferTransaction transaction =
             TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                networkType,
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", networkType),
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
@@ -173,7 +174,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
             transaction.toAggregate(
                 new PublicAccount(
                     "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
-                    NetworkType.MIJIN_TEST));
+                    networkType));
 
         assertEmbeddedSerialization(expected, aggregateTransaction);
 
@@ -183,8 +184,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
     void serializeAndSignTransaction() {
         TransferTransaction transaction =
             TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                networkType,
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", networkType),
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
@@ -208,7 +209,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
         Assertions.assertEquals("e7ca7e22727ddd88", namespaceId.getIdAsHex());
         TransferTransaction transaction =
             TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
+                networkType,
                 namespaceId,
                 Collections.singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.ONE)),
                 PlainMessage.create("test-message")).deadline(new Deadline(BigInteger.ONE)).build();
@@ -220,15 +221,14 @@ class TransferTransactionTest extends AbstractTransactionTester {
             .deserialize(payload);
         String newPayloadHex = Hex.toHexString(newTransaction.serialize());
 
-        Assertions.assertEquals(transaction.getRecipient().encoded(),
-            newTransaction.getRecipient().encoded());
+        Assertions.assertEquals(transaction.getRecipient().encoded(networkType),
+            newTransaction.getRecipient().encoded(networkType));
 
         Assertions.assertEquals(payloadHex, newPayloadHex);
     }
 
     @Test
     void createPersistentDelegationRequestTransaction() {
-        NetworkType networkType = NetworkType.MIJIN_TEST;
 
         KeyPair remoteProxy = KeyPair.fromPrivate(PrivateKey
                 .fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C111"),
@@ -294,8 +294,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
 
         TransferTransaction transaction =
             TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                networkType,
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", networkType),
                 mosaics,
                 PlainMessage.Empty).deadline(new FakeDeadline()).build();
 
@@ -324,8 +324,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
 
         TransferTransaction transaction =
             TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                networkType,
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", networkType),
                 mosaics,
                 PlainMessage.Empty).deadline(new FakeDeadline()).build();
 

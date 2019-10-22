@@ -20,6 +20,7 @@ import io.nem.core.utils.ByteUtils;
 import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.infrastructure.SerializationUtils;
 import io.nem.sdk.model.account.UnresolvedAddress;
+import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.IllegalIdentifierException;
 import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.transaction.IdGenerator;
@@ -143,9 +144,9 @@ public class NamespaceId implements UnresolvedMosaicId, UnresolvedAddress {
 
 
     @Override
-    public String encoded() {
+    public String encoded(NetworkType networkType) {
         return ConvertUtils
-            .toHex(SerializationUtils.fromUnresolvedAddressToByteBuffer(this).array());
+            .toHex(SerializationUtils.fromUnresolvedAddressToByteBuffer(this, networkType).array());
     }
 
     /**

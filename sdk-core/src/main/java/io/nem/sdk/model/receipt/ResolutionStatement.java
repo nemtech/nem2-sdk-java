@@ -21,6 +21,7 @@ import io.nem.core.utils.ArrayUtils;
 import io.nem.core.utils.ByteUtils;
 import io.nem.sdk.infrastructure.SerializationUtils;
 import io.nem.sdk.model.account.UnresolvedAddress;
+import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import java.math.BigInteger;
 import java.util.List;
@@ -142,9 +143,10 @@ public abstract class ResolutionStatement<U, R> {
     /**
      * Serialize resolution statement and generate hash
      *
+     * @param networkType networkType
      * @return resolution statement hash
      */
-    public String generateHash() {
+    public String generateHash(NetworkType networkType) {
 
         final byte[] versionByte = ByteUtils.shortToBytes(
             Short.reverseBytes((short) ReceiptVersion.RESOLUTION_STATEMENT.getValue()));
@@ -153,7 +155,7 @@ public abstract class ResolutionStatement<U, R> {
                 Short.reverseBytes((short) ReceiptType.ADDRESS_ALIAS_RESOLUTION.getValue())) :
             ByteUtils.shortToBytes(
                 Short.reverseBytes((short) ReceiptType.MOSAIC_ALIAS_RESOLUTION.getValue()));
-        final byte[] unresolvedBytes = serializeUnresolved();
+        final byte[] unresolvedBytes = serializeUnresolved(networkType);
 
         byte[] results = ArrayUtils.concat(versionByte, typeByte, unresolvedBytes);
 
@@ -168,12 +170,14 @@ public abstract class ResolutionStatement<U, R> {
     /**
      * Generate unresolved bytes
      *
+     * @param networkType the network type.
      * @return unresolved bytes
      */
-    private byte[] serializeUnresolved() {
+    private byte[] serializeUnresolved(NetworkType networkType) {
         if (getResolutionType() == ResolutionType.ADDRESS) {
             return SerializationUtils
-                .fromUnresolvedAddressToByteBuffer((UnresolvedAddress) getUnresolved()).array();
+                .fromUnresolvedAddressToByteBuffer((UnresolvedAddress) getUnresolved(), networkType)
+                .array();
         }
         return ByteUtils
             .reverseCopy(ByteUtils.bigIntToBytes(((UnresolvedMosaicId) getUnresolved()).getId()));

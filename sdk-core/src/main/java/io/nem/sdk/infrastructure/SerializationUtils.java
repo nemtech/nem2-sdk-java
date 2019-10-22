@@ -125,18 +125,23 @@ public class SerializationUtils {
     }
 
     /**
-     * It serializes a UnresolvedAddress to a xx
+     * It serializes a UnresolvedAddress to an hex catbuffer understand.
+     *
+     * @param unresolvedAddress the {@link Address} or {@link NamespaceId} to be serialized.
+     * @param networkType the network type to customize the {@link NamespaceId} serialization
+     * @return the serialized {@link UnresolvedAddress} as {@link ByteBuffer}.
      */
-    public static ByteBuffer fromUnresolvedAddressToByteBuffer(
-        UnresolvedAddress unresolvedAddress) {
+    public static ByteBuffer fromUnresolvedAddressToByteBuffer(UnresolvedAddress unresolvedAddress,
+        NetworkType networkType) {
         Validate.notNull(unresolvedAddress, "unresolvedAddress must not be null");
 
         if (unresolvedAddress instanceof NamespaceId) {
             final ByteBuffer namespaceIdAlias = ByteBuffer.allocate(25);
-            final byte firstByte = (byte) 0x91;
+            NamespaceId namespaceId = (NamespaceId) unresolvedAddress;
+            final byte firstByte = (byte) (networkType.getValue() | 0x01);
             namespaceIdAlias.order(ByteOrder.LITTLE_ENDIAN);
             namespaceIdAlias.put(firstByte);
-            namespaceIdAlias.putLong(((NamespaceId) unresolvedAddress).getIdAsLong());
+            namespaceIdAlias.putLong(namespaceId.getIdAsLong());
             return ByteBuffer.wrap(namespaceIdAlias.array());
         }
 
