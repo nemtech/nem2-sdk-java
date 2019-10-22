@@ -71,7 +71,6 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
 
     public Observable<List<BlockInfo>> getBlocksByHeightWithLimit(
         BigInteger height, int limit, Optional<QueryParams> queryParams) {
-        //TODO queryParams not defined in the descriptor nor generated.
         Callable<List<BlockInfoDTO>> callback = () ->
             getClient().getBlocksByHeightWithLimit(height.longValue(), limit);
 

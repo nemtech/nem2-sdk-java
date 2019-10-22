@@ -310,6 +310,7 @@ public class BinarySerializationImpl implements BinarySerialization {
      * @return the {@link Transaction}
      */
     @Override
+    @SuppressWarnings("squid:S1192")
     public Transaction deserialize(byte[] payload) {
         Validate.notNull(payload, "Payload must not be null");
         DataInput stream = SerializationUtils.toDataInput(payload);

@@ -27,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Random;
 import org.apache.commons.lang3.RandomUtils;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -46,8 +45,8 @@ public class MapperUtilsTest {
         Address address = MapperUtils
             .toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
         Assertions.assertNotNull(address);
-        Assert.assertEquals("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX", address.plain());
-        Assert.assertEquals("SBCPGZ-3S2SCC-3YHBBT-YDCUZV-4ZZEPH-M2KGCP-4QXX", address.pretty());
+        Assertions.assertEquals("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX", address.plain());
+        Assertions.assertEquals("SBCPGZ-3S2SCC-3YHBBT-YDCUZV-4ZZEPH-M2KGCP-4QXX", address.pretty());
     }
 
     @Test
@@ -59,8 +58,8 @@ public class MapperUtilsTest {
         Assertions.assertNotNull(
             address);
 
-        Assert.assertEquals("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", address.plain());
-        Assert.assertEquals("SBILTA-367K2L-X2FEXG-5TFWAS-7GEFYA-GY7QLF-BYKC", address.pretty());
+        Assertions.assertEquals("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", address.plain());
+        Assertions.assertEquals("SBILTA-367K2L-X2FEXG-5TFWAS-7GEFYA-GY7QLF-BYKC", address.pretty());
     }
 
     @Test

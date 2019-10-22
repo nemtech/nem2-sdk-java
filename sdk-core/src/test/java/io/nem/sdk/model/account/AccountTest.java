@@ -22,16 +22,15 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import io.nem.core.crypto.KeyPair;
 import io.nem.core.crypto.ed25519.Ed25519CryptoEngine;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.transaction.FakeDeadline;
-import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
 import java.util.Collections;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -150,8 +149,8 @@ class AccountTest {
         Address address = Address
             .createFromPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C",
                 NetworkType.MIJIN_TEST);
-        Assert.assertEquals("SCUNEE-EE4FON-6N3DKD-FZUM6U-V7AU26-ZFTWT5-6NUX", address.pretty());
-        Assert.assertEquals("SCUNEEEE4FON6N3DKDFZUM6UV7AU26ZFTWT56NUX", address.plain());
+        Assertions.assertEquals("SCUNEE-EE4FON-6N3DKD-FZUM6U-V7AU26-ZFTWT5-6NUX", address.pretty());
+        Assertions.assertEquals("SCUNEEEE4FON6N3DKDFZUM6UV7AU26ZFTWT56NUX", address.plain());
     }
 
     @Test

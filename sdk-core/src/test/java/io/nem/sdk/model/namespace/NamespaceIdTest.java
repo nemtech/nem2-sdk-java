@@ -116,6 +116,7 @@ class NamespaceIdTest {
     }
 
     @Test
+    @SuppressWarnings("squid:S3415")
     public void shouldCompareNamespaceIdsForEqualityUsingNames() {
 
         NamespaceId test = NamespaceId.createFromName("subnem");

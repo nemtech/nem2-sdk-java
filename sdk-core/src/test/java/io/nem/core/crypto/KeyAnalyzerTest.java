@@ -16,8 +16,8 @@
 
 package io.nem.core.crypto;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -31,7 +31,7 @@ public abstract class KeyAnalyzerTest {
         final KeyPair keyPair = this.getCryptoEngine().createKeyGenerator(signSchema).generateKeyPair();
 
         // Act + Assert:
-        Assert.assertThat(analyzer.isKeyCompressed(keyPair.getPublicKey()), IsEqual.equalTo(true));
+        MatcherAssert.assertThat(analyzer.isKeyCompressed(keyPair.getPublicKey()), IsEqual.equalTo(true));
     }
 
     @ParameterizedTest
@@ -43,7 +43,7 @@ public abstract class KeyAnalyzerTest {
         final PublicKey key = new PublicKey(new byte[keyPair.getPublicKey().getBytes().length + 1]);
 
         // Act + Assert:
-        Assert.assertThat(analyzer.isKeyCompressed(key), IsEqual.equalTo(false));
+        MatcherAssert.assertThat(analyzer.isKeyCompressed(key), IsEqual.equalTo(false));
     }
 
     protected KeyAnalyzer getKeyAnalyzer() {

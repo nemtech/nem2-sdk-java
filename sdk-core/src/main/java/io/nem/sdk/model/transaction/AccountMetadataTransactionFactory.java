@@ -34,7 +34,7 @@ public class AccountMetadataTransactionFactory extends
         String value) {
         super(TransactionType.ACCOUNT_METADATA_TRANSACTION, networkType, targetAccount,
             scopedMetadataKey, value);
-        };
+    }
 
     /**
      * Static create method for factory.
@@ -47,7 +47,8 @@ public class AccountMetadataTransactionFactory extends
      */
     public static AccountMetadataTransactionFactory create(NetworkType networkType,
         PublicAccount targetAccount, BigInteger scopedMetadataKey, String value) {
-        return new AccountMetadataTransactionFactory(networkType, targetAccount, scopedMetadataKey, value);
+        return new AccountMetadataTransactionFactory(networkType, targetAccount, scopedMetadataKey,
+            value);
     }
 
     @Override

@@ -57,7 +57,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -144,9 +143,9 @@ public class ListenerVertxTest {
 
         listener.handle(transactionInfoDtoJsonObject, null);
 
-        Assert.assertEquals(1, transactions.size());
+        Assertions.assertEquals(1, transactions.size());
 
-        Assert.assertEquals(address, transactions.get(0).getSigner().get().getAddress());
+        Assertions.assertEquals(address, transactions.get(0).getSigner().get().getAddress());
 
     }
 

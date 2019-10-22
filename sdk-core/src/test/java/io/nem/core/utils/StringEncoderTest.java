@@ -16,11 +16,9 @@
 
 package io.nem.core.utils;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.util.Arrays;
+import org.junit.jupiter.api.Test;
 
 public class StringEncoderTest {
 
@@ -32,16 +30,16 @@ public class StringEncoderTest {
     @Test
     public void stringCanBeConvertedToByteArray() {
         // Assert:
-        Assert.assertThat(StringEncoder.getBytes("Sigma"), IsEqual.equalTo(ENCODED_SIGMA_BYTES));
-        Assert.assertThat(
+        MatcherAssert.assertThat(StringEncoder.getBytes("Sigma"), IsEqual.equalTo(ENCODED_SIGMA_BYTES));
+        MatcherAssert.assertThat(
                 StringEncoder.getBytes("\u0024\u00a2\u20ac"), IsEqual.equalTo(ENCODED_CURRENCY_SYMBOLS_BYTES));
     }
 
     @Test
     public void byteArrayCanBeConvertedToString() {
         // Assert:
-        Assert.assertThat(StringEncoder.getString(ENCODED_SIGMA_BYTES), IsEqual.equalTo("Sigma"));
-        Assert.assertThat(
+        MatcherAssert.assertThat(StringEncoder.getString(ENCODED_SIGMA_BYTES), IsEqual.equalTo("Sigma"));
+        MatcherAssert.assertThat(
                 StringEncoder.getString(ENCODED_CURRENCY_SYMBOLS_BYTES), IsEqual.equalTo("\u0024\u00a2\u20ac"));
     }
 }

@@ -16,9 +16,10 @@
 
 package io.nem.core.utils;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class Base32EncoderTest {
 
@@ -30,8 +31,9 @@ public class Base32EncoderTest {
     @Test
     public void stringCanBeConvertedToByteArray() {
         // Assert:
-        Assert.assertThat(Base32Encoder.getBytes("KNUWO3LB"), IsEqual.equalTo(ENCODED_SIGMA_BYTES));
-        Assert.assertThat(
+        MatcherAssert
+            .assertThat(Base32Encoder.getBytes("KNUWO3LB"), IsEqual.equalTo(ENCODED_SIGMA_BYTES));
+        MatcherAssert.assertThat(
             Base32Encoder.getBytes("ETBKFYUCVQ======"),
             IsEqual.equalTo(ENCODED_CURRENCY_SYMBOLS_BYTES));
     }
@@ -39,23 +41,24 @@ public class Base32EncoderTest {
     @Test
     public void byteArrayCanBeConvertedToString() {
         // Assert:
-        Assert
+        MatcherAssert
             .assertThat(Base32Encoder.getString(ENCODED_SIGMA_BYTES), IsEqual.equalTo("KNUWO3LB"));
-        Assert.assertThat(
+        MatcherAssert.assertThat(
             Base32Encoder.getString(ENCODED_CURRENCY_SYMBOLS_BYTES),
             IsEqual.equalTo("ETBKFYUCVQ======"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void malformedStringCannotBeDecoded() {
         // Act:
-        Base32Encoder.getBytes("BAD STRING)(*&^%$#@!");
+        Assertions.assertThrows(IllegalArgumentException.class,
+            () -> Base32Encoder.getBytes("BAD STRING)(*&^%$#@!"));
     }
 
     @Test
     public void stringCanContainPaddingAndWhitespace() {
         // Assert:
-        Assert.assertThat(
+        MatcherAssert.assertThat(
             Base32Encoder.getBytes("  ETBKFYUCVQ======  "),
             IsEqual.equalTo(ENCODED_CURRENCY_SYMBOLS_BYTES));
     }

@@ -34,7 +34,7 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -82,7 +82,7 @@ public class AddressAliasTransactionIntegrationTest extends BaseIntegrationTest 
         List<AccountNames> accountNames = get(getRepositoryFactory(type).createAccountRepository()
             .getAccountsNames(Collections.singletonList(account.getAddress())));
 
-        Assert.assertEquals(1, accountNames.size());
+        Assertions.assertEquals(1, accountNames.size());
 
         assertEquals(1, accountNames.size());
         assertEquals(account.getAddress(), accountNames.get(0).getAddress());

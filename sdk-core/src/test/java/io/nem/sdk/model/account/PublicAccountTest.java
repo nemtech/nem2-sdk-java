@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.HashSet;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -74,9 +73,9 @@ class PublicAccountTest {
     }
 
     private void assertAddress(Address address) {
-        Assert.assertEquals(plain, address.plain());
-        Assert.assertEquals(pretty, address.pretty());
-        Assert.assertEquals(networkType, address.getNetworkType());
+        Assertions.assertEquals(plain, address.plain());
+        Assertions.assertEquals(pretty, address.pretty());
+        Assertions.assertEquals(networkType, address.getNetworkType());
     }
 
 

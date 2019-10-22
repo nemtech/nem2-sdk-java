@@ -41,6 +41,7 @@ public class ByteBufferBackedInputStream extends InputStream {
     /**
      * @return the next byte of data from the ByteBuffer. -1 if ByteBuffer has reached the end.
      */
+    @Override
     public int read() {
         if (!buf.hasRemaining()) {
             return -1;
@@ -58,6 +59,7 @@ public class ByteBufferBackedInputStream extends InputStream {
      * @return the total number of bytes read into the buffer, or <code>-1</code> if there is no
      * more data because the end of the stream has been reached.
      */
+    @Override
     public int read(byte[] bytes, int off, int len) {
         if (!buf.hasRemaining()) {
             return -1;

@@ -24,7 +24,7 @@ import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class AccountInfoTest {
@@ -60,7 +60,7 @@ class AccountInfoTest {
                 NetworkType.MIJIN_TEST),
             accountInfo.getPublicAccount());
 
-        Assert.assertEquals(AccountType.REMOTE_UNLINKED,
+        Assertions.assertEquals(AccountType.REMOTE_UNLINKED,
             accountInfo.getAccountType());
     }
 }

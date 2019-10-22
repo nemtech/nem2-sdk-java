@@ -5,7 +5,7 @@ set -e
 if [ "$RELEASE_ENABLED" = "true" ]
 then
   echo "Releasing sdk jars and javadocs"
-  ./gradlew release uploadArchives publishGhPages
+  ./gradlew release uploadArchives gitPublishPush
   git push
 else
   echo "Release is disabled"

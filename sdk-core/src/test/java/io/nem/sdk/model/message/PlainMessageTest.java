@@ -18,10 +18,7 @@ package io.nem.sdk.model.message;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.nem.sdk.model.message.MessageType;
-import io.nem.sdk.model.message.PlainMessage;
 import org.junit.jupiter.api.Test;
 
 class PlainMessageTest {

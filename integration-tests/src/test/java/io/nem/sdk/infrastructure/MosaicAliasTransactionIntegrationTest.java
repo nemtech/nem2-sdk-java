@@ -37,7 +37,7 @@ import io.nem.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -57,7 +57,7 @@ public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
         AccountInfo accountInfo = get(getRepositoryFactory(type).createAccountRepository()
             .getAccountInfo(account.getPublicAccount().getAddress()));
 
-        Assert.assertFalse(
+        Assertions.assertFalse(
             accountInfo.getMosaics().isEmpty());
 
         MosaicId mosaicId = createMosaic(type, account);
@@ -87,7 +87,7 @@ public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
         List<MosaicNames> accountNames = get(getRepositoryFactory(type).createMosaicRepository()
             .getMosaicsNames(Collections.singletonList(mosaicId)));
 
-        Assert.assertEquals(1, accountNames.size());
+        Assertions.assertEquals(1, accountNames.size());
 
         assertEquals(1, accountNames.size());
         assertEquals(mosaicId, accountNames.get(0).getMosaicId());

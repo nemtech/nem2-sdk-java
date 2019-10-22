@@ -27,8 +27,8 @@ import io.nem.core.crypto.SignSchema;
 import io.nem.core.crypto.ed25519.arithmetic.Ed25519EncodedGroupElement;
 import io.nem.core.crypto.ed25519.arithmetic.Ed25519GroupElement;
 import io.nem.core.crypto.ed25519.arithmetic.MathUtils;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -69,7 +69,7 @@ public class Ed25519KeyGeneratorTest extends KeyGeneratorTest {
             final PublicKey publicKey2 = MathUtils.derivePublicKey(kp.getPrivateKey(), signSchema);
 
             // Assert:
-            Assert.assertThat(publicKey1, IsEqual.equalTo(publicKey2));
+            MatcherAssert.assertThat(publicKey1, IsEqual.equalTo(publicKey2));
         }
     }
 
@@ -88,7 +88,7 @@ public class Ed25519KeyGeneratorTest extends KeyGeneratorTest {
         final PublicKey expected =
             PublicKey
                 .fromHexString("1026d70e1954775749c6811084d6450a3184d977383f0e4282cd47118af37755");
-        Assert.assertThat(publicKey, IsEqual.equalTo(expected));
+        MatcherAssert.assertThat(publicKey, IsEqual.equalTo(expected));
     }
 
     @Override

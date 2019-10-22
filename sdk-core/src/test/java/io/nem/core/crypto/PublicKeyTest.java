@@ -16,11 +16,11 @@
 
 package io.nem.core.crypto;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
-import org.junit.Assert;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class PublicKeyTest {
 
@@ -35,7 +35,7 @@ public class PublicKeyTest {
         final PublicKey key = new PublicKey(TEST_BYTES);
 
         // Assert:
-        Assert.assertThat(key.getBytes(), IsEqual.equalTo(TEST_BYTES));
+        MatcherAssert.assertThat(key.getBytes(), IsEqual.equalTo(TEST_BYTES));
     }
 
     @Test
@@ -44,13 +44,13 @@ public class PublicKeyTest {
         final PublicKey key = PublicKey.fromHexString("227F");
 
         // Assert:
-        Assert.assertThat(key.getBytes(), IsEqual.equalTo(new byte[]{0x22, 0x7F}));
+        MatcherAssert.assertThat(key.getBytes(), IsEqual.equalTo(new byte[]{0x22, 0x7F}));
     }
 
-    @Test(expected = CryptoException.class)
+    @Test
     public void cannotCreateAroundMalformedHexString() {
         // Act:
-        PublicKey.fromHexString("22G75");
+        Assertions.assertThrows(CryptoException.class, () -> PublicKey.fromHexString("22G75"));
     }
 
     // endregion
@@ -67,11 +67,11 @@ public class PublicKeyTest {
         final PublicKey key = new PublicKey(TEST_BYTES);
 
         // Assert:
-        Assert.assertThat(new PublicKey(TEST_BYTES), IsEqual.equalTo(key));
-        Assert.assertThat(new PublicKey(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(key)));
-        Assert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
-        Assert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo(key)));
-        Assert.assertThat(key, IsNot.not(IsEqual.equalTo("ImNotAPublicKey")));
+        MatcherAssert.assertThat(new PublicKey(TEST_BYTES), IsEqual.equalTo(key));
+        MatcherAssert.assertThat(new PublicKey(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(key)));
+        MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
+        MatcherAssert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo(key)));
+        MatcherAssert.assertThat(key, IsNot.not(IsEqual.equalTo("ImNotAPublicKey")));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class PublicKeyTest {
     @Test
     public void toStringReturnsHexRepresentation() {
         // Assert:
-        Assert.assertThat(
+        MatcherAssert.assertThat(
             new PublicKey(TEST_BYTES).toHex().toUpperCase(),
             IsEqual.equalTo("22ab71".toUpperCase()));
     }

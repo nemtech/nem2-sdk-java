@@ -2,7 +2,7 @@
 set -e
 
 echo "Uploading generated clients jars and javadocs"
-./gradlew -b ./openapi-generator/build.gradle uploadArchives publishGhPages
+./gradlew -b ./openapi-generator/build.gradle uploadArchives gitPublishPush
 
 echo "Uploading sdk jars and javadocs"
-./gradlew uploadArchives publishGhPages
+./gradlew uploadArchives gitPublishPush

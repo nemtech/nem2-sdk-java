@@ -2,14 +2,12 @@ buildscript {
     repositories {
         mavenCentral()
     }
-    dependencies {
-        classpath 'org.ajoberstar:gradle-git:1.7.2'
-    }
 }
 
 plugins {
-    id "org.openapi.generator" version "4.1.0"
+    id 'org.openapi.generator' version '4.1.0'
     id 'ch.netzwerg.release' version '1.2.5'
+    id 'org.ajoberstar.git-publish' version '0.3.3'
 }
 
 task clean(type: Delete) {
@@ -58,7 +56,7 @@ def signingSecretKeyRingFile = getPropertyValue('signingSecretKeyRingFile')
 def signingKeyId = getPropertyValue('signingKeyId')
 def signingPassword = getPropertyValue('signingPassword')
 
-def githubToken = getPropertyValue('githubToken')
+def githubToken = getPropertyValue('GRGIT_USER')
 def repoPath = getPropertyValue('TRAVIS_REPO_SLUG')
 
 allprojects {
@@ -67,14 +65,9 @@ allprojects {
     ext."signing.password" = signingPassword
 }
 
-task githubPages {
-    subprojects.each { dependsOn("${it.name}:githubPages") }
-}
-
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
-    apply plugin: 'org.ajoberstar.github-pages'
 
     javadoc {
         failOnError = false
@@ -90,20 +83,17 @@ subprojects {
         from javadoc
     }
 
-    githubPages {
-        System.out.println("$buildDir/docs/javadoc")
+
+    gitPublish {
         if (githubToken) {
             repoUri = "https://github.com/${repoPath}.git".toString()
-            credentials {
-                username = githubToken
-                password = ''
-            }
         } else {
             repoUri = "git@github.com:${repoPath}.git".toString()
         }
-        deleteExistingFiles = false
-        commitMessage = "Publishing Generated Client Javadocs for version ${artifactVersion}".toString()
-        pages {
+        branch = 'gh-pages'
+        preserve { include '**/*' }
+        commitMessage = "Publishing ${project.name} Generated Client Javadocs for version ${artifactVersion}".toString()
+        contents {
             from(file("$buildDir/docs/javadoc")) {
                 into "client/${project.name}/javadoc/${artifactVersion}".toString()
             }
