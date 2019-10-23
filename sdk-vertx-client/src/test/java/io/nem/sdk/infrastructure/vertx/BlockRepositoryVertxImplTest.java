@@ -202,10 +202,10 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
 
         Assertions.assertNotNull(info);
 
-        Assertions.assertEquals(1, info.getPayload().size());
-        Assertions.assertEquals(marklePathItem.getHash(), info.getPayload().get(0).getHash());
+        Assertions.assertEquals(1, info.getMerklePath().size());
+        Assertions.assertEquals(marklePathItem.getHash(), info.getMerklePath().get(0).getHash());
         Assertions
-            .assertEquals(marklePathItem.getPosition(), info.getPayload().get(0).getPosition());
+            .assertEquals(marklePathItem.getPosition(), info.getMerklePath().get(0).getPosition());
     }
 
     @Test

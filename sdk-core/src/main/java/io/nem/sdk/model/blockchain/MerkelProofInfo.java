@@ -4,32 +4,22 @@ import java.util.List;
 
 public class MerkelProofInfo {
 
-    private final List<MerkelPathItem> payload;
-    private final String type;
+    private final List<MerkelPathItem> merklePath;
 
     /**
      * Constructor
      */
-    public MerkelProofInfo(List<MerkelPathItem> payload, String type) {
-        this.payload = payload;
-        this.type = type;
+    public MerkelProofInfo(List<MerkelPathItem> merklePath) {
+        this.merklePath = merklePath;
     }
 
-    /**
-     * Return type
-     *
-     * @return String
-     */
-    public String getType() {
-        return this.type;
-    }
 
     /**
      * Return Payload
      *
      * @return {@link List} of MerkelPathItem
      */
-    public List<MerkelPathItem> getPayload() {
-        return this.payload;
+    public List<MerkelPathItem> getMerklePath() {
+        return this.merklePath;
     }
 }

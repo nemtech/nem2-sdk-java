@@ -84,7 +84,7 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
         String hash = statement.getTransactionStatements().get(0).generateHash();
 
         MerkelProofInfo merkleInfo = get(getBlockRepository(type).getMerkleReceipts(BigInteger.valueOf(2), hash));
-        assertTrue(merkleInfo.getPayload().size() >= 0);
+        assertTrue(merkleInfo.getMerklePath().size() >= 0);
     }
 
 

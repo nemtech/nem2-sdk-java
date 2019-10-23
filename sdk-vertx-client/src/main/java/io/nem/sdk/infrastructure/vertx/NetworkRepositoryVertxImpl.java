@@ -18,10 +18,10 @@ package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.sdk.api.NetworkRepository;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.openapi.vertx.api.NetworkRoutesApi;
-import io.nem.sdk.openapi.vertx.api.NetworkRoutesApiImpl;
+import io.nem.sdk.openapi.vertx.api.NodeRoutesApi;
+import io.nem.sdk.openapi.vertx.api.NodeRoutesApiImpl;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
-import io.nem.sdk.openapi.vertx.model.NetworkTypeDTO;
+import io.nem.sdk.openapi.vertx.model.NodeInfoDTO;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -35,26 +35,33 @@ import java.util.function.Consumer;
 public class NetworkRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements
     NetworkRepository {
 
-    private final NetworkRoutesApi client;
+    // Cannot use network route yet.
+    // https://github.com/nemtech/nem2-openapi/issues/43
+    private final NodeRoutesApi client;
 
     public NetworkRepositoryVertxImpl(ApiClient apiClient) {
-        super(apiClient, null);
-        client = new NetworkRoutesApiImpl(apiClient);
+        super(apiClient, () -> {
+            throw new IllegalStateException(
+                "This service is in charge of loading the network type");
+        });
+        client = new NodeRoutesApiImpl(apiClient);
     }
 
-    @Override
+    /**
+     * The current network type.
+     *
+     * @return Observable of NodeTime
+     */
     public Observable<NetworkType> getNetworkType() {
-        Consumer<Handler<AsyncResult<NetworkTypeDTO>>> callback = client::getNetworkType;
+        Consumer<Handler<AsyncResult<NodeInfoDTO>>> callback = handler -> getClient()
+            .getNodeInfo(handler);
         return exceptionHandling(
-            call(callback).map(NetworkTypeDTO::getName).map(this::getNetworkType));
+            call(callback).map(info -> NetworkType.rawValueOf(info.getNetworkIdentifier())));
     }
 
-    private NetworkType getNetworkType(String name) {
-        if ("mijinTest".equalsIgnoreCase(name)) {
-            return NetworkType.MIJIN_TEST;
-        } else {
-            throw new IllegalArgumentException(
-                "network " + name + " is not supported yet by the sdk");
-        }
+
+    public NodeRoutesApi getClient() {
+        return client;
     }
+
 }

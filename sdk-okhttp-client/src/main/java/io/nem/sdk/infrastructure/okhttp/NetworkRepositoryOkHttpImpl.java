@@ -18,9 +18,8 @@ package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.sdk.api.NetworkRepository;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.openapi.okhttp_gson.api.NetworkRoutesApi;
+import io.nem.sdk.openapi.okhttp_gson.api.NodeRoutesApi;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
-import io.nem.sdk.openapi.okhttp_gson.model.NetworkTypeDTO;
 import io.reactivex.Observable;
 
 /**
@@ -31,30 +30,23 @@ import io.reactivex.Observable;
 public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements
     NetworkRepository {
 
-    private final NetworkRoutesApi client;
+    // Cannot use network route yet.
+    // https://github.com/nemtech/nem2-openapi/issues/43
+    private final NodeRoutesApi client;
 
     public NetworkRepositoryOkHttpImpl(ApiClient apiClient) {
         super(apiClient);
-        client = new NetworkRoutesApi(apiClient);
+        client = new NodeRoutesApi(apiClient);
     }
 
     @Override
     public Observable<NetworkType> getNetworkType() {
         return exceptionHandling(
-            call(getClient()::getNetworkType).map(NetworkTypeDTO::getName)
-                .map(this::getNetworkType));
+            call(getClient()::getNodeInfo)
+                .map(info -> NetworkType.rawValueOf(info.getNetworkIdentifier())));
     }
 
-    private NetworkType getNetworkType(String name) {
-        if ("mijinTest".equalsIgnoreCase(name)) {
-            return NetworkType.MIJIN_TEST;
-        } else {
-            throw new IllegalArgumentException(
-                "network " + name + " is not supported yet by the sdk");
-        }
-    }
-
-    public NetworkRoutesApi getClient() {
+    public NodeRoutesApi getClient() {
         return client;
     }
 }
