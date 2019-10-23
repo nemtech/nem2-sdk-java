@@ -17,7 +17,6 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.openapi.okhttp_gson.model.NetworkTypeDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,10 +39,7 @@ public class NetworkRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     @Test
     public void shouldGetNetworkType() throws Exception {
 
-        NetworkTypeDTO dto = new NetworkTypeDTO();
-        dto.setName("mijinTest");
-
-        mockRemoteCall(dto);
+        resolveNetworkType();
 
         NetworkType info = repository.getNetworkType().toFuture().get();
 
