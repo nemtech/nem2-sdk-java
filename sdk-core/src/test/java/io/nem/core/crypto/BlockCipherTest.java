@@ -18,9 +18,9 @@ package io.nem.core.crypto;
 
 import io.nem.core.test.Utils;
 import org.bouncycastle.util.encoders.Hex;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -41,8 +41,8 @@ public abstract class BlockCipherTest {
         final byte[] decryptedBytes = blockCipher.decrypt(encryptedBytes);
 
         // Assert:
-        Assert.assertThat(encryptedBytes, IsNot.not(IsEqual.equalTo(decryptedBytes)));
-        Assert.assertThat(decryptedBytes, IsEqual.equalTo(input));
+        MatcherAssert.assertThat(encryptedBytes, IsNot.not(IsEqual.equalTo(decryptedBytes)));
+        MatcherAssert.assertThat(decryptedBytes, IsEqual.equalTo(input));
     }
 
     @ParameterizedTest
@@ -60,7 +60,7 @@ public abstract class BlockCipherTest {
         final byte[] encryptedBytes = blockCipher.encrypt(input);
 
         // Assert:
-        Assert.assertThat(encryptedBytes, IsNot.not(IsEqual.equalTo(input)));
+        MatcherAssert.assertThat(encryptedBytes, IsNot.not(IsEqual.equalTo(input)));
     }
 
     @ParameterizedTest
@@ -102,7 +102,7 @@ public abstract class BlockCipherTest {
         final byte[] decryptedBytes = blockCipher2.decrypt(encryptedBytes);
 
         // Assert:
-        Assert.assertThat(decryptedBytes, IsEqual.equalTo(input));
+        MatcherAssert.assertThat(decryptedBytes, IsEqual.equalTo(input));
     }
 
     @ParameterizedTest
@@ -124,10 +124,10 @@ public abstract class BlockCipherTest {
         final byte[] encryptedBytes2 = blockCipher2.encrypt(input);
 
         // Assert:
-        Assert.assertThat(blockCipher1.decrypt(encryptedBytes1), IsEqual.equalTo(input));
-        Assert.assertThat(blockCipher1.decrypt(encryptedBytes2), IsNot.not(IsEqual.equalTo(input)));
-        Assert.assertThat(blockCipher2.decrypt(encryptedBytes1), IsNot.not(IsEqual.equalTo(input)));
-        Assert.assertThat(blockCipher2.decrypt(encryptedBytes2), IsEqual.equalTo(input));
+        MatcherAssert.assertThat(blockCipher1.decrypt(encryptedBytes1), IsEqual.equalTo(input));
+        MatcherAssert.assertThat(blockCipher1.decrypt(encryptedBytes2), IsNot.not(IsEqual.equalTo(input)));
+        MatcherAssert.assertThat(blockCipher2.decrypt(encryptedBytes1), IsNot.not(IsEqual.equalTo(input)));
+        MatcherAssert.assertThat(blockCipher2.decrypt(encryptedBytes2), IsEqual.equalTo(input));
     }
 
     protected BlockCipher getBlockCipher(

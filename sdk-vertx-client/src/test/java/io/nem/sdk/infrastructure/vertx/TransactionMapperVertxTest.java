@@ -66,7 +66,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.bouncycastle.util.encoders.Hex;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -498,11 +497,11 @@ public class TransactionMapperVertxTest {
         validateAggregateTransaction(
             (AggregateTransaction) aggregateTransferTransaction, aggregateTransferTransactionDTO);
 
+
         MosaicAliasTransaction transaction = (MosaicAliasTransaction) ((AggregateTransaction) aggregateTransferTransaction)
             .getInnerTransactions().get(0);
 
-        Assert
-            .assertEquals(new BigInteger("884562898459306"), transaction.getMosaicId().getId());
+        Assertions.assertEquals(new BigInteger("884562898459306"), transaction.getMosaicId().getId());
         Assertions.assertEquals(AliasAction.UNLINK, transaction.getAliasAction());
         Assertions.assertEquals(new BigInteger("307262000798378"),
             transaction.getNamespaceId().getId());

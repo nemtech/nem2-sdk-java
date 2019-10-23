@@ -16,18 +16,16 @@
 
 package io.nem.sdk.infrastructure;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import io.nem.core.crypto.KeyPair;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.message.MessageType;
-import io.nem.sdk.model.message.PersistentHarvestingDelegationMessage;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.message.EncryptedMessage;
 import io.nem.sdk.model.message.Message;
+import io.nem.sdk.model.message.MessageType;
+import io.nem.sdk.model.message.PersistentHarvestingDelegationMessage;
 import io.nem.sdk.model.message.PlainMessage;
+import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;

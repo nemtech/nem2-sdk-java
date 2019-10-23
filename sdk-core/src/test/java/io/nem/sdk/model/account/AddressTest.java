@@ -19,7 +19,6 @@ package io.nem.sdk.model.account;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.stream.Stream;

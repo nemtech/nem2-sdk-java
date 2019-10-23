@@ -18,7 +18,7 @@ package io.nem.core.test;
 
 import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 /**
  * Helper class that contains functions for asserting that specific exceptions are thrown.
@@ -88,13 +88,13 @@ public class ExceptionAssert {
                 return;
             }
 
-            Assert.fail(
+            Assertions.fail(
                 String.format(
                     "%sunexpected exception of type %s was thrown: '%s'",
                     normalizedMessage, ex.getClass(), ex.getMessage()));
         }
 
-        Assert.fail(
+        Assertions.fail(
             String.format(
                 "%sexpected exception of type %s was not thrown", normalizedMessage,
                 exceptionClass));
@@ -117,9 +117,9 @@ public class ExceptionAssert {
                 return;
             }
 
-            Assert.fail(String.format("unexpected exception of type %s was thrown", ex.getClass()));
+            Assertions.fail(String.format("unexpected exception of type %s was thrown", ex.getClass()));
         }
 
-        Assert.fail(String.format("expected exception of type %s was not thrown", exceptionClass));
+        Assertions.fail(String.format("expected exception of type %s was not thrown", exceptionClass));
     }
 }

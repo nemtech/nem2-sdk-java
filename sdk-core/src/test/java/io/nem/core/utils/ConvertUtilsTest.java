@@ -16,10 +16,9 @@
 
 package io.nem.core.utils;
 
-import io.nem.sdk.infrastructure.SerializationUtils;
 import java.math.BigInteger;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +31,7 @@ public class ConvertUtilsTest {
         final byte[] output = ConvertUtils.getBytes(input);
 
         // Assert:
-        Assert.assertThat(output, IsEqual.equalTo(expectedOutput));
+        MatcherAssert.assertThat(output, IsEqual.equalTo(expectedOutput));
     }
 
 
@@ -41,8 +40,8 @@ public class ConvertUtilsTest {
         final String output = ConvertUtils.toHex(input);
 
         // Assert:
-        Assert.assertThat(output, IsEqual.equalTo(expectedOutput));
-        Assert.assertThat(input, IsEqual.equalTo(ConvertUtils.fromHexToBytes(output)));
+        MatcherAssert.assertThat(output, IsEqual.equalTo(expectedOutput));
+        MatcherAssert.assertThat(input, IsEqual.equalTo(ConvertUtils.fromHexToBytes(output)));
     }
 
     @Test

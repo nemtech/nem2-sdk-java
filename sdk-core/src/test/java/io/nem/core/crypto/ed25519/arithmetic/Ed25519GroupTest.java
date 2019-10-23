@@ -17,9 +17,9 @@
 package io.nem.core.crypto.ed25519.arithmetic;
 
 import java.math.BigInteger;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class Ed25519GroupTest {
 
@@ -31,7 +31,7 @@ public class Ed25519GroupTest {
                 "7237005577332262213973186563042994240857116359379907606001950938285454250989");
 
         // Assert:
-        Assert.assertThat(groupOrder, IsEqual.equalTo(Ed25519Group.GROUP_ORDER));
+        MatcherAssert.assertThat(groupOrder, IsEqual.equalTo(Ed25519Group.GROUP_ORDER));
     }
 
     @Test
@@ -45,7 +45,7 @@ public class Ed25519GroupTest {
                 MathUtils.toFieldElement(x), MathUtils.toFieldElement(y), Ed25519Field.ONE);
 
         // Assert:
-        Assert.assertThat(basePoint, IsEqual.equalTo(Ed25519Group.BASE_POINT));
+        MatcherAssert.assertThat(basePoint, IsEqual.equalTo(Ed25519Group.BASE_POINT));
     }
 
     @Test
@@ -55,7 +55,7 @@ public class Ed25519GroupTest {
             Ed25519GroupElement.p2(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE);
 
         // Assert:
-        Assert.assertThat(zeroP2, IsEqual.equalTo(Ed25519Group.ZERO_P2));
+        MatcherAssert.assertThat(zeroP2, IsEqual.equalTo(Ed25519Group.ZERO_P2));
     }
 
     @Test
@@ -66,7 +66,7 @@ public class Ed25519GroupTest {
                 Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
 
         // Assert:
-        Assert.assertThat(zeroP3, IsEqual.equalTo(Ed25519Group.ZERO_P3));
+        MatcherAssert.assertThat(zeroP3, IsEqual.equalTo(Ed25519Group.ZERO_P3));
     }
 
     @Test
@@ -76,6 +76,6 @@ public class Ed25519GroupTest {
             Ed25519GroupElement.precomputed(Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
 
         // Assert:
-        Assert.assertThat(zeroPrecomputed, IsEqual.equalTo(Ed25519Group.ZERO_PRECOMPUTED));
+        MatcherAssert.assertThat(zeroPrecomputed, IsEqual.equalTo(Ed25519Group.ZERO_PRECOMPUTED));
     }
 }

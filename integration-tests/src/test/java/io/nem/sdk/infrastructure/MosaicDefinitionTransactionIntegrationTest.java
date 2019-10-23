@@ -29,7 +29,6 @@ import io.nem.sdk.model.transaction.MosaicSupplyChangeTransaction;
 import io.nem.sdk.model.transaction.MosaicSupplyChangeTransactionFactory;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -95,7 +94,6 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    @Disabled
     void standaloneMosaicSupplyChangeTransaction(RepositoryType type) {
         MosaicId mosaicId = createMosaic(type);
 
@@ -111,7 +109,6 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    @Disabled
     void aggregateMosaicSupplyChangeTransaction(RepositoryType type) {
 
         MosaicId mosaicId = createMosaic(type);

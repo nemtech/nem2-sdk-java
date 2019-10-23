@@ -18,11 +18,11 @@ package io.nem.core.crypto.ed25519.arithmetic;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
-import org.junit.Assert;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests rely on the BigInteger class.
@@ -42,7 +42,7 @@ public class Ed25519FieldElementTest {
 
     private static void assertEquals(final Ed25519FieldElement f, final BigInteger b) {
         final BigInteger b2 = MathUtils.toBigInteger(f);
-        Assert.assertThat(b2.mod(Ed25519Field.P), IsEqual.equalTo(b.mod(Ed25519Field.P)));
+        MatcherAssert.assertThat(b2.mod(Ed25519Field.P), IsEqual.equalTo(b.mod(Ed25519Field.P)));
     }
 
     // endregion
@@ -57,10 +57,11 @@ public class Ed25519FieldElementTest {
         Assertions.assertEquals(10, element.getRaw().length);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotCreateFieldElementFromArrayWithIncorrectLength() {
         // Assert:
-        new Ed25519FieldElement(new int[9]);
+        Assertions.assertThrows(IllegalArgumentException.class,
+            () -> new Ed25519FieldElement(new int[9]));
     }
 
     // endregion
@@ -73,7 +74,7 @@ public class Ed25519FieldElementTest {
         final Ed25519FieldElement f = new Ed25519FieldElement(new int[10]);
 
         // Assert:
-        Assert.assertThat(f.isNonZero(), IsEqual.equalTo(false));
+        MatcherAssert.assertThat(f.isNonZero(), IsEqual.equalTo(false));
     }
 
     // endregion
@@ -88,7 +89,7 @@ public class Ed25519FieldElementTest {
         final Ed25519FieldElement f = new Ed25519FieldElement(t);
 
         // Assert:
-        Assert.assertThat(f.isNonZero(), IsEqual.equalTo(true));
+        MatcherAssert.assertThat(f.isNonZero(), IsEqual.equalTo(true));
     }
 
     @Test
@@ -101,7 +102,7 @@ public class Ed25519FieldElementTest {
         final Ed25519FieldElement f = new Ed25519FieldElement(values);
 
         // Assert:
-        Assert.assertThat(values, IsEqual.equalTo(f.getRaw()));
+        MatcherAssert.assertThat(values, IsEqual.equalTo(f.getRaw()));
     }
 
     @Test
@@ -230,10 +231,10 @@ public class Ed25519FieldElementTest {
 
             // Assert:
             // (u / v)^4 == (sqrt(u^2 / v^2))^4.
-            Assert.assertThat(fraction.square().square(), IsEqual.equalTo(sqrt.square().square()));
+            MatcherAssert.assertThat(fraction.square().square(), IsEqual.equalTo(sqrt.square().square()));
 
             // (u / v) == +-1 * sqrt(u^2 / v^2) or (u / v) == +-i * sqrt(u^2 / v^2)
-            Assert.assertThat(
+            MatcherAssert.assertThat(
                 differsOnlyByAFactorOfAFourthRootOfOne(fraction, sqrt), IsEqual.equalTo(true));
         }
     }
@@ -256,8 +257,8 @@ public class Ed25519FieldElementTest {
         final BigInteger b2 = MathUtils.toBigInteger(f2);
 
         // Assert:
-        Assert.assertThat(b1, IsEqual.equalTo(BigInteger.ZERO));
-        Assert.assertThat(b2, IsEqual.equalTo(BigInteger.ONE));
+        MatcherAssert.assertThat(b1, IsEqual.equalTo(BigInteger.ZERO));
+        MatcherAssert.assertThat(b2, IsEqual.equalTo(BigInteger.ONE));
     }
 
     @Test
@@ -275,7 +276,7 @@ public class Ed25519FieldElementTest {
             final BigInteger b2 = MathUtils.toBigInteger(f.getRaw()).mod(Ed25519Field.P);
 
             // Assert:
-            Assert.assertThat(b2, IsEqual.equalTo(b1));
+            MatcherAssert.assertThat(b2, IsEqual.equalTo(b1));
         }
     }
 
@@ -302,7 +303,7 @@ public class Ed25519FieldElementTest {
             final Ed25519FieldElement f = new Ed25519FieldElement(t);
 
             // Assert:
-            Assert.assertThat(f.isNegative(), IsEqual.equalTo(isNegative));
+            MatcherAssert.assertThat(f.isNegative(), IsEqual.equalTo(isNegative));
         }
     }
 
@@ -319,10 +320,10 @@ public class Ed25519FieldElementTest {
         final Ed25519FieldElement f4 = MathUtils.getRandomFieldElement();
 
         // Assert:
-        Assert.assertThat(f1, IsEqual.equalTo(f2));
-        Assert.assertThat(f1, IsNot.not(IsEqual.equalTo(f3)));
-        Assert.assertThat(f1, IsNot.not(IsEqual.equalTo(f4)));
-        Assert.assertThat(f3, IsNot.not(IsEqual.equalTo(f4)));
+        MatcherAssert.assertThat(f1, IsEqual.equalTo(f2));
+        MatcherAssert.assertThat(f1, IsNot.not(IsEqual.equalTo(f3)));
+        MatcherAssert.assertThat(f1, IsNot.not(IsEqual.equalTo(f4)));
+        MatcherAssert.assertThat(f3, IsNot.not(IsEqual.equalTo(f4)));
     }
 
     @Test
@@ -334,10 +335,10 @@ public class Ed25519FieldElementTest {
         final Ed25519FieldElement f4 = MathUtils.getRandomFieldElement();
 
         // Assert:
-        Assert.assertThat(f1.hashCode(), IsEqual.equalTo(f2.hashCode()));
-        Assert.assertThat(f1.hashCode(), IsNot.not(IsEqual.equalTo(f3.hashCode())));
-        Assert.assertThat(f1.hashCode(), IsNot.not(IsEqual.equalTo(f4.hashCode())));
-        Assert.assertThat(f3.hashCode(), IsNot.not(IsEqual.equalTo(f4.hashCode())));
+        MatcherAssert.assertThat(f1.hashCode(), IsEqual.equalTo(f2.hashCode()));
+        MatcherAssert.assertThat(f1.hashCode(), IsNot.not(IsEqual.equalTo(f3.hashCode())));
+        MatcherAssert.assertThat(f1.hashCode(), IsNot.not(IsEqual.equalTo(f4.hashCode())));
+        MatcherAssert.assertThat(f3.hashCode(), IsNot.not(IsEqual.equalTo(f4.hashCode())));
     }
 
     // endregion
@@ -361,7 +362,7 @@ public class Ed25519FieldElementTest {
         }
 
         // Assert:
-        Assert.assertThat(fAsString, IsEqual.equalTo(builder.toString()));
+        MatcherAssert.assertThat(fAsString, IsEqual.equalTo(builder.toString()));
     }
 
     // endregion

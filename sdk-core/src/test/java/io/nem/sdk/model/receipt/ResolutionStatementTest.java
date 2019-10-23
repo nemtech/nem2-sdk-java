@@ -19,7 +19,6 @@ package io.nem.sdk.model.receipt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -145,6 +144,6 @@ public class ResolutionStatementTest {
         String hash = resolutionStatement.generateHash(networkType);
 
         assertFalse(hash.isEmpty());
-        assertEquals(hash, "C965152CBD197283CC9F7AFD7F8C4C3FF03B0B54FCE7C8F4820F966AB0591A5C");
+        assertEquals("C965152CBD197283CC9F7AFD7F8C4C3FF03B0B54FCE7C8F4820F966AB0591A5C", hash);
     }
 }

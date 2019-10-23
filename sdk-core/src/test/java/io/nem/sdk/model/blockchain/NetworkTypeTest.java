@@ -16,7 +16,7 @@
 
 package io.nem.sdk.model.blockchain;
 
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,25 +24,25 @@ public class NetworkTypeTest {
 
     @Test
     void MAIN_NETIs0x68() {
-        assertTrue(0x68 == NetworkType.MAIN_NET.getValue());
-        assertTrue(104 == NetworkType.MAIN_NET.getValue());
+        assertEquals(0x68, NetworkType.MAIN_NET.getValue());
+        assertEquals(104, NetworkType.MAIN_NET.getValue());
     }
 
     @Test
     void TEST_NETIs0x96() {
-        assertTrue(0x98 == NetworkType.TEST_NET.getValue());
-        assertTrue(152 == NetworkType.TEST_NET.getValue());
+        assertEquals(0x98, NetworkType.TEST_NET.getValue());
+        assertEquals(152, NetworkType.TEST_NET.getValue());
     }
 
     @Test
     void MIJINIs0x60() {
-        assertTrue(0x60 == NetworkType.MIJIN.getValue());
-        assertTrue(96 == NetworkType.MIJIN.getValue());
+        assertEquals(0x60, NetworkType.MIJIN.getValue());
+        assertEquals(96, NetworkType.MIJIN.getValue());
     }
 
     @Test
     void MIJIN_TESTIs0x90() {
-        assertTrue(0x90 == NetworkType.MIJIN_TEST.getValue());
-        assertTrue(144 == NetworkType.MIJIN_TEST.getValue());
+        assertEquals(0x90, NetworkType.MIJIN_TEST.getValue());
+        assertEquals(144, NetworkType.MIJIN_TEST.getValue());
     }
 }

@@ -17,18 +17,12 @@
 package io.nem.sdk.infrastructure.vertx;
 
 import static io.nem.core.utils.MapperUtils.toAddressFromEncoded;
-import static io.nem.core.utils.MapperUtils.toAddressFromRawAddress;
 import static io.nem.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.core.utils.MapperUtils;
-import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
-import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
-import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
-import io.nem.sdk.model.namespace.AddressAlias;
-import io.nem.sdk.model.namespace.MosaicAlias;
 import io.nem.sdk.model.receipt.AddressResolutionStatement;
 import io.nem.sdk.model.receipt.ArtifactExpiryReceipt;
 import io.nem.sdk.model.receipt.BalanceChangeReceipt;
@@ -40,8 +34,6 @@ import io.nem.sdk.model.receipt.ReceiptSource;
 import io.nem.sdk.model.receipt.ReceiptType;
 import io.nem.sdk.model.receipt.ReceiptVersion;
 import io.nem.sdk.model.receipt.ResolutionEntry;
-import io.nem.sdk.model.receipt.ResolutionStatement;
-import io.nem.sdk.model.receipt.ResolutionType;
 import io.nem.sdk.model.receipt.Statement;
 import io.nem.sdk.model.receipt.TransactionStatement;
 import io.nem.sdk.model.transaction.JsonHelper;

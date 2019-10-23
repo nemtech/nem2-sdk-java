@@ -16,8 +16,8 @@
 
 package io.nem.core.crypto;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsInstanceOf;
-import org.junit.Assert;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -30,7 +30,7 @@ public abstract class CryptoEngineTest {
         final Curve curve = this.getCryptoEngine().getCurve();
 
         // Assert:
-        Assert.assertThat(curve, IsInstanceOf.instanceOf(Curve.class));
+        MatcherAssert.assertThat(curve, IsInstanceOf.instanceOf(Curve.class));
     }
 
     @ParameterizedTest
@@ -42,7 +42,7 @@ public abstract class CryptoEngineTest {
             .createDsaSigner(KeyPair.random(engine, signSchema), signSchema);
 
         // Assert:
-        Assert.assertThat(signer, IsInstanceOf.instanceOf(DsaSigner.class));
+        MatcherAssert.assertThat(signer, IsInstanceOf.instanceOf(DsaSigner.class));
     }
 
     @ParameterizedTest
@@ -52,7 +52,7 @@ public abstract class CryptoEngineTest {
         final KeyGenerator keyGenerator = this.getCryptoEngine().createKeyGenerator(signSchema);
 
         // Assert:
-        Assert.assertThat(keyGenerator, IsInstanceOf.instanceOf(KeyGenerator.class));
+        MatcherAssert.assertThat(keyGenerator, IsInstanceOf.instanceOf(KeyGenerator.class));
     }
 
     @ParameterizedTest
@@ -62,7 +62,7 @@ public abstract class CryptoEngineTest {
         final KeyAnalyzer keyAnalyzer = this.getCryptoEngine().createKeyAnalyzer();
 
         // Assert:
-        Assert.assertThat(keyAnalyzer, IsInstanceOf.instanceOf(KeyAnalyzer.class));
+        MatcherAssert.assertThat(keyAnalyzer, IsInstanceOf.instanceOf(KeyAnalyzer.class));
     }
 
     @ParameterizedTest
@@ -75,7 +75,7 @@ public abstract class CryptoEngineTest {
                 signSchema), signSchema);
 
         // Assert:
-        Assert.assertThat(blockCipher, IsInstanceOf.instanceOf(BlockCipher.class));
+        MatcherAssert.assertThat(blockCipher, IsInstanceOf.instanceOf(BlockCipher.class));
     }
 
     protected abstract CryptoEngine getCryptoEngine();

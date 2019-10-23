@@ -17,10 +17,11 @@
 package io.nem.core.crypto;
 
 import java.math.BigInteger;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class PrivateKeyTest {
 
@@ -32,7 +33,7 @@ public class PrivateKeyTest {
         final PrivateKey key = new PrivateKey(new BigInteger("2275"));
 
         // Assert:
-        Assert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("2275")));
+        MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("2275")));
     }
 
     @Test
@@ -41,7 +42,7 @@ public class PrivateKeyTest {
         final PrivateKey key = PrivateKey.fromDecimalString("2279");
 
         // Assert:
-        Assert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("2279")));
+        MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("2279")));
     }
 
     @Test
@@ -50,7 +51,7 @@ public class PrivateKeyTest {
         final PrivateKey key = PrivateKey.fromDecimalString("-2279");
 
         // Assert:
-        Assert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("-2279")));
+        MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("-2279")));
     }
 
     @Test
@@ -59,7 +60,7 @@ public class PrivateKeyTest {
         final PrivateKey key = PrivateKey.fromHexString("227F");
 
         // Assert:
-        Assert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("227F", 16)));
+        MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("227F", 16)));
     }
 
     @Test
@@ -68,7 +69,7 @@ public class PrivateKeyTest {
         final PrivateKey key = PrivateKey.fromHexString("ABC");
 
         // Assert:
-        Assert.assertThat(
+        MatcherAssert.assertThat(
             key.getRaw(), IsEqual.equalTo(new BigInteger(new byte[]{(byte) 0x0A, (byte) 0xBC})));
     }
 
@@ -78,20 +79,20 @@ public class PrivateKeyTest {
         final PrivateKey key = PrivateKey.fromHexString("8000");
 
         // Assert:
-        Assert.assertThat(
+        MatcherAssert.assertThat(
             key.getRaw(), IsEqual.equalTo(new BigInteger(-1, new byte[]{(byte) 0x80, 0x00})));
     }
 
-    @Test(expected = CryptoException.class)
+    @Test
     public void cannotCreateAroundMalformedDecimalString() {
         // Act:
-        PrivateKey.fromDecimalString("22A75");
+        Assertions.assertThrows(CryptoException.class, () -> PrivateKey.fromDecimalString("22A75"));
     }
 
-    @Test(expected = CryptoException.class)
+    @Test
     public void cannotCreateAroundMalformedHexString() {
         // Act:
-        PrivateKey.fromHexString("22G75");
+        Assertions.assertThrows(CryptoException.class, () -> PrivateKey.fromHexString("22G75"));
     }
 
     // endregion
@@ -108,11 +109,11 @@ public class PrivateKeyTest {
         final PrivateKey key = new PrivateKey(new BigInteger("2275"));
 
         // Assert:
-        Assert.assertThat(PrivateKey.fromDecimalString("2275"), IsEqual.equalTo(key));
-        Assert.assertThat(PrivateKey.fromDecimalString("2276"), IsNot.not(IsEqual.equalTo(key)));
-        Assert.assertThat(PrivateKey.fromHexString("2276"), IsNot.not(IsEqual.equalTo(key)));
-        Assert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
-        Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo(key)));
+        MatcherAssert.assertThat(PrivateKey.fromDecimalString("2275"), IsEqual.equalTo(key));
+        MatcherAssert.assertThat(PrivateKey.fromDecimalString("2276"), IsNot.not(IsEqual.equalTo(key)));
+        MatcherAssert.assertThat(PrivateKey.fromHexString("2276"), IsNot.not(IsEqual.equalTo(key)));
+        MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
+        MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo(key)));
     }
 
     @Test
@@ -122,11 +123,11 @@ public class PrivateKeyTest {
         final int hashCode = key.hashCode();
 
         // Assert:
-        Assert
+        MatcherAssert
             .assertThat(PrivateKey.fromDecimalString("2275").hashCode(), IsEqual.equalTo(hashCode));
-        Assert.assertThat(
+        MatcherAssert.assertThat(
             PrivateKey.fromDecimalString("2276").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-        Assert.assertThat(
+        MatcherAssert.assertThat(
             PrivateKey.fromHexString("2275").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
     }
 
@@ -137,8 +138,8 @@ public class PrivateKeyTest {
     @Test
     public void toStringReturnsHexRepresentation() {
         // Assert:
-        Assert.assertThat(PrivateKey.fromHexString("2275").toHex(), IsEqual.equalTo("2275"));
-        Assert.assertThat(PrivateKey.fromDecimalString("2275").toHex(), IsEqual.equalTo("08e3"));
+        MatcherAssert.assertThat(PrivateKey.fromHexString("2275").toHex(), IsEqual.equalTo("2275"));
+        MatcherAssert.assertThat(PrivateKey.fromDecimalString("2275").toHex(), IsEqual.equalTo("08e3"));
     }
 
     // endregion

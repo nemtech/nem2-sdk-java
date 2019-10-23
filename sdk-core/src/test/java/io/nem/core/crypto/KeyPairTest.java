@@ -16,10 +16,10 @@
 
 package io.nem.core.crypto;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
 import org.hamcrest.core.IsNull;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -36,9 +36,9 @@ public class KeyPairTest {
         final KeyPair kp = KeyPair.random(signSchema);
 
         // Assert:
-        Assert.assertThat(kp.hasPrivateKey(), IsEqual.equalTo(true));
-        Assert.assertThat(kp.getPrivateKey(), IsNull.notNullValue());
-        Assert.assertThat(kp.getPublicKey(), IsNull.notNullValue());
+        MatcherAssert.assertThat(kp.hasPrivateKey(), IsEqual.equalTo(true));
+        MatcherAssert.assertThat(kp.getPrivateKey(), IsNull.notNullValue());
+        MatcherAssert.assertThat(kp.getPublicKey(), IsNull.notNullValue());
     }
 
     @ParameterizedTest
@@ -51,9 +51,9 @@ public class KeyPairTest {
         final KeyPair kp2 = KeyPair.fromPrivate(kp1.getPrivateKey(), signSchema);
 
         // Assert:
-        Assert.assertThat(kp2.hasPrivateKey(), IsEqual.equalTo(true));
-        Assert.assertThat(kp2.getPrivateKey(), IsEqual.equalTo(kp1.getPrivateKey()));
-        Assert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
+        MatcherAssert.assertThat(kp2.hasPrivateKey(), IsEqual.equalTo(true));
+        MatcherAssert.assertThat(kp2.getPrivateKey(), IsEqual.equalTo(kp1.getPrivateKey()));
+        MatcherAssert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
     }
 
     @ParameterizedTest
@@ -66,8 +66,8 @@ public class KeyPairTest {
         final KeyPair kp2 = KeyPair.onlyPublic(kp1.getPublicKey());
 
         // Assert:
-        Assert.assertThat(kp2.hasPrivateKey(), IsEqual.equalTo(false));
-        Assert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
+        MatcherAssert.assertThat(kp2.hasPrivateKey(), IsEqual.equalTo(false));
+        MatcherAssert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
 
         IllegalStateException exception = Assertions
             .assertThrows(IllegalStateException.class, kp2::getPrivateKey);
@@ -85,8 +85,8 @@ public class KeyPairTest {
         final KeyPair kp2 = KeyPair.random(signSchema);
 
         // Assert:
-        Assert.assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));
-        Assert.assertThat(kp2.getPublicKey(), IsNot.not(IsEqual.equalTo(kp1.getPublicKey())));
+        MatcherAssert.assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));
+        MatcherAssert.assertThat(kp2.getPublicKey(), IsNot.not(IsEqual.equalTo(kp1.getPublicKey())));
     }
 
     @ParameterizedTest

@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.bouncycastle.util.encoders.Hex;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -120,8 +119,8 @@ class BinarySerializationTest {
 
         Assertions.assertTrue(deserialized.getSignature().isPresent());
         Assertions.assertTrue(deserialized.getSigner().isPresent());
-        Assert.assertEquals(signature, deserialized.getSignature().get().toUpperCase());
-        Assert.assertEquals(account.getPublicAccount(), deserialized.getSigner().get());
+        Assertions.assertEquals(signature, deserialized.getSignature().get().toUpperCase());
+        Assertions.assertEquals(account.getPublicAccount(), deserialized.getSigner().get());
 
         //Test that the payload is the same, just without the signature and signer.
         byte[] payloadWithoutSignatureAndSigner = binarySerialization.serialize(transaction);

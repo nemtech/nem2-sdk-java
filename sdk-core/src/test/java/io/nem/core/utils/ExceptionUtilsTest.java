@@ -20,12 +20,13 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsInstanceOf;
 import org.hamcrest.core.IsNull;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("squid:S2925")
 public class ExceptionUtilsTest {
@@ -38,63 +39,63 @@ public class ExceptionUtilsTest {
         final int result = ExceptionUtils.propagate(() -> 7);
 
         // Assert:
-        Assert.assertThat(result, IsEqual.equalTo(7));
+        MatcherAssert.assertThat(result, IsEqual.equalTo(7));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void propagateAllowsRuntimeExceptionsToPropagate() {
         // Act:
-        ExceptionUtils.propagate(
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ExceptionUtils.propagate(
             () -> {
                 throw new IllegalArgumentException();
-            });
+            }));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void propagateWrapsCheckedExceptionsInRuntimeExceptionByDefault() {
         // Act:
-        ExceptionUtils.propagate(
+        Assertions.assertThrows(RuntimeException.class, () -> ExceptionUtils.propagate(
             () -> {
                 throw new IOException();
-            });
+            }));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void propagateCanWrapCheckedExceptionsInCustomRuntimeException() {
         // Act:
-        ExceptionUtils.propagate(
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ExceptionUtils.propagate(
             () -> {
                 throw new IOException();
             },
-            IllegalArgumentException::new);
+            IllegalArgumentException::new));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void propagateUnwrapsUncheckedExecutionExceptions() {
         // Act:
-        ExceptionUtils.propagate(
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ExceptionUtils.propagate(
             () -> {
                 throw new MockExecutionException(new IllegalArgumentException());
-            });
+            }));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void propagateWrapsCheckedExecutionExceptionsInRuntimeExceptionByDefault() {
         // Act:
-        ExceptionUtils.propagate(
+        Assertions.assertThrows(RuntimeException.class, () -> ExceptionUtils.propagate(
             () -> {
                 throw new MockExecutionException(new IOException());
-            });
+            }));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void propagateCanWrapCheckedExecutionExceptionsInCustomRuntimeException() {
         // Act:
-        ExceptionUtils.propagate(
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ExceptionUtils.propagate(
             () -> {
                 throw new MockExecutionException(new IOException());
             },
-            IllegalArgumentException::new);
+            IllegalArgumentException::new));
     }
 
     @Test
@@ -114,8 +115,8 @@ public class ExceptionUtilsTest {
         runner.run();
 
         // Assert:
-        Assert.assertThat(runner.getUnhandledException(), IsNull.notNullValue());
-        Assert.assertThat(
+        MatcherAssert.assertThat(runner.getUnhandledException(), IsNull.notNullValue());
+        MatcherAssert.assertThat(
             runner.getUnhandledException(), IsInstanceOf.instanceOf(IllegalStateException.class));
     }
 
@@ -137,8 +138,8 @@ public class ExceptionUtilsTest {
         runner.run();
 
         // Assert:
-        Assert.assertThat(runner.isInterruptedPreRun(), IsEqual.equalTo(false));
-        Assert.assertThat(runner.isInterruptedPostRun(), IsEqual.equalTo(true));
+        MatcherAssert.assertThat(runner.isInterruptedPreRun(), IsEqual.equalTo(false));
+        MatcherAssert.assertThat(runner.isInterruptedPostRun(), IsEqual.equalTo(true));
     }
 
     // endregion
@@ -153,63 +154,63 @@ public class ExceptionUtilsTest {
 
         // Assert: (no exception)
 
-        Assert.assertTrue("No Problems", true);
+        Assertions.assertTrue(true, "No Problems");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void propagateVoidAllowsRuntimeExceptionsToPropagate() {
         // Act:
-        ExceptionUtils.propagateVoid(
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ExceptionUtils.propagateVoid(
             () -> {
                 throw new IllegalArgumentException();
-            });
+            }));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void propagateVoidWrapsCheckedExceptionsInRuntimeExceptionByDefault() {
         // Act:
-        ExceptionUtils.propagateVoid(
+        Assertions.assertThrows(RuntimeException.class, () ->ExceptionUtils.propagateVoid(
             () -> {
                 throw new IOException();
-            });
+            }));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void propagateVoidCanWrapCheckedExceptionsInCustomRuntimeException() {
         // Act:
-        ExceptionUtils.propagateVoid(
+        Assertions.assertThrows(IllegalArgumentException.class, () ->ExceptionUtils.propagateVoid(
             () -> {
                 throw new IOException();
             },
-            IllegalArgumentException::new);
+            IllegalArgumentException::new));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void propagateVoidUnwrapsUncheckedExecutionExceptions() {
         // Act:
-        ExceptionUtils.propagateVoid(
+        Assertions.assertThrows(IllegalArgumentException.class, () ->ExceptionUtils.propagateVoid(
             () -> {
                 throw new MockExecutionException(new IllegalArgumentException());
-            });
+            }));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void propagateVoidWrapsCheckedExecutionExceptionsInRuntimeExceptionByDefault() {
         // Act:
-        ExceptionUtils.propagateVoid(
+        Assertions.assertThrows(RuntimeException.class, () ->ExceptionUtils.propagateVoid(
             () -> {
                 throw new MockExecutionException(new IOException());
-            });
+            }));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void propagateVoidCanWrapCheckedExecutionExceptionsInCustomRuntimeException() {
         // Act:
-        ExceptionUtils.propagateVoid(
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ExceptionUtils.propagateVoid(
             () -> {
                 throw new MockExecutionException(new IOException());
             },
-            IllegalArgumentException::new);
+            IllegalArgumentException::new));
     }
 
     @Test
@@ -227,8 +228,8 @@ public class ExceptionUtilsTest {
         runner.run();
 
         // Assert:
-        Assert.assertThat(runner.getUnhandledException(), IsNull.notNullValue());
-        Assert.assertThat(
+        MatcherAssert.assertThat(runner.getUnhandledException(), IsNull.notNullValue());
+        MatcherAssert.assertThat(
             runner.getUnhandledException(), IsInstanceOf.instanceOf(IllegalStateException.class));
     }
 
@@ -247,8 +248,8 @@ public class ExceptionUtilsTest {
         runner.run();
 
         // Assert:
-        Assert.assertThat(runner.isInterruptedPreRun(), IsEqual.equalTo(false));
-        Assert.assertThat(runner.isInterruptedPostRun(), IsEqual.equalTo(true));
+        MatcherAssert.assertThat(runner.isInterruptedPreRun(), IsEqual.equalTo(false));
+        MatcherAssert.assertThat(runner.isInterruptedPostRun(), IsEqual.equalTo(true));
     }
 
     // endregion

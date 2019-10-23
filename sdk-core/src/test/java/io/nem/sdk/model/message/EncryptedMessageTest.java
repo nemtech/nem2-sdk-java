@@ -19,8 +19,6 @@ package io.nem.sdk.model.message;
 import io.nem.core.crypto.KeyPair;
 import io.nem.core.crypto.PrivateKey;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.message.EncryptedMessage;
-import io.nem.sdk.model.message.MessageType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

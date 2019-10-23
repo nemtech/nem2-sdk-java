@@ -21,10 +21,10 @@ import io.nem.core.test.IsEquivalent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsSame;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
 
@@ -37,16 +37,16 @@ public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
         final DenseMatrix matrix = new DenseMatrix(2, 3, values);
 
         // Assert:
-        Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(2));
-        Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
-        Assert.assertThat(matrix.getElementCount(), IsEqual.equalTo(6));
-        Assert.assertThat(matrix.getRaw(), IsSame.sameInstance(values));
-        Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(1.0));
-        Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(4.0));
-        Assert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(5.0));
-        Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(7.0));
-        Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(2.0));
-        Assert.assertThat(matrix.getAt(1, 2), IsEqual.equalTo(3.0));
+        MatcherAssert.assertThat(matrix.getRowCount(), IsEqual.equalTo(2));
+        MatcherAssert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+        MatcherAssert.assertThat(matrix.getElementCount(), IsEqual.equalTo(6));
+        MatcherAssert.assertThat(matrix.getRaw(), IsSame.sameInstance(values));
+        MatcherAssert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(1.0));
+        MatcherAssert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(4.0));
+        MatcherAssert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(5.0));
+        MatcherAssert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(7.0));
+        MatcherAssert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(2.0));
+        MatcherAssert.assertThat(matrix.getAt(1, 2), IsEqual.equalTo(3.0));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
         matrix.forEach((row, col, value) -> values.add(value));
 
         // Assert:
-        Assert.assertThat(values, IsEquivalent.equivalentTo(2.0, 0.0, 0.0, 1.0, -5.0, 8.0));
+        MatcherAssert.assertThat(values, IsEquivalent.equivalentTo(2.0, 0.0, 0.0, 1.0, -5.0, 8.0));
     }
 
     // endregion
@@ -89,7 +89,7 @@ public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
             Arrays.equals(matrix.getRaw(), new double[]{9.0, 3.2, 5.4, 1.2, 4.3, 7.6});
 
         // Assert:
-        Assert.assertThat(areEqual, IsEqual.equalTo(true));
+        MatcherAssert.assertThat(areEqual, IsEqual.equalTo(true));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
             Arrays.equals(matrix.getRaw(), new double[]{9.0, 12.1, 5.4, 1.2, 4.3, 7.6});
 
         // Assert:
-        Assert.assertThat(areEqual, IsEqual.equalTo(true));
+        MatcherAssert.assertThat(areEqual, IsEqual.equalTo(true));
     }
 
     // endregion
@@ -124,7 +124,7 @@ public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
                 + "3.235 1.000"
                 + System.lineSeparator()
                 + "5012.013 8.000";
-        Assert.assertThat(matrix.toString(), IsEqual.equalTo(expectedResult));
+        MatcherAssert.assertThat(matrix.toString(), IsEqual.equalTo(expectedResult));
     }
 
     // endregion

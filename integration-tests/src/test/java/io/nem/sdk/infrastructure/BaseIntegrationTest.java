@@ -51,7 +51,6 @@ import io.nem.sdk.model.transaction.TransactionStatusError;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.reactivex.Observable;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -102,7 +101,7 @@ public abstract class BaseIntegrationTest {
     @BeforeEach
     void coolDown() throws InterruptedException {
         //To avoid rate-limiting errors from server. (5 per seconds)
-        Thread.sleep(500);
+        sleep(500);
     }
 
     private String resolveGenerationHash() {

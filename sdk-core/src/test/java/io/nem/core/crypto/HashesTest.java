@@ -19,12 +19,13 @@ package io.nem.core.crypto;
 import io.nem.core.test.Utils;
 import java.util.Arrays;
 import java.util.function.Function;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HashesTest {
+
 
     private static final HashTester SHA3_256_TESTER = new HashTester(Hashes::sha3_256, 32);
     private static final HashTester SHA3_512_TESTER = new HashTester(Hashes::sha3_512, 64);
@@ -48,7 +49,7 @@ public class HashesTest {
         final byte[] hash2 = hashFunction2.apply(input);
 
         // Assert:
-        Assert.assertThat(hash2, IsNot.not(IsEqual.equalTo(hash1)));
+        MatcherAssert.assertThat(hash2, IsNot.not(IsEqual.equalTo(hash1)));
     }
 
     @Test
@@ -348,7 +349,7 @@ public class HashesTest {
             final byte[] hash = this.hashFunction.apply(input);
 
             // Assert:
-            Assert.assertThat(hash.length, IsEqual.equalTo(this.expectedHashLength));
+            MatcherAssert.assertThat(hash.length, IsEqual.equalTo(this.expectedHashLength));
         }
 
         public void assertHashIsSameForSameInputs() {
@@ -360,7 +361,7 @@ public class HashesTest {
             final byte[] hash2 = this.hashFunction.apply(input);
 
             // Assert:
-            Assert.assertThat(hash2, IsEqual.equalTo(hash1));
+            MatcherAssert.assertThat(hash2, IsEqual.equalTo(hash1));
         }
 
         public void assertHashIsSameForSplitInputs() {
@@ -372,7 +373,7 @@ public class HashesTest {
             final byte[] hash2 = this.hashMultipleFunction.apply(split(input));
 
             // Assert:
-            Assert.assertThat(hash2, IsEqual.equalTo(hash1));
+            MatcherAssert.assertThat(hash2, IsEqual.equalTo(hash1));
         }
 
         public void assertHashIsDifferentForDifferentInputs() {
@@ -385,7 +386,7 @@ public class HashesTest {
             final byte[] hash2 = this.hashFunction.apply(input2);
 
             // Assert:
-            Assert.assertThat(hash2, IsNot.not(IsEqual.equalTo(hash1)));
+            MatcherAssert.assertThat(hash2, IsNot.not(IsEqual.equalTo(hash1)));
         }
     }
 }

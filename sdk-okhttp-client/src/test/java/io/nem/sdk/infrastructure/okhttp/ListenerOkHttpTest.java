@@ -37,7 +37,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -125,9 +124,9 @@ public class ListenerOkHttpTest {
 
         listener.handle(transactionInfoDtoJsonObject, null);
 
-        Assert.assertEquals(1, transactions.size());
+        Assertions.assertEquals(1, transactions.size());
 
-        Assert.assertEquals(address, transactions.get(0).getSigner().get().getAddress());
+        Assertions.assertEquals(address, transactions.get(0).getSigner().get().getAddress());
 
     }
 
@@ -148,7 +147,7 @@ public class ListenerOkHttpTest {
 
         Assertions.assertNotNull(webSocketListener);
 
-        Assert.assertEquals("http://nem.com:3000/ws", requestCaptor.getValue().url().toString());
+        Assertions.assertEquals("http://nem.com:3000/ws", requestCaptor.getValue().url().toString());
 
         webSocketListener
             .onMessage(webSocketMock, jsonHelper.print(Collections.singletonMap("uid", wsId)));

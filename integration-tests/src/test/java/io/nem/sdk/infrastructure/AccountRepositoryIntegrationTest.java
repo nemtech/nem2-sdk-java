@@ -34,7 +34,6 @@ import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -198,18 +197,18 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
 
     private void assertTransaction(Transaction transaction, boolean outgoingTransactions) {
 
-        Assert.assertNotNull(transaction.getType());
-        Assert.assertTrue(transaction.getTransactionInfo().isPresent());
-        Assert.assertEquals(getNetworkType(), transaction.getNetworkType());
+        Assertions.assertNotNull(transaction.getType());
+        Assertions.assertTrue(transaction.getTransactionInfo().isPresent());
+        Assertions.assertEquals(getNetworkType(), transaction.getNetworkType());
         if (outgoingTransactions) {
-            Assert.assertEquals(getTestAccount().getAddress(),
+            Assertions.assertEquals(getTestAccount().getAddress(),
                 transaction.getSigner().get().getAddress());
         }
 
-        Assert.assertTrue(transaction.getSignature().isPresent());
-        Assert.assertNotNull(transaction.getMaxFee());
-        Assert.assertNotNull(transaction.getVersion());
-        Assert.assertNotNull(transaction.getDeadline());
+        Assertions.assertTrue(transaction.getSignature().isPresent());
+        Assertions.assertNotNull(transaction.getMaxFee());
+        Assertions.assertNotNull(transaction.getVersion());
+        Assertions.assertNotNull(transaction.getDeadline());
 
     }
 

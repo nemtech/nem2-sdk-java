@@ -16,29 +16,30 @@
 
 package io.nem.core.utils;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsSame;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class CircularStackTest {
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void peekOnEmptyStackThrowsException() {
         // Arrange:
         final CircularStack<Integer> intStack = this.createStack(3);
 
         // Act:
-        intStack.peek();
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> intStack.peek());
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void popFromEmptyStackThrowsException() {
         // Arrange:
         final CircularStack<Integer> intStack = this.createStack(3);
 
         // Act:
-        intStack.pop();
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () ->intStack.pop());
     }
 
     @Test
@@ -50,8 +51,8 @@ public class CircularStackTest {
         intStack.push(123);
 
         // Assert:
-        Assert.assertThat(intStack.peek(), IsEqual.equalTo(123));
-        Assert.assertThat(intStack.size(), IsEqual.equalTo(1));
+        MatcherAssert.assertThat(intStack.peek(), IsEqual.equalTo(123));
+        MatcherAssert.assertThat(intStack.size(), IsEqual.equalTo(1));
     }
 
     @Test
@@ -65,8 +66,8 @@ public class CircularStackTest {
         intStack.push(888);
 
         // Assert:
-        Assert.assertThat(intStack.peek(), IsEqual.equalTo(888));
-        Assert.assertThat(intStack.size(), IsEqual.equalTo(3));
+        MatcherAssert.assertThat(intStack.peek(), IsEqual.equalTo(888));
+        MatcherAssert.assertThat(intStack.size(), IsEqual.equalTo(3));
     }
 
     @Test
@@ -80,8 +81,8 @@ public class CircularStackTest {
         }
 
         // Assert:
-        Assert.assertThat(intStack.peek(), IsEqual.equalTo(123 + 99));
-        Assert.assertThat(intStack.size(), IsEqual.equalTo(3));
+        MatcherAssert.assertThat(intStack.peek(), IsEqual.equalTo(123 + 99));
+        MatcherAssert.assertThat(intStack.size(), IsEqual.equalTo(3));
     }
 
     @Test
@@ -97,8 +98,8 @@ public class CircularStackTest {
         intStack.pop();
 
         // Assert:
-        Assert.assertThat(intStack.peek(), IsEqual.equalTo(123 + 99 - 1));
-        Assert.assertThat(intStack.size(), IsEqual.equalTo(2));
+        MatcherAssert.assertThat(intStack.peek(), IsEqual.equalTo(123 + 99 - 1));
+        MatcherAssert.assertThat(intStack.size(), IsEqual.equalTo(2));
     }
 
     // region shallowCopyTo
@@ -117,11 +118,11 @@ public class CircularStackTest {
         source.shallowCopyTo(destination);
 
         // Assert:
-        Assert.assertThat(source.size(), IsEqual.equalTo(10));
-        Assert.assertThat(destination.size(), IsEqual.equalTo(3));
+        MatcherAssert.assertThat(source.size(), IsEqual.equalTo(10));
+        MatcherAssert.assertThat(destination.size(), IsEqual.equalTo(3));
         int i = 7;
         for (final Integer element : destination) {
-            Assert.assertThat(element, IsEqual.equalTo(i++));
+            MatcherAssert.assertThat(element, IsEqual.equalTo(i++));
         }
     }
 
@@ -139,11 +140,11 @@ public class CircularStackTest {
         source.shallowCopyTo(destination);
 
         // Assert:
-        Assert.assertThat(source.size(), IsEqual.equalTo(3));
-        Assert.assertThat(destination.size(), IsEqual.equalTo(3));
+        MatcherAssert.assertThat(source.size(), IsEqual.equalTo(3));
+        MatcherAssert.assertThat(destination.size(), IsEqual.equalTo(3));
         int i = 0;
         for (final Integer element : destination) {
-            Assert.assertThat(element, IsEqual.equalTo(i++));
+            MatcherAssert.assertThat(element, IsEqual.equalTo(i++));
         }
     }
 
@@ -160,10 +161,10 @@ public class CircularStackTest {
         stack1.shallowCopyTo(stack2);
 
         // Assert:
-        Assert.assertThat(stack1.size(), IsEqual.equalTo(3));
-        Assert.assertThat(stack2.size(), IsEqual.equalTo(3));
+        MatcherAssert.assertThat(stack1.size(), IsEqual.equalTo(3));
+        MatcherAssert.assertThat(stack2.size(), IsEqual.equalTo(3));
         for (int i = 0; i < 3; ++i) {
-            Assert.assertThat(stack1.peek(), IsSame.sameInstance(stack2.peek()));
+            MatcherAssert.assertThat(stack1.peek(), IsSame.sameInstance(stack2.peek()));
             stack1.pop();
             stack2.pop();
         }
@@ -186,7 +187,7 @@ public class CircularStackTest {
         // Assert:
         int i = 123;
         for (final Integer elem : intStack) {
-            Assert.assertThat(elem, IsEqual.equalTo(i));
+            MatcherAssert.assertThat(elem, IsEqual.equalTo(i));
             ++i;
         }
     }
@@ -203,11 +204,11 @@ public class CircularStackTest {
 
         // Assert:
         for (int i = 125; i >= 123; --i) {
-            Assert.assertThat(intStack.peek(), IsEqual.equalTo(i));
+            MatcherAssert.assertThat(intStack.peek(), IsEqual.equalTo(i));
             intStack.pop();
         }
 
-        Assert.assertThat(intStack.size(), IsEqual.equalTo(0));
+        MatcherAssert.assertThat(intStack.size(), IsEqual.equalTo(0));
     }
 
     // endregion

@@ -17,9 +17,10 @@
 package io.nem.core.utils;
 
 import java.math.BigInteger;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ByteUtilsTest {
 
@@ -31,7 +32,7 @@ public class ByteUtilsTest {
         final byte[] result = ByteUtils.bigIntToBytes(input);
 
         // Assert:
-        Assert.assertThat(result, IsEqual.equalTo(expected));
+        MatcherAssert.assertThat(result, IsEqual.equalTo(expected));
     }
 
     private static void assertBigIntToBytesOfSizeConversion(
@@ -40,7 +41,7 @@ public class ByteUtilsTest {
         final byte[] result = ByteUtils.bigIntToBytesOfSize(input, size);
 
         // Assert:
-        Assert.assertThat(result, IsEqual.equalTo(expected));
+        MatcherAssert.assertThat(result, IsEqual.equalTo(expected));
     }
 
     private static void assertBytesToLongConversion(final byte[] input, final long expected) {
@@ -48,7 +49,7 @@ public class ByteUtilsTest {
         final long result = ByteUtils.bytesToLong(input);
 
         // Assert:
-        Assert.assertThat(result, IsEqual.equalTo(expected));
+        MatcherAssert.assertThat(result, IsEqual.equalTo(expected));
     }
 
     private static void assertLongToBytesConversion(final long input, final byte[] expected) {
@@ -56,7 +57,7 @@ public class ByteUtilsTest {
         final byte[] result = ByteUtils.longToBytes(input);
 
         // Assert:
-        Assert.assertThat(result, IsEqual.equalTo(expected));
+        MatcherAssert.assertThat(result, IsEqual.equalTo(expected));
     }
 
     private static void assertBytesToIntConversion(final byte[] input, final int expected) {
@@ -64,7 +65,7 @@ public class ByteUtilsTest {
         final int result = ByteUtils.bytesToInt(input);
 
         // Assert:
-        Assert.assertThat(result, IsEqual.equalTo(expected));
+        MatcherAssert.assertThat(result, IsEqual.equalTo(expected));
     }
 
     // endregion
@@ -78,7 +79,7 @@ public class ByteUtilsTest {
         final byte[] result = ByteUtils.intToBytes(input);
 
         // Assert:
-        Assert.assertThat(result, IsEqual.equalTo(expected));
+        MatcherAssert.assertThat(result, IsEqual.equalTo(expected));
     }
 
     private static void assertIntArrayToBytesConversion(final int[] input, final byte[] expected) {
@@ -86,7 +87,7 @@ public class ByteUtilsTest {
         final byte[] result = ByteUtils.intArrayToByteArray(input);
 
         // Assert:
-        Assert.assertThat(result, IsEqual.equalTo(expected));
+        MatcherAssert.assertThat(result, IsEqual.equalTo(expected));
     }
 
     @Test
@@ -148,13 +149,13 @@ public class ByteUtilsTest {
 
     // region roundtrip
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void conversionToLongFailsOnDataUnderflow() {
         // Arrange:
         final byte[] data = {1, 2, 3, 4, 5, 6};
 
         // Act:
-        ByteUtils.bytesToLong(data);
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> ByteUtils.bytesToLong(data));
     }
 
     @Test
@@ -187,7 +188,7 @@ public class ByteUtilsTest {
         final long result = ByteUtils.bytesToLong(ByteUtils.longToBytes(input));
 
         // Assert:
-        Assert.assertThat(result, IsEqual.equalTo(input));
+        MatcherAssert.assertThat(result, IsEqual.equalTo(input));
     }
 
     @Test
@@ -199,7 +200,7 @@ public class ByteUtilsTest {
         final byte[] result = ByteUtils.longToBytes(ByteUtils.bytesToLong(input));
 
         // Assert:
-        Assert.assertThat(result, IsEqual.equalTo(input));
+        MatcherAssert.assertThat(result, IsEqual.equalTo(input));
     }
 
     @Test
@@ -224,13 +225,13 @@ public class ByteUtilsTest {
         assertBytesToIntConversion(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9}, 0x01020304);
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void conversionToIntFailsOnDataUnderflow() {
         // Arrange:
         final byte[] data = {1, 2, 3};
 
         // Act:
-        ByteUtils.bytesToInt(data);
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> ByteUtils.bytesToInt(data));
     }
 
     @Test
@@ -258,7 +259,7 @@ public class ByteUtilsTest {
         final int result = ByteUtils.bytesToInt(ByteUtils.intToBytes(input));
 
         // Assert:
-        Assert.assertThat(result, IsEqual.equalTo(input));
+        MatcherAssert.assertThat(result, IsEqual.equalTo(input));
     }
 
     // endregion
@@ -274,7 +275,7 @@ public class ByteUtilsTest {
         final byte[] result = ByteUtils.intToBytes(ByteUtils.bytesToInt(input));
 
         // Assert:
-        Assert.assertThat(result, IsEqual.equalTo(input));
+        MatcherAssert.assertThat(result, IsEqual.equalTo(input));
     }
 
     @Test
@@ -294,26 +295,26 @@ public class ByteUtilsTest {
     @Test
     public void isEqualReturnsOneIfBytesAreEqual() {
         // Assert:
-        Assert.assertThat(ByteUtils.isEqualConstantTime(0, 0), IsEqual.equalTo(1));
-        Assert.assertThat(ByteUtils.isEqualConstantTime(7, 7), IsEqual.equalTo(1));
-        Assert.assertThat(ByteUtils.isEqualConstantTime(64, 64), IsEqual.equalTo(1));
-        Assert.assertThat(ByteUtils.isEqualConstantTime(255, 255), IsEqual.equalTo(1));
+        MatcherAssert.assertThat(ByteUtils.isEqualConstantTime(0, 0), IsEqual.equalTo(1));
+        MatcherAssert.assertThat(ByteUtils.isEqualConstantTime(7, 7), IsEqual.equalTo(1));
+        MatcherAssert.assertThat(ByteUtils.isEqualConstantTime(64, 64), IsEqual.equalTo(1));
+        MatcherAssert.assertThat(ByteUtils.isEqualConstantTime(255, 255), IsEqual.equalTo(1));
     }
 
     @Test
     public void isEqualReturnsOneIfLoBytesAreEqualButHiBytesAreNot() {
         // Assert:
-        Assert
+        MatcherAssert
             .assertThat(ByteUtils.isEqualConstantTime(75 + 256, 75 + 256 * 2), IsEqual.equalTo(1));
     }
 
     @Test
     public void isEqualReturnsZeroIfBytesAreNotEqual() {
         // Assert:
-        Assert.assertThat(ByteUtils.isEqualConstantTime(0, 1), IsEqual.equalTo(0));
-        Assert.assertThat(ByteUtils.isEqualConstantTime(7, -7), IsEqual.equalTo(0));
-        Assert.assertThat(ByteUtils.isEqualConstantTime(64, 63), IsEqual.equalTo(0));
-        Assert.assertThat(ByteUtils.isEqualConstantTime(254, 255), IsEqual.equalTo(0));
+        MatcherAssert.assertThat(ByteUtils.isEqualConstantTime(0, 1), IsEqual.equalTo(0));
+        MatcherAssert.assertThat(ByteUtils.isEqualConstantTime(7, -7), IsEqual.equalTo(0));
+        MatcherAssert.assertThat(ByteUtils.isEqualConstantTime(64, 63), IsEqual.equalTo(0));
+        MatcherAssert.assertThat(ByteUtils.isEqualConstantTime(254, 255), IsEqual.equalTo(0));
     }
 
     // endregion
@@ -323,18 +324,18 @@ public class ByteUtilsTest {
     @Test
     public void isNegativeReturnsOneIfByteIsNegative() {
         // Assert:
-        Assert.assertThat(ByteUtils.isNegativeConstantTime(-1), IsEqual.equalTo(1));
-        Assert.assertThat(ByteUtils.isNegativeConstantTime(-100), IsEqual.equalTo(1));
-        Assert.assertThat(ByteUtils.isNegativeConstantTime(-255), IsEqual.equalTo(1));
+        MatcherAssert.assertThat(ByteUtils.isNegativeConstantTime(-1), IsEqual.equalTo(1));
+        MatcherAssert.assertThat(ByteUtils.isNegativeConstantTime(-100), IsEqual.equalTo(1));
+        MatcherAssert.assertThat(ByteUtils.isNegativeConstantTime(-255), IsEqual.equalTo(1));
     }
 
     @Test
     public void isNegativeReturnsZeroIfByteIsZeroOrPositive() {
         // Assert:
-        Assert.assertThat(ByteUtils.isNegativeConstantTime(0), IsEqual.equalTo(0));
-        Assert.assertThat(ByteUtils.isNegativeConstantTime(1), IsEqual.equalTo(0));
-        Assert.assertThat(ByteUtils.isNegativeConstantTime(32), IsEqual.equalTo(0));
-        Assert.assertThat(ByteUtils.isNegativeConstantTime(127), IsEqual.equalTo(0));
+        MatcherAssert.assertThat(ByteUtils.isNegativeConstantTime(0), IsEqual.equalTo(0));
+        MatcherAssert.assertThat(ByteUtils.isNegativeConstantTime(1), IsEqual.equalTo(0));
+        MatcherAssert.assertThat(ByteUtils.isNegativeConstantTime(32), IsEqual.equalTo(0));
+        MatcherAssert.assertThat(ByteUtils.isNegativeConstantTime(127), IsEqual.equalTo(0));
     }
 
     // endregion
@@ -347,7 +348,7 @@ public class ByteUtilsTest {
         final String result = ByteUtils.toString(new byte[]{});
 
         // Assert:
-        Assert.assertThat(result, IsEqual.equalTo("{ }"));
+        MatcherAssert.assertThat(result, IsEqual.equalTo("{ }"));
     }
 
     @Test
@@ -356,7 +357,7 @@ public class ByteUtilsTest {
         final String result = ByteUtils.toString(new byte[]{0x12, (byte) 0x8A, 0x00, 0x07});
 
         // Assert:
-        Assert.assertThat(result, IsEqual.equalTo("{ 12 8A 00 07 }"));
+        MatcherAssert.assertThat(result, IsEqual.equalTo("{ 12 8A 00 07 }"));
     }
 
     // endregion

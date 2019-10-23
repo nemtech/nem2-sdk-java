@@ -23,7 +23,6 @@ import io.nem.sdk.model.blockchain.BlockDuration;
 import io.nem.sdk.model.mosaic.MosaicFlags;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicNonce;
-import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.restriction.MosaicGlobalRestriction;
 import io.nem.sdk.model.transaction.MosaicDefinitionTransaction;

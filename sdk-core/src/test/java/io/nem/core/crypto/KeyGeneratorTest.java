@@ -16,10 +16,10 @@
 
 package io.nem.core.crypto;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
 import org.hamcrest.core.IsNull;
-import org.junit.Assert;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -35,8 +35,8 @@ public abstract class KeyGeneratorTest {
         final KeyPair kp = generator.generateKeyPair();
 
         // Assert:
-        Assert.assertThat(kp.getPrivateKey(), IsNull.notNullValue());
-        Assert.assertThat(kp.getPublicKey(), IsNull.notNullValue());
+        MatcherAssert.assertThat(kp.getPrivateKey(), IsNull.notNullValue());
+        MatcherAssert.assertThat(kp.getPublicKey(), IsNull.notNullValue());
     }
 
     @ParameterizedTest
@@ -50,8 +50,8 @@ public abstract class KeyGeneratorTest {
         final PublicKey publicKey = generator.derivePublicKey(kp.getPrivateKey());
 
         // Assert:
-        Assert.assertThat(publicKey, IsNull.notNullValue());
-        Assert.assertThat(publicKey.getBytes(), IsEqual.equalTo(kp.getPublicKey().getBytes()));
+        MatcherAssert.assertThat(publicKey, IsNull.notNullValue());
+        MatcherAssert.assertThat(publicKey.getBytes(), IsEqual.equalTo(kp.getPublicKey().getBytes()));
     }
 
     @ParameterizedTest
@@ -62,8 +62,8 @@ public abstract class KeyGeneratorTest {
         final KeyPair kp2 = this.getKeyGenerator(signSchema).generateKeyPair();
 
         // Assert:
-        Assert.assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));
-        Assert.assertThat(kp2.getPublicKey(), IsNot.not(IsEqual.equalTo(kp1.getPublicKey())));
+        MatcherAssert.assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));
+        MatcherAssert.assertThat(kp2.getPublicKey(), IsNot.not(IsEqual.equalTo(kp1.getPublicKey())));
     }
 
     protected KeyGenerator getKeyGenerator(SignSchema signSchema) {

@@ -22,10 +22,9 @@ import io.nem.core.test.Utils;
 import java.math.BigInteger;
 import java.util.stream.Stream;
 import org.bouncycastle.util.encoders.Hex;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -62,9 +61,9 @@ public class Ed25519UtilsTest {
         final byte[] a = Ed25519Utils.prepareForScalarMultiply(privateKey, signSchema).getRaw();
 
         // Assert:
-        Assert.assertThat(a[31] & 0x40, IsEqual.equalTo(0x40));
-        Assert.assertThat(a[31] & 0x80, IsEqual.equalTo(0x0));
-        Assert.assertThat(a[0] & 0x7, IsEqual.equalTo(0x0));
+        MatcherAssert.assertThat(a[31] & 0x40, IsEqual.equalTo(0x40));
+        MatcherAssert.assertThat(a[31] & 0x80, IsEqual.equalTo(0x0));
+        MatcherAssert.assertThat(a[0] & 0x7, IsEqual.equalTo(0x0));
     }
 
     @ParameterizedTest
