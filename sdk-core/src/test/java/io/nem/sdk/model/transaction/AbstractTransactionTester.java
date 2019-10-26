@@ -27,6 +27,7 @@ import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
 import java.util.Collections;
 import org.bouncycastle.util.encoders.Hex;
+import org.junit.jupiter.api.Assertions;
 
 /**
  * Super class of all transaction unit tests.
@@ -52,6 +53,8 @@ abstract class AbstractTransactionTester {
     protected <T extends Transaction> T assertSerialization(String expected, T transaction) {
         byte[] actual = transaction.serialize();
         assertEquals(expected, Hex.toHexString(actual));
+        Assertions
+            .assertEquals(ConvertUtils.fromHexToBytes(expected).length, transaction.getSize());
         T deserialized = (T) binarySerialization.deserialize(actual);
         assertEquals(expected, Hex.toHexString(binarySerialization.serialize(deserialized)));
         if (!AggregateTransaction.class.isInstance(transaction)) {
@@ -85,6 +88,9 @@ abstract class AbstractTransactionTester {
         account.sign(aggregateTransaction, generationHash);
 
         byte[] serializedAggregate = aggregateTransaction.serialize();
+
+        Assertions.assertEquals(serializedAggregate.length, aggregateTransaction.getSize());
+
         assertEquals(Hex.toHexString(serializedAggregate),
             Hex.toHexString(binarySerialization.deserialize(serializedAggregate).serialize()));
         return deserialized;

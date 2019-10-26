@@ -172,6 +172,15 @@ public abstract class Transaction {
     }
 
     /**
+     * It returns the transaction's byte array size useful to calculate its fee.
+     *
+     * @return the size of the transaction.
+     */
+    public int getSize() {
+        return BINARY_SERIALIZATION.getSize(this);
+    }
+
+    /**
      * Serialize and sign transaction creating a new SignedTransaction.
      *
      * @param account The account to sign the transaction.

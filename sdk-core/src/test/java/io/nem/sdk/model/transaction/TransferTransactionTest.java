@@ -40,6 +40,7 @@ import io.nem.sdk.model.namespace.NamespaceId;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
@@ -107,20 +108,23 @@ class TransferTransactionTest extends AbstractTransactionTester {
     void serialization() {
         // Generated at nem2-library-js/test/transactions/TransferTransaction.spec.js
         String expected =
-            "b8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001026d70e1954775749c6811084d6450a3184d977383f0e4282cd47118af37755019054410000000000000000010000000000000090e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac14000100536f6d65204d65737361676520e6bca2e5ad97672b0000ce5600006400000000000000";
+            "c8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001026d70e1954775749c6811084d6450a3184d977383f0e4282cd47118af37755019054410000000000000000010000000000000090e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac14000200536f6d65204d65737361676520e6bca2e5ad97671305c6390b00002c01000000000000672b0000ce5600006400000000000000";
+        Mosaic mosaicId1 = new Mosaic(
+            new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100));
+        Mosaic mosaicId2 = new Mosaic(
+            new MosaicId(new BigInteger("12342763262823")), BigInteger.valueOf(300));
         TransferTransaction transaction =
             TransferTransactionFactory.create(
                 networkType,
                 new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", networkType),
-                Collections.singletonList(
-                    new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
+                Arrays.asList(
+                    mosaicId1, mosaicId2),
                 new PlainMessage("Some Message 漢字")).signer(account.getPublicAccount())
                 .deadline(new FakeDeadline()).build();
 
         assertSerialization(expected, transaction);
 
-        String embeddedExpected = "680000001026d70e1954775749c6811084d6450a3184d977383f0e4282cd47118af377550190544190e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac14000100536f6d65204d65737361676520e6bca2e5ad97672b0000ce5600006400000000000000";
+        String embeddedExpected = "780000001026d70e1954775749c6811084d6450a3184d977383f0e4282cd47118af377550190544190e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac14000200536f6d65204d65737361676520e6bca2e5ad97671305c6390b00002c01000000000000672b0000ce5600006400000000000000";
 
         assertEmbeddedSerialization(embeddedExpected, transaction);
 

@@ -43,4 +43,14 @@ public interface BinarySerialization {
      */
     Transaction deserialize(byte[] payload);
 
+
+    /**
+     * It returns the transaction's byte array size useful to calculate its fee.
+     *
+     * @param <T> the type of the transaction
+     * @param transaction the transaction
+     * @return the size of the transaction.
+     */
+    <T extends Transaction> int getSize(T transaction);
+
 }

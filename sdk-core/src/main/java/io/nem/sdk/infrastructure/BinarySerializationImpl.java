@@ -292,6 +292,19 @@ public class BinarySerializationImpl implements BinarySerialization {
         return SerializationUtils.concat(commonBytes, transactionBytes);
     }
 
+
+    @Override
+    public <T extends Transaction> int getSize(T transaction) {
+        int byteSize = 4 // size
+            + 64 // signature
+            + 32 // signerPublicKey
+            + 2 // version
+            + 2 // type
+            + 8 // maxFee
+            + 8; // deadline
+        return byteSize + resolveSerializer(transaction.getType()).getSize(transaction);
+    }
+
     /**
      * Returns the transaction creator public account.
      *
@@ -438,7 +451,15 @@ public class BinarySerializationImpl implements BinarySerialization {
          */
         byte[] serializeInternal(T transaction);
 
-
+        /**
+         * Subclasses would need to know how to calculate the size of the transactions's specific
+         * values. The size of the common values like maxFee and deadline are calculated at the top
+         * level serialization.
+         *
+         * @param transaction the transaction to be serialized
+         * @return the size of the specific transaction values.
+         */
+        int getSize(T transaction);
     }
 
     private static class TransferTransactionSerializer implements
@@ -484,6 +505,23 @@ public class BinarySerializationImpl implements BinarySerialization {
                 getMessageBuffer(transaction),
                 getUnresolvedMosaicArray(transaction)).serialize();
 
+        }
+
+        @Override
+        public int getSize(TransferTransaction transaction) {
+
+            // recipient and number of mosaics are static byte size
+            int byteRecipientAddress = 25;
+            int byteNumMosaics = 2;
+            int byteMosaicsCount = 1;
+
+            // read message payload size
+            int bytePayload = getMessageBuffer(transaction).array().length;
+
+            int byteMosaics = transaction.getMosaics().size() * (8 + 8);
+
+            return byteRecipientAddress + byteNumMosaics + byteMosaicsCount + bytePayload
+                + byteMosaics;
         }
 
         /**
@@ -565,6 +603,15 @@ public class BinarySerializationImpl implements BinarySerialization {
                 new AmountDto(transaction.getDelta().longValue())).serialize();
 
         }
+
+        @Override
+        public int getSize(MosaicSupplyChangeTransaction transaction) {
+            // set static byte size fields
+            int byteMosaicId = 8;
+            int byteAction = 1;
+            int byteDelta = 8;
+            return byteMosaicId + byteAction + byteDelta;
+        }
     }
 
     private static class MosaicDefinitionTransactionSerializer implements
@@ -609,6 +656,17 @@ public class BinarySerializationImpl implements BinarySerialization {
                 (byte) transaction.getDivisibility(),
                 new BlockDurationDto(transaction.getBlockDuration().getDuration())).serialize();
 
+        }
+
+        @Override
+        public int getSize(MosaicDefinitionTransaction transaction) {
+            int byteNonce = 4;
+            int byteMosaicId = 8;
+            int byteFlags = 1;
+            int byteDivisibility = 1;
+            int byteDuration = 8;
+            return byteNonce + byteMosaicId + byteFlags + byteDivisibility
+                + byteDuration;
         }
 
         /**
@@ -666,6 +724,14 @@ public class BinarySerializationImpl implements BinarySerialization {
                 .serialize();
 
         }
+
+        @Override
+        public int getSize(AccountLinkTransaction transaction) {
+            // set static byte size fields
+            int bytePublicKey = 32;
+            int byteLinkAction = 1;
+            return bytePublicKey + byteLinkAction;
+        }
     }
 
     private static class AccountMetadataTransactionSerializer implements
@@ -704,6 +770,20 @@ public class BinarySerializationImpl implements BinarySerialization {
                 (short) transaction.getValueSizeDelta(),
                 ByteBuffer.wrap(MetadataTransaction.toByteArray(transaction.getValue()))
             ).serialize();
+
+        }
+
+        @Override
+        public int getSize(AccountMetadataTransaction transaction) {
+            // set static byte size fields
+            int targetPublicKey = 32;
+            int byteScopedMetadataKey = 8;
+            int byteValueSizeDelta = 2;
+            int valueSize = 2;
+            return targetPublicKey + byteScopedMetadataKey +
+                byteValueSizeDelta + valueSize + MetadataTransaction
+                .toByteArray(transaction.getValue()).length;
+
 
         }
     }
@@ -749,6 +829,19 @@ public class BinarySerializationImpl implements BinarySerialization {
             ).serialize();
 
         }
+
+        @Override
+        public int getSize(MosaicMetadataTransaction transaction) {
+            // set static byte size fields
+            int targetPublicKey = 32;
+            int byteScopedMetadataKey = 8;
+            int byteTargetMosaicId = 8;
+            int byteValueSizeDelta = 2;
+            int valueSize = 2;
+            return targetPublicKey + byteScopedMetadataKey + valueSize +
+                byteTargetMosaicId + byteValueSizeDelta + MetadataTransaction
+                .toByteArray(transaction.getValue()).length;
+        }
     }
 
 
@@ -793,6 +886,19 @@ public class BinarySerializationImpl implements BinarySerialization {
                 )).serialize();
 
         }
+
+        @Override
+        public int getSize(NamespaceMetadataTransaction transaction) {
+            // set static byte size fields
+            int targetPublicKey = 32;
+            int byteScopedMetadataKey = 8;
+            int byteTargetNamespaceId = 8;
+            int byteValueSizeDelta = 2;
+            int byteValueSize = 2;
+            return targetPublicKey + byteScopedMetadataKey + byteValueSize +
+                byteTargetNamespaceId + byteValueSizeDelta + MetadataTransaction
+                .toByteArray(transaction.getValue()).length;
+        }
     }
 
     private static class NamespaceRegistrationTransactionSerializer implements
@@ -831,7 +937,7 @@ public class BinarySerializationImpl implements BinarySerialization {
             Optional<NamespaceId> parentId =
                 namespaceRegistrationType == NamespaceRegistrationType.SUB_NAMESPACE ? Optional
                     .of(builder.getParentId())
-                    .map((NamespaceIdDto dto) -> SerializationUtils.toNamespaceId(dto))
+                    .map(SerializationUtils::toNamespaceId)
                     : Optional.empty();
 
             return NamespaceRegistrationTransactionFactory
@@ -867,6 +973,22 @@ public class BinarySerializationImpl implements BinarySerialization {
                         namespaceNameByteBuffer);
             }
             return txBuilder.serialize();
+        }
+
+        @Override
+        public int getSize(NamespaceRegistrationTransaction transaction) {
+            ByteBuffer namespaceNameByteBuffer = ByteBuffer
+                .wrap(StringEncoder.getBytes(transaction.getNamespaceName()));
+            // set static byte size fields
+            int byteType = 1;
+            int byteDurationParentId = 8;
+            int byteNamespaceId = 8;
+            int byteNameSize = 1;
+
+            // convert name to uint8
+            int byteName = namespaceNameByteBuffer.array().length;
+
+            return byteType + byteDurationParentId + byteNamespaceId + byteNameSize + byteName;
         }
     }
 
@@ -916,6 +1038,20 @@ public class BinarySerializationImpl implements BinarySerialization {
                         .fromUnresolvedAddressToByteBuffer(transaction.getRecipient(),
                             transaction.getNetworkType())))
                 .serialize();
+        }
+
+        @Override
+        public int getSize(SecretLockTransaction transaction) {
+            // set static byte size fields
+            int byteMosaicId = 8;
+            int byteAmount = 8;
+            int byteDuration = 8;
+            int byteAlgorithm = 1;
+            int byteRecipient = 25;
+            // convert secret to uint8
+            int byteSecret = getSecretBuffer(transaction).array().length;
+            return byteMosaicId + byteAmount + byteDuration + byteAlgorithm + byteRecipient
+                + byteSecret;
         }
 
         /**
@@ -971,6 +1107,20 @@ public class BinarySerializationImpl implements BinarySerialization {
                         .fromUnresolvedAddressToByteBuffer(transaction.getRecipient(),
                             transaction.getNetworkType())),
                 getProofBuffer(transaction)).serialize();
+        }
+
+        @Override
+        public int getSize(SecretProofTransaction transaction) {
+            // hash algorithm and proof size static byte size
+            int byteAlgorithm = 1;
+            int byteProofSize = 2;
+            int byteRecipient = 25;
+
+            // convert secret and proof to uint8
+            int byteSecret = 32;
+            int byteProof = getProofBuffer(transaction).array().length;
+
+            return byteAlgorithm + byteSecret + byteRecipient + byteProofSize + byteProof;
         }
 
         /**
@@ -1035,6 +1185,16 @@ public class BinarySerializationImpl implements BinarySerialization {
                     .fromUnresolvedAddressToByteBuffer(transaction.getAddress(),
                         transaction.getNetworkType()))).serialize();
         }
+
+        @Override
+        public int getSize(AddressAliasTransaction transaction) {
+            // set static byte size fields
+            int byteActionType = 1;
+            int byteNamespaceId = 8;
+            int byteAddress = 25;
+
+            return byteActionType + byteNamespaceId + byteAddress;
+        }
     }
 
     private static class MosaicAliasTransactionSerializer implements
@@ -1071,6 +1231,14 @@ public class BinarySerializationImpl implements BinarySerialization {
                 AliasActionDto.rawValueOf(transaction.getAliasAction().getValue()),
                 new NamespaceIdDto(transaction.getNamespaceId().getIdAsLong()),
                 new MosaicIdDto(transaction.getMosaicId().getIdAsLong())).serialize();
+        }
+
+        @Override
+        public int getSize(MosaicAliasTransaction transaction) {
+            int byteType = 1;
+            int byteNamespaceId = 8;
+            int byteMosaicId = 8;
+            return byteType + byteNamespaceId + byteMosaicId;
         }
     }
 
@@ -1112,6 +1280,16 @@ public class BinarySerializationImpl implements BinarySerialization {
                     new AmountDto(transaction.getMosaic().getAmount().longValue())),
                 new BlockDurationDto(transaction.getDuration().longValue()),
                 new Hash256Dto(getHashBuffer(transaction))).serialize();
+        }
+
+        @Override
+        public int getSize(HashLockTransaction transaction) {
+            // set static byte size fields
+            int byteMosaicId = 8;
+            int byteAmount = 8;
+            int byteDuration = 8;
+            int byteHash = 32;
+            return byteMosaicId + byteAmount + byteDuration + byteHash;
         }
 
 
@@ -1164,6 +1342,20 @@ public class BinarySerializationImpl implements BinarySerialization {
                 AccountRestrictionTypeDto
                     .rawValueOf((byte) transaction.getRestrictionType().getValue()),
                 getModificationBuilder(transaction)).serialize();
+        }
+
+        @Override
+        public int getSize(AccountAddressRestrictionTransaction transaction) {
+            // set static byte size fields
+            int byteRestrictionType = 1;
+            int byteModificationCount = 1;
+
+            // each modification contains :
+            // - 1 byte for modificationType
+            // - 25 bytes for the modification value (address)
+            int byteModifications = 26 * transaction.getModifications().size();
+
+            return byteRestrictionType + byteModificationCount + byteModifications;
         }
 
         /**
@@ -1239,6 +1431,20 @@ public class BinarySerializationImpl implements BinarySerialization {
                 getModificationBuilder(transaction)).serialize();
         }
 
+        @Override
+        public int getSize(AccountMosaicRestrictionTransaction transaction) {
+            // set static byte size fields
+            int byteRestrictionType = 1;
+            int byteModificationCount = 1;
+
+            // each modification contains :
+            // - 1 byte for modificationType
+            // - 8 bytes for the modification value (mosaicId)
+            int byteModifications = 9 * transaction.getModifications().size();
+
+            return byteRestrictionType + byteModificationCount + byteModifications;
+        }
+
         /**
          * Gets account restriction modification.
          *
@@ -1306,6 +1512,20 @@ public class BinarySerializationImpl implements BinarySerialization {
                 AccountRestrictionTypeDto
                     .rawValueOf((byte) transaction.getRestrictionType().getValue()),
                 getModificationBuilder(transaction)).serialize();
+        }
+
+        @Override
+        public int getSize(AccountOperationRestrictionTransaction transaction) {
+            // set static byte size fields
+            int byteRestrictionType = 1;
+            int byteModificationCount = 1;
+
+            // each modification contains :
+            // - 1 byte for modificationType
+            // - 2 bytes for the modification value (transaction type)
+            int byteModifications = 3 * transaction.getModifications().size();
+
+            return byteRestrictionType + byteModificationCount + byteModifications;
         }
 
         /**
@@ -1390,6 +1610,18 @@ public class BinarySerializationImpl implements BinarySerialization {
             ).serialize();
         }
 
+        @Override
+        public int getSize(MosaicAddressRestrictionTransaction transaction) {
+            // set static byte size fields
+            int byteMosaicId = 8;
+            int byteRestrictionKey = 8;
+            int byteTargetAddress = 25;
+            int bytePreviousRestrictionValue = 8;
+            int byteNewRestrictionValue = 8;
+            return byteMosaicId + byteRestrictionKey +
+                byteTargetAddress + bytePreviousRestrictionValue + byteNewRestrictionValue;
+        }
+
     }
 
     private static class MosaicGlobalRestrictionTransactionSerializer implements
@@ -1443,6 +1675,21 @@ public class BinarySerializationImpl implements BinarySerialization {
                 MosaicRestrictionTypeDto.rawValueOf(transaction.getNewRestrictionType().getValue()))
                 .serialize();
         }
+
+        @Override
+        public int getSize(MosaicGlobalRestrictionTransaction transaction) {
+            // set static byte size fields
+            int byteMosaicId = 8;
+            int byteReferenceMosaicId = 8;
+            int byteRestrictionKey = 8;
+            int bytePreviousRestrictionValue = 8;
+            int byteNewRestrictionValue = 8;
+            int bytePreviousRestrictionType = 1;
+            int byteNewRestrictionType = 1;
+            return byteMosaicId + byteRestrictionKey + byteReferenceMosaicId +
+                bytePreviousRestrictionValue + byteNewRestrictionValue + byteNewRestrictionType +
+                bytePreviousRestrictionType;
+        }
     }
 
 
@@ -1482,6 +1729,21 @@ public class BinarySerializationImpl implements BinarySerialization {
                 transaction.getMinRemovalDelta(),
                 transaction.getMinApprovalDelta(),
                 getModificationBuilder(transaction)).serialize();
+        }
+
+        @Override
+        public int getSize(MultisigAccountModificationTransaction transaction) {
+            // set static byte size fields
+            int byteRemovalDelta = 1;
+            int byteApprovalDelta = 1;
+            int byteNumModifications = 1;
+
+            // each modification contains :
+            // - 1 byte for modificationType
+            // - 32 bytes for cosignatoryPublicKey
+            int byteModifications = 33 * transaction.getModifications().size();
+
+            return byteRemovalDelta + byteApprovalDelta + byteNumModifications + byteModifications;
         }
 
         /**
@@ -1596,6 +1858,19 @@ public class BinarySerializationImpl implements BinarySerialization {
                             dataOutputStream.write(cosignaturesBytes);
                         });
                 });
+        }
+
+        @Override
+        public int getSize(AggregateTransaction transaction) {
+            // set static byte size fields
+            int byteTransactionsSize = 4;
+            // calculate each inner transaction's size
+
+            int byteTransactions = transaction.getInnerTransactions().stream()
+                .mapToInt(t -> transactionSerialization.getSize(t) - 80).sum();
+
+            int byteCosignatures = transaction.getCosignatures().size() * 96;
+            return byteTransactionsSize + byteTransactions + byteCosignatures;
         }
 
         private byte[] getTransactionBytes(AggregateTransaction transaction) {
