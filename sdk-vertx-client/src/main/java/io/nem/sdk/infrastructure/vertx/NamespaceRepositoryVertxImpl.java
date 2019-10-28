@@ -234,9 +234,9 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
         Address address = null;
         if (namespaceDTO.getAlias() != null && AliasType.ADDRESS.getValue()
             .equals(namespaceDTO.getAlias().getType().getValue())) {
-            String rawAddress = namespaceDTO.getAlias().getAddress();
-            if (rawAddress != null) {
-                address = MapperUtils.toAddressFromRawAddress(rawAddress);
+            String encodedAddress = namespaceDTO.getAlias().getAddress();
+            if (encodedAddress != null) {
+                address = MapperUtils.toAddressFromEncoded(encodedAddress);
             }
         }
         return address;

@@ -39,6 +39,7 @@ import io.nem.sdk.model.transaction.MultisigAccountModificationTransactionFactor
 import io.nem.sdk.model.transaction.MultisigCosignatoryModification;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
+import io.nem.sdk.model.transaction.TransactionStatusError;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
@@ -52,11 +53,14 @@ import io.vertx.core.http.WebSocket;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -282,6 +286,54 @@ public class ListenerVertxTest {
     }
 
     @Test
+    public void shouldHandleStatus()
+        throws InterruptedException, ExecutionException, TimeoutException {
+        Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+
+        AtomicReference<TransactionStatusError> reference = new AtomicReference<>();
+
+        simulateWebSocketStartup();
+
+        Assertions.assertNotNull(listener.status(account1.getAddress()).subscribe(reference::set));
+
+        Map<String, Object> message = new HashMap<>();
+        message.put("hash", "1234hash");
+        message.put("address", account1.getAddress().encoded());
+        message.put("status", "some error");
+        message.put("deadline", 5555);
+        listener.handle(message, null);
+
+        Assertions.assertNotNull(reference.get());
+
+        Assertions.assertEquals(message.get("hash"), reference.get().getHash());
+        Assertions.assertEquals(message.get("status"), reference.get().getStatus());
+        Assertions.assertEquals(account1.getAddress(), reference.get().getAddress());
+
+    }
+
+    @Test
+    public void shouldFilterOutHandleStatus()
+        throws InterruptedException, ExecutionException, TimeoutException {
+        Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+        Account account2 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+
+        AtomicReference<TransactionStatusError> reference = new AtomicReference<>();
+
+        simulateWebSocketStartup();
+
+        Assertions.assertNotNull(listener.status(account2.getAddress()).subscribe(reference::set));
+
+        Map<String, Object> message = new HashMap<>();
+        message.put("hash", "1234hash");
+        message.put("address", account1.getAddress().encoded());
+        message.put("status", "some error");
+        message.put("deadline", 5555);
+        listener.handle(message, null);
+
+        Assertions.assertNull(reference.get());
+    }
+
+    @Test
     public void shouldCheckTransactionFromAddressHashLockTransaction() {
         Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
         Account account2 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
@@ -317,8 +369,9 @@ public class ListenerVertxTest {
         List<MultisigCosignatoryModification> modifications = new ArrayList<>();
         modifications
             .add(new MultisigCosignatoryModification(modificationAction, cosignatoryPublicAccount));
-        MultisigAccountModificationTransactionFactory factory = MultisigAccountModificationTransactionFactory.create(
-            NetworkType.MIJIN_TEST, (byte) 0, (byte) 0, modifications);
+        MultisigAccountModificationTransactionFactory factory = MultisigAccountModificationTransactionFactory
+            .create(
+                NetworkType.MIJIN_TEST, (byte) 0, (byte) 0, modifications);
         if (signer != null) {
             factory.signer(signer);
         }

@@ -16,6 +16,7 @@
 
 package io.nem.sdk.infrastructure;
 
+import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.BlockInfo;
 import io.nem.sdk.model.transaction.AggregateTransaction;
@@ -72,6 +73,8 @@ public abstract class ListenerBase implements Listener {
             onNext(ListenerChannel.BLOCK, messageObject);
         } else if (jsonHelper.contains(message, "status")) {
             TransactionStatusError messageObject = new TransactionStatusError(
+                MapperUtils
+                    .toAddressFromEncoded(jsonHelper.getString(message, "address")),
                 jsonHelper.getString(message, "hash"),
                 jsonHelper.getString(message, "status"),
                 new Deadline(
@@ -208,7 +211,8 @@ public abstract class ListenerBase implements Listener {
         this.subscribeTo(ListenerChannel.STATUS + "/" + address.plain());
         return getMessageSubject()
             .filter(rawMessage -> rawMessage.getChannel().equals(ListenerChannel.STATUS))
-            .map(rawMessage -> (TransactionStatusError) rawMessage.getMessage());
+            .map(rawMessage -> (TransactionStatusError) rawMessage.getMessage())
+            .filter(status -> address.equals(status.getAddress()));
     }
 
     /**
@@ -267,7 +271,13 @@ public abstract class ListenerBase implements Listener {
     }
 
 
-    protected void onNext(ListenerChannel channel, Object messageObject) {
+    /**
+     * I fires the new message object to the subject listenrs.
+     *
+     * @param channel the channel
+     * @param messageObject the message object.
+     */
+    private void onNext(ListenerChannel channel, Object messageObject) {
         this.getMessageSubject().onNext(new ListenerMessage(channel, messageObject));
     }
 

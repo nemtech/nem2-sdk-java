@@ -122,7 +122,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
         AliasDTO alias = new AliasDTO();
         alias.setType(AliasTypeEnum.NUMBER_2);
-        alias.setAddress(address.plain());
+        alias.setAddress(address.encoded());
         namespace.setAlias(alias);
 
         dto.setNamespace(namespace);
@@ -169,7 +169,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
         AliasDTO alias = new AliasDTO();
         alias.setType(AliasTypeEnum.NUMBER_2);
-        alias.setAddress(address.plain());
+        alias.setAddress(address.encoded());
         namespace.setAlias(alias);
 
         dto.setNamespace(namespace);
@@ -248,7 +248,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
         AliasDTO alias = new AliasDTO();
         alias.setType(AliasTypeEnum.NUMBER_2);
-        alias.setAddress(address.plain());
+        alias.setAddress(address.encoded());
         namespace.setAlias(alias);
 
         dto.setNamespace(namespace);
