@@ -17,7 +17,9 @@
 package io.nem.sdk.model.blockchain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 public class NetworkTypeTest {
@@ -44,5 +46,33 @@ public class NetworkTypeTest {
     void MIJIN_TESTIs0x90() {
         assertEquals(0x90, NetworkType.MIJIN_TEST.getValue());
         assertEquals(144, NetworkType.MIJIN_TEST.getValue());
+    }
+
+    @Test
+    void rawValueOfNetworkName() {
+        assertEquals(NetworkType.MAIN_NET, NetworkType.rawValueOf("public"));
+        assertEquals(NetworkType.MIJIN_TEST, NetworkType.rawValueOf("mijinTest"));
+        assertEquals(NetworkType.TEST_NET, NetworkType.rawValueOf("publicTest"));
+        assertEquals(NetworkType.MIJIN, NetworkType.rawValueOf("mijin"));
+    }
+
+    @Test
+    void rawValueOfValue() {
+        Arrays.stream(NetworkType.values()).forEach(networkType -> assertEquals(networkType,
+            NetworkType.rawValueOf(networkType.getValue())));
+    }
+
+    @Test
+    void rawValueOfInvalidName() {
+        assertEquals("NotANetworkName is not a valid network name",
+            assertThrows(IllegalArgumentException.class,
+                () -> NetworkType.rawValueOf("NotANetworkName")).getMessage());
+    }
+
+    @Test
+    void rawValueOfInvalidValue() {
+        assertEquals("10 is not a valid value",
+            assertThrows(IllegalArgumentException.class,
+                () -> NetworkType.rawValueOf(10)).getMessage());
     }
 }

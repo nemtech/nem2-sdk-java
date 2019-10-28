@@ -33,6 +33,7 @@ import io.nem.sdk.openapi.vertx.model.NamespaceMetaDTO;
 import io.nem.sdk.openapi.vertx.model.NamespaceNameDTO;
 import io.nem.sdk.openapi.vertx.model.NamespaceRegistrationTypeEnum;
 import io.nem.sdk.openapi.vertx.model.NetworkTypeDTO;
+import io.nem.sdk.openapi.vertx.model.NetworkTypeNameEnum;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
@@ -91,7 +92,8 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
         Assertions.assertNotNull(info);
 
-        Assertions.assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
+        Assertions
+            .assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
 
         Assertions.assertEquals(meta.getId(), info.getMetaId());
         Assertions.assertEquals(meta.getIndex(), info.getIndex());
@@ -106,7 +108,8 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
         resolveNetworkType();
 
-        Address address = MapperUtils.toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = MapperUtils
+            .toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
         NamespaceMetaDTO meta = new NamespaceMetaDTO();
@@ -136,7 +139,8 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
         Assertions.assertNotNull(info);
 
-        Assertions.assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
+        Assertions
+            .assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
 
         Assertions.assertEquals(meta.getId(), info.getMetaId());
         Assertions.assertEquals(meta.getIndex(), info.getIndex());
@@ -184,7 +188,8 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
         Assertions.assertNotNull(info);
 
-        Assertions.assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
+        Assertions
+            .assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
 
         Assertions.assertEquals(meta.getId(), info.getMetaId());
         Assertions.assertEquals(meta.getIndex(), info.getIndex());
@@ -303,7 +308,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
     protected void resolveNetworkType() throws ApiException {
         NetworkTypeDTO networkTypeDTO = new NetworkTypeDTO();
-        networkTypeDTO.setName("mijinTest");
+        networkTypeDTO.setName(NetworkTypeNameEnum.MIJINTEST);
         mockRemoteCall(networkTypeDTO);
         NetworkType networkType = repository.getNetworkTypeBlocking();
         Assertions.assertEquals(NetworkType.MIJIN_TEST, networkType);
