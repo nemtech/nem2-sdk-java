@@ -31,33 +31,33 @@ public class AccountRestrictionModification<T> {
     }
 
     /**
-     * @param modificationType the modification type.
+     * @param modificationAction the modification type.
      * @param address the affected unresolved address.
      * @return AccountRestrictionModification of {@link Address}
      */
     public static AccountRestrictionModification<UnresolvedAddress> createForAddress(
-        AccountRestrictionModificationAction modificationType, UnresolvedAddress address) {
-        return new AccountRestrictionModification<>(modificationType, address);
+        AccountRestrictionModificationAction modificationAction, UnresolvedAddress address) {
+        return new AccountRestrictionModification<>(modificationAction, address);
     }
 
     /**
-     * @param modificationType the modification type.
+     * @param modificationAction the modification type.
      * @param mosaicId the affected unresolved mosaic id.
      * @return AccountRestrictionModification {@link UnresolvedMosaicId}
      */
     public static AccountRestrictionModification<UnresolvedMosaicId> createForMosaic(
-        AccountRestrictionModificationAction modificationType, UnresolvedMosaicId mosaicId) {
-        return new AccountRestrictionModification<>(modificationType, mosaicId);
+        AccountRestrictionModificationAction modificationAction, UnresolvedMosaicId mosaicId) {
+        return new AccountRestrictionModification<>(modificationAction, mosaicId);
     }
 
     /**
-     * @param modificationType the modification type.
+     * @param modificationAction the modification type.
      * @param transactionType the affected transaction type.
      * @return AccountRestrictionModification of {@link TransactionType}
      */
     public static AccountRestrictionModification<TransactionType> createForTransactionType(
-        AccountRestrictionModificationAction modificationType, TransactionType transactionType) {
-        return new AccountRestrictionModification<>(modificationType, transactionType);
+        AccountRestrictionModificationAction modificationAction, TransactionType transactionType) {
+        return new AccountRestrictionModification<>(modificationAction, transactionType);
     }
 
     /**
@@ -72,7 +72,7 @@ public class AccountRestrictionModification<T> {
     /**
      * Get modification type
      *
-     * @return AccountRestrictionModificationType
+     * @return AccountRestrictionModificationAction
      */
     public AccountRestrictionModificationAction getModificationAction() {
         return this.modificationAction;

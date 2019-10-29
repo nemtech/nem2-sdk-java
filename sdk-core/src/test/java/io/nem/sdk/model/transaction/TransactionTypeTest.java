@@ -55,7 +55,7 @@ class TransactionTypeTest {
     }
 
     @Test
-    void multisigModificationType() {
+    void multisigModificationAction() {
         TransactionType transactionType = TransactionType.MODIFY_MULTISIG_ACCOUNT;
         assertEquals(0x4155, transactionType.getValue());
         assertEquals(16725, transactionType.getValue());

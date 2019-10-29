@@ -215,7 +215,7 @@ public class EnumMapperTest {
     }
 
     @Test
-    void testAccountRestrictionModificationTypeModel() {
+    void testAccountRestrictionModificationActionModel() {
         Set<Integer> existingValues = new HashSet<>();
         Arrays.stream(AccountRestrictionModificationActionEnum.values()).forEach(v -> {
             Assertions

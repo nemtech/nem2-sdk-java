@@ -305,6 +305,14 @@ public class BinarySerializationImpl implements BinarySerialization {
         return byteSize + resolveSerializer(transaction.getType()).getSize(transaction);
     }
 
+    private <T extends Transaction> int getEmbeddedSize(T transaction) {
+        int byteSize = 4 // size
+            + 32 // signerPublicKey
+            + 2 // version
+            + 2; // type
+        return byteSize + resolveSerializer(transaction.getType()).getSize(transaction);
+    }
+
     /**
      * Returns the transaction creator public account.
      *
@@ -1351,7 +1359,7 @@ public class BinarySerializationImpl implements BinarySerialization {
             int byteModificationCount = 1;
 
             // each modification contains :
-            // - 1 byte for modificationType
+            // - 1 byte for modificationAction
             // - 25 bytes for the modification value (address)
             int byteModifications = 26 * transaction.getModifications().size();
 
@@ -1386,10 +1394,10 @@ public class BinarySerializationImpl implements BinarySerialization {
 
         private AccountRestrictionModification<UnresolvedAddress> toAccountRestrictionModificationAddress(
             AccountAddressRestrictionModificationBuilder builder) {
-            AccountRestrictionModificationAction modificationType = AccountRestrictionModificationAction
+            AccountRestrictionModificationAction modificationAction = AccountRestrictionModificationAction
                 .rawValueOf(builder.getModificationAction().getValue());
             UnresolvedAddress address = SerializationUtils.toAddress(builder.getValue());
-            return AccountRestrictionModification.createForAddress(modificationType, address);
+            return AccountRestrictionModification.createForAddress(modificationAction, address);
         }
     }
 
@@ -1438,7 +1446,7 @@ public class BinarySerializationImpl implements BinarySerialization {
             int byteModificationCount = 1;
 
             // each modification contains :
-            // - 1 byte for modificationType
+            // - 1 byte for modificationAction
             // - 8 bytes for the modification value (mosaicId)
             int byteModifications = 9 * transaction.getModifications().size();
 
@@ -1469,10 +1477,10 @@ public class BinarySerializationImpl implements BinarySerialization {
 
         private AccountRestrictionModification<UnresolvedMosaicId> toAccountRestrictionModificationMosaic(
             AccountMosaicRestrictionModificationBuilder builder) {
-            AccountRestrictionModificationAction modificationType = AccountRestrictionModificationAction
+            AccountRestrictionModificationAction modificationAction = AccountRestrictionModificationAction
                 .rawValueOf(builder.getModificationAction().getValue());
             UnresolvedMosaicId mosaicId = SerializationUtils.toMosaicId(builder.getValue());
-            return AccountRestrictionModification.createForMosaic(modificationType, mosaicId);
+            return AccountRestrictionModification.createForMosaic(modificationAction, mosaicId);
         }
     }
 
@@ -1521,7 +1529,7 @@ public class BinarySerializationImpl implements BinarySerialization {
             int byteModificationCount = 1;
 
             // each modification contains :
-            // - 1 byte for modificationType
+            // - 1 byte for modificationAction
             // - 2 bytes for the modification value (transaction type)
             int byteModifications = 3 * transaction.getModifications().size();
 
@@ -1553,12 +1561,12 @@ public class BinarySerializationImpl implements BinarySerialization {
 
         private AccountRestrictionModification<TransactionType> toAccountRestrictionModificationOperation(
             AccountOperationRestrictionModificationBuilder builder) {
-            AccountRestrictionModificationAction modificationType = AccountRestrictionModificationAction
+            AccountRestrictionModificationAction modificationAction = AccountRestrictionModificationAction
                 .rawValueOf(builder.getModificationAction().getValue());
             TransactionType transactionType = TransactionType
                 .rawValueOf(SerializationUtils.shortToUnsignedInt(builder.getValue().getValue()));
             return AccountRestrictionModification
-                .createForTransactionType(modificationType, transactionType);
+                .createForTransactionType(modificationAction, transactionType);
         }
     }
 
@@ -1739,7 +1747,7 @@ public class BinarySerializationImpl implements BinarySerialization {
             int byteNumModifications = 1;
 
             // each modification contains :
-            // - 1 byte for modificationType
+            // - 1 byte for modificationAction
             // - 32 bytes for cosignatoryPublicKey
             int byteModifications = 33 * transaction.getModifications().size();
 
@@ -1867,7 +1875,7 @@ public class BinarySerializationImpl implements BinarySerialization {
             // calculate each inner transaction's size
 
             int byteTransactions = transaction.getInnerTransactions().stream()
-                .mapToInt(t -> transactionSerialization.getSize(t) - 80).sum();
+                .mapToInt(t -> transactionSerialization.getEmbeddedSize(t)).sum();
 
             int byteCosignatures = transaction.getCosignatures().size() * 96;
             return byteTransactionsSize + byteTransactions + byteCosignatures;
