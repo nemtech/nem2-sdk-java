@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.14.1] - 24-Oct-2019
+
+**Milestone**: Fuschicho
+
+- Improved Transaction serialization. Signature and signer are serialized when present.
+- Upgraded Gradle to latest 5.6.3. Gradle build has been simplified.
+- Removed JUnit 4 support. All the tests are now JUnit 5.
+- Fixed hardcoded network type in unresolved address serialization.
+- Improved release process.
+- Other small fixes.
+
 ## [0.14.0] - 16-Oct-2019
 
 **Milestone**: Fuschicho
@@ -22,3 +33,5 @@ The changelog format is based on [Keep a Changelog](https://keepachangelog.com/e
 - Vertx and OkHttp rest client support.
 - Improved Listeners.
 - Other small fixes.
+
+
