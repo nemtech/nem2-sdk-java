@@ -28,13 +28,17 @@ plugins {
     id 'com.github.kt3k.coveralls' version '2.8.4'
     id 'ch.netzwerg.release' version '1.2.5'
     id 'org.ajoberstar.git-publish' version '0.3.3'
+    id "de.marcphilipp.nexus-publish" version "0.4.0"
+    id 'io.codearte.nexus-staging' version '0.21.1'
     id 'jacoco'
+    id 'signing'
+    id 'java-library'
 }
 
 apply plugin: 'nebula-aggregate-javadocs'
 
-
 def artifactVersion = rootProject.file('version.txt').text.trim()
+def isReleaseVersion = !artifactVersion.contains("SNAPSHOT")
 
 ext {
     vertxVersion = "3.5.0"
@@ -51,9 +55,9 @@ repositories {
     mavenCentral()
 }
 
-def getPropertyValue(key) {
+def getPropertyValue(key, defaultValue = null) {
     def value = project.hasProperty(key) ? project[key] : System.getenv(key)
-    return value?.trim() == '' ? null : value
+    return value?.trim() == '' ? defaultValue : value
 }
 
 def ossrhUsername = getPropertyValue('ossrhUsername');
@@ -70,7 +74,7 @@ def signingKeyId = getPropertyValue('signingKeyId')
 def signingPassword = getPropertyValue('signingPassword')
 
 def githubToken = getPropertyValue('GRGIT_USER')
-def repoPath = getPropertyValue('TRAVIS_REPO_SLUG')
+def repoPath = getPropertyValue('TRAVIS_REPO_SLUG', "nemtech/nem2-sdk-java")
 def excludedCoverage = ['**catapult**']
 
 allprojects {
@@ -79,17 +83,39 @@ allprojects {
     ext."signing.password" = signingPassword
 }
 
-subprojects {
 
+
+
+subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
     apply plugin: 'jacoco'
+    apply plugin: 'signing'
     apply plugin: 'org.sonarqube'
-    apply plugin: 'project-report'
+    apply plugin: "de.marcphilipp.nexus-publish"
+
+
     group 'io.nem'
     sourceCompatibility = 1.8
     version = artifactVersion
 
+    signing {
+        required { signingKeyId }
+        sign publishing.publications
+    }
+
+    task checkForSnapshotDependencies {
+        onlyIf { isReleaseVersion }
+        doLast {
+            allprojects { project ->
+                project.configurations.runtime.each {
+                    if (it.toString().contains("-SNAPSHOT"))
+                        throw new Exception("Release build contains snapshot dependencies: " + it)
+                }
+            }
+        }
+    }
+    jar.dependsOn checkForSnapshotDependencies
 
     repositories {
         mavenLocal()
@@ -142,71 +168,64 @@ subprojects {
 
         testImplementation(platform("org.junit:junit-bom:$junitVersion"))
         testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")
-
     }
-    if (signingKeyId != null) {
-        apply plugin: 'signing'
-        signing {
-            sign configurations.archives
-        }
-    }
-    uploadArchives {
 
-        repositories {
-            mavenDeployer {
-                if (signingKeyId != null) {
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-                }
 
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
+    if (project.name != "integration-tests") {
+        publishing {
+            publications {
+                mavenJava(MavenPublication) {
+                    from components.java
+                    artifact sourcesJar
+                    artifact javadocJar
+                    pom {
+                        packaging = 'jar'
+                        url = "https://github.com/${repoPath}"
+                        name = "${project.name}"
+                        description = "${project.name} lib for NEM2 sdk Java"
 
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    packaging 'jar'
-                    url 'https://github.com/nemtech/nem2-sdk-java'
-                    name "${project.name}"
-                    description "${project.name} lib for NEM2 sdk Java"
-
-                    scm {
-                        connection 'scm:git:https://github.com/nemtech/nem2-sdk-java.git'
-                        developerConnection 'scm:svn:https://github.com/nemtech/nem2-sdk-java'
-                        url 'https://github.com/nemtech/nem2-sdk-java'
-                    }
-
-                    licenses {
-                        license {
-                            name 'The Apache License, Version 2.0'
-                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        scm {
+                            connection = "scm:git:https://github.com/${repoPath}.git"
+                            developerConnection = "scm:svn:https://github.com/${repoPath}"
+                            url = "https://github.com/${repoPath}"
                         }
-                    }
-                    developers {
-                        developer {
-                            id 'fullcircle23'
-                            name 'Ravi Shanker'
+
+                        licenses {
+                            license {
+                                name = 'The Apache License, Version 2.0'
+                                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            }
                         }
-                        developer {
-                            id 'rg911'
-                            name 'Steven Liu'
-                        }
-                        developer {
-                            id 'fboucquez'
-                            name 'Fernando Boucquez'
+                        developers {
+                            developer {
+                                id = 'fullcircle23'
+                                name = 'Ravi Shanker'
+                            }
+                            developer {
+                                id = 'rg911'
+                                name = 'Steven Liu'
+                            }
+                            developer {
+                                id = 'fboucquez'
+                                name = 'Fernando Boucquez'
+                            }
                         }
                     }
                 }
             }
         }
     }
+
+    nexusPublishing {
+        repositories {
+            sonatype {
+                username = ossrhUsername
+                password = ossrhPassword
+            }
+        }
+    }
 }
 
-project("integration-tests") {
-    uploadArchives.enabled = false
-}
 
 def publishedProjects = subprojects
 
@@ -251,23 +270,6 @@ tasks.coveralls {
     dependsOn jacocoRootReport
 }
 
-tasks.coveralls {
-    group = 'Coverage reports'
-    description = 'Uploads the aggregated coverage report to Coveralls'
-    dependsOn jacocoMerge
-}
-
-task clean {
-    subprojects.each {
-        it.afterEvaluate {
-            def cleanTask = it.tasks.findByName('clean')
-            if (cleanTask) {
-                dependsOn(cleanTask)
-            }
-        }
-    }
-}
-
 
 gitPublish {
     if (githubToken) {
@@ -298,8 +300,16 @@ def gitBranch() {
 }
 
 release {
-
+    push = false
 }
+
+nexusStaging {
+    packageGroup = "io.nem"
+    stagingProfileId = "365f7aa90b3b13"
+    username = ossrhUsername
+    password = ossrhPassword
+}
+
 
 release.dependsOn subprojects.install
 

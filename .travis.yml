@@ -11,27 +11,26 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-#install:
-#  - ./gradlew -b ./openapi-generator/build.gradle clean generate
-#  - ./gradlew -b ./openapi-generator/build.gradle install
-script:
-  - ./gradlew install jacocoTestReport coveralls -x javadoc
+    - gradle/wrapper/
+install:
+  - true  #If install is not set, travis will run gradle assemble
+script: /bin/sh travis/build.sh
 deploy:
   - provider: script
     skip_cleanup: true
-    script: /bin/sh uploadArchives.sh
+    script: /bin/sh travis/uploadArchives.sh
     on:
       branch: master
       jdk: oraclejdk8
   - provider: script
     skip_cleanup: true
-    script: /bin/sh release.sh
+    script: /bin/sh travis/release.sh
     on:
-      branch: release
+      branch: $RELEASE_BRANCH
       jdk: oraclejdk8
   - provider: script
     skip_cleanup: true
-    script: /bin/sh sonarqube.sh
+    script: /bin/sh travis/sonarqube.sh
     on:
       branch: master
       jdk: oraclejdk9
@@ -41,5 +40,5 @@ before_install:
       echo "No signing the artifacts"
     else
       echo "Signing artifacts"
-      openssl aes-256-cbc -K $encrypted_98cf1ffdea51_key -iv $encrypted_98cf1ffdea51_iv -in nem2-sdk-java.gpg.enc -out nem2-sdk-java.gpg -d
+      openssl aes-256-cbc -K $encrypted_98cf1ffdea51_key -iv $encrypted_98cf1ffdea51_iv -in travis/nem2-sdk-java.gpg.enc -out nem2-sdk-java.gpg -d
     fi
