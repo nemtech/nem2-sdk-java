@@ -44,7 +44,7 @@ ext {
     vertxVersion = "3.5.0"
     rxjavaVersion = "2.1.7"
     junitVersion = "5.4.0"
-    restApiVersion = "0.7.19"
+    restApiVersion = "0.7.20-SNAPSHOT"
     jackson_version = "2.9.9"
     junit4Version = '4.12'
     jackson_databind_version = "2.9.9"
@@ -120,6 +120,9 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots'
+        }
     }
 
     javadoc {

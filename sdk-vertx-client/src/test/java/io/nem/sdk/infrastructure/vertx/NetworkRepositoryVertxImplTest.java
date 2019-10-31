@@ -17,7 +17,8 @@
 package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.openapi.vertx.model.NodeInfoDTO;
+import io.nem.sdk.openapi.vertx.model.NetworkTypeDTO;
+import io.nem.sdk.openapi.vertx.model.NetworkTypeNameEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,10 +41,10 @@ public class NetworkRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     @Test
     public void shouldGetNetworkType() throws Exception {
 
-        NodeInfoDTO dto = new NodeInfoDTO();
-        dto.setNetworkIdentifier(NetworkType.MIJIN_TEST.getValue());
+        NetworkTypeDTO networkTypeDTO = new NetworkTypeDTO();
+        networkTypeDTO.setName(NetworkTypeNameEnum.MIJINTEST);
 
-        mockRemoteCall(dto);
+        mockRemoteCall(networkTypeDTO);
 
         NetworkType info = repository.getNetworkType().toFuture().get();
 
