@@ -18,6 +18,7 @@ package io.nem.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.sdk.model.account.Address;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 
@@ -25,23 +26,37 @@ class TransactionStatusErrorTest {
 
     @Test
     void getHash() {
+        Address address = Address.createFromRawAddress("SCJFR55L7KWHERD2VW6C3NR2MBZLVDQWDHCHH6ZP");
         final TransactionStatusError transactionStatusError =
-            new TransactionStatusError("hash", "error", new Deadline(BigInteger.valueOf(1)));
+            new TransactionStatusError(address, "hash", "error",
+                new Deadline(BigInteger.valueOf(1)));
         assertEquals("hash", transactionStatusError.getHash());
     }
 
     @Test
     void getStatus() {
+        Address address = Address.createFromRawAddress("SCJFR55L7KWHERD2VW6C3NR2MBZLVDQWDHCHH6ZP");
         final TransactionStatusError transactionStatusError =
-            new TransactionStatusError("hash", "error", new Deadline(BigInteger.valueOf(1)));
+            new TransactionStatusError(address, "hash", "error",
+                new Deadline(BigInteger.valueOf(1)));
         assertEquals("error", transactionStatusError.getStatus());
     }
 
     @Test
     void getDeadline() {
+        Address address = Address.createFromRawAddress("SCJFR55L7KWHERD2VW6C3NR2MBZLVDQWDHCHH6ZP");
         Deadline deadline = new Deadline(BigInteger.valueOf(1));
         final TransactionStatusError transactionStatusError =
-            new TransactionStatusError("hash", "error", deadline);
+            new TransactionStatusError(address, "hash", "error", deadline);
         assertEquals(deadline, transactionStatusError.getDeadline());
+    }
+
+    @Test
+    void getAddress() {
+        Address address = Address.createFromRawAddress("SCJFR55L7KWHERD2VW6C3NR2MBZLVDQWDHCHH6ZP");
+        Deadline deadline = new Deadline(BigInteger.valueOf(1));
+        final TransactionStatusError transactionStatusError =
+            new TransactionStatusError(address, "hash", "error", deadline);
+        assertEquals(address, transactionStatusError.getAddress());
     }
 }

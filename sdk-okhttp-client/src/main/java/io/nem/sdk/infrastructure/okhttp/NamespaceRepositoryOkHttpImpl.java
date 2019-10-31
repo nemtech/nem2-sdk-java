@@ -269,7 +269,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
     private Address toAddress(NamespaceDTO namespaceDTO) {
         if (namespaceDTO.getAlias() != null && AliasType.ADDRESS.getValue()
             .equals(namespaceDTO.getAlias().getType().getValue())) {
-            return MapperUtils.toAddressFromRawAddress(namespaceDTO.getAlias().getAddress());
+            return MapperUtils.toAddressFromEncoded(namespaceDTO.getAlias().getAddress());
         } else {
             return null;
         }

@@ -256,7 +256,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
         RepositoryCallException exception = Assertions
             .assertThrows(RepositoryCallException.class, () -> get(this.getAccountRepository(type)
                 .getAccountInfo(
-                    Address.createFromRawAddress("SAAAAACB67D4HPGIMIHPNSRYRJRT7DOBGWZY"))));
+                    Address.createFromRawAddress("SCJFR55L7KWHERD2VW6C3NR2MBZLVDQWDHCH1111"))));
         Assertions.assertEquals(
             "ApiException: Conflict - 409 - InvalidArgument - accountId has an invalid format",
             exception.getMessage());

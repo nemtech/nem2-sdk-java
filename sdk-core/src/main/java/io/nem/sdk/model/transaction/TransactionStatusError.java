@@ -16,19 +16,31 @@
 
 package io.nem.sdk.model.transaction;
 
+import io.nem.sdk.model.account.Address;
+
 /**
  * The transaction status error model returned by listeners.
  */
 public class TransactionStatusError {
 
+    private final Address address;
     private final String hash;
     private final String status;
     private final Deadline deadline;
 
-    public TransactionStatusError(String hash, String status, Deadline deadline) {
+    public TransactionStatusError(Address address, String hash, String status, Deadline deadline) {
+        this.address = address;
         this.hash = hash;
         this.status = status;
         this.deadline = deadline;
+    }
+
+
+    /**
+     * @return the address that fires the transaction status error.
+     */
+    public Address getAddress() {
+        return address;
     }
 
     /**

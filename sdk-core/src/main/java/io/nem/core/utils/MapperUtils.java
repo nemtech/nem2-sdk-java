@@ -118,13 +118,13 @@ public class MapperUtils {
     }
 
     /**
-     * Creates a {@link Address} from an unresolved address.
+     * Creates a {@link Address} from an encoded address.
      *
-     * @param unresolvedAddress the unresolvedAddress
+     * @param encodedAddress the encodedAddress
      * @return a {@link Address} from the unresolved  address or null if the parameter is null
      */
-    public static Address toAddressFromEncoded(String unresolvedAddress) {
-        return unresolvedAddress != null ? Address.createFromEncoded(unresolvedAddress) : null;
+    public static Address toAddressFromEncoded(String encodedAddress) {
+        return encodedAddress != null ? Address.createFromEncoded(encodedAddress) : null;
     }
 
     /**

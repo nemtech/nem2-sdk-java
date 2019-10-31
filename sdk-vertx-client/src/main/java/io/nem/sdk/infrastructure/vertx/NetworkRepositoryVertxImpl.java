@@ -18,10 +18,10 @@ package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.sdk.api.NetworkRepository;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.openapi.vertx.api.NodeRoutesApi;
-import io.nem.sdk.openapi.vertx.api.NodeRoutesApiImpl;
+import io.nem.sdk.openapi.vertx.api.NetworkRoutesApi;
+import io.nem.sdk.openapi.vertx.api.NetworkRoutesApiImpl;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
-import io.nem.sdk.openapi.vertx.model.NodeInfoDTO;
+import io.nem.sdk.openapi.vertx.model.NetworkTypeDTO;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -37,14 +37,14 @@ public class NetworkRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
 
     // Cannot use network route yet.
     // https://github.com/nemtech/nem2-openapi/issues/43
-    private final NodeRoutesApi client;
+    private final NetworkRoutesApi client;
 
     public NetworkRepositoryVertxImpl(ApiClient apiClient) {
         super(apiClient, () -> {
             throw new IllegalStateException(
                 "This service is in charge of loading the network type");
         });
-        client = new NodeRoutesApiImpl(apiClient);
+        client = new NetworkRoutesApiImpl(apiClient);
     }
 
     /**
@@ -53,14 +53,14 @@ public class NetworkRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
      * @return Observable of NodeTime
      */
     public Observable<NetworkType> getNetworkType() {
-        Consumer<Handler<AsyncResult<NodeInfoDTO>>> callback = handler -> getClient()
-            .getNodeInfo(handler);
+        Consumer<Handler<AsyncResult<NetworkTypeDTO>>> callback = handler -> getClient()
+            .getNetworkType(handler);
         return exceptionHandling(
-            call(callback).map(info -> NetworkType.rawValueOf(info.getNetworkIdentifier())));
+            call(callback).map(info -> NetworkType.rawValueOf(info.getName().getValue())));
     }
 
 
-    public NodeRoutesApi getClient() {
+    public NetworkRoutesApi getClient() {
         return client;
     }
 

@@ -20,19 +20,24 @@ import static org.mockito.Mockito.when;
 import com.google.gson.JsonObject;
 import io.nem.sdk.infrastructure.ListenerChannel;
 import io.nem.sdk.infrastructure.ListenerSubscribeMessage;
+import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.Transaction;
+import io.nem.sdk.model.transaction.TransactionStatusError;
 import io.nem.sdk.openapi.okhttp_gson.invoker.JSON;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
@@ -153,6 +158,52 @@ public class ListenerOkHttpTest {
             .onMessage(webSocketMock, jsonHelper.print(Collections.singletonMap("uid", wsId)));
 
         future.get(3, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void shouldHandleStatus()
+        throws InterruptedException, ExecutionException, TimeoutException {
+        Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+
+        AtomicReference<TransactionStatusError> reference = new AtomicReference<>();
+
+        simulateWebSocketStartup();
+        Assertions.assertNotNull(listener.status(account1.getAddress()).subscribe(reference::set));
+
+        Map<String, Object> message = new HashMap<>();
+        message.put("hash", "1234hash");
+        message.put("address", account1.getAddress().encoded());
+        message.put("status", "some error");
+        message.put("deadline", 5555);
+        listener.handle(message, null);
+
+        Assertions.assertNotNull(reference.get());
+
+        Assertions.assertEquals(message.get("hash"), reference.get().getHash());
+        Assertions.assertEquals(message.get("status"), reference.get().getStatus());
+        Assertions.assertEquals(account1.getAddress(), reference.get().getAddress());
+
+    }
+
+    @Test
+    public void shouldFilterOutHandleStatus()
+        throws InterruptedException, ExecutionException, TimeoutException {
+        Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+        Account account2 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+
+        AtomicReference<TransactionStatusError> reference = new AtomicReference<>();
+
+        simulateWebSocketStartup();
+        Assertions.assertNotNull(listener.status(account2.getAddress()).subscribe(reference::set));
+
+        Map<String, Object> message = new HashMap<>();
+        message.put("hash", "1234hash");
+        message.put("address", account1.getAddress().encoded());
+        message.put("status", "some error");
+        message.put("deadline", 5555);
+        listener.handle(message, null);
+
+        Assertions.assertNull(reference.get());
     }
 
 }

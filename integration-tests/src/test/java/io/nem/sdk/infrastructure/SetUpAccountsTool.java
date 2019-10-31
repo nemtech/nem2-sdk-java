@@ -70,13 +70,16 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
             setAddressAlias(type, config().getTestAccount2().getAddress(), "testaccount2");
 
             sendMosaicFromNemesis(config().getCosignatoryAccount(), false);
-            setAddressAlias(type, config().getCosignatoryAccount().getAddress(), "cosignatory-account");
+            setAddressAlias(type, config().getCosignatoryAccount().getAddress(),
+                "cosignatory-account");
 
             sendMosaicFromNemesis(config().getCosignatory2Account(), false);
-            setAddressAlias(type, config().getCosignatory2Account().getAddress(), "cosignatory-account2");
+            setAddressAlias(type, config().getCosignatory2Account().getAddress(),
+                "cosignatory-account2");
 
             sendMosaicFromNemesis(config().getCosignatory3Account(), false);
-            setAddressAlias(type, config().getCosignatory3Account().getAddress(), "cosignatory-account3");
+            setAddressAlias(type, config().getCosignatory3Account().getAddress(),
+                "cosignatory-account3");
 
             sendMosaicFromNemesis(config().getMultisigAccount(), false);
             setAddressAlias(type, config().getMultisigAccount().getAddress(), "nemesis-account");
@@ -115,7 +118,7 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
 
         System.out.println("Creating multisg account");
         MultisigAccountModificationTransaction convertIntoMultisigTransaction = MultisigAccountModificationTransactionFactory
-            .create(getNetworkType(), (byte) 2, (byte) 1, Arrays.stream(accounts)
+            .create(getNetworkType(), (byte) 1, (byte) 1, Arrays.stream(accounts)
                 .map(a -> new MultisigCosignatoryModification(CosignatoryModificationActionType.ADD,
                     a.getPublicAccount())).collect(Collectors.toList())).build();
 
