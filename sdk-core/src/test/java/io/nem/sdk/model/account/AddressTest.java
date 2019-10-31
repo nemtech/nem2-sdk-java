@@ -19,11 +19,11 @@ package io.nem.sdk.model.account;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -34,10 +34,14 @@ class AddressTest {
 
     private static Stream<Arguments> provider() {
         return Stream.of(
-            Arguments.of("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST),
-            Arguments.of("MDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN),
-            Arguments.of("TDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.TEST_NET),
-            Arguments.of("NDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MAIN_NET));
+            Arguments
+                .of("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST, true),
+            Arguments
+                .of("MDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN, false),
+            Arguments
+                .of("TDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.TEST_NET, false),
+            Arguments
+                .of("NDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MAIN_NET, false));
     }
 
     private static Stream<Arguments> assertExceptionProvider() {
@@ -200,7 +204,6 @@ class AddressTest {
 
     @ParameterizedTest
     @MethodSource("assertExceptionProvider")
-    @DisplayName("NetworkType")
     void testThrowErrorWhenNetworkTypeIsNotTheSameAsAddress(
         String rawAddress, NetworkType networkType) {
         assertThrows(
@@ -212,7 +215,6 @@ class AddressTest {
 
     @ParameterizedTest
     @MethodSource("assertExceptionProvider")
-    @DisplayName("NetworkType")
     void shouldReturnDifferentNetworkType(
         String address, NetworkType networkType) {
         Assertions
@@ -247,20 +249,52 @@ class AddressTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provider")
-    @DisplayName("NetworkType")
-    void testUInt64FromBigInteger(String rawAddress, NetworkType input) {
-        Address address = new Address(rawAddress, input);
-        assertEquals(input, address.getNetworkType());
-    }
-
-    @ParameterizedTest
     @MethodSource("publicKeys")
     void testCreateAddressFromPublicKeys(String publicKey, NetworkType networkType,
         String input) {
         Address address = Address.createFromPublicKey(publicKey, networkType);
         assertEquals(input, address.plain());
         assertEquals(networkType, address.getNetworkType());
+    }
+
+
+    @ParameterizedTest
+    @MethodSource("provider")
+    void testUInt64FromBigInteger(String rawAddress, NetworkType input, boolean validChecksum) {
+        Address address = new Address(rawAddress, input);
+        assertEquals(input, address.getNetworkType());
+        Assertions.assertEquals(validChecksum, Address.isValidPlainAddress(address.plain()));
+    }
+
+    @ParameterizedTest
+    @MethodSource("publicKeys")
+    void isValidAddressFromPublicKeys(String publicKey, NetworkType networkType,
+        String input) {
+        Address address = Address.createFromPublicKey(publicKey, networkType);
+        assertEquals(input, address.plain());
+        assertTrue(Address.isValidPlainAddress(address.plain()));
+        assertTrue(Address.isValidEncodedAddress(address.encoded()));
+    }
+
+    @ParameterizedTest
+    @MethodSource("assertExceptionProvider")
+    void isValidAddressWhenInvalid(String rawAddress, NetworkType networkType) {
+        boolean validPlainAddress = Address.isValidPlainAddress(rawAddress);
+        if (validPlainAddress) {
+            Assertions.assertNotEquals(networkType,
+                Address.createFromRawAddress(rawAddress).getNetworkType());
+        } else {
+            Assertions.assertFalse(validPlainAddress);
+        }
+    }
+
+
+    @ParameterizedTest
+    @EnumSource(NetworkType.class)
+    void isValidAddressFromGeneratedPublicKey(NetworkType networkType) {
+        Account account = Account.generateNewAccount(networkType);
+        Assertions.assertTrue(Address.isValidPlainAddress(account.getAddress().plain()));
+        Assertions.assertTrue(Address.isValidEncodedAddress(account.getAddress().encoded()));
     }
 
 }

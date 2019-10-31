@@ -17,11 +17,14 @@
 package io.nem.sdk.model.account;
 
 import io.nem.core.crypto.RawAddress;
+import io.nem.core.crypto.SignSchema;
 import io.nem.sdk.model.blockchain.NetworkType;
+import java.util.Arrays;
 import java.util.Objects;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
@@ -30,6 +33,21 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  * @since 1.0
  */
 public class Address implements UnresolvedAddress {
+
+    /**
+     * The plain address size.
+     */
+    private static final int PLAIN_ADDRESS_SIZE = 40;
+
+    /**
+     * The raw address size.
+     */
+    private static final int RAW_ADDRESS_SIZE = 25;
+
+    /**
+     * The checksum size.
+     */
+    private static final int CHECKSUM_SIZE = 4;
 
     private final String plainAddress;
 
@@ -42,11 +60,10 @@ public class Address implements UnresolvedAddress {
      * @param networkType Network type
      */
     public Address(String plainAddress, NetworkType networkType) {
-        this.plainAddress =
-            Objects.requireNonNull(plainAddress, "address must not be null")
-                .replace("-", "")
-                .trim()
-                .toUpperCase();
+        Validate.notNull(plainAddress, "address must not be null");
+        this.plainAddress = toPlainAddress(plainAddress);
+        Validate.isTrue(this.plainAddress.length() == PLAIN_ADDRESS_SIZE,
+            "Address " + plainAddress + " has to be " + PLAIN_ADDRESS_SIZE + " characters long.");
         this.networkType = Objects.requireNonNull(networkType, "networkType must not be null");
         char addressNetwork = this.plainAddress.charAt(0);
         if (networkType.equals(NetworkType.MAIN_NET) && addressNetwork != 'N') {
@@ -61,31 +78,48 @@ public class Address implements UnresolvedAddress {
     }
 
     /**
+     * It normalizes a plain or pretty address into an upercase plain address.
+     *
+     * @param address the plain or pretty address.
+     * @return the plain address.
+     */
+    private static String toPlainAddress(String address) {
+        return address.trim().toUpperCase().replace("-", "");
+    }
+
+    /**
      * Create an Address from a given raw address.
      *
      * @param rawAddress String
      * @return {@link Address}
      */
     public static Address createFromRawAddress(String rawAddress) {
-        String addressTrimAndUpperCase = rawAddress
-            .trim()
-            .toUpperCase()
-            .replace("-", "");
-        if (addressTrimAndUpperCase.length() != 40) {
-            throw new IllegalArgumentException(
-                "Address " + addressTrimAndUpperCase + " has to be 40 characters long.");
-        }
-        char addressNetwork = addressTrimAndUpperCase.charAt(0);
+        String addressTrimAndUpperCase = toPlainAddress(rawAddress);
+        Validate.isTrue(addressTrimAndUpperCase.length() == PLAIN_ADDRESS_SIZE,
+            "Address " + addressTrimAndUpperCase + " has to be " + PLAIN_ADDRESS_SIZE
+                + " characters long.");
+        return new Address(addressTrimAndUpperCase, resolveNetworkType(addressTrimAndUpperCase));
+    }
+
+    /**
+     * It resolve the network type from a given address using the first character.
+     *
+     * @param plainAddress the plain address
+     * @return the network type.
+     */
+    private static NetworkType resolveNetworkType(String plainAddress) {
+        char addressNetwork = plainAddress.charAt(0);
         if (addressNetwork == 'N') {
-            return new Address(addressTrimAndUpperCase, NetworkType.MAIN_NET);
+            return NetworkType.MAIN_NET;
         } else if (addressNetwork == 'T') {
-            return new Address(addressTrimAndUpperCase, NetworkType.TEST_NET);
+            return NetworkType.TEST_NET;
         } else if (addressNetwork == 'M') {
-            return new Address(addressTrimAndUpperCase, NetworkType.MIJIN);
+            return NetworkType.MIJIN;
         } else if (addressNetwork == 'S') {
-            return new Address(addressTrimAndUpperCase, NetworkType.MIJIN_TEST);
+            return NetworkType.MIJIN_TEST;
         }
-        throw new IllegalArgumentException(addressTrimAndUpperCase + " is an invalid address.");
+        throw new IllegalArgumentException(plainAddress + " is an invalid address.");
+
     }
 
     /**
@@ -115,6 +149,46 @@ public class Address implements UnresolvedAddress {
      */
     public static Address createFromPublicKey(String publicKey, NetworkType networkType) {
         return new Address(RawAddress.generateAddress(publicKey, networkType), networkType);
+    }
+
+    /**
+     * Determines the validity of a rawAddress address.
+     *
+     * @param rawAddress Decoded address.
+     * @return true if the rawAddress address is valid, false otherwise.
+     */
+    public static boolean isValidPlainAddress(String rawAddress) {
+        try {
+            NetworkType networkType = resolveNetworkType(toPlainAddress(rawAddress));
+            byte[] decodedArray = new Base32().decode(rawAddress);
+            Validate.isTrue(decodedArray.length == 25);
+            int checksumBegin = RAW_ADDRESS_SIZE - CHECKSUM_SIZE;
+            byte[] expectedChecksum = Arrays
+                .copyOf(SignSchema.toHash32Bytes(networkType.resolveSignSchema(),
+                    Arrays.copyOf(decodedArray, checksumBegin)), CHECKSUM_SIZE);
+            Validate.isTrue(expectedChecksum.length == 4);
+            byte[] providedChecksum = Arrays
+                .copyOfRange(decodedArray, checksumBegin, decodedArray.length);
+            return Arrays
+                .equals(expectedChecksum, providedChecksum);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Determines the validity of an encoded address string.
+     *
+     * @param encodedAddress encoded Encoded address string.
+     * @return true if the encoded address string is valid, false otherwise.
+     */
+    public static boolean isValidEncodedAddress(String encodedAddress) {
+        try {
+            return isValidPlainAddress(
+                new String(new Base32().encode(Hex.decodeHex(encodedAddress))));
+        } catch (DecoderException e) {
+            return false;
+        }
     }
 
     /**
@@ -163,19 +237,7 @@ public class Address implements UnresolvedAddress {
      * @return String
      */
     public String pretty() {
-        return this.plainAddress.substring(0, 6)
-            + "-"
-            + this.plainAddress.substring(6, 6 + 6)
-            + "-"
-            + this.plainAddress.substring(6 * 2, 6 * 2 + 6)
-            + "-"
-            + this.plainAddress.substring(6 * 3, 6 * 3 + 6)
-            + "-"
-            + this.plainAddress.substring(6 * 4, 6 * 4 + 6)
-            + "-"
-            + this.plainAddress.substring(6 * 5, 6 * 5 + 6)
-            + "-"
-            + this.plainAddress.substring(6 * 6, 6 * 6 + 4);
+        return this.plainAddress.replaceAll("(.{6})", "$1-");
     }
 
     /**
