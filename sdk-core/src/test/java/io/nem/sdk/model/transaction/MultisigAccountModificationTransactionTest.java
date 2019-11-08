@@ -24,8 +24,8 @@ import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -37,17 +37,21 @@ class MultisigAccountModificationTransactionTest extends AbstractTransactionTest
 
     @Test
     void createAMultisigModificationTransactionViaConstructor() {
+        List<PublicAccount> additions = Collections.singletonList(
+            PublicAccount.createFromPublicKey(
+                "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b111",
+                NetworkType.MIJIN_TEST));
+        List<PublicAccount> deletions = Collections.singletonList(
+            PublicAccount.createFromPublicKey(
+                "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b222",
+                NetworkType.MIJIN_TEST));
         MultisigAccountModificationTransaction multisigAccountModificationTransaction =
             MultisigAccountModificationTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 (byte) 2,
                 (byte) 1,
-                Collections.singletonList(
-                    new MultisigCosignatoryModification(
-                        CosignatoryModificationActionType.ADD,
-                        PublicAccount.createFromPublicKey(
-                            "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b763",
-                            NetworkType.MIJIN_TEST)))
+                additions,
+                deletions
             ).build();
 
         assertEquals(NetworkType.MIJIN_TEST,
@@ -59,50 +63,39 @@ class MultisigAccountModificationTransactionTest extends AbstractTransactionTest
         assertEquals(BigInteger.valueOf(0), multisigAccountModificationTransaction.getMaxFee());
         assertEquals(2, multisigAccountModificationTransaction.getMinApprovalDelta());
         assertEquals(1, multisigAccountModificationTransaction.getMinRemovalDelta());
-        assertEquals(
-            "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b763".toUpperCase(),
-            multisigAccountModificationTransaction
-                .getModifications()
-                .get(0)
-                .getCosignatoryPublicAccount()
-                .getPublicKey()
-                .toHex()
-                .toUpperCase());
-        assertEquals(
-            CosignatoryModificationActionType.ADD,
-            multisigAccountModificationTransaction.getModifications().get(0)
-                .getModificationAction());
+        assertEquals(additions, multisigAccountModificationTransaction.getPublicKeyAdditions());
+        assertEquals(deletions, multisigAccountModificationTransaction.getPublicKeyDeletions());
+
     }
 
     @Test
     @DisplayName("Serialization")
     void serialization() {
         // Generated at nem2-library-js/test/transactions/ModifyMultisigAccountTransaction.spec.js
+        List<PublicAccount> additions = Collections.singletonList(
+            PublicAccount.createFromPublicKey(
+                "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b111",
+                NetworkType.MIJIN_TEST));
+        List<PublicAccount> deletions = Collections.singletonList(
+            PublicAccount.createFromPublicKey(
+                "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b222",
+                NetworkType.MIJIN_TEST));
         MultisigAccountModificationTransaction transaction =
             MultisigAccountModificationTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 (byte) 2,
                 (byte) 1,
-                Arrays.asList(
-                    new MultisigCosignatoryModification(
-                        CosignatoryModificationActionType.ADD,
-                        PublicAccount.createFromPublicKey(
-                            "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b763",
-                            NetworkType.MIJIN_TEST)),
-                    new MultisigCosignatoryModification(
-                        CosignatoryModificationActionType.ADD,
-                        PublicAccount.createFromPublicKey(
-                            "cf893ffcc47c33e7f68ab1db56365c156b0736824a0c1e273f9e00b8df8f01eb",
-                            NetworkType.MIJIN_TEST)))
+                additions,
+                deletions
             ).signer(account.getPublicAccount()).deadline(new FakeDeadline()).build();
 
         String expected =
-            "bd000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401905541000000000000000001000000000000000102020168b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b76301cf893ffcc47c33e7f68ab1db56365c156b0736824a0c1e273f9e00b8df8f01eb";
+            "c800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b24000000000190554100000000000000000100000000000000010201010000000068b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b11168b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b222";
 
         assertSerialization(expected, transaction);
 
         String expectedEmbedded =
-            "6d0000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b24019055410102020168b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b76301cf893ffcc47c33e7f68ab1db56365c156b0736824a0c1e273f9e00b8df8f01eb";
+            "78000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001905541010201010000000068b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b11168b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b222";
 
         assertEmbeddedSerialization(expectedEmbedded, transaction);
     }

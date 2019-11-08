@@ -27,7 +27,7 @@ import io.nem.sdk.model.restriction.MosaicRestrictionEntryType;
 import io.nem.sdk.model.transaction.AccountRestrictionType;
 import io.nem.sdk.model.transaction.MosaicRestrictionType;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionTypeEnum;
+import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionFlagsEnum;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionsDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionsInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MosaicAddressRestrictionDTO;
@@ -73,7 +73,7 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         AccountRestrictionsDTO dto = new AccountRestrictionsDTO();
         dto.setAddress(address.encoded());
         AccountRestrictionDTO restriction = new AccountRestrictionDTO();
-        restriction.setRestrictionType(AccountRestrictionTypeEnum.NUMBER_2);
+        restriction.setRestrictionType(AccountRestrictionFlagsEnum.NUMBER_32770);
         restriction.setValues(Arrays.asList("9636553580561478212"));
         dto.setRestrictions(Collections.singletonList(restriction));
 
@@ -86,7 +86,7 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
 
         Assertions.assertEquals(address, accountRestrictions.getAddress());
         Assertions.assertEquals(1, accountRestrictions.getRestrictions().size());
-        Assertions.assertEquals(AccountRestrictionType.ALLOW_INCOMING_MOSAIC,
+        Assertions.assertEquals(AccountRestrictionType.BLOCK_MOSAIC,
             accountRestrictions.getRestrictions().get(0).getRestrictionType());
         Assertions.assertEquals(
             Arrays.asList(MapperUtils.toMosaicId("9636553580561478212")),
@@ -103,7 +103,7 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         AccountRestrictionsDTO dto = new AccountRestrictionsDTO();
         dto.setAddress(address.encoded());
         AccountRestrictionDTO restriction = new AccountRestrictionDTO();
-        restriction.setRestrictionType(AccountRestrictionTypeEnum.NUMBER_1);
+        restriction.setRestrictionType(AccountRestrictionFlagsEnum.NUMBER_16385);
         restriction.setValues(Arrays.asList("9050b9837efab4bbe8a4b9bb32d812f9885c00d8fc1650e142"));
         dto.setRestrictions(Collections.singletonList(restriction));
 
@@ -117,7 +117,7 @@ public class RestrictionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
 
         Assertions.assertEquals(address, accountRestrictions.getAddress());
         Assertions.assertEquals(1, accountRestrictions.getRestrictions().size());
-        Assertions.assertEquals(AccountRestrictionType.ALLOW_INCOMING_ADDRESS,
+        Assertions.assertEquals(AccountRestrictionType.ALLOW_OUTGOING_ADDRESS,
             accountRestrictions.getRestrictions().get(0).getRestrictionType());
         Assertions.assertEquals(Collections.singletonList(MapperUtils
                 .toUnresolvedAddress("9050b9837efab4bbe8a4b9bb32d812f9885c00d8fc1650e142")),

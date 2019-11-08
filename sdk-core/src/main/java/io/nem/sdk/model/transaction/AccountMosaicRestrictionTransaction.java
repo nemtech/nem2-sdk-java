@@ -21,13 +21,17 @@ import java.util.List;
 public class AccountMosaicRestrictionTransaction extends Transaction {
 
     private final AccountRestrictionType restrictionType;
-    private final List<AccountRestrictionModification<UnresolvedMosaicId>> modifications;
 
-    public AccountMosaicRestrictionTransaction(
+    private final List<UnresolvedMosaicId> restrictionAdditions;
+
+    private final List<UnresolvedMosaicId> restrictionDeletions;
+
+    AccountMosaicRestrictionTransaction(
         AccountMosaicRestrictionTransactionFactory factory) {
         super(factory);
         this.restrictionType = factory.getRestrictionType();
-        this.modifications = factory.getModifications();
+        this.restrictionAdditions = factory.getRestrictionAdditions();
+        this.restrictionDeletions = factory.getRestrictionDeletions();
     }
 
     /**
@@ -39,13 +43,19 @@ public class AccountMosaicRestrictionTransaction extends Transaction {
         return this.restrictionType;
     }
 
+
     /**
-     * Get account mosaic restriction modifications
-     *
-     * @return list of {@link AccountRestrictionModification} with {@link UnresolvedMosaicId}
+     * @return List of mosaic ids that are going to be added to the restriction.
      */
-    public List<AccountRestrictionModification<UnresolvedMosaicId>> getModifications() {
-        return this.modifications;
+    public List<UnresolvedMosaicId> getRestrictionAdditions() {
+        return restrictionAdditions;
+    }
+
+    /**
+     * @return List of mosaic ids that are going to be removed from the restriction.
+     */
+    public List<UnresolvedMosaicId> getRestrictionDeletions() {
+        return restrictionDeletions;
     }
 
 }

@@ -22,15 +22,11 @@ import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
-import io.nem.sdk.model.transaction.AccountRestrictionModification;
-import io.nem.sdk.model.transaction.AccountRestrictionModificationAction;
 import io.nem.sdk.model.transaction.AccountRestrictionType;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.vertx.model.AccountAddressRestrictionModificationDTO;
 import io.nem.sdk.openapi.vertx.model.AccountAddressRestrictionTransactionDTO;
-import io.nem.sdk.openapi.vertx.model.AccountRestrictionModificationActionEnum;
-import io.nem.sdk.openapi.vertx.model.AccountRestrictionTypeEnum;
+import io.nem.sdk.openapi.vertx.model.AccountRestrictionFlagsEnum;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,41 +47,32 @@ public class AccountAddressRestrictionTransactionMapper extends
         NetworkType networkType, AccountAddressRestrictionTransactionDTO transaction) {
         AccountRestrictionType restrictionType = AccountRestrictionType
             .rawValueOf(transaction.getRestrictionType().getValue());
-        List<AccountRestrictionModification<UnresolvedAddress>> modifications = transaction
-            .getModifications().stream().map(this::toModification).collect(Collectors.toList());
+        List<UnresolvedAddress> restrictionAdditions = transaction
+            .getRestrictionAdditions().stream().map(MapperUtils::toUnresolvedAddress)
+            .collect(Collectors.toList());
+
+        List<UnresolvedAddress> restrictionDeletions = transaction
+            .getRestrictionDeletions().stream().map(MapperUtils::toUnresolvedAddress)
+            .collect(Collectors.toList());
+
         return AccountAddressRestrictionTransactionFactory.create(networkType, restrictionType,
-            modifications);
+            restrictionAdditions, restrictionDeletions);
     }
 
-    private AccountRestrictionModification<UnresolvedAddress> toModification(
-        AccountAddressRestrictionModificationDTO dto) {
-        AccountRestrictionModificationAction modificationAction = AccountRestrictionModificationAction
-            .rawValueOf(dto.getModificationAction().getValue().byteValue());
-        return AccountRestrictionModification
-            .createForAddress(modificationAction,
-                MapperUtils.toUnresolvedAddress(dto.getValue()));
-    }
 
     @Override
     protected void copyToDto(
         AccountAddressRestrictionTransaction transaction,
         AccountAddressRestrictionTransactionDTO dto) {
         dto.setRestrictionType(
-            AccountRestrictionTypeEnum.fromValue(transaction.getRestrictionType().getValue()));
-        dto.setModifications(
-            transaction.getModifications().stream().map(
-                source -> toModification(source, transaction.getNetworkType())).collect(
-                Collectors.toList()));
-    }
+            AccountRestrictionFlagsEnum.fromValue(transaction.getRestrictionType().getValue()));
 
-    private AccountAddressRestrictionModificationDTO toModification(
-        AccountRestrictionModification<UnresolvedAddress> source,
-        NetworkType networkType) {
-        AccountRestrictionModificationActionEnum modificationAction = AccountRestrictionModificationActionEnum
-            .fromValue((int) source.getModificationAction().getValue());
-        AccountAddressRestrictionModificationDTO target = new AccountAddressRestrictionModificationDTO();
-        target.setModificationAction(modificationAction);
-        target.setValue(source.getValue().encoded(networkType));
-        return target;
+        dto.setRestrictionAdditions(transaction.getRestrictionAdditions().stream()
+            .map(r -> r.encoded(transaction.getNetworkType())).collect(
+                Collectors.toList()));
+
+        dto.setRestrictionDeletions(transaction.getRestrictionDeletions().stream()
+            .map(r -> r.encoded(transaction.getNetworkType())).collect(
+                Collectors.toList()));
     }
 }

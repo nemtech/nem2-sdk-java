@@ -40,6 +40,7 @@ import io.nem.sdk.openapi.okhttp_gson.model.NamespaceDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.NamespaceIds;
 import io.nem.sdk.openapi.okhttp_gson.model.NamespaceInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.NamespaceNameDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.NamespacesInfoDTO;
 import io.reactivex.Observable;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,14 +88,15 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
     private Observable<List<NamespaceInfo>> getNamespacesFromAccount(
         Address address, Optional<QueryParams> queryParams) {
 
-        Callable<List<NamespaceInfoDTO>> callback = () ->
+        Callable<NamespacesInfoDTO> callback = () ->
             getClient().getNamespacesFromAccount(address.plain(),
                 getPageSize(queryParams),
                 getId(queryParams)
             );
 
         return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toNamespaceInfo).toList()
+            call(callback).flatMapIterable(NamespacesInfoDTO::getNamespaces)
+                .map(this::toNamespaceInfo).toList()
                 .toObservable());
     }
 
@@ -117,11 +119,12 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
             .addresses(addresses.stream().map(Address::plain).collect(
                 Collectors.toList()));
 
-        Callable<List<NamespaceInfoDTO>> callback = () ->
+        Callable<NamespacesInfoDTO> callback = () ->
             getClient().getNamespacesFromAccounts(accounts);
 
         return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toNamespaceInfo).toList()
+            call(callback).flatMapIterable(NamespacesInfoDTO::getNamespaces)
+                .map(this::toNamespaceInfo).toList()
                 .toObservable());
     }
 

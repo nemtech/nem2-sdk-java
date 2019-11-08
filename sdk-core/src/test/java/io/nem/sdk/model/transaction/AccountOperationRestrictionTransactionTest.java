@@ -19,7 +19,7 @@ package io.nem.sdk.model.transaction;
 
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.blockchain.NetworkType;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,44 +32,37 @@ public class AccountOperationRestrictionTransactionTest extends AbstractTransact
 
     @Test
     void create() {
-        final List<AccountRestrictionModification<TransactionType>> modifications = new ArrayList<>();
-        AccountRestrictionModification<TransactionType> modification = AccountRestrictionModification
-            .createForTransactionType(AccountRestrictionModificationAction.ADD,
-                TransactionType.SECRET_PROOF);
-        modifications.add(modification);
+        List<TransactionType> additions = Collections.singletonList(TransactionType.SECRET_PROOF);
+        List<TransactionType> deletions = Collections.singletonList(TransactionType.TRANSFER);
+
         AccountOperationRestrictionTransaction transaction =
             AccountOperationRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 AccountRestrictionType.ALLOW_OUTGOING_TRANSACTION_TYPE,
-                modifications).deadline(new FakeDeadline()).build();
+                additions, deletions).deadline(new FakeDeadline()).build();
         Assertions.assertEquals(AccountRestrictionType.ALLOW_OUTGOING_TRANSACTION_TYPE,
             transaction.getRestrictionType());
-        Assertions.assertEquals(modifications, transaction.getModifications());
-        Assertions.assertEquals(AccountRestrictionModificationAction.ADD,
-            modification.getModificationAction());
-        Assertions.assertEquals(TransactionType.SECRET_PROOF,
-            modification.getValue());
+        Assertions.assertEquals(additions, transaction.getRestrictionAdditions());
+        Assertions.assertEquals(deletions, transaction.getRestrictionDeletions());
     }
 
     @Test
     void shouldGenerateBytes() {
 
-        final List<AccountRestrictionModification<TransactionType>> modifications = new ArrayList<>();
-        AccountRestrictionModification<TransactionType> modification = AccountRestrictionModification
-            .createForTransactionType(AccountRestrictionModificationAction.ADD,
-                TransactionType.SECRET_PROOF);
-        modifications.add(modification);
+        List<TransactionType> additions = Collections.singletonList(TransactionType.SECRET_PROOF);
+        List<TransactionType> deletions = Collections.singletonList(TransactionType.TRANSFER);
         AccountOperationRestrictionTransaction transaction =
             AccountOperationRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 AccountRestrictionType.ALLOW_INCOMING_MOSAIC,
-                modifications).signer(account.getPublicAccount()).deadline(new FakeDeadline())
+                additions, deletions).signer(account.getPublicAccount())
+                .deadline(new FakeDeadline())
                 .build();
 
-        String expected = "7d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401905043000000000000000001000000000000000201015242";
+        String expected = "8c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b24000000000190504300000000000000000100000000000000020001010000000052425441";
         assertSerialization(expected, transaction);
 
-        String expectedEmbeddedHash = "2d0000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b24019050430201015242";
+        String expectedEmbeddedHash = "3c000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001905043020001010000000052425441";
         assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
     }
 }

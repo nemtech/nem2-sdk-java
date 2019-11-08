@@ -51,11 +51,6 @@ public class MetadataEntry {
     private final MetadataType metadataType;
 
     /**
-     * The metadata value size
-     */
-    private final Integer valueSize;
-
-    /**
      * The metadata value
      */
     private final String value;
@@ -71,14 +66,13 @@ public class MetadataEntry {
 
     @SuppressWarnings("squid:S00107")
     public MetadataEntry(String compositeHash, String senderPublicKey, String targetPublicKey,
-        BigInteger scopedMetadataKey, MetadataType metadataType, Integer valueSize,
+        BigInteger scopedMetadataKey, MetadataType metadataType,
         String value, Optional<String> targetId) {
         this.compositeHash = compositeHash;
         this.senderPublicKey = senderPublicKey;
         this.targetPublicKey = targetPublicKey;
         this.scopedMetadataKey = scopedMetadataKey;
         this.metadataType = metadataType;
-        this.valueSize = valueSize;
         this.value = value;
         this.targetId = resolveTargetId(targetId, metadataType);
     }
@@ -115,10 +109,6 @@ public class MetadataEntry {
 
     public MetadataType getMetadataType() {
         return metadataType;
-    }
-
-    public Integer getValueSize() {
-        return valueSize;
     }
 
     public String getValue() {

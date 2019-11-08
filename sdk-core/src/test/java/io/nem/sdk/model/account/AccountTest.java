@@ -127,10 +127,10 @@ class AccountTest {
         SignedTransaction signedTransaction = account.sign(transferTransaction, generationHash);
         String payload = signedTransaction.getPayload();
         assertEquals(
-            "90E8FEBD671DD41BEE94EC3BA5831CB608A312C2F203BA84AC01000100672B0000CE5600006400000000000000",
+            "010000000000000090E8FEBD671DD41BEE94EC3BA5831CB608A312C2F203BA84AC01010000000000672B0000CE560000640000000000000000",
             payload.substring(240));
         assertEquals(
-            "B54321C382FA3CC53EB6559FDDE03832898E7E89C8F90C10DF8567AD41A926A2",
+            "C86F3B0A954677761671C2D1A273C59B5F45EE7FB19385DB2D094DE5A0270262",
             signedTransaction.getHash());
     }
 

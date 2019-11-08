@@ -42,6 +42,7 @@ import io.nem.sdk.openapi.vertx.model.NamespaceDTO;
 import io.nem.sdk.openapi.vertx.model.NamespaceIds;
 import io.nem.sdk.openapi.vertx.model.NamespaceInfoDTO;
 import io.nem.sdk.openapi.vertx.model.NamespaceNameDTO;
+import io.nem.sdk.openapi.vertx.model.NamespacesInfoDTO;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -92,14 +93,15 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
     private Observable<List<NamespaceInfo>> getNamespacesFromAccount(
         Address address, Optional<QueryParams> queryParams) {
 
-        Consumer<Handler<AsyncResult<List<NamespaceInfoDTO>>>> callback = handler ->
+        Consumer<Handler<AsyncResult<NamespacesInfoDTO>>> callback = handler ->
             client.getNamespacesFromAccount(address.plain(),
                 getPageSize(queryParams),
                 getId(queryParams),
                 handler);
 
         return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toNamespaceInfo).toList()
+            call(callback).flatMapIterable(NamespacesInfoDTO::getNamespaces)
+                .map(this::toNamespaceInfo).toList()
                 .toObservable());
     }
 
@@ -122,11 +124,13 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
             .addresses(addresses.stream().map(Address::plain).collect(
                 Collectors.toList()));
 
-        Consumer<Handler<AsyncResult<List<NamespaceInfoDTO>>>> callback = handler -> client
+        Consumer<Handler<AsyncResult<NamespacesInfoDTO>>> callback = handler -> client
             .getNamespacesFromAccounts(accounts, handler);
 
         return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toNamespaceInfo).toList()
+            call(callback).flatMapIterable(NamespacesInfoDTO::getNamespaces)
+                .map(this::toNamespaceInfo)
+                .toList()
                 .toObservable());
     }
 

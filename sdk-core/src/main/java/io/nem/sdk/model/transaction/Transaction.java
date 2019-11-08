@@ -21,7 +21,6 @@ import io.nem.core.crypto.DsaSigner;
 import io.nem.core.crypto.Hashes;
 import io.nem.core.crypto.Signature;
 import io.nem.core.utils.ConvertUtils;
-import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.api.BinarySerialization;
 import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.model.account.Account;
@@ -66,26 +65,6 @@ public abstract class Transaction {
         this.transactionInfo = factory.getTransactionInfo();
     }
 
-    /**
-     * Generates hash for a serialized transaction payload.
-     *
-     * @param transactionPayload Transaction payload
-     * @param generationHashBytes the generation hash.
-     * @return generated transaction hash.
-     */
-    public static String createTransactionHash(
-        String transactionPayload, final byte[] generationHashBytes) {
-        byte[] bytes = Hex.decode(transactionPayload);
-        byte[] signingBytes = new byte[bytes.length + generationHashBytes.length - 36];
-        System.arraycopy(bytes, 4, signingBytes, 0, 32);
-        System.arraycopy(bytes, 68, signingBytes, 32, 32);
-        System.arraycopy(generationHashBytes, 0, signingBytes, 64, generationHashBytes.length);
-        System.arraycopy(bytes, 100, signingBytes, generationHashBytes.length + 64,
-            bytes.length - 100);
-
-        byte[] result = Hashes.sha3_256(signingBytes);
-        return Hex.toHexString(result).toUpperCase();
-    }
 
     /**
      * Returns the transaction type.
@@ -171,6 +150,7 @@ public abstract class Transaction {
         return BINARY_SERIALIZATION.serialize(this);
     }
 
+
     /**
      * It returns the transaction's byte array size useful to calculate its fee.
      *
@@ -178,6 +158,42 @@ public abstract class Transaction {
      */
     public int getSize() {
         return BINARY_SERIALIZATION.getSize(this);
+    }
+
+
+    /**
+     * Generates hash for a serialized transaction payload.
+     *
+     * @param transactionPayload Transaction payload
+     * @param generationHashBytes the generation hash.
+     * @return generated transaction hash.
+     */
+    public static String createTransactionHash(
+        String transactionPayload, final byte[] generationHashBytes) {
+        byte[] bytes = Hex.decode(transactionPayload);
+        final byte[] dataBytes = getSignBytes(bytes, generationHashBytes);
+        byte[] signingBytes = new byte[dataBytes.length + 64];
+        System.arraycopy(bytes, 8, signingBytes, 0, 32);
+        System.arraycopy(bytes, 72, signingBytes, 32, 32);
+        System.arraycopy(dataBytes, 0, signingBytes, 64, dataBytes.length);
+
+        byte[] result = Hashes.sha3_256(signingBytes);
+        return Hex.toHexString(result).toUpperCase();
+    }
+
+    /**
+     * Get the bytes required for signing.
+     *
+     * @param payloadBytes Payload bytes.
+     * @param generationHashBytes Generation hash bytes.
+     * @return Bytes to sign.
+     */
+    public static byte[] getSignBytes(final byte[] payloadBytes, final byte[] generationHashBytes) {
+        final short headerSize = 4 + 32 + 64 + 8;
+        final byte[] signingBytes = new byte[payloadBytes.length + generationHashBytes.length - headerSize];
+        System.arraycopy(generationHashBytes, 0, signingBytes, 0, generationHashBytes.length);
+        System.arraycopy(payloadBytes, headerSize, signingBytes, generationHashBytes.length, payloadBytes.length - headerSize);
+        return signingBytes;
     }
 
     /**
@@ -188,30 +204,26 @@ public abstract class Transaction {
      * @return {@link SignedTransaction}
      */
     public SignedTransaction signWith(final Account account, final String generationHash) {
-
         final DsaSigner theSigner = CryptoEngines.defaultEngine()
             .createDsaSigner(account.getKeyPair(), getNetworkType().resolveSignSchema());
         final byte[] bytes = this.serialize();
         final byte[] generationHashBytes = ConvertUtils.getBytes(generationHash);
-        final byte[] signingBytes = new byte[bytes.length + generationHashBytes.length - 100];
-        System.arraycopy(generationHashBytes, 0, signingBytes, 0, generationHashBytes.length);
-        System.arraycopy(bytes, 100, signingBytes, generationHashBytes.length, bytes.length - 100);
+        final byte[] signingBytes = getSignBytes(bytes, generationHashBytes);
         final Signature theSignature = theSigner.sign(signingBytes);
 
         final byte[] payload = new byte[bytes.length];
-        System.arraycopy(bytes, 0, payload, 0, 4); // Size
-        System.arraycopy(theSignature.getBytes(), 0, payload, 4,
+        System.arraycopy(bytes, 0, payload, 0, 8); // Size
+        System.arraycopy(theSignature.getBytes(), 0, payload, 8,
             theSignature.getBytes().length); // Signature
         System.arraycopy(
             account.getKeyPair().getPublicKey().getBytes(),
             0,
             payload,
-            64 + 4,
+            64 + 8,
             account.getKeyPair().getPublicKey().getBytes().length); // Signer
-        System.arraycopy(bytes, 100, payload, 100, bytes.length - 100);
+        System.arraycopy(bytes, 104, payload, 104, bytes.length - 104);
 
-        final String hash =
-            Transaction.createTransactionHash(Hex.toHexString(payload), generationHashBytes);
+        final String hash = createTransactionHash(Hex.toHexString(payload), generationHashBytes);
         return new SignedTransaction(Hex.toHexString(payload).toUpperCase(), hash, type);
     }
 
@@ -268,12 +280,4 @@ public abstract class Transaction {
         return !this.getTransactionInfo().isPresent();
     }
 
-    /**
-     * Gets the version of the transaction using the open api format.
-     *
-     * @return Version of the transaction
-     */
-    public int getTransactionVersion() {
-        return MapperUtils.toNetworkVersion(getNetworkType(), getVersion());
-    }
 }

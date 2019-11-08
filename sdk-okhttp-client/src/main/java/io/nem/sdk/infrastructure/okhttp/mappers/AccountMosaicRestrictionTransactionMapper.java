@@ -21,15 +21,11 @@ import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.transaction.AccountMosaicRestrictionTransaction;
 import io.nem.sdk.model.transaction.AccountMosaicRestrictionTransactionFactory;
-import io.nem.sdk.model.transaction.AccountRestrictionModification;
-import io.nem.sdk.model.transaction.AccountRestrictionModificationAction;
 import io.nem.sdk.model.transaction.AccountRestrictionType;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountMosaicRestrictionModificationDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountMosaicRestrictionTransactionDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionModificationActionEnum;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionTypeEnum;
+import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionFlagsEnum;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,43 +40,39 @@ public class AccountMosaicRestrictionTransactionMapper extends
         super(jsonHelper, TransactionType.ACCOUNT_MOSAIC_RESTRICTION,
             AccountMosaicRestrictionTransactionDTO.class);
     }
-
     @Override
     protected AccountMosaicRestrictionTransactionFactory createFactory(
         NetworkType networkType, AccountMosaicRestrictionTransactionDTO transaction) {
         AccountRestrictionType restrictionType = AccountRestrictionType
             .rawValueOf(transaction.getRestrictionType().getValue());
-        List<AccountRestrictionModification<UnresolvedMosaicId>> modifications = transaction
-            .getModifications().stream().map(this::toModification).collect(Collectors.toList());
-        return AccountMosaicRestrictionTransactionFactory.create(networkType, restrictionType,
-            modifications);
-    }
 
-    private AccountRestrictionModification<UnresolvedMosaicId> toModification(
-        AccountMosaicRestrictionModificationDTO dto) {
-        AccountRestrictionModificationAction modificationAction = AccountRestrictionModificationAction
-            .rawValueOf(dto.getModificationAction().getValue().byteValue());
-        return AccountRestrictionModification
-            .createForMosaic(modificationAction, MapperUtils.toMosaicId(dto.getValue()));
+        List<UnresolvedMosaicId> additions = transaction.getRestrictionAdditions().stream()
+            .map(MapperUtils::toUnresolvedMosaicId).collect(
+                Collectors.toList());
+
+        List<UnresolvedMosaicId> deletions = transaction.getRestrictionDeletions().stream()
+            .map(MapperUtils::toUnresolvedMosaicId).collect(
+                Collectors.toList());
+        return AccountMosaicRestrictionTransactionFactory.create(networkType, restrictionType,
+            additions, deletions);
     }
 
     @Override
     protected void copyToDto(AccountMosaicRestrictionTransaction transaction,
         AccountMosaicRestrictionTransactionDTO dto) {
         dto.setRestrictionType(
-            AccountRestrictionTypeEnum.fromValue(transaction.getRestrictionType().getValue()));
-        dto.setModifications(transaction.getModifications().stream().map(this::toModification)
-            .collect(Collectors.toList()));
-    }
+            AccountRestrictionFlagsEnum.fromValue(transaction.getRestrictionType().getValue()));
 
+        List<String> additions = transaction.getRestrictionAdditions().stream()
+            .map(MapperUtils::getIdAsHex).collect(
+                Collectors.toList());
 
-    private AccountMosaicRestrictionModificationDTO toModification(
-        AccountRestrictionModification<UnresolvedMosaicId> model) {
-        AccountMosaicRestrictionModificationDTO dto = new AccountMosaicRestrictionModificationDTO();
-        dto.setModificationAction(AccountRestrictionModificationActionEnum
-            .fromValue((int) model.getModificationAction().getValue()));
-        dto.setValue(MapperUtils.getIdAsHex(model.getValue()));
-        return dto;
+        List<String> deletions = transaction.getRestrictionDeletions().stream()
+            .map(MapperUtils::getIdAsHex).collect(
+                Collectors.toList());
+
+        dto.setRestrictionAdditions(additions);
+        dto.setRestrictionDeletions(deletions);
     }
 
 }

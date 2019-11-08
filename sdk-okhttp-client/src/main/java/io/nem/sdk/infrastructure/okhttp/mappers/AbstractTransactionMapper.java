@@ -17,7 +17,6 @@
 package io.nem.sdk.infrastructure.okhttp.mappers;
 
 import io.nem.core.crypto.PublicKey;
-import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.Deadline;
@@ -28,6 +27,7 @@ import io.nem.sdk.model.transaction.TransactionInfo;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.openapi.okhttp_gson.model.EmbeddedTransactionInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.EmbeddedTransactionMetaDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.NetworkTypeEnum;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionMetaDTO;
@@ -71,9 +71,9 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
         D transaction = getJsonHelper().convert(transactionDto, transactionDtoClass);
         TransactionDTO transactionDTO = getJsonHelper()
             .convert(transactionDto, TransactionDTO.class);
-        NetworkType networkType = MapperUtils.extractNetworkType(transactionDTO.getVersion());
+        NetworkType networkType = NetworkType.rawValueOf(transactionDTO.getNetwork().getValue());
         TransactionFactory<T> factory = createFactory(networkType, transaction);
-        factory.version(MapperUtils.extractTransactionVersion(transactionDTO.getVersion()));
+        factory.version(transactionDTO.getVersion());
         factory.deadline(new Deadline(transactionDTO.getDeadline()));
         if (transactionDTO.getSignerPublicKey() != null) {
             factory.signer(
@@ -166,7 +166,8 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
             transaction.getSigner().map(PublicAccount::getPublicKey).map(PublicKey::toHex)
                 .orElse(null));
 
-        dto.setVersion(transaction.getTransactionVersion());
+        dto.setVersion(transaction.getVersion());
+        dto.setNetwork(NetworkTypeEnum.fromValue(transaction.getNetworkType().getValue()));
         dto.setType(transaction.getType().getValue());
 
         if (!embedded) {

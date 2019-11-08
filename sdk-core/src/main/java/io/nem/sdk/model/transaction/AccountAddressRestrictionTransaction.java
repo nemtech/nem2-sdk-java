@@ -22,13 +22,16 @@ public class AccountAddressRestrictionTransaction extends Transaction {
 
     private final AccountRestrictionType restrictionType;
 
-    private final List<AccountRestrictionModification<UnresolvedAddress>> modifications;
+    private final List<UnresolvedAddress> restrictionAdditions;
+
+    private final List<UnresolvedAddress> restrictionDeletions;
 
     AccountAddressRestrictionTransaction(
         AccountAddressRestrictionTransactionFactory factory) {
         super(factory);
         this.restrictionType = factory.getRestrictionType();
-        this.modifications = factory.getModifications();
+        this.restrictionAdditions = factory.getRestrictionAdditions();
+        this.restrictionDeletions = factory.getRestrictionDeletions();
     }
 
     /**
@@ -41,11 +44,16 @@ public class AccountAddressRestrictionTransaction extends Transaction {
     }
 
     /**
-     * Get account address restriction modifications
-     *
-     * @return List of {@link AccountRestrictionModification}
+     * @return List of addresses that are going to be added to the restriction.
      */
-    public List<AccountRestrictionModification<UnresolvedAddress>> getModifications() {
-        return this.modifications;
+    public List<UnresolvedAddress> getRestrictionAdditions() {
+        return restrictionAdditions;
+    }
+
+    /**
+     * @return List of addresses that are going to be removed from the restriction.
+     */
+    public List<UnresolvedAddress> getRestrictionDeletions() {
+        return restrictionDeletions;
     }
 }

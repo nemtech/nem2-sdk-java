@@ -25,13 +25,13 @@ import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.JsonHelper;
-import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
@@ -57,7 +57,8 @@ public class OkHttpAggregateTransactionTest {
         TransferTransaction transferTx =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST),
+                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
+                    NetworkType.MIJIN_TEST),
                 Collections.emptyList(),
                 PlainMessage.Empty).build();
 
@@ -81,7 +82,7 @@ public class OkHttpAggregateTransactionTest {
     void serialization() {
         // Generated at nem2-library-js/test/transactions/RegisterNamespaceTransaction.spec.js
         String expected =
-            "d100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904141000000000000000001000000000000005500000055000000846b4439154579a5903b1459c9cf69cb8153f6d0110a7a0ed61de29ae4810bf2019054419050b9837efab4bbe8a4b9bb32d812f9885c00d8fc1650e1420100010044b262c46ceabb858096980000000000";
+            "0901000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000190414100000000000000000100000000000000de78f6d81ae02ad16559f6e4d3d4acc5ed343ee0ae65b1c9ad4fc0091a3903b561000000000000006100000000000000846b4439154579a5903b1459c9cf69cb8153f6d0110a7a0ed61de29ae4810bf200000000019054419050b9837efab4bbe8a4b9bb32d812f9885c00d8fc1650e1420101000000000044b262c46ceabb85809698000000000000";
 
         TransferTransaction transferTx =
             TransferTransactionFactory.create(
@@ -138,9 +139,8 @@ public class OkHttpAggregateTransactionTest {
             cosignatoryAccount.signTransactionWithCosignatories(
                 aggregateTx, Collections.singletonList(cosignatoryAccount2), generationHash);
 
-        assertEquals("2d010000", signedTransaction.getPayload().substring(0, 8));
-        assertEquals("5100000051000000", signedTransaction.getPayload().substring(240, 256));
-        // assertEquals("039054419050b9837efab4bbe8a4b9bb32d812f9885c00d8fc1650e1420D000000746573742D6D65737361676568B3FBB18729C1FDE225C57F8CE080FA828F0067E451A3FD81FA628842B0B763", signedTransaction.getPayload().substring(320, 474));
+        assertEquals("6501000000000000", signedTransaction.getPayload().substring(0, 16));
+        assertEquals("1a000000d6a52a97", signedTransaction.getPayload().substring(248, 264));
 
     }
 

@@ -27,7 +27,7 @@ import io.nem.sdk.model.restriction.MosaicRestrictionEntryType;
 import io.nem.sdk.model.transaction.AccountRestrictionType;
 import io.nem.sdk.model.transaction.MosaicRestrictionType;
 import io.nem.sdk.openapi.vertx.model.AccountRestrictionDTO;
-import io.nem.sdk.openapi.vertx.model.AccountRestrictionTypeEnum;
+import io.nem.sdk.openapi.vertx.model.AccountRestrictionFlagsEnum;
 import io.nem.sdk.openapi.vertx.model.AccountRestrictionsDTO;
 import io.nem.sdk.openapi.vertx.model.AccountRestrictionsInfoDTO;
 import io.nem.sdk.openapi.vertx.model.MosaicAddressRestrictionDTO;
@@ -74,7 +74,7 @@ public class RestrictionRepositoryVertxImplTest extends AbstractVertxRespository
         AccountRestrictionsDTO dto = new AccountRestrictionsDTO();
         dto.setAddress(address.encoded());
         AccountRestrictionDTO restriction = new AccountRestrictionDTO();
-        restriction.setRestrictionType(AccountRestrictionTypeEnum.NUMBER_2);
+        restriction.setRestrictionType(AccountRestrictionFlagsEnum.NUMBER_32770);
         restriction.setValues(Arrays.asList("9636553580561478212"));
         dto.setRestrictions(Collections.singletonList(restriction));
 
@@ -87,7 +87,7 @@ public class RestrictionRepositoryVertxImplTest extends AbstractVertxRespository
 
         Assertions.assertEquals(address, accountRestrictions.getAddress());
         Assertions.assertEquals(1, accountRestrictions.getRestrictions().size());
-        Assertions.assertEquals(AccountRestrictionType.ALLOW_INCOMING_MOSAIC,
+        Assertions.assertEquals(AccountRestrictionType.BLOCK_MOSAIC,
             accountRestrictions.getRestrictions().get(0).getRestrictionType());
         Assertions.assertEquals(
             Arrays.asList(MapperUtils.toMosaicId("9636553580561478212")),
@@ -104,7 +104,7 @@ public class RestrictionRepositoryVertxImplTest extends AbstractVertxRespository
         AccountRestrictionsDTO dto = new AccountRestrictionsDTO();
         dto.setAddress(address.encoded());
         AccountRestrictionDTO restriction = new AccountRestrictionDTO();
-        restriction.setRestrictionType(AccountRestrictionTypeEnum.NUMBER_1);
+        restriction.setRestrictionType(AccountRestrictionFlagsEnum.NUMBER_1);
         restriction.setValues(Arrays.asList("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142"));
         dto.setRestrictions(Collections.singletonList(restriction));
 

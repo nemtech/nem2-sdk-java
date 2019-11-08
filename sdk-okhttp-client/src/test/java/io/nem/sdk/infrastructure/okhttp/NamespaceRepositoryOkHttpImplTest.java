@@ -30,6 +30,7 @@ import io.nem.sdk.openapi.okhttp_gson.model.NamespaceInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.NamespaceMetaDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.NamespaceNameDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.NamespaceRegistrationTypeEnum;
+import io.nem.sdk.openapi.okhttp_gson.model.NamespacesInfoDTO;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
@@ -88,7 +89,8 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
         Assertions.assertNotNull(info);
 
-        Assertions.assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
+        Assertions
+            .assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
 
         Assertions.assertEquals(meta.getId(), info.getMetaId());
         Assertions.assertEquals(meta.getIndex(), info.getIndex());
@@ -103,7 +105,8 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
         resolveNetworkType();
 
-        Address address = MapperUtils.toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = MapperUtils
+            .toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
         NamespaceMetaDTO meta = new NamespaceMetaDTO();
@@ -127,13 +130,14 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
         dto.setNamespace(namespace);
 
-        mockRemoteCall(Collections.singletonList(dto));
+        mockRemoteCall(new NamespacesInfoDTO().addNamespacesItem(dto));
 
         NamespaceInfo info = repository.getNamespacesFromAccount(address).toFuture().get().get(0);
 
         Assertions.assertNotNull(info);
 
-        Assertions.assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
+        Assertions
+            .assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
 
         Assertions.assertEquals(meta.getId(), info.getMetaId());
         Assertions.assertEquals(meta.getIndex(), info.getIndex());
@@ -174,14 +178,15 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
         dto.setNamespace(namespace);
 
-        mockRemoteCall(Collections.singletonList(dto));
+        mockRemoteCall(new NamespacesInfoDTO().addNamespacesItem(dto));
 
         NamespaceInfo info = repository
             .getNamespacesFromAccounts(Collections.singletonList(address)).toFuture().get().get(0);
 
         Assertions.assertNotNull(info);
 
-        Assertions.assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
+        Assertions
+            .assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
 
         Assertions.assertEquals(meta.getId(), info.getMetaId());
         Assertions.assertEquals(meta.getIndex(), info.getIndex());
@@ -292,7 +297,8 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
         Assertions.assertNotNull(linkedMosaicId);
 
-        Assertions.assertEquals(MapperUtils.fromHexToBigInteger("528280977531AAA"), linkedMosaicId.getId());
+        Assertions.assertEquals(MapperUtils.fromHexToBigInteger("528280977531AAA"),
+            linkedMosaicId.getId());
     }
 
 

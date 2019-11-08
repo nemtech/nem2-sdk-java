@@ -23,26 +23,38 @@ package io.nem.sdk.model.transaction;
  * For example, Block (0X80) + Outgoing (0x40) + Operation Type (0x04) = 0xC4
  *
  *
- * Restriction type is an address. ADDRESS((byte)1),
+ * Restriction type is an address. ADDRESS(1),
  *
- * Restriction type is a mosaic identifier. MOSAIC_ID((byte)2),
+ * Restriction type is a mosaic identifier. MOSAIC_ID(2),
  *
- * Restriction type is a transaction type. TRANSACTION_TYPE((byte)4),
+ * Restriction type is a transaction type. TRANSACTION_TYPE(4),
  *
- * Restriction is interpreted as outgoing. OUTGOING((byte)64),
+ * Restriction is interpreted as outgoing. OUTGOING(16384),
  *
- * Restriction is interpreted as blocking operation. BLOCK((byte)128);
+ * Restriction is interpreted as blocking operation. BLOCK(32768);
  */
 
-class AccountRestrictionTypeValueOptions {
+public enum AccountRestrictionFlag {
 
-    private AccountRestrictionTypeValueOptions() {
+    ADDRESS_VALUE(1),
+    MOSAIC_VALUE(2),
+    TRANSACTION_TYPE_VALUE(4),
+    OUTGOING_VALUE(16384),
+    BLOCK_VALUE(32768);
+
+    /**
+     * The value.
+     */
+    private final int value;
+
+    AccountRestrictionFlag(int value) {
+        this.value = value;
     }
 
-    static final int ADDRESS_VALUE = 0x01;
-    static final int MOSAIC_VALUE = 0x02;
-    static final int TRANSACTION_TYPE_VALUE = 0x04;
-    static final int SENTINEL_VALUE = 0x05;
-    static final int OUTGOING_VALUE = 0x40;
-    static final int BLOCK_VALUE = 0x80;
+    /**
+     * @return the low level value.
+     */
+    public int getValue() {
+        return value;
+    }
 }

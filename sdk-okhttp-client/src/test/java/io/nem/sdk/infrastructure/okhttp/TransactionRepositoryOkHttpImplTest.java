@@ -22,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.message.PlainMessage;
+import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionAnnounceResponse;
@@ -195,7 +195,7 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
 
         SignedTransaction signedTransaction = account.sign(transferTransaction, generationHash);
         String payload = signedTransaction.getPayload();
-        assertEquals(420, payload.length());
+        assertEquals(444, payload.length());
         return signedTransaction;
     }
 

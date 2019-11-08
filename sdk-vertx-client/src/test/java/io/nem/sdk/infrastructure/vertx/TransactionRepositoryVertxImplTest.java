@@ -194,7 +194,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
 
         SignedTransaction signedTransaction = account.sign(transferTransaction, generationHash);
         String payload = signedTransaction.getPayload();
-        assertEquals(420, payload.length());
+        assertEquals(444, payload.length());
         return signedTransaction;
     }
 

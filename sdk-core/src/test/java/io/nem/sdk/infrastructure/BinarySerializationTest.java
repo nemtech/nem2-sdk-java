@@ -106,7 +106,7 @@ class BinarySerializationTest {
 
         SignedTransaction signedTransaction = transaction.signWith(account, generationHash);
 
-        String signature = signedTransaction.getPayload().substring(8, 128 + 8);
+        String signature = signedTransaction.getPayload().substring(16, 128 + 16);
 
         //If we deserialize the signed transaction, we get everything back, include the signer and signature
 
@@ -116,7 +116,6 @@ class BinarySerializationTest {
         TransferTransaction deserialized = (TransferTransaction) binarySerialization
             .deserialize(payloadWithSignatureAndSigner);
 
-
         Assertions.assertTrue(deserialized.getSignature().isPresent());
         Assertions.assertTrue(deserialized.getSigner().isPresent());
         Assertions.assertEquals(signature, deserialized.getSignature().get().toUpperCase());
@@ -124,8 +123,8 @@ class BinarySerializationTest {
 
         //Test that the payload is the same, just without the signature and signer.
         byte[] payloadWithoutSignatureAndSigner = binarySerialization.serialize(transaction);
-        Assertions.assertEquals(Hex.toHexString(payloadWithoutSignatureAndSigner).substring(200),
-            Hex.toHexString(payloadWithSignatureAndSigner).substring(200));
+        Assertions.assertEquals(Hex.toHexString(payloadWithoutSignatureAndSigner).substring(208),
+            Hex.toHexString(payloadWithSignatureAndSigner).substring(208));
 
         Transaction deserializeWithoutSignature = binarySerialization
             .deserialize(payloadWithoutSignatureAndSigner);

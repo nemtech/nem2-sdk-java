@@ -18,16 +18,11 @@ package io.nem.sdk.infrastructure.okhttp.mappers;
 
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.transaction.CosignatoryModificationActionType;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
-import io.nem.sdk.model.transaction.MultisigCosignatoryModification;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.okhttp_gson.model.CosignatoryModificationActionEnum;
-import io.nem.sdk.openapi.okhttp_gson.model.CosignatoryModificationDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MultisigAccountModificationTransactionDTO;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,17 +40,19 @@ class MultisigAccountModificationTransactionMapper extends
     @Override
     protected MultisigAccountModificationTransactionFactory createFactory(
         NetworkType networkType, MultisigAccountModificationTransactionDTO transaction) {
-
-        List<MultisigCosignatoryModification> modifications =
-            transaction.getModifications() == null ? Collections.emptyList()
-                : transaction.getModifications().stream().map(m -> toModification(networkType, m))
-                    .collect(Collectors.toList());
-
+        List<PublicAccount> additions = transaction.getPublicKeyAdditions().stream()
+            .map(publicKey -> PublicAccount.createFromPublicKey(
+                publicKey,
+                networkType)).collect(Collectors.toList());
+        List<PublicAccount> deletions = transaction.getPublicKeyDeletions().stream()
+            .map(publicKey -> PublicAccount.createFromPublicKey(
+                publicKey,
+                networkType)).collect(Collectors.toList());
         return MultisigAccountModificationTransactionFactory.create(
             networkType,
             transaction.getMinApprovalDelta().byteValue(),
             transaction.getMinRemovalDelta().byteValue(),
-            modifications);
+            additions, deletions);
     }
 
     @Override
@@ -63,29 +60,13 @@ class MultisigAccountModificationTransactionMapper extends
         MultisigAccountModificationTransactionDTO dto) {
         dto.setMinApprovalDelta((int) transaction.getMinApprovalDelta());
         dto.setMinRemovalDelta((int) transaction.getMinRemovalDelta());
-        dto.setModifications(transaction.getModifications().stream().map(this::toModification)
-            .collect(Collectors.toList()));
+        dto.setPublicKeyAdditions(
+            transaction.getPublicKeyAdditions().stream().map(p -> p.getPublicKey().toHex())
+                .collect(Collectors.toList()));
+
+        dto.setPublicKeyDeletions(
+            transaction.getPublicKeyDeletions().stream().map(p -> p.getPublicKey().toHex())
+                .collect(Collectors.toList()));
     }
-
-    private MultisigCosignatoryModification toModification(NetworkType networkType,
-        CosignatoryModificationDTO dto) {
-        return new MultisigCosignatoryModification(
-            CosignatoryModificationActionType.rawValueOf(
-                dto.getModificationAction().getValue()),
-            PublicAccount.createFromPublicKey(
-                dto.getCosignatoryPublicKey(),
-                networkType));
-    }
-
-
-    private CosignatoryModificationDTO toModification(
-        MultisigCosignatoryModification model) {
-        CosignatoryModificationDTO dto = new CosignatoryModificationDTO();
-        dto.setModificationAction(
-            CosignatoryModificationActionEnum.fromValue(model.getModificationAction().getValue()));
-        dto.setCosignatoryPublicKey(model.getCosignatoryPublicAccount().getPublicKey().toHex());
-        return dto;
-    }
-
 
 }

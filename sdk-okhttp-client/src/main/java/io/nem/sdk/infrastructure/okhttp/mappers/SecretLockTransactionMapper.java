@@ -16,7 +16,7 @@
 
 package io.nem.sdk.infrastructure.okhttp.mappers;
 
-import static io.nem.core.utils.MapperUtils.toMosaicId;
+import static io.nem.core.utils.MapperUtils.toUnresolvedMosaicId;
 
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -45,7 +45,7 @@ class SecretLockTransactionMapper extends
         SecretLockTransactionDTO transaction) {
         Mosaic mosaic =
             new Mosaic(
-                toMosaicId(transaction.getMosaicId()),
+                toUnresolvedMosaicId(transaction.getMosaicId()),
                 transaction.getAmount());
         return SecretLockTransactionFactory.create(
             networkType,

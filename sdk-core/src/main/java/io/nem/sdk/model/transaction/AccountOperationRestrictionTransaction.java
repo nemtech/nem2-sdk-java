@@ -20,13 +20,15 @@ import java.util.List;
 public class AccountOperationRestrictionTransaction extends Transaction {
 
     private final AccountRestrictionType restrictionType;
-    private final List<AccountRestrictionModification<TransactionType>> modifications;
+    private final List<TransactionType> restrictionAdditions;
+    private final List<TransactionType> restrictionDeletions;
 
     AccountOperationRestrictionTransaction(
         AccountOperationRestrictionTransactionFactory factory) {
         super(factory);
         this.restrictionType = factory.getRestrictionType();
-        this.modifications = factory.getModifications();
+        this.restrictionAdditions = factory.getRestrictionAdditions();
+        this.restrictionDeletions = factory.getRestrictionDeletions();
     }
 
     /**
@@ -38,12 +40,18 @@ public class AccountOperationRestrictionTransaction extends Transaction {
         return this.restrictionType;
     }
 
+
     /**
-     * Get account operation restriction modifications
-     *
-     * @return list of {@link AccountRestrictionModification}
+     * @return List of transaction types that are going to be added to the restriction.
      */
-    public List<AccountRestrictionModification<TransactionType>> getModifications() {
-        return this.modifications;
+    public List<TransactionType> getRestrictionAdditions() {
+        return restrictionAdditions;
+    }
+
+    /**
+     * @return List of transaction types that are going to be removed from the restriction.
+     */
+    public List<TransactionType> getRestrictionDeletions() {
+        return restrictionDeletions;
     }
 }

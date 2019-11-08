@@ -65,7 +65,7 @@ public class TestHelperVertx {
             return IOUtils.toString(resourceAsStream, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new IllegalStateException(
-                "Cannot open resource " + resourceName + ". Error: " + ExceptionUtils.getMessage(e),
+                "Cannot open resource " + resName + ". Error: " + ExceptionUtils.getMessage(e),
                 e);
         }
     }

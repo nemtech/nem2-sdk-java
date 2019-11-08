@@ -16,6 +16,7 @@
 
 package io.nem.sdk.model.transaction;
 
+import io.nem.sdk.model.account.PublicAccount;
 import java.util.List;
 
 /**
@@ -29,14 +30,16 @@ public class MultisigAccountModificationTransaction extends Transaction {
 
     private final byte minApprovalDelta;
     private final byte minRemovalDelta;
-    private final List<MultisigCosignatoryModification> modifications;
+    private final List<PublicAccount> publicKeyAdditions;
+    private final List<PublicAccount> publicKeyDeletions;
 
     public MultisigAccountModificationTransaction(
         MultisigAccountModificationTransactionFactory factory) {
         super(factory);
         this.minApprovalDelta = factory.getMinApprovalDelta();
         this.minRemovalDelta = factory.getMinRemovalDelta();
-        this.modifications = factory.getModifications();
+        this.publicKeyAdditions = factory.getPublicKeyAdditions();
+        this.publicKeyDeletions = factory.getPublicKeyDeletions();
     }
 
     /**
@@ -60,12 +63,18 @@ public class MultisigAccountModificationTransaction extends Transaction {
     }
 
     /**
-     * The List of cosigner accounts added or removed from the multi-signature account.
-     *
-     * @return {@link List} of { @ link MultisigCosignatoryModification }
+     * @return List of public accounts that are going to be added to the multisig account.
      */
-    public List<MultisigCosignatoryModification> getModifications() {
-        return modifications;
+    public List<PublicAccount> getPublicKeyAdditions() {
+        return publicKeyAdditions;
     }
+
+    /**
+     * @return List of public accounts that are going to be removed from the multisig account.
+     */
+    public List<PublicAccount> getPublicKeyDeletions() {
+        return publicKeyDeletions;
+    }
+
 
 }

@@ -50,11 +50,11 @@ public class AddressAliasTransactionTest extends AbstractTransactionTester {
             .transactionInfo(transactionInfo).signature(signatureHex).deadline(new FakeDeadline())
             .maxFee(fee).build();
 
-        String expectedHash = "9a000000" + signatureHex
-            + "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b76301904e4201000000000000000100000000000000014bfa5f372d55b3849049e14bebca93758eb36805bae760a57239976f009a545cad";
+        String expectedHash = "a200000000000000" + signatureHex
+            + "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b7630000000001904e42010000000000000001000000000000004bfa5f372d55b3849049e14bebca93758eb36805bae760a57239976f009a545cad01";
         assertSerialization(expectedHash, transaction);
 
-        String expectedEmbeddedHash = "4a00000068b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b76301904e42014bfa5f372d55b3849049e14bebca93758eb36805bae760a57239976f009a545cad";
+        String expectedEmbeddedHash = "520000000000000068b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b7630000000001904e424bfa5f372d55b3849049e14bebca93758eb36805bae760a57239976f009a545cad01";
         assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
     }
 

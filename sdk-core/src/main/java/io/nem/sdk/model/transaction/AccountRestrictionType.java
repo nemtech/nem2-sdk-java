@@ -17,93 +17,96 @@
 package io.nem.sdk.model.transaction;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
- * Type of account restriction (DTO):
+ * The valid combinations of {@link AccountRestrictionFlag} that creates a {@link
+ * AccountRestrictionType}.
  *
- * 0x01 (1 decimal) - Allow only incoming transactions from a given address.
+ * Type of account restriction types:
  *
- * 0x02 (2 decimal) - Allow only incoming transactions containing a given mosaic identifier.
+ * 0x0001 (1 decimal) - Allow only incoming transactions from a given address.
  *
- * 0x05 (5 decimal) - Account restriction sentinel.
+ * 0x0002 (2 decimal) - Allow only incoming transactions containing a given mosaic identifier.
  *
- * 0x41 (65 decimal) - Allow only outgoing transactions to a given address.
+ * 0x4001 (16385 decimal) - Allow only outgoing transactions to a given address.
  *
- * 0x44 (68 decimal) - Allow only outgoing transactions with a given transaction type.
+ * 0x4004 (16388 decimal) - Allow only outgoing transactions with a given transaction type.
  *
- * 0x81 (129 decimal) - Block incoming transactions from a given address.
+ * 0x8001 (32769 decimal) - Block incoming transactions from a given address.
  *
- * 0x82 (130 decimal) - Block incoming transactions containing a given mosaic identifier.
+ * 0x8002 (32770 decimal) - Block incoming transactions containing a given mosaic identifier.
  *
- * 0xC1 (193 decimal) - Block outgoing transactions to a given address.
+ * 0xC001 (49153 decimal) - Block outgoing transactions to a given address.
  *
- * 0xC4 (196 decimal) - Block outgoing transactions with a given transaction type.
+ * 0xC004 (49156 decimal) - Block outgoing transactions with a given transaction type.
  */
 
 public enum AccountRestrictionType {
     /**
      * Allow only incoming transactions from a given address.
      */
-    ALLOW_INCOMING_ADDRESS(AccountRestrictionTypeValueOptions.ADDRESS_VALUE,
-        AccountRestrictionTargetType.ADDRESS),
+    ALLOW_INCOMING_ADDRESS(AccountRestrictionTargetType.ADDRESS,
+        AccountRestrictionFlag.ADDRESS_VALUE
+    ),
 
     /**
      * Allow only incoming transactions containing a a given mosaic identifier.
      */
-    ALLOW_INCOMING_MOSAIC(AccountRestrictionTypeValueOptions.MOSAIC_VALUE,
-        AccountRestrictionTargetType.MOSAIC_ID),
+    ALLOW_INCOMING_MOSAIC(AccountRestrictionTargetType.MOSAIC_ID,
+        AccountRestrictionFlag.MOSAIC_VALUE
+    ),
 
     /**
      * Allow only outgoing transactions from a given address.
      */
-    ALLOW_OUTGOING_ADDRESS(AccountRestrictionTypeValueOptions.ADDRESS_VALUE
-        + AccountRestrictionTypeValueOptions.OUTGOING_VALUE, AccountRestrictionTargetType.ADDRESS),
+    ALLOW_OUTGOING_ADDRESS(AccountRestrictionTargetType.ADDRESS,
+        AccountRestrictionFlag.ADDRESS_VALUE
+        , AccountRestrictionFlag.OUTGOING_VALUE),
 
     /**
      * Allow only outgoing transactions of a given type.
      */
-    ALLOW_OUTGOING_TRANSACTION_TYPE(AccountRestrictionTypeValueOptions.TRANSACTION_TYPE_VALUE
-        + AccountRestrictionTypeValueOptions.OUTGOING_VALUE,
-        AccountRestrictionTargetType.TRANSACTION_TYPE),
-
-    /**
-     * Account restriction type sentinel.
-     */
-    SENTINEL(AccountRestrictionTypeValueOptions.SENTINEL_VALUE,
-        AccountRestrictionTargetType.ADDRESS),
+    ALLOW_OUTGOING_TRANSACTION_TYPE(AccountRestrictionTargetType.TRANSACTION_TYPE,
+        AccountRestrictionFlag.TRANSACTION_TYPE_VALUE
+        , AccountRestrictionFlag.OUTGOING_VALUE
+    ),
 
     /**
      * Account restriction is interpreted as blocking address operation.
      */
-    BLOCK_ADDRESS(AccountRestrictionTypeValueOptions.ADDRESS_VALUE
-        + AccountRestrictionTypeValueOptions.BLOCK_VALUE, AccountRestrictionTargetType.ADDRESS),
+    BLOCK_ADDRESS(AccountRestrictionTargetType.ADDRESS, AccountRestrictionFlag.ADDRESS_VALUE
+        , AccountRestrictionFlag.BLOCK_VALUE),
 
     /**
      * Account restriction is interpreted as blocking mosaicId operation.
      */
-    BLOCK_MOSAIC(AccountRestrictionTypeValueOptions.MOSAIC_VALUE
-        + AccountRestrictionTypeValueOptions.BLOCK_VALUE, AccountRestrictionTargetType.MOSAIC_ID),
+    BLOCK_MOSAIC(AccountRestrictionTargetType.MOSAIC_ID, AccountRestrictionFlag.MOSAIC_VALUE
+        , AccountRestrictionFlag.BLOCK_VALUE),
 
     /**
      * Block outgoing transactions for a given address.
      */
-    BLOCK_OUTGOING_ADDRESS(AccountRestrictionTypeValueOptions.ADDRESS_VALUE
-        + AccountRestrictionTypeValueOptions.BLOCK_VALUE
-        + AccountRestrictionTypeValueOptions.OUTGOING_VALUE, AccountRestrictionTargetType.ADDRESS),
+    BLOCK_OUTGOING_ADDRESS(AccountRestrictionTargetType.ADDRESS,
+        AccountRestrictionFlag.ADDRESS_VALUE
+        , AccountRestrictionFlag.BLOCK_VALUE
+        , AccountRestrictionFlag.OUTGOING_VALUE),
 
     /**
      * Block outgoing transactions for a given transactionType.
      */
     BLOCK_OUTGOING_TRANSACTION_TYPE(
-        AccountRestrictionTypeValueOptions.TRANSACTION_TYPE_VALUE
-            + AccountRestrictionTypeValueOptions.BLOCK_VALUE
-            + AccountRestrictionTypeValueOptions.OUTGOING_VALUE,
-        AccountRestrictionTargetType.TRANSACTION_TYPE);
+        AccountRestrictionTargetType.TRANSACTION_TYPE, AccountRestrictionFlag.TRANSACTION_TYPE_VALUE
+        , AccountRestrictionFlag.BLOCK_VALUE
+        , AccountRestrictionFlag.OUTGOING_VALUE
+    );
 
+    private List<AccountRestrictionFlag> flags;
     /**
      * Enum value.
      */
     private final int value;
+
 
     /**
      * The target type.
@@ -113,11 +116,13 @@ public enum AccountRestrictionType {
     /**
      * Constructor.
      *
-     * @param value Enum value.
      * @param targetType the target type
+     * @param flags the values this type is composed of.
      */
-    AccountRestrictionType(final int value, AccountRestrictionTargetType targetType) {
-        this.value = value;
+    AccountRestrictionType(AccountRestrictionTargetType targetType,
+        AccountRestrictionFlag... flags) {
+        this.flags = Arrays.asList(flags);
+        this.value = this.flags.stream().mapToInt(AccountRestrictionFlag::getValue).sum();
         this.targetType = targetType;
     }
 
@@ -139,6 +144,14 @@ public enum AccountRestrictionType {
      */
     public int getValue() {
         return value;
+    }
+
+
+    /**
+     * @return a list with the individual flags.
+     */
+    public List<AccountRestrictionFlag> getFlags() {
+        return flags;
     }
 
     /**

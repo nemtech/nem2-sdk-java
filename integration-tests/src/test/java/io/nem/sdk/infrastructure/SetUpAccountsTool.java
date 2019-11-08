@@ -23,16 +23,15 @@ import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.AccountInfo;
 import io.nem.sdk.model.account.MultisigAccountInfo;
+import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
-import io.nem.sdk.model.transaction.CosignatoryModificationActionType;
 import io.nem.sdk.model.transaction.HashLockTransaction;
 import io.nem.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
-import io.nem.sdk.model.transaction.MultisigCosignatoryModification;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.TransactionAnnounceResponse;
 import io.nem.sdk.model.transaction.TransferTransaction;
@@ -41,6 +40,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
@@ -117,10 +117,11 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
         }
 
         System.out.println("Creating multisg account");
+        List<PublicAccount> additions = Arrays.stream(accounts)
+            .map(Account::getPublicAccount).collect(Collectors.toList());
         MultisigAccountModificationTransaction convertIntoMultisigTransaction = MultisigAccountModificationTransactionFactory
-            .create(getNetworkType(), (byte) 1, (byte) 1, Arrays.stream(accounts)
-                .map(a -> new MultisigCosignatoryModification(CosignatoryModificationActionType.ADD,
-                    a.getPublicAccount())).collect(Collectors.toList())).build();
+            .create(getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList())
+            .build();
 
         AggregateTransaction aggregateTransaction = AggregateTransactionFactory.createBonded(
             getNetworkType(),

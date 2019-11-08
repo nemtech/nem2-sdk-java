@@ -17,6 +17,7 @@
 
 package io.nem.sdk.model.transaction;
 
+import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -29,18 +30,22 @@ public class MultisigAccountModificationTransactionFactory extends
 
     private final byte minApprovalDelta;
     private final byte minRemovalDelta;
-    private final List<MultisigCosignatoryModification> modifications;
+    private final List<PublicAccount> publicKeyAdditions;
+    private final List<PublicAccount> publicKeyDeletions;
 
     private MultisigAccountModificationTransactionFactory(
         NetworkType networkType,
         byte minApprovalDelta,
         byte minRemovalDelta,
-        List<MultisigCosignatoryModification> modifications) {
+        List<PublicAccount> publicKeyAdditions,
+        List<PublicAccount> publicKeyDeletions) {
         super(TransactionType.MODIFY_MULTISIG_ACCOUNT, networkType);
-        Validate.notNull(modifications, "Modifications must not be null");
+        Validate.notNull(publicKeyAdditions, "PublicKeyAdditions must not be null");
+        Validate.notNull(publicKeyDeletions, "PublicKeyDeletions must not be null");
         this.minApprovalDelta = minApprovalDelta;
         this.minRemovalDelta = minRemovalDelta;
-        this.modifications = modifications;
+        this.publicKeyAdditions = publicKeyAdditions;
+        this.publicKeyDeletions = publicKeyDeletions;
     }
 
     /**
@@ -49,16 +54,21 @@ public class MultisigAccountModificationTransactionFactory extends
      * @param networkType Network type.
      * @param minApprovalDelta Minimum approval delta.
      * @param minRemovalDelta Minimum removal delta.
-     * @param modifications List of multisig account modifications.
+     * @param publicKeyAdditions List of public accounts that are going to be added to the multisig
+     * account.
+     * @param publicKeyDeletions List of public accounts that are going to be removed from the
+     * multisig account.
      * @return Multisig account modification transaction.
      */
     public static MultisigAccountModificationTransactionFactory create(
         NetworkType networkType,
         byte minApprovalDelta,
         byte minRemovalDelta,
-        List<MultisigCosignatoryModification> modifications) {
-        return new MultisigAccountModificationTransactionFactory(networkType, minApprovalDelta, minRemovalDelta,
-            modifications);
+        List<PublicAccount> publicKeyAdditions,
+        List<PublicAccount> publicKeyDeletions) {
+        return new MultisigAccountModificationTransactionFactory(networkType, minApprovalDelta,
+            minRemovalDelta,
+            publicKeyAdditions, publicKeyDeletions);
     }
 
     /**
@@ -82,13 +92,19 @@ public class MultisigAccountModificationTransactionFactory extends
     }
 
     /**
-     * The List of cosigner accounts added or removed from the multi-signature account.
-     *
-     * @return {@link List} of { @ link MultisigCosignatoryModification }
+     * @return List of public accounts that are going to be added to the multisig account.
      */
-    public List<MultisigCosignatoryModification> getModifications() {
-        return modifications;
+    public List<PublicAccount> getPublicKeyAdditions() {
+        return publicKeyAdditions;
     }
+
+    /**
+     * @return List of public accounts that are going to be removed from the multisig account.
+     */
+    public List<PublicAccount> getPublicKeyDeletions() {
+        return publicKeyDeletions;
+    }
+
 
     @Override
     public MultisigAccountModificationTransaction build() {

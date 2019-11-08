@@ -29,18 +29,14 @@ import io.nem.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.sdk.model.receipt.ReceiptType;
 import io.nem.sdk.model.restriction.MosaicRestrictionEntryType;
 import io.nem.sdk.model.transaction.AccountLinkAction;
-import io.nem.sdk.model.transaction.AccountRestrictionModificationAction;
 import io.nem.sdk.model.transaction.AccountRestrictionType;
-import io.nem.sdk.model.transaction.CosignatoryModificationActionType;
 import io.nem.sdk.model.transaction.LockHashAlgorithmType;
 import io.nem.sdk.model.transaction.MosaicRestrictionType;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.openapi.vertx.model.AccountLinkActionEnum;
-import io.nem.sdk.openapi.vertx.model.AccountRestrictionModificationActionEnum;
-import io.nem.sdk.openapi.vertx.model.AccountRestrictionTypeEnum;
+import io.nem.sdk.openapi.vertx.model.AccountRestrictionFlagsEnum;
 import io.nem.sdk.openapi.vertx.model.AccountTypeEnum;
 import io.nem.sdk.openapi.vertx.model.AliasActionEnum;
-import io.nem.sdk.openapi.vertx.model.CosignatoryModificationActionEnum;
 import io.nem.sdk.openapi.vertx.model.LockHashAlgorithmEnum;
 import io.nem.sdk.openapi.vertx.model.MessageTypeEnum;
 import io.nem.sdk.openapi.vertx.model.MosaicRestrictionEntryTypeEnum;
@@ -92,7 +88,7 @@ public class EnumMapperTest {
 
     @Test
     public void shouldAccountRestrictionTypeEnumMapToAccountRestrictionType() {
-        Arrays.stream(AccountRestrictionTypeEnum.values()).forEach(
+        Arrays.stream(AccountRestrictionFlagsEnum.values()).forEach(
             v -> Assertions.assertNotNull(AccountRestrictionType.rawValueOf(v.getValue())));
     }
 
@@ -100,7 +96,7 @@ public class EnumMapperTest {
     public void shouldAccountRestrictionTypeMapToAccountRestrictionType() {
         Arrays.stream(AccountRestrictionType.values()).forEach(
             v -> Assertions
-                .assertNotNull(AccountRestrictionTypeEnum.fromValue((int) v.getValue())));
+                .assertNotNull(AccountRestrictionFlagsEnum.fromValue((int) v.getValue())));
 
     }
 
@@ -204,29 +200,14 @@ public class EnumMapperTest {
 
     @Test
     void testAccountRestrictionModificationDTO() {
-        Set<Byte> existingValues = new HashSet<>();
-        Arrays.stream(AccountRestrictionModificationAction.values()).forEach(v -> {
-            Assertions
-                .assertNotNull(AccountRestrictionModificationActionEnum.fromValue(
-                    (int) v.getValue()), v.name());
-            Assertions
-                .assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
-        });
-    }
-
-    @Test
-    void testAccountRestrictionModificationActionModel() {
         Set<Integer> existingValues = new HashSet<>();
-        Arrays.stream(AccountRestrictionModificationActionEnum.values()).forEach(v -> {
+        Arrays.stream(AccountRestrictionType.values()).forEach(v -> {
             Assertions
-                .assertNotNull(
-                    AccountRestrictionModificationAction.rawValueOf(v.getValue().byteValue()),
-                    v.name());
+                .assertNotNull(AccountRestrictionFlagsEnum.fromValue(v.getValue()), v.name());
             Assertions
                 .assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
         });
     }
-
 
     @Test
     void testAccountTypeDto() {
@@ -256,7 +237,7 @@ public class EnumMapperTest {
         Set<Integer> existingValues = new HashSet<>();
         Arrays.stream(AccountRestrictionType.values()).forEach(v -> {
             Assertions
-                .assertNotNull(AccountRestrictionTypeEnum.fromValue(v.getValue()), v.name());
+                .assertNotNull(AccountRestrictionFlagsEnum.fromValue(v.getValue()), v.name());
             Assertions
                 .assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
         });
@@ -265,35 +246,9 @@ public class EnumMapperTest {
     @Test
     void testAccountRestrictionTypeModel() {
         Set<Integer> existingValues = new HashSet<>();
-        Arrays.stream(AccountRestrictionTypeEnum.values()).forEach(v -> {
+        Arrays.stream(AccountRestrictionFlagsEnum.values()).forEach(v -> {
             Assertions
                 .assertNotNull(AccountRestrictionType.rawValueOf(v.getValue()),
-                    v.name());
-            Assertions
-                .assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
-        });
-    }
-
-
-    @Test
-    void testCosignatoryModificationActionDto() {
-        Set<Integer> existingValues = new HashSet<>();
-        Arrays.stream(CosignatoryModificationActionType.values()).forEach(v -> {
-            Assertions
-                .assertNotNull(CosignatoryModificationActionEnum.fromValue((int) v.getValue()),
-                    v.name());
-            Assertions
-                .assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
-        });
-    }
-
-    @Test
-    void testCosignatoryModificationActionModel() {
-        Set<Integer> existingValues = new HashSet<>();
-        Arrays.stream(CosignatoryModificationActionEnum.values()).forEach(v -> {
-            Assertions
-                .assertNotNull(
-                    CosignatoryModificationActionType.rawValueOf(v.getValue().byteValue()),
                     v.name());
             Assertions
                 .assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");

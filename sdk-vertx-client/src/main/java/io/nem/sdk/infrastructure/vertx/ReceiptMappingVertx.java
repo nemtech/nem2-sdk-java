@@ -37,10 +37,11 @@ import io.nem.sdk.model.receipt.ResolutionEntry;
 import io.nem.sdk.model.receipt.Statement;
 import io.nem.sdk.model.receipt.TransactionStatement;
 import io.nem.sdk.model.transaction.JsonHelper;
-import io.nem.sdk.openapi.vertx.model.ArtifactExpiryReceiptDTO;
 import io.nem.sdk.openapi.vertx.model.BalanceChangeReceiptDTO;
 import io.nem.sdk.openapi.vertx.model.BalanceTransferReceiptDTO;
 import io.nem.sdk.openapi.vertx.model.InflationReceiptDTO;
+import io.nem.sdk.openapi.vertx.model.MosaicExpiryReceiptDTO;
+import io.nem.sdk.openapi.vertx.model.NamespaceExpiryReceiptDTO;
 import io.nem.sdk.openapi.vertx.model.ResolutionStatementBodyDTO;
 import io.nem.sdk.openapi.vertx.model.ResolutionStatementDTO;
 import io.nem.sdk.openapi.vertx.model.StatementsDTO;
@@ -139,10 +140,12 @@ public class ReceiptMappingVertx {
                 return createBalanceTransferRecipient(
                     jsonHelper.convert(receiptDto, BalanceTransferReceiptDTO.class), networkType);
             case MOSAIC_EXPIRED:
+                return createArtifactExpiryReceipt(
+                    jsonHelper.convert(receiptDto, MosaicExpiryReceiptDTO.class), type);
             case NAMESPACE_EXPIRED:
             case NAMESPACE_DELETED:
                 return createArtifactExpiryReceipt(
-                    jsonHelper.convert(receiptDto, ArtifactExpiryReceiptDTO.class), type);
+                    jsonHelper.convert(receiptDto, NamespaceExpiryReceiptDTO.class), type);
             case INFLATION:
                 return createInflationReceipt(
                     jsonHelper.convert(receiptDto, InflationReceiptDTO.class));
@@ -152,9 +155,16 @@ public class ReceiptMappingVertx {
     }
 
     public ArtifactExpiryReceipt<MosaicId> createArtifactExpiryReceipt(
-        ArtifactExpiryReceiptDTO receipt, ReceiptType type) {
+        NamespaceExpiryReceiptDTO receipt, ReceiptType type) {
         return new ArtifactExpiryReceipt<>(
-            MapperUtils.toMosaicId(receipt.getArtifactId().toString()), type,
+            MapperUtils.toMosaicId(receipt.getArtifactId()), type,
+            ReceiptVersion.ARTIFACT_EXPIRY);
+    }
+
+    public ArtifactExpiryReceipt<MosaicId> createArtifactExpiryReceipt(
+        MosaicExpiryReceiptDTO receipt, ReceiptType type) {
+        return new ArtifactExpiryReceipt<>(
+            MapperUtils.toMosaicId(receipt.getArtifactId()), type,
             ReceiptVersion.ARTIFACT_EXPIRY);
     }
 

@@ -33,6 +33,8 @@ import org.bouncycastle.util.encoders.Hex;
  */
 public class AggregateTransaction extends Transaction {
 
+    private final String transactionsHash;
+
     private final List<Transaction> innerTransactions;
 
     private final List<AggregateTransactionCosignature> cosignatures;
@@ -42,6 +44,7 @@ public class AggregateTransaction extends Transaction {
      */
     AggregateTransaction(AggregateTransactionFactory factory) {
         super(factory);
+        this.transactionsHash = factory.getTransactionsHash();
         this.innerTransactions = factory.getInnerTransactions();
         this.cosignatures = factory.getCosignatures();
     }
@@ -64,7 +67,12 @@ public class AggregateTransaction extends Transaction {
         return cosignatures;
     }
 
-
+    /**
+     * @return Aggregate hash of an aggregate's transactions
+     */
+    public String getTransactionsHash() {
+        return transactionsHash;
+    }
     /**
      * Sign transaction with cosignatories creating a new SignedTransaction.
      *

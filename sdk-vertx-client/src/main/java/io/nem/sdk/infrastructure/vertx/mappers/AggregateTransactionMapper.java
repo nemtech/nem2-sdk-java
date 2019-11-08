@@ -76,8 +76,10 @@ class AggregateTransactionMapper extends
                     .collect(Collectors.toList());
         }
 
-        return AggregateTransactionFactory.create(getTransactionType(), networkType, transactions,
-            cosignatures);
+        return AggregateTransactionFactory
+            .create(getTransactionType(), networkType, transaction.getTransactionsHash(),
+                transactions,
+                cosignatures);
     }
 
     private AggregateTransactionCosignature toCosignature(NetworkType networkType,
@@ -100,6 +102,7 @@ class AggregateTransactionMapper extends
                 transaction.getCosignatures().stream().map(this::toCosignature)
                     .collect(Collectors.toList());
         }
+        dto.setTransactionsHash(transaction.getTransactionsHash());
         dto.setCosignatures(cosignatures);
         dto.setTransactions(transactions);
     }

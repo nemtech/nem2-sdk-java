@@ -22,7 +22,7 @@ import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,45 +36,42 @@ public class AccountMosaicRestrictionTransactionTest extends AbstractTransaction
 
     static UnresolvedMosaicId mosaicId = new MosaicId(BigInteger.valueOf(1000));
 
+    static UnresolvedMosaicId mosaicId2 = new MosaicId(BigInteger.valueOf(2000));
+
 
     @Test
     void create() {
-        final List<AccountRestrictionModification<UnresolvedMosaicId>> modifications = new ArrayList<>();
-        AccountRestrictionModification<UnresolvedMosaicId> modification = AccountRestrictionModification
-            .createForMosaic(AccountRestrictionModificationAction.ADD, mosaicId);
-        modifications.add(modification);
+        List<UnresolvedMosaicId> additions = Collections.singletonList(mosaicId);
+        List<UnresolvedMosaicId> deletions = Collections.singletonList(mosaicId2);
+
         AccountMosaicRestrictionTransaction transaction =
             AccountMosaicRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 AccountRestrictionType.ALLOW_INCOMING_MOSAIC,
-                modifications).deadline(new FakeDeadline()).build();
+                additions, deletions).deadline(new FakeDeadline()).build();
         Assertions.assertEquals(AccountRestrictionType.ALLOW_INCOMING_MOSAIC,
             transaction.getRestrictionType());
-        Assertions.assertEquals(modifications, transaction.getModifications());
-        Assertions.assertEquals(AccountRestrictionModificationAction.ADD,
-            modification.getModificationAction());
-        Assertions.assertEquals(mosaicId,
-            modification.getValue());
+        Assertions.assertEquals(additions, transaction.getRestrictionAdditions());
+        Assertions.assertEquals(deletions, transaction.getRestrictionDeletions());
     }
 
     @Test
     void shouldGenerateBytes() {
 
-        final List<AccountRestrictionModification<UnresolvedMosaicId>> modifications = new ArrayList<>();
-        AccountRestrictionModification<UnresolvedMosaicId> modification = AccountRestrictionModification
-            .createForMosaic(AccountRestrictionModificationAction.ADD, mosaicId);
-        modifications.add(modification);
+        List<UnresolvedMosaicId> additions = Collections.singletonList(mosaicId);
+        List<UnresolvedMosaicId> deletions = Collections.singletonList(mosaicId2);
         AccountMosaicRestrictionTransaction transaction =
             AccountMosaicRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 AccountRestrictionType.ALLOW_INCOMING_MOSAIC,
-                modifications).deadline(new FakeDeadline()).signer(account.getPublicAccount())
+                additions, deletions).deadline(new FakeDeadline())
+                .signer(account.getPublicAccount())
                 .build();
 
-        String expected = "83000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240190504200000000000000000100000000000000020101e803000000000000";
+        String expected = "9800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001905042000000000000000001000000000000000200010100000000e803000000000000d007000000000000";
         assertSerialization(expected, transaction);
 
-        String expectedEmbeddedHash = "330000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401905042020101e803000000000000";
+        String expectedEmbeddedHash = "48000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2400000000019050420200010100000000e803000000000000d007000000000000";
         assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
     }
 }

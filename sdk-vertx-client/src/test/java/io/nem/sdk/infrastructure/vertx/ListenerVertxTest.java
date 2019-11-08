@@ -19,6 +19,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.infrastructure.ListenerChannel;
 import io.nem.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.sdk.model.account.Account;
@@ -27,16 +28,15 @@ import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.mosaic.Mosaic;
+import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionCosignature;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
-import io.nem.sdk.model.transaction.CosignatoryModificationActionType;
 import io.nem.sdk.model.transaction.HashLockTransaction;
 import io.nem.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
-import io.nem.sdk.model.transaction.MultisigCosignatoryModification;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionStatusError;
@@ -226,63 +226,41 @@ public class ListenerVertxTest {
         Assertions.assertTrue(listener
             .transactionFromAddress(
                 multisigAccountModificationTransaction(account1.getPublicAccount(),
-                    CosignatoryModificationActionType.ADD, account3.getPublicAccount()),
-                account1.getAddress()));
-
-        Assertions.assertFalse(listener
-            .transactionFromAddress(
-                multisigAccountModificationTransaction(account2.getPublicAccount(),
-                    CosignatoryModificationActionType.ADD,
                     account3.getPublicAccount()),
                 account1.getAddress()));
 
         Assertions.assertFalse(listener
             .transactionFromAddress(
-                multisigAccountModificationTransaction(null, CosignatoryModificationActionType.ADD,
+                multisigAccountModificationTransaction(account2.getPublicAccount(),
+
                     account3.getPublicAccount()),
                 account1.getAddress()));
-
-        Assertions.assertTrue(listener
-            .transactionFromAddress(
-                multisigAccountModificationTransaction(account1.getPublicAccount(),
-                    CosignatoryModificationActionType.ADD,
-                    account3.getPublicAccount()),
-                account3.getAddress()));
-
-        Assertions.assertTrue(listener
-            .transactionFromAddress(
-                multisigAccountModificationTransaction(account2.getPublicAccount(),
-                    CosignatoryModificationActionType.ADD,
-                    account3.getPublicAccount()),
-                account3.getAddress()));
-
-        Assertions.assertTrue(listener
-            .transactionFromAddress(
-                multisigAccountModificationTransaction(null, CosignatoryModificationActionType.ADD,
-                    account3.getPublicAccount()),
-                account3.getAddress()));
-
-        Assertions.assertFalse(listener
-            .transactionFromAddress(
-                multisigAccountModificationTransaction(account1.getPublicAccount(),
-                    CosignatoryModificationActionType.REMOVE,
-                    account3.getPublicAccount()),
-                account3.getAddress()));
-
-        Assertions.assertFalse(listener
-            .transactionFromAddress(
-                multisigAccountModificationTransaction(account2.getPublicAccount(),
-                    CosignatoryModificationActionType.REMOVE,
-                    account3.getPublicAccount()),
-                account3.getAddress()));
 
         Assertions.assertFalse(listener
             .transactionFromAddress(
                 multisigAccountModificationTransaction(null,
-                    CosignatoryModificationActionType.REMOVE,
+                    account3.getPublicAccount()),
+                account1.getAddress()));
+
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                multisigAccountModificationTransaction(account1.getPublicAccount(),
+
                     account3.getPublicAccount()),
                 account3.getAddress()));
 
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                multisigAccountModificationTransaction(account2.getPublicAccount(),
+
+                    account3.getPublicAccount()),
+                account3.getAddress()));
+
+        Assertions.assertTrue(listener
+            .transactionFromAddress(
+                multisigAccountModificationTransaction(null,
+                    account3.getPublicAccount()),
+                account3.getAddress()));
     }
 
     @Test
@@ -364,14 +342,13 @@ public class ListenerVertxTest {
     }
 
     private MultisigAccountModificationTransaction multisigAccountModificationTransaction(
-        PublicAccount signer, CosignatoryModificationActionType modificationAction,
+        PublicAccount signer,
         PublicAccount cosignatoryPublicAccount) {
-        List<MultisigCosignatoryModification> modifications = new ArrayList<>();
-        modifications
-            .add(new MultisigCosignatoryModification(modificationAction, cosignatoryPublicAccount));
+        List<PublicAccount> additions = Collections.singletonList(cosignatoryPublicAccount);
+        List<PublicAccount> deletions = Collections.singletonList(cosignatoryPublicAccount);
+
         MultisigAccountModificationTransactionFactory factory = MultisigAccountModificationTransactionFactory
-            .create(
-                NetworkType.MIJIN_TEST, (byte) 0, (byte) 0, modifications);
+            .create(NetworkType.MIJIN_TEST, (byte) 0, (byte) 0, additions, deletions);
         if (signer != null) {
             factory.signer(signer);
         }
@@ -474,8 +451,10 @@ public class ListenerVertxTest {
                 "payload",
                 "8498B38D89C1DC8A448EA5824938FF828926CD9F7747B1844B59B4B6807E878B",
                 TransactionType.AGGREGATE_BONDED);
+        MosaicId mosaicId = MapperUtils.toMosaicId("123");
+        Mosaic mosaic = new Mosaic(mosaicId, BigInteger.TEN);
         HashLockTransactionFactory factory = HashLockTransactionFactory.create(
-            NetworkType.MIJIN_TEST, Mockito.mock(Mosaic.class),
+            NetworkType.MIJIN_TEST, mosaic,
             BigInteger.TEN, signedTransaction);
         if (signer != null) {
             factory.signer(signer);

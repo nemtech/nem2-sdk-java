@@ -174,7 +174,7 @@ public class MetadataRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl i
         MetadataEntry metadataEntry = new MetadataEntry(entryDto.getCompositeHash(),
             entryDto.getSenderPublicKey(), entryDto.getTargetPublicKey(),
             new BigInteger(entryDto.getScopedMetadataKey(), 16),
-            MetadataType.rawValueOf(entryDto.getMetadataType().getValue()), entryDto.getValueSize(),
+            MetadataType.rawValueOf(entryDto.getMetadataType().getValue()),
             ConvertUtils.fromHexToString(entryDto.getValue()),
             Optional.ofNullable(Objects.toString(entryDto.getTargetId(), null)));
         return new Metadata(dto.getId(), metadataEntry);

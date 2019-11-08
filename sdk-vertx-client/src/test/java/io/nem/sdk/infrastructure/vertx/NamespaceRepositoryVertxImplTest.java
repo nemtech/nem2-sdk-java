@@ -32,6 +32,7 @@ import io.nem.sdk.openapi.vertx.model.NamespaceInfoDTO;
 import io.nem.sdk.openapi.vertx.model.NamespaceMetaDTO;
 import io.nem.sdk.openapi.vertx.model.NamespaceNameDTO;
 import io.nem.sdk.openapi.vertx.model.NamespaceRegistrationTypeEnum;
+import io.nem.sdk.openapi.vertx.model.NamespacesInfoDTO;
 import io.nem.sdk.openapi.vertx.model.NetworkTypeDTO;
 import io.nem.sdk.openapi.vertx.model.NetworkTypeNameEnum;
 import java.math.BigInteger;
@@ -133,7 +134,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
         dto.setNamespace(namespace);
 
-        mockRemoteCall(Collections.singletonList(dto));
+        mockRemoteCall(new NamespacesInfoDTO().addNamespacesItem(dto));
 
         NamespaceInfo info = repository.getNamespacesFromAccount(address).toFuture().get().get(0);
 
@@ -181,7 +182,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
         dto.setNamespace(namespace);
 
-        mockRemoteCall(Collections.singletonList(dto));
+        mockRemoteCall(new NamespacesInfoDTO().addNamespacesItem(dto));
 
         NamespaceInfo info = repository
             .getNamespacesFromAccounts(Collections.singletonList(address)).toFuture().get().get(0);

@@ -27,6 +27,7 @@ import io.nem.catapult.builders.SignatureDto;
 import io.nem.catapult.builders.UnresolvedAddressDto;
 import io.nem.catapult.builders.UnresolvedMosaicBuilder;
 import io.nem.catapult.builders.UnresolvedMosaicIdDto;
+import io.nem.core.crypto.PublicKey;
 import io.nem.core.utils.ConvertUtils;
 import io.nem.core.utils.MapperUtils;
 import io.nem.core.utils.StringEncoder;
@@ -39,13 +40,13 @@ import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.namespace.NamespaceId;
 import java.io.ByteArrayInputStream;
-import java.io.DataInput;
 import java.io.DataInputStream;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.lang3.Validate;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Utility class used to serialize/deserialize catbuffer values.
@@ -84,12 +85,12 @@ public class SerializationUtils {
     }
 
     /**
-     * It creates a {@link MosaicId} from an {@link UnresolvedMosaicIdDto}.
+     * It creates a {@link UnresolvedMosaicId} from an {@link UnresolvedMosaicIdDto}.
      *
      * @param dto the catbuffer {@link UnresolvedMosaicIdDto}.
-     * @return the model {@link MosaicId}
+     * @return the model {@link UnresolvedMosaicId}
      */
-    public static UnresolvedMosaicId toMosaicId(UnresolvedMosaicIdDto dto) {
+    public static UnresolvedMosaicId toUnresolvedMosaicId(UnresolvedMosaicIdDto dto) {
         return new MosaicId(toUnsignedBigInteger(dto.getUnresolvedMosaicId()));
     }
 
@@ -111,17 +112,6 @@ public class SerializationUtils {
      */
     public static NamespaceId toNamespaceId(NamespaceIdDto dto) {
         return NamespaceId.createFromId(toUnsignedBigInteger(dto.getNamespaceId()));
-    }
-
-    /**
-     * It creates a {@link Address} from an {@link UnresolvedAddressDto}.
-     *
-     * @param dto the catbuffer {@link UnresolvedAddressDto}.
-     * @return the model {@link Address}
-     */
-    public static UnresolvedAddress toAddress(UnresolvedAddressDto dto) {
-        return MapperUtils
-            .toUnresolvedAddress(ConvertUtils.toHex(dto.getUnresolvedAddress().array()));
     }
 
     /**
@@ -163,6 +153,30 @@ public class SerializationUtils {
         return Address.createFromEncoded(ConvertUtils.toHex(dto.getAddress().array()));
     }
 
+    /**
+     * It creates a {@link UnresolvedAddressDto} from an {@link UnresolvedAddress}.
+     *
+     * @param unresolvedAddress the catbuffer {@link UnresolvedAddressDto}.
+     * @return the dto {@link UnresolvedAddressDto}
+     */
+    public static UnresolvedAddressDto toUnresolvedAddress(UnresolvedAddress unresolvedAddress,
+        NetworkType networkType) {
+        return new UnresolvedAddressDto(
+            SerializationUtils.fromUnresolvedAddressToByteBuffer(unresolvedAddress, networkType));
+    }
+
+
+    /**
+     * It creates a {@link UnresolvedAddress} from an {@link UnresolvedAddressDto}.
+     *
+     * @param dto the catbuffer {@link UnresolvedAddressDto}.
+     * @return the model {@link UnresolvedAddress}
+     */
+    public static UnresolvedAddress toUnresolvedAddress(UnresolvedAddressDto dto) {
+        return MapperUtils
+            .toUnresolvedAddress(ConvertUtils.toHex(dto.getUnresolvedAddress().array()));
+    }
+
 
     /**
      * It converts a signed byte to a positive integer.
@@ -185,12 +199,12 @@ public class SerializationUtils {
     }
 
     /**
-     * It creates a {@link DataInput} from a binary payload.
+     * It creates a {@link DataInputStream} from a binary payload.
      *
      * @param payload the payload
-     * @return the {@link DataInput} catbuffer uses.
+     * @return the {@link DataInputStream} catbuffer uses.
      */
-    public static DataInput toDataInput(byte[] payload) {
+    public static DataInputStream toDataInput(byte[] payload) {
         return new DataInputStream(new ByteArrayInputStream(payload));
     }
 
@@ -225,13 +239,13 @@ public class SerializationUtils {
     }
 
     /**
-     * It extracts the hex string from the {@link SignatureDto}
+     * It extracts the hex string from the {@link ByteBuffer}
      *
-     * @param dto the {@link SignatureDto}
+     * @param buffer the {@link ByteBuffer}
      * @return the hex string.
      */
-    public static String toHexString(SignatureDto dto) {
-        return ConvertUtils.toHex(dto.getSignature().array());
+    public static String toHexString(ByteBuffer buffer) {
+        return ConvertUtils.toHex(buffer.array());
     }
 
     /**
@@ -282,5 +296,22 @@ public class SerializationUtils {
         return new SignatureDto(ByteBuffer.wrap(ConvertUtils.getBytes(signature)));
     }
 
+    /**
+     * It creates a catbuffer KeyDto from a {@link PublicKey}.
+     *
+     * @param publicKey the public key.
+     * @return the keyDto
+     */
+    public static KeyDto toKeyDto(PublicKey publicKey) {
+        return new KeyDto(ByteBuffer.wrap(publicKey.getBytes()));
+    }
 
+    /**
+     * It creates a catbuffer Hash256Dto from a String hash.
+     * @param hash the hash
+     * @return the {@link Hash256Dto}
+     */
+    public static Hash256Dto toHash256Dto(String hash){
+        return new Hash256Dto(ByteBuffer.wrap(Hex.decode(hash)));
+    }
 }

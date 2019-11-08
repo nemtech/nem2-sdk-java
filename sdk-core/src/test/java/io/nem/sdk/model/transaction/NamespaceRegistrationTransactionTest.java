@@ -54,8 +54,8 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
         SignedTransaction signedTransaction =
             namespaceRegistrationTransaction.signWith(testAccount, generationHash);
 
-        assertEquals("00E803000000000000CFCBE72D994BE69B13726F6F742D746573742D6E616D657370616365",
-            signedTransaction.getPayload().substring(240)
+        assertEquals("1A000000E803000000000000CFCBE72D994BE69B0013726F6F742D746573742D6E616D657370616365",
+            signedTransaction.getPayload().substring(248)
         );
         assertEquals(NetworkType.MIJIN_TEST, namespaceRegistrationTransaction.getNetworkType());
         assertTrue(1 == namespaceRegistrationTransaction.getVersion());
@@ -86,8 +86,8 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
             namespaceRegistrationTransaction.signWith(testAccount, generationHash);
 
         assertEquals(
-            "014DF55E7F6D8FB7FF924207DF2CA1BBF313726F6F742D746573742D6E616D657370616365",
-            signedTransaction.getPayload().substring(240));
+            "1A0000004DF55E7F6D8FB7FF924207DF2CA1BBF30113726F6F742D746573742D6E616D657370616365",
+            signedTransaction.getPayload().substring(248));
         assertEquals(NetworkType.MIJIN_TEST, namespaceRegistrationTransaction.getNetworkType());
         assertTrue(1 == namespaceRegistrationTransaction.getVersion());
         assertTrue(
@@ -115,8 +115,8 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
         SignedTransaction signedTransaction =
             namespaceRegistrationTransaction.signWith(testAccount, generationHash);
 
-        assertEquals("014DF55E7F6D8FB7FF924207DF2CA1BBF313726F6F742D746573742D6E616D657370616365",
-            signedTransaction.getPayload().substring(240));
+        assertEquals("1A0000004DF55E7F6D8FB7FF924207DF2CA1BBF30113726F6F742D746573742D6E616D657370616365",
+            signedTransaction.getPayload().substring(248));
         assertEquals(NetworkType.MIJIN_TEST, namespaceRegistrationTransaction.getNetworkType());
         assertTrue(1 == namespaceRegistrationTransaction.getVersion());
         assertTrue(
@@ -146,11 +146,11 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
                 .build();
 
         String expected =
-            "96000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401904e41000000000000000001000000000000000010270000000000007ee9b3b8afdf53c00c6e65776e616d657370616365";
+            "9e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001904e410000000000000000010000000000000010270000000000007ee9b3b8afdf53c0000c6e65776e616d657370616365";
         assertSerialization(expected, transaction);
 
         String expectedEmbedded =
-            "460000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401904e410010270000000000007ee9b3b8afdf53c00c6e65776e616d657370616365";
+            "4e000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001904e4110270000000000007ee9b3b8afdf53c0000c6e65776e616d657370616365";
         assertEmbeddedSerialization(expectedEmbedded, transaction);
 
     }
@@ -168,11 +168,11 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
                 .deadline(new FakeDeadline()).build();
 
         String expected =
-            "96000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401904e4100000000000000000100000000000000017ee9b3b8afdf53400312981b7879a3f10c7375626e616d657370616365";
+            "9e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001904e41000000000000000001000000000000007ee9b3b8afdf53400312981b7879a3f1010c7375626e616d657370616365";
         assertSerialization(expected, transaction);
 
         String expectedEmbedded =
-            "460000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401904e41017ee9b3b8afdf53400312981b7879a3f10c7375626e616d657370616365";
+            "4e000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001904e417ee9b3b8afdf53400312981b7879a3f1010c7375626e616d657370616365";
         assertEmbeddedSerialization(expectedEmbedded, transaction);
     }
 }

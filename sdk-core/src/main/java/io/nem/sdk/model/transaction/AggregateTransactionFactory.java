@@ -17,15 +17,23 @@
 
 package io.nem.sdk.model.transaction;
 
+import io.nem.core.crypto.Hashes;
+import io.nem.core.crypto.MerkleHashBuilder;
+import io.nem.core.crypto.SignSchema;
+import io.nem.core.utils.ConvertUtils;
+import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Factory of {@link AggregateTransaction}
  */
 public class AggregateTransactionFactory extends TransactionFactory<AggregateTransaction> {
+
+    private String transactionsHash;
 
     private final List<Transaction> innerTransactions;
 
@@ -33,13 +41,36 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
 
     private AggregateTransactionFactory(TransactionType type,
         NetworkType networkType,
+        String transactionsHash,
         List<Transaction> innerTransactions,
         List<AggregateTransactionCosignature> cosignatures) {
         super(type, networkType);
+        Validate.notNull(transactionsHash, "transactionsHash must not be null");
         Validate.notNull(innerTransactions, "InnerTransactions must not be null");
         Validate.notNull(cosignatures, "Cosignatures must not be null");
+        ConvertUtils.validateIsHexString(transactionsHash, 64);
+        this.transactionsHash = transactionsHash;
         this.innerTransactions = innerTransactions;
         this.cosignatures = cosignatures;
+    }
+
+    /**
+     * Create an aggregate transaction factory that can be customized.
+     *
+     * @param type Transaction type.
+     * @param networkType Network type.
+     * @param transactionsHash Aggregate hash of an aggregate's transactions
+     * @param innerTransactions List of inner transactions.
+     * @param cosignatures List of transaction cosigners signatures.
+     * @return The aggregate transaction factory
+     */
+    public static AggregateTransactionFactory create(TransactionType type,
+        NetworkType networkType,
+        String transactionsHash,
+        List<Transaction> innerTransactions,
+        List<AggregateTransactionCosignature> cosignatures) {
+        return new AggregateTransactionFactory(type, networkType, transactionsHash,
+            innerTransactions, cosignatures);
     }
 
     /**
@@ -55,7 +86,8 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
         NetworkType networkType,
         List<Transaction> innerTransactions,
         List<AggregateTransactionCosignature> cosignatures) {
-        return new AggregateTransactionFactory(type, networkType, innerTransactions, cosignatures);
+        return create(type, networkType, calculateTransactionsHash(innerTransactions),
+            innerTransactions, cosignatures);
     }
 
     /**
@@ -108,9 +140,39 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
         return cosignatures;
     }
 
+    /**
+     * @return Aggregate hash of an aggregate's transactions
+     */
+    public String getTransactionsHash() {
+        return transactionsHash;
+    }
 
     @Override
     public AggregateTransaction build() {
         return new AggregateTransaction(this);
+    }
+
+    /**
+     * It generates the hash of the transactions that are going to be included in the {@link
+     * AggregateTransaction}
+     *
+     * @param transactions the inner transaction
+     * @return the added transaction hash.
+     */
+    private static String calculateTransactionsHash(final List<Transaction> transactions) {
+        final SignSchema.Hasher hasher = SignSchema
+            .getHasher(SignSchema.SHA3, SignSchema.HashSize.HASH_SIZE_32_BYTES);
+        final MerkleHashBuilder transactionsHashBuilder = new MerkleHashBuilder(hasher,
+            transactions.size());
+        final BinarySerializationImpl transactionSerialization = new BinarySerializationImpl();
+
+        for (final Transaction transaction : transactions) {
+            final byte[] bytes = transactionSerialization.serializeEmbedded(transaction);
+            byte[] transactionHash = Hashes.sha3_256(bytes);
+            transactionsHashBuilder.update(transactionHash);
+        }
+
+        final byte[] hash = transactionsHashBuilder.getRootHash();
+        return Hex.toHexString(hash).toUpperCase();
     }
 }
