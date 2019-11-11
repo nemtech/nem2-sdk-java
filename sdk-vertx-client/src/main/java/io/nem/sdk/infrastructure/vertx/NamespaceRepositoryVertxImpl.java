@@ -16,15 +16,18 @@
 
 package io.nem.sdk.infrastructure.vertx;
 
+import static io.nem.core.utils.MapperUtils.toAddressFromEncoded;
 import static io.nem.core.utils.MapperUtils.toNamespaceId;
 
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.api.NamespaceRepository;
 import io.nem.sdk.api.QueryParams;
+import io.nem.sdk.model.account.AccountNames;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.MosaicNames;
 import io.nem.sdk.model.namespace.AddressAlias;
 import io.nem.sdk.model.namespace.Alias;
 import io.nem.sdk.model.namespace.AliasType;
@@ -38,6 +41,11 @@ import io.nem.sdk.openapi.vertx.api.NamespaceRoutesApi;
 import io.nem.sdk.openapi.vertx.api.NamespaceRoutesApiImpl;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.sdk.openapi.vertx.model.AccountIds;
+import io.nem.sdk.openapi.vertx.model.AccountNamesDTO;
+import io.nem.sdk.openapi.vertx.model.AccountsNamesDTO;
+import io.nem.sdk.openapi.vertx.model.MosaicIds;
+import io.nem.sdk.openapi.vertx.model.MosaicNamesDTO;
+import io.nem.sdk.openapi.vertx.model.MosaicsNamesDTO;
 import io.nem.sdk.openapi.vertx.model.NamespaceDTO;
 import io.nem.sdk.openapi.vertx.model.NamespaceIds;
 import io.nem.sdk.openapi.vertx.model.NamespaceInfoDTO;
@@ -153,6 +161,32 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
     }
 
 
+    @Override
+    public Observable<List<MosaicNames>> getMosaicsNames(List<MosaicId> ids) {
+        MosaicIds mosaicIds = new MosaicIds();
+        mosaicIds.mosaicIds(ids.stream()
+            .map(MosaicId::getIdAsHex)
+            .collect(Collectors.toList()));
+        Consumer<Handler<AsyncResult<MosaicsNamesDTO>>> callback = handler -> getClient()
+            .getMosaicsNames(mosaicIds, handler);
+        return exceptionHandling(
+            call(callback).map(MosaicsNamesDTO::getMosaicNames).flatMapIterable(item -> item)
+                .map(this::toMosaicNames).toList()
+                .toObservable());
+    }
+
+    /**
+     * Converts a {@link MosaicNamesDTO} into a {@link MosaicNames}
+     *
+     * @param dto {@link MosaicNamesDTO}
+     * @return {@link MosaicNames}
+     */
+    private MosaicNames toMosaicNames(MosaicNamesDTO dto) {
+        return new MosaicNames(
+            MapperUtils.toMosaicId(dto.getMosaicId()),
+            dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
+    }
+
     /**
      * Gets the MosaicId from a MosaicAlias
      *
@@ -230,9 +264,6 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
 
     /**
      * Create a Address from a NamespaceDTO
-     *
-     * @internal
-     * @access private
      */
     private Address toAddress(NamespaceDTO namespaceDTO) {
         Address address = null;
@@ -246,11 +277,38 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
         return address;
     }
 
+
+    @Override
+    public Observable<List<AccountNames>> getAccountsNames(List<Address> addresses) {
+        AccountIds accountIds = new AccountIds()
+            .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
+        return getAccountsNames(accountIds);
+    }
+
+    private Observable<List<AccountNames>> getAccountsNames(AccountIds accountIds) {
+        Consumer<Handler<AsyncResult<AccountsNamesDTO>>> callback = handler -> getClient()
+            .getAccountsNames(accountIds, handler);
+        return exceptionHandling(
+            call(callback).map(AccountsNamesDTO::getAccountNames).flatMapIterable(item -> item)
+                .map(this::toAccountNames).toList()
+                .toObservable());
+    }
+
+    /**
+     * Converts a {@link AccountNamesDTO} into a {@link AccountNames}
+     *
+     * @param dto {@link AccountNamesDTO}
+     * @return {@link AccountNames}
+     */
+    private AccountNames toAccountNames(AccountNamesDTO dto) {
+        return new AccountNames(
+            toAddressFromEncoded(dto.getAddress()),
+            dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
+    }
+
+
     /**
      * Extract a list of NamespaceId levels from a NamespaceInfoDTO
-     *
-     * @internal
-     * @access private
      */
     private List<NamespaceId> extractLevels(NamespaceInfoDTO namespaceInfoDTO) {
         List<NamespaceId> levels = new ArrayList<>();

@@ -17,14 +17,11 @@
 package io.nem.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.sdk.api.BlockRepository;
 import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.model.blockchain.BlockInfo;
-import io.nem.sdk.model.blockchain.MerkelProofInfo;
-import io.nem.sdk.model.receipt.Statement;
 import io.nem.sdk.model.transaction.Transaction;
 import java.math.BigInteger;
 import java.util.List;
@@ -67,26 +64,6 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
         assertEquals(transactions.get(1).getTransactionInfo().get().getHash(),
             nextTransactions.get(0).getTransactionInfo().get().getHash());
     }
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getBlockReceipts(RepositoryType type) {
-        Statement statement = get(
-            getBlockRepository(type).getBlockReceipts(BigInteger.valueOf(1)));
-        assertTrue(statement.getTransactionStatements().isEmpty());
-    }
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getBlockReceiptMerkle(RepositoryType type) {
-        Statement statement = get(
-            getBlockRepository(type).getBlockReceipts(BigInteger.valueOf(2)));
-        String hash = statement.getTransactionStatements().get(0).generateHash();
-
-        MerkelProofInfo merkleInfo = get(getBlockRepository(type).getMerkleReceipts(BigInteger.valueOf(2), hash));
-        assertTrue(merkleInfo.getMerklePath().size() >= 0);
-    }
-
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)

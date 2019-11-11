@@ -24,15 +24,11 @@ import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.sdk.infrastructure.vertx.mappers.TransactionMapper;
 import io.nem.sdk.model.account.AccountInfo;
-import io.nem.sdk.model.account.AccountNames;
 import io.nem.sdk.model.account.AccountType;
 import io.nem.sdk.model.account.Address;
-import io.nem.sdk.model.account.MultisigAccountGraphInfo;
-import io.nem.sdk.model.account.MultisigAccountInfo;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.Mosaic;
-import io.nem.sdk.model.namespace.NamespaceName;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.openapi.vertx.api.AccountRoutesApi;
@@ -41,18 +37,11 @@ import io.nem.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.sdk.openapi.vertx.model.AccountDTO;
 import io.nem.sdk.openapi.vertx.model.AccountIds;
 import io.nem.sdk.openapi.vertx.model.AccountInfoDTO;
-import io.nem.sdk.openapi.vertx.model.AccountNamesDTO;
-import io.nem.sdk.openapi.vertx.model.AccountsNamesDTO;
-import io.nem.sdk.openapi.vertx.model.MultisigAccountGraphInfoDTO;
-import io.nem.sdk.openapi.vertx.model.MultisigAccountInfoDTO;
-import io.nem.sdk.openapi.vertx.model.MultisigDTO;
 import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -90,34 +79,6 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
     }
 
     @Override
-    public Observable<List<AccountNames>> getAccountsNames(List<Address> addresses) {
-        AccountIds accountIds = new AccountIds()
-            .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-        return getAccountsNames(accountIds);
-    }
-
-    private Observable<List<AccountNames>> getAccountsNames(AccountIds accountIds) {
-        Consumer<Handler<AsyncResult<AccountsNamesDTO>>> callback = handler -> getClient()
-            .getAccountsNames(accountIds, handler);
-        return exceptionHandling(
-            call(callback).map(AccountsNamesDTO::getAccountNames).flatMapIterable(item -> item)
-                .map(this::toAccountNames).toList()
-                .toObservable());
-    }
-
-    /**
-     * Converts a {@link AccountNamesDTO} into a {@link AccountNames}
-     *
-     * @param dto {@link AccountNamesDTO}
-     * @return {@link AccountNames}
-     */
-    private AccountNames toAccountNames(AccountNamesDTO dto) {
-        return new AccountNames(
-            toAddressFromEncoded(dto.getAddress()),
-            dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
-    }
-
-    @Override
     public Observable<List<AccountInfo>> getAccountsInfo(List<Address> addresses) {
         AccountIds accountIds = new AccountIds()
             .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
@@ -127,44 +88,6 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
             call(callback).flatMapIterable(item -> item)
                 .map(AccountInfoDTO::getAccount)
                 .map(this::toAccountInfo).toList().toObservable());
-    }
-
-    @Override
-    public Observable<MultisigAccountInfo> getMultisigAccountInfo(Address address) {
-        return exceptionHandling(call(
-            (Handler<AsyncResult<MultisigAccountInfoDTO>> handler) -> getClient()
-                .getAccountMultisig(address.plain(), handler))
-            .map(MultisigAccountInfoDTO::getMultisig)
-            .map(this::toMultisigAccountInfo));
-
-    }
-
-
-    @Override
-    public Observable<MultisigAccountGraphInfo> getMultisigAccountGraphInfo(Address address) {
-
-        return exceptionHandling(call(
-            (Handler<AsyncResult<List<MultisigAccountGraphInfoDTO>>> handler) -> getClient()
-                .getAccountMultisigGraph(address.plain(), handler))
-            .map(
-                multisigAccountGraphInfoDTOList -> {
-                    Map<Integer, List<MultisigAccountInfo>> multisigAccountInfoMap =
-                        new HashMap<>();
-                    multisigAccountGraphInfoDTOList.forEach(
-                        item ->
-                            multisigAccountInfoMap.put(
-                                item.getLevel(),
-                                toMultisigAccountInfo(item)));
-                    return new MultisigAccountGraphInfo(multisigAccountInfoMap);
-                }));
-    }
-
-
-    private List<MultisigAccountInfo> toMultisigAccountInfo(MultisigAccountGraphInfoDTO item) {
-        return item.getMultisigEntries().stream()
-            .map(MultisigAccountInfoDTO::getMultisig)
-            .map(this::toMultisigAccountInfo)
-            .collect(Collectors.toList());
     }
 
 
@@ -183,7 +106,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         PublicAccount publicAccount, Optional<QueryParams> queryParams) {
 
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.transactions(publicAccount.getPublicKey().toHex(),
+            client.getAccountTransactions(publicAccount.getPublicKey().toHex(),
                 getPageSize(queryParams),
                 getId(queryParams),
                 null,
@@ -209,7 +132,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         PublicAccount publicAccount, Optional<QueryParams> queryParams) {
 
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.incomingTransactions(publicAccount.getPublicKey().toHex(),
+            client.getAccountIncomingTransactions(publicAccount.getPublicKey().toHex(),
                 getPageSize(queryParams),
                 getId(queryParams),
                 null,
@@ -235,7 +158,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         PublicAccount publicAccount, Optional<QueryParams> queryParams) {
 
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.outgoingTransactions(publicAccount.getPublicKey().toHex(),
+            client.getAccountOutgoingTransactions(publicAccount.getPublicKey().toHex(),
                 getPageSize(queryParams),
                 getId(queryParams),
                 null,
@@ -268,7 +191,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         PublicAccount publicAccount, Optional<QueryParams> queryParams) {
 
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.partialTransactions(publicAccount.getPublicKey().toHex(),
+            client.getAccountPartialTransactions(publicAccount.getPublicKey().toHex(),
                 getPageSize(queryParams),
                 getId(queryParams),
                 null,
@@ -294,7 +217,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
     private Observable<List<Transaction>> unconfirmedTransactions(
         PublicAccount publicAccount, Optional<QueryParams> queryParams) {
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.unconfirmedTransactions(publicAccount.getPublicKey().toHex(),
+            client.getAccountUnconfirmedTransactions(publicAccount.getPublicKey().toHex(),
                 getPageSize(queryParams),
                 getId(queryParams),
                 null,
@@ -321,27 +244,6 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
                             mosaicDTO.getAmount()))
                 .collect(Collectors.toList()),
             AccountType.rawValueOf(accountDTO.getAccountType().getValue()));
-    }
-
-    private MultisigAccountInfo toMultisigAccountInfo(MultisigDTO dto) {
-        NetworkType networkType = getNetworkTypeBlocking();
-        return new MultisigAccountInfo(
-            new PublicAccount(dto.getAccountPublicKey(), networkType),
-            dto.getMinApproval(),
-            dto.getMinRemoval(),
-            dto.getCosignatoryPublicKeys().stream()
-                .map(
-                    cosigner ->
-                        new PublicAccount(
-                            cosigner, networkType))
-                .collect(Collectors.toList()),
-            dto.getMultisigPublicKeys().stream()
-                .map(
-                    multisigAccount ->
-                        new PublicAccount(
-                            multisigAccount,
-                            networkType))
-                .collect(Collectors.toList()));
     }
 
 

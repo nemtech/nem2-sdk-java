@@ -19,14 +19,11 @@ package io.nem.sdk.infrastructure.vertx;
 import io.nem.core.utils.ExceptionUtils;
 import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.model.account.AccountInfo;
-import io.nem.sdk.model.account.AccountNames;
 import io.nem.sdk.model.account.AccountType;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.openapi.vertx.model.AccountDTO;
 import io.nem.sdk.openapi.vertx.model.AccountInfoDTO;
-import io.nem.sdk.openapi.vertx.model.AccountNamesDTO;
 import io.nem.sdk.openapi.vertx.model.AccountTypeEnum;
-import io.nem.sdk.openapi.vertx.model.AccountsNamesDTO;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -143,31 +140,6 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
                 }).getMessage());
     }
 
-    @Test
-    public void shouldGetAccountsNamesFromAddresses() throws Exception {
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
-
-        AccountNamesDTO dto = new AccountNamesDTO();
-        dto.setAddress(encodeAddress(address));
-        dto.setNames(Collections.singletonList("accountalias"));
-
-        AccountsNamesDTO accountsNamesDTO = new AccountsNamesDTO();
-        accountsNamesDTO.setAccountNames(Collections.singletonList(dto));
-
-        mockRemoteCall(accountsNamesDTO);
-
-        List<AccountNames> resolvedList = repository
-            .getAccountsNames(Collections.singletonList(address)).toFuture().get();
-
-        Assertions.assertEquals(1, resolvedList.size());
-
-        AccountNames accountNames = resolvedList.get(0);
-
-        Assertions.assertEquals(address, accountNames.getAddress());
-        Assertions.assertEquals("accountalias", accountNames.getNames().get(0).getName());
-    }
 
 
 

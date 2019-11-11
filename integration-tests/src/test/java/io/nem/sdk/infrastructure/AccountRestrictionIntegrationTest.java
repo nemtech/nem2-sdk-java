@@ -17,7 +17,7 @@
 package io.nem.sdk.infrastructure;
 
 import io.nem.sdk.api.RepositoryCallException;
-import io.nem.sdk.api.RestrictionRepository;
+import io.nem.sdk.api.RestrictionAccountRepository;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.AccountRestrictions;
 import io.nem.sdk.model.account.Address;
@@ -145,7 +145,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
         try {
             sleep(2000);//Need to wait?
             AccountRestrictions restrictions = get(
-                getRepositoryFactory(type).createRestrictionRepository()
+                getRepositoryFactory(type).createRestrictionAccountRepository()
                     .getAccountRestrictions(testAccount.getAddress()));
             Assertions.assertEquals(testAccount.getAddress(), restrictions.getAddress());
 
@@ -249,7 +249,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
             .createFromPublicKey("67F69FA4BFCD158F6E1AF1ABC82F725F5C5C4710D6E29217B12BE66397435DFB",
                 getNetworkType());
 
-        RestrictionRepository repository = getRepositoryFactory(type).createRestrictionRepository();
+        RestrictionAccountRepository repository = getRepositoryFactory(type).createRestrictionAccountRepository();
         Assertions.assertEquals(0, get(repository
             .getAccountsRestrictions(
                 Collections.singletonList(address))).size());
@@ -258,7 +258,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getAccountRestrictionsWhenAccountDoesNotExist(RepositoryType type) {
-        RestrictionRepository repository = getRepositoryFactory(type).createRestrictionRepository();
+        RestrictionAccountRepository repository = getRepositoryFactory(type).createRestrictionAccountRepository();
 
         Address address = Address
             .createFromPublicKey("67F69FA4BFCD158F6E1AF1ABC82F725F5C5C4710D6E29217B12BE66397435DFB",

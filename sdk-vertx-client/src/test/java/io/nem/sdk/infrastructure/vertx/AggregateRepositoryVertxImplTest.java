@@ -1,0 +1,99 @@
+/*
+ * Copyright 2019 NEM
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package io.nem.sdk.infrastructure.vertx;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import io.nem.sdk.model.account.Account;
+import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.message.PlainMessage;
+import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
+import io.nem.sdk.model.transaction.SignedTransaction;
+import io.nem.sdk.model.transaction.TransactionAnnounceResponse;
+import io.nem.sdk.model.transaction.TransferTransaction;
+import io.nem.sdk.model.transaction.TransferTransactionFactory;
+import io.nem.sdk.openapi.vertx.model.AnnounceTransactionInfoDTO;
+import java.math.BigInteger;
+import java.util.Collections;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+/**
+ * Unit Tests for {@link TransactionRepositoryVertxImpl}
+ *
+ * @author Fernando Boucquez
+ */
+public class AggregateRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
+
+    private AggregateRepositoryVertxImpl repository;
+
+
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+        repository = new AggregateRepositoryVertxImpl(apiClientMock, networkType);
+    }
+
+    @Test
+    public void shouldAnnounceAggregateBonded() throws Exception {
+
+        SignedTransaction signedTransaction = getSignedTransaction();
+
+        AnnounceTransactionInfoDTO announceTransactionInfoDTO = new AnnounceTransactionInfoDTO();
+        announceTransactionInfoDTO.setMessage("SomeMessage");
+        mockRemoteCall(announceTransactionInfoDTO);
+
+        TransactionAnnounceResponse response = repository.announceAggregateBonded(signedTransaction)
+            .toFuture().get();
+
+        Assertions.assertNotNull(response);
+
+        Assertions.assertEquals(announceTransactionInfoDTO.getMessage(),
+            announceTransactionInfoDTO.getMessage());
+    }
+
+    private SignedTransaction getSignedTransaction() {
+
+        String generationHash = "A94B1BE81F1D4C95D6D252AD7BA3FFFB1674991FD880B7A57DC3180AF8D69C32";
+
+        Account account = Account.createFromPrivateKey(
+            "063F36659A8BB01D5685826C19E2C2CA9D281465B642BD5E43CB69510408ECF7",
+            this.networkType.get());
+
+        Address recipientAddress =
+            Address.createFromRawAddress(
+                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+
+        TransferTransaction transferTransaction =
+            TransferTransactionFactory.create(
+                NetworkType.MIJIN_TEST,
+                recipientAddress,
+                Collections
+                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                new PlainMessage("E2ETest:standaloneTransferTransaction:message")
+            ).build();
+
+        SignedTransaction signedTransaction = account.sign(transferTransaction, generationHash);
+        String payload = signedTransaction.getPayload();
+        assertEquals(444, payload.length());
+        return signedTransaction;
+    }
+
+
+}

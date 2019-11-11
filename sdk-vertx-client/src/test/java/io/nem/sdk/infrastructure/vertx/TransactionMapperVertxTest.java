@@ -51,7 +51,6 @@ import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.openapi.vertx.model.AggregateTransactionBodyDTO;
 import io.nem.sdk.openapi.vertx.model.HashLockTransactionDTO;
-import io.nem.sdk.openapi.vertx.model.Mosaic;
 import io.nem.sdk.openapi.vertx.model.MosaicDefinitionTransactionDTO;
 import io.nem.sdk.openapi.vertx.model.MosaicSupplyChangeTransactionDTO;
 import io.nem.sdk.openapi.vertx.model.MultisigAccountModificationTransactionDTO;
@@ -60,6 +59,7 @@ import io.nem.sdk.openapi.vertx.model.SecretLockTransactionDTO;
 import io.nem.sdk.openapi.vertx.model.SecretProofTransactionDTO;
 import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.nem.sdk.openapi.vertx.model.TransferTransactionDTO;
+import io.nem.sdk.openapi.vertx.model.UnresolvedMosaic;
 import io.vertx.core.json.Json;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -717,7 +717,7 @@ public class TransactionMapperVertxTest {
                 transferTransaction.getRecipientAddress()),
             transaction.getRecipient());
 
-        List<Mosaic> mosaicsDTO = transferTransaction.getMosaics();
+        List<UnresolvedMosaic> mosaicsDTO = transferTransaction.getMosaics();
         if (mosaicsDTO != null && mosaicsDTO.size() > 0) {
             assertEquals(
                 MapperUtils.fromHexToBigInteger(mosaicsDTO.get(0).getId()),

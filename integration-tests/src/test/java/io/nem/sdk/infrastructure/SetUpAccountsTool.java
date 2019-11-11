@@ -19,6 +19,7 @@ package io.nem.sdk.infrastructure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.sdk.api.AccountRepository;
+import io.nem.sdk.api.MultisigRepository;
 import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.AccountInfo;
@@ -98,13 +99,16 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
         AccountRepository accountRepository = getRepositoryFactory(type)
             .createAccountRepository();
 
+        MultisigRepository multisigRepository = getRepositoryFactory(type)
+            .createMultisigRepository();
+
         AccountInfo accountInfo = get(
             accountRepository.getAccountInfo(multisigAccount.getAddress()));
         System.out.println(jsonHelper().print(accountInfo));
 
         try {
             MultisigAccountInfo multisigAccountInfo = get(
-                accountRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
+                multisigRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
 
             System.out.println(
                 "Multisig account with address " + multisigAccount.getAddress() + " already exist");

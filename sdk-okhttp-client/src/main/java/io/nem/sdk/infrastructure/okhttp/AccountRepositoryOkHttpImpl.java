@@ -24,15 +24,10 @@ import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.sdk.infrastructure.okhttp.mappers.TransactionMapper;
 import io.nem.sdk.model.account.AccountInfo;
-import io.nem.sdk.model.account.AccountNames;
 import io.nem.sdk.model.account.AccountType;
 import io.nem.sdk.model.account.Address;
-import io.nem.sdk.model.account.MultisigAccountGraphInfo;
-import io.nem.sdk.model.account.MultisigAccountInfo;
 import io.nem.sdk.model.account.PublicAccount;
-import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.Mosaic;
-import io.nem.sdk.model.namespace.NamespaceName;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.openapi.okhttp_gson.api.AccountRoutesApi;
@@ -40,16 +35,9 @@ import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountIds;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountInfoDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountNamesDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountsNamesDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.MultisigAccountGraphInfoDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.MultisigAccountInfoDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.MultisigDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import io.reactivex.Observable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -94,64 +82,6 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
                 .map(this::toAccountInfo).toList().toObservable());
     }
 
-    @Override
-    public Observable<List<AccountNames>> getAccountsNames(List<Address> addresses) {
-        AccountIds accountIds = new AccountIds()
-            .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-        return getAccountNames(accountIds);
-    }
-
-    private Observable<List<AccountNames>> getAccountNames(AccountIds accountIds) {
-        Callable<AccountsNamesDTO> callback = () -> getClient()
-            .getAccountsNames(accountIds);
-        return exceptionHandling(
-            call(callback).map(AccountsNamesDTO::getAccountNames).flatMapIterable(item -> item)
-                .map(this::toAccountNames).toList().toObservable());
-    }
-
-    /**
-     * Converts a {@link AccountNamesDTO} into a {@link AccountNames}
-     *
-     * @param dto {@link AccountNamesDTO}
-     * @return {@link AccountNames}
-     */
-    private AccountNames toAccountNames(AccountNamesDTO dto) {
-        return new AccountNames(MapperUtils.toAddressFromEncoded(dto.getAddress()),
-            dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
-    }
-
-    @Override
-    public Observable<MultisigAccountInfo> getMultisigAccountInfo(Address address) {
-        return exceptionHandling(call(
-            () -> getClient().getAccountMultisig(address.plain()))
-            .map(MultisigAccountInfoDTO::getMultisig)
-            .map(this::toMultisigAccountInfo));
-
-    }
-
-
-    @Override
-    public Observable<MultisigAccountGraphInfo> getMultisigAccountGraphInfo(Address address) {
-        return exceptionHandling(call(
-            () -> getClient().getAccountMultisigGraph(address.plain()))
-            .map(multisigAccountGraphInfoDTOList -> {
-                Map<Integer, List<MultisigAccountInfo>> multisigAccountInfoMap = new HashMap<>();
-                multisigAccountGraphInfoDTOList.forEach(
-                    item ->
-                        multisigAccountInfoMap.put(
-                            item.getLevel(),
-                            toMultisigAccountInfo(item)));
-                return new MultisigAccountGraphInfo(multisigAccountInfoMap);
-            }));
-    }
-
-    private List<MultisigAccountInfo> toMultisigAccountInfo(MultisigAccountGraphInfoDTO item) {
-        return item.getMultisigEntries().stream()
-            .map(MultisigAccountInfoDTO::getMultisig)
-            .map(this::toMultisigAccountInfo)
-            .collect(Collectors.toList());
-    }
-
 
     @Override
     public Observable<List<Transaction>> transactions(PublicAccount publicAccount) {
@@ -168,7 +98,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         PublicAccount publicAccount, Optional<QueryParams> queryParams) {
 
         Callable<List<TransactionInfoDTO>> callback = () ->
-            getClient().transactions(publicAccount.getPublicKey().toHex(),
+            getClient().getAccountTransactions(publicAccount.getPublicKey().toHex(),
                 getPageSize(queryParams),
                 getId(queryParams),
                 null);
@@ -193,7 +123,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         PublicAccount publicAccount, Optional<QueryParams> queryParams) {
 
         Callable<List<TransactionInfoDTO>> callback = () ->
-            getClient().incomingTransactions(publicAccount.getPublicKey().toHex(),
+            getClient().getAccountIncomingTransactions(publicAccount.getPublicKey().toHex(),
                 getPageSize(queryParams), getId(queryParams), null);
 
         return exceptionHandling(
@@ -216,7 +146,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         PublicAccount publicAccount, Optional<QueryParams> queryParams) {
 
         Callable<List<TransactionInfoDTO>> callback = () ->
-            getClient().outgoingTransactions(publicAccount.getPublicKey().toHex(),
+            getClient().getAccountOutgoingTransactions(publicAccount.getPublicKey().toHex(),
                 getPageSize(queryParams),
                 getId(queryParams), null);
 
@@ -246,7 +176,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         PublicAccount publicAccount, Optional<QueryParams> queryParams) {
 
         Callable<List<TransactionInfoDTO>> callback = () ->
-            getClient().partialTransactions(publicAccount.getPublicKey().toHex(),
+            getClient().getAccountPartialTransactions(publicAccount.getPublicKey().toHex(),
                 getPageSize(queryParams), getId(queryParams), null);
 
         return exceptionHandling(
@@ -269,7 +199,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
     private Observable<List<Transaction>> unconfirmedTransactions(
         PublicAccount publicAccount, Optional<QueryParams> queryParams) {
         Callable<List<TransactionInfoDTO>> callback = () ->
-            getClient().unconfirmedTransactions(publicAccount.getPublicKey().toHex(),
+            getClient().getAccountUnconfirmedTransactions(publicAccount.getPublicKey().toHex(),
                 getPageSize(queryParams),
                 getId(queryParams), null);
         return exceptionHandling(
@@ -290,21 +220,6 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
                 .map(mosaicDTO -> new Mosaic(toMosaicId(mosaicDTO.getId()), mosaicDTO.getAmount()))
                 .collect(Collectors.toList()),
             AccountType.rawValueOf(accountDTO.getAccountType().getValue()));
-    }
-
-    private MultisigAccountInfo toMultisigAccountInfo(MultisigDTO dto) {
-        NetworkType networkType = getNetworkTypeBlocking();
-        return new MultisigAccountInfo(
-            new PublicAccount(
-                dto.getAccountPublicKey(), networkType),
-            dto.getMinApproval(),
-            dto.getMinRemoval(),
-            dto.getCosignatoryPublicKeys().stream()
-                .map(cosigner -> new PublicAccount(cosigner, networkType))
-                .collect(Collectors.toList()),
-            dto.getMultisigPublicKeys().stream()
-                .map(multisigAccount -> new PublicAccount(multisigAccount, networkType))
-                .collect(Collectors.toList()));
     }
 
 

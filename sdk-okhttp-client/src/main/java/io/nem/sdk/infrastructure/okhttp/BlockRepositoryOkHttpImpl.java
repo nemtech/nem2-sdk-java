@@ -22,13 +22,11 @@ import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.blockchain.BlockInfo;
 import io.nem.sdk.model.blockchain.MerkelPathItem;
 import io.nem.sdk.model.blockchain.MerkelProofInfo;
-import io.nem.sdk.model.receipt.Statement;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.openapi.okhttp_gson.api.BlockRoutesApi;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.sdk.openapi.okhttp_gson.model.BlockInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MerkleProofInfoDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.StatementsDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import io.reactivex.Observable;
 import java.math.BigInteger;
@@ -55,24 +53,28 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
         this.transactionMapper = new GeneralTransactionMapper(getJsonHelper());
     }
 
+    @Override
     public Observable<BlockInfo> getBlockByHeight(BigInteger height) {
-        Callable<BlockInfoDTO> callback = () -> getClient().getBlockByHeight(height.longValue());
+        Callable<BlockInfoDTO> callback = () -> getClient().getBlockByHeight(height);
         return exceptionHandling(call(callback).map(BlockRepositoryOkHttpImpl::toBlockInfo));
     }
 
+    @Override
     public Observable<List<Transaction>> getBlockTransactions(
         BigInteger height, QueryParams queryParams) {
         return this.getBlockTransactions(height, Optional.of(queryParams));
     }
 
+    @Override
     public Observable<List<Transaction>> getBlockTransactions(BigInteger height) {
         return this.getBlockTransactions(height, Optional.empty());
     }
 
+    @Override
     public Observable<List<BlockInfo>> getBlocksByHeightWithLimit(
         BigInteger height, int limit, Optional<QueryParams> queryParams) {
         Callable<List<BlockInfoDTO>> callback = () ->
-            getClient().getBlocksByHeightWithLimit(height.longValue(), limit);
+            getClient().getBlocksByHeightWithLimit(height, limit);
 
         return exceptionHandling(
             call(callback).flatMapIterable(item -> item).map(BlockRepositoryOkHttpImpl::toBlockInfo)
@@ -80,14 +82,29 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
                 .toObservable());
     }
 
-    public Observable<MerkelProofInfo> getMerkleReceipts(BigInteger height, String hash) {
 
+    @Override
+    public Observable<MerkelProofInfo> getMerkleTransaction(BigInteger height, String hash) {
         Callable<MerkleProofInfoDTO> callback = () ->
-            getClient().getMerkleReceipts(height.longValue(), hash);
+            getClient().getMerkleTransaction(height, hash);
         return exceptionHandling(call(callback).map(this::toMerkelProofInfo));
 
-
     }
+
+    private Observable<List<Transaction>> getBlockTransactions(
+        BigInteger height, Optional<QueryParams> queryParams) {
+        Callable<List<TransactionInfoDTO>> callback = () ->
+            getClient().getBlockTransactions(height,
+                getPageSize(queryParams),
+                getId(queryParams),
+                null
+            );
+
+        return exceptionHandling(
+            call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
+                .toObservable());
+    }
+
 
     private MerkelProofInfo toMerkelProofInfo(MerkleProofInfoDTO dto) {
         List<MerkelPathItem> pathItems =
@@ -99,35 +116,6 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
         return new MerkelProofInfo(pathItems);
     }
 
-    public Observable<MerkelProofInfo> getMerkleTransaction(BigInteger height, String hash) {
-        Callable<MerkleProofInfoDTO> callback = () ->
-            getClient().getMerkleTransaction(height.longValue(), hash);
-        return exceptionHandling(call(callback).map(this::toMerkelProofInfo));
-
-    }
-
-    public Observable<Statement> getBlockReceipts(BigInteger height) {
-        Callable<StatementsDTO> callback = () ->
-            getClient().getBlockReceipts(height.longValue());
-        return exceptionHandling(call(callback).map(statementsDTO ->
-            new ReceiptMappingOkHttp(getJsonHelper())
-                .createStatementFromDto(statementsDTO, getNetworkTypeBlocking())));
-    }
-
-    private Observable<List<Transaction>> getBlockTransactions(
-        BigInteger height, Optional<QueryParams> queryParams) {
-        Callable<List<TransactionInfoDTO>> callback = () ->
-            getClient().getBlockTransactions(height.longValue(),
-                getPageSize(queryParams),
-                getId(queryParams),
-                null
-            );
-
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
-                .toObservable());
-    }
-
     private Transaction toTransaction(TransactionInfoDTO input) {
         return transactionMapper.map(input);
     }
@@ -136,16 +124,16 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
         return BlockInfo.create(
             blockInfoDTO.getMeta().getHash(),
             blockInfoDTO.getMeta().getGenerationHash(),
-            (blockInfoDTO.getMeta().getTotalFee()),
+            blockInfoDTO.getMeta().getTotalFee(),
             blockInfoDTO.getMeta().getNumTransactions(),
             blockInfoDTO.getMeta().getStateHashSubCacheMerkleRoots(),
             blockInfoDTO.getBlock().getSignature(),
             blockInfoDTO.getBlock().getSignerPublicKey(),
             blockInfoDTO.getBlock().getVersion(),
             blockInfoDTO.getBlock().getType(),
-            (blockInfoDTO.getBlock().getHeight()),
-            (blockInfoDTO.getBlock().getTimestamp()),
-            (blockInfoDTO.getBlock().getDifficulty()),
+            blockInfoDTO.getBlock().getHeight(),
+            blockInfoDTO.getBlock().getTimestamp(),
+            blockInfoDTO.getBlock().getDifficulty(),
             blockInfoDTO.getBlock().getFeeMultiplier(),
             blockInfoDTO.getBlock().getPreviousBlockHash(),
             blockInfoDTO.getBlock().getTransactionsHash(),

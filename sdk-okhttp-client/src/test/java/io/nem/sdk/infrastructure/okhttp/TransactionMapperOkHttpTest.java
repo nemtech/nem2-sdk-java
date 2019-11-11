@@ -51,7 +51,6 @@ import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.openapi.okhttp_gson.model.AggregateTransactionBodyDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.HashLockTransactionDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.Mosaic;
 import io.nem.sdk.openapi.okhttp_gson.model.MosaicDefinitionTransactionDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MosaicSupplyChangeTransactionDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MultisigAccountModificationTransactionDTO;
@@ -60,6 +59,7 @@ import io.nem.sdk.openapi.okhttp_gson.model.SecretLockTransactionDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.SecretProofTransactionDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.TransferTransactionDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.UnresolvedMosaic;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -699,7 +699,7 @@ public class TransactionMapperOkHttpTest {
             transferTransaction.getRecipientAddress()),
             transaction.getRecipient());
 
-        List<Mosaic> mosaicsDTO = transferTransaction.getMosaics();
+        List<UnresolvedMosaic> mosaicsDTO = transferTransaction.getMosaics();
         if (mosaicsDTO != null && mosaicsDTO.size() > 0) {
             assertEquals(
                 MapperUtils.fromHexToBigInteger(mosaicsDTO.get(0).getId()),

@@ -42,6 +42,7 @@ public class RepositoryFactoryVertxImplTest {
 
         Assertions.assertNotNull(factory.createAccountRepository());
         Assertions.assertNotNull(factory.createBlockRepository());
+        Assertions.assertNotNull(factory.createReceiptRepository());
         Assertions.assertNotNull(factory.createChainRepository());
         Assertions.assertNotNull(factory.createDiagnosticRepository());
         Assertions.assertNotNull(factory.createListener());
@@ -50,8 +51,10 @@ public class RepositoryFactoryVertxImplTest {
         Assertions.assertNotNull(factory.createNetworkRepository());
         Assertions.assertNotNull(factory.createNodeRepository());
         Assertions.assertNotNull(factory.createTransactionRepository());
+        Assertions.assertNotNull(factory.createAggregateRepository());
         Assertions.assertNotNull(factory.createMetadataRepository());
-        Assertions.assertNotNull(factory.createRestrictionRepository());
+        Assertions.assertNotNull(factory.createRestrictionAccountRepository());
+        Assertions.assertNotNull(factory.createRestrictionMosaicRepository());
         Assertions.assertNotNull(factory.createJsonSerialization());
 
         factory.close();

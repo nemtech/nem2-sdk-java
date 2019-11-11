@@ -23,15 +23,11 @@ import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicFlags;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicInfo;
-import io.nem.sdk.model.mosaic.MosaicNames;
-import io.nem.sdk.model.namespace.NamespaceName;
 import io.nem.sdk.openapi.okhttp_gson.api.MosaicRoutesApi;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.sdk.openapi.okhttp_gson.model.MosaicDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MosaicIds;
 import io.nem.sdk.openapi.okhttp_gson.model.MosaicInfoDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.MosaicNamesDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.MosaicsNamesDTO;
 import io.reactivex.Observable;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -76,31 +72,6 @@ public class MosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imp
                 .toObservable());
     }
 
-    @Override
-    public Observable<List<MosaicNames>> getMosaicsNames(List<MosaicId> ids) {
-        MosaicIds mosaicIds = new MosaicIds();
-        mosaicIds.mosaicIds(ids.stream()
-            .map(MosaicId::getIdAsHex)
-            .collect(Collectors.toList()));
-        Callable<MosaicsNamesDTO> callback = () -> getClient()
-            .getMosaicsNames(mosaicIds);
-        return exceptionHandling(
-            call(callback).map(MosaicsNamesDTO::getMosaicNames).flatMapIterable(item -> item)
-                .map(this::toMosaicNames).toList()
-                .toObservable());
-    }
-
-    /**
-     * Converts a {@link MosaicNamesDTO} into a {@link MosaicNames}
-     *
-     * @param dto {@link MosaicNamesDTO}
-     * @return {@link MosaicNames}
-     */
-    private MosaicNames toMosaicNames(MosaicNamesDTO dto) {
-        return new MosaicNames(
-            MapperUtils.toMosaicId(dto.getMosaicId()),
-            dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
-    }
 
     private MosaicInfo createMosaicInfo(MosaicInfoDTO mosaicInfoDTO) {
         NetworkType networkType = getNetworkTypeBlocking();

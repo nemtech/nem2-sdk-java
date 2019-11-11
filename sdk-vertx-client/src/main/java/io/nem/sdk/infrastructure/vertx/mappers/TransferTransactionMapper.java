@@ -34,6 +34,7 @@ import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import io.nem.sdk.openapi.vertx.model.MessageDTO;
 import io.nem.sdk.openapi.vertx.model.MessageTypeEnum;
 import io.nem.sdk.openapi.vertx.model.TransferTransactionDTO;
+import io.nem.sdk.openapi.vertx.model.UnresolvedMosaic;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,13 +79,13 @@ class TransferTransactionMapper extends
 
     @Override
     protected void copyToDto(TransferTransaction transaction, TransferTransactionDTO dto) {
-        List<io.nem.sdk.openapi.vertx.model.Mosaic> mosaics = new ArrayList<>();
+        List<UnresolvedMosaic> mosaics = new ArrayList<>();
         if (transaction.getMosaics() != null) {
             mosaics =
                 transaction.getMosaics().stream()
                     .map(
                         mosaic -> {
-                            io.nem.sdk.openapi.vertx.model.Mosaic mosaicDto = new io.nem.sdk.openapi.vertx.model.Mosaic();
+                            io.nem.sdk.openapi.vertx.model.UnresolvedMosaic mosaicDto = new io.nem.sdk.openapi.vertx.model.UnresolvedMosaic();
                             mosaicDto.setAmount(mosaic.getAmount());
                             mosaicDto.setId(MapperUtils.getIdAsHex(mosaic.getId()));
                             return mosaicDto;

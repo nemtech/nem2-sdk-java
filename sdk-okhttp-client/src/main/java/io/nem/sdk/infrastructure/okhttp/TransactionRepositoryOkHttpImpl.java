@@ -18,7 +18,6 @@ package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.sdk.api.TransactionRepository;
 import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
-import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.sdk.model.transaction.Deadline;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
@@ -27,7 +26,6 @@ import io.nem.sdk.model.transaction.TransactionStatus;
 import io.nem.sdk.openapi.okhttp_gson.api.TransactionRoutesApi;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.sdk.openapi.okhttp_gson.model.AnnounceTransactionInfoDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.Cosignature;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionHashes;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionIds;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
@@ -116,30 +114,5 @@ public class TransactionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImp
                 new TransactionPayload().payload(signedTransaction.getPayload()));
         return exceptionHandling(
             call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
-    }
-
-    @Override
-    public Observable<TransactionAnnounceResponse> announceAggregateBonded(
-        SignedTransaction signedTransaction) {
-        Callable<AnnounceTransactionInfoDTO> callback = () -> getClient()
-            .announcePartialTransaction(
-                new TransactionPayload().payload(signedTransaction.getPayload()));
-        return exceptionHandling(
-            call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
-    }
-
-    @Override
-    public Observable<TransactionAnnounceResponse> announceAggregateBondedCosignature(
-        CosignatureSignedTransaction cosignatureSignedTransaction) {
-
-        Callable<AnnounceTransactionInfoDTO> callback = () -> getClient()
-            .announceCosignatureTransaction(
-                new Cosignature().parentHash(cosignatureSignedTransaction.getParentHash())
-                    .signature(cosignatureSignedTransaction.getSignature())
-                    .signature(cosignatureSignedTransaction.getSigner()));
-        return exceptionHandling(
-            call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
-
-
     }
 }

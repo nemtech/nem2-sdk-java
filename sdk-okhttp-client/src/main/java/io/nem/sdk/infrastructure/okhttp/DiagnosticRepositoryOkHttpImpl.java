@@ -63,12 +63,12 @@ public class DiagnosticRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
      * @return {@link Observable} of ServerInfo
      */
     public Observable<ServerInfo> getServerInfo() {
-        Callable<ServerDTO> callback = getClient()::getServerInfo;
+        Callable<ServerInfoDTO> callback = getClient()::getServerInfo;
         return exceptionHandling(
-            call(callback).map(ServerDTO::getServerInfo).map(this::toServerInfo));
+            call(callback).map(ServerInfoDTO::getServerInfo).map(this::toServerInfo));
     }
 
-    private ServerInfo toServerInfo(ServerInfoDTO serverInfoDTO) {
+    private ServerInfo toServerInfo(ServerDTO serverInfoDTO) {
         return new ServerInfo(serverInfoDTO.getRestVersion(), serverInfoDTO.getSdkVersion());
     }
 

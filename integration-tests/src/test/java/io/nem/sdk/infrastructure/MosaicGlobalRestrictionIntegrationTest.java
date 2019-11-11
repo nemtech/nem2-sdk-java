@@ -17,7 +17,7 @@
 package io.nem.sdk.infrastructure;
 
 import io.nem.sdk.api.RepositoryCallException;
-import io.nem.sdk.api.RestrictionRepository;
+import io.nem.sdk.api.RestrictionMosaicRepository;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.blockchain.BlockDuration;
 import io.nem.sdk.model.mosaic.MosaicFlags;
@@ -76,8 +76,8 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
         //5) Validate the data from the endpoints
         sleep(1000);
 
-        RestrictionRepository restrictionRepository = getRepositoryFactory(type)
-            .createRestrictionRepository();
+        RestrictionMosaicRepository restrictionRepository = getRepositoryFactory(type)
+            .createRestrictionMosaicRepository();
 
         assertMosaicGlobalRestriction(createTransaction, get(
             restrictionRepository.getMosaicGlobalRestriction(mosaicId)));
@@ -192,7 +192,8 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getMosaicGlobalRestrictionWhenMosaicDoesNotExist(RepositoryType type) {
-        RestrictionRepository repository = getRepositoryFactory(type).createRestrictionRepository();
+        RestrictionMosaicRepository repository = getRepositoryFactory(type)
+            .createRestrictionMosaicRepository();
 
         RepositoryCallException exception = Assertions
             .assertThrows(RepositoryCallException.class,
@@ -206,7 +207,8 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getMosaicGlobalRestrictionsWhenMosaicDoesNotExist(RepositoryType type) {
-        RestrictionRepository repository = getRepositoryFactory(type).createRestrictionRepository();
+        RestrictionMosaicRepository repository = getRepositoryFactory(type)
+            .createRestrictionMosaicRepository();
         Assertions.assertEquals(0, get(repository
             .getMosaicGlobalRestrictions(
                 Collections.singletonList(new MosaicId(BigInteger.valueOf(888888))))).size());

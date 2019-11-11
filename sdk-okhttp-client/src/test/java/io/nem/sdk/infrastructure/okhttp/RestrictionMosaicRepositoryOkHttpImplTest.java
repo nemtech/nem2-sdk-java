@@ -14,34 +14,27 @@
  * limitations under the License.
  */
 
-package io.nem.sdk.infrastructure.vertx;
+package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.core.utils.ConvertUtils;
 import io.nem.core.utils.MapperUtils;
-import io.nem.sdk.model.account.AccountRestrictions;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.restriction.MosaicAddressRestriction;
 import io.nem.sdk.model.restriction.MosaicGlobalRestriction;
 import io.nem.sdk.model.restriction.MosaicRestrictionEntryType;
-import io.nem.sdk.model.transaction.AccountRestrictionType;
 import io.nem.sdk.model.transaction.MosaicRestrictionType;
-import io.nem.sdk.openapi.vertx.model.AccountRestrictionDTO;
-import io.nem.sdk.openapi.vertx.model.AccountRestrictionFlagsEnum;
-import io.nem.sdk.openapi.vertx.model.AccountRestrictionsDTO;
-import io.nem.sdk.openapi.vertx.model.AccountRestrictionsInfoDTO;
-import io.nem.sdk.openapi.vertx.model.MosaicAddressRestrictionDTO;
-import io.nem.sdk.openapi.vertx.model.MosaicAddressRestrictionEntryDTO;
-import io.nem.sdk.openapi.vertx.model.MosaicAddressRestrictionEntryWrapperDTO;
-import io.nem.sdk.openapi.vertx.model.MosaicGlobalRestrictionDTO;
-import io.nem.sdk.openapi.vertx.model.MosaicGlobalRestrictionEntryDTO;
-import io.nem.sdk.openapi.vertx.model.MosaicGlobalRestrictionEntryRestrictionDTO;
-import io.nem.sdk.openapi.vertx.model.MosaicGlobalRestrictionEntryWrapperDTO;
-import io.nem.sdk.openapi.vertx.model.MosaicRestrictionEntryTypeEnum;
-import io.nem.sdk.openapi.vertx.model.MosaicRestrictionTypeEnum;
+import io.nem.sdk.openapi.okhttp_gson.model.MosaicAddressRestrictionDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.MosaicAddressRestrictionEntryDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.MosaicAddressRestrictionEntryWrapperDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.MosaicGlobalRestrictionDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.MosaicGlobalRestrictionEntryDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.MosaicGlobalRestrictionEntryRestrictionDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.MosaicGlobalRestrictionEntryWrapperDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.MosaicRestrictionEntryTypeEnum;
+import io.nem.sdk.openapi.okhttp_gson.model.MosaicRestrictionTypeEnum;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -49,81 +42,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit Tests for {@link RestrictionRepositoryVertxImpl}
+ * Unit Tests for {@link RestrictionMosaicRepositoryOkHttpImpl}
  *
  * @author Fernando Boucquez
  */
-public class RestrictionRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
+public class RestrictionMosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest {
 
-    private RestrictionRepositoryVertxImpl repository;
+    private RestrictionMosaicRepositoryOkHttpImpl repository;
 
 
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new RestrictionRepositoryVertxImpl(apiClientMock, networkType);
-    }
-
-
-    @Test
-    public void shouldGetAccountRestrictions() throws Exception {
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
-
-        AccountRestrictionsDTO dto = new AccountRestrictionsDTO();
-        dto.setAddress(address.encoded());
-        AccountRestrictionDTO restriction = new AccountRestrictionDTO();
-        restriction.setRestrictionType(AccountRestrictionFlagsEnum.NUMBER_32770);
-        restriction.setValues(Arrays.asList("9636553580561478212"));
-        dto.setRestrictions(Collections.singletonList(restriction));
-
-        AccountRestrictionsInfoDTO info = new AccountRestrictionsInfoDTO();
-        info.setAccountRestrictions(dto);
-        mockRemoteCall(info);
-
-        AccountRestrictions accountRestrictions = repository
-            .getAccountRestrictions(address).toFuture().get();
-
-        Assertions.assertEquals(address, accountRestrictions.getAddress());
-        Assertions.assertEquals(1, accountRestrictions.getRestrictions().size());
-        Assertions.assertEquals(AccountRestrictionType.BLOCK_MOSAIC,
-            accountRestrictions.getRestrictions().get(0).getRestrictionType());
-        Assertions.assertEquals(
-            Arrays.asList(MapperUtils.toMosaicId("9636553580561478212")),
-            accountRestrictions.getRestrictions().get(0).getValues());
-
-    }
-
-    @Test
-    public void shouldGetAccountsRestrictionsFromAddresses() throws Exception {
-        Address address =
-            Address.createFromEncoded(
-                "9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142");
-
-        AccountRestrictionsDTO dto = new AccountRestrictionsDTO();
-        dto.setAddress(address.encoded());
-        AccountRestrictionDTO restriction = new AccountRestrictionDTO();
-        restriction.setRestrictionType(AccountRestrictionFlagsEnum.NUMBER_1);
-        restriction.setValues(Arrays.asList("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142"));
-        dto.setRestrictions(Collections.singletonList(restriction));
-
-        AccountRestrictionsInfoDTO info = new AccountRestrictionsInfoDTO();
-        info.setAccountRestrictions(dto);
-        mockRemoteCall(Collections.singletonList(info));
-
-        AccountRestrictions accountRestrictions = repository
-            .getAccountsRestrictions(Collections.singletonList(address)).toFuture()
-            .get().get(0);
-
-        Assertions.assertEquals(address, accountRestrictions.getAddress());
-        Assertions.assertEquals(1, accountRestrictions.getRestrictions().size());
-        Assertions.assertEquals(AccountRestrictionType.ALLOW_INCOMING_ADDRESS,
-            accountRestrictions.getRestrictions().get(0).getRestrictionType());
-        Assertions.assertEquals(Collections.singletonList(MapperUtils
-                .toUnresolvedAddress("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142")),
-            accountRestrictions.getRestrictions().get(0).getValues());
-
+        repository = new RestrictionMosaicRepositoryOkHttpImpl(apiClientMock);
     }
 
 
@@ -192,7 +123,7 @@ public class RestrictionRepositoryVertxImplTest extends AbstractVertxRespository
         MosaicGlobalRestrictionEntryRestrictionDTO entryRestrictionDto = new MosaicGlobalRestrictionEntryRestrictionDTO();
         entryRestrictionDto.setRestrictionType(MosaicRestrictionTypeEnum.NUMBER_5);
         entryRestrictionDto.setReferenceMosaicId("456");
-        entryRestrictionDto.setRestrictionValue("3333");
+        entryRestrictionDto.setRestrictionValue(BigInteger.valueOf(3333));
         entryDTO.setRestriction(entryRestrictionDto);
         List<MosaicGlobalRestrictionEntryDTO> restrictions = new ArrayList<>();
         restrictions.add(entryDTO);
@@ -252,7 +183,7 @@ public class RestrictionRepositoryVertxImplTest extends AbstractVertxRespository
         MosaicGlobalRestrictionEntryRestrictionDTO entryRestrictionDto = new MosaicGlobalRestrictionEntryRestrictionDTO();
         entryRestrictionDto.setRestrictionType(MosaicRestrictionTypeEnum.NUMBER_5);
         entryRestrictionDto.setReferenceMosaicId("456");
-        entryRestrictionDto.setRestrictionValue("3333");
+        entryRestrictionDto.setRestrictionValue(BigInteger.valueOf(3333));
         entryDTO.setRestriction(entryRestrictionDto);
         List<MosaicGlobalRestrictionEntryDTO> restrictions = new ArrayList<>();
         restrictions.add(entryDTO);
@@ -338,4 +269,8 @@ public class RestrictionRepositoryVertxImplTest extends AbstractVertxRespository
 
     }
 
+    @Override
+    public RestrictionMosaicRepositoryOkHttpImpl getRepository() {
+        return repository;
+    }
 }

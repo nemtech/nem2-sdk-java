@@ -18,18 +18,22 @@ package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.core.utils.Suppliers;
 import io.nem.sdk.api.AccountRepository;
+import io.nem.sdk.api.AggregateRepository;
 import io.nem.sdk.api.BlockRepository;
 import io.nem.sdk.api.ChainRepository;
 import io.nem.sdk.api.DiagnosticRepository;
 import io.nem.sdk.api.JsonSerialization;
 import io.nem.sdk.api.MetadataRepository;
 import io.nem.sdk.api.MosaicRepository;
+import io.nem.sdk.api.MultisigRepository;
 import io.nem.sdk.api.NamespaceRepository;
 import io.nem.sdk.api.NetworkRepository;
 import io.nem.sdk.api.NodeRepository;
+import io.nem.sdk.api.ReceiptRepository;
 import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.api.RepositoryFactory;
-import io.nem.sdk.api.RestrictionRepository;
+import io.nem.sdk.api.RestrictionAccountRepository;
+import io.nem.sdk.api.RestrictionMosaicRepository;
 import io.nem.sdk.api.TransactionRepository;
 import io.nem.sdk.infrastructure.Listener;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -98,8 +102,18 @@ public class RepositoryFactoryVertxImpl implements RepositoryFactory {
     }
 
     @Override
+    public MultisigRepository createMultisigRepository() {
+        return new MultisigRepositoryVertxImpl(apiClient, networkType);
+    }
+
+    @Override
     public BlockRepository createBlockRepository() {
         return new BlockRepositoryVertxImpl(apiClient, networkType);
+    }
+
+    @Override
+    public ReceiptRepository createReceiptRepository() {
+        return new ReceiptRepositoryVertxImpl(apiClient, networkType);
     }
 
     @Override
@@ -138,13 +152,23 @@ public class RepositoryFactoryVertxImpl implements RepositoryFactory {
     }
 
     @Override
+    public AggregateRepository createAggregateRepository() {
+        return new AggregateRepositoryVertxImpl(apiClient, networkType);
+    }
+
+    @Override
     public MetadataRepository createMetadataRepository() {
         return new MetadataRepositoryVertxImpl(apiClient, networkType);
     }
 
     @Override
-    public RestrictionRepository createRestrictionRepository() {
-        return new RestrictionRepositoryVertxImpl(apiClient, networkType);
+    public RestrictionAccountRepository createRestrictionAccountRepository() {
+        return new RestrictionAccountRepositoryVertxImpl(apiClient, networkType);
+    }
+
+    @Override
+    public RestrictionMosaicRepository createRestrictionMosaicRepository() {
+        return new RestrictionMosaicRepositoryVertxImpl(apiClient, networkType);
     }
 
     @Override

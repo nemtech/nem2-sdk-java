@@ -1,14 +1,14 @@
 /*
  * Copyright 2019 NEM
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -17,9 +17,7 @@
 package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.core.utils.MapperUtils;
-import io.nem.sdk.api.RestrictionRepository;
-import io.nem.sdk.model.account.AccountRestriction;
-import io.nem.sdk.model.account.AccountRestrictions;
+import io.nem.sdk.api.RestrictionMosaicRepository;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
@@ -27,15 +25,11 @@ import io.nem.sdk.model.restriction.MosaicAddressRestriction;
 import io.nem.sdk.model.restriction.MosaicGlobalRestriction;
 import io.nem.sdk.model.restriction.MosaicGlobalRestrictionItem;
 import io.nem.sdk.model.restriction.MosaicRestrictionEntryType;
-import io.nem.sdk.model.transaction.AccountRestrictionType;
 import io.nem.sdk.model.transaction.MosaicRestrictionType;
-import io.nem.sdk.openapi.vertx.api.RestrictionRoutesApi;
-import io.nem.sdk.openapi.vertx.api.RestrictionRoutesApiImpl;
+import io.nem.sdk.openapi.vertx.api.RestrictionMosaicRoutesApi;
+import io.nem.sdk.openapi.vertx.api.RestrictionMosaicRoutesApiImpl;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.sdk.openapi.vertx.model.AccountIds;
-import io.nem.sdk.openapi.vertx.model.AccountRestrictionDTO;
-import io.nem.sdk.openapi.vertx.model.AccountRestrictionsDTO;
-import io.nem.sdk.openapi.vertx.model.AccountRestrictionsInfoDTO;
 import io.nem.sdk.openapi.vertx.model.MosaicAddressRestrictionDTO;
 import io.nem.sdk.openapi.vertx.model.MosaicAddressRestrictionEntryWrapperDTO;
 import io.nem.sdk.openapi.vertx.model.MosaicGlobalRestrictionDTO;
@@ -48,65 +42,18 @@ import io.vertx.core.Handler;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class RestrictionRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements
-    RestrictionRepository {
+public class RestrictionMosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements
+    RestrictionMosaicRepository {
 
-    private final RestrictionRoutesApi client;
+    private final RestrictionMosaicRoutesApi client;
 
-    public RestrictionRepositoryVertxImpl(ApiClient apiClient,
+    public RestrictionMosaicRepositoryVertxImpl(ApiClient apiClient,
         Supplier<NetworkType> networkType) {
         super(apiClient, networkType);
-        this.client = new RestrictionRoutesApiImpl(apiClient);
-    }
-
-
-    @Override
-    public Observable<AccountRestrictions> getAccountRestrictions(Address address) {
-
-        return exceptionHandling(call(
-            (Handler<AsyncResult<AccountRestrictionsInfoDTO>> handler) -> getClient()
-                .getAccountRestrictions(address.plain(), handler))
-            .map(AccountRestrictionsInfoDTO::getAccountRestrictions)
-            .map(this::toAccountRestrictions));
-    }
-
-    @Override
-    public Observable<List<AccountRestrictions>> getAccountsRestrictions(
-        List<Address> addresses) {
-        AccountIds accountIds = new AccountIds()
-            .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-        return getAccountsRestrictions(accountIds);
-    }
-
-
-    private Observable<List<AccountRestrictions>> getAccountsRestrictions(AccountIds accountIds) {
-        return exceptionHandling(call(
-            (Handler<AsyncResult<List<AccountRestrictionsInfoDTO>>> handler) -> getClient()
-                .getAccountRestrictionsFromAccounts(accountIds, handler))
-            .flatMapIterable(item -> item)
-            .map(AccountRestrictionsInfoDTO::getAccountRestrictions)
-            .map(this::toAccountRestrictions)).toList().toObservable();
-    }
-
-
-    private AccountRestrictions toAccountRestrictions(AccountRestrictionsDTO dto) {
-        return new AccountRestrictions(MapperUtils.toAddressFromEncoded(dto.getAddress()),
-            dto.getRestrictions().stream().map(this::toAccountRestriction).collect(
-                Collectors.toList()));
-    }
-
-    private AccountRestriction toAccountRestriction(AccountRestrictionDTO dto) {
-        AccountRestrictionType restrictionType = AccountRestrictionType
-            .rawValueOf(dto.getRestrictionType().getValue());
-        return new AccountRestriction(
-            restrictionType,
-            dto.getValues().stream().filter(Objects::nonNull).map(Object::toString)
-                .map(restrictionType.getTargetType()::fromString).collect(
-                Collectors.toList()));
+        this.client = new RestrictionMosaicRoutesApiImpl(apiClient);
     }
 
 
@@ -169,7 +116,7 @@ public class RestrictionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
     private MosaicGlobalRestrictionItem toMosaicGlobalRestrictionItem(
         MosaicGlobalRestrictionEntryRestrictionDTO dto) {
         return new MosaicGlobalRestrictionItem(MapperUtils.toMosaicId(dto.getReferenceMosaicId()),
-            toBigInteger(dto.getRestrictionValue()),
+            dto.getRestrictionValue(),
             MosaicRestrictionType.rawValueOf(dto.getRestrictionType().getValue().byteValue()));
     }
 
@@ -193,7 +140,7 @@ public class RestrictionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
         return new BigInteger(value);
     }
 
-    public RestrictionRoutesApi getClient() {
+    public RestrictionMosaicRoutesApi getClient() {
         return client;
     }
 }

@@ -75,7 +75,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void shouldReturnNewBlockViaListener(RepositoryType type)
-        throws ExecutionException, InterruptedException, TimeoutException {
+        throws ExecutionException, InterruptedException {
         Listener listener = getRepositoryFactory(type).createListener();
         listener.open().get();
 
@@ -90,7 +90,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     @EnumSource(RepositoryType.class)
     void shouldReturnConfirmedTransactionAddressSignerViaListener(
         RepositoryType type)
-        throws ExecutionException, InterruptedException, TimeoutException {
+        throws ExecutionException, InterruptedException {
         Listener listener = getRepositoryFactory(type).createListener();
         listener.open().get();
 
@@ -173,7 +173,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void shouldReturnAggregateBondedRemovedTransactionViaListener(RepositoryType type)
-        throws ExecutionException, InterruptedException, TimeoutException {
+        throws ExecutionException, InterruptedException {
         Listener listener = getRepositoryFactory(type).createListener();
         listener.open().get();
 
@@ -187,7 +187,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void shouldReturnCosignatureAddedViaListener(RepositoryType type)
-        throws ExecutionException, InterruptedException, TimeoutException {
+        throws ExecutionException, InterruptedException {
         Listener listener = getRepositoryFactory(type).createListener();
         listener.open().get();
 
@@ -252,8 +252,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     }
 
     private SignedTransaction announceStandaloneTransferTransactionWithInsufficientBalance(
-        RepositoryType type)
-        throws ExecutionException, InterruptedException, TimeoutException {
+        RepositoryType type) {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
                 new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST),
@@ -268,9 +267,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         return signedTransaction;
     }
 
-    private SignedTransaction announceAggregateBondedTransaction(
-        RepositoryType type)
-        throws ExecutionException, InterruptedException, TimeoutException {
+    private SignedTransaction announceAggregateBondedTransaction(RepositoryType type) {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
                 new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST),
@@ -288,21 +285,21 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         SignedTransaction signedTransaction =
             this.cosignatoryAccount.sign(aggregateTransaction, getGenerationHash());
 
-        get(getTransactionRepository(type).announceAggregateBonded(signedTransaction));
+        get(getRepositoryFactory(type).createAggregateRepository()
+            .announceAggregateBonded(signedTransaction));
 
         return signedTransaction;
     }
 
     private CosignatureSignedTransaction announceCosignatureTransaction(
-        AggregateTransaction transactionToCosign,
-        RepositoryType type) throws ExecutionException, InterruptedException, TimeoutException {
+        AggregateTransaction transactionToCosign, RepositoryType type) {
         CosignatureTransaction cosignatureTransaction = new CosignatureTransaction(
             transactionToCosign);
 
         CosignatureSignedTransaction cosignatureSignedTransaction =
             this.cosignatoryAccount2.signCosignatureTransaction(cosignatureTransaction);
 
-        get(getTransactionRepository(type)
+        get(getRepositoryFactory(type).createAggregateRepository()
             .announceAggregateBondedCosignature(cosignatureSignedTransaction));
 
         return cosignatureSignedTransaction;

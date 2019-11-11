@@ -61,8 +61,8 @@ public class DiagnosticRepositoryOkHttpImplTest extends AbstractOkHttpRespositor
 
     @Test
     public void shouldGetServerInfo() throws Exception {
-        ServerDTO dto = new ServerDTO();
-        ServerInfoDTO serverInfoDto = new ServerInfoDTO();
+        ServerInfoDTO dto = new ServerInfoDTO();
+        ServerDTO serverInfoDto = new ServerDTO();
         serverInfoDto.setRestVersion("RestVersion1");
         serverInfoDto.setSdkVersion("SdkVersion1");
         dto.serverInfo(serverInfoDto);

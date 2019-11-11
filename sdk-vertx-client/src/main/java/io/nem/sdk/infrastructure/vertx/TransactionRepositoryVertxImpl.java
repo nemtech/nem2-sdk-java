@@ -20,7 +20,6 @@ import io.nem.sdk.api.TransactionRepository;
 import io.nem.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.sdk.infrastructure.vertx.mappers.TransactionMapper;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.sdk.model.transaction.Deadline;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
@@ -30,7 +29,6 @@ import io.nem.sdk.openapi.vertx.api.TransactionRoutesApi;
 import io.nem.sdk.openapi.vertx.api.TransactionRoutesApiImpl;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.sdk.openapi.vertx.model.AnnounceTransactionInfoDTO;
-import io.nem.sdk.openapi.vertx.model.Cosignature;
 import io.nem.sdk.openapi.vertx.model.TransactionHashes;
 import io.nem.sdk.openapi.vertx.model.TransactionIds;
 import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
@@ -127,30 +125,4 @@ public class TransactionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
             call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
     }
 
-    @Override
-    public Observable<TransactionAnnounceResponse> announceAggregateBonded(
-        SignedTransaction signedTransaction) {
-        Consumer<Handler<AsyncResult<AnnounceTransactionInfoDTO>>> callback = handler -> getClient()
-            .announcePartialTransaction(
-                new TransactionPayload().payload(signedTransaction.getPayload()),
-                handler);
-        return exceptionHandling(
-            call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
-    }
-
-    @Override
-    public Observable<TransactionAnnounceResponse> announceAggregateBondedCosignature(
-        CosignatureSignedTransaction cosignatureSignedTransaction) {
-
-        Consumer<Handler<AsyncResult<AnnounceTransactionInfoDTO>>> callback = handler -> getClient()
-            .announceCosignatureTransaction(
-                new Cosignature().parentHash(cosignatureSignedTransaction.getParentHash())
-                    .signature(cosignatureSignedTransaction.getSignature())
-                    .signature(cosignatureSignedTransaction.getSigner()),
-                handler);
-        return exceptionHandling(
-            call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
-
-
-    }
 }

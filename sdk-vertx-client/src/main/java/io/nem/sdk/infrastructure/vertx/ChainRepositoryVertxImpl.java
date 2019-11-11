@@ -55,7 +55,7 @@ public class ChainRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
      * @return {@link Observable} of {@link BigInteger}
      */
     public Observable<BigInteger> getBlockchainHeight() {
-        Consumer<Handler<AsyncResult<HeightInfoDTO>>> callback = client::getBlockchainHeight;
+        Consumer<Handler<AsyncResult<HeightInfoDTO>>> callback = client::getChainHeight;
         return exceptionHandling(call(callback).map(HeightInfoDTO::getHeight));
 
     }

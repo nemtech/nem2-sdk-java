@@ -73,12 +73,12 @@ public class DiagnosticRepositoryVertxImpl extends AbstractRepositoryVertxImpl i
      * @return Observable of {@link ServerInfo}
      */
     public Observable<ServerInfo> getServerInfo() {
-        Consumer<Handler<AsyncResult<ServerDTO>>> callback = getClient()::getServerInfo;
+        Consumer<Handler<AsyncResult<ServerInfoDTO>>> callback = getClient()::getServerInfo;
         return exceptionHandling(
-            call(callback).map(ServerDTO::getServerInfo).map(this::toServerInfo));
+            call(callback).map(ServerInfoDTO::getServerInfo).map(this::toServerInfo));
     }
 
-    private ServerInfo toServerInfo(ServerInfoDTO serverInfoDTO) {
+    private ServerInfo toServerInfo(ServerDTO serverInfoDTO) {
         return new ServerInfo(serverInfoDTO.getRestVersion(), serverInfoDTO.getSdkVersion());
     }
 }

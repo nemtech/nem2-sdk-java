@@ -84,7 +84,7 @@ public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
 
         sleep(2000);
 
-        List<MosaicNames> accountNames = get(getRepositoryFactory(type).createMosaicRepository()
+        List<MosaicNames> accountNames = get(getRepositoryFactory(type).createNamespaceRepository()
             .getMosaicsNames(Collections.singletonList(mosaicId)));
 
         Assertions.assertEquals(1, accountNames.size());

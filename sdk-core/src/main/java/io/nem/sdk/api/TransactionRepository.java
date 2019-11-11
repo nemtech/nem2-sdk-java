@@ -16,7 +16,6 @@
 
 package io.nem.sdk.api;
 
-import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionAnnounceResponse;
@@ -71,21 +70,4 @@ public interface TransactionRepository {
      */
     Observable<TransactionAnnounceResponse> announce(SignedTransaction signedTransaction);
 
-    /**
-     * Send a signed transaction with missing signatures.
-     *
-     * @param signedTransaction SignedTransaction
-     * @return Observable of TransactionAnnounceResponse
-     */
-    Observable<TransactionAnnounceResponse> announceAggregateBonded(
-        SignedTransaction signedTransaction);
-
-    /**
-     * Send a cosignature signed transaction of an already announced transaction.
-     *
-     * @param cosignatureSignedTransaction CosignatureSignedTransaction
-     * @return Observable of TransactionAnnounceResponse
-     */
-    Observable<TransactionAnnounceResponse> announceAggregateBondedCosignature(
-        CosignatureSignedTransaction cosignatureSignedTransaction);
 }

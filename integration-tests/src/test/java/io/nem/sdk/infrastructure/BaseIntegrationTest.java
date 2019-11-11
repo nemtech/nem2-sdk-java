@@ -351,7 +351,7 @@ public abstract class BaseIntegrationTest {
         Account nemesisAccount = config().getNemesisAccount();
 
         List<AccountNames> accountNames = get(
-            getRepositoryFactory(type).createAccountRepository().getAccountsNames(
+            getRepositoryFactory(type).createNamespaceRepository().getAccountsNames(
                 Collections.singletonList(address)));
 
         if (accountNames.stream().anyMatch(
@@ -395,7 +395,7 @@ public abstract class BaseIntegrationTest {
         Account nemesisAccount = config().getNemesisAccount();
         NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
         List<MosaicNames> mosaicNames = get(
-            getRepositoryFactory(type).createMosaicRepository().getMosaicsNames(
+            getRepositoryFactory(type).createNamespaceRepository().getMosaicsNames(
                 Collections.singletonList(mosaicId)));
 
         if (mosaicNames.stream().anyMatch(

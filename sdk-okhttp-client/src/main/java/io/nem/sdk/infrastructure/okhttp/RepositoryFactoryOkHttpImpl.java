@@ -17,17 +17,21 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.sdk.api.AccountRepository;
+import io.nem.sdk.api.AggregateRepository;
 import io.nem.sdk.api.BlockRepository;
 import io.nem.sdk.api.ChainRepository;
 import io.nem.sdk.api.DiagnosticRepository;
 import io.nem.sdk.api.JsonSerialization;
 import io.nem.sdk.api.MetadataRepository;
 import io.nem.sdk.api.MosaicRepository;
+import io.nem.sdk.api.MultisigRepository;
 import io.nem.sdk.api.NamespaceRepository;
 import io.nem.sdk.api.NetworkRepository;
 import io.nem.sdk.api.NodeRepository;
+import io.nem.sdk.api.ReceiptRepository;
 import io.nem.sdk.api.RepositoryFactory;
-import io.nem.sdk.api.RestrictionRepository;
+import io.nem.sdk.api.RestrictionAccountRepository;
+import io.nem.sdk.api.RestrictionMosaicRepository;
 import io.nem.sdk.api.TransactionRepository;
 import io.nem.sdk.infrastructure.Listener;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
@@ -60,8 +64,18 @@ public class RepositoryFactoryOkHttpImpl implements RepositoryFactory {
     }
 
     @Override
+    public MultisigRepository createMultisigRepository() {
+        return new MultisigRepositoryOkHttpImpl(apiClient);
+    }
+
+    @Override
     public BlockRepository createBlockRepository() {
         return new BlockRepositoryOkHttpImpl(apiClient);
+    }
+
+    @Override
+    public ReceiptRepository createReceiptRepository() {
+        return new ReceiptRepositoryOkHttpImpl(apiClient);
     }
 
     @Override
@@ -100,13 +114,23 @@ public class RepositoryFactoryOkHttpImpl implements RepositoryFactory {
     }
 
     @Override
+    public AggregateRepository createAggregateRepository() {
+        return new AggregateRepositoryOkHttpImpl(apiClient);
+    }
+
+    @Override
     public MetadataRepository createMetadataRepository() {
         return new MetadataRepositoryOkHttpImpl(apiClient);
     }
 
     @Override
-    public RestrictionRepository createRestrictionRepository() {
-        return new RestrictionRepositoryOkHttpImpl(apiClient);
+    public RestrictionAccountRepository createRestrictionAccountRepository() {
+        return new RestrictionAccountRepositoryOkHttpImpl(apiClient);
+    }
+
+    @Override
+    public RestrictionMosaicRepository createRestrictionMosaicRepository() {
+        return new RestrictionMosaicRepositoryOkHttpImpl(apiClient);
     }
 
     @Override

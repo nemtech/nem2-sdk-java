@@ -17,23 +17,17 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.core.utils.MapperUtils;
-import io.nem.sdk.api.RestrictionRepository;
-import io.nem.sdk.model.account.AccountRestriction;
-import io.nem.sdk.model.account.AccountRestrictions;
+import io.nem.sdk.api.RestrictionMosaicRepository;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.restriction.MosaicAddressRestriction;
 import io.nem.sdk.model.restriction.MosaicGlobalRestriction;
 import io.nem.sdk.model.restriction.MosaicGlobalRestrictionItem;
 import io.nem.sdk.model.restriction.MosaicRestrictionEntryType;
-import io.nem.sdk.model.transaction.AccountRestrictionType;
 import io.nem.sdk.model.transaction.MosaicRestrictionType;
-import io.nem.sdk.openapi.okhttp_gson.api.RestrictionRoutesApi;
+import io.nem.sdk.openapi.okhttp_gson.api.RestrictionMosaicRoutesApi;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountIds;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionsDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionsInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MosaicAddressRestrictionDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MosaicAddressRestrictionEntryWrapperDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MosaicGlobalRestrictionDTO;
@@ -44,65 +38,18 @@ import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-public class RestrictionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements
-    RestrictionRepository {
+public class RestrictionMosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements
+    RestrictionMosaicRepository {
 
-    private final RestrictionRoutesApi client;
+    private final RestrictionMosaicRoutesApi client;
 
-    public RestrictionRepositoryOkHttpImpl(ApiClient apiClient) {
+    public RestrictionMosaicRepositoryOkHttpImpl(ApiClient apiClient) {
         super(apiClient);
-        this.client = new RestrictionRoutesApi(apiClient);
+        this.client = new RestrictionMosaicRoutesApi(apiClient);
     }
 
-
-    @Override
-    public Observable<AccountRestrictions> getAccountRestrictions(Address address) {
-
-        Callable<AccountRestrictionsInfoDTO> callback = () -> getClient()
-            .getAccountRestrictions(address.plain());
-        return exceptionHandling(
-            call(callback).map(AccountRestrictionsInfoDTO::getAccountRestrictions)
-                .map(this::toAccountRestrictions));
-    }
-
-    @Override
-    public Observable<List<AccountRestrictions>> getAccountsRestrictions(
-        List<Address> addresses) {
-        AccountIds accountIds = new AccountIds()
-            .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-        return getAccountsRestrictions(accountIds);
-    }
-
-
-    private Observable<List<AccountRestrictions>> getAccountsRestrictions(AccountIds accountIds) {
-        Callable<List<AccountRestrictionsInfoDTO>> callback = () -> getClient()
-            .getAccountRestrictionsFromAccounts(accountIds);
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item)
-                .map(AccountRestrictionsInfoDTO::getAccountRestrictions)
-                .map(this::toAccountRestrictions)).toList().toObservable();
-    }
-
-
-    private AccountRestrictions toAccountRestrictions(AccountRestrictionsDTO dto) {
-        return new AccountRestrictions(MapperUtils.toAddressFromEncoded(dto.getAddress()),
-            dto.getRestrictions().stream().map(this::toAccountRestriction).collect(
-                Collectors.toList()));
-    }
-
-    private AccountRestriction toAccountRestriction(AccountRestrictionDTO dto) {
-        AccountRestrictionType restrictionType = AccountRestrictionType
-            .rawValueOf(dto.getRestrictionType().getValue());
-        return new AccountRestriction(
-            restrictionType,
-            dto.getValues().stream().filter(Objects::nonNull).map(Object::toString)
-                .map(restrictionType.getTargetType()::fromString).collect(
-                Collectors.toList()));
-    }
 
     @Override
     public Observable<List<MosaicAddressRestriction>> getMosaicAddressRestrictions(
@@ -158,7 +105,7 @@ public class RestrictionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImp
     private MosaicGlobalRestrictionItem toMosaicGlobalRestrictionItem(
         MosaicGlobalRestrictionEntryRestrictionDTO dto) {
         return new MosaicGlobalRestrictionItem(MapperUtils.toMosaicId(dto.getReferenceMosaicId()),
-            toBigInteger(dto.getRestrictionValue()),
+            dto.getRestrictionValue(),
             MosaicRestrictionType.rawValueOf(dto.getRestrictionType().getValue().byteValue()));
     }
 
@@ -182,7 +129,7 @@ public class RestrictionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImp
     }
 
 
-    public RestrictionRoutesApi getClient() {
+    public RestrictionMosaicRoutesApi getClient() {
         return client;
     }
 }

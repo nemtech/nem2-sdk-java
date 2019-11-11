@@ -17,10 +17,7 @@
 package io.nem.sdk.api;
 
 import io.nem.sdk.model.account.AccountInfo;
-import io.nem.sdk.model.account.AccountNames;
 import io.nem.sdk.model.account.Address;
-import io.nem.sdk.model.account.MultisigAccountGraphInfo;
-import io.nem.sdk.model.account.MultisigAccountInfo;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.Transaction;
@@ -49,31 +46,6 @@ public interface AccountRepository {
      * @return Observable {@link List} of {@link AccountInfo}
      */
     Observable<List<AccountInfo>> getAccountsInfo(List<Address> addresses);
-
-    /**
-     * Gets AccountNames for different accounts based on their addresses. The names are namespaces
-     * linked using address aliases.
-     *
-     * @param addresses {@link List} of {@link Address}
-     * @return Observable {@link List} of {@link AccountNames}
-     */
-    Observable<List<AccountNames>> getAccountsNames(List<Address> addresses);
-
-    /**
-     * Gets a MultisigAccountInfo for an account.
-     *
-     * @param address Address
-     * @return Observable {@link MultisigAccountInfo}
-     */
-    Observable<MultisigAccountInfo> getMultisigAccountInfo(Address address);
-
-    /**
-     * Gets a MultisigAccountGraphInfo for an account.
-     *
-     * @param address Address
-     * @return Observable {@link MultisigAccountGraphInfo}
-     */
-    Observable<MultisigAccountGraphInfo> getMultisigAccountGraphInfo(Address address);
 
     /**
      * Gets an list of confirmed transactions for which an account is signer or receiver.

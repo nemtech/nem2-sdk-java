@@ -79,7 +79,7 @@ public class AddressAliasTransactionIntegrationTest extends BaseIntegrationTest 
 
         sleep(1000);
 
-        List<AccountNames> accountNames = get(getRepositoryFactory(type).createAccountRepository()
+        List<AccountNames> accountNames = get(getRepositoryFactory(type).createNamespaceRepository()
             .getAccountsNames(Collections.singletonList(account.getAddress())));
 
         Assertions.assertEquals(1, accountNames.size());

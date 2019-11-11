@@ -155,24 +155,6 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
             announceTransactionInfoDTO.getMessage());
     }
 
-    @Test
-    public void shouldAnnounceAggregateBonded() throws Exception {
-
-        SignedTransaction signedTransaction = getSignedTransaction();
-
-        AnnounceTransactionInfoDTO announceTransactionInfoDTO = new AnnounceTransactionInfoDTO();
-        announceTransactionInfoDTO.setMessage("SomeMessage");
-        mockRemoteCall(announceTransactionInfoDTO);
-
-        TransactionAnnounceResponse response = repository.announceAggregateBonded(signedTransaction)
-            .toFuture().get();
-
-        Assertions.assertNotNull(response);
-
-        Assertions.assertEquals(announceTransactionInfoDTO.getMessage(),
-            announceTransactionInfoDTO.getMessage());
-    }
-
     private SignedTransaction getSignedTransaction() throws ApiException {
         NetworkType networkType = resolveNetworkType();
 

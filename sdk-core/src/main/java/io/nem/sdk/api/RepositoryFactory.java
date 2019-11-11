@@ -33,9 +33,19 @@ public interface RepositoryFactory extends Closeable {
     AccountRepository createAccountRepository();
 
     /**
+     * @return a newly created {@link MultisigRepository}
+     */
+    MultisigRepository createMultisigRepository();
+
+    /**
      * @return a newly created {@link BlockRepository}
      */
     BlockRepository createBlockRepository();
+
+    /**
+     * @return a newly created {@link ReceiptRepository}
+     */
+    ReceiptRepository createReceiptRepository();
 
     /**
      * @return a newly created {@link ChainRepository}
@@ -73,14 +83,24 @@ public interface RepositoryFactory extends Closeable {
     TransactionRepository createTransactionRepository();
 
     /**
+     * @return a newly created {@link AggregateRepository}
+     */
+    AggregateRepository createAggregateRepository();
+
+    /**
      * @return a newly created {@link MetadataRepository}
      */
     MetadataRepository createMetadataRepository();
 
     /**
-     * @return a newly created {@link RestrictionRepository}
+     * @return a newly created {@link RestrictionAccountRepository}
      */
-    RestrictionRepository createRestrictionRepository();
+    RestrictionAccountRepository createRestrictionAccountRepository();
+
+    /**
+     * @return a newly created {@link RestrictionMosaicRepository}
+     */
+    RestrictionMosaicRepository createRestrictionMosaicRepository();
 
     /**
      * @return a newly created {@link Listener}

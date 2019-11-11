@@ -17,14 +17,20 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.core.utils.MapperUtils;
+import io.nem.sdk.model.account.AccountNames;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.MosaicNames;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.namespace.NamespaceInfo;
 import io.nem.sdk.model.namespace.NamespaceName;
 import io.nem.sdk.model.namespace.NamespaceRegistrationType;
+import io.nem.sdk.openapi.okhttp_gson.model.AccountNamesDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.AccountsNamesDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.AliasDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.AliasTypeEnum;
+import io.nem.sdk.openapi.okhttp_gson.model.MosaicNamesDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.MosaicsNamesDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.NamespaceDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.NamespaceInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.NamespaceMetaDTO;
@@ -301,6 +307,58 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
             linkedMosaicId.getId());
     }
 
+    @Test
+    public void shouldGetMosaicsNamesFromPublicKeys() throws Exception {
+
+        MosaicId mosaicId = MapperUtils.toMosaicId("99262122238339734");
+
+        MosaicNamesDTO dto = new MosaicNamesDTO();
+        dto.setMosaicId("99262122238339734");
+        dto.setNames(Collections.singletonList("accountalias"));
+
+        MosaicsNamesDTO accountsNamesDTO = new MosaicsNamesDTO();
+        accountsNamesDTO.setMosaicNames(Collections.singletonList(dto));
+
+        mockRemoteCall(accountsNamesDTO);
+
+        List<MosaicNames> resolvedList = repository
+            .getMosaicsNames(Collections.singletonList(mosaicId))
+            .toFuture().get();
+
+        Assertions.assertEquals(1, resolvedList.size());
+
+        MosaicNames accountNames = resolvedList.get(0);
+
+        Assertions.assertEquals(mosaicId, accountNames.getMosaicId());
+        Assertions.assertEquals("accountalias", accountNames.getNames().get(0).getName());
+    }
+
+
+    @Test
+    public void shouldGetAccountsNamesFromAddresses() throws Exception {
+        Address address =
+            Address.createFromRawAddress(
+                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+
+        AccountNamesDTO dto = new AccountNamesDTO();
+        dto.setAddress(encodeAddress(address));
+        dto.setNames(Collections.singletonList("accountalias"));
+
+        AccountsNamesDTO accountsNamesDTO = new AccountsNamesDTO();
+        accountsNamesDTO.setAccountNames(Collections.singletonList(dto));
+
+        mockRemoteCall(accountsNamesDTO);
+
+        List<AccountNames> resolvedList = repository
+            .getAccountsNames(Collections.singletonList(address)).toFuture().get();
+
+        Assertions.assertEquals(1, resolvedList.size());
+
+        AccountNames accountNames = resolvedList.get(0);
+
+        Assertions.assertEquals(address, accountNames.getAddress());
+        Assertions.assertEquals("accountalias", accountNames.getNames().get(0).getName());
+    }
 
     @Override
     public NamespaceRepositoryOkHttpImpl getRepository() {

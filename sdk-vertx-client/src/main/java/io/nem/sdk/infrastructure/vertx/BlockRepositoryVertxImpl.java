@@ -24,14 +24,12 @@ import io.nem.sdk.model.blockchain.BlockInfo;
 import io.nem.sdk.model.blockchain.MerkelPathItem;
 import io.nem.sdk.model.blockchain.MerkelProofInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.receipt.Statement;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.openapi.vertx.api.BlockRoutesApi;
 import io.nem.sdk.openapi.vertx.api.BlockRoutesApiImpl;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.sdk.openapi.vertx.model.BlockInfoDTO;
 import io.nem.sdk.openapi.vertx.model.MerkleProofInfoDTO;
-import io.nem.sdk.openapi.vertx.model.StatementsDTO;
 import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
@@ -61,25 +59,29 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
         transactionMapper = new GeneralTransactionMapper(getJsonHelper());
     }
 
+    @Override
     public Observable<BlockInfo> getBlockByHeight(BigInteger height) {
         Consumer<Handler<AsyncResult<BlockInfoDTO>>> callback = handler -> getClient()
-            .getBlockByHeight(height.longValue(), handler);
+            .getBlockByHeight(height, handler);
         return exceptionHandling(call(callback).map(BlockRepositoryVertxImpl::toBlockInfo));
     }
 
+    @Override
     public Observable<List<Transaction>> getBlockTransactions(
         BigInteger height, QueryParams queryParams) {
         return this.getBlockTransactions(height, Optional.of(queryParams));
     }
 
+    @Override
     public Observable<List<Transaction>> getBlockTransactions(BigInteger height) {
         return this.getBlockTransactions(height, Optional.empty());
     }
 
+    @Override
     public Observable<List<BlockInfo>> getBlocksByHeightWithLimit(
         BigInteger height, int limit, Optional<QueryParams> queryParams) {
         Consumer<Handler<AsyncResult<List<BlockInfoDTO>>>> callback = handler ->
-            client.getBlocksByHeightWithLimit(height.longValue(), limit, handler);
+            client.getBlocksByHeightWithLimit(height, limit, handler);
 
         return exceptionHandling(
             call(callback).flatMapIterable(item -> item).map(BlockRepositoryVertxImpl::toBlockInfo)
@@ -87,12 +89,11 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
                 .toObservable());
     }
 
-    public Observable<MerkelProofInfo> getMerkleReceipts(BigInteger height, String hash) {
-
+    @Override
+    public Observable<MerkelProofInfo> getMerkleTransaction(BigInteger height, String hash) {
         Consumer<Handler<AsyncResult<MerkleProofInfoDTO>>> callback = handler ->
-            client.getMerkleReceipts(height.longValue(), hash, handler);
+            client.getMerkleTransaction(height, hash, handler);
         return exceptionHandling(call(callback).map(this::toMerkelProofInfo));
-
 
     }
 
@@ -106,25 +107,10 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
         return new MerkelProofInfo(pathItems);
     }
 
-    public Observable<MerkelProofInfo> getMerkleTransaction(BigInteger height, String hash) {
-        Consumer<Handler<AsyncResult<MerkleProofInfoDTO>>> callback = handler ->
-            client.getMerkleTransaction(height.longValue(), hash, handler);
-        return exceptionHandling(call(callback).map(this::toMerkelProofInfo));
-
-    }
-
-    public Observable<Statement> getBlockReceipts(BigInteger height) {
-        Consumer<Handler<AsyncResult<StatementsDTO>>> callback = handler ->
-            client.getBlockReceipts(height.longValue(), handler);
-        return exceptionHandling(call(callback).map(statementsDTO ->
-            new ReceiptMappingVertx(getJsonHelper())
-                .createStatementFromDto(statementsDTO, getNetworkTypeBlocking())));
-    }
-
     private Observable<List<Transaction>> getBlockTransactions(
         BigInteger height, Optional<QueryParams> queryParams) {
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.getBlockTransactions(height.longValue(),
+            client.getBlockTransactions(height,
                 getPageSize(queryParams),
                 getId(queryParams),
                 null,

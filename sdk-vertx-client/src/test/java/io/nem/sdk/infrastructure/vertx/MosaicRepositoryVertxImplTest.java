@@ -19,11 +19,8 @@ package io.nem.sdk.infrastructure.vertx;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicInfo;
-import io.nem.sdk.model.mosaic.MosaicNames;
 import io.nem.sdk.openapi.vertx.model.MosaicDTO;
 import io.nem.sdk.openapi.vertx.model.MosaicInfoDTO;
-import io.nem.sdk.openapi.vertx.model.MosaicNamesDTO;
-import io.nem.sdk.openapi.vertx.model.MosaicsNamesDTO;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
@@ -47,31 +44,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
     }
 
 
-    @Test
-    public void shouldGetMosaicsNamesFromPublicKeys() throws Exception {
 
-        MosaicId mosaicId = MapperUtils.toMosaicId("99262122238339734");
-
-        MosaicNamesDTO dto = new MosaicNamesDTO();
-        dto.setMosaicId("99262122238339734");
-        dto.setNames(Collections.singletonList("accountalias"));
-
-        MosaicsNamesDTO accountsNamesDTO = new MosaicsNamesDTO();
-        accountsNamesDTO.setMosaicNames(Collections.singletonList(dto));
-
-        mockRemoteCall(accountsNamesDTO);
-
-        List<MosaicNames> resolvedList = repository
-            .getMosaicsNames(Collections.singletonList(mosaicId))
-            .toFuture().get();
-
-        Assertions.assertEquals(1, resolvedList.size());
-
-        MosaicNames accountNames = resolvedList.get(0);
-
-        Assertions.assertEquals(mosaicId, accountNames.getMosaicId());
-        Assertions.assertEquals("accountalias", accountNames.getNames().get(0).getName());
-    }
 
 
     @Test
