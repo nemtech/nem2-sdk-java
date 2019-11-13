@@ -147,6 +147,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bouncycastle.util.encoders.Hex;
 
 
@@ -374,7 +375,7 @@ public class BinarySerializationImpl implements BinarySerialization {
      * @param payload the payload as byte array.
      * @return the {@link Transaction} model.
      */
-    public Transaction deserializeEmbedded(byte[] payload) {
+    public Pair<Transaction, Integer> deserializeEmbedded(byte[] payload) {
         Validate.notNull(payload, "Payload must not be null");
         return deserializeEmbedded(SerializationUtils.toDataInput(payload));
     }
@@ -386,7 +387,7 @@ public class BinarySerializationImpl implements BinarySerialization {
      * level payload.
      * @return the {@link Transaction} model.
      */
-    public Transaction deserializeEmbedded(ByteBuffer payload) {
+    public Pair<Transaction, Integer> deserializeEmbedded(ByteBuffer payload) {
         Validate.notNull(payload, "Payload must not be null");
         return deserializeEmbedded(new DataInputStream(new ByteBufferBackedInputStream(payload)));
     }
@@ -397,7 +398,7 @@ public class BinarySerializationImpl implements BinarySerialization {
      * @param payload the payload as {@link DataInputStream}
      * @return the {@link Transaction} model.
      */
-    private Transaction deserializeEmbedded(DataInputStream payload) {
+    private Pair<Transaction, Integer> deserializeEmbedded(DataInputStream payload) {
 
         return ExceptionUtils.propagate(() -> {
             Validate.notNull(payload, "Payload must not be null");
@@ -412,7 +413,7 @@ public class BinarySerializationImpl implements BinarySerialization {
                 .signer(
                     SerializationUtils.toPublicAccount(builder.getSignerPublicKey(), networkType));
             factory.version(SerializationUtils.byteToUnsignedInt(builder.getVersion()));
-            return factory.build();
+            return Pair.of(factory.build(), builder.getStreamSize());
         });
     }
 
@@ -1545,17 +1546,19 @@ public class BinarySerializationImpl implements BinarySerialization {
             DataInputStream stream) {
             return ExceptionUtils.propagate(
                 () -> {
-                    final String transactionsHash = SerializationUtils
-                        .toHexString(Hash256Dto.loadFromBinary(stream).getHash256());
+                    final Hash256Dto transactionsHash = Hash256Dto.loadFromBinary(stream);
                     final int payloadSize = Integer.reverseBytes(stream.readInt());
-                    Integer.reverseBytes(stream.readInt());
+                    stream.readInt(); //Reserved
                     final ByteBuffer transactionByteByteBuffer = ByteBuffer.allocate(payloadSize);
                     stream.read(transactionByteByteBuffer.array());
                     List<Transaction> transactions = new ArrayList<>();
                     while (transactionByteByteBuffer.hasRemaining()) {
-                        transactions.add(
-                            transactionSerialization
-                                .deserializeEmbedded(transactionByteByteBuffer));
+                        Pair<Transaction, Integer> transaction = transactionSerialization
+                            .deserializeEmbedded(transactionByteByteBuffer);
+                        transactions.add(transaction.getLeft());
+                        int paddingSize = getPaddingSize(transaction.getRight(), 8);
+                        new ByteBufferBackedInputStream(transactionByteByteBuffer)
+                            .skip(paddingSize);
                     }
 
                     List<AggregateTransactionCosignature> cosignatures = new ArrayList<>();
@@ -1577,7 +1580,8 @@ public class BinarySerializationImpl implements BinarySerialization {
                         }
                     }
                     return AggregateTransactionFactory.create(
-                        getTransactionType(), networkType, transactionsHash, transactions,
+                        getTransactionType(), networkType,
+                        SerializationUtils.toHexString(transactionsHash), transactions,
                         cosignatures);
                 });
         }
@@ -1618,33 +1622,40 @@ public class BinarySerializationImpl implements BinarySerialization {
                 });
         }
 
+        // Gets the padding size that rounds up \a size to the next multiple of \a alignment.
+        private int getPaddingSize(final int size, final int alignment) {
+            return 0 == size % alignment ? 0 : alignment - (size % alignment);
+        }
+
         private byte[] getTransactionBytes(AggregateTransaction transaction) {
             byte[] transactionsBytes = new byte[0];
             for (Transaction innerTransaction : transaction.getInnerTransactions()) {
-                final byte[] transactionBytes = transactionSerialization
-                    .serializeEmbedded(innerTransaction);
+                final byte[] transactionBytes =
+                    transactionSerialization.serializeEmbedded(innerTransaction);
                 transactionsBytes = ArrayUtils.addAll(transactionsBytes, transactionBytes);
+                final int padding = getPaddingSize(transactionBytes.length, 8);
+                final ByteBuffer paddingBuffer = ByteBuffer.allocate(padding);
+                transactionsBytes = ArrayUtils.addAll(transactionsBytes, paddingBuffer.array());
             }
             return transactionsBytes;
         }
 
+
         private byte[] getConsignaturesBytes(AggregateTransaction transaction) {
             byte[] cosignaturesBytes = new byte[0];
             for (AggregateTransactionCosignature cosignature : transaction.getCosignatures()) {
-                final byte[] signerBytes = cosignature.getSigner().getPublicKey()
-                    .getBytes();
+                final byte[] signerBytes = cosignature.getSigner().getPublicKey().getBytes();
 
                 final ByteBuffer signerBuffer = ByteBuffer.wrap(signerBytes);
-                final CosignatureBuilder cosignatureBuilder = CosignatureBuilder
-                    .create(new KeyDto(signerBuffer),
+                final CosignatureBuilder cosignatureBuilder =
+                    CosignatureBuilder.create(
+                        new KeyDto(signerBuffer),
                         SerializationUtils.toSignatureDto(cosignature.getSignature()));
                 byte[] consignaturePayload = cosignatureBuilder.serialize();
-                cosignaturesBytes = ArrayUtils
-                    .addAll(cosignaturesBytes, consignaturePayload);
+                cosignaturesBytes = ArrayUtils.addAll(cosignaturesBytes, consignaturePayload);
             }
             return cosignaturesBytes;
         }
-
 
     }
 

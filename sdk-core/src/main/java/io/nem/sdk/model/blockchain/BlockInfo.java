@@ -16,7 +16,6 @@
 
 package io.nem.sdk.model.blockchain;
 
-import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.PublicAccount;
 import java.math.BigInteger;
 import java.util.List;
@@ -98,7 +97,8 @@ public class BlockInfo {
         List<String> subCacheMerkleRoots,
         String signature,
         String signer,
-        Integer blockVersion,
+        NetworkType networkType,
+        Integer version,
         int type,
         BigInteger height,
         BigInteger timestamp,
@@ -109,8 +109,6 @@ public class BlockInfo {
         String blockReceiptsHash,
         String stateHash,
         String beneficiaryPublicKey) {
-        NetworkType networkType = BlockInfo.getNetworkType(blockVersion);
-        Integer transactionVersion = BlockInfo.getTransactionVersion(blockVersion);
         PublicAccount signerPublicAccount = BlockInfo.getPublicAccount(signer, networkType);
         PublicAccount beneficiaryPublicAccount = beneficiaryPublicKey == null ? null :
             BlockInfo.getPublicAccount(beneficiaryPublicKey, networkType);
@@ -123,7 +121,7 @@ public class BlockInfo {
             signature,
             signerPublicAccount,
             networkType,
-            transactionVersion,
+            version,
             type,
             height,
             timestamp,
@@ -135,29 +133,7 @@ public class BlockInfo {
             stateHash,
             beneficiaryPublicAccount);
     }
-
-    /**
-     * Get network type
-     *
-     * @param blockVersion the block version.
-     * @return network type
-     */
-    public static NetworkType getNetworkType(Integer blockVersion) {
-        return MapperUtils.extractNetworkType(blockVersion);
-    }
-
-    /**
-     * Get transaction version
-     *
-     * param blockVersion the block version.
-     *
-     * @param blockVersion the block version.
-     * @return transaction version
-     */
-    public static Integer getTransactionVersion(Integer blockVersion) {
-        return MapperUtils.extractTransactionVersion(blockVersion);
-    }
-
+    
     /**
      * Get public account
      *

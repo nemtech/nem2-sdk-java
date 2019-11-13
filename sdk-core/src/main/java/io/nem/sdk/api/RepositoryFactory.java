@@ -83,11 +83,6 @@ public interface RepositoryFactory extends Closeable {
     TransactionRepository createTransactionRepository();
 
     /**
-     * @return a newly created {@link AggregateRepository}
-     */
-    AggregateRepository createAggregateRepository();
-
-    /**
      * @return a newly created {@link MetadataRepository}
      */
     MetadataRepository createMetadataRepository();

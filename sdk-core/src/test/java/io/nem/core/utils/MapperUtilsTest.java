@@ -25,7 +25,6 @@ import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.namespace.NamespaceId;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -68,41 +67,6 @@ public class MapperUtilsTest {
         Assertions.assertNull(MapperUtils.toMosaicId(null));
         Assertions
             .assertEquals(BigInteger.valueOf(1194684), MapperUtils.toMosaicId("123ABC").getId());
-    }
-
-
-    @Test
-    void extractTransactionVersion() {
-        Assertions
-            .assertEquals(1, MapperUtils.extractTransactionVersion(36865));
-        Assertions
-            .assertEquals(11, MapperUtils.extractTransactionVersion(36875));
-    }
-
-    @Test
-    void extractNetworkType() {
-        Assertions
-            .assertEquals(NetworkType.MIJIN_TEST, MapperUtils.extractNetworkType(36865));
-    }
-
-    @Test
-    void toNetworkVersion() {
-        Assertions
-            .assertEquals(36865, MapperUtils.toNetworkVersion(NetworkType.MIJIN_TEST, 1));
-
-        Arrays.stream(NetworkType.values()).forEach(networkType -> {
-            int version = RandomUtils.generateRandomInt(99) + 1;
-
-            Assertions.assertEquals(networkType,
-                MapperUtils.extractNetworkType(MapperUtils.toNetworkVersion(networkType,
-                    version)));
-
-            Assertions.assertEquals(version,
-                MapperUtils.extractTransactionVersion(MapperUtils.toNetworkVersion(networkType,
-                    version)));
-        });
-
-
     }
 
 

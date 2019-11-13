@@ -31,10 +31,9 @@ public class MerkleHashBuilder {
      * Constructor.
      *
      * @param hasher Hasher used to create the hash.
-     * @param capacity Capacity of the tree.
      */
-    public MerkleHashBuilder(final SignSchema.Hasher hasher, final int capacity) {
-        hashes = new ArrayList<>(capacity);
+    public MerkleHashBuilder(final SignSchema.Hasher hasher) {
+        this.hashes = new ArrayList<>();
         this.hasher = hasher;
     }
 
@@ -47,8 +46,7 @@ public class MerkleHashBuilder {
         int numRemainingHashes = hashes.size();
         while (numRemainingHashes > 1) {
 
-            int i = 0;
-            for (; i < numRemainingHashes; i += 2) {
+            for (int i = 0; i < numRemainingHashes; i += 2) {
                 if (i + 1 < numRemainingHashes) {
                     hashes.add(i / 2, hasher.hash(hashes.get(i), hashes.get(i + 1)));
                     continue;

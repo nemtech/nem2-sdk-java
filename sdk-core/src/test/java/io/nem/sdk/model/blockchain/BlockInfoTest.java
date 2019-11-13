@@ -67,7 +67,8 @@ class BlockInfoTest {
                 subCacheMerkleRoots,
                 signature,
                 signer,
-                36867,
+                NetworkType.MIJIN_TEST,
+                1,
                 32768,
                 BigInteger.ONE,
                 BigInteger.ZERO,
@@ -90,7 +91,7 @@ class BlockInfoTest {
         Assertions.assertEquals(
             new PublicAccount(signer, NetworkType.MIJIN_TEST), blockInfo.getSignerPublicAccount());
         assertEquals(NetworkType.MIJIN_TEST, blockInfo.getNetworkType());
-        assertEquals(3, (int) blockInfo.getVersion());
+        assertEquals(1, (int) blockInfo.getVersion());
         assertEquals(32768, blockInfo.getType());
         assertEquals(BigInteger.valueOf(1), blockInfo.getHeight());
         assertEquals(BigInteger.valueOf(0), blockInfo.getTimestamp());

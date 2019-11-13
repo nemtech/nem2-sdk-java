@@ -134,6 +134,7 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
             blockInfoDTO.getMeta().getStateHashSubCacheMerkleRoots(),
             blockInfoDTO.getBlock().getSignature(),
             blockInfoDTO.getBlock().getSignerPublicKey(),
+            NetworkType.rawValueOf(blockInfoDTO.getBlock().getNetwork().getValue()),
             blockInfoDTO.getBlock().getVersion(),
             blockInfoDTO.getBlock().getType(),
             blockInfoDTO.getBlock().getHeight(),

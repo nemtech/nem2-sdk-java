@@ -62,16 +62,10 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
                 "oooooooong";
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
-                getNetworkType(),
-                recipient,
+                getNetworkType(), recipient,
                 Collections
                     .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
-                /*new PlainMessage(
-                    "E2ETest:aggregateTransferTransaction:message"), */
-// short message for debugging
-                new PlainMessage(
-                    message)
-                // Use long message to test if size of inner transaction is calculated correctly
+                new PlainMessage(message)
             ).build();
 
         TransferTransaction processed = announceAggregateAndValidate(type, account,

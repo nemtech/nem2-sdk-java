@@ -162,8 +162,8 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
     private static String calculateTransactionsHash(final List<Transaction> transactions) {
         final SignSchema.Hasher hasher = SignSchema
             .getHasher(SignSchema.SHA3, SignSchema.HashSize.HASH_SIZE_32_BYTES);
-        final MerkleHashBuilder transactionsHashBuilder = new MerkleHashBuilder(hasher,
-            transactions.size());
+        final MerkleHashBuilder transactionsHashBuilder = new MerkleHashBuilder(hasher
+        );
         final BinarySerializationImpl transactionSerialization = new BinarySerializationImpl();
 
         for (final Transaction transaction : transactions) {

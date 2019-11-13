@@ -114,7 +114,7 @@ abstract class AbstractTransactionTester {
         T transaction) {
         byte[] actual = binarySerialization.serializeEmbedded(transaction);
         assertEquals(expected, Hex.toHexString(actual));
-        T deserialized = (T) binarySerialization.deserializeEmbedded(actual);
+        T deserialized = (T) binarySerialization.deserializeEmbedded(actual).getLeft();
         assertEquals(expected,
             Hex.toHexString(binarySerialization.serializeEmbedded(deserialized)));
         return deserialized;

@@ -16,9 +16,10 @@
 
 package io.nem.sdk.infrastructure.vertx;
 
+import io.nem.sdk.model.blockchain.NetworkInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.openapi.vertx.model.NetworkTypeDTO;
-import io.nem.sdk.openapi.vertx.model.NetworkTypeNameEnum;
+import io.nem.sdk.openapi.vertx.model.NodeInfoDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,16 +42,35 @@ public class NetworkRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     @Test
     public void shouldGetNetworkType() throws Exception {
 
-        NetworkTypeDTO networkTypeDTO = new NetworkTypeDTO();
-        networkTypeDTO.setName(NetworkTypeNameEnum.MIJINTEST);
+        NodeInfoDTO dto = new NodeInfoDTO();
+        dto.setNetworkIdentifier(NetworkType.MIJIN_TEST.getValue());
 
-        mockRemoteCall(networkTypeDTO);
+        mockRemoteCall(dto);
 
         NetworkType info = repository.getNetworkType().toFuture().get();
 
         Assertions.assertNotNull(info);
 
         Assertions.assertEquals(NetworkType.MIJIN_TEST, info);
+
+    }
+
+
+    @Test
+    public void shouldGetNetworkInfo() throws Exception {
+
+        NetworkTypeDTO networkTypeDTO = new NetworkTypeDTO();
+        networkTypeDTO.setName("mijinTest");
+        networkTypeDTO.setDescription("some description");
+
+        mockRemoteCall(networkTypeDTO);
+
+        NetworkInfo info = repository.getNetworkInfo().toFuture().get();
+
+        Assertions.assertNotNull(info);
+
+        Assertions.assertEquals("mijinTest", info.getName());
+        Assertions.assertEquals("some description", info.getDescription());
 
     }
 

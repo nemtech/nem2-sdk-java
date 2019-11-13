@@ -18,7 +18,6 @@ package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.core.utils.Suppliers;
 import io.nem.sdk.api.AccountRepository;
-import io.nem.sdk.api.AggregateRepository;
 import io.nem.sdk.api.BlockRepository;
 import io.nem.sdk.api.ChainRepository;
 import io.nem.sdk.api.DiagnosticRepository;
@@ -149,11 +148,6 @@ public class RepositoryFactoryVertxImpl implements RepositoryFactory {
     @Override
     public TransactionRepository createTransactionRepository() {
         return new TransactionRepositoryVertxImpl(apiClient, networkType);
-    }
-
-    @Override
-    public AggregateRepository createAggregateRepository() {
-        return new AggregateRepositoryVertxImpl(apiClient, networkType);
     }
 
     @Override

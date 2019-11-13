@@ -22,6 +22,7 @@ import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.blockchain.BlockInfo;
 import io.nem.sdk.model.blockchain.MerkelPathItem;
 import io.nem.sdk.model.blockchain.MerkelProofInfo;
+import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.openapi.okhttp_gson.api.BlockRoutesApi;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
@@ -129,6 +130,7 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
             blockInfoDTO.getMeta().getStateHashSubCacheMerkleRoots(),
             blockInfoDTO.getBlock().getSignature(),
             blockInfoDTO.getBlock().getSignerPublicKey(),
+            NetworkType.rawValueOf(blockInfoDTO.getBlock().getNetwork().getValue()),
             blockInfoDTO.getBlock().getVersion(),
             blockInfoDTO.getBlock().getType(),
             blockInfoDTO.getBlock().getHeight(),

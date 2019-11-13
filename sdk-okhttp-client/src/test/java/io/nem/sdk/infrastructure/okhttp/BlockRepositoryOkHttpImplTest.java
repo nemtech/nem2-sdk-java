@@ -23,6 +23,7 @@ import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.openapi.okhttp_gson.model.BlockDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.BlockInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.BlockMetaDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.NetworkTypeEnum;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -64,13 +65,14 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
 
         BlockDTO blockDto = new BlockDTO();
         blockDto.setType(16716);
-        blockDto.setVersion(36867);
+        blockDto.setVersion(3);
         blockDto
             .setSignerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
         blockDto.setBeneficiaryPublicKey(
             "B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
         blockDto.setHeight(BigInteger.valueOf(9L));
 
+        blockDto.setNetwork(NetworkTypeEnum.NUMBER_144);
         dto.setBlock(blockDto);
 
         mockRemoteCall(dto);
@@ -119,12 +121,13 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
 
         BlockDTO blockDto = new BlockDTO();
         blockDto.setType(16716);
-        blockDto.setVersion(36867);
+        blockDto.setVersion(3);
         blockDto
             .setSignerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
         blockDto.setBeneficiaryPublicKey(
             "B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
         blockDto.setHeight(BigInteger.valueOf(9L));
+        blockDto.setNetwork(NetworkTypeEnum.NUMBER_144);
 
         dto.setBlock(blockDto);
 

@@ -19,7 +19,6 @@ package io.nem.core.utils;
 
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.UnresolvedAddress;
-import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.namespace.NamespaceId;
@@ -138,35 +137,5 @@ public class MapperUtils {
     }
 
 
-    /**
-     * Extracts the transaction version from the version in dto/buffer transactions.
-     *
-     * @param version the network version
-     * @return the transaction version.
-     */
-    public static int extractTransactionVersion(int version) {
-        return version & 0x00ff;
-    }
-
-    /**
-     * Extracts the network type from the version in dto/buffer transactions.
-     *
-     * @param version the network version
-     * @return the network type.
-     */
-    public static NetworkType extractNetworkType(int version) {
-        return NetworkType.rawValueOf(version >> 8);
-    }
-
-    /**
-     * Generates the networkVersion from the network type and transaction version.
-     *
-     * @param networkType the {@link NetworkType}
-     * @param version the version.
-     * @return network version
-     */
-    public static int toNetworkVersion(NetworkType networkType, int version) {
-        return (networkType.getValue() << 8) + version;
-    }
 
 }

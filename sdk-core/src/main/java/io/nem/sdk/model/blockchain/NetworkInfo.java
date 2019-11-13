@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 NEM
+ * Copyright 2019 NEM
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,33 @@
  * limitations under the License.
  */
 
-package io.nem.sdk.api;
-
-import io.nem.sdk.model.blockchain.NetworkInfo;
-import io.nem.sdk.model.blockchain.NetworkType;
-import io.reactivex.Observable;
+package io.nem.sdk.model.blockchain;
 
 /**
- * Network interface repository.
- *
- * @since 1.0
+ * It holds information about the catapult network.
  */
-public interface NetworkRepository {
+public class NetworkInfo {
 
     /**
-     * Get current network type.
-     *
-     * @return network type enum.
+     * The name of the network.
      */
-    Observable<NetworkType> getNetworkType();
+    private final String name;
 
     /**
-     * @return the network information with like the network's name and description.
+     * The description of the network.
      */
-    Observable<NetworkInfo> getNetworkInfo();
+    private final String description;
+
+    public NetworkInfo(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }

@@ -39,8 +39,7 @@ import io.nem.sdk.openapi.vertx.model.NamespaceMetaDTO;
 import io.nem.sdk.openapi.vertx.model.NamespaceNameDTO;
 import io.nem.sdk.openapi.vertx.model.NamespaceRegistrationTypeEnum;
 import io.nem.sdk.openapi.vertx.model.NamespacesInfoDTO;
-import io.nem.sdk.openapi.vertx.model.NetworkTypeDTO;
-import io.nem.sdk.openapi.vertx.model.NetworkTypeNameEnum;
+import io.nem.sdk.openapi.vertx.model.NodeInfoDTO;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
@@ -367,9 +366,9 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
 
     protected void resolveNetworkType() throws ApiException {
-        NetworkTypeDTO networkTypeDTO = new NetworkTypeDTO();
-        networkTypeDTO.setName(NetworkTypeNameEnum.MIJINTEST);
-        mockRemoteCall(networkTypeDTO);
+        NodeInfoDTO nodeInfoDTO = new NodeInfoDTO();
+        nodeInfoDTO.setNetworkIdentifier(NetworkType.MIJIN_TEST.getValue());
+        mockRemoteCall(nodeInfoDTO);
         NetworkType networkType = repository.getNetworkTypeBlocking();
         Assertions.assertEquals(NetworkType.MIJIN_TEST, networkType);
     }

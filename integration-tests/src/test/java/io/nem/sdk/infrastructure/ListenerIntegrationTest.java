@@ -285,7 +285,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         SignedTransaction signedTransaction =
             this.cosignatoryAccount.sign(aggregateTransaction, getGenerationHash());
 
-        get(getRepositoryFactory(type).createAggregateRepository()
+        get(getRepositoryFactory(type).createTransactionRepository()
             .announceAggregateBonded(signedTransaction));
 
         return signedTransaction;
@@ -299,7 +299,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         CosignatureSignedTransaction cosignatureSignedTransaction =
             this.cosignatoryAccount2.signCosignatureTransaction(cosignatureTransaction);
 
-        get(getRepositoryFactory(type).createAggregateRepository()
+        get(getRepositoryFactory(type).createTransactionRepository()
             .announceAggregateBondedCosignature(cosignatureSignedTransaction));
 
         return cosignatureSignedTransaction;

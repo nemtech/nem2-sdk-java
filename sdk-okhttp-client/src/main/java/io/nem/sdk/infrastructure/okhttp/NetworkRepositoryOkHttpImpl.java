@@ -17,8 +17,10 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.sdk.api.NetworkRepository;
+import io.nem.sdk.model.blockchain.NetworkInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.openapi.okhttp_gson.api.NetworkRoutesApi;
+import io.nem.sdk.openapi.okhttp_gson.api.NodeRoutesApi;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.reactivex.Observable;
 
@@ -30,23 +32,31 @@ import io.reactivex.Observable;
 public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements
     NetworkRepository {
 
-    // Cannot use network route yet.
-    // https://github.com/nemtech/nem2-openapi/issues/43
-    private final NetworkRoutesApi client;
+    private final NetworkRoutesApi networkRoutesApi;
+
+    private final NodeRoutesApi nodeRoutesApi;
 
     public NetworkRepositoryOkHttpImpl(ApiClient apiClient) {
         super(apiClient);
-        client = new NetworkRoutesApi(apiClient);
+        networkRoutesApi = new NetworkRoutesApi(apiClient);
+        nodeRoutesApi = new NodeRoutesApi(apiClient);
     }
 
     @Override
     public Observable<NetworkType> getNetworkType() {
         return exceptionHandling(
-            call(getClient()::getNetworkType)
-                .map(info -> NetworkType.rawValueOf(info.getName().getValue())));
+            call(nodeRoutesApi::getNodeInfo)
+                .map(info -> NetworkType.rawValueOf(info.getNetworkIdentifier())));
     }
 
-    public NetworkRoutesApi getClient() {
-        return client;
+    @Override
+    public Observable<NetworkInfo> getNetworkInfo() {
+        return exceptionHandling(
+            call(getNetworkRoutesApi()::getNetworkType)
+                .map(info -> new NetworkInfo(info.getName(), info.getDescription())));
+    }
+
+    public NetworkRoutesApi getNetworkRoutesApi() {
+        return networkRoutesApi;
     }
 }

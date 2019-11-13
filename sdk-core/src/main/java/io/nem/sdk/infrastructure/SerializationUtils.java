@@ -157,6 +157,7 @@ public class SerializationUtils {
      * It creates a {@link UnresolvedAddressDto} from an {@link UnresolvedAddress}.
      *
      * @param unresolvedAddress the catbuffer {@link UnresolvedAddressDto}.
+     * @param networkType the network type serialized in the payload.
      * @return the dto {@link UnresolvedAddressDto}
      */
     public static UnresolvedAddressDto toUnresolvedAddress(UnresolvedAddress unresolvedAddress,

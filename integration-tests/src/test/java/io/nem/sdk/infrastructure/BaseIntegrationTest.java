@@ -257,8 +257,11 @@ public abstract class BaseIntegrationTest {
 
         if (transaction.getType() != TransactionType.AGGREGATE_COMPLETE) {
             System.out
-                .println("Announcing Transaction address: " + testAccount.getAddress().pretty()
-                    + " Transaction: " + transaction.getType());
+                .println(
+                    "Announcing Transaction address: " + testAccount.getAddress().plain()
+                        + " Public Key: "
+                        + testAccount.getPublicAccount().getPublicKey().toHex()
+                        + " Transaction: " + transaction.getType());
         }
         SignedTransaction signedTransaction = testAccount
             .sign(transaction, getGenerationHash());
