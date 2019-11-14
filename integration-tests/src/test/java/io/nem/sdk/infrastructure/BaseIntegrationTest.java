@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nem.core.utils.ExceptionUtils;
+import io.nem.sdk.api.Listener;
 import io.nem.sdk.api.RepositoryFactory;
 import io.nem.sdk.infrastructure.okhttp.RepositoryFactoryOkHttpImpl;
 import io.nem.sdk.infrastructure.vertx.JsonHelperJackson2;
@@ -28,9 +29,12 @@ import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.AccountNames;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
+import io.nem.sdk.model.blockchain.BlockDuration;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.mosaic.MosaicFlags;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicNames;
+import io.nem.sdk.model.mosaic.MosaicNonce;
 import io.nem.sdk.model.namespace.AliasAction;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.AddressAliasTransaction;
@@ -41,6 +45,8 @@ import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.MosaicAliasTransaction;
 import io.nem.sdk.model.transaction.MosaicAliasTransactionFactory;
+import io.nem.sdk.model.transaction.MosaicDefinitionTransaction;
+import io.nem.sdk.model.transaction.MosaicDefinitionTransactionFactory;
 import io.nem.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
 import io.nem.sdk.model.transaction.SignedTransaction;
@@ -51,12 +57,14 @@ import io.nem.sdk.model.transaction.TransactionStatusError;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.reactivex.Observable;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -232,21 +240,24 @@ public abstract class BaseIntegrationTest {
     }
 
 
-    <T extends Transaction> T announceAggregateAndValidate(RepositoryType type, Account testAccount,
-        T transaction) {
+    <T extends Transaction> T announceAggregateAndValidate(RepositoryType type, T transaction,
+        Account... signers) {
+
+        Assertions.assertTrue(signers.length > 0);
 
         System.out.println(
-            "Announcing Aggregate Transaction address: " + testAccount.getAddress().pretty()
+            "Announcing Aggregate Transaction address: " + Arrays.stream(signers)
+                .map(s -> s.getAddress().plain()).collect(Collectors.joining(", "))
                 + " Transaction: " + transaction.getType());
         AggregateTransaction aggregateTransaction =
             AggregateTransactionFactory.createComplete(
                 getNetworkType(),
-                Collections.singletonList(
-                    transaction.toAggregate(testAccount.getPublicAccount()))
+                Arrays.stream(signers).map(s -> transaction.toAggregate(s.getPublicAccount()))
+                    .collect(Collectors.toList())
             ).build();
 
         T announcedCorrectly = (T) announceAndValidate(
-            type, testAccount, aggregateTransaction).getInnerTransactions().get(0);
+            type, signers[0], aggregateTransaction).getInnerTransactions().get(0);
         System.out.println("Transaction completed");
         return announcedCorrectly;
     }
@@ -376,8 +387,9 @@ public abstract class BaseIntegrationTest {
                 namespaceName,
                 BigInteger.valueOf(100)).build();
 
-        NamespaceId rootNamespaceId = announceAggregateAndValidate(type, nemesisAccount,
-            namespaceRegistrationTransaction).getNamespaceId();
+        NamespaceId rootNamespaceId = announceAggregateAndValidate(type,
+            namespaceRegistrationTransaction, nemesisAccount
+        ).getNamespaceId();
 
         System.out.println(
             "Setting account alias " + address.plain() + " alias: " + namespaceName);
@@ -388,7 +400,7 @@ public abstract class BaseIntegrationTest {
                 address
             ).build();
 
-        announceAggregateAndValidate(type, nemesisAccount, aliasTransaction);
+        announceAggregateAndValidate(type, aliasTransaction, nemesisAccount);
         return rootNamespaceId;
     }
 
@@ -419,8 +431,9 @@ public abstract class BaseIntegrationTest {
                 namespaceName,
                 BigInteger.valueOf(100)).build();
 
-        NamespaceId rootNamespaceId = announceAggregateAndValidate(type, nemesisAccount,
-            namespaceRegistrationTransaction).getNamespaceId();
+        NamespaceId rootNamespaceId = announceAggregateAndValidate(type,
+            namespaceRegistrationTransaction, nemesisAccount
+        ).getNamespaceId();
 
         System.out.println(
             "Setting mosaic alias " + mosaicId.getIdAsHex() + " alias: " + namespaceName);
@@ -432,8 +445,25 @@ public abstract class BaseIntegrationTest {
                 mosaicId
             ).build();
 
-        announceAggregateAndValidate(type, nemesisAccount, aliasTransaction);
+        announceAggregateAndValidate(type, aliasTransaction, nemesisAccount);
         return rootNamespaceId;
+    }
+
+    protected MosaicId createMosaic(Account account, RepositoryType type) {
+        MosaicNonce nonce = MosaicNonce.createRandom();
+        MosaicId mosaicId = MosaicId.createFromNonce(nonce, account.getPublicAccount());
+
+        MosaicDefinitionTransaction mosaicDefinitionTransaction =
+            MosaicDefinitionTransactionFactory.create(getNetworkType(),
+                nonce,
+                mosaicId,
+                MosaicFlags.create(true, true, true),
+                4, new BlockDuration(100)).build();
+
+        MosaicDefinitionTransaction validateTransaction = announceAndValidate(type, account,
+            mosaicDefinitionTransaction);
+        Assertions.assertEquals(mosaicId, validateTransaction.getMosaicId());
+        return mosaicId;
     }
 
 }

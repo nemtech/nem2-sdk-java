@@ -52,10 +52,10 @@ public class MetadataRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl i
     }
 
     @Override
-    public Observable<List<Metadata>> getAccountMetadata(Address address,
+    public Observable<List<Metadata>> getAccountMetadata(Address targetAddress,
         Optional<QueryParams> queryParams) {
         Callable<MetadataEntriesDTO> callback = () -> getClient()
-            .getAccountMetadata(address.plain(), getPageSize(queryParams), getId(queryParams),
+            .getAccountMetadata(targetAddress.plain(), getPageSize(queryParams), getId(queryParams),
                 getOrder(queryParams)
             );
         return handleList(callback);
@@ -63,71 +63,72 @@ public class MetadataRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl i
 
 
     @Override
-    public Observable<List<Metadata>> getAccountMetadataByKey(Address address, BigInteger key) {
+    public Observable<List<Metadata>> getAccountMetadataByKey(Address targetAddress, BigInteger key) {
         Callable<MetadataEntriesDTO> callback = () -> getClient()
-            .getAccountMetadataByKey(address.plain(), toHex(key));
+            .getAccountMetadataByKey(targetAddress.plain(), toHex(key));
         return handleList(callback);
     }
 
 
     @Override
-    public Observable<List<Metadata>> getMosaicMetadata(MosaicId mosaicId,
+    public Observable<List<Metadata>> getMosaicMetadata(MosaicId targetMosaicId,
         Optional<QueryParams> queryParams) {
         Callable<MetadataEntriesDTO> callback = () -> getClient()
-            .getMosaicMetadata(mosaicId.getIdAsHex(), getPageSize(queryParams), getId(queryParams),
+            .getMosaicMetadata(targetMosaicId.getIdAsHex(), getPageSize(queryParams), getId(queryParams),
                 getOrder(queryParams));
         return handleList(callback);
     }
 
     @Override
-    public Observable<List<Metadata>> getMosaicMetadataByKey(MosaicId mosaicId, BigInteger key) {
+    public Observable<List<Metadata>> getMosaicMetadataByKey(MosaicId targetMosaicId, BigInteger key) {
         Callable<MetadataEntriesDTO> callback = () -> getClient()
-            .getMosaicMetadataByKey(mosaicId.getIdAsHex(), toHex(key));
+            .getMosaicMetadataByKey(targetMosaicId.getIdAsHex(), toHex(key));
         return handleList(callback);
     }
 
     @Override
-    public Observable<Metadata> getAccountMetadataByKeyAndSender(Address address, BigInteger key,
-        String publicKey) {
+    public Observable<Metadata> getAccountMetadataByKeyAndSender(Address targetAddress, BigInteger key,
+        String senderPublicKey) {
         Callable<MetadataDTO> callback = () -> getClient()
-            .getAccountMetadataByKeyAndSender(address.plain(), toHex(key), publicKey);
+            .getAccountMetadataByKeyAndSender(targetAddress.plain(), toHex(key), senderPublicKey);
         return handleOne(callback);
     }
 
 
     @Override
-    public Observable<Metadata> getMosaicMetadataByKeyAndSender(MosaicId mosaicId, BigInteger key,
-        String publicKey) {
+    public Observable<Metadata> getMosaicMetadataByKeyAndSender(MosaicId targetMosaicId, BigInteger key,
+        String senderPublicKey) {
         Callable<MetadataDTO> callback = () -> getClient()
-            .getMosaicMetadataByKeyAndSender(mosaicId.getIdAsHex(), toHex(key), publicKey);
+            .getMosaicMetadataByKeyAndSender(targetMosaicId.getIdAsHex(), toHex(key),
+                senderPublicKey);
         return handleOne(callback);
     }
 
     @Override
-    public Observable<List<Metadata>> getNamespaceMetadata(NamespaceId namespaceId,
+    public Observable<List<Metadata>> getNamespaceMetadata(NamespaceId targetNamespaceId,
         Optional<QueryParams> queryParams) {
         Callable<MetadataEntriesDTO> callback = () -> getClient()
-            .getNamespaceMetadata(namespaceId.getIdAsHex(), getPageSize(queryParams),
+            .getNamespaceMetadata(targetNamespaceId.getIdAsHex(), getPageSize(queryParams),
                 getId(queryParams),
                 getOrder(queryParams));
         return handleList(callback);
     }
 
     @Override
-    public Observable<List<Metadata>> getNamespaceMetadataByKey(NamespaceId namespaceId,
+    public Observable<List<Metadata>> getNamespaceMetadataByKey(NamespaceId targetNamespaceId,
         BigInteger key) {
         Callable<MetadataEntriesDTO> callback = () -> getClient()
-            .getNamespaceMetadataByKey(namespaceId.getIdAsHex(), toHex(key));
+            .getNamespaceMetadataByKey(targetNamespaceId.getIdAsHex(), toHex(key));
         return handleList(callback);
     }
 
 
     @Override
-    public Observable<Metadata> getNamespaceMetadataByKeyAndSender(NamespaceId namespaceId,
-        BigInteger key, String publicKey) {
+    public Observable<Metadata> getNamespaceMetadataByKeyAndSender(NamespaceId targetNamespaceId,
+        BigInteger key, String senderPublicKey) {
         Callable<MetadataDTO> callback = () -> getClient()
-            .getNamespaceMetadataByKeyAndSender(namespaceId.getIdAsHex(),
-                MetadataRepositoryOkHttpImpl.this.toHex(key), publicKey);
+            .getNamespaceMetadataByKeyAndSender(targetNamespaceId.getIdAsHex(),
+                MetadataRepositoryOkHttpImpl.this.toHex(key), senderPublicKey);
         return handleOne(callback);
     }
 

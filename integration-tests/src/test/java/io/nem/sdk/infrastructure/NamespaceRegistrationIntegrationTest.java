@@ -62,7 +62,7 @@ public class NamespaceRegistrationIntegrationTest extends BaseIntegrationTest {
                 namespaceName,
                 BigInteger.valueOf(100)).build();
 
-        announceAggregateAndValidate(type, this.account, namespaceRegistrationTransaction);
+        announceAggregateAndValidate(type, namespaceRegistrationTransaction, this.account);
         rootNamespaceId = namespaceRegistrationTransaction.getNamespaceId();
     }
 
@@ -100,6 +100,6 @@ public class NamespaceRegistrationIntegrationTest extends BaseIntegrationTest {
                 namespaceName,
                 this.rootNamespaceId).build();
 
-        announceAggregateAndValidate(type, this.account, namespaceRegistrationTransaction);
+        announceAggregateAndValidate(type, namespaceRegistrationTransaction, this.account);
     }
 }

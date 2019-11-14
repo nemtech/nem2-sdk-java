@@ -16,7 +16,6 @@
 
 package io.nem.sdk.api;
 
-import io.nem.sdk.infrastructure.Listener;
 import java.io.Closeable;
 
 /**

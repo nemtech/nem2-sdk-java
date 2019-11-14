@@ -87,7 +87,7 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
                 4, new BlockDuration(100)).build();
 
         MosaicDefinitionTransaction processed = announceAggregateAndValidate(
-            type, this.account, mosaicDefinitionTransaction);
+            type, mosaicDefinitionTransaction, this.account);
         Assertions.assertEquals(mosaicId, processed.getMosaicId());
     }
 
@@ -120,7 +120,7 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
                 MosaicSupplyChangeActionType.INCREASE,
                 BigInteger.valueOf(12)).build();
 
-        announceAggregateAndValidate(type, account, mosaicSupplyChangeTransaction);
+        announceAggregateAndValidate(type, mosaicSupplyChangeTransaction, account);
 
 
     }

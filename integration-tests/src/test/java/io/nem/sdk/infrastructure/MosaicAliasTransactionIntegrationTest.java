@@ -68,8 +68,9 @@ public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
                 namespaceName,
                 BigInteger.valueOf(100)).build();
 
-        NamespaceId rootNamespaceId = announceAggregateAndValidate(type, account,
-            namespaceRegistrationTransaction).getNamespaceId();
+        NamespaceId rootNamespaceId = announceAggregateAndValidate(type,
+            namespaceRegistrationTransaction, account
+        ).getNamespaceId();
 
         sleep(1000);
 
@@ -80,7 +81,7 @@ public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
                 rootNamespaceId,
                 mosaicId).build();
 
-        announceAggregateAndValidate(type, account, addressAliasTransaction);
+        announceAggregateAndValidate(type, addressAliasTransaction, account);
 
         sleep(2000);
 

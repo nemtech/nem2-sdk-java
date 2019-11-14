@@ -18,6 +18,7 @@ package io.nem.sdk.infrastructure.okhttp;
 import static org.mockito.Mockito.when;
 
 import com.google.gson.JsonObject;
+import io.nem.sdk.api.Listener;
 import io.nem.sdk.infrastructure.ListenerChannel;
 import io.nem.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.sdk.model.account.Account;
@@ -50,7 +51,7 @@ import org.mockito.Mockito;
 
 /**
  * Tests for the {@link ListenerOkHttp} implementation of the {@link
- * io.nem.sdk.infrastructure.Listener}
+ * Listener}
  */
 public class ListenerOkHttpTest {
 

@@ -17,6 +17,7 @@
 
 package io.nem.sdk.infrastructure;
 
+import io.nem.sdk.api.Listener;
 import io.nem.sdk.model.account.Account;
 import java.util.concurrent.ExecutionException;
 

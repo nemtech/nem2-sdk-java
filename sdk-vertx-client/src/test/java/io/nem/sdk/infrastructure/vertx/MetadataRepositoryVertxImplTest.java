@@ -164,7 +164,7 @@ public class MetadataRepositoryVertxImplTest extends AbstractVertxRespositoryTes
         }
     }
 
-    private void assertMetadata(MetadataDTO expected, Metadata result) {
+    protected void assertMetadata(MetadataDTO expected, Metadata result) {
         Assertions.assertEquals(expected.getId(), result.getId());
         Assertions.assertEquals(expected.getMetadataEntry().getCompositeHash(),
             result.getMetadataEntry().getCompositeHash());
@@ -221,12 +221,12 @@ public class MetadataRepositoryVertxImplTest extends AbstractVertxRespositoryTes
         return dto;
     }
 
-    private MetadataDTO createMetadataDto(String name,
+    protected MetadataDTO createMetadataDto(String name,
         MetadataTypeEnum type, String targetId) {
         MetadataDTO dto = new MetadataDTO();
         dto.setId(name);
         MetadataEntryDTO metadataEntry = new MetadataEntryDTO();
-        metadataEntry.setCompositeHash("ompositeHash " + name);
+        metadataEntry.setCompositeHash("compositeHash " + name);
         metadataEntry.setMetadataType(type);
         metadataEntry.setScopedMetadataKey("10");
         metadataEntry.setSenderPublicKey("senderPublicKey " + name);

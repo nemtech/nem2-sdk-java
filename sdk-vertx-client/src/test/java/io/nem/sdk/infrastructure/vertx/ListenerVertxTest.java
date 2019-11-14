@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nem.core.utils.MapperUtils;
+import io.nem.sdk.api.Listener;
 import io.nem.sdk.infrastructure.ListenerChannel;
 import io.nem.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.sdk.model.account.Account;
@@ -68,7 +69,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 /**
- * Tests for the {@link ListenerVertx} implementation of the {@link io.nem.sdk.infrastructure.Listener}
+ * Tests for the {@link ListenerVertx} implementation of the {@link Listener}
  */
 public class ListenerVertxTest {
 

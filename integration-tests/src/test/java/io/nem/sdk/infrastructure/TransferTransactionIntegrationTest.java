@@ -68,8 +68,9 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
                 new PlainMessage(message)
             ).build();
 
-        TransferTransaction processed = announceAggregateAndValidate(type, account,
-            transferTransaction);
+        TransferTransaction processed = announceAggregateAndValidate(type, transferTransaction,
+            account
+        );
         Assertions.assertEquals(message, processed.getMessage().getPayload());
     }
 

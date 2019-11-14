@@ -33,91 +33,93 @@ public interface MetadataRepository {
     /**
      * Returns the account metadata given an account id.
      *
-     * @param address - Account address to be created from PublicKey or RawAddress
-     * @param queryParams - Optional query parameters
+     * @param targetAddress the address that holds the medata values.
+     * @param queryParams Optional query parameters
      * @return Observable of {@link Metadata} {@link List}
      */
-    Observable<List<Metadata>> getAccountMetadata(Address address,
+    Observable<List<Metadata>> getAccountMetadata(Address targetAddress,
         Optional<QueryParams> queryParams);
 
     /**
      * Returns the account metadata given an account id and a key
      *
-     * @param address - Account address to be created from PublicKey or RawAddress
-     * @param key - Metadata key
+     * @param targetAddress the address that holds the medata values with the given key.
+     * @param key Metadata key
      * @return Observable of {@link Metadata} {@link List}
      */
-    Observable<List<Metadata>> getAccountMetadataByKey(Address address, BigInteger key);
+    Observable<List<Metadata>> getAccountMetadataByKey(Address targetAddress, BigInteger key);
 
     /**
      * Returns the account metadata given an account id and a key
      *
-     * @param address - Account address to be created from PublicKey or RawAddress
+     * @param targetAddress the address that holds the medata values with the given key sent by the
+     * given public key.
      * @param key - Metadata key
-     * @param publicKey - Sender public key
+     * @param senderPublicKey The public key of the account that created the metadata.
      * @return Observable of {@link Metadata}
      */
-    Observable<Metadata> getAccountMetadataByKeyAndSender(Address address, BigInteger key,
-        String publicKey);
+    Observable<Metadata> getAccountMetadataByKeyAndSender(Address targetAddress, BigInteger key,
+        String senderPublicKey);
 
     /**
      * Returns the mosaic metadata given a mosaic id.
      *
-     * @param mosaicId - Mosaic identifier.
-     * @param queryParams - Optional query parameters
+     * @param targetMosaicId The mosaic id that holds the metadata values.
+     * @param queryParams Optional query parameters
      * @return Observable of {@link Metadata} {@link List}
      */
-    Observable<List<Metadata>> getMosaicMetadata(MosaicId mosaicId,
+    Observable<List<Metadata>> getMosaicMetadata(MosaicId targetMosaicId,
         Optional<QueryParams> queryParams);
 
     /**
      * Returns the mosaic metadata given a mosaic id and metadata key.
      *
-     * @param mosaicId - Mosaic identifier.
-     * @param key - Metadata key.
+     * @param targetMosaicId The mosaic id that holds the metadata values.
+     * @param key Metadata key.
      * @return Observable of {@link Metadata} {@link List}
      */
-    Observable<List<Metadata>> getMosaicMetadataByKey(MosaicId mosaicId, BigInteger key);
+    Observable<List<Metadata>> getMosaicMetadataByKey(MosaicId targetMosaicId, BigInteger key);
 
     /**
      * Returns the mosaic metadata given a mosaic id and metadata key.
      *
-     * @param mosaicId - Mosaic identifier.
-     * @param key - Metadata key.
-     * @param publicKey - Sender public key
+     * @param targetMosaicId The mosaic id that holds the metadata values.
+     * @param key Metadata key.
+     * @param senderPublicKey The public key of the account that created the metadata.
      * @return Observable of {@link Metadata} {@link List}
      */
-    Observable<Metadata> getMosaicMetadataByKeyAndSender(MosaicId mosaicId, BigInteger key,
-        String publicKey);
+    Observable<Metadata> getMosaicMetadataByKeyAndSender(MosaicId targetMosaicId, BigInteger key,
+        String senderPublicKey);
 
     /**
      * Returns the mosaic metadata given a mosaic id.
      *
-     * @param namespaceId - Namespace identifier.
-     * @param queryParams - Optional query parameters
+     * @param targetNamespaceId The namespace id that holds the metadata values.
+     * @param queryParams Optional query parameters
      * @return Observable of {@link Metadata} {@link List}
      */
-    Observable<List<Metadata>> getNamespaceMetadata(NamespaceId namespaceId,
+    Observable<List<Metadata>> getNamespaceMetadata(NamespaceId targetNamespaceId,
         Optional<QueryParams> queryParams);
 
     /**
      * Returns the mosaic metadata given a mosaic id and metadata key.
      *
-     * @param namespaceId - Namespace identifier.
-     * @param key - Metadata key.
+     * @param targetNamespaceId The namespace id that holds the metadata values.
+     * @param key Metadata key.
      * @return Observable of {@link Metadata} {@link List}
      */
-    Observable<List<Metadata>> getNamespaceMetadataByKey(NamespaceId namespaceId, BigInteger key);
+    Observable<List<Metadata>> getNamespaceMetadataByKey(NamespaceId targetNamespaceId,
+        BigInteger key);
 
     /**
      * Returns the namespace metadata given a mosaic id and metadata key.
      *
-     * @param namespaceId - Namespace identifier.
-     * @param key - Metadata key.
-     * @param publicKey - Sender public key
+     * @param targetNamespaceId The namespace id that holds the metadata values.
+     * @param key Metadata key.
+     * @param senderPublicKey The public key of the account that created the metadata.
      * @return Observable of {@link Metadata}
      */
-    Observable<Metadata> getNamespaceMetadataByKeyAndSender(NamespaceId namespaceId,
-        BigInteger key, String publicKey);
+    Observable<Metadata> getNamespaceMetadataByKeyAndSender(NamespaceId targetNamespaceId,
+        BigInteger key, String senderPublicKey);
 
 }

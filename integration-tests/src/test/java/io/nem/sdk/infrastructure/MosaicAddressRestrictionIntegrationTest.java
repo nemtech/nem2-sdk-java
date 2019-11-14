@@ -85,7 +85,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
 
         //4)Announce and validate
         assertTransaction(createTransaction, announceAggregateAndValidate(
-            type, testAccount, createTransaction));
+            type, createTransaction, testAccount));
 
         //5) Validate that endpoints have the data.
         sleep(1000);
@@ -114,7 +114,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
 
         //7) Announce and validate.
         assertTransaction(updateTransaction, announceAggregateAndValidate(
-            type, testAccount, updateTransaction));
+            type, updateTransaction, testAccount));
 
         sleep(1000);
 

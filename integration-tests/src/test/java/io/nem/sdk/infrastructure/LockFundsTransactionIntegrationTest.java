@@ -71,6 +71,6 @@ public class LockFundsTransactionIntegrationTest extends BaseIntegrationTest {
                 BigInteger.valueOf(100),
                 signedTransaction).build();
 
-        announceAggregateAndValidate(type, this.account, hashLockTransaction);
+        announceAggregateAndValidate(type, hashLockTransaction, this.account);
     }
 }

@@ -17,17 +17,12 @@
 package io.nem.sdk.infrastructure;
 
 import io.nem.sdk.model.account.Account;
-import io.nem.sdk.model.blockchain.BlockDuration;
 import io.nem.sdk.model.metadata.Metadata;
 import io.nem.sdk.model.metadata.MetadataType;
-import io.nem.sdk.model.mosaic.MosaicFlags;
 import io.nem.sdk.model.mosaic.MosaicId;
-import io.nem.sdk.model.mosaic.MosaicNonce;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
-import io.nem.sdk.model.transaction.MosaicDefinitionTransaction;
-import io.nem.sdk.model.transaction.MosaicDefinitionTransactionFactory;
 import io.nem.sdk.model.transaction.MosaicMetadataTransaction;
 import io.nem.sdk.model.transaction.MosaicMetadataTransactionFactory;
 import java.math.BigInteger;
@@ -135,19 +130,6 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
 
 
     private MosaicId createMosaic(RepositoryType type) {
-        MosaicNonce nonce = MosaicNonce.createRandom();
-        MosaicId mosaicId = MosaicId.createFromNonce(nonce, testAccount.getPublicAccount());
-
-        MosaicDefinitionTransaction mosaicDefinitionTransaction =
-            MosaicDefinitionTransactionFactory.create(getNetworkType(),
-                nonce,
-                mosaicId,
-                MosaicFlags.create(true, true, true),
-                4, new BlockDuration(100)).build();
-
-        MosaicDefinitionTransaction validateTransaction = announceAndValidate(type,
-            testAccount, mosaicDefinitionTransaction);
-        Assertions.assertEquals(mosaicId, validateTransaction.getMosaicId());
-        return mosaicId;
+        return super.createMosaic(testAccount, type);
     }
 }

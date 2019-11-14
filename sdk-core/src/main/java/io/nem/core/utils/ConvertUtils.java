@@ -19,6 +19,7 @@ package io.nem.core.utils;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
@@ -224,6 +225,34 @@ public class ConvertUtils {
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         byteBuffer.putLong(new BigInteger(hex, 16).longValue());
         return Hex.encodeHexString(byteBuffer.array());
+    }
+
+    /**
+     * It xors two bytes array into one.
+     *
+     * @param b1 the first byte array
+     * @param b2 the second byte array
+     * @return the bite array with a size of the biggest parameter.
+     */
+    public static byte[] xor(byte[] b1, byte[] b2) {
+        byte[] result = new byte[Math.max(b1.length, b2.length)];
+        for (int i = 0; i < b1.length && i < b2.length; i++) {
+            result[i] = (byte) (b1[i] ^ b2[i]);
+        }
+        for (int i = b2.length; i < b1.length; i++) {
+            result[i] = b1[i];
+        }
+        for (int i = b1.length; i < b2.length; i++) {
+            result[i] = b2[i];
+        }
+        int length = result.length;
+        while (length > 0 && result[length - 1] == 0) {
+            length--;
+        }
+        if (length < result.length) {
+            return Arrays.copyOf(result, length);
+        }
+        return result;
     }
 
 }

@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.14.2] - 04-Nov-2019
+
+**Milestone**: Fuschicho
+
+- Added Address isValidAddress methods.
+- Added Transaction size methods to calculate transaction fees.
+- Listener status filtered by topic/address.
+- NetworkRepository uses Network Routes.
+- NetworkType is now present in Address Alias / Unresolved Address Catbuffer serialization.
+- Other small fixes.
+
 ## [0.14.1] - 24-Oct-2019
 
 **Milestone**: Fuschicho

@@ -22,6 +22,7 @@ import io.nem.sdk.api.BlockRepository;
 import io.nem.sdk.api.ChainRepository;
 import io.nem.sdk.api.DiagnosticRepository;
 import io.nem.sdk.api.JsonSerialization;
+import io.nem.sdk.api.Listener;
 import io.nem.sdk.api.MetadataRepository;
 import io.nem.sdk.api.MosaicRepository;
 import io.nem.sdk.api.MultisigRepository;
@@ -34,9 +35,9 @@ import io.nem.sdk.api.RepositoryFactory;
 import io.nem.sdk.api.RestrictionAccountRepository;
 import io.nem.sdk.api.RestrictionMosaicRepository;
 import io.nem.sdk.api.TransactionRepository;
-import io.nem.sdk.infrastructure.Listener;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
+import io.nem.sdk.openapi.vertx.invoker.ApiException;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
@@ -90,8 +91,13 @@ public class RepositoryFactoryVertxImpl implements RepositoryFactory {
             });
         } catch (Exception e) {
             throw new RepositoryCallException(
-                "Unable to load NetworkType. Error: " + ExceptionUtils.getMessage(e), e);
+                "Unable to load NetworkType. Error: " + ExceptionUtils.getMessage(e),
+                extractStatusCodeFromException(e), e);
         }
+    }
+
+    protected int extractStatusCodeFromException(Throwable e) {
+        return (e instanceof ApiException) ? ((ApiException) e).getCode() : 0;
     }
 
 

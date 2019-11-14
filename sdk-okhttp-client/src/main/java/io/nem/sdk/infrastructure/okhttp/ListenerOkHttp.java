@@ -17,7 +17,7 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import com.google.gson.JsonObject;
-import io.nem.sdk.infrastructure.Listener;
+import io.nem.sdk.api.Listener;
 import io.nem.sdk.infrastructure.ListenerBase;
 import io.nem.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;

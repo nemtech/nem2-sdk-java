@@ -73,7 +73,7 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
                 recipient
             ).build();
 
-        announceAggregateAndValidate(type, account, transaction);
+        announceAggregateAndValidate(type, transaction, account);
 
     }
 
@@ -135,6 +135,6 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
                 proof
             ).build();
 
-        announceAggregateAndValidate(type, account, secretProofTransaction);
+        announceAggregateAndValidate(type, secretProofTransaction, account);
     }
 }

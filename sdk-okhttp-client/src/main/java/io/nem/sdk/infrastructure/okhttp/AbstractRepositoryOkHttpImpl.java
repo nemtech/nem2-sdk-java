@@ -68,7 +68,12 @@ public abstract class AbstractRepositoryOkHttpImpl {
         if (e instanceof RepositoryCallException) {
             return (RepositoryCallException) e;
         }
-        return new RepositoryCallException(extractMessageFromException(e), e);
+        return new RepositoryCallException(extractMessageFromException(e),
+            extractStatusCodeFromException(e), e);
+    }
+
+    protected int extractStatusCodeFromException(Throwable e) {
+        return (e instanceof ApiException) ? ((ApiException) e).getCode() : 0;
     }
 
     private String extractMessageFromException(Throwable e) {

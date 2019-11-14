@@ -57,8 +57,9 @@ public class AddressAliasTransactionIntegrationTest extends BaseIntegrationTest 
                 namespaceName,
                 BigInteger.valueOf(100)).build();
 
-        NamespaceId rootNamespaceId = announceAggregateAndValidate(type, account,
-            namespaceRegistrationTransaction).getNamespaceId();
+        NamespaceId rootNamespaceId = announceAggregateAndValidate(type,
+            namespaceRegistrationTransaction, account
+        ).getNamespaceId();
         sleep(1000);
 
         AddressAliasTransaction addressAliasTransaction =

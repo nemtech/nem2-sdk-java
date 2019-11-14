@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.nem.sdk.infrastructure;
+package io.nem.sdk.api;
 
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.BlockInfo;

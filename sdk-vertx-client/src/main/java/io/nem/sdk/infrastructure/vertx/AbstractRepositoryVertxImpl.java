@@ -63,7 +63,8 @@ public abstract class AbstractRepositoryVertxImpl {
         if (e instanceof RepositoryCallException) {
             return (RepositoryCallException) e;
         }
-        return new RepositoryCallException(extractMessageFromException(e), e);
+        return new RepositoryCallException(extractMessageFromException(e),
+            extractStatusCodeFromException(e), e);
     }
 
     private String extractMessageFromException(Throwable e) {
@@ -84,6 +85,10 @@ public abstract class AbstractRepositoryVertxImpl {
             }
         }
         return messages.stream().filter(StringUtils::isNotBlank).collect(Collectors.joining(" - "));
+    }
+
+    private int extractStatusCodeFromException(Throwable e) {
+        return (e instanceof ApiException) ? ((ApiException) e).getCode() : 0;
     }
 
     public <T> Observable<T> onError(Throwable e) {
