@@ -64,7 +64,7 @@ class MetadataTransactionServiceTest {
         Metadata metadata = new Metadata("someId",
             new MetadataEntry("compositeHash", senderPublicKey.toHex(),
                 targetAccount.getPublicKey().toHex(),
-                metadataKey, MetadataType.ACCOUNT, oldValue.length(),
+                metadataKey, MetadataType.ACCOUNT,
                 oldValue, Optional.of(targetAccount.getAddress().encoded())));
 
         Mockito.when(
@@ -198,7 +198,7 @@ class MetadataTransactionServiceTest {
         Metadata metadata = new Metadata("someId",
             new MetadataEntry("compositeHash", senderPublicKey.toHex(),
                 targetAccount.getPublicKey().toHex(),
-                metadataKey, MetadataType.MOSAIC, oldValue.length(),
+                metadataKey, MetadataType.MOSAIC,
                 oldValue, Optional.of(targetAccount.getAddress().encoded())));
 
         Mockito.when(
@@ -336,7 +336,7 @@ class MetadataTransactionServiceTest {
         Metadata metadata = new Metadata("someId",
             new MetadataEntry("compositeHash", senderPublicKey.toHex(),
                 targetAccount.getPublicKey().toHex(),
-                metadataKey, MetadataType.NAMESPACE, oldValue.length(),
+                metadataKey, MetadataType.NAMESPACE,
                 oldValue, Optional.of(targetAccount.getAddress().encoded())));
 
         Mockito.when(
