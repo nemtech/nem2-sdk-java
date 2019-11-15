@@ -21,7 +21,6 @@ import io.nem.sdk.api.RestrictionAccountRepository;
 import io.nem.sdk.model.account.AccountRestriction;
 import io.nem.sdk.model.account.AccountRestrictions;
 import io.nem.sdk.model.account.Address;
-import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.AccountRestrictionType;
 import io.nem.sdk.openapi.vertx.api.RestrictionAccountRoutesApi;
 import io.nem.sdk.openapi.vertx.api.RestrictionAccountRoutesApiImpl;
@@ -36,7 +35,6 @@ import io.vertx.core.Handler;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class RestrictionAccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements
@@ -44,9 +42,8 @@ public class RestrictionAccountRepositoryVertxImpl extends AbstractRepositoryVer
 
     private final RestrictionAccountRoutesApi client;
 
-    public RestrictionAccountRepositoryVertxImpl(ApiClient apiClient,
-        Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
+    public RestrictionAccountRepositoryVertxImpl(ApiClient apiClient) {
+        super(apiClient);
         this.client = new RestrictionAccountRoutesApiImpl(apiClient);
     }
 

@@ -54,7 +54,7 @@ public class RestrictionMosaicRepositoryVertxImplTest extends AbstractVertxRespo
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new RestrictionMosaicRepositoryVertxImpl(apiClientMock, networkType);
+        repository = new RestrictionMosaicRepositoryVertxImpl(apiClientMock);
     }
 
 

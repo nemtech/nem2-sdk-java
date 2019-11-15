@@ -18,7 +18,6 @@ package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.api.RepositoryCallException;
-import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.sdk.openapi.vertx.invoker.ApiException;
@@ -32,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -44,12 +42,9 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  */
 public abstract class AbstractRepositoryVertxImpl {
 
-    private final Supplier<NetworkType> networkType;
-
     private final JsonHelper jsonHelper;
 
-    public AbstractRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType) {
-        this.networkType = networkType;
+    public AbstractRepositoryVertxImpl(ApiClient apiClient) {
         this.jsonHelper = new JsonHelperJackson2(apiClient.getObjectMapper());
     }
 
@@ -95,9 +90,6 @@ public abstract class AbstractRepositoryVertxImpl {
         return Observable.error(exceptionHandling(e));
     }
 
-    protected NetworkType getNetworkTypeBlocking() {
-        return networkType.get();
-    }
 
     public <T> Observable<T> exceptionHandling(Observable<T> observable) {
         Function<? super Throwable, ? extends ObservableSource<? extends T>> resumeFunction = this::onError;

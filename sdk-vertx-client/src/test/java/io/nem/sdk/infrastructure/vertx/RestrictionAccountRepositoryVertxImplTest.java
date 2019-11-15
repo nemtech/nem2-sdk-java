@@ -43,7 +43,7 @@ public class RestrictionAccountRepositoryVertxImplTest extends AbstractVertxResp
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new RestrictionAccountRepositoryVertxImpl(apiClientMock, networkType);
+        repository = new RestrictionAccountRepositoryVertxImpl(apiClientMock);
     }
 
 

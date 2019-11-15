@@ -19,14 +19,12 @@ package io.nem.sdk.infrastructure.vertx;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.AccountNames;
 import io.nem.sdk.model.account.Address;
-import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicNames;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.namespace.NamespaceInfo;
 import io.nem.sdk.model.namespace.NamespaceName;
 import io.nem.sdk.model.namespace.NamespaceRegistrationType;
-import io.nem.sdk.openapi.vertx.invoker.ApiException;
 import io.nem.sdk.openapi.vertx.model.AccountNamesDTO;
 import io.nem.sdk.openapi.vertx.model.AccountsNamesDTO;
 import io.nem.sdk.openapi.vertx.model.AliasDTO;
@@ -39,7 +37,6 @@ import io.nem.sdk.openapi.vertx.model.NamespaceMetaDTO;
 import io.nem.sdk.openapi.vertx.model.NamespaceNameDTO;
 import io.nem.sdk.openapi.vertx.model.NamespaceRegistrationTypeEnum;
 import io.nem.sdk.openapi.vertx.model.NamespacesInfoDTO;
-import io.nem.sdk.openapi.vertx.model.NodeInfoDTO;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
@@ -60,13 +57,11 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new NamespaceRepositoryVertxImpl(apiClientMock, networkType);
+        repository = new NamespaceRepositoryVertxImpl(apiClientMock, networkTypeObservable);
     }
 
     @Test
     public void shouldGetNamespace() throws Exception {
-
-        resolveNetworkType();
 
         NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
 
@@ -112,8 +107,6 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
     @Test
     public void shouldGetNamespacesFromAccount() throws Exception {
 
-        resolveNetworkType();
-
         Address address = MapperUtils
             .toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
 
@@ -158,8 +151,6 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
     @Test
     public void shouldGetNamespacesFromAccounts() throws Exception {
-
-        resolveNetworkType();
 
         Address address =
             Address.createFromRawAddress(
@@ -207,7 +198,6 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
     @Test
     public void shouldGetNamespaceNames() throws Exception {
-        resolveNetworkType();
         NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
         NamespaceNameDTO dto1 = new NamespaceNameDTO();
         dto1.setName("someName1");
@@ -243,8 +233,6 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
             Address.createFromRawAddress(
                 "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
 
-        resolveNetworkType();
-
         NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
@@ -278,8 +266,6 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
     @Test
     public void shouldGetLinkedMosaicId() throws Exception {
-
-        resolveNetworkType();
 
         NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
 
@@ -364,13 +350,5 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
         Assertions.assertEquals("accountalias", accountNames.getNames().get(0).getName());
     }
 
-
-    protected void resolveNetworkType() throws ApiException {
-        NodeInfoDTO nodeInfoDTO = new NodeInfoDTO();
-        nodeInfoDTO.setNetworkIdentifier(NetworkType.MIJIN_TEST.getValue());
-        mockRemoteCall(nodeInfoDTO);
-        NetworkType networkType = repository.getNetworkTypeBlocking();
-        Assertions.assertEquals(NetworkType.MIJIN_TEST, networkType);
-    }
 
 }

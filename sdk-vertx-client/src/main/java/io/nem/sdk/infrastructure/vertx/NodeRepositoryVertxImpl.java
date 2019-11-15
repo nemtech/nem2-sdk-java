@@ -31,7 +31,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.math.BigInteger;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * Node http repository.
@@ -41,8 +40,8 @@ public class NodeRepositoryVertxImpl extends AbstractRepositoryVertxImpl impleme
 
     private final NodeRoutesApi client;
 
-    public NodeRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
+    public NodeRepositoryVertxImpl(ApiClient apiClient) {
+        super(apiClient);
         client = new NodeRoutesApiImpl(apiClient);
     }
 

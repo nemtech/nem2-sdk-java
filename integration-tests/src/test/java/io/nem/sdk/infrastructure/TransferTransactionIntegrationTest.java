@@ -66,7 +66,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
                 Collections
                     .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
                 new PlainMessage(message)
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         TransferTransaction processed = announceAggregateAndValidate(type, transferTransaction,
             account
@@ -101,7 +101,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
                 Collections
                     .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
                 encryptedMessage
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         TransferTransaction processed = announceAndValidate(type, account, transferTransaction);
 
@@ -157,7 +157,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 senderKeyPair.getPrivateKey(), senderKeyPair.getPrivateKey(),
                 recipientKeyPair.getPublicKey()
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         TransferTransaction processed = announceAndValidate(type, account, transferTransaction);
 

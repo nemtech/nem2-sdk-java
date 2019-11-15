@@ -43,7 +43,7 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new AccountRepositoryVertxImpl(apiClientMock, networkType);
+        repository = new AccountRepositoryVertxImpl(apiClientMock);
     }
 
     @Test

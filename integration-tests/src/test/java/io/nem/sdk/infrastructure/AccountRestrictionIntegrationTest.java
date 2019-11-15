@@ -180,7 +180,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 accountRestrictionType
                 , additions, deletions
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         AccountOperationRestrictionTransaction processedTransaction = announceAndValidate(type,
             testAccount, transaction);
@@ -205,7 +205,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 accountRestrictionType
                 , additions, deletions
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         AccountMosaicRestrictionTransaction processedTransaction = announceAndValidate(type,
             testAccount, transaction);
@@ -230,7 +230,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 accountRestrictionType
                 , additions, deletions
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         AccountAddressRestrictionTransaction processedTransaction = announceAndValidate(type,
             testAccount, transaction);

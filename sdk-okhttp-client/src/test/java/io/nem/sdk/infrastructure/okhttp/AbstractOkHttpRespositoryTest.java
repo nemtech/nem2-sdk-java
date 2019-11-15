@@ -25,14 +25,13 @@ import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiException;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiResponse;
 import io.nem.sdk.openapi.okhttp_gson.invoker.JSON;
-import io.nem.sdk.openapi.okhttp_gson.model.NodeInfoDTO;
+import io.reactivex.Observable;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import okhttp3.Call;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
@@ -47,6 +46,10 @@ public abstract class AbstractOkHttpRespositoryTest {
     protected ApiClient apiClientMock;
 
     protected JsonHelper jsonHelper;
+
+    protected final NetworkType networkType = NetworkType.MIJIN_TEST;
+
+    protected final Observable<NetworkType> networkTypeObservable = Observable.just(networkType);
 
     @BeforeEach
     public void setUp() {
@@ -114,16 +117,6 @@ public abstract class AbstractOkHttpRespositoryTest {
 
         Mockito.when(apiClientMock.execute(Mockito.any(Call.class),
             Mockito.any(Type.class))).thenThrow(exception);
-    }
-
-
-    protected final NetworkType resolveNetworkType() throws ApiException {
-        NodeInfoDTO dto = new NodeInfoDTO();
-        dto.setNetworkIdentifier(NetworkType.MIJIN_TEST.getValue());
-        mockRemoteCall(dto);
-        NetworkType networkType = getRepository().getNetworkTypeBlocking();
-        Assertions.assertEquals(NetworkType.MIJIN_TEST, networkType);
-        return networkType;
     }
 
     protected abstract AbstractRepositoryOkHttpImpl getRepository();

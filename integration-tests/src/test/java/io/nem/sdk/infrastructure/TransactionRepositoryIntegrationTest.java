@@ -47,7 +47,7 @@ public class TransactionRepositoryIntegrationTest extends BaseIntegrationTest {
     void setup() {
         AccountRepository accountRepository = getRepositoryFactory(RepositoryType.VERTX)
             .createAccountRepository();
-        PublicAccount account = config().getTestAccount().getPublicAccount();
+        PublicAccount account = config().getDefaultAccount().getPublicAccount();
         List<Transaction> transactions = get(
             accountRepository.transactions(account, new QueryParams(100, null)))
             .stream().filter(t -> t.getType() == TransactionType.TRANSFER).collect(

@@ -16,7 +16,6 @@
 
 package io.nem.sdk.infrastructure.vertx;
 
-import io.nem.core.utils.Suppliers;
 import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.BlockRepository;
 import io.nem.sdk.api.ChainRepository;
@@ -30,21 +29,19 @@ import io.nem.sdk.api.NamespaceRepository;
 import io.nem.sdk.api.NetworkRepository;
 import io.nem.sdk.api.NodeRepository;
 import io.nem.sdk.api.ReceiptRepository;
-import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.api.RepositoryFactory;
 import io.nem.sdk.api.RestrictionAccountRepository;
 import io.nem.sdk.api.RestrictionMosaicRepository;
 import io.nem.sdk.api.TransactionRepository;
+import io.nem.sdk.model.blockchain.BlockInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
-import io.nem.sdk.openapi.vertx.invoker.ApiException;
+import io.reactivex.Observable;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import java.math.BigInteger;
 
 /**
  * Vertx implementation of a {@link RepositoryFactory}
@@ -56,13 +53,15 @@ public class RepositoryFactoryVertxImpl implements RepositoryFactory {
 
     private final ApiClient apiClient;
 
-    private final Supplier<NetworkType> networkType;
-
     private final WebClient webClient;
 
     private final String baseUrl;
 
     private final Vertx vertx;
+
+    private final Observable<NetworkType> networkTypeObservable;
+
+    private final Observable<String> generationHashObservable;
 
     public RepositoryFactoryVertxImpl(String baseUrl) {
         this.baseUrl = baseUrl;
@@ -74,71 +73,62 @@ public class RepositoryFactoryVertxImpl implements RepositoryFactory {
                 return webClient;
             }
         };
-        //Note: For some reason the genereated code use to mapper instances.
+        //Note: For some reason the generated code use to mapper instances.
         JsonHelperJackson2.configureMapper(apiClient.getObjectMapper());
         JsonHelperJackson2.configureMapper(Json.mapper);
-
-        this.networkType = Suppliers.memoize(this::loadNetworkType);
-        networkType.get();
+        this.networkTypeObservable = createNetworkRepository().getNetworkType().cache();
+        this.generationHashObservable = createBlockRepository().getBlockByHeight(BigInteger.ONE)
+            .map(BlockInfo::getGenerationHash).cache();
     }
 
-    protected NetworkType loadNetworkType() {
-        try {
-            return io.nem.core.utils.ExceptionUtils.propagate(() -> {
-                NetworkRepositoryVertxImpl networkRepository = new NetworkRepositoryVertxImpl(
-                    apiClient);
-                return networkRepository.getNetworkType().toFuture().get(10, TimeUnit.SECONDS);
-            });
-        } catch (Exception e) {
-            throw new RepositoryCallException(
-                "Unable to load NetworkType. Error: " + ExceptionUtils.getMessage(e),
-                extractStatusCodeFromException(e), e);
-        }
+    @Override
+    public Observable<NetworkType> getNetworkType() {
+        return networkTypeObservable;
     }
 
-    protected int extractStatusCodeFromException(Throwable e) {
-        return (e instanceof ApiException) ? ((ApiException) e).getCode() : 0;
+    @Override
+    public Observable<String> getGenerationHash() {
+        return generationHashObservable;
     }
-
 
     @Override
     public AccountRepository createAccountRepository() {
-        return new AccountRepositoryVertxImpl(apiClient, networkType);
+        return new AccountRepositoryVertxImpl(apiClient);
     }
 
     @Override
     public MultisigRepository createMultisigRepository() {
-        return new MultisigRepositoryVertxImpl(apiClient, networkType);
+        return new MultisigRepositoryVertxImpl(apiClient, networkTypeObservable);
     }
 
     @Override
     public BlockRepository createBlockRepository() {
-        return new BlockRepositoryVertxImpl(apiClient, networkType);
+        return new BlockRepositoryVertxImpl(apiClient);
     }
 
     @Override
     public ReceiptRepository createReceiptRepository() {
-        return new ReceiptRepositoryVertxImpl(apiClient, networkType);
+        return new ReceiptRepositoryVertxImpl(apiClient, networkTypeObservable);
     }
 
     @Override
     public ChainRepository createChainRepository() {
-        return new ChainRepositoryVertxImpl(apiClient, networkType);
+        return new ChainRepositoryVertxImpl(apiClient);
     }
 
     @Override
     public DiagnosticRepository createDiagnosticRepository() {
-        return new DiagnosticRepositoryVertxImpl(apiClient, networkType);
+        return new DiagnosticRepositoryVertxImpl(apiClient);
     }
 
     @Override
     public MosaicRepository createMosaicRepository() {
-        return new MosaicRepositoryVertxImpl(apiClient, networkType);
+        return new MosaicRepositoryVertxImpl(apiClient, networkTypeObservable);
     }
 
     @Override
     public NamespaceRepository createNamespaceRepository() {
-        return new NamespaceRepositoryVertxImpl(apiClient, networkType);
+        return new NamespaceRepositoryVertxImpl(apiClient, networkTypeObservable);
     }
 
     @Override
@@ -148,27 +138,27 @@ public class RepositoryFactoryVertxImpl implements RepositoryFactory {
 
     @Override
     public NodeRepository createNodeRepository() {
-        return new NodeRepositoryVertxImpl(apiClient, networkType);
+        return new NodeRepositoryVertxImpl(apiClient);
     }
 
     @Override
     public TransactionRepository createTransactionRepository() {
-        return new TransactionRepositoryVertxImpl(apiClient, networkType);
+        return new TransactionRepositoryVertxImpl(apiClient);
     }
 
     @Override
     public MetadataRepository createMetadataRepository() {
-        return new MetadataRepositoryVertxImpl(apiClient, networkType);
+        return new MetadataRepositoryVertxImpl(apiClient);
     }
 
     @Override
     public RestrictionAccountRepository createRestrictionAccountRepository() {
-        return new RestrictionAccountRepositoryVertxImpl(apiClient, networkType);
+        return new RestrictionAccountRepositoryVertxImpl(apiClient);
     }
 
     @Override
     public RestrictionMosaicRepository createRestrictionMosaicRepository() {
-        return new RestrictionMosaicRepositoryVertxImpl(apiClient, networkType);
+        return new RestrictionMosaicRepositoryVertxImpl(apiClient);
     }
 
     @Override

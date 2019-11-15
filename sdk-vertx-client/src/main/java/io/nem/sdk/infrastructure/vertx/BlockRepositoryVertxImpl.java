@@ -38,7 +38,6 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -53,8 +52,8 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
 
     private final TransactionMapper transactionMapper;
 
-    public BlockRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
+    public BlockRepositoryVertxImpl(ApiClient apiClient) {
+        super(apiClient);
         client = new BlockRoutesApiImpl(apiClient);
         transactionMapper = new GeneralTransactionMapper(getJsonHelper());
     }

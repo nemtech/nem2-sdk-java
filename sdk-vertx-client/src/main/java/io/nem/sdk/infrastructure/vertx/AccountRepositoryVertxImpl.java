@@ -27,7 +27,6 @@ import io.nem.sdk.model.account.AccountInfo;
 import io.nem.sdk.model.account.AccountType;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
-import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.Transaction;
@@ -44,7 +43,6 @@ import io.vertx.core.Handler;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -60,9 +58,8 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
 
     private final TransactionMapper transactionMapper;
 
-    public AccountRepositoryVertxImpl(ApiClient apiClient,
-        Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
+    public AccountRepositoryVertxImpl(ApiClient apiClient) {
+        super(apiClient);
         this.client = new AccountRoutesApiImpl(apiClient);
 
         transactionMapper = new GeneralTransactionMapper(getJsonHelper());

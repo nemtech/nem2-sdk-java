@@ -42,7 +42,7 @@ public class ReceiptRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new ReceiptRepositoryVertxImpl(apiClientMock, networkType);
+        repository = new ReceiptRepositoryVertxImpl(apiClientMock, networkTypeObservable);
     }
 
     @Test

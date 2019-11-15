@@ -52,14 +52,14 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
                 Collections
                     .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
                 PlainMessage.create("test-message")
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         AggregateTransaction aggregateTransaction =
             AggregateTransactionFactory.createBonded(
                 getNetworkType(),
                 Collections.singletonList(
                     transferTransaction.toAggregate(this.multisigAccount.getPublicAccount())))
-                .build();
+                .maxFee(this.maxFee).build();
 
         SignedTransaction signedTransaction =
             this.cosignatoryAccount.sign(aggregateTransaction, getGenerationHash());
@@ -83,7 +83,7 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
             HashLockTransactionFactory.create(getNetworkType(),
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
-                signedTransaction).build();
+                signedTransaction).maxFee(this.maxFee).build();
         announceAndValidate(type, account, hashLockTransaction);
     }
 }

@@ -125,13 +125,13 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
             .map(Account::getPublicAccount).collect(Collectors.toList());
         MultisigAccountModificationTransaction convertIntoMultisigTransaction = MultisigAccountModificationTransactionFactory
             .create(getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList())
-            .build();
+            .maxFee(this.maxFee).build();
 
         AggregateTransaction aggregateTransaction = AggregateTransactionFactory.createBonded(
             getNetworkType(),
             Collections.singletonList(
                 convertIntoMultisigTransaction.toAggregate(multisigAccount.getPublicAccount()))
-        ).build();
+        ).maxFee(this.maxFee).build();
 
         SignedTransaction signedTransaction = aggregateTransaction
             .signTransactionWithCosigners(multisigAccount, Arrays.asList(accounts),
@@ -172,7 +172,7 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
                 Collections
                     .singletonList(NetworkCurrencyMosaic.createAbsolute(amount)),
                 new PlainMessage("E2ETest:SetUpAccountsTool")
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         TransferTransaction processedTransaction = announceAndValidate(type, nemesisAccount,
             transferTransaction);
@@ -206,7 +206,7 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
             NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
             BigInteger.valueOf(100),
             signedTransaction)
-            .build();
+            .maxFee(this.maxFee).build();
         announceAndValidate(type, account, hashLockTransaction);
     }
 }

@@ -32,7 +32,6 @@ import io.vertx.core.Handler;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 
@@ -44,19 +43,23 @@ public class ReceiptRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
 
     private final ReceiptRoutesApi client;
 
-    public ReceiptRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
-        this.client = new ReceiptRoutesApiImpl(apiClient);
-    }
+    private final Observable<NetworkType> networkTypeObservable;
 
+    public ReceiptRepositoryVertxImpl(ApiClient apiClient,
+        Observable<NetworkType> networkTypeObservable) {
+        super(apiClient);
+        this.client = new ReceiptRoutesApiImpl(apiClient);
+        this.networkTypeObservable = networkTypeObservable;
+    }
 
     @Override
     public Observable<Statement> getBlockReceipts(BigInteger height) {
         Consumer<Handler<AsyncResult<StatementsDTO>>> callback = handler ->
             getClient().getBlockReceipts(height, handler);
-        return exceptionHandling(call(callback).map(statementsDTO ->
-            new ReceiptMappingVertx(getJsonHelper())
-                .createStatementFromDto(statementsDTO, getNetworkTypeBlocking())));
+        return exceptionHandling(
+            networkTypeObservable.flatMap(networkType -> call(callback).map(statementsDTO ->
+                new ReceiptMappingVertx(getJsonHelper())
+                    .createStatementFromDto(statementsDTO, networkType))));
     }
 
 

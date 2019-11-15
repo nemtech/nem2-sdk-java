@@ -18,7 +18,6 @@ package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.sdk.api.DiagnosticRepository;
 import io.nem.sdk.model.blockchain.BlockchainStorageInfo;
-import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.blockchain.ServerInfo;
 import io.nem.sdk.openapi.vertx.api.DiagnosticRoutesApi;
 import io.nem.sdk.openapi.vertx.api.DiagnosticRoutesApiImpl;
@@ -30,7 +29,6 @@ import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * Diagnostic http repository.
@@ -40,8 +38,8 @@ public class DiagnosticRepositoryVertxImpl extends AbstractRepositoryVertxImpl i
 
     private final DiagnosticRoutesApi client;
 
-    public DiagnosticRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
+    public DiagnosticRepositoryVertxImpl(ApiClient apiClient) {
+        super(apiClient);
         client = new DiagnosticRoutesApiImpl(apiClient);
     }
 

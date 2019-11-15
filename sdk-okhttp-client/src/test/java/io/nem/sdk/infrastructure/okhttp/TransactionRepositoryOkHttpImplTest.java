@@ -30,7 +30,6 @@ import io.nem.sdk.model.transaction.TransactionAnnounceResponse;
 import io.nem.sdk.model.transaction.TransactionStatus;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
-import io.nem.sdk.openapi.okhttp_gson.invoker.ApiException;
 import io.nem.sdk.openapi.okhttp_gson.model.AnnounceTransactionInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionStatusDTO;
@@ -155,8 +154,7 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
             announceTransactionInfoDTO.getMessage());
     }
 
-    private SignedTransaction getSignedTransaction() throws ApiException {
-        NetworkType networkType = resolveNetworkType();
+    private SignedTransaction getSignedTransaction() {
 
         String generationHash = "A94B1BE81F1D4C95D6D252AD7BA3FFFB1674991FD880B7A57DC3180AF8D69C32";
 

@@ -60,7 +60,7 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
         MosaicMetadataTransaction originalTransaction = get(service
             .createMosaicMetadataTransactionFactory(getNetworkType(),
                 targetAccount.getPublicAccount(), key, originalMessage,
-                signerAccount.getPublicAccount().getPublicKey(), targetMosaicId)).build();
+                signerAccount.getPublicAccount().getPublicKey(), targetMosaicId)).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, originalTransaction, signerAccount);
 
@@ -71,7 +71,7 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
         MosaicMetadataTransaction updateTransaction = get(service
             .createMosaicMetadataTransactionFactory(getNetworkType(),
                 targetAccount.getPublicAccount(), key, newMessage,
-                signerAccount.getPublicAccount().getPublicKey(), targetMosaicId)).build();
+                signerAccount.getPublicAccount().getPublicKey(), targetMosaicId)).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, updateTransaction, signerAccount);
 

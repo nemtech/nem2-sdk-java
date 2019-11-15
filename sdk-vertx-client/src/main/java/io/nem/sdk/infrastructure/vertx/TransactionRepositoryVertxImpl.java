@@ -19,7 +19,6 @@ package io.nem.sdk.infrastructure.vertx;
 import io.nem.sdk.api.TransactionRepository;
 import io.nem.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.sdk.infrastructure.vertx.mappers.TransactionMapper;
-import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.sdk.model.transaction.Deadline;
 import io.nem.sdk.model.transaction.SignedTransaction;
@@ -41,7 +40,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * Transaction http repository.
@@ -55,9 +53,8 @@ public class TransactionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
 
     private final TransactionMapper transactionMapper;
 
-    public TransactionRepositoryVertxImpl(ApiClient apiClient,
-        Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
+    public TransactionRepositoryVertxImpl(ApiClient apiClient) {
+        super(apiClient);
         client = new TransactionRoutesApiImpl(apiClient);
         transactionMapper = new GeneralTransactionMapper(getJsonHelper());
     }

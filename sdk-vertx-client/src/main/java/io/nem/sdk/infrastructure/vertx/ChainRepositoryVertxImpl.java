@@ -18,7 +18,6 @@ package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.sdk.api.ChainRepository;
 import io.nem.sdk.model.blockchain.BlockchainScore;
-import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.openapi.vertx.api.ChainRoutesApi;
 import io.nem.sdk.openapi.vertx.api.ChainRoutesApiImpl;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
@@ -29,7 +28,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.math.BigInteger;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * Chain http repository.
@@ -39,8 +37,8 @@ public class ChainRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
 
     private final ChainRoutesApi client;
 
-    public ChainRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
+    public ChainRepositoryVertxImpl(ApiClient apiClient) {
+        super(apiClient);
         client = new ChainRoutesApiImpl(apiClient);
     }
 

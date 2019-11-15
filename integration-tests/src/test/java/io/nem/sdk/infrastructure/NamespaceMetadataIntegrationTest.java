@@ -57,12 +57,12 @@ public class NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
             NamespaceMetadataTransactionFactory.create(
                 getNetworkType(), testAccount.getPublicAccount(), targetNamespaceId,
                 key, message
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         AggregateTransaction aggregateTransaction = AggregateTransactionFactory
             .createComplete(getNetworkType(),
                 Collections.singletonList(transaction.toAggregate(testAccount.getPublicAccount())))
-            .build();
+            .maxFee(this.maxFee).build();
 
         AggregateTransaction announceCorrectly = announceAndValidate(type, testAccount,
             aggregateTransaction);
@@ -139,7 +139,7 @@ public class NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
         System.out.println("Creating namespace " + namespaceName);
         NamespaceRegistrationTransaction namespaceRegistrationTransaction = NamespaceRegistrationTransactionFactory
             .createRootNamespace(
-                getNetworkType(), namespaceName, BigInteger.valueOf(10)).build();
+                getNetworkType(), namespaceName, BigInteger.valueOf(10)).maxFee(this.maxFee).build();
 
         NamespaceRegistrationTransaction processedTransaction = announceAndValidate(type,
             testAccount, namespaceRegistrationTransaction);

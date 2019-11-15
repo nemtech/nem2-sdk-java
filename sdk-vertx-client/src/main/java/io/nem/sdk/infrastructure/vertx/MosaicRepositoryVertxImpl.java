@@ -35,7 +35,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -48,9 +47,12 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl imple
 
     private final MosaicRoutesApi client;
 
-    public MosaicRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
-        client = new MosaicRoutesApiImpl(apiClient);
+    private final Observable<NetworkType> networkTypeObservable;
+
+    public MosaicRepositoryVertxImpl(ApiClient apiClient, Observable<NetworkType> networkTypeObservable) {
+        super(apiClient);
+        this.client = new MosaicRoutesApiImpl(apiClient);
+        this.networkTypeObservable = networkTypeObservable;
     }
 
     public MosaicRoutesApi getClient() {
@@ -62,7 +64,8 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl imple
 
         Consumer<Handler<AsyncResult<MosaicInfoDTO>>> callback = handler -> getClient()
             .getMosaic((mosaicId.getIdAsHex()), handler);
-        return exceptionHandling(call(callback).map(this::createMosaicInfo));
+        return exceptionHandling(networkTypeObservable.flatMap(networkType -> call(callback).map(
+            (MosaicInfoDTO mosaicInfoDTO) -> createMosaicInfo(mosaicInfoDTO, networkType))));
     }
 
     @Override
@@ -74,13 +77,15 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl imple
             .collect(Collectors.toList()));
         Consumer<Handler<AsyncResult<List<MosaicInfoDTO>>>> callback = handler -> getClient()
             .getMosaics(mosaicIds, handler);
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::createMosaicInfo).toList()
-                .toObservable());
+        return exceptionHandling(networkTypeObservable.flatMap(networkType ->
+            call(callback).flatMapIterable(item -> item).map(
+                (MosaicInfoDTO mosaicInfoDTO) -> createMosaicInfo(mosaicInfoDTO, networkType))
+                .toList()
+                .toObservable()));
     }
 
-    private MosaicInfo createMosaicInfo(MosaicInfoDTO mosaicInfoDTO) {
-        NetworkType networkType = getNetworkTypeBlocking();
+    private MosaicInfo createMosaicInfo(MosaicInfoDTO mosaicInfoDTO, NetworkType networkType) {
+
         return MosaicInfo.create(
             toMosaicId(mosaicInfoDTO.getMosaic().getId()),
             mosaicInfoDTO.getMosaic().getSupply(),
@@ -91,8 +96,6 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl imple
             mosaicInfoDTO.getMosaic().getDivisibility(),
             mosaicInfoDTO.getMosaic().getDuration());
     }
-
-
 
 
     public static MosaicFlags extractMosaicFlags(MosaicDTO mosaicDTO) {

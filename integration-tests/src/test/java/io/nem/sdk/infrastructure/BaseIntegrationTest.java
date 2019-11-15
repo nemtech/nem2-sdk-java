@@ -83,6 +83,9 @@ public abstract class BaseIntegrationTest {
      */
     protected static final RepositoryType DEFAULT_REPOSITORY_TYPE = RepositoryType.VERTX;
 
+
+    protected BigInteger maxFee = BigInteger.valueOf(200);
+
     /**
      * Known implementations of repositories that the integration tests use.
      */
@@ -114,9 +117,7 @@ public abstract class BaseIntegrationTest {
 
     private String resolveGenerationHash() {
         return Optional.ofNullable(this.config().getGenerationHash()).orElseGet(
-            () -> get(getRepositoryFactory(DEFAULT_REPOSITORY_TYPE).createBlockRepository()
-                .getBlockByHeight(
-                    BigInteger.ONE)).getGenerationHash());
+            () -> get(getRepositoryFactory(DEFAULT_REPOSITORY_TYPE).getGenerationHash()));
 
     }
 
@@ -254,7 +255,7 @@ public abstract class BaseIntegrationTest {
                 getNetworkType(),
                 Arrays.stream(signers).map(s -> transaction.toAggregate(s.getPublicAccount()))
                     .collect(Collectors.toList())
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         T announcedCorrectly = (T) announceAndValidate(
             type, signers[0], aggregateTransaction).getInnerTransactions().get(0);
@@ -385,7 +386,7 @@ public abstract class BaseIntegrationTest {
             NamespaceRegistrationTransactionFactory.createRootNamespace(
                 getNetworkType(),
                 namespaceName,
-                BigInteger.valueOf(100)).build();
+                BigInteger.valueOf(100)).maxFee(this.maxFee).build();
 
         NamespaceId rootNamespaceId = announceAggregateAndValidate(type,
             namespaceRegistrationTransaction, nemesisAccount
@@ -398,7 +399,7 @@ public abstract class BaseIntegrationTest {
                 AliasAction.LINK,
                 rootNamespaceId,
                 address
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, aliasTransaction, nemesisAccount);
         return rootNamespaceId;
@@ -429,7 +430,7 @@ public abstract class BaseIntegrationTest {
             NamespaceRegistrationTransactionFactory.createRootNamespace(
                 getNetworkType(),
                 namespaceName,
-                BigInteger.valueOf(100)).build();
+                BigInteger.valueOf(100)).maxFee(this.maxFee).build();
 
         NamespaceId rootNamespaceId = announceAggregateAndValidate(type,
             namespaceRegistrationTransaction, nemesisAccount
@@ -443,7 +444,7 @@ public abstract class BaseIntegrationTest {
                 AliasAction.LINK,
                 rootNamespaceId,
                 mosaicId
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, aliasTransaction, nemesisAccount);
         return rootNamespaceId;
@@ -458,7 +459,7 @@ public abstract class BaseIntegrationTest {
                 nonce,
                 mosaicId,
                 MosaicFlags.create(true, true, true),
-                4, new BlockDuration(100)).build();
+                4, new BlockDuration(100)).maxFee(this.maxFee).build();
 
         MosaicDefinitionTransaction validateTransaction = announceAndValidate(type, account,
             mosaicDefinitionTransaction);

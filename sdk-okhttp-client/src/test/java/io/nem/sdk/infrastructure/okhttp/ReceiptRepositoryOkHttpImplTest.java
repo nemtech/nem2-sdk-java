@@ -42,13 +42,11 @@ public class ReceiptRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new ReceiptRepositoryOkHttpImpl(apiClientMock);
+        repository = new ReceiptRepositoryOkHttpImpl(apiClientMock, networkTypeObservable);
     }
 
     @Test
     public void shouldGetReceiptReceipts() throws Exception {
-
-        resolveNetworkType();
 
         StatementsDTO dto = new StatementsDTO();
         ResolutionStatementDTO addressResolutionStatement = new ResolutionStatementDTO();

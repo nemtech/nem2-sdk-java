@@ -44,7 +44,7 @@ public class NamespaceRegistrationIntegrationTest extends BaseIntegrationTest {
             NamespaceRegistrationTransactionFactory.createRootNamespace(
                 getNetworkType(),
                 namespaceName,
-                BigInteger.valueOf(100)).build();
+                BigInteger.valueOf(100)).maxFee(this.maxFee).build();
 
         announceAndValidate(type, this.account, namespaceRegistrationTransaction);
         rootNamespaceId = namespaceRegistrationTransaction.getNamespaceId();
@@ -60,7 +60,7 @@ public class NamespaceRegistrationIntegrationTest extends BaseIntegrationTest {
             NamespaceRegistrationTransactionFactory.createRootNamespace(
                 getNetworkType(),
                 namespaceName,
-                BigInteger.valueOf(100)).build();
+                BigInteger.valueOf(100)).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, namespaceRegistrationTransaction, this.account);
         rootNamespaceId = namespaceRegistrationTransaction.getNamespaceId();
@@ -80,7 +80,7 @@ public class NamespaceRegistrationIntegrationTest extends BaseIntegrationTest {
             NamespaceRegistrationTransactionFactory.createSubNamespace(
                 getNetworkType(),
                 namespaceName,
-                this.rootNamespaceId).build();
+                this.rootNamespaceId).maxFee(this.maxFee).build();
 
         announceAndValidate(type, this.account, namespaceRegistrationTransaction);
     }
@@ -98,7 +98,7 @@ public class NamespaceRegistrationIntegrationTest extends BaseIntegrationTest {
             NamespaceRegistrationTransactionFactory.createSubNamespace(
                 getNetworkType(),
                 namespaceName,
-                this.rootNamespaceId).build();
+                this.rootNamespaceId).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, namespaceRegistrationTransaction, this.account);
     }

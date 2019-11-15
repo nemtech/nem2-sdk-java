@@ -41,7 +41,7 @@ public class LockFundsTransactionIntegrationTest extends BaseIntegrationTest {
         AggregateTransaction aggregateTransaction =
             AggregateTransactionFactory.createBonded(
                 getNetworkType(),
-                Collections.emptyList()).build();
+                Collections.emptyList()).maxFee(this.maxFee).build();
         SignedTransaction signedTransaction = this.account
             .sign(aggregateTransaction, getGenerationHash());
 
@@ -50,7 +50,7 @@ public class LockFundsTransactionIntegrationTest extends BaseIntegrationTest {
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 signedTransaction
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         announceAndValidate(type, this.account, hashLockTransaction);
     }
@@ -61,7 +61,7 @@ public class LockFundsTransactionIntegrationTest extends BaseIntegrationTest {
         AggregateTransaction aggregateTransaction =
             AggregateTransactionFactory.createBonded(
                 getNetworkType(),
-                Collections.emptyList()).build();
+                Collections.emptyList()).maxFee(this.maxFee).build();
         SignedTransaction signedTransaction = this.account
             .sign(aggregateTransaction, getGenerationHash());
         HashLockTransaction hashLockTransaction =
@@ -69,7 +69,7 @@ public class LockFundsTransactionIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
-                signedTransaction).build();
+                signedTransaction).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, hashLockTransaction, this.account);
     }

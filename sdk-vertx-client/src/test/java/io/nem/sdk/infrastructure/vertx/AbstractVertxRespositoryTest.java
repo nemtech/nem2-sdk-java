@@ -24,13 +24,13 @@ import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.sdk.openapi.vertx.invoker.ApiException;
 import io.nem.sdk.openapi.vertx.invoker.Pair;
+import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.impl.headers.VertxHttpHeaders;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
@@ -47,7 +47,9 @@ public abstract class AbstractVertxRespositoryTest {
 
     protected JsonHelper jsonHelper;
 
-    protected Supplier<NetworkType> networkType = () -> NetworkType.MIJIN_TEST;
+    protected final NetworkType networkType = NetworkType.MIJIN_TEST;
+
+    protected final Observable<NetworkType> networkTypeObservable = Observable.just(networkType);
 
     @BeforeEach
     public void setUp() {

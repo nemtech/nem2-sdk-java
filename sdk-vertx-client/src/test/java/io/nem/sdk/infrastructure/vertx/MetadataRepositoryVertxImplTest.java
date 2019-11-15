@@ -46,7 +46,7 @@ public class MetadataRepositoryVertxImplTest extends AbstractVertxRespositoryTes
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new MetadataRepositoryVertxImpl(apiClientMock, networkType);
+        repository = new MetadataRepositoryVertxImpl(apiClientMock);
     }
 
     @Test

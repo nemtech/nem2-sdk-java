@@ -43,9 +43,13 @@ public class MosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imp
 
     private final MosaicRoutesApi client;
 
-    public MosaicRepositoryOkHttpImpl(ApiClient apiClient) {
+    private final Observable<NetworkType> networkTypeObservable;
+
+    public MosaicRepositoryOkHttpImpl(ApiClient apiClient,
+        Observable<NetworkType> networkTypeObservable) {
         super(apiClient);
-        client = new MosaicRoutesApi(apiClient);
+        this.client = new MosaicRoutesApi(apiClient);
+        this.networkTypeObservable = networkTypeObservable;
     }
 
     public MosaicRoutesApi getClient() {
@@ -56,7 +60,8 @@ public class MosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imp
     @Override
     public Observable<MosaicInfo> getMosaic(MosaicId mosaicId) {
         Callable<MosaicInfoDTO> callback = () -> getClient().getMosaic(mosaicId.getIdAsHex());
-        return exceptionHandling(call(callback).map(this::createMosaicInfo));
+        return exceptionHandling(networkTypeObservable.flatMap(networkType -> call(callback).map(
+            mosaicInfoDTO -> createMosaicInfo(mosaicInfoDTO, networkType))));
     }
 
     @Override
@@ -67,14 +72,16 @@ public class MosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imp
             .collect(Collectors.toList()));
         Callable<List<MosaicInfoDTO>> callback = () -> getClient()
             .getMosaics(mosaicIds);
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::createMosaicInfo).toList()
-                .toObservable());
+        return exceptionHandling(networkTypeObservable.flatMap(networkType ->
+            call(callback).flatMapIterable(item -> item).map(
+                mosaicInfoDTO -> createMosaicInfo(mosaicInfoDTO, networkType)).toList()
+                .toObservable()));
     }
 
 
-    private MosaicInfo createMosaicInfo(MosaicInfoDTO mosaicInfoDTO) {
-        NetworkType networkType = getNetworkTypeBlocking();
+    private MosaicInfo createMosaicInfo(MosaicInfoDTO mosaicInfoDTO,
+        NetworkType networkType) {
+
         return MosaicInfo.create(
             MapperUtils.toMosaicId(mosaicInfoDTO.getMosaic().getId()),
             mosaicInfoDTO.getMosaic().getSupply(),

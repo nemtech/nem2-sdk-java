@@ -16,6 +16,8 @@
 
 package io.nem.sdk.api;
 
+import io.nem.sdk.model.blockchain.NetworkType;
+import io.reactivex.Observable;
 import java.io.Closeable;
 
 /**
@@ -25,6 +27,18 @@ import java.io.Closeable;
  * @author Fernando Boucquez
  */
 public interface RepositoryFactory extends Closeable {
+
+    /**
+     * @return the network type of the network. This method is cached, the server is only called the
+     * first time.
+     */
+    Observable<NetworkType> getNetworkType();
+
+    /**
+     * @return the generation hash used to sign transactions. Value retrieved from the block/1
+     * endpoint. This method is cached, the server is only called the first time.
+     */
+    Observable<String> getGenerationHash();
 
     /**
      * @return a newly created {@link AccountRepository}

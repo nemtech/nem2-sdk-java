@@ -43,10 +43,7 @@ public class NetworkRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
     private final NodeRoutesApi nodeRoutesApi;
 
     public NetworkRepositoryVertxImpl(ApiClient apiClient) {
-        super(apiClient, () -> {
-            throw new IllegalStateException(
-                "This service is in charge of loading the network type");
-        });
+        super(apiClient);
         networkRoutesApi = new NetworkRoutesApiImpl(apiClient);
         nodeRoutesApi = new NodeRoutesApiImpl(apiClient);
     }

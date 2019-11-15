@@ -40,7 +40,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new MosaicRepositoryVertxImpl(apiClientMock, networkType);
+        repository = new MosaicRepositoryVertxImpl(apiClientMock, networkTypeObservable);
     }
 
 

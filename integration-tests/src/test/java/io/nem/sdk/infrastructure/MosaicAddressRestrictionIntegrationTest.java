@@ -64,7 +64,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
                 restrictionKey,
                 BigInteger.valueOf(20),
                 MosaicRestrictionType.GE
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         announceAndValidate(
             type, testAccount, mosaicGlobalRestrictionTransaction);
@@ -81,7 +81,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
                 restrictionKey,
                 targetAddressAlias,
                 originalRestrictionValue
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         //4)Announce and validate
         assertTransaction(createTransaction, announceAggregateAndValidate(
@@ -110,7 +110,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
                 restrictionKey,
                 targetAddress,
                 BigInteger.valueOf(40)
-            ).previousRestrictionValue(originalRestrictionValue).build();
+            ).previousRestrictionValue(originalRestrictionValue).maxFee(this.maxFee).build();
 
         //7) Announce and validate.
         assertTransaction(updateTransaction, announceAggregateAndValidate(
@@ -181,7 +181,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
                 nonce,
                 mosaicId,
                 MosaicFlags.create(true, true, true),
-                4, new BlockDuration(100)).build();
+                4, new BlockDuration(100)).maxFee(this.maxFee).build();
 
         MosaicDefinitionTransaction validateTransaction = announceAndValidate(type,
             testAccount, mosaicDefinitionTransaction);

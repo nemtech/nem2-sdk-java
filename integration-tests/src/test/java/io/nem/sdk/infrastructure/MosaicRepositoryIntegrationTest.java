@@ -106,7 +106,7 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
                 nonce,
                 mosaicId,
                 MosaicFlags.create(true, true, true),
-                4, new BlockDuration(100)).build();
+                4, new BlockDuration(100)).maxFee(this.maxFee).build();
 
         MosaicDefinitionTransaction validateTransaction = announceAndValidate(type,
             testAccount, mosaicDefinitionTransaction);

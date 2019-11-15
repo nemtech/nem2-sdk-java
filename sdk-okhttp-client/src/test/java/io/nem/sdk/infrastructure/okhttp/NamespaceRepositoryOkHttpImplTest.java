@@ -57,13 +57,12 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new NamespaceRepositoryOkHttpImpl(apiClientMock);
+        repository = new NamespaceRepositoryOkHttpImpl(apiClientMock, networkTypeObservable);
     }
 
 
     @Test
     public void shouldGetNamespace() throws Exception {
-        resolveNetworkType();
 
         NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
 
@@ -109,8 +108,6 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
     @Test
     public void shouldGetNamespacesFromAccount() throws Exception {
 
-        resolveNetworkType();
-
         Address address = MapperUtils
             .toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
 
@@ -155,8 +152,6 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
     @Test
     public void shouldGetNamespacesFromAccounts() throws Exception {
-
-        resolveNetworkType();
 
         Address address =
             Address.createFromRawAddress(
@@ -204,7 +199,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
     @Test
     public void shouldGetNamespaceNames() throws Exception {
-        resolveNetworkType();
+
         NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
         NamespaceNameDTO dto1 = new NamespaceNameDTO();
         dto1.setName("someName1");
@@ -240,8 +235,6 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
             Address.createFromRawAddress(
                 "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
 
-        resolveNetworkType();
-
         NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
@@ -275,7 +268,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
     @Test
     public void shouldGetLinkedMosaicId() throws Exception {
-        resolveNetworkType();
+
         NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
         NamespaceMetaDTO meta = new NamespaceMetaDTO();

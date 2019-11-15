@@ -40,15 +40,11 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new MosaicRepositoryOkHttpImpl(apiClientMock);
+        repository = new MosaicRepositoryOkHttpImpl(apiClientMock, networkTypeObservable);
     }
-
-
-
 
     @Test
     public void shouldGetMosaics() throws Exception {
-        resolveNetworkType();
         MosaicId mosaicId = MapperUtils.toMosaicId("481110499AAA");
 
         MosaicDTO mosaicDto = new MosaicDTO();
@@ -87,7 +83,6 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
     @Test
     public void shouldGetMosaic() throws Exception {
 
-        resolveNetworkType();
         MosaicId mosaicId = MapperUtils.toMosaicId("481110499AAA");
 
         MosaicDTO mosiacMetaDto = new MosaicDTO();

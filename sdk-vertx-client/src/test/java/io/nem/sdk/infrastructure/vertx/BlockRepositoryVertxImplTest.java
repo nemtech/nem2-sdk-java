@@ -46,7 +46,7 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new BlockRepositoryVertxImpl(apiClientMock, networkType);
+        repository = new BlockRepositoryVertxImpl(apiClientMock);
     }
 
     @Test

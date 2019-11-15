@@ -55,7 +55,7 @@ class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
         AccountMetadataTransaction originalTransaction = get(service
             .createAccountMetadataTransactionFactory(getNetworkType(),
                 targetAccount.getPublicAccount(), key, originalMessage,
-                signerAccount.getPublicAccount().getPublicKey())).build();
+                signerAccount.getPublicAccount().getPublicKey())).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, originalTransaction, signerAccount);
 
@@ -66,7 +66,7 @@ class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
         AccountMetadataTransaction updateTransaction = get(service
             .createAccountMetadataTransactionFactory(getNetworkType(),
                 targetAccount.getPublicAccount(), key, newMessage,
-                signerAccount.getPublicAccount().getPublicKey())).build();
+                signerAccount.getPublicAccount().getPublicKey())).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, updateTransaction, signerAccount);
 

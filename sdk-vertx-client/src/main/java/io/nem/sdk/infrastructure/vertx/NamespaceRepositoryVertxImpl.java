@@ -58,7 +58,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -71,20 +70,26 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
 
     private final NamespaceRoutesApi client;
 
-    public NamespaceRepositoryVertxImpl(ApiClient apiClient, Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
-        client = new NamespaceRoutesApiImpl(apiClient);
+    private final Observable<NetworkType> networkTypeObservable;
+
+    public NamespaceRepositoryVertxImpl(ApiClient apiClient,
+        Observable<NetworkType> networkTypeObservable) {
+        super(apiClient);
+        this.client = new NamespaceRoutesApiImpl(apiClient);
+        this.networkTypeObservable = networkTypeObservable;
     }
 
     public NamespaceRoutesApi getClient() {
         return client;
     }
 
+
     @Override
     public Observable<NamespaceInfo> getNamespace(NamespaceId namespaceId) {
         Consumer<Handler<AsyncResult<NamespaceInfoDTO>>> callback = handler -> getClient()
             .getNamespace(namespaceId.getIdAsHex(), handler);
-        return exceptionHandling(call(callback).map(this::toNamespaceInfo));
+        return exceptionHandling(networkTypeObservable.flatMap(networkType -> call(callback).map(
+            namespaceInfoDTO -> toNamespaceInfo(namespaceInfoDTO, networkType))));
     }
 
     @Override
@@ -107,10 +112,10 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
                 getId(queryParams),
                 handler);
 
-        return exceptionHandling(
+        return exceptionHandling(networkTypeObservable.flatMap(networkType ->
             call(callback).flatMapIterable(NamespacesInfoDTO::getNamespaces)
-                .map(this::toNamespaceInfo).toList()
-                .toObservable());
+                .map(namespaceInfoDTO -> toNamespaceInfo(namespaceInfoDTO, networkType)).toList()
+                .toObservable()));
     }
 
 
@@ -135,11 +140,11 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
         Consumer<Handler<AsyncResult<NamespacesInfoDTO>>> callback = handler -> client
             .getNamespacesFromAccounts(accounts, handler);
 
-        return exceptionHandling(
+        return exceptionHandling(networkTypeObservable.flatMap(networkType ->
             call(callback).flatMapIterable(NamespacesInfoDTO::getNamespaces)
-                .map(this::toNamespaceInfo)
+                .map(namespaceInfoDTO -> toNamespaceInfo(namespaceInfoDTO, networkType))
                 .toList()
-                .toObservable());
+                .toObservable()));
     }
 
 
@@ -225,12 +230,11 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
     /**
      * Create a NamespaceInfo from a NamespaceInfoDTO and a NetworkType
      *
-     * @param namespaceInfoDTO, networkType
-     * @internal
-     * @access private
+     * @param namespaceInfoDTO namespaceInfo
+     * @param networkType the resolved networkType
      */
     private NamespaceInfo toNamespaceInfo(
-        NamespaceInfoDTO namespaceInfoDTO) {
+        NamespaceInfoDTO namespaceInfoDTO, NetworkType networkType) {
         return new NamespaceInfo(
             namespaceInfoDTO.getMeta().getActive(),
             namespaceInfoDTO.getMeta().getIndex(),
@@ -241,7 +245,7 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
             this.extractLevels(namespaceInfoDTO),
             toNamespaceId(namespaceInfoDTO.getNamespace().getParentId()),
             new PublicAccount(namespaceInfoDTO.getNamespace().getOwnerPublicKey(),
-                getNetworkTypeBlocking()),
+                networkType),
             namespaceInfoDTO.getNamespace().getStartHeight(),
             namespaceInfoDTO.getNamespace().getEndHeight(),
             this.extractAlias(namespaceInfoDTO.getNamespace()));
@@ -249,9 +253,6 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
 
     /**
      * Create a MosaicId from a NamespaceDTO
-     *
-     * @internal
-     * @access private
      */
     private MosaicId toMosaicId(NamespaceDTO namespaceDTO) {
         MosaicId mosaicId = null;

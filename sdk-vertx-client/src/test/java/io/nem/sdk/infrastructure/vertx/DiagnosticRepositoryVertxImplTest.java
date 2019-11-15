@@ -38,7 +38,7 @@ public class DiagnosticRepositoryVertxImplTest extends AbstractVertxRespositoryT
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new DiagnosticRepositoryVertxImpl(apiClientMock, networkType);
+        repository = new DiagnosticRepositoryVertxImpl(apiClientMock);
     }
 
     @Test

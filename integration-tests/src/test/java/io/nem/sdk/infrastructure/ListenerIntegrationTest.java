@@ -239,7 +239,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
                 this.getRecipient(),
                 Collections.emptyList(),
                 PlainMessage.create("test-message")
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         SignedTransaction signedTransaction = this.account
             .sign(transferTransaction, getGenerationHash());
@@ -260,7 +260,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
                 Collections.singletonList(
                     NetworkCurrencyMosaic.createRelative(new BigInteger("100000000000"))),
                 PlainMessage.create("test-message")
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         SignedTransaction signedTransaction = this.account
             .sign(transferTransaction, getGenerationHash());
@@ -274,14 +274,14 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
                 new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST),
                 Collections.emptyList(),
                 PlainMessage.create("test-message")
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         AggregateTransaction aggregateTransaction =
             AggregateTransactionFactory.createComplete(
                 NetworkType.MIJIN_TEST,
                 Collections.singletonList(
                     transferTransaction.toAggregate(this.multisigAccount.getPublicAccount())))
-                .build();
+                .maxFee(this.maxFee).build();
 
         SignedTransaction signedTransaction =
             this.cosignatoryAccount.sign(aggregateTransaction, getGenerationHash());

@@ -34,28 +34,29 @@ import io.vertx.core.Handler;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class MultisigRepositoryVertxImpl  extends AbstractRepositoryVertxImpl implements MultisigRepository {
+public class MultisigRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements
+    MultisigRepository {
 
     private final MultisigRoutesApi client;
 
+    private final Observable<NetworkType> networkTypeObservable;
 
     public MultisigRepositoryVertxImpl(ApiClient apiClient,
-        Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
+        Observable<NetworkType> networkTypeObservable) {
+        super(apiClient);
         this.client = new MultisigRoutesApiImpl(apiClient);
+        this.networkTypeObservable = networkTypeObservable;
     }
-
 
     @Override
     public Observable<MultisigAccountInfo> getMultisigAccountInfo(Address address) {
-        return exceptionHandling(call(
+        return exceptionHandling(networkTypeObservable.flatMap(networkType -> call(
             (Handler<AsyncResult<MultisigAccountInfoDTO>> handler) -> getClient()
                 .getAccountMultisig(address.plain(), handler))
             .map(MultisigAccountInfoDTO::getMultisig)
-            .map(this::toMultisigAccountInfo));
+            .map(dto -> toMultisigAccountInfo(dto, networkType))));
 
     }
 
@@ -63,7 +64,7 @@ public class MultisigRepositoryVertxImpl  extends AbstractRepositoryVertxImpl im
     @Override
     public Observable<MultisigAccountGraphInfo> getMultisigAccountGraphInfo(Address address) {
 
-        return exceptionHandling(call(
+        return exceptionHandling(networkTypeObservable.flatMap(networkType -> call(
             (Handler<AsyncResult<List<MultisigAccountGraphInfoDTO>>> handler) -> getClient()
                 .getAccountMultisigGraph(address.plain(), handler))
             .map(
@@ -74,22 +75,22 @@ public class MultisigRepositoryVertxImpl  extends AbstractRepositoryVertxImpl im
                         item ->
                             multisigAccountInfoMap.put(
                                 item.getLevel(),
-                                toMultisigAccountInfo(item)));
+                                toMultisigAccountInfo(item, networkType)));
                     return new MultisigAccountGraphInfo(multisigAccountInfoMap);
-                }));
+                })));
     }
 
 
-    private List<MultisigAccountInfo> toMultisigAccountInfo(MultisigAccountGraphInfoDTO item) {
+    private List<MultisigAccountInfo> toMultisigAccountInfo(MultisigAccountGraphInfoDTO item,
+        NetworkType networkType) {
         return item.getMultisigEntries().stream()
             .map(MultisigAccountInfoDTO::getMultisig)
-            .map(this::toMultisigAccountInfo)
+            .map(dto -> toMultisigAccountInfo(dto, networkType))
             .collect(Collectors.toList());
     }
 
 
-    private MultisigAccountInfo toMultisigAccountInfo(MultisigDTO dto) {
-        NetworkType networkType = getNetworkTypeBlocking();
+    private MultisigAccountInfo toMultisigAccountInfo(MultisigDTO dto, NetworkType networkType) {
         return new MultisigAccountInfo(
             new PublicAccount(dto.getAccountPublicKey(), networkType),
             dto.getMinApproval(),

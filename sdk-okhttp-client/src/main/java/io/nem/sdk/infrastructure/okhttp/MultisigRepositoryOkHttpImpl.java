@@ -38,23 +38,27 @@ public class MultisigRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl i
 
     private final MultisigRoutesApi client;
 
-    public MultisigRepositoryOkHttpImpl(ApiClient apiClient) {
+    private final Observable<NetworkType> networkTypeObservable;
+
+    public MultisigRepositoryOkHttpImpl(ApiClient apiClient,
+        Observable<NetworkType> networkTypeObservable) {
         super(apiClient);
         this.client = new MultisigRoutesApi(apiClient);
+        this.networkTypeObservable = networkTypeObservable;
     }
 
     @Override
     public Observable<MultisigAccountInfo> getMultisigAccountInfo(Address address) {
-        return exceptionHandling(call(
+        return exceptionHandling(networkTypeObservable.flatMap(networkType -> call(
             () -> getClient().getAccountMultisig(address.plain()))
             .map(MultisigAccountInfoDTO::getMultisig)
-            .map(this::toMultisigAccountInfo));
+            .map(dto -> toMultisigAccountInfo(dto, networkType))));
 
     }
 
     @Override
     public Observable<MultisigAccountGraphInfo> getMultisigAccountGraphInfo(Address address) {
-        return exceptionHandling(call(
+        return exceptionHandling(networkTypeObservable.flatMap(networkType -> call(
             () -> getClient().getAccountMultisigGraph(address.plain()))
             .map(multisigAccountGraphInfoDTOList -> {
                 Map<Integer, List<MultisigAccountInfo>> multisigAccountInfoMap = new HashMap<>();
@@ -62,21 +66,22 @@ public class MultisigRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl i
                     item ->
                         multisigAccountInfoMap.put(
                             item.getLevel(),
-                            toMultisigAccountInfo(item)));
+                            toMultisigAccountInfo(item, networkType)));
                 return new MultisigAccountGraphInfo(multisigAccountInfoMap);
-            }));
+            })));
     }
 
-    private List<MultisigAccountInfo> toMultisigAccountInfo(MultisigAccountGraphInfoDTO item) {
+    private List<MultisigAccountInfo> toMultisigAccountInfo(MultisigAccountGraphInfoDTO item,
+        NetworkType networkType) {
         return item.getMultisigEntries().stream()
             .map(MultisigAccountInfoDTO::getMultisig)
-            .map(this::toMultisigAccountInfo)
+            .map(dto -> toMultisigAccountInfo(dto, networkType))
             .collect(Collectors.toList());
     }
 
 
-    private MultisigAccountInfo toMultisigAccountInfo(MultisigDTO dto) {
-        NetworkType networkType = getNetworkTypeBlocking();
+    private MultisigAccountInfo toMultisigAccountInfo(MultisigDTO dto,
+        NetworkType networkType) {
         return new MultisigAccountInfo(
             new PublicAccount(
                 dto.getAccountPublicKey(), networkType),

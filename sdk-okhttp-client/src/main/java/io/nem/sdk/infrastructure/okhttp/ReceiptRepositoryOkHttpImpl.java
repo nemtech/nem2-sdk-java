@@ -19,6 +19,7 @@ package io.nem.sdk.infrastructure.okhttp;
 import io.nem.sdk.api.ReceiptRepository;
 import io.nem.sdk.model.blockchain.MerkelPathItem;
 import io.nem.sdk.model.blockchain.MerkelProofInfo;
+import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.receipt.Statement;
 import io.nem.sdk.openapi.okhttp_gson.api.ReceiptRoutesApi;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
@@ -39,18 +40,23 @@ public class ReceiptRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
 
     private final ReceiptRoutesApi client;
 
-    public ReceiptRepositoryOkHttpImpl(ApiClient apiClient) {
+    private final Observable<NetworkType> networkTypeObservable;
+
+    public ReceiptRepositoryOkHttpImpl(ApiClient apiClient,
+        Observable<NetworkType> networkTypeObservable) {
         super(apiClient);
         this.client = new ReceiptRoutesApi(apiClient);
+        this.networkTypeObservable = networkTypeObservable;
     }
 
     @Override
     public Observable<Statement> getBlockReceipts(BigInteger height) {
         Callable<StatementsDTO> callback = () ->
             getClient().getBlockReceipts(height);
-        return exceptionHandling(call(callback).map(statementsDTO ->
-            new ReceiptMappingOkHttp(getJsonHelper())
-                .createStatementFromDto(statementsDTO, getNetworkTypeBlocking())));
+        return exceptionHandling(
+            networkTypeObservable.flatMap(networkType -> call(callback).map(statementsDTO ->
+                new ReceiptMappingOkHttp(getJsonHelper())
+                    .createStatementFromDto(statementsDTO, networkType))));
     }
 
 
@@ -71,7 +77,6 @@ public class ReceiptRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
                 .collect(Collectors.toList());
         return new MerkelProofInfo(pathItems);
     }
-
 
     public ReceiptRoutesApi getClient() {
         return client;

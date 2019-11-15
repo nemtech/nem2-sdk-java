@@ -16,6 +16,8 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
+import io.nem.catapult.builders.GeneratorUtils;
+import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.api.RepositoryFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -51,6 +53,33 @@ public class RepositoryFactoryOkHttpImplTest {
         factory.close();
         factory.close();
         factory.close();
+    }
+
+    @Test
+    public void getNetworkTypeFailWhenInvalidServer() {
+        String baseUrl = "https://localhost:1934/path";
+
+        RepositoryCallException e = Assertions.assertThrows(RepositoryCallException.class,
+            () -> GeneratorUtils.propagate(
+                () -> new RepositoryFactoryOkHttpImpl(baseUrl).getNetworkType().toFuture().get()));
+
+        Assertions.assertEquals(
+            "ApiException: java.net.ConnectException: Failed to connect to localhost/127.0.0.1:1934 - 0",
+            e.getMessage());
+    }
+
+
+    @Test
+    public void getGenerationHashFailWhenInvalidServer() {
+        String baseUrl = "https://localhost:1934/path";
+
+        RepositoryCallException e = Assertions.assertThrows(RepositoryCallException.class,
+            () -> GeneratorUtils.propagate(
+                () -> new RepositoryFactoryOkHttpImpl(baseUrl).getGenerationHash().toFuture().get()));
+
+        Assertions.assertEquals(
+            "ApiException: java.net.ConnectException: Failed to connect to localhost/127.0.0.1:1934 - 0",
+            e.getMessage());
     }
 
 }

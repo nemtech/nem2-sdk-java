@@ -19,7 +19,6 @@ package io.nem.sdk.infrastructure.vertx;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.api.RestrictionMosaicRepository;
 import io.nem.sdk.model.account.Address;
-import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.restriction.MosaicAddressRestriction;
 import io.nem.sdk.model.restriction.MosaicGlobalRestriction;
@@ -42,7 +41,6 @@ import io.vertx.core.Handler;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class RestrictionMosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements
@@ -50,9 +48,8 @@ public class RestrictionMosaicRepositoryVertxImpl extends AbstractRepositoryVert
 
     private final RestrictionMosaicRoutesApi client;
 
-    public RestrictionMosaicRepositoryVertxImpl(ApiClient apiClient,
-        Supplier<NetworkType> networkType) {
-        super(apiClient, networkType);
+    public RestrictionMosaicRepositoryVertxImpl(ApiClient apiClient) {
+        super(apiClient);
         this.client = new RestrictionMosaicRoutesApiImpl(apiClient);
     }
 

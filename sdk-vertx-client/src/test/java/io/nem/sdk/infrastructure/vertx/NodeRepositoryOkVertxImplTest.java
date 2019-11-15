@@ -41,7 +41,7 @@ public class NodeRepositoryOkVertxImplTest extends AbstractVertxRespositoryTest 
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new NodeRepositoryVertxImpl(apiClientMock, networkType);
+        repository = new NodeRepositoryVertxImpl(apiClientMock);
     }
 
     @Test

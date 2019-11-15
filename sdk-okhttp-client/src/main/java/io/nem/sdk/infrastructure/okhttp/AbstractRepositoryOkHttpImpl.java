@@ -16,10 +16,8 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
-import io.nem.core.utils.Suppliers;
 import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.api.RepositoryCallException;
-import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiException;
@@ -30,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -42,13 +39,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  */
 public abstract class AbstractRepositoryOkHttpImpl {
 
-    private final Supplier<Observable<NetworkType>> networkTypeObservable;
 
     private final JsonHelper jsonHelper;
 
     public AbstractRepositoryOkHttpImpl(ApiClient apiClient) {
-        networkTypeObservable = Suppliers
-            .memoize(() -> new NetworkRepositoryOkHttpImpl(apiClient).getNetworkType().cache());
         jsonHelper = new JsonHelperGson(apiClient.getJSON().getGson());
 
     }
@@ -72,7 +66,7 @@ public abstract class AbstractRepositoryOkHttpImpl {
             extractStatusCodeFromException(e), e);
     }
 
-    protected int extractStatusCodeFromException(Throwable e) {
+    public static int extractStatusCodeFromException(Throwable e) {
         return (e instanceof ApiException) ? ((ApiException) e).getCode() : 0;
     }
 
@@ -100,10 +94,6 @@ public abstract class AbstractRepositoryOkHttpImpl {
         return Observable.error(exceptionHandling(e));
     }
 
-
-    protected NetworkType getNetworkTypeBlocking() {
-        return networkTypeObservable.get().blockingFirst();
-    }
 
     public <T> Observable<T> exceptionHandling(Observable<T> observable) {
         Function<? super Throwable, ? extends ObservableSource<? extends T>> resumeFunction = this::onError;

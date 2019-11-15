@@ -63,7 +63,7 @@ class NamespaceIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
         NamespaceMetadataTransaction originalTransaction = get(service
             .createNamespaceMetadataTransactionFactory(getNetworkType(),
                 targetAccount.getPublicAccount(), key, originalMessage,
-                signerAccount.getPublicAccount().getPublicKey(), targetNamespaceId)).build();
+                signerAccount.getPublicAccount().getPublicKey(), targetNamespaceId)).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, originalTransaction, signerAccount);
 
@@ -74,7 +74,7 @@ class NamespaceIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
         NamespaceMetadataTransaction updateTransaction = get(service
             .createNamespaceMetadataTransactionFactory(getNetworkType(),
                 targetAccount.getPublicAccount(), key, newMessage,
-                signerAccount.getPublicAccount().getPublicKey(), targetNamespaceId)).build();
+                signerAccount.getPublicAccount().getPublicKey(), targetNamespaceId)).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, updateTransaction, signerAccount);
 

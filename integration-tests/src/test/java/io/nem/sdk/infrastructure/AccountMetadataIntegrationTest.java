@@ -55,12 +55,12 @@ public class AccountMetadataIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(), testAccount.getPublicAccount(),
                 key,
                 message
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         AggregateTransaction aggregateTransaction = AggregateTransactionFactory
             .createComplete(getNetworkType(),
                 Collections.singletonList(transaction.toAggregate(testAccount.getPublicAccount())))
-            .build();
+            .maxFee(this.maxFee).build();
 
         AggregateTransaction announceCorrectly = announceAndValidate(type,
             testAccount, aggregateTransaction);

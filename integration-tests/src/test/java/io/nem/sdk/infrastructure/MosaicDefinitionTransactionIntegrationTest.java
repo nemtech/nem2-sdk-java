@@ -63,7 +63,7 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
                 nonce,
                 mosaicId,
                 MosaicFlags.create(true, true, true),
-                4, new BlockDuration(100)).build();
+                4, new BlockDuration(100)).maxFee(this.maxFee).build();
 
         MosaicDefinitionTransaction processed = announceAndValidate(type,
             this.account, mosaicDefinitionTransaction);
@@ -84,7 +84,7 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
                 nonce,
                 mosaicId,
                 MosaicFlags.create(true, false, true),
-                4, new BlockDuration(100)).build();
+                4, new BlockDuration(100)).maxFee(this.maxFee).build();
 
         MosaicDefinitionTransaction processed = announceAggregateAndValidate(
             type, mosaicDefinitionTransaction, this.account);
@@ -102,7 +102,7 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
                 mosaicId,
                 MosaicSupplyChangeActionType.INCREASE,
                 BigInteger.valueOf(11)
-            ).build();
+            ).maxFee(this.maxFee).build();
 
         announceAndValidate(type, account, mosaicSupplyChangeTransaction);
     }
@@ -118,7 +118,7 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
                 getNetworkType(),
                 mosaicId,
                 MosaicSupplyChangeActionType.INCREASE,
-                BigInteger.valueOf(12)).build();
+                BigInteger.valueOf(12)).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, mosaicSupplyChangeTransaction, account);
 
