@@ -1,4 +1,3 @@
-io.nem.catapult.builders
 io.nem.core.crypto
 io.nem.core.crypto.ed25519
 io.nem.core.crypto.ed25519.arithmetic
