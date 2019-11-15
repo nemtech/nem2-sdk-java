@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.sdk.model.namespace.NamespaceId;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +24,15 @@ class NetworkCurrencyMosaicTest {
         NetworkCurrencyMosaic currency = NetworkCurrencyMosaic
             .createRelative(BigInteger.valueOf(1000));
         assertEquals(BigInteger.valueOf(1000 * 1000000), currency.getAmount());
+        assertEquals(NetworkCurrencyMosaic.NAMESPACEID, currency.getId());
+        assertEquals("85bbea6cc462b244", currency.getIdAsHex());
+    }
+
+    @Test
+    void shouldCreateRelativeNetworkCurrencyMosaicUsingBigDecimal() {
+        NetworkCurrencyMosaic currency = NetworkCurrencyMosaic
+            .createRelative(BigDecimal.valueOf(0.000001));
+        assertEquals(BigInteger.valueOf((long) (0.000001 * 1000000)), currency.getAmount());
         assertEquals(NetworkCurrencyMosaic.NAMESPACEID, currency.getId());
         assertEquals("85bbea6cc462b244", currency.getIdAsHex());
     }
