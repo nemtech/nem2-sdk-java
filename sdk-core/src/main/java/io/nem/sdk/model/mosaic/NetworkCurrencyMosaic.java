@@ -58,6 +58,21 @@ public class NetworkCurrencyMosaic extends Mosaic {
     }
 
     /**
+     * Create xem with using xem as unit.
+     *
+     * @param amount amount to send
+     * @return a NetworkCurrencyMosaic instance
+     */
+    public static NetworkCurrencyMosaic createRelative(BigDecimal amount) {
+
+        BigInteger relativeAmount =
+            BigDecimal.valueOf(Math.pow(10, NetworkCurrencyMosaic.DIVISIBILITY))
+                .multiply(amount)
+                .toBigInteger();
+        return new NetworkCurrencyMosaic(relativeAmount);
+    }
+
+    /**
      * Create xem with using micro xem as unit, 1 NetworkCurrencyMosaic = 1000000 micro
      * NetworkCurrencyMosaic.
      *
