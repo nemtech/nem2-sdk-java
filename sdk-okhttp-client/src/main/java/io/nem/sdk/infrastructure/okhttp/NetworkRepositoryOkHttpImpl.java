@@ -45,7 +45,7 @@ public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
     @Override
     public Observable<NetworkType> getNetworkType() {
         return exceptionHandling(
-            call(nodeRoutesApi::getNodeInfo)
+            call(getNodeRoutesApi()::getNodeInfo)
                 .map(info -> NetworkType.rawValueOf(info.getNetworkIdentifier())));
     }
 
@@ -58,5 +58,9 @@ public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
 
     public NetworkRoutesApi getNetworkRoutesApi() {
         return networkRoutesApi;
+    }
+    
+    public NodeRoutesApi getNodeRoutesApi() {
+        return nodeRoutesApi;
     }
 }
