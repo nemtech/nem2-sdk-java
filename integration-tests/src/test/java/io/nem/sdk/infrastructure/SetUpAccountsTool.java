@@ -171,7 +171,7 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
             TransferTransactionFactory.create(
                 getNetworkType(),
                 recipient.getAddress(),
-                Collections.singletonList(NetworkCurrencyMosaic.createAbsolute(amount)),
+                Collections.singletonList(NetworkCurrencyMosaic.createAbsolute(amount, getNetworkType())),
                 new PlainMessage("E2ETest:SetUpAccountsTool")
             );
 
@@ -208,7 +208,7 @@ public class SetUpAccountsTool extends BaseIntegrationTest {
         SignedTransaction signedTransaction) {
         HashLockTransaction hashLockTransaction = HashLockTransactionFactory.create(
             getNetworkType(),
-            NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+            NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), getNetworkType()),
             BigInteger.valueOf(100),
             signedTransaction)
             .maxFee(this.maxFee).build();

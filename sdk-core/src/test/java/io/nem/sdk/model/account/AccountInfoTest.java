@@ -29,10 +29,13 @@ import org.junit.jupiter.api.Test;
 
 class AccountInfoTest {
 
+    private NetworkType networkType = NetworkType.MIJIN_TEST;
+
     @Test
     void shouldCreateAccountInfoViaConstructor() {
         List<Mosaic> mosaics =
-            Arrays.asList(NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)));
+            Arrays
+                .asList(NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), networkType));
         AccountInfo accountInfo =
             new AccountInfo(
                 Address.createFromRawAddress("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR26"),
@@ -54,10 +57,8 @@ class AccountInfoTest {
         assertEquals(new BigInteger("777"), accountInfo.getImportances().get(0).getValue());
         assertEquals(new BigInteger("0"), accountInfo.getImportances().get(0).getHeight());
         assertEquals(mosaics, accountInfo.getMosaics());
-        assertEquals(
-            PublicAccount.createFromPublicKey(
-                "cf893ffcc47c33e7f68ab1db56365c156b0736824a0c1e273f9e00b8df8f01eb",
-                NetworkType.MIJIN_TEST),
+        assertEquals(PublicAccount.createFromPublicKey(
+            "cf893ffcc47c33e7f68ab1db56365c156b0736824a0c1e273f9e00b8df8f01eb", networkType),
             accountInfo.getPublicAccount());
 
         Assertions.assertEquals(AccountType.REMOTE_UNLINKED,

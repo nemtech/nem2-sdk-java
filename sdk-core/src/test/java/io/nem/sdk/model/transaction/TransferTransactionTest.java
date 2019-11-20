@@ -138,7 +138,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
     void serializationNamespaceRecipient() {
         String expected =
             "c4000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001905441000000000000000001000000000000009151776168d24257d80000000000000000000000000000000001140000000000672b0000ce560000640000000000000000536f6d65204d65737361676520e6bca2e5ad97";
-        NamespaceId recipient = NamespaceId.createFromName("nem.owner");
+        NamespaceId recipient = NamespaceId.createFromName("nem.owner", networkType);
 
         Assertions.assertEquals("d85742d268617751",
             recipient.getIdAsHex());
@@ -212,13 +212,14 @@ class TransferTransactionTest extends AbstractTransactionTester {
 
     @Test
     void serializeNamespaceTransaction() {
-        NamespaceId namespaceId = NamespaceId.createFromName("testaccount2");
+        NamespaceId namespaceId = NamespaceId.createFromName("testaccount2", networkType);
         Assertions.assertEquals("e7ca7e22727ddd88", namespaceId.getIdAsHex());
         TransferTransaction transaction =
             TransferTransactionFactory.create(
                 networkType,
                 namespaceId,
-                Collections.singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.ONE)),
+                Collections.singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.ONE,
+                    networkType)),
                 PlainMessage.create("test-message")).deadline(new Deadline(BigInteger.ONE)).build();
 
         byte[] payload = transaction.serialize();

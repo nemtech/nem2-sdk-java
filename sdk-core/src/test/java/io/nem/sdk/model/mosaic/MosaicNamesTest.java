@@ -18,6 +18,7 @@ package io.nem.sdk.model.mosaic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.namespace.NamespaceName;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -26,11 +27,14 @@ import org.junit.jupiter.api.Test;
 
 class MosaicNamesTest {
 
+    private NetworkType networkType = NetworkType.MIJIN_TEST;
+
     @Test
     void createMosaicNames() {
         MosaicId mosaicId = new MosaicId(new BigInteger("-3087871471161192663"));
         List<NamespaceName> namespaceNames = Arrays
-            .asList(new NamespaceName("xem"), new NamespaceName("anotheralias"));
+            .asList(new NamespaceName("xem", networkType),
+                new NamespaceName("anotheralias", networkType));
         MosaicNames names = new MosaicNames(mosaicId, namespaceNames);
         assertEquals(mosaicId, names.getMosaicId());
 

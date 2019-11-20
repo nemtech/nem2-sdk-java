@@ -64,7 +64,8 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
             TransferTransactionFactory.create(
                 getNetworkType(), recipient,
                 Collections
-                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1),
+                        getNetworkType())),
                 new PlainMessage(message)
             ).maxFee(this.maxFee).build();
 
@@ -87,19 +88,20 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         String message = "E2ETest:standaloneTransferTransaction:message 漢字";
 
         NetworkType networkType = getNetworkType();
-        KeyPair senderKeyPair = KeyPair.random(networkType.resolveSignSchema());
-        KeyPair recipientKeyPair = KeyPair.random(networkType.resolveSignSchema());
+        KeyPair senderKeyPair = KeyPair.random(getNetworkType().resolveSignSchema());
+        KeyPair recipientKeyPair = KeyPair.random(getNetworkType().resolveSignSchema());
 
         Message encryptedMessage = EncryptedMessage
             .create(message, senderKeyPair.getPrivateKey(), recipientKeyPair.getPublicKey(),
-                networkType);
+                getNetworkType());
 
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 getNetworkType(),
                 recipient,
                 Collections
-                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1),
+                        getNetworkType())),
                 encryptedMessage
             ).maxFee(this.maxFee).build();
 
@@ -149,8 +151,8 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         throws InterruptedException {
 
         NetworkType networkType = getNetworkType();
-        KeyPair senderKeyPair = KeyPair.random(networkType.resolveSignSchema());
-        KeyPair recipientKeyPair = KeyPair.random(networkType.resolveSignSchema());
+        KeyPair senderKeyPair = KeyPair.random(getNetworkType().resolveSignSchema());
+        KeyPair recipientKeyPair = KeyPair.random(getNetworkType().resolveSignSchema());
 
         TransferTransaction transferTransaction =
             TransferTransactionFactory.createPersistentDelegationRequestTransaction(

@@ -42,7 +42,7 @@ class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
 
     @BeforeAll
     void setup() {
-        namespaceId = NetworkCurrencyMosaic.NAMESPACEID;
+        namespaceId = NetworkCurrencyMosaic.NAMESPACE_ID_RESOLVER.apply(getNetworkType());
     }
 
     @ParameterizedTest
@@ -103,7 +103,8 @@ class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
     void throwExceptionWhenNamespaceDoesNotExists(RepositoryType type) {
         RepositoryCallException exception = Assertions
             .assertThrows(RepositoryCallException.class, () -> get(getNamespaceRepository(type)
-                .getNamespace(NamespaceId.createFromName("nonregisterednamespace"))));
+                .getNamespace(
+                    NamespaceId.createFromName("nonregisterednamespace", getNetworkType()))));
         Assertions.assertEquals(
             "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'f75cf605c224a9e7'",
             exception.getMessage());

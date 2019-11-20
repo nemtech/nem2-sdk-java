@@ -47,7 +47,7 @@ public class LockFundsTransactionIntegrationTest extends BaseIntegrationTest {
 
         HashLockTransaction hashLockTransaction =
             HashLockTransactionFactory.create(getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), getNetworkType()),
                 BigInteger.valueOf(100),
                 signedTransaction
             ).maxFee(this.maxFee).build();
@@ -67,7 +67,7 @@ public class LockFundsTransactionIntegrationTest extends BaseIntegrationTest {
         HashLockTransaction hashLockTransaction =
             HashLockTransactionFactory.create(
                 getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), getNetworkType()),
                 BigInteger.valueOf(100),
                 signedTransaction).maxFee(this.maxFee).build();
 

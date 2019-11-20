@@ -73,7 +73,8 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
         BigInteger originalRestrictionValue = BigInteger.valueOf(30);
 
         Address targetAddress = testAccount2.getAddress();
-        NamespaceId targetAddressAlias = NamespaceId.createFromName("testaccount2");
+        NamespaceId targetAddressAlias = NamespaceId
+            .createFromName("testaccount2", getNetworkType());
         MosaicAddressRestrictionTransaction createTransaction =
             MosaicAddressRestrictionTransactionFactory.create(
                 getNetworkType(),

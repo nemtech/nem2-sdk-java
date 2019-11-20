@@ -119,7 +119,7 @@ public class MetadataRepositoryVertxImplTest extends AbstractVertxRespositoryTes
 
     @Test
     public void shouldGetNamespaceMetadata() throws Exception {
-        NamespaceId namespaceId = NamespaceId.createFromName("mynamespace");
+        NamespaceId namespaceId = NamespaceId.createFromName("mynamespace", networkType);
         MetadataEntriesDTO dto = getMetadataEntriesDTO();
         mockRemoteCall(dto);
         List<Metadata> resultList = repository.getNamespaceMetadata(namespaceId, Optional.empty())
@@ -129,7 +129,7 @@ public class MetadataRepositoryVertxImplTest extends AbstractVertxRespositoryTes
 
     @Test
     public void shouldGetNamespaceMetadataByKey() throws Exception {
-        NamespaceId namespaceId = NamespaceId.createFromName("mynamespace");
+        NamespaceId namespaceId = NamespaceId.createFromName("mynamespace", networkType);
         MetadataEntriesDTO dto = getMetadataEntriesDTO();
         mockRemoteCall(dto);
         List<Metadata> resultList = repository
@@ -140,7 +140,7 @@ public class MetadataRepositoryVertxImplTest extends AbstractVertxRespositoryTes
 
     @Test
     public void shouldGetNamespaceMetadataByKeyAndSender() throws Exception {
-        NamespaceId namespaceId = NamespaceId.createFromName("mynamespace");
+        NamespaceId namespaceId = NamespaceId.createFromName("mynamespace", networkType);
         MetadataDTO expected = createMetadataDto(ConvertUtils.toSize16Hex(BigInteger.valueOf(10)),
             MetadataTypeEnum.NUMBER_1,
             "11111");

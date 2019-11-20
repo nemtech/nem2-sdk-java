@@ -189,7 +189,8 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
                 NetworkType.MIJIN_TEST,
                 recipientAddress,
                 Collections
-                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1),
+                        networkType)),
                 new PlainMessage("E2ETest:standaloneTransferTransaction:message")
             ).build();
 

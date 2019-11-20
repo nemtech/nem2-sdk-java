@@ -192,20 +192,23 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
     private Observable<List<AccountNames>> getAccountNames(AccountIds accountIds) {
         Callable<AccountsNamesDTO> callback = () -> getClient()
             .getAccountsNames(accountIds);
-        return exceptionHandling(
+        return exceptionHandling(networkTypeObservable.flatMap(networkType ->
             call(callback).map(AccountsNamesDTO::getAccountNames).flatMapIterable(item -> item)
-                .map(this::toAccountNames).toList().toObservable());
+                .map(dto -> toAccountNames(dto, networkType)).toList().toObservable()));
     }
 
     /**
      * Converts a {@link AccountNamesDTO} into a {@link AccountNames}
      *
      * @param dto {@link AccountNamesDTO}
+     * @param networkType the network type.
      * @return {@link AccountNames}
      */
-    private AccountNames toAccountNames(AccountNamesDTO dto) {
+    private AccountNames toAccountNames(AccountNamesDTO dto,
+        NetworkType networkType) {
         return new AccountNames(MapperUtils.toAddressFromEncoded(dto.getAddress()),
-            dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
+            dto.getNames().stream().map(name -> new NamespaceName(name, networkType))
+                .collect(Collectors.toList()));
     }
 
 
@@ -217,22 +220,23 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
             .collect(Collectors.toList()));
         Callable<MosaicsNamesDTO> callback = () -> getClient()
             .getMosaicsNames(mosaicIds);
-        return exceptionHandling(
+        return exceptionHandling(networkTypeObservable.flatMap(networkType ->
             call(callback).map(MosaicsNamesDTO::getMosaicNames).flatMapIterable(item -> item)
-                .map(this::toMosaicNames).toList()
-                .toObservable());
+                .map(dto -> toMosaicNames(dto, networkType))).toList().toObservable());
     }
 
     /**
      * Converts a {@link MosaicNamesDTO} into a {@link MosaicNames}
      *
      * @param dto {@link MosaicNamesDTO}
+     * @param networkType the network type.
      * @return {@link MosaicNames}
      */
-    private MosaicNames toMosaicNames(MosaicNamesDTO dto) {
+    private MosaicNames toMosaicNames(MosaicNamesDTO dto, NetworkType networkType) {
         return new MosaicNames(
             MapperUtils.toMosaicId(dto.getMosaicId()),
-            dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
+            dto.getNames().stream().map(name -> new NamespaceName(name, networkType))
+                .collect(Collectors.toList()));
     }
 
     /**

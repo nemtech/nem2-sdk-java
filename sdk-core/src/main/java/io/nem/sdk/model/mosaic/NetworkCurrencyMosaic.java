@@ -1,8 +1,10 @@
 package io.nem.sdk.model.mosaic;
 
+import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.namespace.NamespaceId;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.function.Function;
 
 /**
  * NetworkCurrencyMosaic mosaic
@@ -15,9 +17,10 @@ import java.math.BigInteger;
 public class NetworkCurrencyMosaic extends Mosaic {
 
     /**
-     * Namespace id of `currency` namespace.
+     * Generates a Namespace id of `currency` namespace depending on the NetworkType.
      */
-    public static final NamespaceId NAMESPACEID = NamespaceId.createFromName("cat.currency");
+    public static final Function<NetworkType, NamespaceId> NAMESPACE_ID_RESOLVER = networkType -> NamespaceId
+        .createFromName("cat.currency", networkType);
     /**
      * Divisibility
      */
@@ -37,39 +40,43 @@ public class NetworkCurrencyMosaic extends Mosaic {
 
     /**
      * @param amount the mosaic amount.
+     * @param networkType the network type.
      */
-    public NetworkCurrencyMosaic(BigInteger amount) {
-        super(NetworkCurrencyMosaic.NAMESPACEID, amount);
+    public NetworkCurrencyMosaic(BigInteger amount, NetworkType networkType) {
+        super(NetworkCurrencyMosaic.NAMESPACE_ID_RESOLVER.apply(networkType), amount);
     }
 
     /**
      * Create xem with using xem as unit.
      *
      * @param amount amount to send
+     * @param networkType the network type.
      * @return a NetworkCurrencyMosaic instance
      */
-    public static NetworkCurrencyMosaic createRelative(BigInteger amount) {
+    public static NetworkCurrencyMosaic createRelative(BigInteger amount, NetworkType networkType) {
 
         BigInteger relativeAmount =
             BigDecimal.valueOf(Math.pow(10, NetworkCurrencyMosaic.DIVISIBILITY))
                 .toBigInteger()
                 .multiply(amount);
-        return new NetworkCurrencyMosaic(relativeAmount);
+        return new NetworkCurrencyMosaic(relativeAmount, networkType);
     }
 
     /**
      * Create xem with using xem as unit.
      *
      * @param amount amount to send
+     * @param networkType the network type
      * @return a NetworkCurrencyMosaic instance
      */
-    public static NetworkCurrencyMosaic createRelative(BigDecimal amount) {
+    public static NetworkCurrencyMosaic createRelative(BigDecimal amount,
+        NetworkType networkType) {
 
         BigInteger relativeAmount =
             BigDecimal.valueOf(Math.pow(10, NetworkCurrencyMosaic.DIVISIBILITY))
                 .multiply(amount)
                 .toBigInteger();
-        return new NetworkCurrencyMosaic(relativeAmount);
+        return new NetworkCurrencyMosaic(relativeAmount, networkType);
     }
 
     /**
@@ -77,10 +84,12 @@ public class NetworkCurrencyMosaic extends Mosaic {
      * NetworkCurrencyMosaic.
      *
      * @param amount amount to send
+     * @param networkType the network type.
      * @return a NetworkCurrencyMosaic instance
      */
-    public static NetworkCurrencyMosaic createAbsolute(BigInteger amount) {
+    public static NetworkCurrencyMosaic createAbsolute(BigInteger amount,
+        NetworkType networkType) {
 
-        return new NetworkCurrencyMosaic(amount);
+        return new NetworkCurrencyMosaic(amount, networkType);
     }
 }

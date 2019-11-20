@@ -47,7 +47,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
         SecretLockTransaction transaction =
             SecretLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), networkType),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,
@@ -69,7 +69,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
         SecretLockTransaction transaction =
             SecretLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), networkType),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,
@@ -93,7 +93,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
         SecretLockTransaction transaction =
             SecretLockTransactionFactory.create(NetworkType.MIJIN_TEST,
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), networkType),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,
@@ -118,7 +118,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
                 SecretLockTransaction transaction =
                     SecretLockTransactionFactory.create(
                         NetworkType.MIJIN_TEST,
-                        NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                        NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), networkType),
                         BigInteger.valueOf(100),
                         LockHashAlgorithmType.SHA3_256,
                         "non valid hash",

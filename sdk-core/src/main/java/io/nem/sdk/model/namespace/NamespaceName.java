@@ -16,6 +16,7 @@
 
 package io.nem.sdk.model.namespace;
 
+import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.Optional;
 
 /**
@@ -27,8 +28,8 @@ public class NamespaceName {
     private final String name;
     private final Optional<NamespaceId> parentId;
 
-    public NamespaceName(String name) {
-        this(NamespaceId.createFromName(name), name, Optional.empty());
+    public NamespaceName(String name, NetworkType networkType) {
+        this(NamespaceId.createFromName(name, networkType), name, Optional.empty());
     }
 
     public NamespaceName(NamespaceId namespaceId, String name) {

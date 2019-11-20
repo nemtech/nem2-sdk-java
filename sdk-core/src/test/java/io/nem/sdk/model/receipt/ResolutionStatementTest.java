@@ -48,7 +48,7 @@ public class ResolutionStatementTest {
         address = new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
             networkType);
         mosaicId = new MosaicId("85BBEA6CC462B244");
-        namespaceId = NamespaceId.createFromName("money");
+        namespaceId = NamespaceId.createFromName("money", networkType);
         receiptSource = new ReceiptSource(1, 1);
         addressResolutionEntry =
             new ResolutionEntry<>(address, receiptSource, ReceiptType.ADDRESS_ALIAS_RESOLUTION);

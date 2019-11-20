@@ -169,7 +169,8 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
             TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
                 address,
                 Collections
-                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1),
+                        networkType)),
                 new PlainMessage("E2ETest:standaloneTransferTransaction:message")
             ).build();
 

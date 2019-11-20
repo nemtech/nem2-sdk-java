@@ -16,9 +16,11 @@
 
 package io.nem.sdk.model.transaction;
 
-import io.nem.core.crypto.Hashes;
+import io.nem.core.crypto.SignSchema;
+import io.nem.core.crypto.SignSchema.HashSize;
 import io.nem.core.utils.ByteUtils;
 import io.nem.core.utils.ConvertUtils;
+import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.IllegalIdentifierException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -47,11 +49,13 @@ public class IdGenerator {
      *
      * @param nonce Nonce bytes.
      * @param publicKey Public key.
+     * @param networkType The network type.
      * @return Mosaic id.
      */
-    public static BigInteger generateMosaicId(final byte[] nonce, final byte[] publicKey) {
+    public static BigInteger generateMosaicId(final byte[] nonce, final byte[] publicKey,
+        NetworkType networkType) {
         final byte[] reverseNonce = ByteUtils.reverseCopy(nonce);
-        final byte[] hash = IdGenerator.getHashInLittleEndian(reverseNonce, publicKey);
+        final byte[] hash = IdGenerator.getHashInLittleEndian(networkType, reverseNonce, publicKey);
         // Unset the high bit for mosaic id
         return BigInteger.valueOf(ByteBuffer.wrap(hash).getLong() & ~ID_GENERATOR_FLAG);
     }
@@ -61,10 +65,11 @@ public class IdGenerator {
      *
      * @param namespaceName Namespace name.
      * @param parentId Parent id.
+     * @param networkType the network type.
      * @return Namespace id.
      */
     public static BigInteger generateNamespaceId(final String namespaceName,
-        final BigInteger parentId) {
+        final BigInteger parentId, final NetworkType networkType) {
         if (!namespaceName.matches("^[a-z0-9][a-z0-9-_]*$")) {
             throw new IllegalIdentifierException("invalid namespace name");
         }
@@ -72,7 +77,7 @@ public class IdGenerator {
         final ByteBuffer parentIdBuffer = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN)
             .putLong(parentId.longValue());
         final byte[] hash = IdGenerator
-            .getHashInLittleEndian(parentIdBuffer.array(), namespaceName.getBytes());
+            .getHashInLittleEndian(networkType, parentIdBuffer.array(), namespaceName.getBytes());
         // Set the high bit for namespace id
         return ConvertUtils
             .toUnsignedBigInteger(ByteBuffer.wrap(hash).getLong() | ID_GENERATOR_FLAG);
@@ -83,20 +88,24 @@ public class IdGenerator {
      *
      * @param namespaceName Namespace name.
      * @param parentNamespaceName Parent name.
+     * @param networkType the network type.
      * @return Namespace id.
      */
-    public static BigInteger generateNamespaceId(String namespaceName, String parentNamespaceName) {
-        return IdGenerator.generateNamespaceId(parentNamespaceName + "." + namespaceName);
+    public static BigInteger generateNamespaceId(String namespaceName, String parentNamespaceName,
+        NetworkType networkType) {
+        return IdGenerator.generateNamespaceId(parentNamespaceName + "." + namespaceName,
+            networkType);
     }
 
     /**
      * Generate namespace id.
      *
      * @param namespacePath Namespace path.
+     * @param networkType the network type.
      * @return Namespace id.
      */
-    public static BigInteger generateNamespaceId(String namespacePath) {
-        List<BigInteger> namespaceList = generateNamespacePath(namespacePath);
+    public static BigInteger generateNamespaceId(String namespacePath, NetworkType networkType) {
+        List<BigInteger> namespaceList = generateNamespacePath(namespacePath, networkType);
         return namespaceList.get(namespaceList.size() - 1);
     }
 
@@ -104,9 +113,11 @@ public class IdGenerator {
      * Generate namespace id.
      *
      * @param namespacePath Namespace path.
+     * @param networkType the network type
      * @return List of namespace id.
      */
-    public static List<BigInteger> generateNamespacePath(String namespacePath) {
+    public static List<BigInteger> generateNamespacePath(String namespacePath,
+        NetworkType networkType) {
         String[] parts = namespacePath.split(Pattern.quote("."));
         List<BigInteger> path = new ArrayList<>();
 
@@ -119,7 +130,7 @@ public class IdGenerator {
         BigInteger namespaceId = BigInteger.valueOf(0);
 
         for (int i = 0; i < parts.length; i++) {
-            namespaceId = generateNamespaceId(parts[i], namespaceId);
+            namespaceId = generateNamespaceId(parts[i], namespaceId, networkType);
             path.add(namespaceId);
         }
         return path;
@@ -128,11 +139,14 @@ public class IdGenerator {
     /**
      * Gets hash in little endian.
      *
+     * @param networkType the network type used to define the hash to be used.
      * @param inputs Inputs to hash.
      * @return Hash value.
      */
-    private static byte[] getHashInLittleEndian(final byte[]... inputs) {
-        byte[] result = Hashes.sha3_256(inputs);
+    private static byte[] getHashInLittleEndian(NetworkType networkType,
+        final byte[]... inputs) {
+        byte[] result = SignSchema
+            .getHasher(networkType.resolveSignSchema(), HashSize.HASH_SIZE_32_BYTES).hash(inputs);
         result = Arrays.copyOfRange(result, 0, 8);
         ArrayUtils.reverse(result);
         return result;

@@ -48,7 +48,7 @@ class HashLockTransactionTest extends AbstractTransactionTester {
         HashLockTransaction transaction =
             HashLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), networkType),
                 BigInteger.valueOf(100),
                 signedTransaction).signer(account.getPublicAccount()).deadline(new FakeDeadline())
                 .build();
@@ -71,7 +71,7 @@ class HashLockTransactionTest extends AbstractTransactionTester {
         HashLockTransaction transaction =
             HashLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), networkType),
                 BigInteger.valueOf(100),
                 signedTransaction).deadline(new FakeDeadline()).build();
 
@@ -96,7 +96,7 @@ class HashLockTransactionTest extends AbstractTransactionTester {
         HashLockTransaction transaction =
             HashLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), networkType),
                 BigInteger.valueOf(100),
                 signedTransaction).deadline(new FakeDeadline()).build();
         SignedTransaction lockFundsTransactionSigned = transaction
@@ -126,7 +126,7 @@ class HashLockTransactionTest extends AbstractTransactionTester {
             () -> {
                 HashLockTransactionFactory.create(
                     NetworkType.MIJIN_TEST,
-                    NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                    NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), networkType),
                     BigInteger.valueOf(100),
                     signedTransaction).deadline(
                     new FakeDeadline()).build();

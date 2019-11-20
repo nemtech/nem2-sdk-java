@@ -73,7 +73,7 @@ public class MapperUtilsTest {
     @Test
     void toUnresolvedAddress() {
 
-        NamespaceId namespaceId = NamespaceId.createFromName("some.name");
+        NamespaceId namespaceId = NamespaceId.createFromName("some.name", networkType);
 
         Assertions.assertEquals("91d9e338f78767ed9500000000000000000000000000000000",
             namespaceId.encoded(networkType));
@@ -108,7 +108,7 @@ public class MapperUtilsTest {
     @Test
     void toUnresolvedMosaicId() {
         MosaicId mosaicId = new MosaicId("11F4B1B3AC033DB5");
-        NamespaceId namespaceId = NamespaceId.createFromName("some.name123");
+        NamespaceId namespaceId = NamespaceId.createFromName("some.name123", networkType);
 
         Assertions.assertNull(MapperUtils.toUnresolvedMosaicId(null));
         Assertions.assertEquals(mosaicId, MapperUtils.toUnresolvedMosaicId(mosaicId.getIdAsHex()));

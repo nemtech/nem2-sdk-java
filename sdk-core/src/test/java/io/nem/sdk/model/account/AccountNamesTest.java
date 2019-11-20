@@ -18,6 +18,7 @@ package io.nem.sdk.model.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.namespace.NamespaceName;
 import java.util.Arrays;
 import java.util.List;
@@ -25,12 +26,15 @@ import org.junit.jupiter.api.Test;
 
 class AccountNamesTest {
 
+    private NetworkType networkType = NetworkType.MIJIN_TEST;
+
     @Test
     void createAccountNames() {
         Address address = Address.createFromRawAddress("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR26");
 
-        List<NamespaceName> namespaceNames = Arrays
-            .asList(new NamespaceName("accountalias"), new NamespaceName("anotheralias"));
+        List<NamespaceName> namespaceNames = Arrays.asList(
+            new NamespaceName("accountalias", networkType),
+            new NamespaceName("anotheralias", networkType));
 
         AccountNames names = new AccountNames(address, namespaceNames);
         assertEquals(address, names.getAddress());

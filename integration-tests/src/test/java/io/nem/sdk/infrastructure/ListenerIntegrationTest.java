@@ -257,7 +257,8 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
             TransferTransactionFactory.create(getNetworkType(),
                 new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", getNetworkType()),
                 Collections.singletonList(
-                    NetworkCurrencyMosaic.createRelative(new BigInteger("100000000000"))),
+                    NetworkCurrencyMosaic.createRelative(new BigInteger("100000000000"),
+                        getNetworkType())),
                 PlainMessage.create("test-message")
             ).maxFee(this.maxFee).build();
 

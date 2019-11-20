@@ -65,7 +65,8 @@ public class MosaicId implements UnresolvedMosaicId {
      */
     public MosaicId(MosaicNonce mosaicNonce, PublicAccount owner) {
         this.id = IdGenerator
-            .generateMosaicId(mosaicNonce.getNonce(), owner.getPublicKey().getBytes());
+            .generateMosaicId(mosaicNonce.getNonce(), owner.getPublicKey().getBytes(),
+                owner.getAddress().getNetworkType());
         this.fullName = Optional.empty();
     }
 
@@ -74,7 +75,6 @@ public class MosaicId implements UnresolvedMosaicId {
      *
      * @param mosaicNonce the mosaic nonce
      * @param owner thw account owner.
-     *
      * @return the created {@link MosaicId}.
      */
     public static MosaicId createFromNonce(MosaicNonce mosaicNonce, PublicAccount owner) {

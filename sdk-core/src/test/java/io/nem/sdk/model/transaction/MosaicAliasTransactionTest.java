@@ -40,7 +40,7 @@ public class MosaicAliasTransactionTest extends AbstractTransactionTester {
     @Test
     void shouldBuild() {
         MosaicId mosaicId = new MosaicId(BigInteger.TEN);
-        NamespaceId namespaceId = NamespaceId.createFromName("anamespaced");
+        NamespaceId namespaceId = NamespaceId.createFromName("anamespaced", networkType);
         MosaicAliasTransaction transaction =
             MosaicAliasTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
@@ -59,7 +59,7 @@ public class MosaicAliasTransactionTest extends AbstractTransactionTester {
     @Test
     void serialize() {
         MosaicId mosaicId = new MosaicId(BigInteger.TEN);
-        NamespaceId namespaceId = NamespaceId.createFromName("anamespaced");
+        NamespaceId namespaceId = NamespaceId.createFromName("anamespaced", networkType);
         MosaicAliasTransaction transaction =
             MosaicAliasTransactionFactory.create(
                 NetworkType.MIJIN_TEST,

@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.nem.core.utils.ByteUtils;
+import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.IllegalIdentifierException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class IdGeneratorTest {
@@ -131,7 +133,8 @@ class IdGeneratorTest {
         long[] expected = new long[]{0xC0AFC518, 0x3AD842A8};
         BigInteger id =
             IdGenerator.generateMosaicId(
-                ByteUtils.intArrayToByteArray(nonce), ByteUtils.intArrayToByteArray(publicKey));
+                ByteUtils.intArrayToByteArray(nonce), ByteUtils.intArrayToByteArray(publicKey),
+                NetworkType.MIJIN_TEST);
         assertEquals(new BigInteger("4240212341724005656"), id);
     }
 
@@ -141,7 +144,8 @@ class IdGeneratorTest {
         String hexPublicKey, String hexNonce, String hexExpectedMosaicId) {
         byte[] nonceBytes = Hex.decode(hexNonce);
         //ArrayUtils.reverse(nonceBytes);
-        BigInteger id = IdGenerator.generateMosaicId(nonceBytes, Hex.decode(hexPublicKey));
+        BigInteger id = IdGenerator.generateMosaicId(nonceBytes, Hex.decode(hexPublicKey),
+            NetworkType.MIJIN_TEST);
         assertEquals(hexExpectedMosaicId.toLowerCase(), String.format("%016x", id));
         assertEquals(hexExpectedMosaicId.toLowerCase(), Hex.toHexString(id.toByteArray()));
     }
@@ -155,9 +159,10 @@ class IdGeneratorTest {
 
     @Test
     void namespacePathGeneratesCorrectWellKnownRootPath() {
-        List<BigInteger> ids = IdGenerator.generateNamespacePath("nem");
-        BigInteger id = IdGenerator.generateNamespaceId("nem");
-        BigInteger id2 = IdGenerator.generateNamespaceId("nem", BigInteger.valueOf(0));
+        List<BigInteger> ids = IdGenerator.generateNamespacePath("nem", NetworkType.MIJIN_TEST);
+        BigInteger id = IdGenerator.generateNamespaceId("nem", NetworkType.MIJIN_TEST);
+        BigInteger id2 = IdGenerator
+            .generateNamespaceId("nem", BigInteger.valueOf(0), NetworkType.MIJIN_TEST);
         assertEquals(1, ids.size());
         assertEquals(new BigInteger("9562080086528621131"), ids.get(0));
         assertEquals(id, ids.get(0));
@@ -165,8 +170,9 @@ class IdGeneratorTest {
     }
 
     @Test
-    void namespacePathGeneratesCorrectWellKnownChildPath() {
-        List<BigInteger> ids = IdGenerator.generateNamespacePath("nem.subnem");
+    void namespacePathGeneratesCorrectWellKnownChildPathMijinTest() {
+        List<BigInteger> ids = IdGenerator
+            .generateNamespacePath("nem.subnem", NetworkType.MIJIN_TEST);
 
         assertEquals(2, ids.size());
         assertEquals(new BigInteger("9562080086528621131"), ids.get(0));
@@ -174,131 +180,170 @@ class IdGeneratorTest {
     }
 
     @Test
-    void namespacePathSupportsMultiLevelNamespaces() {
-        List<BigInteger> ids = new ArrayList<BigInteger>();
-        ids.add(IdGenerator.generateNamespaceId("foo", BigInteger.valueOf(0)));
-        ids.add(IdGenerator.generateNamespaceId("bar", ids.get(0)));
-        ids.add(IdGenerator.generateNamespaceId("baz", ids.get(1)));
+    void namespacePathGeneratesCorrectWellKnownChildPathMijin() {
+        List<BigInteger> ids = IdGenerator.generateNamespacePath("nem.subnem", NetworkType.MIJIN);
 
-        assertEquals(IdGenerator.generateNamespacePath("foo.bar.baz"), ids);
+        assertEquals(2, ids.size());
+        assertEquals(new BigInteger("9562080086528621131"), ids.get(0));
+        assertEquals(new BigInteger("16440672666685223858"), ids.get(1));
     }
 
     @Test
-    void namespacePathSupportsMultiLevelNamespaces2() {
-        List<BigInteger> ids = new ArrayList<BigInteger>();
-        ids.add(IdGenerator.generateNamespaceId("foo", BigInteger.valueOf(0)));
-        ids.add(IdGenerator.generateNamespaceId("bar", ids.get(0)));
-        ids.add(IdGenerator.generateNamespaceId("baz", ids.get(1)));
+    void namespacePathGeneratesCorrectWellKnownChildPathMainNetwork() {
+        List<BigInteger> ids = IdGenerator
+            .generateNamespacePath("nem.subnem", NetworkType.MAIN_NET);
 
-        assertEquals(ids.get(2), IdGenerator.generateNamespaceId("baz", "foo.bar"));
+        assertEquals(2, ids.size());
+        assertEquals(new BigInteger("12183079102292608952"), ids.get(0));
+        assertEquals(new BigInteger("10869300015622108583"), ids.get(1));
     }
 
     @Test
-    void namespacePathSupportsMultiLevelNamespaces2a() {
-        List<BigInteger> ids = new ArrayList<BigInteger>();
-        ids.add(IdGenerator.generateNamespaceId("nem", BigInteger.valueOf(0)));
-        ids.add(IdGenerator.generateNamespaceId("subnem", ids.get(0)));
-        ids.add(IdGenerator.generateNamespaceId("subsubnem", ids.get(1)));
+    void namespacePathGeneratesCorrectWellKnownChildPathMainTestNet() {
+        List<BigInteger> ids = IdGenerator
+            .generateNamespacePath("nem.subnem", NetworkType.TEST_NET);
 
-        assertEquals(ids.get(2), IdGenerator.generateNamespaceId("subsubnem", "nem.subnem"));
+        assertEquals(2, ids.size());
+        assertEquals(new BigInteger("12183079102292608952"), ids.get(0));
+        assertEquals(new BigInteger("10869300015622108583"), ids.get(1));
     }
 
-    @Test
-    void namespacePathSupportsMultiLevelNamespaces3() {
-        List<BigInteger> ids = new ArrayList<BigInteger>();
-        ids.add(IdGenerator.generateNamespaceId("foo", BigInteger.valueOf(0)));
-        ids.add(IdGenerator.generateNamespaceId("bar", ids.get(0)));
-        ids.add(IdGenerator.generateNamespaceId("baz", ids.get(1)));
-
-        assertEquals(ids.get(2), IdGenerator.generateNamespaceId("bar.baz", "foo"));
+    @ParameterizedTest
+    @EnumSource(NetworkType.class)
+    void namespacePathSupportsMultiLevelNamespaces(NetworkType networkType) {
+        List<BigInteger> ids = new ArrayList<>();
+        ids.add(IdGenerator.generateNamespaceId("foo", BigInteger.valueOf(0), networkType));
+        ids.add(IdGenerator.generateNamespaceId("bar", ids.get(0), networkType));
+        ids.add(IdGenerator.generateNamespaceId("baz", ids.get(1), networkType));
+        assertEquals(IdGenerator.generateNamespacePath("foo.bar.baz", networkType), ids);
     }
 
-    @Test
-    void namespaceNameInvalid() {
+    @ParameterizedTest
+    @EnumSource(NetworkType.class)
+    void namespacePathSupportsMultiLevelNamespaces2(NetworkType networkType) {
+        List<BigInteger> ids = new ArrayList<>();
+        ids.add(IdGenerator.generateNamespaceId("foo", BigInteger.valueOf(0), networkType));
+        ids.add(IdGenerator.generateNamespaceId("bar", ids.get(0), networkType));
+        ids.add(IdGenerator.generateNamespaceId("baz", ids.get(1), networkType));
+        assertEquals(ids.get(2),
+            IdGenerator.generateNamespaceId("baz", "foo.bar", networkType));
+    }
+
+    @ParameterizedTest
+    @EnumSource(NetworkType.class)
+    void namespacePathSupportsMultiLevelNamespaces2a(NetworkType networkType) {
+
+        List<BigInteger> ids = new ArrayList<>();
+        ids.add(IdGenerator.generateNamespaceId("nem", BigInteger.valueOf(0), networkType));
+        ids.add(IdGenerator.generateNamespaceId("subnem", ids.get(0), networkType));
+        ids.add(IdGenerator.generateNamespaceId("subsubnem", ids.get(1), networkType));
+
+        assertEquals(ids.get(2), IdGenerator.generateNamespaceId("subsubnem", "nem.subnem",
+            networkType));
+    }
+
+    @ParameterizedTest
+    @EnumSource(NetworkType.class)
+    void namespacePathSupportsMultiLevelNamespaces3(NetworkType networkType) {
+
+        List<BigInteger> ids = new ArrayList<>();
+        ids.add(IdGenerator.generateNamespaceId("foo", BigInteger.valueOf(0), networkType));
+        ids.add(IdGenerator.generateNamespaceId("bar", ids.get(0), networkType));
+        ids.add(IdGenerator.generateNamespaceId("baz", ids.get(1), networkType));
+        assertEquals(ids.get(2),
+            IdGenerator.generateNamespaceId("bar.baz", "foo", networkType));
+
+    }
+
+    @ParameterizedTest
+    @EnumSource(NetworkType.class)
+    void namespaceNameInvalid(NetworkType networkType) {
         assertThrows(
             IllegalIdentifierException.class,
             () -> {
-                IdGenerator.generateNamespaceId("foo.bar", BigInteger.valueOf(0));
+                IdGenerator.generateNamespaceId("foo.bar", BigInteger.valueOf(0), networkType);
             },
             "contains dot");
         assertThrows(
             IllegalIdentifierException.class,
             () -> {
-                IdGenerator.generateNamespaceId("", BigInteger.valueOf(0));
+                IdGenerator.generateNamespaceId("", BigInteger.valueOf(0), networkType);
             },
             "having zero length");
     }
 
-    @Test
-    void namespacePathRejectsNamesWithTooManyParts() {
+    @ParameterizedTest
+    @EnumSource(NetworkType.class)
+    void namespacePathRejectsNamesWithTooManyParts(NetworkType networkType) {
         assertThrows(
             IllegalIdentifierException.class,
             () -> {
-                IdGenerator.generateNamespacePath("a.b.c.d");
+                IdGenerator.generateNamespacePath("a.b.c.d", networkType);
             },
             "too many parts");
         assertThrows(
             IllegalIdentifierException.class,
             () -> {
-                IdGenerator.generateNamespacePath("a.b.c.d.e");
+                IdGenerator.generateNamespacePath("a.b.c.d.e", networkType);
             },
             "too many parts");
     }
 
-    @Test
-    void namespacePathInvalid() {
+    @ParameterizedTest
+    @EnumSource(NetworkType.class)
+    void namespacePathInvalid(NetworkType networkType) {
         assertThrows(
             IllegalIdentifierException.class,
             () -> {
-                IdGenerator.generateNamespacePath("");
+                IdGenerator.generateNamespacePath("", networkType);
             },
             "having zero length");
         assertThrows(
             IllegalIdentifierException.class,
             () -> {
-                IdGenerator.generateNamespacePath("alpha.bet@.zeta");
+                IdGenerator.generateNamespacePath("alpha.bet@.zeta", networkType);
             },
             "invalid part");
         assertThrows(
             IllegalIdentifierException.class,
             () -> {
-                IdGenerator.generateNamespacePath("a!pha.beta.zeta");
+                IdGenerator.generateNamespacePath("a!pha.beta.zeta", networkType);
             },
             "invalid part");
         assertThrows(
             IllegalIdentifierException.class,
             () -> {
-                IdGenerator.generateNamespacePath("alpha.beta.ze^a");
+                IdGenerator.generateNamespacePath("alpha.beta.ze^a", networkType);
             },
             "invalid part");
         assertThrows(
             IllegalIdentifierException.class,
             () -> {
-                IdGenerator.generateNamespacePath(".");
+                IdGenerator.generateNamespacePath(".", networkType);
             },
             "invalid part");
         assertThrows(
             IllegalIdentifierException.class,
             () -> {
-                IdGenerator.generateNamespacePath("..");
+                IdGenerator.generateNamespacePath("..", networkType);
             },
             "invalid part");
         assertThrows(
             IllegalIdentifierException.class,
             () -> {
-                IdGenerator.generateNamespacePath(".a");
+                IdGenerator.generateNamespacePath(".a", networkType);
             },
             "invalid part");
         assertThrows(
             IllegalIdentifierException.class,
             () -> {
-                IdGenerator.generateNamespacePath("a..a");
+                IdGenerator.generateNamespacePath("a..a", networkType);
             },
             "invalid part");
         assertThrows(
             IllegalIdentifierException.class,
             () -> {
-                IdGenerator.generateNamespacePath("A");
+                IdGenerator.generateNamespacePath("A", networkType);
             },
             "invalid part");
     }

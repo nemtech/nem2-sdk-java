@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.core.utils.ConvertUtils;
+import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Stream;
@@ -31,6 +32,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class NamespaceIdTest {
+
+    private NetworkType networkType = NetworkType.MIJIN_TEST;
 
     static Stream<Arguments> provider() {
         return Stream.of(
@@ -78,7 +81,7 @@ class NamespaceIdTest {
 
     @Test
     void createANamespaceIdFromRootNamespaceNameViaConstructor() {
-        NamespaceId namespaceId = NamespaceId.createFromName("nem");
+        NamespaceId namespaceId = NamespaceId.createFromName("nem", networkType);
         assertEquals(namespaceId.getId(), new BigInteger("9562080086528621131"));
         assertEquals("nem", namespaceId.getFullName().get());
     }
@@ -86,15 +89,16 @@ class NamespaceIdTest {
 
     @Test
     void createANamespaceIdFromSubNamespacePathViaConstructor() {
-        NamespaceId test = NamespaceId.createFromName("subnem");
-        NamespaceId namespaceId = NamespaceId.createFromName("nem.subnem");
+        NamespaceId test = NamespaceId.createFromName("subnem", networkType);
+        NamespaceId namespaceId = NamespaceId.createFromName("nem.subnem", networkType);
         assertEquals(new BigInteger("16440672666685223858"), namespaceId.getId());
         assertEquals("nem.subnem", namespaceId.getFullName().get());
     }
 
     @Test
     void createANamespaceIdFromSubNamespaceNameAndParentNamespaceNameViaConstructor() {
-        NamespaceId namespaceId = NamespaceId.createFromNameAndParentName("subnem", "nem");
+        NamespaceId namespaceId = NamespaceId.createFromNameAndParentName("subnem", "nem",
+            networkType);
         assertEquals(new BigInteger("16440672666685223858"), namespaceId.getId());
         assertEquals("nem.subnem", namespaceId.getFullName().get());
     }
@@ -102,10 +106,11 @@ class NamespaceIdTest {
     @Test
     void createANamespaceIdFromSubNamespaceNameAndParentNamespaceName2ViaConstructor() {
         NamespaceId namespaceId = NamespaceId
-            .createFromNameAndParentName("subsubnem", "nem.subnem");
-        NamespaceId parentId = NamespaceId.createFromNameAndParentName("subnem", "nem");
+            .createFromNameAndParentName("subsubnem", "nem.subnem", networkType);
+        NamespaceId parentId = NamespaceId
+            .createFromNameAndParentName("subnem", "nem", networkType);
         NamespaceId namespaceId2 = NamespaceId
-            .createFromNameAndParentId("subsubnem", parentId.getId());
+            .createFromNameAndParentId("subsubnem", parentId.getId(), networkType);
 
         assertEquals(new BigInteger("10592058992486201054"), namespaceId.getId());
         assertEquals("nem.subnem.subsubnem", namespaceId.getFullName().get());
@@ -115,14 +120,15 @@ class NamespaceIdTest {
     @Test
     void createASubNamespaceIdFromSubNamespaceNameAndParentIdViaConstructor() {
         NamespaceId namespaceId = NamespaceId
-            .createFromNameAndParentId("subnem", new BigInteger("-8884663987180930485"));
+            .createFromNameAndParentId("subnem", new BigInteger("-8884663987180930485"),
+                networkType);
         assertEquals(new BigInteger("16440672666685223858"), namespaceId.getId());
         assertEquals("subnem", namespaceId.getFullName().get());
     }
 
     @Test
     void createNamespacePathArray() {
-        List<BigInteger> path = NamespaceId.getNamespacePath("nem.subnem");
+        List<BigInteger> path = NamespaceId.getNamespacePath("nem.subnem", networkType);
         assertEquals(new BigInteger("9562080086528621131"), path.get(0));
         assertEquals(new BigInteger("16440672666685223858"), path.get(1));
     }
@@ -146,9 +152,9 @@ class NamespaceIdTest {
     @SuppressWarnings("squid:S3415")
     public void shouldCompareNamespaceIdsForEqualityUsingNames() {
 
-        NamespaceId test = NamespaceId.createFromName("subnem");
-        NamespaceId test2 = NamespaceId.createFromName("subnem");
-        NamespaceId test3 = NamespaceId.createFromName("another");
+        NamespaceId test = NamespaceId.createFromName("subnem", networkType);
+        NamespaceId test2 = NamespaceId.createFromName("subnem", networkType);
+        NamespaceId test3 = NamespaceId.createFromName("another", networkType);
         Assertions.assertEquals(test, test2);
         Assertions.assertNotEquals(test, test3);
         Assertions.assertNotEquals("NotANamespaceId", test3);
@@ -159,9 +165,9 @@ class NamespaceIdTest {
     @Test
     public void shouldCompareNamespaceIdsHashCode() {
 
-        NamespaceId test = NamespaceId.createFromName("subnem");
-        NamespaceId test2 = NamespaceId.createFromName("subnem");
-        NamespaceId test3 = NamespaceId.createFromName("another");
+        NamespaceId test = NamespaceId.createFromName("subnem", networkType);
+        NamespaceId test2 = NamespaceId.createFromName("subnem", networkType);
+        NamespaceId test3 = NamespaceId.createFromName("another", networkType);
         Assertions.assertEquals(test.hashCode(), test2.hashCode());
         Assertions.assertNotEquals(test.hashCode(), test3.hashCode());
 

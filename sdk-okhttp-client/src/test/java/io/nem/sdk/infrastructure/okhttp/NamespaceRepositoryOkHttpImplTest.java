@@ -64,7 +64,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
     @Test
     public void shouldGetNamespace() throws Exception {
 
-        NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
+        NamespaceId namespaceId = NamespaceId.createFromName("accountalias", networkType);
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
         NamespaceMetaDTO meta = new NamespaceMetaDTO();
@@ -200,7 +200,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
     @Test
     public void shouldGetNamespaceNames() throws Exception {
 
-        NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
+        NamespaceId namespaceId = NamespaceId.createFromName("accountalias", networkType);
         NamespaceNameDTO dto1 = new NamespaceNameDTO();
         dto1.setName("someName1");
         dto1.setId("1");
@@ -235,7 +235,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
             Address.createFromRawAddress(
                 "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
 
-        NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
+        NamespaceId namespaceId = NamespaceId.createFromName("accountalias", networkType);
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
         NamespaceMetaDTO meta = new NamespaceMetaDTO();
@@ -269,7 +269,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
     @Test
     public void shouldGetLinkedMosaicId() throws Exception {
 
-        NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
+        NamespaceId namespaceId = NamespaceId.createFromName("accountalias", networkType);
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
         NamespaceMetaDTO meta = new NamespaceMetaDTO();
         meta.setActive(true);

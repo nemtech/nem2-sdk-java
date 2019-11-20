@@ -84,23 +84,25 @@ public class OkHttpAggregateTransactionTest {
         String expected =
             "1001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000190414100000000000000000100000000000000de78f6d81ae02ad16559f6e4d3d4acc5ed343ee0ae65b1c9ad4fc0091a3903b568000000000000006100000000000000846b4439154579a5903b1459c9cf69cb8153f6d0110a7a0ed61de29ae4810bf200000000019054419050b9837efab4bbe8a4b9bb32d812f9885c00d8fc1650e1420101000000000044b262c46ceabb8580969800000000000000000000000000";
 
+        NetworkType networkType = NetworkType.MIJIN_TEST;
         TransferTransaction transferTx =
             TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST),
+                networkType,
+                new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", networkType),
                 Collections.singletonList(
-                    new Mosaic(new MosaicId(NetworkCurrencyMosaic.NAMESPACEID.getId()),
+                    new Mosaic(
+                        new MosaicId(NetworkCurrencyMosaic.NAMESPACE_ID_RESOLVER.apply(networkType).getId()),
                         BigInteger.valueOf(10000000))),
                 PlainMessage.Empty).deadline(new OkHttpFakeDeadline()).build();
 
         AggregateTransaction aggregateTx =
             AggregateTransactionFactory.createComplete(
-                NetworkType.MIJIN_TEST,
+                networkType,
                 Collections.singletonList(
                     transferTx.toAggregate(
                         new PublicAccount(
                             "846B4439154579A5903B1459C9CF69CB8153F6D0110A7A0ED61DE29AE4810BF2",
-                            NetworkType.MIJIN_TEST)))).deadline(new OkHttpFakeDeadline()).build();
+                            networkType)))).deadline(new OkHttpFakeDeadline()).build();
 
         byte[] actual = aggregateTx.serialize();
         assertEquals(expected, Hex.toHexString(actual));

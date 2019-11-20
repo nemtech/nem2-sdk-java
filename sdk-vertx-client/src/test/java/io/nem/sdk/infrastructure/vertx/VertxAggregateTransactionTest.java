@@ -93,7 +93,8 @@ public class VertxAggregateTransactionTest {
                 NetworkType.MIJIN_TEST,
                 new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST),
                 Collections.singletonList(
-                    new Mosaic(new MosaicId(NetworkCurrencyMosaic.NAMESPACEID.getId()),
+                    new Mosaic(new MosaicId(
+                        NetworkCurrencyMosaic.NAMESPACE_ID_RESOLVER.apply(NetworkType.MIJIN_TEST).getId()),
                         BigInteger.valueOf(10000000))),
                 PlainMessage.Empty).deadline(new VertxFakeDeadline()).build();
 

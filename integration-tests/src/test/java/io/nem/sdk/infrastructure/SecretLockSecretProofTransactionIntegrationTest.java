@@ -46,7 +46,7 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
         Address recipient = config().getTestAccount2().getAddress();
         SecretLockTransaction secretLockTransaction =
             SecretLockTransactionFactory.create(getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), getNetworkType()),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,
@@ -66,7 +66,7 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
         SecretLockTransaction transaction =
             SecretLockTransactionFactory.create(
                 getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), getNetworkType()),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,
@@ -88,7 +88,7 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
         SecretLockTransaction secretLockTransaction =
             SecretLockTransactionFactory.create(
                 getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), getNetworkType()),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,
@@ -119,7 +119,7 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
         SecretLockTransaction secretLockTransaction =
             SecretLockTransactionFactory.create(
                 getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), getNetworkType()),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,

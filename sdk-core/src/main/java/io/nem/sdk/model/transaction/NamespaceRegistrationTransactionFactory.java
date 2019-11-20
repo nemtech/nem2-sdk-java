@@ -94,7 +94,7 @@ public class NamespaceRegistrationTransactionFactory extends
         final NetworkType networkType,
         final String namespaceName,
         final BigInteger duration) {
-        NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
+        NamespaceId namespaceId = NamespaceId.createFromName(namespaceName, networkType);
         return create(networkType, namespaceName,
             namespaceId, NamespaceRegistrationType.ROOT_NAMESPACE, Optional.of(duration), Optional.empty());
     }
@@ -112,7 +112,7 @@ public class NamespaceRegistrationTransactionFactory extends
         final String namespaceName,
         final NamespaceId parentId) {
         NamespaceId namespaceId = NamespaceId
-            .createFromNameAndParentId(namespaceName, parentId.getId());
+            .createFromNameAndParentId(namespaceName, parentId.getId(), networkType);
         return create(networkType, namespaceName, namespaceId,
             NamespaceRegistrationType.SUB_NAMESPACE, Optional.empty(),
             Optional.of(parentId));

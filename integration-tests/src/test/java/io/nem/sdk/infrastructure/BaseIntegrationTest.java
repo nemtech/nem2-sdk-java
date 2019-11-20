@@ -369,7 +369,7 @@ public abstract class BaseIntegrationTest {
     protected NamespaceId setAddressAlias(RepositoryType type, Address address,
         String namespaceName) {
 
-        NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
+        NamespaceId namespaceId = NamespaceId.createFromName(namespaceName, networkType);
 
         Account nemesisAccount = config().getNemesisAccount();
 
@@ -417,7 +417,7 @@ public abstract class BaseIntegrationTest {
         RepositoryType type, MosaicId mosaicId,
         String namespaceName) {
         Account nemesisAccount = config().getNemesisAccount();
-        NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
+        NamespaceId namespaceId = NamespaceId.createFromName(namespaceName, networkType);
         List<MosaicNames> mosaicNames = get(
             getRepositoryFactory(type).createNamespaceRepository().getMosaicsNames(
                 Collections.singletonList(mosaicId)));

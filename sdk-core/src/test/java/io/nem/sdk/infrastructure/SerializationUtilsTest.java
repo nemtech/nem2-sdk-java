@@ -28,36 +28,39 @@ import org.junit.jupiter.api.Test;
 
 public class SerializationUtilsTest {
 
-
     @Test
     void toUnresolvedAddressFromNamespaceId() {
-
-        NamespaceId namespaceId = NamespaceId.createFromName("this.currency");
-
-        Assertions.assertEquals("bded68013aaee068", namespaceId.getIdAsHex());
 
         Assertions.assertEquals("9168e0ae3a0168edbd00000000000000000000000000000000",
             Hex.toHexString(
                 SerializationUtils
-                    .fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MIJIN_TEST)
+                    .fromUnresolvedAddressToByteBuffer(
+                        NamespaceId.createFromName("this.currency", NetworkType.MIJIN_TEST),
+                        NetworkType.MIJIN_TEST)
                     .array()));
 
-        Assertions.assertEquals("6968e0ae3a0168edbd00000000000000000000000000000000",
+        Assertions.assertEquals("69bd12bab1fe3689ab00000000000000000000000000000000",
             Hex.toHexString(
                 SerializationUtils
-                    .fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MAIN_NET)
+                    .fromUnresolvedAddressToByteBuffer(
+                        NamespaceId.createFromName("this.currency", NetworkType.MAIN_NET),
+                        NetworkType.MAIN_NET)
                     .array()));
 
         Assertions.assertEquals("6168e0ae3a0168edbd00000000000000000000000000000000",
             Hex.toHexString(
                 SerializationUtils
-                    .fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MIJIN)
+                    .fromUnresolvedAddressToByteBuffer(
+                        NamespaceId.createFromName("this.currency", NetworkType.MIJIN),
+                        NetworkType.MIJIN)
                     .array()));
 
-        Assertions.assertEquals("6968e0ae3a0168edbd00000000000000000000000000000000",
+        Assertions.assertEquals("99bd12bab1fe3689ab00000000000000000000000000000000",
             Hex.toHexString(
                 SerializationUtils
-                    .fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MAIN_NET)
+                    .fromUnresolvedAddressToByteBuffer(
+                        NamespaceId.createFromName("this.currency", NetworkType.TEST_NET),
+                        NetworkType.TEST_NET)
                     .array()));
     }
 

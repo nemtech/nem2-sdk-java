@@ -44,7 +44,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
 
     @Test
     void createANamespaceCreationRootNamespaceTransactionViaStaticConstructor() {
-        NamespaceId namespaceId = NamespaceId.createFromName("root-test-namespace");
+        NamespaceId namespaceId = NamespaceId.createFromName("root-test-namespace", networkType);
         NamespaceRegistrationTransaction namespaceRegistrationTransaction =
             NamespaceRegistrationTransactionFactory.createRootNamespace(
                 NetworkType.MIJIN_TEST,
@@ -79,7 +79,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
             NamespaceRegistrationTransactionFactory.createSubNamespace(
                 NetworkType.MIJIN_TEST,
                 "root-test-namespace",
-                NamespaceId.createFromName("parent-test-namespace")
+                NamespaceId.createFromName("parent-test-namespace", networkType)
             ).build();
 
         SignedTransaction signedTransaction =

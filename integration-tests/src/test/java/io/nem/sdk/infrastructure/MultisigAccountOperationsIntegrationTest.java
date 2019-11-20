@@ -50,7 +50,8 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
                 getNetworkType(),
                 recipient,
                 Collections
-                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1),
+                        getNetworkType())),
                 PlainMessage.create("test-message")
             ).maxFee(this.maxFee).build();
 
@@ -81,7 +82,7 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
         SignedTransaction signedTransaction) {
         HashLockTransaction hashLockTransaction =
             HashLockTransactionFactory.create(getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10), getNetworkType()),
                 BigInteger.valueOf(100),
                 signedTransaction).maxFee(this.maxFee).build();
         announceAndValidate(type, account, hashLockTransaction);

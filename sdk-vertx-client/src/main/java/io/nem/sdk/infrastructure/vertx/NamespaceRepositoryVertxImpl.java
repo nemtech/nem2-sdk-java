@@ -163,22 +163,26 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
             .collect(Collectors.toList()));
         Consumer<Handler<AsyncResult<MosaicsNamesDTO>>> callback = handler -> getClient()
             .getMosaicsNames(mosaicIds, handler);
-        return exceptionHandling(
-            call(callback).map(MosaicsNamesDTO::getMosaicNames).flatMapIterable(item -> item)
-                .map(this::toMosaicNames).toList()
-                .toObservable());
+        return exceptionHandling(networkTypeObservable.flatMap(
+            networkType -> call(callback).map(MosaicsNamesDTO::getMosaicNames)
+                .flatMapIterable(item -> item)
+                .map(dto -> toMosaicNames(dto, networkType)).toList()
+                .toObservable()));
     }
 
     /**
      * Converts a {@link MosaicNamesDTO} into a {@link MosaicNames}
      *
      * @param dto {@link MosaicNamesDTO}
+     * @param networkType the networkType.
      * @return {@link MosaicNames}
      */
-    private MosaicNames toMosaicNames(MosaicNamesDTO dto) {
+    private MosaicNames toMosaicNames(MosaicNamesDTO dto,
+        NetworkType networkType) {
         return new MosaicNames(
             MapperUtils.toMosaicId(dto.getMosaicId()),
-            dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
+            dto.getNames().stream().map(name -> new NamespaceName(name, networkType))
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -278,22 +282,25 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
     private Observable<List<AccountNames>> getAccountsNames(AccountIds accountIds) {
         Consumer<Handler<AsyncResult<AccountsNamesDTO>>> callback = handler -> getClient()
             .getAccountsNames(accountIds, handler);
-        return exceptionHandling(
+        return exceptionHandling(networkTypeObservable.flatMap(networkType ->
             call(callback).map(AccountsNamesDTO::getAccountNames).flatMapIterable(item -> item)
-                .map(this::toAccountNames).toList()
-                .toObservable());
+                .map(dto -> toAccountNames(dto, networkType)).toList()
+                .toObservable()));
     }
 
     /**
      * Converts a {@link AccountNamesDTO} into a {@link AccountNames}
      *
      * @param dto {@link AccountNamesDTO}
+     * @param networkType the network type.
      * @return {@link AccountNames}
      */
-    private AccountNames toAccountNames(AccountNamesDTO dto) {
+    private AccountNames toAccountNames(AccountNamesDTO dto,
+        NetworkType networkType) {
         return new AccountNames(
             toAddressFromEncoded(dto.getAddress()),
-            dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
+            dto.getNames().stream().map(name -> new NamespaceName(name, networkType))
+                .collect(Collectors.toList()));
     }
 
 

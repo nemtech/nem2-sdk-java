@@ -61,10 +61,12 @@ public class NamespaceId implements UnresolvedMosaicId, UnresolvedAddress {
      * Create NamespaceId from namespace string name (ex: nem or domain.subdom.subdome)
      *
      * @param namespaceName the namespace name.
+     * @param networkType the network type
      * @return the new {@link NamespaceId}
      */
-    public static NamespaceId createFromName(String namespaceName) {
-        return new NamespaceId(IdGenerator.generateNamespaceId(namespaceName),
+    public static NamespaceId createFromName(String namespaceName,
+        NetworkType networkType) {
+        return new NamespaceId(IdGenerator.generateNamespaceId(namespaceName, networkType),
             Optional.of(namespaceName));
     }
 
@@ -74,11 +76,13 @@ public class NamespaceId implements UnresolvedMosaicId, UnresolvedAddress {
      *
      * @param namespaceName the namespace name.
      * @param parentId the parent id.
+     * @param networkType the network type.
      * @return the new {@link NamespaceId}
      */
-    public static NamespaceId createFromNameAndParentId(String namespaceName, BigInteger parentId) {
-        return new NamespaceId(IdGenerator.generateNamespaceId(namespaceName, parentId),
-            Optional.of(namespaceName));
+    public static NamespaceId createFromNameAndParentId(String namespaceName, BigInteger parentId,
+        NetworkType networkType) {
+        return new NamespaceId(
+            IdGenerator.generateNamespaceId(namespaceName, parentId, networkType), Optional.of(namespaceName));
     }
 
     /**
@@ -87,11 +91,13 @@ public class NamespaceId implements UnresolvedMosaicId, UnresolvedAddress {
      *
      * @param namespaceName the namespace name.
      * @param parentNamespaceName the parent's namespace name.
+     * @param networkType the network type.
      * @return the new {@link NamespaceId}
      */
     public static NamespaceId createFromNameAndParentName(String namespaceName,
-        String parentNamespaceName) {
-        return new NamespaceId(IdGenerator.generateNamespaceId(namespaceName, parentNamespaceName),
+        String parentNamespaceName, NetworkType networkType) {
+        return new NamespaceId(
+            IdGenerator.generateNamespaceId(namespaceName, parentNamespaceName, networkType),
             Optional.of(parentNamespaceName + "." + namespaceName));
     }
 
@@ -109,10 +115,12 @@ public class NamespaceId implements UnresolvedMosaicId, UnresolvedAddress {
      * Returns a list of BigInteger ids for a namespace path (ex: nem or domain.subdom.subdome)
      *
      * @param namespaceName the namespace name.
+     * @param networkType The network type.
      * @return the paths
      */
-    public static List<BigInteger> getNamespacePath(String namespaceName) {
-        return IdGenerator.generateNamespacePath(namespaceName);
+    public static List<BigInteger> getNamespacePath(String namespaceName,
+        NetworkType networkType) {
+        return IdGenerator.generateNamespacePath(namespaceName, networkType);
     }
 
     /**
