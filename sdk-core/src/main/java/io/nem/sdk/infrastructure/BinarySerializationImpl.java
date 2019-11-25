@@ -127,7 +127,6 @@ import io.nem.sdk.model.transaction.SecretLockTransaction;
 import io.nem.sdk.model.transaction.SecretLockTransactionFactory;
 import io.nem.sdk.model.transaction.SecretProofTransaction;
 import io.nem.sdk.model.transaction.SecretProofTransactionFactory;
-import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
@@ -1122,11 +1121,9 @@ public class BinarySerializationImpl implements BinarySerialization {
             Mosaic mosaic = SerializationUtils.toMosaic(builder.getMosaic());
             BigInteger duration = SerializationUtils
                 .toUnsignedBigInteger(builder.getDuration().getBlockDuration());
-            SignedTransaction signedTransaction = new SignedTransaction(null,
-                SerializationUtils.toHexString(builder.getHash()),
-                TransactionType.AGGREGATE_BONDED);
             return HashLockTransactionFactory
-                .create(networkType, mosaic, duration, signedTransaction);
+                .create(networkType, mosaic, duration,
+                    SerializationUtils.toHexString(builder.getHash()));
         }
 
         @Override
@@ -1147,7 +1144,7 @@ public class BinarySerializationImpl implements BinarySerialization {
          * @return Hash buffer.
          */
         private ByteBuffer getHashBuffer(HashLockTransaction transaction) {
-            return ByteBuffer.wrap(Hex.decode(transaction.getSignedTransaction().getHash()));
+            return ByteBuffer.wrap(Hex.decode(transaction.getHash()));
         }
     }
 

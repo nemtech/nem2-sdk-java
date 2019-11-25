@@ -68,6 +68,20 @@ public interface Listener extends Closeable {
     Observable<Transaction> confirmed(Address address);
 
     /**
+     * Returns an observable stream of the transaction of the given transactionHash. This stream is
+     * integrated with the status listener. If an error message for the given transaction hash and
+     * signer address occurs while waiting for the confirmed transaction, a {@link
+     * io.nem.sdk.model.transaction.TransactionStatusException} with the status error is raised.
+     * This will help the caller identify errors faster, unlike the regular confirmed method that
+     * will just time out.
+     *
+     * @param address address we listen when a transaction is in confirmed state
+     * @param transactionHash the expected transaction hash
+     * @return an observable stream of Transaction with given transaction hash and state confirmed.
+     */
+    Observable<Transaction> confirmed(Address address, String transactionHash);
+
+    /**
      * Returns an observable stream of Transaction for a specific address. Each time a transaction
      * is in unconfirmed state an it involves the address, it emits a new Transaction in the event
      * stream.
@@ -96,6 +110,21 @@ public interface Listener extends Closeable {
      * @return an observable stream of AggregateTransaction with missing signatures state
      */
     Observable<AggregateTransaction> aggregateBondedAdded(Address address);
+
+    /**
+     * Return an observable of {@link AggregateTransaction} for an specific address and transcation
+     * hash. Each time an aggregate bonded transaction is announced, it emits a new {@link
+     * AggregateTransaction} in the event stream. If an error message for the given transaction hash
+     * and signer address occurs while waiting for the confirmed transaction, a {@link
+     * io.nem.sdk.model.transaction.TransactionStatusException} with the status error is raised.
+     * This will help the caller identify errors faster, unlike the regular confirmed method that
+     * will just time out.
+     *
+     * @param address address we listen when a transaction with missing signatures state.
+     * @param transactionHash the expected transaction hash
+     * @return an observable stream of AggregateTransaction with missing signatures state
+     */
+    Observable<AggregateTransaction> aggregateBondedAdded(Address address, String transactionHash);
 
     /**
      * Returns an observable stream of Transaction Hashes for specific address. Each time an

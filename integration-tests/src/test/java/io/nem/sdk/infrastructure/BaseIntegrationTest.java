@@ -16,12 +16,11 @@
 
 package io.nem.sdk.infrastructure;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nem.core.utils.ExceptionUtils;
 import io.nem.sdk.api.Listener;
 import io.nem.sdk.api.RepositoryFactory;
+import io.nem.sdk.api.TransactionService;
 import io.nem.sdk.infrastructure.okhttp.RepositoryFactoryOkHttpImpl;
 import io.nem.sdk.infrastructure.vertx.JsonHelperJackson2;
 import io.nem.sdk.infrastructure.vertx.RepositoryFactoryVertxImpl;
@@ -41,7 +40,6 @@ import io.nem.sdk.model.transaction.AddressAliasTransaction;
 import io.nem.sdk.model.transaction.AddressAliasTransactionFactory;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
-import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.MosaicAliasTransaction;
 import io.nem.sdk.model.transaction.MosaicAliasTransactionFactory;
@@ -51,9 +49,6 @@ import io.nem.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
-import io.nem.sdk.model.transaction.TransactionAnnounceResponse;
-import io.nem.sdk.model.transaction.TransactionInfo;
-import io.nem.sdk.model.transaction.TransactionStatusError;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.reactivex.Observable;
 import java.math.BigInteger;
@@ -282,17 +277,9 @@ public abstract class BaseIntegrationTest {
         }
         SignedTransaction signedTransaction = testAccount
             .sign(transaction, getGenerationHash());
-
-        TransactionAnnounceResponse transactionAnnounceResponse =
-            get(getRepositoryFactory(type).createTransactionRepository()
-                .announce(signedTransaction));
-        assertEquals(
-            "packet 9 was pushed to the network via /transaction",
-            transactionAnnounceResponse.getMessage());
-
-        Transaction announceCorrectly = this
-            .validateTransactionAnnounceCorrectly(
-                testAccount.getAddress(), signedTransaction.getHash(), type, transaction);
+        TransactionService transactionService = getTransactionService(type);
+        Transaction announceCorrectly = getTransactionOrFail(
+            transactionService.announce(signedTransaction), transaction);
         Assertions.assertEquals(announceCorrectly.getType(), transaction.getType());
         if (transaction.getType() != TransactionType.AGGREGATE_COMPLETE) {
             System.out.println("Transaction completed");
@@ -300,43 +287,8 @@ public abstract class BaseIntegrationTest {
         return (T) announceCorrectly;
     }
 
-
-    Transaction validateTransactionAnnounceCorrectly(Address address, String transactionHash,
-        RepositoryType type, Transaction originalTransaction) {
-        Listener listener = getListener(type);
-        Observable<Transaction> observable = listener.confirmed(address)
-            .filter(t -> t.getTransactionInfo().flatMap(TransactionInfo::getHash)
-                .filter(s -> s.equals(transactionHash)).isPresent());
-        Transaction transaction = getTransactionOrFail(address, listener, observable,
-            originalTransaction);
-        assertEquals(transactionHash, transaction.getTransactionInfo().get().getHash().get());
-        return transaction;
-    }
-
-
-    AggregateTransaction validateAggregateBondedTransactionAnnounceCorrectly(Address address,
-        String transactionHash, RepositoryType type, Transaction originalTransaction) {
-        Listener listener = getListener(type);
-        Observable<AggregateTransaction> observable = listener.aggregateBondedAdded(address)
-            .filter(t -> t.getTransactionInfo().flatMap(TransactionInfo::getHash)
-                .filter(s -> s.equals(transactionHash)).isPresent());
-        AggregateTransaction aggregateTransaction = getTransactionOrFail(address, listener,
-            observable, originalTransaction);
-        assertEquals(transactionHash,
-            aggregateTransaction.getTransactionInfo().get().getHash().get());
-        return aggregateTransaction;
-    }
-
-    CosignatureSignedTransaction validateAggregateBondedCosignatureTransactionAnnounceCorrectly(
-        Address address, String transactionHash,
-        RepositoryType type, Transaction originalTransaction) {
-        Listener listener = getListener(type);
-        Observable<CosignatureSignedTransaction> observable = listener.cosignatureAdded(address)
-            .filter(t -> t.getParentHash().equals(transactionHash));
-        CosignatureSignedTransaction transaction = getTransactionOrFail(address, listener,
-            observable, originalTransaction);
-        assertEquals(transactionHash, transaction.getParentHash());
-        return transaction;
+    protected TransactionServiceImpl getTransactionService(RepositoryType type) {
+        return new TransactionServiceImpl(getRepositoryFactory(type), getListener(type));
     }
 
     /**
@@ -344,29 +296,20 @@ public abstract class BaseIntegrationTest {
      * will raise an error. This speeds up the tests, if a transaction is not announced  correctly,
      * the method will fail before timing out as it listens errors raised by the server.
      */
-    private <T> T getTransactionOrFail(Address address, Listener listener,
-        Observable<T> observable, Transaction originalTransaction) {
+    protected <T> T getTransactionOrFail(Observable<T> observable,
+        Transaction originalTransaction) {
         try {
-            Observable<Object> errorOrTransactionObservable = Observable
-                .merge(observable, listener.status(address));
-            Object errorOrTransaction = get(errorOrTransactionObservable.take(1));
-            if (errorOrTransaction instanceof TransactionStatusError) {
-                throw new IllegalArgumentException(
-                    "TransactionStatusError " + ((TransactionStatusError) errorOrTransaction)
-                        .getStatus());
-            }
-            return (T) errorOrTransaction;
+            return (T) get(observable.take(1));
         } catch (Exception e) {
-            String failedTransaction = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE)
-                .createJsonSerialization()
-                .transactionToJson(originalTransaction);
             throw new IllegalArgumentException(
-                org.apache.commons.lang3.exception.ExceptionUtils.getMessage(e)
-                    + ". Failed Transaction json: \n" + failedTransaction, e);
+                e.getMessage() + ". Failed Transaction json: \n" + toJson(originalTransaction), e);
         }
-
     }
 
+    protected String toJson(Transaction originalTransaction) {
+        return getRepositoryFactory(DEFAULT_REPOSITORY_TYPE).createJsonSerialization()
+            .transactionToJson(originalTransaction);
+    }
 
     @SuppressWarnings("squid:S2925")
     protected void sleep(long time) throws InterruptedException {

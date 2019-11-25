@@ -16,7 +16,6 @@
 
 package io.nem.sdk.infrastructure;
 
-import io.nem.sdk.api.TransactionRepository;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.message.PlainMessage;
@@ -26,6 +25,7 @@ import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.HashLockTransaction;
 import io.nem.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.sdk.model.transaction.SignedTransaction;
+import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
@@ -64,26 +64,19 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
         SignedTransaction signedTransaction =
             this.cosignatoryAccount.sign(aggregateTransaction, getGenerationHash());
 
-        hashLock(type, this.cosignatoryAccount, signedTransaction);
-
-        get(getTransactionRepository(type).announce(signedTransaction));
-
-        validateTransactionAnnounceCorrectly(cosignatoryAccount.getAddress(),
-            signedTransaction.getHash(), type, aggregateTransaction);
-    }
-
-    private TransactionRepository getTransactionRepository(
-        RepositoryType type) {
-        return getRepositoryFactory(type).createTransactionRepository();
-    }
-
-    protected void hashLock(RepositoryType type, Account account,
-        SignedTransaction signedTransaction) {
-        HashLockTransaction hashLockTransaction =
-            HashLockTransactionFactory.create(getNetworkType(),
+        TransactionFactory<HashLockTransaction> hashLockTransaction = HashLockTransactionFactory
+            .create(
+                getNetworkType(),
                 NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
-                signedTransaction).maxFee(this.maxFee).build();
-        announceAndValidate(type, account, hashLockTransaction);
+                signedTransaction)
+            .maxFee(this.maxFee);
+        SignedTransaction signedHashLockTransaction = hashLockTransaction.build()
+            .signWith(this.cosignatoryAccount, getGenerationHash());
+
+        getTransactionOrFail(getTransactionService(type)
+                .announceHashLockAggregateBonded(signedHashLockTransaction, signedTransaction),
+            aggregateTransaction);
     }
+
 }

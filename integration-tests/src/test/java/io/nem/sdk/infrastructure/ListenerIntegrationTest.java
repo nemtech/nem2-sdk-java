@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.Listener;
 import io.nem.sdk.api.TransactionRepository;
+import io.nem.sdk.api.TransactionService;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.BlockInfo;
@@ -157,14 +158,18 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void shouldReturnAggregateBondedAddedTransactionViaListener(RepositoryType type)
-        throws ExecutionException, InterruptedException, TimeoutException {
+        throws ExecutionException, InterruptedException {
         Listener listener = getRepositoryFactory(type).createListener();
         listener.open().get();
 
-        SignedTransaction signedTransaction = this.announceAggregateBondedTransaction(type);
+        TransactionService transactionService = new TransactionServiceImpl(
+            getRepositoryFactory(type), getListener(type));
 
-        AggregateTransaction aggregateTransaction =
-            get(listener.aggregateBondedAdded(this.account.getAddress()));
+        SignedTransaction signedTransaction = this.createAggregateBondedTransaction(type);
+
+        AggregateTransaction aggregateTransaction = get(
+            transactionService.announceAggregateBonded(signedTransaction));
+
         assertEquals(
             signedTransaction.getHash(), aggregateTransaction.getTransactionInfo().get().getHash());
     }
@@ -177,7 +182,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         Listener listener = getRepositoryFactory(type).createListener();
         listener.open().get();
 
-        SignedTransaction signedTransaction = this.announceAggregateBondedTransaction(type);
+        SignedTransaction signedTransaction = this.createAggregateBondedTransaction(type);
 
         String transactionHash = get(listener.aggregateBondedRemoved(this.account.getAddress()));
         assertEquals(signedTransaction.getHash(), transactionHash);
@@ -191,10 +196,13 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         Listener listener = getRepositoryFactory(type).createListener();
         listener.open().get();
 
-        SignedTransaction signedTransaction = this.announceAggregateBondedTransaction(type);
+        SignedTransaction signedTransaction = this.createAggregateBondedTransaction(type);
 
-        AggregateTransaction announcedTransaction = get(listener
-            .aggregateBondedAdded(this.cosignatoryAccount.getAddress()));
+        TransactionService transactionService = new TransactionServiceImpl(
+            getRepositoryFactory(type), getListener(type));
+
+        AggregateTransaction announcedTransaction = get(
+            transactionService.announceAggregateBonded(signedTransaction));
 
         assertEquals(
             signedTransaction.getHash(), announcedTransaction.getTransactionInfo().get().getHash());
@@ -267,7 +275,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         return signedTransaction;
     }
 
-    private SignedTransaction announceAggregateBondedTransaction(RepositoryType type) {
+    private SignedTransaction createAggregateBondedTransaction(RepositoryType type) {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(getNetworkType(),
                 new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", getNetworkType()),
@@ -284,9 +292,6 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
 
         SignedTransaction signedTransaction =
             this.cosignatoryAccount.sign(aggregateTransaction, getGenerationHash());
-
-        get(getRepositoryFactory(type).createTransactionRepository()
-            .announceAggregateBonded(signedTransaction));
 
         return signedTransaction;
     }

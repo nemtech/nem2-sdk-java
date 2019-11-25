@@ -813,7 +813,7 @@ public class TransactionMapperOkHttpTest {
             transaction.getDuration());
         assertEquals(
             hashLockTransactionDTO.getHash(),
-            transaction.getSignedTransaction().getHash());
+            transaction.getHash());
     }
 
     void validateSecretLockTx(SecretLockTransaction transaction,

@@ -28,20 +28,34 @@ public class HashLockTransactionFactory extends TransactionFactory<HashLockTrans
 
     private final Mosaic mosaic;
     private final BigInteger duration;
-    private final SignedTransaction signedTransaction;
+    private final String hash;
 
     private HashLockTransactionFactory(
         NetworkType networkType,
         Mosaic mosaic,
         BigInteger duration,
-        SignedTransaction signedTransaction) {
+        String hash) {
         super(TransactionType.LOCK, networkType);
         Validate.notNull(mosaic, "Mosaic must not be null");
         Validate.notNull(duration, "Duration must not be null");
-        Validate.notNull(signedTransaction, "Signed transaction must not be null");
+        Validate.notNull(hash, "Hash must not be null");
         this.mosaic = mosaic;
         this.duration = duration;
-        this.signedTransaction = signedTransaction;
+        this.hash = hash;
+    }
+
+    /**
+     * Static create method for factory.
+     *
+     * @param networkType Network type.
+     * @param mosaic Mosaic.
+     * @param duration Duration.
+     * @param hash the transaction hash.
+     * @return Hash lock transaction.
+     */
+    public static HashLockTransactionFactory create(NetworkType networkType,
+        Mosaic mosaic, BigInteger duration, String hash) {
+        return new HashLockTransactionFactory(networkType, mosaic, duration, hash);
     }
 
     /**
@@ -55,7 +69,12 @@ public class HashLockTransactionFactory extends TransactionFactory<HashLockTrans
      */
     public static HashLockTransactionFactory create(NetworkType networkType,
         Mosaic mosaic, BigInteger duration, SignedTransaction signedTransaction) {
-        return new HashLockTransactionFactory(networkType, mosaic, duration, signedTransaction);
+        if (signedTransaction.getType() != TransactionType.AGGREGATE_BONDED) {
+            throw new IllegalArgumentException(
+                "Signed transaction must be Aggregate Bonded Transaction");
+        }
+        return new HashLockTransactionFactory(networkType, mosaic, duration,
+            signedTransaction.getHash());
     }
 
     /**
@@ -77,12 +96,12 @@ public class HashLockTransactionFactory extends TransactionFactory<HashLockTrans
     }
 
     /**
-     * Returns signed transaction for which funds are locked.
+     * Returns signed transaction hash for which funds are locked.
      *
-     * @return signed transaction for which funds are locked.
+     * @return signed transaction hash for which funds are locked.
      */
-    public SignedTransaction getSignedTransaction() {
-        return signedTransaction;
+    public String getHash() {
+        return hash;
     }
 
     @Override
