@@ -29,7 +29,7 @@ public class HashLockTransaction extends Transaction {
 
     private final Mosaic mosaic;
     private final BigInteger duration;
-    private final SignedTransaction signedTransaction;
+    private final String hash;
 
     /**
      * It creates a {@link HashLockTransaction} based on the factory.
@@ -40,11 +40,7 @@ public class HashLockTransaction extends Transaction {
         super(factory);
         this.mosaic = factory.getMosaic();
         this.duration = factory.getDuration();
-        this.signedTransaction = factory.getSignedTransaction();
-        if (signedTransaction.getType() != TransactionType.AGGREGATE_BONDED) {
-            throw new IllegalArgumentException(
-                "Signed transaction must be Aggregate Bonded Transaction");
-        }
+        this.hash = factory.getHash();
     }
 
     /**
@@ -66,12 +62,12 @@ public class HashLockTransaction extends Transaction {
     }
 
     /**
-     * Returns signed transaction for which funds are locked.
+     * Returns signed transaction hash for which funds are locked.
      *
-     * @return signed transaction for which funds are locked.
+     * @return signed transaction hash for which funds are locked.
      */
-    public SignedTransaction getSignedTransaction() {
-        return signedTransaction;
+    public String getHash() {
+        return hash;
     }
 
 }

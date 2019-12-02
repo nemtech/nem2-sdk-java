@@ -41,6 +41,7 @@ import io.nem.sdk.model.transaction.MultisigAccountModificationTransactionFactor
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionStatusError;
+import io.nem.sdk.model.transaction.TransactionStatusException;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
@@ -62,6 +63,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -89,6 +91,13 @@ public class ListenerVertxTest {
         String url = "http://nem.com:3000/";
         listener = new ListenerVertx(httpClientMock, url);
         jsonHelper = listener.getJsonHelper();
+        webSocketMock = Mockito.mock(WebSocket.class);
+    }
+
+
+    @AfterEach
+    public void tearDown() {
+        Mockito.verifyNoMoreInteractions(webSocketMock);
     }
 
 
@@ -117,8 +126,15 @@ public class ListenerVertxTest {
             "Listener has not been opened yet. Please call the open method before subscribing.",
             Assertions
                 .assertThrows(IllegalStateException.class, () -> listener.newBlock()).getMessage());
-    }
 
+        Map<String, String> sendPayload = new HashMap<>();
+        sendPayload.put("uid", wsId);
+        sendPayload.put("subscribe", "block");
+
+        Mockito.verify(webSocketMock).writeTextMessage(jsonHelper.print(sendPayload));
+        Mockito.verify(webSocketMock).handler(Mockito.any());
+        Mockito.verify(webSocketMock).close();
+    }
 
     @Test
     public void shouldHandleTransaction()
@@ -140,23 +156,211 @@ public class ListenerVertxTest {
         ((ObjectNode) transactionInfoDtoJsonObject.get("meta")).put("channelName", channelName);
 
         List<Transaction> transactions = new ArrayList<>();
-        listener.confirmed(address).forEach(transactions::add);
-
-        Mockito.verify(webSocketMock)
-            .writeTextMessage(jsonHelper.print(new ListenerSubscribeMessage(this.wsId,
-                channelName + "/" + address.plain())));
+        List<Throwable> exceptions = new ArrayList<>();
+        listener.confirmed(address, transactionInfo.getMeta().getHash()).doOnError(exceptions::add)
+            .forEach(transactions::add);
 
         listener.handle(transactionInfoDtoJsonObject, null);
 
         Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(0, exceptions.size());
 
         Assertions.assertEquals(address, transactions.get(0).getSigner().get().getAddress());
+
+        Mockito.verify(webSocketMock).handler(Mockito.any());
+        Mockito.verify(webSocketMock)
+            .writeTextMessage(jsonHelper.print(new ListenerSubscribeMessage(this.wsId,
+                channelName + "/" + address.plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(jsonHelper
+            .print(new ListenerSubscribeMessage(this.wsId, "status" + "/" + address.plain())));
+
+    }
+
+    @Test
+    public void confirmedUsingHash()
+        throws InterruptedException, ExecutionException, TimeoutException {
+        simulateWebSocketStartup();
+
+        TransactionInfoDTO transactionInfo = TestHelperVertx.loadTransactionInfoDTO(
+            "shouldCreateAggregateMosaicCreationTransaction.json");
+
+        ObjectNode transactionInfoDtoJsonObject = jsonHelper
+            .convert(transactionInfo, ObjectNode.class);
+
+        Address address = Address.createFromPublicKey(
+            jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
+            NetworkType.MIJIN_TEST);
+
+        String channelName = ListenerChannel.CONFIRMED_ADDED.toString();
+
+        ((ObjectNode) transactionInfoDtoJsonObject.get("meta"))
+            .put("channelName", channelName);
+
+        List<Transaction> transactions = new ArrayList<>();
+        List<Throwable> exceptions = new ArrayList<>();
+        listener.confirmed(address, transactionInfo.getMeta().getHash()).doOnError(exceptions::add)
+            .forEach(transactions::add);
+
+        listener.handle(transactionInfoDtoJsonObject, null);
+
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(0, exceptions.size());
+
+        Assertions.assertEquals(address, transactions.get(0).getSigner().get().getAddress());
+
+        Mockito.verify(webSocketMock).handler(Mockito.any());
+        Mockito.verify(webSocketMock)
+            .writeTextMessage(jsonHelper.print(new ListenerSubscribeMessage(this.wsId,
+                channelName + "/" + address.plain())));
+
+        Mockito.verify(webSocketMock).writeTextMessage(jsonHelper
+            .print(new ListenerSubscribeMessage(this.wsId, "status" + "/" + address.plain())));
+
+    }
+
+    @Test
+    public void confirmedUsingHashRaiseError()
+        throws InterruptedException, ExecutionException, TimeoutException {
+        simulateWebSocketStartup();
+
+        TransactionInfoDTO transactionInfo = TestHelperVertx.loadTransactionInfoDTO(
+            "shouldCreateAggregateMosaicCreationTransaction.json");
+
+        ObjectNode transactionInfoDtoJsonObject = jsonHelper
+            .convert(transactionInfo, ObjectNode.class);
+
+        Address address = Address.createFromPublicKey(
+            jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
+            NetworkType.MIJIN_TEST);
+
+        String channelName = ListenerChannel.CONFIRMED_ADDED.toString();
+
+        Map<String, Object> transactionStatusError = new HashMap<>();
+        transactionStatusError.put("address", address.encoded());
+        transactionStatusError.put("status", "Fail 666");
+        transactionStatusError.put("hash", transactionInfo.getMeta().getHash());
+        transactionStatusError.put("deadline", 123);
+
+        List<Transaction> transactions = new ArrayList<>();
+        List<Throwable> exceptions = new ArrayList<>();
+        listener.confirmed(address, transactionInfo.getMeta().getHash()).doOnError(exceptions::add)
+            .forEach(transactions::add);
+
+        listener.handle(transactionStatusError, null);
+
+        Assertions.assertEquals(0, transactions.size());
+        Assertions.assertEquals(1, exceptions.size());
+        Assertions.assertEquals(TransactionStatusException.class, exceptions.get(0).getClass());
+        Assertions
+            .assertEquals("Fail 666 processing transaction " + transactionInfo.getMeta().getHash(),
+                exceptions.get(0).getMessage());
+
+        Mockito.verify(webSocketMock).handler(Mockito.any());
+        Mockito.verify(webSocketMock)
+            .writeTextMessage(jsonHelper.print(new ListenerSubscribeMessage(this.wsId,
+                channelName + "/" + address.plain())));
+
+        Mockito.verify(webSocketMock)
+            .writeTextMessage(jsonHelper
+                .print(new ListenerSubscribeMessage(this.wsId, "status" + "/" + address.plain())));
+
+    }
+
+    @Test
+    public void aggregateBondedAddedUsingHash()
+        throws InterruptedException, ExecutionException, TimeoutException {
+        simulateWebSocketStartup();
+
+        TransactionInfoDTO transactionInfo = TestHelperVertx.loadTransactionInfoDTO(
+            "shouldCreateAggregateMosaicCreationTransaction.json");
+
+        ObjectNode transactionInfoDtoJsonObject = jsonHelper
+            .convert(transactionInfo, ObjectNode.class);
+
+        Address address = Address.createFromPublicKey(
+            jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
+            NetworkType.MIJIN_TEST);
+
+        String channelName = ListenerChannel.AGGREGATE_BONDED_ADDED.toString();
+
+        ((ObjectNode) transactionInfoDtoJsonObject.get("meta"))
+            .put("channelName", channelName);
+
+        List<Transaction> transactions = new ArrayList<>();
+        List<Throwable> exceptions = new ArrayList<>();
+        listener.aggregateBondedAdded(address, transactionInfo.getMeta().getHash())
+            .doOnError(exceptions::add)
+            .forEach(transactions::add);
+
+        listener.handle(transactionInfoDtoJsonObject, null);
+
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(0, exceptions.size());
+
+        Assertions.assertEquals(address, transactions.get(0).getSigner().get().getAddress());
+
+        Mockito.verify(webSocketMock).handler(Mockito.any());
+        Mockito.verify(webSocketMock)
+            .writeTextMessage(jsonHelper.print(new ListenerSubscribeMessage(this.wsId,
+                channelName + "/" + address.plain())));
+
+        Mockito.verify(webSocketMock).writeTextMessage(jsonHelper
+            .print(new ListenerSubscribeMessage(this.wsId, "status" + "/" + address.plain())));
+
+    }
+
+    @Test
+    public void aggregateBondedAddedUsingHashOnError()
+        throws InterruptedException, ExecutionException, TimeoutException {
+        simulateWebSocketStartup();
+
+        TransactionInfoDTO transactionInfo = TestHelperVertx.loadTransactionInfoDTO(
+            "shouldCreateAggregateMosaicCreationTransaction.json");
+
+        ObjectNode transactionInfoDtoJsonObject = jsonHelper
+            .convert(transactionInfo, ObjectNode.class);
+
+        Address address = Address.createFromPublicKey(
+            jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
+            NetworkType.MIJIN_TEST);
+
+        String channelName = ListenerChannel.AGGREGATE_BONDED_ADDED.toString();
+
+        Map<String, Object> transactionStatusError = new HashMap<>();
+        transactionStatusError.put("address", address.encoded());
+        transactionStatusError.put("status", "Fail 666");
+        transactionStatusError.put("hash", transactionInfo.getMeta().getHash());
+        transactionStatusError.put("deadline", 123);
+
+        List<Transaction> transactions = new ArrayList<>();
+        List<Throwable> exceptions = new ArrayList<>();
+        listener.aggregateBondedAdded(address, transactionInfo.getMeta().getHash())
+            .doOnError(exceptions::add)
+            .forEach(transactions::add);
+
+        listener.handle(transactionStatusError, null);
+
+        Assertions.assertEquals(0, transactions.size());
+        Assertions.assertEquals(1, exceptions.size());
+        Assertions.assertEquals(TransactionStatusException.class, exceptions.get(0).getClass());
+        Assertions
+            .assertEquals("Fail 666 processing transaction " + transactionInfo.getMeta().getHash(),
+                exceptions.get(0).getMessage());
+
+        Mockito.verify(webSocketMock).handler(Mockito.any());
+        Mockito.verify(webSocketMock)
+            .writeTextMessage(jsonHelper.print(new ListenerSubscribeMessage(this.wsId,
+                channelName + "/" + address.plain())));
+
+        Mockito.verify(webSocketMock)
+            .writeTextMessage(jsonHelper
+                .print(new ListenerSubscribeMessage(this.wsId, "status" + "/" + address.plain())));
 
     }
 
     private void simulateWebSocketStartup()
         throws InterruptedException, ExecutionException, TimeoutException {
-        webSocketMock = Mockito.mock(WebSocket.class);
+
         ArgumentCaptor<Handler> webSocketHandlerCapture = ArgumentCaptor.forClass(Handler.class);
         ArgumentCaptor<Handler> bufferHandlerCapture = ArgumentCaptor.forClass(Handler.class);
 
@@ -288,6 +492,13 @@ public class ListenerVertxTest {
         Assertions.assertEquals(message.get("status"), reference.get().getStatus());
         Assertions.assertEquals(account1.getAddress(), reference.get().getAddress());
 
+        Mockito.verify(webSocketMock).handler(Mockito.any());
+
+        Mockito.verify(webSocketMock).writeTextMessage(jsonHelper
+            .print(new ListenerSubscribeMessage(this.wsId,
+                "status" + "/" + account1.getAddress().plain())));
+
+
     }
 
     @Test
@@ -310,6 +521,12 @@ public class ListenerVertxTest {
         listener.handle(message, null);
 
         Assertions.assertNull(reference.get());
+
+        Mockito.verify(webSocketMock).handler(Mockito.any());
+
+        Mockito.verify(webSocketMock).writeTextMessage(jsonHelper
+            .print(new ListenerSubscribeMessage(this.wsId,
+                "status" + "/" + account2.getAddress().plain())));
     }
 
     @Test
@@ -449,14 +666,14 @@ public class ListenerVertxTest {
     private HashLockTransaction hashLockTransaction(PublicAccount signer) {
         SignedTransaction signedTransaction =
             new SignedTransaction(
-                "payload",
+                signer == null ? null : signer.getAddress(), "payload",
                 "8498B38D89C1DC8A448EA5824938FF828926CD9F7747B1844B59B4B6807E878B",
                 TransactionType.AGGREGATE_BONDED);
         MosaicId mosaicId = MapperUtils.toMosaicId("123");
         Mosaic mosaic = new Mosaic(mosaicId, BigInteger.TEN);
         HashLockTransactionFactory factory = HashLockTransactionFactory.create(
             NetworkType.MIJIN_TEST, mosaic,
-            BigInteger.TEN, signedTransaction);
+            BigInteger.TEN, signedTransaction.getHash());
         if (signer != null) {
             factory.signer(signer);
         }

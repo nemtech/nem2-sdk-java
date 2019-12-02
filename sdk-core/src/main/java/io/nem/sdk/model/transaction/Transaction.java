@@ -223,7 +223,8 @@ public abstract class Transaction {
         System.arraycopy(bytes, 104, payload, 104, bytes.length - 104);
 
         final String hash = createTransactionHash(Hex.toHexString(payload), generationHashBytes);
-        return new SignedTransaction(Hex.toHexString(payload).toUpperCase(), hash, type);
+        return new SignedTransaction(account.getAddress(),
+            Hex.toHexString(payload).toUpperCase(), hash, type);
     }
 
     /**

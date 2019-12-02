@@ -16,6 +16,8 @@
 
 package io.nem.sdk.model.transaction;
 
+import io.nem.sdk.model.account.Address;
+
 /**
  * The signed transaction object is used to transfer the transaction data and the signature to NIS
  * in order to initiate and broadcast a transaction.
@@ -24,14 +26,26 @@ package io.nem.sdk.model.transaction;
  */
 public class SignedTransaction {
 
+    private final Address signer;
     private final String payload;
     private final String hash;
     private final TransactionType type;
 
-    public SignedTransaction(String payload, String hash, TransactionType type) {
+    public SignedTransaction(Address signer, String payload, String hash,
+        TransactionType type) {
+        this.signer = signer;
         this.payload = payload;
         this.hash = hash;
         this.type = type;
+    }
+
+    /**
+     * Returns the signer of this transaction.
+     *
+     * @return the signer of this transaction.
+     */
+    public Address getSigner() {
+        return signer;
     }
 
     /**

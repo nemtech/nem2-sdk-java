@@ -16,8 +16,6 @@
 
 package io.nem.sdk.infrastructure;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.MultisigRepository;
 import io.nem.sdk.api.RepositoryCallException;
@@ -29,12 +27,10 @@ import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
-import io.nem.sdk.model.transaction.HashLockTransaction;
 import io.nem.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
 import io.nem.sdk.model.transaction.SignedTransaction;
-import io.nem.sdk.model.transaction.TransactionAnnounceResponse;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
@@ -59,7 +55,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 @TestMethodOrder(OrderAnnotation.class)
 public class AAASetupIntegrationTest extends BaseIntegrationTest {
 
-    public static final long AMOUNT_PER_TRANSFER = 10000000;
+    public static final long AMOUNT_PER_TRANSFER = 100000000;
 
     private final RepositoryType type = DEFAULT_REPOSITORY_TYPE;
 
@@ -143,22 +139,21 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
                 convertIntoMultisigTransaction.toAggregate(multisigAccount.getPublicAccount()))
         ).maxFee(this.maxFee).build();
 
-        SignedTransaction signedTransaction = aggregateTransaction
+        SignedTransaction signedAggregateTransaction = aggregateTransaction
             .signTransactionWithCosigners(multisigAccount, Arrays.asList(accounts),
                 getGenerationHash());
 
-        hashLock(type, multisigAccount, signedTransaction);
+        SignedTransaction signedHashLocktransaction = HashLockTransactionFactory.create(
+            getNetworkType(),
+            NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+            BigInteger.valueOf(100),
+            signedAggregateTransaction)
+            .maxFee(this.maxFee).build().signWith(multisigAccount, getGenerationHash());
 
-        TransactionAnnounceResponse transactionAnnounceResponse =
-            get(getRepositoryFactory(type).createTransactionRepository()
-                .announce(signedTransaction));
+        getTransactionOrFail(
+            getTransactionService(type).announceHashLockAggregateBonded(signedHashLocktransaction,
+                signedAggregateTransaction), aggregateTransaction);
 
-        assertEquals(
-            "packet 9 was pushed to the network via /transaction",
-            transactionAnnounceResponse.getMessage());
-
-        validateTransactionAnnounceCorrectly(multisigAccount.getAddress(),
-            signedTransaction.getHash(), type, aggregateTransaction);
     }
 
     private void sendMosaicFromNemesis(Account recipient, boolean force) {
@@ -196,7 +191,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
             AccountInfo accountInfo = get(getRepositoryFactory(type).createAccountRepository()
                 .getAccountInfo(recipient.getAddress()));
             return accountInfo.getMosaics().stream().anyMatch(
-                m -> m.getAmount().longValue() >= 100);
+                m -> m.getAmount().longValue() >= AMOUNT_PER_TRANSFER);
         } catch (RepositoryCallException e) {
             return false;
         }
@@ -210,14 +205,4 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
         System.out.println(jsonHelper().print(map));
     }
 
-    protected void hashLock(RepositoryType type, Account account,
-        SignedTransaction signedTransaction) {
-        HashLockTransaction hashLockTransaction = HashLockTransactionFactory.create(
-            getNetworkType(),
-            NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
-            BigInteger.valueOf(100),
-            signedTransaction)
-            .maxFee(this.maxFee).build();
-        announceAndValidate(type, account, hashLockTransaction);
-    }
 }

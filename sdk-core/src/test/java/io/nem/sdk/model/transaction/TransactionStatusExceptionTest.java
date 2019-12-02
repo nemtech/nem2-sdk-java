@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 NEM
+ * Copyright 2019 NEM
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,22 +18,23 @@ package io.nem.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.nem.sdk.model.account.Account;
-import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.account.Address;
+import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 
-public class SignedTransactionTest {
+class TransactionStatusExceptionTest {
 
     @Test
-    void createASignedTransactionViaConstructor() {
-        Account signer = Account.generateNewAccount(NetworkType.MIJIN_TEST);
-        SignedTransaction signedTransaction =
-            new SignedTransaction(signer.getAddress(), "payload", "hash",
-                TransactionType.TRANSFER);
+    void getStatusError() {
+        Address address = Address.createFromRawAddress("SCJFR55L7KWHERD2VW6C3NR2MBZLVDQWDHCHH6ZP");
+        TransactionStatusError transactionStatusError =
+            new TransactionStatusError(address, "hash", "error",
+                new Deadline(BigInteger.valueOf(1)));
 
-        assertEquals("payload", signedTransaction.getPayload());
-        assertEquals("hash", signedTransaction.getHash());
-        assertEquals(TransactionType.TRANSFER, signedTransaction.getType());
-        assertEquals(signer.getAddress(), signedTransaction.getSigner());
+        TransactionStatusException exception = new TransactionStatusException(
+            new IllegalStateException("Caller"), transactionStatusError);
+
+        assertEquals(transactionStatusError, exception.getStatusError());
     }
+
 }

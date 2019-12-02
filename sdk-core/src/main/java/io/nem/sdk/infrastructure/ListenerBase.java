@@ -27,12 +27,14 @@ import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionStatusError;
+import io.nem.sdk.model.transaction.TransactionStatusException;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import java.math.BigInteger;
 import java.util.concurrent.CompletableFuture;
+import org.apache.commons.lang3.Validate;
 
 /**
  * Created by fernando on 19/08/19.
@@ -113,14 +115,15 @@ public abstract class ListenerBase implements Listener {
      */
     @Override
     public Observable<Transaction> confirmed(final Address address) {
+        Validate.notNull(address, "Address is required");
         validateOpen();
-        this.subscribeTo(ListenerChannel.STATUS.toString() + "/" + address.plain());
         this.subscribeTo(ListenerChannel.CONFIRMED_ADDED.toString() + "/" + address.plain());
         return getMessageSubject()
             .filter(rawMessage -> rawMessage.getChannel().equals(ListenerChannel.CONFIRMED_ADDED))
             .map(rawMessage -> (Transaction) rawMessage.getMessage())
             .filter(transaction -> this.transactionFromAddress(transaction, address));
     }
+
 
     /**
      * Returns an observable stream of Transaction for a specific address. Each time a transaction
@@ -132,6 +135,7 @@ public abstract class ListenerBase implements Listener {
      */
     @Override
     public Observable<Transaction> unconfirmedAdded(Address address) {
+        Validate.notNull(address, "Address is required");
         validateOpen();
         this.subscribeTo(ListenerChannel.UNCONFIRMED_ADDED + "/" + address.plain());
         return getMessageSubject()
@@ -150,6 +154,7 @@ public abstract class ListenerBase implements Listener {
      */
     @Override
     public Observable<String> unconfirmedRemoved(Address address) {
+        Validate.notNull(address, "Address is required");
         validateOpen();
         this.subscribeTo(ListenerChannel.UNCONFIRMED_REMOVED + "/" + address.plain());
         return getMessageSubject()
@@ -168,12 +173,12 @@ public abstract class ListenerBase implements Listener {
      */
     @Override
     public Observable<AggregateTransaction> aggregateBondedAdded(Address address) {
+        Validate.notNull(address, "Address is required");
         validateOpen();
         this.subscribeTo(ListenerChannel.AGGREGATE_BONDED_ADDED + "/" + address.plain());
         return getMessageSubject()
-            .filter(
-                rawMessage -> rawMessage.getChannel()
-                    .equals(ListenerChannel.AGGREGATE_BONDED_ADDED))
+            .filter(rawMessage -> rawMessage.getChannel()
+                .equals(ListenerChannel.AGGREGATE_BONDED_ADDED))
             .map(rawMessage -> (AggregateTransaction) rawMessage.getMessage())
             .filter(transaction -> this.transactionFromAddress(transaction, address));
     }
@@ -188,6 +193,7 @@ public abstract class ListenerBase implements Listener {
      */
     @Override
     public Observable<String> aggregateBondedRemoved(Address address) {
+        Validate.notNull(address, "Address is required");
         validateOpen();
         this.subscribeTo(ListenerChannel.AGGREGATE_BONDED_REMOVED + "/" + address.plain());
         return getMessageSubject()
@@ -207,6 +213,7 @@ public abstract class ListenerBase implements Listener {
      */
     @Override
     public Observable<TransactionStatusError> status(Address address) {
+        Validate.notNull(address, "Address is required");
         validateOpen();
         this.subscribeTo(ListenerChannel.STATUS + "/" + address.plain());
         return getMessageSubject()
@@ -226,6 +233,7 @@ public abstract class ListenerBase implements Listener {
      */
     @Override
     public Observable<CosignatureSignedTransaction> cosignatureAdded(Address address) {
+        Validate.notNull(address, "Address is required");
         validateOpen();
         this.subscribeTo(ListenerChannel.CONFIRMED_ADDED + "/" + address.plain());
         return getMessageSubject()
@@ -238,6 +246,56 @@ public abstract class ListenerBase implements Listener {
             throw new IllegalStateException(
                 "Listener has not been opened yet. Please call the open method before subscribing.");
         }
+    }
+
+    @Override
+    public Observable<Transaction> confirmed(Address address, String transactionHash) {
+
+        // I may move this method to the Listener
+        Validate.notNull(address, "Address is required");
+        Validate.notNull(transactionHash, "TransactionHash is required");
+
+        Observable<Transaction> transactionListener = confirmed(address)
+            .filter(t -> t.getTransactionInfo()
+                .filter(info -> info.getHash().filter(transactionHash::equals).isPresent())
+                .isPresent());
+
+        return getTransactionOrRaiseError(address, transactionHash, transactionListener);
+    }
+
+    @Override
+    public Observable<AggregateTransaction> aggregateBondedAdded(Address address,
+        String transactionHash) {
+        Validate.notNull(address, "Address is required");
+        Validate.notNull(transactionHash, "TransactionHash is required");
+
+        // I may move this method to the Listener
+        Observable<AggregateTransaction> transactionListener = aggregateBondedAdded(address)
+            .filter(t -> t.getTransactionInfo()
+                .filter(info -> info.getHash().filter(transactionHash::equals).isPresent())
+                .isPresent());
+
+        return getTransactionOrRaiseError(address, transactionHash, transactionListener);
+    }
+
+
+    private <T extends Transaction> Observable<T> getTransactionOrRaiseError(Address address,
+        String transactionHash, Observable<T> transactionListener) {
+
+        // I may move this method to the Listener
+        IllegalStateException caller = new IllegalStateException("The Caller");
+        Observable<TransactionStatusError> errorListener = status(address)
+            .filter(m -> transactionHash.equals(m.getHash()));
+        Observable<Object> errorOrTransactionObservable = Observable
+            .merge(transactionListener, errorListener);
+        return errorOrTransactionObservable.map(errorOrTransaction -> {
+            if (errorOrTransaction instanceof TransactionStatusError) {
+                throw new TransactionStatusException(caller,
+                    (TransactionStatusError) errorOrTransaction);
+            } else {
+                return (T) errorOrTransaction;
+            }
+        });
     }
 
 
