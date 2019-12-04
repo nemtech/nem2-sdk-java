@@ -80,7 +80,6 @@ public class NetworkCurrencyMosaic extends Mosaic {
      * @return a NetworkCurrencyMosaic instance
      */
     public static NetworkCurrencyMosaic createAbsolute(BigInteger amount) {
-
         return new NetworkCurrencyMosaic(amount);
     }
 }

@@ -49,13 +49,18 @@ class MosaicGlobalRestrictionTransactionMapper extends
         byte prevRestrictionType = transaction.getPreviousRestrictionType().getValue().byteValue();
         byte newRestrictionType = transaction.getNewRestrictionType().getValue().byteValue();
 
-        return MosaicGlobalRestrictionTransactionFactory.create(networkType,
-            toUnresolvedMosaicId(transaction.getMosaicId()),
-            MapperUtils.fromHexToBigInteger(transaction.getRestrictionKey()),
-            transaction.getNewRestrictionValue(),
-            MosaicRestrictionType.rawValueOf(newRestrictionType)
-        ).referenceMosaicId(toUnresolvedMosaicId(transaction.getReferenceMosaicId()))
-            .previousRestrictionValue(transaction.getPreviousRestrictionValue())
+        MosaicGlobalRestrictionTransactionFactory factory = MosaicGlobalRestrictionTransactionFactory
+            .create(networkType,
+                toUnresolvedMosaicId(transaction.getMosaicId()),
+                MapperUtils.fromHexToBigInteger(transaction.getRestrictionKey()),
+                transaction.getNewRestrictionValue(),
+                MosaicRestrictionType.rawValueOf(newRestrictionType)
+            );
+        if (transaction.getReferenceMosaicId() != null) {
+            factory.referenceMosaicId(
+                MapperUtils.toUnresolvedMosaicId(transaction.getReferenceMosaicId()));
+        }
+        return factory.previousRestrictionValue(transaction.getPreviousRestrictionValue())
             .previousRestrictionType(MosaicRestrictionType.rawValueOf(prevRestrictionType));
     }
 

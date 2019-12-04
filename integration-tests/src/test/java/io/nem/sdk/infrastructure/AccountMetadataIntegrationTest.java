@@ -56,7 +56,7 @@ public class AccountMetadataIntegrationTest extends BaseIntegrationTest {
             ).maxFee(this.maxFee).build();
 
         AccountMetadataTransaction processedTransaction = announceAggregateAndValidate(type,
-            transaction, testAccount);
+            transaction, testAccount).getLeft();
 
         Assertions.assertEquals(transaction.getValueSizeDelta(),
             processedTransaction.getValueSizeDelta());

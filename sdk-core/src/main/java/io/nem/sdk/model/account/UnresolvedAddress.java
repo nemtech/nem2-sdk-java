@@ -31,4 +31,8 @@ public interface UnresolvedAddress {
      */
     String encoded(NetworkType networkType);
 
+    /**
+     * @return if the address is an alias (namespace).
+     */
+    boolean isAlias();
 }

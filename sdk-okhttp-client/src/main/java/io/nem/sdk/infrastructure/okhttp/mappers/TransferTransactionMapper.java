@@ -16,7 +16,7 @@
 
 package io.nem.sdk.infrastructure.okhttp.mappers;
 
-import static io.nem.core.utils.MapperUtils.toMosaicId;
+import static io.nem.core.utils.MapperUtils.toUnresolvedMosaicId;
 
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -59,7 +59,7 @@ class TransferTransactionMapper extends
                     .map(
                         mosaic ->
                             new Mosaic(
-                                toMosaicId(mosaic.getId()),
+                                toUnresolvedMosaicId(mosaic.getId()),
                                 mosaic.getAmount()))
                     .collect(Collectors.toList());
         }

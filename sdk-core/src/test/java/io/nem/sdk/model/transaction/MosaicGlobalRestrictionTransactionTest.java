@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.sdk.model.account.Account;
-import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -15,14 +14,14 @@ class MosaicGlobalRestrictionTransactionTest extends AbstractTransactionTester {
     static Account account =
         new Account(
             "26b64cb10f005e5988a36744ca19e20d835ccc7c105aaa5f3b212da593180930",
-            NetworkType.MIJIN_TEST);
+            networkType);
     static String generationHash = "57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6";
 
     @Test
     void createAMosaicGlobalRestrictionTransactionViaStaticConstructor() {
         MosaicGlobalRestrictionTransaction transaction =
             MosaicGlobalRestrictionTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
+                networkType,
                 new MosaicId(new BigInteger("1")), // restrictedMosaicId
                 BigInteger.valueOf(1),    // restrictionKey
                 BigInteger.valueOf(8),    // newRestrictionValue
@@ -31,7 +30,7 @@ class MosaicGlobalRestrictionTransactionTest extends AbstractTransactionTester {
                 .previousRestrictionValue(BigInteger.valueOf(9))
                 .previousRestrictionType(MosaicRestrictionType.EQ).build();
 
-        assertEquals(NetworkType.MIJIN_TEST, transaction.getNetworkType());
+        assertEquals(networkType, transaction.getNetworkType());
         assertTrue(1 == transaction.getVersion());
         assertTrue(LocalDateTime.now()
             .isBefore(transaction.getDeadline().getLocalDateTime()));
@@ -51,7 +50,7 @@ class MosaicGlobalRestrictionTransactionTest extends AbstractTransactionTester {
     void serializeAndSignTransaction() {
         MosaicGlobalRestrictionTransaction transaction =
             MosaicGlobalRestrictionTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
+                networkType,
                 new MosaicId(new BigInteger("1")), // restricted MosaicId
                 BigInteger.valueOf(1),    // restrictionKey
                 BigInteger.valueOf(8),    // newRestrictionValue
@@ -64,7 +63,7 @@ class MosaicGlobalRestrictionTransactionTest extends AbstractTransactionTester {
             .signWith(account, generationHash);
 
         assertEquals(
-            "1A000000010000000000000002000000000000000100000000000000090000000000000008000000000000000106",
+            "1B000000010000000000000002000000000000000100000000000000090000000000000008000000000000000106",
             signedTransaction.getPayload().substring(248));
     }
 
@@ -72,7 +71,7 @@ class MosaicGlobalRestrictionTransactionTest extends AbstractTransactionTester {
     void serialize() {
         MosaicGlobalRestrictionTransaction transaction =
             MosaicGlobalRestrictionTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
+                networkType,
                 new MosaicId(new BigInteger("3456")), // restricted MosaicId
                 BigInteger.valueOf(1),    // restrictionKey
                 BigInteger.valueOf(8),    // newRestrictionValue

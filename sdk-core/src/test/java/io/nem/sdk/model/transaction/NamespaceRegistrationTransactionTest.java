@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.sdk.model.account.Account;
-import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.namespace.NamespaceRegistrationType;
 import java.math.BigInteger;
@@ -33,12 +32,12 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
 
     private static Account account = new Account(
         "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
-        NetworkType.MIJIN_TEST);
+        networkType);
 
     private final String publicKey =
         "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf";
     private final Account testAccount =
-        Account.createFromPrivateKey(publicKey, NetworkType.MIJIN_TEST);
+        Account.createFromPrivateKey(publicKey, networkType);
     private final String generationHash =
         "57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6";
 
@@ -47,17 +46,18 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
         NamespaceId namespaceId = NamespaceId.createFromName("root-test-namespace");
         NamespaceRegistrationTransaction namespaceRegistrationTransaction =
             NamespaceRegistrationTransactionFactory.createRootNamespace(
-                NetworkType.MIJIN_TEST,
+                networkType,
                 "root-test-namespace",
                 BigInteger.valueOf(1000)).build();
 
         SignedTransaction signedTransaction =
             namespaceRegistrationTransaction.signWith(testAccount, generationHash);
 
-        assertEquals("1A000000E803000000000000CFCBE72D994BE69B0013726F6F742D746573742D6E616D657370616365",
+        assertEquals(
+            "1B000000E803000000000000CFCBE72D994BE69B0013726F6F742D746573742D6E616D657370616365",
             signedTransaction.getPayload().substring(248)
         );
-        assertEquals(NetworkType.MIJIN_TEST, namespaceRegistrationTransaction.getNetworkType());
+        assertEquals(networkType, namespaceRegistrationTransaction.getNetworkType());
         assertTrue(1 == namespaceRegistrationTransaction.getVersion());
         assertTrue(
             LocalDateTime.now()
@@ -77,7 +77,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
     void createANamespaceCreationSubNamespaceTransactionViaStaticConstructor() {
         NamespaceRegistrationTransaction namespaceRegistrationTransaction =
             NamespaceRegistrationTransactionFactory.createSubNamespace(
-                NetworkType.MIJIN_TEST,
+                networkType,
                 "root-test-namespace",
                 NamespaceId.createFromName("parent-test-namespace")
             ).build();
@@ -86,9 +86,9 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
             namespaceRegistrationTransaction.signWith(testAccount, generationHash);
 
         assertEquals(
-            "1A0000004DF55E7F6D8FB7FF924207DF2CA1BBF30113726F6F742D746573742D6E616D657370616365",
+            "1B0000004DF55E7F6D8FB7FF924207DF2CA1BBF30113726F6F742D746573742D6E616D657370616365",
             signedTransaction.getPayload().substring(248));
-        assertEquals(NetworkType.MIJIN_TEST, namespaceRegistrationTransaction.getNetworkType());
+        assertEquals(networkType, namespaceRegistrationTransaction.getNetworkType());
         assertTrue(1 == namespaceRegistrationTransaction.getVersion());
         assertTrue(
             LocalDateTime.now()
@@ -107,7 +107,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
     void createANamespaceCreationSubNamespaceWithParentIdTransactionViaStaticConstructor() {
         NamespaceRegistrationTransaction namespaceRegistrationTransaction =
             NamespaceRegistrationTransactionFactory.createSubNamespace(
-                NetworkType.MIJIN_TEST,
+                networkType,
                 "root-test-namespace",
                 NamespaceId.createFromId(new BigInteger("18426354100860810573"))
             ).build();
@@ -115,9 +115,10 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
         SignedTransaction signedTransaction =
             namespaceRegistrationTransaction.signWith(testAccount, generationHash);
 
-        assertEquals("1A0000004DF55E7F6D8FB7FF924207DF2CA1BBF30113726F6F742D746573742D6E616D657370616365",
+        assertEquals(
+            "1B0000004DF55E7F6D8FB7FF924207DF2CA1BBF30113726F6F742D746573742D6E616D657370616365",
             signedTransaction.getPayload().substring(248));
-        assertEquals(NetworkType.MIJIN_TEST, namespaceRegistrationTransaction.getNetworkType());
+        assertEquals(networkType, namespaceRegistrationTransaction.getNetworkType());
         assertTrue(1 == namespaceRegistrationTransaction.getVersion());
         assertTrue(
             LocalDateTime.now()
@@ -141,7 +142,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
         // Generated at nem2-library-js/test/transactions/RegisterNamespaceTransaction.spec.js
         NamespaceRegistrationTransaction transaction =
             NamespaceRegistrationTransactionFactory.createRootNamespace(
-                NetworkType.MIJIN_TEST, "newnamespace", BigInteger.valueOf(10000))
+                networkType, "newnamespace", BigInteger.valueOf(10000))
                 .deadline(new FakeDeadline()).signer(account.getPublicAccount())
                 .build();
 
@@ -161,7 +162,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
         // Generated at nem2-library-js/test/transactions/RegisterNamespaceTransaction.spec.js
         NamespaceRegistrationTransaction transaction =
             NamespaceRegistrationTransactionFactory.createSubNamespace(
-                NetworkType.MIJIN_TEST,
+                networkType,
                 "subnamespace",
                 NamespaceId.createFromId(new BigInteger("4635294387305441662")))
                 .signer(account.getPublicAccount())

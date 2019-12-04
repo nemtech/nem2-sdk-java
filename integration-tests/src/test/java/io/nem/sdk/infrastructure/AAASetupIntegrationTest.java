@@ -151,8 +151,9 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
             .maxFee(this.maxFee).build().signWith(multisigAccount, getGenerationHash());
 
         getTransactionOrFail(
-            getTransactionService(type).announceHashLockAggregateBonded(signedHashLocktransaction,
-                signedAggregateTransaction), aggregateTransaction);
+            getTransactionService(type)
+                .announceHashLockAggregateBonded(getListener(type), signedHashLocktransaction,
+                    signedAggregateTransaction), aggregateTransaction);
 
     }
 

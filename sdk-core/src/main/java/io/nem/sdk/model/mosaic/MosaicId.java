@@ -74,7 +74,6 @@ public class MosaicId implements UnresolvedMosaicId {
      *
      * @param mosaicNonce the mosaic nonce
      * @param owner thw account owner.
-     *
      * @return the created {@link MosaicId}.
      */
     public static MosaicId createFromNonce(MosaicNonce mosaicNonce, PublicAccount owner) {
@@ -142,6 +141,10 @@ public class MosaicId implements UnresolvedMosaicId {
         return ConvertUtils.toHex(bytes);
     }
 
+    @Override
+    public boolean isAlias() {
+        return false;
+    }
 }
 
 

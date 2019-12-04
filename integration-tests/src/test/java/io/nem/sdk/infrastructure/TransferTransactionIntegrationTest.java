@@ -70,7 +70,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
 
         TransferTransaction processed = announceAggregateAndValidate(type, transferTransaction,
             account
-        );
+        ).getKey();
         Assertions.assertEquals(message, processed.getMessage().getPayload());
     }
 

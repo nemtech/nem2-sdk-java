@@ -87,7 +87,7 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
                 4, new BlockDuration(100)).maxFee(this.maxFee).build();
 
         MosaicDefinitionTransaction processed = announceAggregateAndValidate(
-            type, mosaicDefinitionTransaction, this.account);
+            type, mosaicDefinitionTransaction, this.account).getLeft();
         Assertions.assertEquals(mosaicId, processed.getMosaicId());
     }
 

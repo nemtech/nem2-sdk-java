@@ -129,7 +129,7 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
     }
 
 
-    private MosaicId createMosaic(RepositoryType type) {
-        return super.createMosaic(testAccount, type);
+    private MosaicId createMosaic(RepositoryType type) throws InterruptedException {
+        return super.createMosaic(testAccount, type, BigInteger.ZERO, null);
     }
 }

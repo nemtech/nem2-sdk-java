@@ -44,7 +44,7 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
     @EnumSource(RepositoryType.class)
     void setAndUpdateMosaicMetadata(RepositoryType type) throws InterruptedException {
 
-        MosaicId targetMosaicId = super.createMosaic(signerAccount, type);
+        MosaicId targetMosaicId = super.createMosaic(signerAccount, type, BigInteger.ZERO, null);
 
         BigInteger key = BigInteger.valueOf(RandomUtils.generateRandomInt(100000));
 
@@ -60,7 +60,8 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
         MosaicMetadataTransaction originalTransaction = get(service
             .createMosaicMetadataTransactionFactory(getNetworkType(),
                 targetAccount.getPublicAccount(), key, originalMessage,
-                signerAccount.getPublicAccount().getPublicKey(), targetMosaicId)).maxFee(this.maxFee).build();
+                signerAccount.getPublicAccount().getPublicKey(), targetMosaicId))
+            .maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, originalTransaction, signerAccount);
 
@@ -71,7 +72,8 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
         MosaicMetadataTransaction updateTransaction = get(service
             .createMosaicMetadataTransactionFactory(getNetworkType(),
                 targetAccount.getPublicAccount(), key, newMessage,
-                signerAccount.getPublicAccount().getPublicKey(), targetMosaicId)).maxFee(this.maxFee).build();
+                signerAccount.getPublicAccount().getPublicKey(), targetMosaicId))
+            .maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, updateTransaction, signerAccount);
 

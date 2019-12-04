@@ -16,7 +16,6 @@
 
 package io.nem.sdk.infrastructure.okhttp.mappers;
 
-import static io.nem.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -39,7 +38,7 @@ class HashLockTransactionMapper extends
     }
 
     private Mosaic getMosaic(HashLockTransactionDTO mosaic) {
-        return new Mosaic(toMosaicId(mosaic.getMosaicId()),
+        return new Mosaic(MapperUtils.toUnresolvedMosaicId(mosaic.getMosaicId()),
             mosaic.getAmount());
     }
 

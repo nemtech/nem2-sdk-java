@@ -177,4 +177,9 @@ public class NamespaceId implements UnresolvedMosaicId, UnresolvedAddress {
         byte[] bytes = ByteUtils.bigIntToBytes(getId());
         return ConvertUtils.toHex(bytes);
     }
+
+    @Override
+    public boolean isAlias() {
+        return true;
+    }
 }

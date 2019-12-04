@@ -43,4 +43,9 @@ public interface UnresolvedMosaicId {
      * @return Long id.
      */
     BigInteger getId();
+
+    /**
+     * @return if the mosaic is an alias (namespace).
+     */
+    boolean isAlias();
 }

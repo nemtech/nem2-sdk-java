@@ -17,8 +17,8 @@
 package io.nem.sdk.infrastructure.okhttp.mappers;
 
 import static io.nem.core.utils.MapperUtils.getIdAsHex;
-import static io.nem.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicSupplyChangeActionType;
 import io.nem.sdk.model.transaction.JsonHelper;
@@ -44,7 +44,7 @@ class MosaicSupplyChangeTransactionMapper extends
     protected TransactionFactory<MosaicSupplyChangeTransaction> createFactory(
         NetworkType networkType, MosaicSupplyChangeTransactionDTO transaction) {
         return MosaicSupplyChangeTransactionFactory.create(networkType,
-            toMosaicId(transaction.getMosaicId()),
+            MapperUtils.toUnresolvedMosaicId(transaction.getMosaicId()),
             MosaicSupplyChangeActionType.rawValueOf(transaction.getAction().getValue()),
             transaction.getDelta());
     }

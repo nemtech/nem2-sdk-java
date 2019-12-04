@@ -17,8 +17,8 @@
 package io.nem.sdk.infrastructure.okhttp.mappers;
 
 import static io.nem.core.utils.MapperUtils.getIdAsHex;
-import static io.nem.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.blockchain.BlockDuration;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicFlags;
@@ -48,7 +48,7 @@ class MosaicDefinitionTransactionMapper extends
             MosaicFlags.create(transaction.getFlags().intValue());
         return MosaicDefinitionTransactionFactory.create(networkType,
             MosaicNonce.createFromBigInteger(transaction.getNonce()),
-            toMosaicId(transaction.getId()),
+            MapperUtils.toMosaicId(transaction.getId()),
             mosaicFlags, transaction.getDivisibility(),
             new BlockDuration(transaction.getDuration()));
     }

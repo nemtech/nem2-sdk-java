@@ -31,7 +31,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SuppressWarnings("squid:S2699")
-public class LockFundsTransactionIntegrationTest extends BaseIntegrationTest {
+public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
 
     private Account account = config().getDefaultAccount();
 

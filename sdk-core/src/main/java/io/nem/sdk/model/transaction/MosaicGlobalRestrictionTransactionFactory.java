@@ -153,7 +153,7 @@ public class MosaicGlobalRestrictionTransactionFactory
      * @return this factory.
      */
     public MosaicGlobalRestrictionTransactionFactory referenceMosaicId(UnresolvedMosaicId referenceMosaicId) {
-        Validate.notNull(previousRestrictionValue, "ReferenceMosaicId must not be null");
+        Validate.notNull(referenceMosaicId, "ReferenceMosaicId must not be null");
         this.referenceMosaicId = referenceMosaicId;
         return this;
     }

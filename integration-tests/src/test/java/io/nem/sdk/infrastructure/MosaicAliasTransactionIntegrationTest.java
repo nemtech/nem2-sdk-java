@@ -21,17 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.AccountInfo;
-import io.nem.sdk.model.blockchain.BlockDuration;
-import io.nem.sdk.model.mosaic.MosaicFlags;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicNames;
-import io.nem.sdk.model.mosaic.MosaicNonce;
 import io.nem.sdk.model.namespace.AliasAction;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.MosaicAliasTransaction;
 import io.nem.sdk.model.transaction.MosaicAliasTransactionFactory;
-import io.nem.sdk.model.transaction.MosaicDefinitionTransaction;
-import io.nem.sdk.model.transaction.MosaicDefinitionTransactionFactory;
 import io.nem.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
 import java.math.BigInteger;
@@ -60,7 +55,7 @@ public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
         Assertions.assertFalse(
             accountInfo.getMosaics().isEmpty());
 
-        MosaicId mosaicId = createMosaic(type, account);
+        MosaicId mosaicId = createMosaic(account, type, BigInteger.ZERO, null);
 
         NamespaceRegistrationTransaction namespaceRegistrationTransaction =
             NamespaceRegistrationTransactionFactory.createRootNamespace(
@@ -70,7 +65,7 @@ public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
 
         NamespaceId rootNamespaceId = announceAggregateAndValidate(type,
             namespaceRegistrationTransaction, account
-        ).getNamespaceId();
+        ).getLeft().getNamespaceId();
 
         sleep(1000);
 
@@ -96,17 +91,5 @@ public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
             .anyMatch(n -> namespaceName.equals(n.getName())));
     }
 
-    private MosaicId createMosaic(RepositoryType type, Account account) {
-        MosaicNonce nonce = MosaicNonce.createRandom();
-        MosaicId mosaicId = MosaicId.createFromNonce(nonce, account.getPublicAccount());
 
-        MosaicDefinitionTransaction mosaicDefinitionTransaction =
-            MosaicDefinitionTransactionFactory.create(getNetworkType(),
-                nonce,
-                mosaicId,
-                MosaicFlags.create(true, true, true),
-                4, new BlockDuration(100)).maxFee(this.maxFee).build();
-
-        return announceAndValidate(type, account, mosaicDefinitionTransaction).getMosaicId();
-    }
 }
