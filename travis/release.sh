@@ -27,7 +27,7 @@ if [ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]; then
 
   echo "Releasing sdk jars and javadocs"
   ./gradlew release publish gitPublishPush
-  ./gradlew closeRepository
+  ./gradlew closeAndReleaseRepository
 
   echo "New Version"
   cat version.txt

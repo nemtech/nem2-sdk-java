@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.15.0] - 25-Nov-2019
+
+**Milestone**: Fuschicho 2
+
+- Applied latest Fushicho2 schema changes to both transaction serialization and http client codes.
+- Added MetadataTransactionService that simplifies how metadata can be set and updated.
+- Added 'Mosaic Owned' endpoints.
+- Other small fixes.
+
 ## [0.14.2] - 04-Nov-2019
 
 **Milestone**: Fuschicho
