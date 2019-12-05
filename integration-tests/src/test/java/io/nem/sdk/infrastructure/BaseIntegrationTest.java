@@ -279,7 +279,7 @@ public abstract class BaseIntegrationTest {
             .sign(transaction, getGenerationHash());
         TransactionService transactionService = getTransactionService(type);
         Transaction announceCorrectly = getTransactionOrFail(
-            transactionService.announce(signedTransaction), transaction);
+            transactionService.announce(getListener(type), signedTransaction), transaction);
         Assertions.assertEquals(announceCorrectly.getType(), transaction.getType());
         if (transaction.getType() != TransactionType.AGGREGATE_COMPLETE) {
             System.out.println("Transaction completed");
@@ -288,7 +288,7 @@ public abstract class BaseIntegrationTest {
     }
 
     protected TransactionServiceImpl getTransactionService(RepositoryType type) {
-        return new TransactionServiceImpl(getRepositoryFactory(type), getListener(type));
+        return new TransactionServiceImpl(getRepositoryFactory(type));
     }
 
     /**

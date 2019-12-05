@@ -33,19 +33,15 @@ import org.apache.commons.lang3.Validate;
  */
 public class TransactionServiceImpl implements TransactionService {
 
-
     private final TransactionRepository transactionRepository;
 
-    private final Listener listener;
-
-    public TransactionServiceImpl(RepositoryFactory repositoryFactory,
-        Listener listener) {
+    public TransactionServiceImpl(RepositoryFactory repositoryFactory) {
         this.transactionRepository = repositoryFactory.createTransactionRepository();
-        this.listener = listener;
     }
 
     @Override
-    public Observable<Transaction> announce(SignedTransaction signedTransaction) {
+    public Observable<Transaction> announce(Listener listener,
+        SignedTransaction signedTransaction) {
         Validate.notNull(signedTransaction, "signedTransaction is required");
         Observable<TransactionAnnounceResponse> announce = transactionRepository
             .announce(signedTransaction);
@@ -55,7 +51,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Observable<AggregateTransaction> announceAggregateBonded(
-        SignedTransaction signedAggregateTransaction) {
+        Listener listener, SignedTransaction signedAggregateTransaction) {
         Validate.notNull(signedAggregateTransaction, "signedAggregateTransaction is required");
         Validate.isTrue(signedAggregateTransaction.getType() == TransactionType.AGGREGATE_BONDED,
             "signedAggregateTransaction type must be AGGREGATE_BONDED");
@@ -68,15 +64,16 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Observable<AggregateTransaction> announceHashLockAggregateBonded(
-        SignedTransaction signedHashLockTransaction, SignedTransaction signedAggregateTransaction) {
+        Listener listener, SignedTransaction signedHashLockTransaction,
+        SignedTransaction signedAggregateTransaction) {
         Validate.notNull(signedHashLockTransaction, "signedHashLockTransaction is required");
         Validate.notNull(signedAggregateTransaction, "signedAggregateTransaction is required");
         Validate.isTrue(signedAggregateTransaction.getType() == TransactionType.AGGREGATE_BONDED,
             "signedAggregateTransaction type must be AGGREGATE_BONDED");
         Validate.isTrue(signedHashLockTransaction.getType() == TransactionType.LOCK,
             "signedHashLockTransaction type must be LOCK");
-        return announce(signedHashLockTransaction)
-            .flatMap(t -> announceAggregateBonded(signedAggregateTransaction));
+        return announce(listener, signedHashLockTransaction)
+            .flatMap(t -> announceAggregateBonded(listener, signedAggregateTransaction));
     }
 
 }

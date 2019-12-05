@@ -64,8 +64,9 @@ public class TransactionServiceTest {
         RepositoryFactory factory = Mockito.mock(RepositoryFactory.class);
         transactionRepositoryMock = Mockito.mock(TransactionRepository.class);
         Mockito.when(factory.createTransactionRepository()).thenReturn(transactionRepositoryMock);
+
         listener = Mockito.mock(Listener.class);
-        service = new TransactionServiceImpl(factory, listener);
+        service = new TransactionServiceImpl(factory);
     }
 
     @Test
@@ -91,7 +92,8 @@ public class TransactionServiceTest {
                 Mockito.eq(signedTransaction.getHash())))
             .thenReturn(Observable.just(transferTransaction));
 
-        Observable<Transaction> announcedTransaction = service.announce(signedTransaction);
+        Observable<Transaction> announcedTransaction = service
+            .announce(listener, signedTransaction);
 
         Assertions.assertEquals(transferTransaction, announcedTransaction.toFuture().get());
 
@@ -121,7 +123,7 @@ public class TransactionServiceTest {
             .thenReturn(Observable.just(aggregateTransaction));
 
         Observable<AggregateTransaction> announcedTransaction = service
-            .announceAggregateBonded(aggregateSignedTransaction);
+            .announceAggregateBonded(listener, aggregateSignedTransaction);
 
         Assertions.assertEquals(aggregateTransaction, announcedTransaction.toFuture().get());
 
@@ -174,7 +176,8 @@ public class TransactionServiceTest {
             .thenReturn(Observable.just(aggregateTransaction));
 
         Observable<AggregateTransaction> announcedTransaction = service
-            .announceHashLockAggregateBonded(hashLockSignedTranscation, aggregateSignedTransaction);
+            .announceHashLockAggregateBonded(listener,
+                hashLockSignedTranscation, aggregateSignedTransaction);
 
         Assertions.assertEquals(aggregateTransaction, announcedTransaction.toFuture().get());
 

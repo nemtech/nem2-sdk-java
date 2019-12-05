@@ -45,7 +45,6 @@ import io.nem.sdk.openapi.vertx.model.NamespaceExpiryReceiptDTO;
 import io.nem.sdk.openapi.vertx.model.ResolutionStatementBodyDTO;
 import io.nem.sdk.openapi.vertx.model.ResolutionStatementDTO;
 import io.nem.sdk.openapi.vertx.model.StatementsDTO;
-import io.nem.sdk.openapi.vertx.model.TransactionStatementBodyDTO;
 import io.nem.sdk.openapi.vertx.model.TransactionStatementDTO;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -82,7 +81,7 @@ public class ReceiptMappingVertx {
         ResolutionStatementBodyDTO statement = receiptDto.getStatement();
         return new AddressResolutionStatement(
             statement.getHeight(),
-            toAddressFromEncoded(statement.getUnresolved().toString()),
+            MapperUtils.toUnresolvedAddress(statement.getUnresolved().toString()),
             statement.getResolutionEntries().stream()
                 .map(
                     entry ->
@@ -98,7 +97,7 @@ public class ReceiptMappingVertx {
         ResolutionStatementBodyDTO statement = receiptDto.getStatement();
         return new MosaicResolutionStatement(
             statement.getHeight(),
-            toMosaicId(statement.getUnresolved().toString()),
+            MapperUtils.toUnresolvedMosaicId(statement.getUnresolved().toString()),
             statement.getResolutionEntries().stream()
                 .map(
                     entry ->
@@ -110,15 +109,15 @@ public class ReceiptMappingVertx {
                 .collect(Collectors.toList()));
     }
 
+
     public TransactionStatement createTransactionStatement(
         TransactionStatementDTO input, NetworkType networkType) {
-        TransactionStatementBodyDTO statement = input.getStatement();
         return new TransactionStatement(
-            statement.getHeight(),
+            input.getStatement().getHeight(),
             new ReceiptSource(
-                statement.getSource().getPrimaryId(),
-                statement.getSource().getSecondaryId()),
-            statement.getReceipts().stream()
+                input.getStatement().getSource().getPrimaryId(),
+                input.getStatement().getSource().getSecondaryId()),
+            input.getStatement().getReceipts().stream()
                 .map(receipt -> createReceiptFromDto(receipt, networkType))
                 .collect(Collectors.toList()));
     }
@@ -168,6 +167,7 @@ public class ReceiptMappingVertx {
             ReceiptVersion.ARTIFACT_EXPIRY);
     }
 
+
     public BalanceChangeReceipt createBalanceChangeReceipt(
         BalanceChangeReceiptDTO receipt, NetworkType networkType) {
         return new BalanceChangeReceipt(
@@ -182,7 +182,7 @@ public class ReceiptMappingVertx {
         BalanceTransferReceiptDTO receipt, NetworkType networkType) {
         return new BalanceTransferReceipt(
             PublicAccount.createFromPublicKey(receipt.getSenderPublicKey(), networkType),
-            MapperUtils.toAddressFromEncoded(receipt.getRecipientAddress()),
+            MapperUtils.toUnresolvedAddress(receipt.getRecipientAddress()),
             new MosaicId(receipt.getMosaicId()),
             receipt.getAmount(),
             ReceiptType.rawValueOf(receipt.getType().getValue()),
@@ -196,6 +196,5 @@ public class ReceiptMappingVertx {
             ReceiptType.rawValueOf(receipt.getType().getValue()),
             ReceiptVersion.INFLATION_RECEIPT);
     }
-
 
 }

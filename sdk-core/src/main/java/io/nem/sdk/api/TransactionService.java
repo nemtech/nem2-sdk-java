@@ -40,11 +40,14 @@ public interface TransactionService {
      *
      * 3) It class the {@link Listener}'s status method waiting for an error to occurred.
      *
+     * @param listener the web socket listener used to detect completed transaction or status errors
+     * coming from the catapult server.
      * @param signedTransaction the signed transaction to be announced.
      * @return an Observable of the completed transaction or an observable that raises a {@link
      * io.nem.sdk.model.transaction.TransactionStatusException} if the transaction has failed.
      */
-    Observable<Transaction> announce(SignedTransaction signedTransaction);
+    Observable<Transaction> announce(Listener listener,
+        SignedTransaction signedTransaction);
 
 
     /**
@@ -62,13 +65,15 @@ public interface TransactionService {
      *
      * 3) It class the {@link Listener}'s status method waiting for an error to occurred.
      *
+     * @param listener the web socket listener used to detect aggregateBondedAdded transaction or
+     * status errors coming from the catapult server.
      * @param signedAggregateTransaction the signed aggregate bonded transaction to be announced.
      * @return an Observable of the added aggregate bonded transaction or an observable that raises
      * a {@link io.nem.sdk.model.transaction.TransactionStatusException} if the transaction has
      * failed.
      */
     Observable<AggregateTransaction> announceAggregateBonded(
-        SignedTransaction signedAggregateTransaction);
+        Listener listener, SignedTransaction signedAggregateTransaction);
 
 
     /**
@@ -77,13 +82,16 @@ public interface TransactionService {
      * socket. If an error is sent while processing any of the given transaction a {@link
      * io.nem.sdk.model.transaction.TransactionStatusException} is raised.
      *
+     * @param listener the web socket listener used to detect completed, aggregateBondedAdded
+     * transaction or status errors coming from the catapult server.
      * @param signedHashLockTransaction the signed hash lock transaction
-     * @param signedAggregateTransaction the signed aggregate bonded transaction that will be announced
-     * after the signed hash lock transaction is completed
+     * @param signedAggregateTransaction the signed aggregate bonded transaction that will be
+     * announced after the signed hash lock transaction is completed
      * @return an Observable of the added aggregate bonded (second) transaction or an observable
      * that raises a {@link io.nem.sdk.model.transaction.TransactionStatusException} if any
      * transaction has failed.
      */
     Observable<AggregateTransaction> announceHashLockAggregateBonded(
-        SignedTransaction signedHashLockTransaction, SignedTransaction signedAggregateTransaction);
+        Listener listener, SignedTransaction signedHashLockTransaction,
+        SignedTransaction signedAggregateTransaction);
 }

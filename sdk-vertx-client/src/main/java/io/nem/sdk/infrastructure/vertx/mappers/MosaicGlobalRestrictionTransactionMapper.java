@@ -18,7 +18,7 @@
 package io.nem.sdk.infrastructure.vertx.mappers;
 
 import static io.nem.core.utils.MapperUtils.getIdAsHex;
-import static io.nem.core.utils.MapperUtils.toMosaicId;
+import static io.nem.core.utils.MapperUtils.toUnresolvedMosaicId;
 
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -50,13 +50,18 @@ class MosaicGlobalRestrictionTransactionMapper extends
         byte prevRestrictionType = transaction.getPreviousRestrictionType().getValue().byteValue();
         byte newRestrictionType = transaction.getNewRestrictionType().getValue().byteValue();
 
-        return MosaicGlobalRestrictionTransactionFactory.create(networkType,
-            toMosaicId(transaction.getMosaicId()),
-            MapperUtils.fromHexToBigInteger(transaction.getRestrictionKey()),
-            transaction.getNewRestrictionValue(),
-            MosaicRestrictionType.rawValueOf(newRestrictionType)
-        ).referenceMosaicId(toMosaicId(transaction.getReferenceMosaicId()))
-            .previousRestrictionValue(transaction.getPreviousRestrictionValue())
+        MosaicGlobalRestrictionTransactionFactory factory = MosaicGlobalRestrictionTransactionFactory
+            .create(networkType,
+                toUnresolvedMosaicId(transaction.getMosaicId()),
+                MapperUtils.fromHexToBigInteger(transaction.getRestrictionKey()),
+                transaction.getNewRestrictionValue(),
+                MosaicRestrictionType.rawValueOf(newRestrictionType)
+            );
+        if (transaction.getReferenceMosaicId() != null) {
+            factory.referenceMosaicId(
+                MapperUtils.toUnresolvedMosaicId(transaction.getReferenceMosaicId()));
+        }
+        return factory.previousRestrictionValue(transaction.getPreviousRestrictionValue())
             .previousRestrictionType(MosaicRestrictionType.rawValueOf(prevRestrictionType));
     }
 

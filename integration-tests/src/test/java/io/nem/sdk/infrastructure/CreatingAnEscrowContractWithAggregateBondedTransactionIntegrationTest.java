@@ -95,7 +95,8 @@ public class CreatingAnEscrowContractWithAggregateBondedTransactionIntegrationTe
         TransactionService transactionService = getTransactionService(type);
 
         Transaction transaction = get(transactionService
-            .announceHashLockAggregateBonded(signedHashLockTransaction, signedTransaction));
+            .announceHashLockAggregateBonded(getListener(type), signedHashLockTransaction,
+                signedTransaction));
 
         System.out.println(toJson(transaction));
 

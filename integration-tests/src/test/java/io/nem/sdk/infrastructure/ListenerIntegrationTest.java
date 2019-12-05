@@ -150,12 +150,12 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     void shouldReturnAggregateBondedAddedTransactionViaListener(RepositoryType type) {
 
         TransactionService transactionService = new TransactionServiceImpl(
-            getRepositoryFactory(type), getListener(type));
+            getRepositoryFactory(type));
 
         SignedTransaction signedTransaction = this.createAggregateBondedTransaction();
 
         AggregateTransaction aggregateTransaction = get(
-            transactionService.announceAggregateBonded(signedTransaction));
+            transactionService.announceAggregateBonded(getListener(type), signedTransaction));
 
         assertEquals(
             signedTransaction.getHash(), aggregateTransaction.getTransactionInfo().get().getHash());
@@ -182,10 +182,10 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         SignedTransaction signedTransaction = this.createAggregateBondedTransaction();
 
         TransactionService transactionService = new TransactionServiceImpl(
-            getRepositoryFactory(type), getListener(type));
+            getRepositoryFactory(type));
 
         AggregateTransaction announcedTransaction = get(
-            transactionService.announceAggregateBonded(signedTransaction));
+            transactionService.announceAggregateBonded(listener, signedTransaction));
 
         assertEquals(
             signedTransaction.getHash(), announcedTransaction.getTransactionInfo().get().getHash());

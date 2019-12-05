@@ -140,7 +140,7 @@ public class OkHttpAggregateTransactionTest {
                 aggregateTx, Collections.singletonList(cosignatoryAccount2), generationHash);
 
         assertEquals("6801000000000000", signedTransaction.getPayload().substring(0, 16));
-        assertEquals("1a000000d6a52a97", signedTransaction.getPayload().substring(248, 264));
+        assertEquals("1b000000d6a52a97", signedTransaction.getPayload().substring(248, 264));
 
     }
 

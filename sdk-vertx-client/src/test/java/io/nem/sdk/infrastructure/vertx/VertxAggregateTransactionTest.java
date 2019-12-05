@@ -40,7 +40,6 @@ import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.vertx.core.json.Json;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
@@ -67,7 +66,7 @@ public class VertxAggregateTransactionTest {
         AggregateTransaction aggregateTx =
             AggregateTransactionFactory.createComplete(
                 NetworkType.MIJIN_TEST,
-                Arrays.asList(
+                Collections.singletonList(
                     transferTx.toAggregate(
                         new PublicAccount(
                             "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
@@ -75,7 +74,7 @@ public class VertxAggregateTransactionTest {
             ).build();
 
         assertEquals(NetworkType.MIJIN_TEST, aggregateTx.getNetworkType());
-        assertTrue(1 == aggregateTx.getVersion());
+        assertEquals(1, (int) aggregateTx.getVersion());
         assertTrue(LocalDateTime.now().isBefore(aggregateTx.getDeadline().getLocalDateTime()));
         assertEquals(BigInteger.valueOf(0), aggregateTx.getMaxFee());
         assertEquals(1, aggregateTx.getInnerTransactions().size());
@@ -144,7 +143,7 @@ public class VertxAggregateTransactionTest {
                 aggregateTx, Collections.singletonList(cosignatoryAccount2), generationHash);
 
         assertEquals("6801000000000000", signedTransaction.getPayload().substring(0, 16));
-        assertEquals("1a000000d6a52a97", signedTransaction.getPayload().substring(248, 264));
+        assertEquals("1b000000d6a52a97", signedTransaction.getPayload().substring(248, 264));
         // assertEquals("039054419050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1420D000000746573742D6D65737361676568B3FBB18729C1FDE225C57F8CE080FA828F0067E451A3FD81FA628842B0B763", signedTransaction.getPayload().substring(320, 474));
 
     }

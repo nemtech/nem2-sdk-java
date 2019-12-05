@@ -75,7 +75,8 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
             .signWith(this.cosignatoryAccount, getGenerationHash());
 
         getTransactionOrFail(getTransactionService(type)
-                .announceHashLockAggregateBonded(signedHashLockTransaction, signedTransaction),
+                .announceHashLockAggregateBonded(getListener(type), signedHashLockTransaction,
+                    signedTransaction),
             aggregateTransaction);
     }
 
