@@ -28,12 +28,12 @@ public class SignedTransactionTest {
     void createASignedTransactionViaConstructor() {
         Account signer = Account.generateNewAccount(NetworkType.MIJIN_TEST);
         SignedTransaction signedTransaction =
-            new SignedTransaction(signer.getAddress(), "payload", "hash",
+            new SignedTransaction(signer.getPublicAccount(), "payload", "hash",
                 TransactionType.TRANSFER);
 
         assertEquals("payload", signedTransaction.getPayload());
         assertEquals("hash", signedTransaction.getHash());
         assertEquals(TransactionType.TRANSFER, signedTransaction.getType());
-        assertEquals(signer.getAddress(), signedTransaction.getSigner());
+        assertEquals(signer.getPublicAccount(), signedTransaction.getSigner());
     }
 }

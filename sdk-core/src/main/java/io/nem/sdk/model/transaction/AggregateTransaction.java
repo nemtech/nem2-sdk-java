@@ -105,7 +105,7 @@ public class AggregateTransaction extends Transaction {
 
         System.arraycopy(size, 0, payloadBytes, 0, size.length);
 
-        return new SignedTransaction(initiatorAccount.getAddress(),
+        return new SignedTransaction(initiatorAccount.getPublicAccount(),
             Hex.toHexString(payloadBytes), signedTransaction.getHash(), getType());
     }
 

@@ -80,7 +80,7 @@ class HashLockTransactionTest extends AbstractTransactionTester {
     void serializeAndSignTransaction() {
         SignedTransaction signedTransaction =
             new SignedTransaction(
-                Account.generateNewAccount(networkType).getAddress(),
+                Account.generateNewAccount(networkType).getPublicAccount(),
                 "payload",
                 "8498B38D89C1DC8A448EA5824938FF828926CD9F7747B1844B59B4B6807E878B",
                 TransactionType.AGGREGATE_BONDED);
@@ -108,7 +108,7 @@ class HashLockTransactionTest extends AbstractTransactionTester {
 
         SignedTransaction signedTransaction =
             new SignedTransaction(
-                Account.generateNewAccount(networkType).getAddress(),
+                Account.generateNewAccount(networkType).getPublicAccount(),
                 "payload",
                 "8498B38D89C1DC8A448EA5824938FF828926CD9F7747B1844B59B4B6807E878B",
                 TransactionType.TRANSFER);

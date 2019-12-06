@@ -29,12 +29,22 @@ import io.reactivex.Observable;
 import org.apache.commons.lang3.Validate;
 
 /**
- * Implementation of {@link TransactionService}.
+ * Implementation of {@link TransactionService}. It  uses the repository interfaces. It works for
+ * the different low level implementations like Vertx and Okhttp.
  */
 public class TransactionServiceImpl implements TransactionService {
 
+
+    /**
+     * The @{@link TransactionRepository} used to query and announce the different transactions.
+     */
     private final TransactionRepository transactionRepository;
 
+    /**
+     * The constructor
+     *
+     * @param repositoryFactory the {@link RepositoryFactory} with the catapult server connection.
+     */
     public TransactionServiceImpl(RepositoryFactory repositoryFactory) {
         this.transactionRepository = repositoryFactory.createTransactionRepository();
     }
@@ -46,7 +56,8 @@ public class TransactionServiceImpl implements TransactionService {
         Observable<TransactionAnnounceResponse> announce = transactionRepository
             .announce(signedTransaction);
         return announce.flatMap(
-            r -> listener.confirmed(signedTransaction.getSigner(), signedTransaction.getHash()));
+            r -> listener.confirmed(signedTransaction.getSigner().getAddress(),
+                signedTransaction.getHash()));
     }
 
     @Override
@@ -58,7 +69,7 @@ public class TransactionServiceImpl implements TransactionService {
         Observable<TransactionAnnounceResponse> announce = transactionRepository
             .announceAggregateBonded(signedAggregateTransaction);
         return announce.flatMap(
-            r -> listener.aggregateBondedAdded(signedAggregateTransaction.getSigner(),
+            r -> listener.aggregateBondedAdded(signedAggregateTransaction.getSigner().getAddress(),
                 signedAggregateTransaction.getHash()));
     }
 
