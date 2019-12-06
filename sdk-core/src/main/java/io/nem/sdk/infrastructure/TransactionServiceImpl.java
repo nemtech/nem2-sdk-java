@@ -65,14 +65,26 @@ import java.util.function.Predicate;
 import org.apache.commons.lang3.Validate;
 
 /**
- * Implementation of {@link TransactionService}.
+ * Implementation of {@link TransactionService}. It  uses the repository interfaces. It works for
+ * the different low level implementations like Vertx and Okhttp.
  */
 public class TransactionServiceImpl implements TransactionService {
 
+    /**
+     * The @{@link TransactionRepository} used to query and announce the different transactions.
+     */
     private final TransactionRepository transactionRepository;
 
+    /**
+     * The @{@link ReceiptRepository} used to resolve the aliases.
+     */
     private final ReceiptRepository receiptRepository;
 
+    /**
+     * The constructor
+     *
+     * @param repositoryFactory the {@link RepositoryFactory} with the catapult server connection.
+     */
     public TransactionServiceImpl(RepositoryFactory repositoryFactory) {
         this.transactionRepository = repositoryFactory.createTransactionRepository();
         this.receiptRepository = repositoryFactory.createReceiptRepository();

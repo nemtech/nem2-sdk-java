@@ -313,9 +313,9 @@ public abstract class BaseIntegrationTest {
         }
     }
 
-    protected String toJson(Transaction transaction) {
+    protected String toJson(Transaction originalTransaction) {
         return getRepositoryFactory(DEFAULT_REPOSITORY_TYPE).createJsonSerialization()
-            .transactionToJson(transaction);
+            .transactionToJson(originalTransaction);
     }
 
     @SuppressWarnings("squid:S2925")
