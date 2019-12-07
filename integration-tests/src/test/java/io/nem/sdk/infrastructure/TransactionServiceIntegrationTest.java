@@ -42,7 +42,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
-    String mosaicAlias = "transaction-service-mosaic-test-4";
+    String mosaicAlias = "transaction-service-mosaic-test-5";
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)

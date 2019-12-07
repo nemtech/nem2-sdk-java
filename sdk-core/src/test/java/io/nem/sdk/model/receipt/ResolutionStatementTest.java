@@ -146,4 +146,5 @@ public class ResolutionStatementTest {
         assertFalse(hash.isEmpty());
         assertEquals("C965152CBD197283CC9F7AFD7F8C4C3FF03B0B54FCE7C8F4820F966AB0591A5C", hash);
     }
+
 }

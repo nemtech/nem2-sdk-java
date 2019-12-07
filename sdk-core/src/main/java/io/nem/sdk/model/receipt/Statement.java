@@ -16,7 +16,14 @@
 
 package io.nem.sdk.model.receipt;
 
+import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.account.UnresolvedAddress;
+import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class Statement {
 
@@ -65,5 +72,49 @@ public class Statement {
      */
     public List<MosaicResolutionStatement> getMosaicResolutionStatement() {
         return this.mosaicResolutionStatement;
+    }
+
+    /**
+     * This method tries to resolve the unresolved mosaic id using the the resolution entries.
+     *
+     * @param height the height of the transaction.
+     * @param mosaicAlias the {@link UnresolvedMosaicId}
+     * @param primaryId the primary id
+     * @param secondaryId the secondary id
+     * @return the {@link Optional} of the resolved {@link MosaicId}
+     */
+    public Optional<MosaicId> getResolvedMosaicId(BigInteger height,
+        UnresolvedMosaicId mosaicAlias, int primaryId,
+        int secondaryId) {
+        if (!mosaicAlias.isAlias()) {
+            return Optional.of((MosaicId) mosaicAlias);
+        }
+        return this.getMosaicResolutionStatement().stream()
+            .filter(s -> height.equals(s.getHeight()))
+            .filter(r -> r.getUnresolved().equals(mosaicAlias))
+            .map(r -> r.getResolutionEntryById(primaryId, secondaryId)
+                .map(ResolutionEntry::getResolved)).findFirst().flatMap(Function.identity());
+    }
+
+    /**
+     * This method tries to resolve the unresolved address using the the resolution entries.
+     *
+     * @param height the height of the transaction.
+     * @param unresolvedAddress the {@link UnresolvedAddress}
+     * @param primaryId the primary id
+     * @param secondaryId the secondary id
+     * @return the {@link Optional} of the resolved {@link Address}
+     */
+    public Optional<Address> getResolvedAddress(BigInteger height,
+        UnresolvedAddress unresolvedAddress, int primaryId,
+        int secondaryId) {
+        if (!unresolvedAddress.isAlias()) {
+            return Optional.of((Address) unresolvedAddress);
+        }
+        return this.getAddressResolutionStatements().stream()
+            .filter(s -> height.equals(s.getHeight()))
+            .filter(r -> r.getUnresolved().equals(unresolvedAddress))
+            .map(r -> r.getResolutionEntryById(primaryId, secondaryId)
+                .map(ResolutionEntry::getResolved)).findFirst().flatMap(Function.identity());
     }
 }

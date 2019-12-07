@@ -16,7 +16,6 @@
 
 package io.nem.sdk.infrastructure;
 
-import io.nem.sdk.api.Listener;
 import io.nem.core.utils.ExceptionUtils;
 import io.nem.sdk.api.Listener;
 import io.nem.sdk.api.ReceiptRepository;
@@ -24,9 +23,6 @@ import io.nem.sdk.api.RepositoryFactory;
 import io.nem.sdk.api.TransactionRepository;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
-import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.message.PlainMessage;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.BlockDuration;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -75,8 +71,6 @@ import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionAnnounceResponse;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionInfo;
-import io.nem.sdk.model.transaction.TransactionFactory;
-import io.nem.sdk.model.transaction.TransactionInfo;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
@@ -84,14 +78,11 @@ import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -101,7 +92,7 @@ import org.mockito.Mockito;
 /**
  * Tests of {@link io.nem.sdk.api.TransactionService}.
  */
-public class TransactionServiceTest {
+class TransactionServiceTest {
 
 
     private NetworkType networkType = NetworkType.MIJIN_TEST;
@@ -110,19 +101,19 @@ public class TransactionServiceTest {
     private ReceiptRepository receiptRepositoryMock;
     private Account account;
     private Listener listener;
-
-    MosaicId mosaicId1 = new MosaicId("AAAAAAAAAAAAAAA1");
-    MosaicId mosaicId2 = new MosaicId("AAAAAAAAAAAAAAA2");
-    MosaicId mosaicId3 = new MosaicId("AAAAAAAAAAAAAAA3");
-    NamespaceId mosaicNamespace1 = NamespaceId.createFromName("mosaicnamespace1");
-    NamespaceId mosaicNamespace2 = NamespaceId.createFromName("mosaicnamespace2");
-    NamespaceId mosaicNamespace3 = NamespaceId.createFromName("mosaicnamespace3");
-    Address address1 = Account.generateNewAccount(networkType).getAddress();
-    Address address2 = Account.generateNewAccount(networkType).getAddress();
-    Address address3 = Account.generateNewAccount(networkType).getAddress();
-    NamespaceId addressNamespace1 = NamespaceId.createFromName("addressnamespace1");
-    NamespaceId addressNamespace2 = NamespaceId.createFromName("addressnamespace2");
-    NamespaceId addressNamespace3 = NamespaceId.createFromName("addressnamespace3");
+    private BigInteger height = BigInteger.TEN;
+    private MosaicId mosaicId1 = new MosaicId("AAAAAAAAAAAAAAA1");
+    private MosaicId mosaicId2 = new MosaicId("AAAAAAAAAAAAAAA2");
+    private MosaicId mosaicId3 = new MosaicId("AAAAAAAAAAAAAAA3");
+    private NamespaceId mosaicNamespace1 = NamespaceId.createFromName("mosaicnamespace1");
+    private NamespaceId mosaicNamespace2 = NamespaceId.createFromName("mosaicnamespace2");
+    private NamespaceId mosaicNamespace3 = NamespaceId.createFromName("mosaicnamespace3");
+    private Address address1 = Account.generateNewAccount(networkType).getAddress();
+    private Address address2 = Account.generateNewAccount(networkType).getAddress();
+    private Address address3 = Account.generateNewAccount(networkType).getAddress();
+    private NamespaceId addressNamespace1 = NamespaceId.createFromName("addressnamespace1");
+    private NamespaceId addressNamespace2 = NamespaceId.createFromName("addressnamespace2");
+    private NamespaceId addressNamespace3 = NamespaceId.createFromName("addressnamespace3");
 
     @BeforeEach
     void setup() {
@@ -264,7 +255,7 @@ public class TransactionServiceTest {
         UnresolvedAddress recipient = addressNamespace1;
 
         String transactionHash = "aaaa";
-        BigInteger height = BigInteger.ONE;
+
         TransactionFactory<TransferTransaction> factory = TransferTransactionFactory
             .create(NetworkType.MIJIN_TEST,
                 recipient,
@@ -310,6 +301,87 @@ public class TransactionServiceTest {
 
     }
 
+    @Test
+    void transferTransactionResolveAliasCannotAddressResolveAliases() {
+
+        ArrayList<Mosaic> mosaics = new ArrayList<>();
+        mosaics.add(new Mosaic(mosaicId1, BigInteger.valueOf(1)));
+        mosaics.add(new Mosaic(mosaicNamespace2, BigInteger.valueOf(2)));
+        mosaics.add(new Mosaic(mosaicId3, BigInteger.valueOf(3)));
+
+        UnresolvedAddress recipient = addressNamespace1;
+
+        String transactionHash = "aaaa";
+
+        TransactionFactory<TransferTransaction> factory = TransferTransactionFactory
+            .create(NetworkType.MIJIN_TEST,
+                recipient,
+                mosaics,
+                PlainMessage.Empty
+            ).transactionInfo(TransactionInfo.create(height, 0, "", transactionHash, ""));
+
+        simulateStatement(height, 0, 0);
+
+        TransferTransaction transaction = factory.build();
+
+        List<String> hashes = Collections.singletonList(transactionHash);
+
+        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+            .thenReturn(Observable.just(Collections.singletonList(transaction)));
+
+        IllegalArgumentException exception = Assertions
+            .assertThrows(IllegalArgumentException.class, () ->
+
+                ExceptionUtils.propagate(() -> service
+                    .resolveAliases(hashes)
+                    .toFuture().get()));
+        Assertions.assertEquals(
+            "Address could not be resolved for alias " + addressNamespace1.getIdAsHex(),
+            exception.getMessage());
+
+    }
+
+    @Test
+    void transferTransactionResolveAliasCannotMosaicAliasResolveAliases() {
+
+        ArrayList<Mosaic> mosaics = new ArrayList<>();
+        mosaics.add(new Mosaic(mosaicId1, BigInteger.valueOf(1)));
+        mosaics.add(new Mosaic(mosaicNamespace2, BigInteger.valueOf(2)));
+        NamespaceId idontexist = NamespaceId.createFromName("idontexist");
+        mosaics.add(new Mosaic(idontexist, BigInteger.valueOf(3)));
+
+        UnresolvedAddress recipient = addressNamespace1;
+
+        String transactionHash = "aaaa";
+
+        TransactionFactory<TransferTransaction> factory = TransferTransactionFactory
+            .create(NetworkType.MIJIN_TEST,
+                recipient,
+                mosaics,
+                PlainMessage.Empty
+            ).transactionInfo(TransactionInfo.create(height, 0, "", transactionHash, ""));
+
+        simulateStatement(height, 1, 0);
+
+        TransferTransaction transaction = factory.build();
+
+        List<String> hashes = Collections.singletonList(transactionHash);
+
+        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+            .thenReturn(Observable.just(Collections.singletonList(transaction)));
+
+        IllegalArgumentException exception = Assertions
+            .assertThrows(IllegalArgumentException.class, () ->
+
+                ExceptionUtils.propagate(() -> service
+                    .resolveAliases(hashes)
+                    .toFuture().get()));
+        Assertions
+            .assertEquals("MosaicId could not be resolved for alias " + idontexist.getIdAsHex(),
+                exception.getMessage());
+
+    }
+
 
     @Test
     void secretLockTransactionResolveAlias() throws ExecutionException, InterruptedException {
@@ -319,7 +391,7 @@ public class TransactionServiceTest {
 
         String transactionHash = "aaaa";
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
-        BigInteger height = BigInteger.ONE;
+
         TransactionFactory<SecretLockTransaction> factory = SecretLockTransactionFactory
             .create(NetworkType.MIJIN_TEST, unresolvedMosaicId, BigInteger.TEN,
                 LockHashAlgorithmType.SHA3_256, secret, recipient
@@ -354,7 +426,7 @@ public class TransactionServiceTest {
         String transactionHash = "aaaa";
         String secret = "1118ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
         String proof = "2228ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
-        BigInteger height = BigInteger.ONE;
+
         TransactionFactory<SecretProofTransaction> factory = SecretProofTransactionFactory
             .create(NetworkType.MIJIN_TEST, LockHashAlgorithmType.SHA3_256, recipient, secret, proof
             ).transactionInfo(TransactionInfo.create(height, 0, "", transactionHash, ""));
@@ -382,7 +454,7 @@ public class TransactionServiceTest {
         throws ExecutionException, InterruptedException {
 
         String transactionHash = "aaaa";
-        BigInteger height = BigInteger.ONE;
+
         MosaicGlobalRestrictionTransactionFactory mosaicGlobalRestrictionTransactionFactory = MosaicGlobalRestrictionTransactionFactory
             .create(NetworkType.MIJIN_TEST, mosaicNamespace2, BigInteger.TEN, BigInteger.ONE,
                 MosaicRestrictionType.GT
@@ -416,7 +488,7 @@ public class TransactionServiceTest {
         throws ExecutionException, InterruptedException {
 
         String transactionHash = "aaaa";
-        BigInteger height = BigInteger.ONE;
+
         TransactionFactory<MosaicAddressRestrictionTransaction> factory = MosaicAddressRestrictionTransactionFactory
             .create(NetworkType.MIJIN_TEST, mosaicNamespace2, BigInteger.TEN,
                 addressNamespace3, BigInteger.ONE
@@ -447,7 +519,7 @@ public class TransactionServiceTest {
         throws ExecutionException, InterruptedException {
 
         String transactionHash = "aaaa";
-        BigInteger height = BigInteger.ONE;
+
         TransactionFactory<AccountMosaicRestrictionTransaction> factory = AccountMosaicRestrictionTransactionFactory
             .create(NetworkType.MIJIN_TEST, AccountRestrictionFlags.ALLOW_INCOMING_MOSAIC,
                 Arrays.asList(mosaicNamespace1, mosaicId2, mosaicNamespace2),
@@ -479,7 +551,7 @@ public class TransactionServiceTest {
         throws ExecutionException, InterruptedException {
 
         String transactionHash = "aaaa";
-        BigInteger height = BigInteger.ONE;
+
         TransactionFactory<MosaicMetadataTransaction> factory = MosaicMetadataTransactionFactory
             .create(NetworkType.MIJIN_TEST,
                 Account.generateNewAccount(networkType).getPublicAccount(), mosaicNamespace2,
@@ -508,7 +580,7 @@ public class TransactionServiceTest {
         throws ExecutionException, InterruptedException {
 
         String transactionHash = "aaaa";
-        BigInteger height = BigInteger.ONE;
+
         TransactionFactory<MosaicSupplyChangeTransaction> factory = MosaicSupplyChangeTransactionFactory
             .create(NetworkType.MIJIN_TEST,
                 mosaicNamespace2, MosaicSupplyChangeActionType.INCREASE, BigInteger.ONE)
@@ -536,7 +608,7 @@ public class TransactionServiceTest {
         throws ExecutionException, InterruptedException {
 
         String transactionHash = "aaaa";
-        BigInteger height = BigInteger.ONE;
+
         TransactionFactory<MosaicDefinitionTransaction> factory = MosaicDefinitionTransactionFactory
             .create(NetworkType.MIJIN_TEST, MosaicNonce.createFromBigInteger(new BigInteger("0")),
                 mosaicId2, MosaicFlags.create(true, true, true),
@@ -566,7 +638,7 @@ public class TransactionServiceTest {
         throws ExecutionException, InterruptedException {
 
         String transactionHash = "aaaa";
-        BigInteger height = BigInteger.ONE;
+
         TransactionFactory<AccountAddressRestrictionTransaction> factory = AccountAddressRestrictionTransactionFactory
             .create(NetworkType.MIJIN_TEST, AccountRestrictionFlags.ALLOW_INCOMING_MOSAIC,
                 Arrays.asList(addressNamespace1, address2, addressNamespace2),
@@ -598,7 +670,7 @@ public class TransactionServiceTest {
         Mosaic unresolvedMosaicId = new Mosaic(mosaicNamespace2, BigInteger.valueOf(2));
 
         String transactionHash = "aaaa";
-        BigInteger height = BigInteger.ONE;
+
         TransactionFactory<HashLockTransaction> factory = HashLockTransactionFactory
             .create(NetworkType.MIJIN_TEST,
                 unresolvedMosaicId, BigInteger.TEN,
@@ -636,7 +708,7 @@ public class TransactionServiceTest {
         UnresolvedAddress recipient = addressNamespace1;
 
         String transactionHash = "aaaa";
-        BigInteger height = BigInteger.ONE;
+
         TransactionFactory<TransferTransaction> factory = TransferTransactionFactory
             .create(NetworkType.MIJIN_TEST,
                 recipient,
@@ -714,7 +786,7 @@ public class TransactionServiceTest {
         UnresolvedAddress recipient = addressNamespace1;
 
         String transactionHash = "aaaa";
-        BigInteger height = BigInteger.ONE;
+
         TransactionFactory<TransferTransaction> factory = TransferTransactionFactory
             .create(NetworkType.MIJIN_TEST,
                 recipient,
@@ -770,7 +842,7 @@ public class TransactionServiceTest {
         UnresolvedAddress recipient = addressNamespace1;
 
         String transactionHash = "aaaa";
-        BigInteger height = BigInteger.ONE;
+
         TransactionFactory<TransferTransaction> factory = TransferTransactionFactory
             .create(NetworkType.MIJIN_TEST,
                 recipient,
@@ -804,7 +876,6 @@ public class TransactionServiceTest {
 
         Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(aggregateTransaction)));
-
 
         IllegalArgumentException exception = Assertions
             .assertThrows(IllegalArgumentException.class, () -> {

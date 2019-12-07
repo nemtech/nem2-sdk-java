@@ -26,9 +26,8 @@ import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
+import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.receipt.ReceiptSource;
-import io.nem.sdk.model.receipt.ResolutionEntry;
-import io.nem.sdk.model.receipt.ResolutionStatement;
 import io.nem.sdk.model.receipt.Statement;
 import io.nem.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
@@ -61,7 +60,6 @@ import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import io.reactivex.Observable;
 import io.reactivex.functions.BiFunction;
 import java.util.List;
-import java.util.function.Predicate;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -97,7 +95,8 @@ public class TransactionServiceImpl implements TransactionService {
         Observable<TransactionAnnounceResponse> announce = transactionRepository
             .announce(signedTransaction);
         return announce.flatMap(
-            r -> listener.confirmed(signedTransaction.getSigner(), signedTransaction.getHash()));
+            r -> listener.confirmed(signedTransaction.getSigner().getAddress(),
+                signedTransaction.getHash()));
     }
 
     @Override
@@ -109,7 +108,7 @@ public class TransactionServiceImpl implements TransactionService {
         Observable<TransactionAnnounceResponse> announce = transactionRepository
             .announceAggregateBonded(signedAggregateTransaction);
         return announce.flatMap(
-            r -> listener.aggregateBondedAdded(signedAggregateTransaction.getSigner(),
+            r -> listener.aggregateBondedAdded(signedAggregateTransaction.getSigner().getAddress(),
                 signedAggregateTransaction.getHash()));
     }
 
@@ -214,7 +213,7 @@ public class TransactionServiceImpl implements TransactionService {
         HashLockTransaction transaction, ReceiptSource expectedReceiptSource) {
         Observable<Statement> statementObservable = getStatement(transaction);
 
-        Observable<Mosaic> resolvedMosaic = getResolvedMosaic(transaction.getMosaic(),
+        Observable<Mosaic> resolvedMosaic = getResolvedMosaic(transaction, transaction.getMosaic(),
             statementObservable, expectedReceiptSource
         );
 
@@ -226,9 +225,9 @@ public class TransactionServiceImpl implements TransactionService {
     private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
         SecretLockTransaction transaction, ReceiptSource expectedReceiptSource) {
         Observable<Statement> statementObservable = getStatement(transaction);
-        Observable<Address> resolvedAddress = getResolvedValue(transaction.getRecipient(),
-            statementObservable, expectedReceiptSource);
-        Observable<Mosaic> resolvedMosaic = getResolvedMosaic(transaction.getMosaic(),
+        Observable<Address> resolvedAddress = getResolvedAddress(transaction,
+            transaction.getRecipient(), statementObservable, expectedReceiptSource);
+        Observable<Mosaic> resolvedMosaic = getResolvedMosaic(transaction, transaction.getMosaic(),
             statementObservable, expectedReceiptSource
         );
         return Observable.combineLatest(resolvedAddress, resolvedMosaic,
@@ -244,8 +243,8 @@ public class TransactionServiceImpl implements TransactionService {
     private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
         SecretProofTransaction transaction, ReceiptSource expectedReceiptSource) {
         Observable<Statement> statementObservable = getStatement(transaction);
-        Observable<Address> resolvedAddress = getResolvedValue(transaction.getRecipient(),
-            statementObservable, expectedReceiptSource);
+        Observable<Address> resolvedAddress = getResolvedAddress(transaction,
+            transaction.getRecipient(), statementObservable, expectedReceiptSource);
         return resolvedAddress.map(address -> SecretProofTransactionFactory
             .create(transaction.getNetworkType(), transaction.getHashType(), address,
                 transaction.getSecret(), transaction.getProof()));
@@ -257,11 +256,11 @@ public class TransactionServiceImpl implements TransactionService {
         Observable<List<Mosaic>> resolvedMosaics = Observable
             .just(transaction.getMosaics()).flatMapIterable(m -> m)
             .flatMap(
-                m -> getResolvedMosaic(m, statementObservable, expectedReceiptSource))
-            .toList()
-            .toObservable();
+                m -> getResolvedMosaic(transaction, m, statementObservable, expectedReceiptSource))
+            .toList().toObservable();
 
-        Observable<Address> resolvedRecipient = getResolvedValue(transaction.getRecipient(),
+        Observable<Address> resolvedRecipient = getResolvedAddress(transaction,
+            transaction.getRecipient(),
             statementObservable, expectedReceiptSource);
 
         BiFunction<Address, List<Mosaic>, TransferTransactionFactory> mergeFunction = (address, mosaics) ->
@@ -273,10 +272,11 @@ public class TransactionServiceImpl implements TransactionService {
     private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
         MosaicGlobalRestrictionTransaction transaction, ReceiptSource expectedReceiptSource) {
         Observable<Statement> statementObservable = getStatement(transaction);
-        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(transaction.getMosaicId(),
+        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(transaction,
+            transaction.getMosaicId(),
             statementObservable, expectedReceiptSource);
 
-        Observable<MosaicId> resolvedReferenceMosaicId = getResolvedMosaicId(
+        Observable<MosaicId> resolvedReferenceMosaicId = getResolvedMosaicId(transaction,
             transaction.getReferenceMosaicId(),
             statementObservable, expectedReceiptSource);
 
@@ -299,13 +299,14 @@ public class TransactionServiceImpl implements TransactionService {
         MosaicAddressRestrictionTransaction transaction,
         ReceiptSource expectedReceiptSource) {
         Observable<Statement> statementObservable = getStatement(transaction);
-        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(transaction.getMosaicId(),
+        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(transaction,
+            transaction.getMosaicId(),
             statementObservable, expectedReceiptSource);
 
         Observable<Address> resolvedTargetAddress = Observable
             .just(transaction.getTargetAddress())
-            .flatMap(
-                m -> getResolvedValue(m, statementObservable, expectedReceiptSource));
+            .flatMap(m -> getResolvedAddress(transaction, m, statementObservable,
+                expectedReceiptSource));
 
         BiFunction<? super MosaicId, ? super Address, MosaicAddressRestrictionTransactionFactory> mapper = (mosaicId, targetAddress) ->
             MosaicAddressRestrictionTransactionFactory
@@ -320,10 +321,10 @@ public class TransactionServiceImpl implements TransactionService {
         AccountMosaicRestrictionTransaction transaction,
         ReceiptSource expectedReceiptSource) {
         Observable<Statement> statementObservable = getStatement(transaction);
-        Observable<List<UnresolvedMosaicId>> unresolvedAdditions = getResolvedMosaicIds(
+        Observable<List<UnresolvedMosaicId>> unresolvedAdditions = getResolvedMosaicIds(transaction,
             transaction.getRestrictionAdditions(), statementObservable, expectedReceiptSource);
 
-        Observable<List<UnresolvedMosaicId>> unresolvedDeletions = getResolvedMosaicIds(
+        Observable<List<UnresolvedMosaicId>> unresolvedDeletions = getResolvedMosaicIds(transaction,
             transaction.getRestrictionDeletions(), statementObservable, expectedReceiptSource);
 
         BiFunction<List<UnresolvedMosaicId>, List<UnresolvedMosaicId>, TransactionFactory<AccountMosaicRestrictionTransaction>> mapper =
@@ -337,10 +338,10 @@ public class TransactionServiceImpl implements TransactionService {
         AccountAddressRestrictionTransaction transaction,
         ReceiptSource expectedReceiptSource) {
         Observable<Statement> statementObservable = getStatement(transaction);
-        Observable<List<UnresolvedAddress>> unresolvedAdditions = getResolvedAddresses(
+        Observable<List<UnresolvedAddress>> unresolvedAdditions = getResolvedAddresses(transaction,
             transaction.getRestrictionAdditions(), statementObservable, expectedReceiptSource);
 
-        Observable<List<UnresolvedAddress>> unresolvedDeletions = getResolvedAddresses(
+        Observable<List<UnresolvedAddress>> unresolvedDeletions = getResolvedAddresses(transaction,
             transaction.getRestrictionDeletions(), statementObservable, expectedReceiptSource);
 
         BiFunction<List<UnresolvedAddress>, List<UnresolvedAddress>, AccountAddressRestrictionTransactionFactory> mapper =
@@ -355,7 +356,7 @@ public class TransactionServiceImpl implements TransactionService {
         MosaicMetadataTransaction transaction, ReceiptSource expectedReceiptSource) {
         Observable<Statement> statementObservable = getStatement(transaction);
 
-        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(
+        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(transaction,
             transaction.getTargetMosaicId(), statementObservable, expectedReceiptSource);
 
         return resolvedMosaicId.map(mosaicId -> MosaicMetadataTransactionFactory
@@ -368,7 +369,7 @@ public class TransactionServiceImpl implements TransactionService {
         MosaicSupplyChangeTransaction transaction, ReceiptSource expectedReceiptSource) {
         Observable<Statement> statementObservable = getStatement(transaction);
 
-        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(
+        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(transaction,
             transaction.getMosaicId(), statementObservable, expectedReceiptSource);
 
         return resolvedMosaicId.map(mosaicId -> MosaicSupplyChangeTransactionFactory
@@ -402,75 +403,65 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Observable<Statement> getStatement(Transaction transaction) {
-        return receiptRepository.getBlockReceipts(transaction.getTransactionInfo().orElseThrow(() ->
-            new IllegalArgumentException(
-                "Transaction Info is required in " + transaction.getType() + " transaction"))
+        return receiptRepository.getBlockReceipts(getTransactionInfo(transaction)
             .getHeight()).cache();
     }
 
-    private Observable<List<UnresolvedMosaicId>> getResolvedMosaicIds(
+
+    private Observable<List<UnresolvedMosaicId>> getResolvedMosaicIds(Transaction transaction,
         List<UnresolvedMosaicId> unresolvedMosaicIds, Observable<Statement> statementObservable,
         ReceiptSource expectedReceiptSource) {
         return Observable.just(unresolvedMosaicIds).flatMapIterable(m -> m)
-            .flatMap(unresolved -> getResolvedMosaicId(unresolved, statementObservable,
+            .flatMap(unresolved -> getResolvedMosaicId(transaction, unresolved, statementObservable,
                 expectedReceiptSource)).map(m -> (UnresolvedMosaicId) m).toList().toObservable();
     }
 
-    private Observable<List<UnresolvedAddress>> getResolvedAddresses(
+    private Observable<List<UnresolvedAddress>> getResolvedAddresses(Transaction transaction,
         List<UnresolvedAddress> unresolvedMosaicIds, Observable<Statement> statementObservable,
         ReceiptSource expectedReceiptSource) {
         return Observable.just(unresolvedMosaicIds).flatMapIterable(m -> m)
-            .flatMap(unresolved -> getResolvedValue(unresolved, statementObservable,
+            .flatMap(unresolved -> getResolvedAddress(transaction, unresolved, statementObservable,
                 expectedReceiptSource)).map(m -> (UnresolvedAddress) m).toList().toObservable();
 
     }
 
-    private Observable<Mosaic> getResolvedMosaic(Mosaic unresolvedMosaic,
+    private Observable<Mosaic> getResolvedMosaic(Transaction transaction, Mosaic unresolvedMosaic,
         Observable<Statement> statementObservable, ReceiptSource expectedReceiptSource) {
         return Observable.just(unresolvedMosaic)
-            .flatMap(m -> getResolvedMosaicId(m.getId(), statementObservable, expectedReceiptSource)
-                .map(mId -> new Mosaic(mId, m.getAmount())));
+            .flatMap(m -> getResolvedMosaicId(transaction, m.getId(), statementObservable,
+                expectedReceiptSource).map(mId -> new Mosaic(mId, m.getAmount())));
     }
 
-    private Observable<MosaicId> getResolvedMosaicId(UnresolvedMosaicId unresolvedMosaicId,
+    private Observable<MosaicId> getResolvedMosaicId(
+        Transaction transaction,
+        UnresolvedMosaicId unresolvedMosaicId,
         Observable<Statement> statementObservable, ReceiptSource expectedReceiptSource) {
         if (!unresolvedMosaicId.isAlias()) {
             return Observable.just((MosaicId) unresolvedMosaicId);
         }
-        return getResolvedValue(unresolvedMosaicId,
-            statementObservable.map(Statement::getMosaicResolutionStatement),
-            expectedReceiptSource);
+        return statementObservable.map(statement -> statement
+            .getResolvedMosaicId(getTransactionInfo(transaction).getHeight(), unresolvedMosaicId,
+                expectedReceiptSource.getPrimaryId(),
+                expectedReceiptSource.getSecondaryId())
+            .orElseThrow(() -> new IllegalArgumentException(
+                "MosaicId could not be resolved for alias "
+                    + unresolvedMosaicId.getIdAsHex())));
     }
 
 
-    private Observable<Address> getResolvedValue(UnresolvedAddress unresolvedAddress,
+    private Observable<Address> getResolvedAddress(Transaction transaction,
+        UnresolvedAddress unresolvedAddress,
         Observable<Statement> statementObservable, ReceiptSource expectedReceiptSource) {
         if (!unresolvedAddress.isAlias()) {
             return Observable.just((Address) unresolvedAddress);
         }
-        return getResolvedValue(unresolvedAddress,
-            statementObservable.map(Statement::getAddressResolutionStatements),
-            expectedReceiptSource);
-    }
-
-    private <R, U> Observable<R> getResolvedValue(U unresolved,
-        Observable<List<? extends ResolutionStatement<U, R>>> resolutionsObservable,
-        ReceiptSource expectedReceiptSource) {
-
-        Predicate<ResolutionEntry<R>> sourceFilter = entry ->
-            entry.getReceiptSource().getPrimaryId() == expectedReceiptSource.getPrimaryId()
-                && entry.getReceiptSource().getSecondaryId() == expectedReceiptSource
-                .getSecondaryId();
-        return resolutionsObservable
-            .map(resolutions -> resolutions.stream()
-                .filter(mrs -> mrs.getUnresolved().equals(unresolved))
-                .map(mrs -> mrs.getResolutionEntries().stream().filter(sourceFilter).findFirst()
-                    .orElseThrow(
-                        () -> new IllegalArgumentException("Resolution Entries is empty.")))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                    "ResolutionStatement could not be found for unresolved "
-                        + unresolved))).map(ResolutionEntry::getResolved);
+        return statementObservable.map(statement -> statement
+            .getResolvedAddress(getTransactionInfo(transaction).getHeight(), unresolvedAddress,
+                expectedReceiptSource.getPrimaryId(),
+                expectedReceiptSource.getSecondaryId())
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Address could not be resolved for alias "
+                    + ((NamespaceId) unresolvedAddress).getIdAsHex())));
     }
 
     private ReceiptSource createExpectedReceiptSource(Transaction transaction) {
@@ -488,6 +479,12 @@ public class TransactionServiceImpl implements TransactionService {
                 "TransactionIndex cannot be loaded from Transaction " + transaction.getType()));
         return new ReceiptSource(aggregateTransactionReceiptSource.getPrimaryId(),
             transactionIndex + 1);
+    }
+
+    private TransactionInfo getTransactionInfo(Transaction transaction) {
+        return transaction.getTransactionInfo().orElseThrow(() ->
+            new IllegalArgumentException(
+                "Transaction Info is required in " + transaction.getType() + " transaction"));
     }
 
 }

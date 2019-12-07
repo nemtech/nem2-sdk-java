@@ -25,6 +25,7 @@ import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 import org.bouncycastle.util.encoders.Hex;
 
 /**
@@ -139,6 +140,141 @@ public abstract class ResolutionStatement<U, R> {
                     + currentRecipientType
                     + "] for this ResolutionStatement");
         }
+    }
+
+
+    /**
+     * Find resolution entry for given primaryId and secondaryId.
+     *
+     * @param primaryId Primary id
+     * @param secondaryId Secondary id
+     * @return Optional of {@link ResolutionEntry}
+     */
+    public Optional<ResolutionEntry<R>> getResolutionEntryById(int primaryId, int secondaryId) {
+        /*
+        Primary id and secondary id do not specifically map to the exact transaction index on the same block.
+        The ids are just the order of the resolution reflecting on the order of transactions (ordered by index).
+        E.g 1 - Bob -> 1 random.token -> Alice
+            2 - Carol -> 1 random.token > Denis
+        Based on above example, 2 transactions (index 0 & 1) are created on the same block, however, only 1
+        resolution entry get generated for both.
+        */
+        int resolvedPrimaryId = getMaxAvailablePrimaryId(primaryId);
+
+        /*
+        If no primaryId found, it means there's no resolution entry available for the process. Invalid entry.
+
+        e.g. Given:
+        Entries: [{P:2, S:0}, {P:5, S:6}]
+        Transaction: [Inx:1(0+1), AggInx:0]
+        It should return Entry: undefined
+        */
+        if (resolvedPrimaryId == 0) {
+            return Optional.empty();
+        } else if (primaryId > resolvedPrimaryId) {
+            /*
+            If the transaction index is greater than the overall most recent source primary id.
+            Use the most recent resolution entry (Max.PrimaryId + Max.SecondaryId)
+
+            e.g. Given:
+            Entries: [{P:1, S:0}, {P:2, S:0}, {P:4, S:2}, {P:4, S:4} {P:7, S:6}]
+            Transaction: [Inx:5(4+1), AggInx:0]
+            It should return Entry: {P:4, S:4}
+
+            e.g. Given:
+            Entries: [{P:1, S:0}, {P:2, S:0}, {P:4, S:2}, {P:4, S:4}, {P:7, S:6}]
+            Transaction: [Inx:3(2+1), AggInx:0]
+            It should return Entry: {P:2, S:0}
+            */
+            return this.resolutionEntries.stream()
+                .filter(entry -> entry.getReceiptSource().getPrimaryId() == resolvedPrimaryId &&
+                    entry.getReceiptSource().getSecondaryId() == this
+                        .getMaxSecondaryIdByPrimaryId(resolvedPrimaryId)).findFirst();
+        }
+
+        // When transaction index matches a primaryId, get the most recent secondaryId (resolvedPrimaryId can only <= primaryId)
+        int resolvedSecondaryId = this
+            .getMaxSecondaryIdByPrimaryIdAndSecondaryId(resolvedPrimaryId, secondaryId);
+
+        /*
+        If no most recent secondaryId matched transaction index, find previous resolution entry (most recent).
+        This means the resolution entry for the specific inner transaction (inside Aggregate) /
+        was generated previously outside the aggregate. It should return the previous entry (previous primaryId)
+
+        e.g. Given:
+        Entries: [{P:1, S:0}, {P:2, S:0}, {P:5, S:6}]
+        Transaction: [Inx:5(4+1), AggInx:3(2+1)]
+        It should return Entry: {P:2, S:0}
+        */
+        if (resolvedSecondaryId == 0 && resolvedSecondaryId != secondaryId) {
+            int lastPrimaryId = this.getMaxAvailablePrimaryId(resolvedPrimaryId - 1);
+            return
+                this.resolutionEntries.stream()
+                    .filter(entry -> entry.getReceiptSource().getPrimaryId() == lastPrimaryId &&
+                        entry.getReceiptSource().getSecondaryId() == this
+                            .getMaxSecondaryIdByPrimaryId(lastPrimaryId)).findFirst();
+        }
+
+        /*
+        Found a matched resolution entry on both primaryId and secondaryId
+
+        e.g. Given:
+        Entries: [{P:1, S:0}, {P:2, S:0}, {P:5, S:6}]
+        Transaction: [Inx:5(4+1), AggInx:6(2+1)]
+        It should return Entry: {P:5, S:6}
+        */
+        return this.resolutionEntries.stream()
+            .filter(entry -> entry.getReceiptSource().getPrimaryId() == resolvedPrimaryId)
+            .filter(entry -> entry.getReceiptSource().getSecondaryId() == resolvedSecondaryId)
+            .findFirst();
+    }
+
+    /**
+     * Get max secondary id by a given primaryId
+     *
+     * @param primaryId Primary source id
+     * @return Get max secondary id by a given primaryId
+     */
+    private int getMaxSecondaryIdByPrimaryId(int primaryId) {
+        return this.resolutionEntries.stream()
+            .filter(entry -> entry.getReceiptSource().getPrimaryId() == primaryId)
+            .mapToInt(entry -> entry.getReceiptSource().getSecondaryId()).max().orElseThrow(() ->
+                new IllegalArgumentException(
+                    "resolutionEntries is empty when calculating getMaxSecondaryIdByPrimaryId"));
+    }
+
+
+    /**
+     * Get most `recent` available secondary id by a given primaryId
+     *
+     * @param primaryId Primary source id
+     * @param secondaryId Secondary source id
+     * @return the expected max available.
+     */
+    private int getMaxSecondaryIdByPrimaryIdAndSecondaryId(int primaryId, int secondaryId) {
+
+        return this.resolutionEntries.stream()
+            .filter(entry -> entry.getReceiptSource().getPrimaryId() == primaryId).mapToInt(
+                entry -> secondaryId >= entry.getReceiptSource().getSecondaryId()
+                    ? entry.getReceiptSource().getSecondaryId() : 0).max().orElseThrow(() ->
+                new IllegalArgumentException(
+                    "resolutionEntries is empty when calculating getMaxSecondaryIdByPrimaryIdAndSecondaryId"));
+    }
+
+    /**
+     * Get most `recent` primary source id by a given id (transaction index) as PrimaryId might not
+     * be the same as block transaction index.
+     *
+     * @param primaryId Primary source id
+     * @return the expected max available.
+     */
+    private int getMaxAvailablePrimaryId(int primaryId) {
+
+        return this.resolutionEntries.stream().mapToInt(
+            entry -> primaryId >= entry.getReceiptSource().getPrimaryId()
+                ? entry.getReceiptSource().getPrimaryId() : 0).max().orElseThrow(() ->
+            new IllegalArgumentException(
+                "resolutionEntries is empty when calculating getMaxAvailablePrimaryId"));
     }
 
     /**
