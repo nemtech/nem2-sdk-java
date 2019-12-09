@@ -30,7 +30,7 @@ class DeadlineTest {
     @Test
     void shouldCreateADeadlineForTwoHoursFromNow() {
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
-        Deadline deadline = new Deadline(2, ChronoUnit.HOURS);
+        Deadline deadline = Deadline.create();
         assertTrue(now.isBefore(deadline.getLocalDateTime()), "now is before deadline localtime");
         assertTrue(
             now.plusHours(2).minusSeconds(1).isBefore(deadline.getLocalDateTime()),

@@ -34,7 +34,7 @@ public class Deadline {
     /**
      * Nemesis block timestamp.
      */
-    private static final Instant TIMESTAMP_NEMSIS_BLOCK = Instant.ofEpochSecond(1459468800);
+    private static final Instant TIMESTAMP_NEMESIS_BLOCK = Instant.ofEpochSecond(1573426800);
 
     private final Instant instant;
 
@@ -56,15 +56,14 @@ public class Deadline {
     public Deadline(BigInteger input) {
         instant =
             Instant
-                .ofEpochMilli(input.longValue() + Deadline.TIMESTAMP_NEMSIS_BLOCK.toEpochMilli());
+                .ofEpochMilli(input.longValue() + Deadline.TIMESTAMP_NEMESIS_BLOCK.toEpochMilli());
     }
 
     /**
      * @return the BigInteger representation of the duration.
      */
     public BigInteger toBigInteger() {
-        return BigInteger
-            .valueOf(instant.toEpochMilli() - Deadline.TIMESTAMP_NEMSIS_BLOCK.toEpochMilli());
+        return BigInteger.valueOf(getInstant());
     }
 
     /**
@@ -93,7 +92,7 @@ public class Deadline {
      * @return long
      */
     public long getInstant() {
-        return instant.toEpochMilli() - Deadline.TIMESTAMP_NEMSIS_BLOCK.toEpochMilli();
+        return instant.toEpochMilli() - Deadline.TIMESTAMP_NEMESIS_BLOCK.toEpochMilli();
     }
 
     /**
