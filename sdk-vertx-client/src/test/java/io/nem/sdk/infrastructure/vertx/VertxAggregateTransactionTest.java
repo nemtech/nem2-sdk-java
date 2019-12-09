@@ -143,7 +143,7 @@ public class VertxAggregateTransactionTest {
                 aggregateTx, Collections.singletonList(cosignatoryAccount2), generationHash);
 
         assertEquals("6801000000000000", signedTransaction.getPayload().substring(0, 16));
-        assertEquals("1b000000d6a52a97", signedTransaction.getPayload().substring(248, 264));
+        assertEquals("00000000d6a52a97", signedTransaction.getPayload().substring(248, 264));
         // assertEquals("039054419050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1420D000000746573742D6D65737361676568B3FBB18729C1FDE225C57F8CE080FA828F0067E451A3FD81FA628842B0B763", signedTransaction.getPayload().substring(320, 474));
 
     }

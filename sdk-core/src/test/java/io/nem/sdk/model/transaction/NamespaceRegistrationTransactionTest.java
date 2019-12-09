@@ -54,7 +54,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
             namespaceRegistrationTransaction.signWith(testAccount, generationHash);
 
         assertEquals(
-            "1B000000E803000000000000CFCBE72D994BE69B0013726F6F742D746573742D6E616D657370616365",
+            "00000000E803000000000000CFCBE72D994BE69B0013726F6F742D746573742D6E616D657370616365",
             signedTransaction.getPayload().substring(248)
         );
         assertEquals(networkType, namespaceRegistrationTransaction.getNetworkType());
@@ -86,7 +86,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
             namespaceRegistrationTransaction.signWith(testAccount, generationHash);
 
         assertEquals(
-            "1B0000004DF55E7F6D8FB7FF924207DF2CA1BBF30113726F6F742D746573742D6E616D657370616365",
+            "000000004DF55E7F6D8FB7FF924207DF2CA1BBF30113726F6F742D746573742D6E616D657370616365",
             signedTransaction.getPayload().substring(248));
         assertEquals(networkType, namespaceRegistrationTransaction.getNetworkType());
         assertTrue(1 == namespaceRegistrationTransaction.getVersion());
@@ -116,7 +116,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
             namespaceRegistrationTransaction.signWith(testAccount, generationHash);
 
         assertEquals(
-            "1B0000004DF55E7F6D8FB7FF924207DF2CA1BBF30113726F6F742D746573742D6E616D657370616365",
+            "000000004DF55E7F6D8FB7FF924207DF2CA1BBF30113726F6F742D746573742D6E616D657370616365",
             signedTransaction.getPayload().substring(248));
         assertEquals(networkType, namespaceRegistrationTransaction.getNetworkType());
         assertTrue(1 == namespaceRegistrationTransaction.getVersion());

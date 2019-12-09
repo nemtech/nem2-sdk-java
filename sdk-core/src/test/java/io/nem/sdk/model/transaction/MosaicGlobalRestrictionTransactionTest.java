@@ -63,7 +63,7 @@ class MosaicGlobalRestrictionTransactionTest extends AbstractTransactionTester {
             .signWith(account, generationHash);
 
         assertEquals(
-            "1B000000010000000000000002000000000000000100000000000000090000000000000008000000000000000106",
+            "00000000010000000000000002000000000000000100000000000000090000000000000008000000000000000106",
             signedTransaction.getPayload().substring(248));
     }
 
