@@ -92,4 +92,9 @@ public class PublicKey {
         return ConvertUtils.toHex(this.value).toUpperCase();
     }
 
+
+    @Override
+    public String toString() {
+        return "PublicKey{" + toHex() + '}';
+    }
 }

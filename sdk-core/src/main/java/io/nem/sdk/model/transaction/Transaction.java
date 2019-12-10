@@ -40,7 +40,7 @@ public abstract class Transaction {
     /**
      * The BinarySerialization object.
      */
-    private static final BinarySerialization BINARY_SERIALIZATION = new BinarySerializationImpl();
+    private static final BinarySerialization BINARY_SERIALIZATION = BinarySerializationImpl.INSTANCE;
 
     private final TransactionType type;
     private final NetworkType networkType;

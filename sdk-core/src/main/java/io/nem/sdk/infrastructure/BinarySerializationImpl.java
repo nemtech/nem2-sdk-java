@@ -157,6 +157,11 @@ import org.bouncycastle.util.encoders.Hex;
 public class BinarySerializationImpl implements BinarySerialization {
 
     /**
+     * Cached instance.
+     */
+    public static final BinarySerialization INSTANCE = new BinarySerializationImpl();
+
+    /**
      * The serializers, one per {@link TransactionType} must be registered.
      */
     private final Map<TransactionType, TransactionSerializer<?>> serializers = new EnumMap<>(

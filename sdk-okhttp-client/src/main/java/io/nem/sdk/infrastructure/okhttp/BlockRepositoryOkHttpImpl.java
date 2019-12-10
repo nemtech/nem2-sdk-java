@@ -109,9 +109,7 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
     private MerkelProofInfo toMerkelProofInfo(MerkleProofInfoDTO dto) {
         List<MerkelPathItem> pathItems =
             dto.getMerklePath().stream()
-                .map(
-                    pathItem ->
-                        new MerkelPathItem(pathItem.getPosition(), pathItem.getHash()))
+                .map(pathItem -> new MerkelPathItem(pathItem.getPosition(), pathItem.getHash()))
                 .collect(Collectors.toList());
         return new MerkelProofInfo(pathItems);
     }

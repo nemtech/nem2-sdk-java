@@ -48,6 +48,18 @@ public class PublicKeyTest {
     }
 
     @Test
+    public void shouldBeEquals() {
+        // Arrange:
+        final PublicKey key1 = PublicKey.fromHexString("227F");
+        final PublicKey key2 = PublicKey.fromHexString("227F");
+        final PublicKey key3 = PublicKey.fromHexString("327F");
+
+        // Assert:
+        MatcherAssert.assertThat(key1, IsEqual.equalTo(key2));
+        MatcherAssert.assertThat(key1, IsNot.not(IsEqual.equalTo(key3)));
+    }
+
+    @Test
     public void cannotCreateAroundMalformedHexString() {
         // Act:
         Assertions.assertThrows(CryptoException.class, () -> PublicKey.fromHexString("22G75"));
@@ -68,7 +80,8 @@ public class PublicKeyTest {
 
         // Assert:
         MatcherAssert.assertThat(new PublicKey(TEST_BYTES), IsEqual.equalTo(key));
-        MatcherAssert.assertThat(new PublicKey(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(key)));
+        MatcherAssert
+            .assertThat(new PublicKey(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(key)));
         MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
         MatcherAssert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo(key)));
         MatcherAssert.assertThat(key, IsNot.not(IsEqual.equalTo("ImNotAPublicKey")));

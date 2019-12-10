@@ -254,8 +254,7 @@ public class TransactionServiceImpl implements TransactionService {
         TransferTransaction transaction, ReceiptSource expectedReceiptSource) {
         Observable<Statement> statementObservable = getStatement(transaction);
         Observable<List<Mosaic>> resolvedMosaics = Observable
-            .just(transaction.getMosaics()).flatMapIterable(m -> m)
-            .flatMap(
+            .fromIterable(transaction.getMosaics()).flatMap(
                 m -> getResolvedMosaic(transaction, m, statementObservable, expectedReceiptSource))
             .toList().toObservable();
 
@@ -411,7 +410,7 @@ public class TransactionServiceImpl implements TransactionService {
     private Observable<List<UnresolvedMosaicId>> getResolvedMosaicIds(Transaction transaction,
         List<UnresolvedMosaicId> unresolvedMosaicIds, Observable<Statement> statementObservable,
         ReceiptSource expectedReceiptSource) {
-        return Observable.just(unresolvedMosaicIds).flatMapIterable(m -> m)
+        return Observable.fromIterable(unresolvedMosaicIds)
             .flatMap(unresolved -> getResolvedMosaicId(transaction, unresolved, statementObservable,
                 expectedReceiptSource)).map(m -> (UnresolvedMosaicId) m).toList().toObservable();
     }
@@ -419,7 +418,7 @@ public class TransactionServiceImpl implements TransactionService {
     private Observable<List<UnresolvedAddress>> getResolvedAddresses(Transaction transaction,
         List<UnresolvedAddress> unresolvedMosaicIds, Observable<Statement> statementObservable,
         ReceiptSource expectedReceiptSource) {
-        return Observable.just(unresolvedMosaicIds).flatMapIterable(m -> m)
+        return Observable.fromIterable(unresolvedMosaicIds)
             .flatMap(unresolved -> getResolvedAddress(transaction, unresolved, statementObservable,
                 expectedReceiptSource)).map(m -> (UnresolvedAddress) m).toList().toObservable();
 
