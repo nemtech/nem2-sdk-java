@@ -135,10 +135,10 @@ public class BalanceTransferReceipt extends Receipt {
         final ByteBuffer buffer = ByteBuffer.allocate(52 + recipientBytes.remaining());
         buffer.putShort(Short.reverseBytes((short) getVersion().getValue()));
         buffer.putShort(Short.reverseBytes((short) getType().getValue()));
-        buffer.put(recipientBytes);
         buffer.putLong(Long.reverseBytes(getMosaicId().getIdAsLong()));
         buffer.putLong(Long.reverseBytes(getAmount().longValue()));
         buffer.put(ConvertUtils.getBytes(getSender().getPublicKey().toHex()));
+        buffer.put(recipientBytes);
         return buffer.array();
     }
 
