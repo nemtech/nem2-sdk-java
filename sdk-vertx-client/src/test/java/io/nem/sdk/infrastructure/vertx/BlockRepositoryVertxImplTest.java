@@ -16,12 +16,19 @@
 
 package io.nem.sdk.infrastructure.vertx;
 
+import static io.nem.sdk.infrastructure.vertx.TestHelperVertx.loadTransactionInfoDTO;
+
+import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.model.blockchain.BlockInfo;
+import io.nem.sdk.model.blockchain.MerkelProofInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.Transaction;
+import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.openapi.vertx.model.BlockDTO;
 import io.nem.sdk.openapi.vertx.model.BlockInfoDTO;
 import io.nem.sdk.openapi.vertx.model.BlockMetaDTO;
+import io.nem.sdk.openapi.vertx.model.MerklePathItemDTO;
+import io.nem.sdk.openapi.vertx.model.MerkleProofInfoDTO;
 import io.nem.sdk.openapi.vertx.model.NetworkTypeEnum;
 import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
 import java.math.BigInteger;
@@ -48,6 +55,46 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
     }
 
     @Test
+    public void getBlockTransactions() throws Exception {
+
+        TransactionInfoDTO aggregateTransferTransactionDTO = loadTransactionInfoDTO(
+            "shouldCreateAggregateTransferTransaction.json"
+        );
+
+        mockRemoteCall(Collections.singletonList(aggregateTransferTransactionDTO));
+
+        List<Transaction> transactions = repository
+            .getBlockTransactions(BigInteger.ONE).toFuture()
+            .get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.AGGREGATE_COMPLETE, transactions.get(0).getType());
+
+        transactions = repository
+            .getBlockTransactions(BigInteger.ONE, new QueryParams(1, "id")).toFuture()
+            .get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.AGGREGATE_COMPLETE, transactions.get(0).getType());
+
+    }
+
+    @Test
+    public void getMerkleTransaction() throws Exception {
+
+        MerkleProofInfoDTO merkleProofInfoDTO = new MerkleProofInfoDTO();
+
+        MerklePathItemDTO item = new MerklePathItemDTO().hash("someHash").position(12);
+        mockRemoteCall(merkleProofInfoDTO.addMerklePathItem(item));
+
+        MerkelProofInfo merkelProofInfo = repository
+            .getMerkleTransaction(BigInteger.ONE, "HASH!").toFuture()
+            .get();
+        Assertions.assertEquals(1, merkelProofInfo.getMerklePath().size());
+        Assertions.assertEquals("someHash", merkelProofInfo.getMerklePath().get(0).getHash());
+        Assertions.assertEquals(12, merkelProofInfo.getMerklePath().get(0).getPosition());
+
+    }
+
+    @Test
     public void shouldGetBlockByHeight() throws Exception {
 
         BlockInfoDTO dto = new BlockInfoDTO();
@@ -65,7 +112,8 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
         blockDto.setType(16716);
         blockDto.setVersion(3);
         blockDto.setNetwork(NetworkTypeEnum.NUMBER_144);
-        blockDto.setSignerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
+        blockDto
+            .setSignerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
         blockDto.setBeneficiaryPublicKey(
             "B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
         blockDto.setHeight(BigInteger.valueOf(9));
@@ -176,7 +224,6 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
         Assertions.assertEquals(1, transactions.size());
 
     }
-
 
 
 }
