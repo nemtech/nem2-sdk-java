@@ -16,14 +16,23 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
+import static io.nem.sdk.infrastructure.okhttp.TestHelperOkHttp.loadTransactionInfoDTO;
+
 import io.nem.core.utils.ExceptionUtils;
+import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.api.RepositoryCallException;
+import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.AccountInfo;
 import io.nem.sdk.model.account.AccountType;
 import io.nem.sdk.model.account.Address;
+import io.nem.sdk.model.account.PublicAccount;
+import io.nem.sdk.model.transaction.AggregateTransaction;
+import io.nem.sdk.model.transaction.Transaction;
+import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountTypeEnum;
+import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -44,6 +53,117 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         super.setUp();
         repository = new AccountRepositoryOkHttpImpl(apiClientMock);
     }
+
+
+    @Test
+    public void incomingTransactions() throws Exception {
+
+        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
+            "shouldCreateStandaloneTransferTransaction.json");
+
+        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
+
+        mockRemoteCall(Collections.singletonList(transferTransactionDTO));
+
+        List<Transaction> transactions = repository.incomingTransactions(publicAccount).toFuture()
+            .get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
+
+        transactions = repository.incomingTransactions(publicAccount, new QueryParams(1, "id"))
+            .toFuture().get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
+    }
+
+    @Test
+    public void transactions() throws Exception {
+
+        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
+            "shouldCreateStandaloneTransferTransaction.json");
+
+        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
+
+        mockRemoteCall(Collections.singletonList(transferTransactionDTO));
+
+        List<Transaction> transactions = repository.transactions(publicAccount).toFuture()
+            .get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
+
+        transactions = repository.transactions(publicAccount, new QueryParams(1, "id"))
+            .toFuture().get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
+    }
+
+    @Test
+    public void outgoingTransactions() throws Exception {
+
+        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
+            "shouldCreateStandaloneTransferTransaction.json");
+
+        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
+
+        mockRemoteCall(Collections.singletonList(transferTransactionDTO));
+
+        List<Transaction> transactions = repository.outgoingTransactions(publicAccount).toFuture()
+            .get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
+
+        transactions = repository.outgoingTransactions(publicAccount, new QueryParams(1, "id"))
+            .toFuture().get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
+    }
+
+    @Test
+    public void unconfirmedTransactions() throws Exception {
+
+        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
+            "shouldCreateStandaloneTransferTransaction.json");
+
+        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
+
+        mockRemoteCall(Collections.singletonList(transferTransactionDTO));
+
+        List<Transaction> transactions = repository.unconfirmedTransactions(publicAccount)
+            .toFuture()
+            .get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
+
+        transactions = repository.unconfirmedTransactions(publicAccount, new QueryParams(1, "id"))
+            .toFuture().get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
+    }
+
+    @Test
+    public void aggregateBondedTransactions() throws Exception {
+
+        TransactionInfoDTO aggregateTransferTransactionDTO = loadTransactionInfoDTO(
+            "shouldCreateAggregateTransferTransaction.json"
+        );
+
+        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
+
+        mockRemoteCall(Collections.singletonList(aggregateTransferTransactionDTO));
+
+        List<AggregateTransaction> transactions = repository
+            .aggregateBondedTransactions(publicAccount).toFuture()
+            .get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.AGGREGATE_COMPLETE, transactions.get(0).getType());
+
+        transactions = repository
+            .aggregateBondedTransactions(publicAccount, new QueryParams(1, "id"))
+            .toFuture().get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.AGGREGATE_COMPLETE, transactions.get(0).getType());
+    }
+
 
     @Test
     public void shouldGetAccountInfo() throws Exception {
@@ -90,7 +210,6 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
         Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
     }
-
 
 
     @Test
