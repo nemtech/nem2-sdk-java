@@ -56,11 +56,11 @@ public class MetadataTransactionServiceImpl implements MetadataTransactionServic
     @Override
     public Observable<MosaicMetadataTransactionFactory> createMosaicMetadataTransactionFactory(
         PublicAccount targetPublicAccount, BigInteger key, String value,
-        PublicKey senderPublicKey, UnresolvedMosaicId unresolvedMosaicId) {
+        PublicKey senderPublicKey, UnresolvedMosaicId unresolvedTargetId) {
 
-        return aliasService.resolveMosaicId(unresolvedMosaicId).flatMap(targetId -> {
+        return aliasService.resolveMosaicId(unresolvedTargetId).flatMap(targetId -> {
             BiFunction<String, NetworkType, MosaicMetadataTransactionFactory> factory = (newValue, networkType) -> MosaicMetadataTransactionFactory
-                .create(networkType, targetPublicAccount, targetId, key, newValue);
+                .create(networkType, targetPublicAccount, unresolvedTargetId, key, newValue);
             return processMetadata(metadataRepository
                     .getMosaicMetadataByKeyAndSender(targetId, key, senderPublicKey.toHex()), factory,
                 value);

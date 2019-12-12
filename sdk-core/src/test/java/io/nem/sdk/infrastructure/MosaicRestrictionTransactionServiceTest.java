@@ -189,7 +189,7 @@ public class MosaicRestrictionTransactionServiceTest {
                 BigInteger.valueOf(30), MosaicRestrictionType.GE).toFuture().get().build();
 
         Assertions.assertEquals(networkType, transaction.getNetworkType());
-        Assertions.assertEquals(mosaicId1, transaction.getMosaicId());
+        Assertions.assertEquals(mosaicAlias1, transaction.getMosaicId());
         Assertions.assertEquals(restrictionKey, transaction.getRestrictionKey());
         Assertions.assertEquals(new MosaicId(BigInteger.ZERO), transaction.getReferenceMosaicId());
         Assertions.assertEquals(BigInteger.valueOf(30), transaction.getNewRestrictionValue());
@@ -273,9 +273,9 @@ public class MosaicRestrictionTransactionServiceTest {
                 BigInteger.valueOf(40)).toFuture().get().build();
 
         Assertions.assertEquals(networkType, transaction.getNetworkType());
-        Assertions.assertEquals(mosaicId1, transaction.getMosaicId());
+        Assertions.assertEquals(mosaicAlias1, transaction.getMosaicId());
         Assertions.assertEquals(restrictionKey, transaction.getRestrictionKey());
-        Assertions.assertEquals(account1.getAddress(), transaction.getTargetAddress());
+        Assertions.assertEquals(accountAlias1, transaction.getTargetAddress());
         Assertions.assertEquals(BigInteger.valueOf(40), transaction.getNewRestrictionValue());
         Assertions.assertEquals(BigInteger.valueOf(30), transaction.getPreviousRestrictionValue());
         Assertions.assertEquals(networkType, transaction.getNetworkType());

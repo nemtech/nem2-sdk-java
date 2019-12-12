@@ -77,7 +77,7 @@ public class MosaicRestrictionTransactionServiceImpl implements
                     MosaicGlobalRestrictionTransactionFactory factory = MosaicGlobalRestrictionTransactionFactory
                         .create(
                             networkType,
-                            mosaicId,
+                            unresolvedMosaicId,
                             restrictionKey,
                             restrictionValue,
                             restrictionType);
@@ -114,9 +114,9 @@ public class MosaicRestrictionTransactionServiceImpl implements
                             MosaicAddressRestrictionTransactionFactory factory = MosaicAddressRestrictionTransactionFactory
                                 .create(
                                     networkType,
-                                    mosaicId,
+                                    unresolvedMosaicId,
                                     restrictionKey,
-                                    targetAddress,
+                                    unresolvedTargetAddress,
                                     restrictionValue
                                 );
                             optionalValue.ifPresent(factory::previousRestrictionValue);
