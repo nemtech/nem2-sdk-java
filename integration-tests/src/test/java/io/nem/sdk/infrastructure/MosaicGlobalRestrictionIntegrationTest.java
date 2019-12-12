@@ -47,10 +47,10 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
 
         //1) Create a new mosaic
 
-        String masaicAliasName = "MosaicRestrictionServiceIntegrationTest_createMosaicGlobalRestrictionAndValidateEndpoints"
+        String mosaicAliasName = "MosaicRestrictionServiceIntegrationTest_createMosaicGlobalRestrictionAndValidateEndpoints"
             .toLowerCase();
-        NamespaceId mosaicAlias = NamespaceId.createFromName(masaicAliasName);
-        MosaicId mosaicId = createMosaic(testAccount, type, null, masaicAliasName);
+        NamespaceId mosaicAlias = NamespaceId.createFromName(mosaicAliasName);
+        MosaicId mosaicId = createMosaic(testAccount, type, null, mosaicAliasName);
 
         //2) Create a restriction on the mosaic
 
