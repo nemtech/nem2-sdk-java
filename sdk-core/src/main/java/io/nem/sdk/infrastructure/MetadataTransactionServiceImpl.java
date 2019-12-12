@@ -3,6 +3,7 @@ package io.nem.sdk.infrastructure;
 import io.nem.core.crypto.PublicKey;
 import io.nem.core.utils.ConvertUtils;
 import io.nem.core.utils.StringEncoder;
+import io.nem.sdk.api.AliasService;
 import io.nem.sdk.api.MetadataRepository;
 import io.nem.sdk.api.MetadataTransactionService;
 import io.nem.sdk.api.RepositoryCallException;
@@ -11,7 +12,7 @@ import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.metadata.Metadata;
-import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.AccountMetadataTransactionFactory;
 import io.nem.sdk.model.transaction.MetadataTransactionFactory;
@@ -19,7 +20,7 @@ import io.nem.sdk.model.transaction.MosaicMetadataTransactionFactory;
 import io.nem.sdk.model.transaction.NamespaceMetadataTransactionFactory;
 import io.reactivex.Observable;
 import java.math.BigInteger;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  * Implementation of {@link MetadataTransactionService}
@@ -30,17 +31,22 @@ public class MetadataTransactionServiceImpl implements MetadataTransactionServic
 
     private final MetadataRepository metadataRepository;
 
+    private final Observable<NetworkType> networkTypeObservable;
+
+    private final AliasService aliasService;
+
     public MetadataTransactionServiceImpl(RepositoryFactory factory) {
         this.metadataRepository = factory.createMetadataRepository();
+        this.networkTypeObservable = factory.getNetworkType();
+        this.aliasService = new AliasServiceImpl(factory);
     }
 
     @Override
     public Observable<AccountMetadataTransactionFactory> createAccountMetadataTransactionFactory(
-        NetworkType networkType,
         PublicAccount targetPublicAccount, BigInteger key, String value,
         PublicKey senderPublicKey) {
         Address address = targetPublicAccount.getAddress();
-        Function<String, AccountMetadataTransactionFactory> factory = newValue -> AccountMetadataTransactionFactory
+        BiFunction<String, NetworkType, AccountMetadataTransactionFactory> factory = (newValue, networkType) -> AccountMetadataTransactionFactory
             .create(networkType, targetPublicAccount, key, newValue);
         return processMetadata(metadataRepository
                 .getAccountMetadataByKeyAndSender(address, key, senderPublicKey.toHex()), factory,
@@ -49,25 +55,24 @@ public class MetadataTransactionServiceImpl implements MetadataTransactionServic
 
     @Override
     public Observable<MosaicMetadataTransactionFactory> createMosaicMetadataTransactionFactory(
-        NetworkType networkType,
         PublicAccount targetPublicAccount, BigInteger key, String value,
-        PublicKey senderPublicKey,
-        MosaicId targetId) {
+        PublicKey senderPublicKey, UnresolvedMosaicId unresolvedMosaicId) {
 
-        Function<String, MosaicMetadataTransactionFactory> factory = newValue -> MosaicMetadataTransactionFactory
-            .create(networkType, targetPublicAccount, targetId, key, newValue);
-        return processMetadata(metadataRepository
-                .getMosaicMetadataByKeyAndSender(targetId, key, senderPublicKey.toHex()), factory,
-            value);
+        return aliasService.resolveMosaicId(unresolvedMosaicId).flatMap(targetId -> {
+            BiFunction<String, NetworkType, MosaicMetadataTransactionFactory> factory = (newValue, networkType) -> MosaicMetadataTransactionFactory
+                .create(networkType, targetPublicAccount, targetId, key, newValue);
+            return processMetadata(metadataRepository
+                    .getMosaicMetadataByKeyAndSender(targetId, key, senderPublicKey.toHex()), factory,
+                value);
+        });
     }
 
     @Override
     public Observable<NamespaceMetadataTransactionFactory> createNamespaceMetadataTransactionFactory(
-        NetworkType networkType,
         PublicAccount targetPublicAccount, BigInteger key, String value,
         PublicKey senderPublicKey,
         NamespaceId targetId) {
-        Function<String, NamespaceMetadataTransactionFactory> factory = newValue -> NamespaceMetadataTransactionFactory
+        BiFunction<String, NetworkType, NamespaceMetadataTransactionFactory> factory = (newValue, networkType) -> NamespaceMetadataTransactionFactory
             .create(networkType, targetPublicAccount, targetId, key, newValue);
         return processMetadata(metadataRepository
                 .getNamespaceMetadataByKeyAndSender(targetId, key, senderPublicKey.toHex()), factory,
@@ -87,23 +92,24 @@ public class MetadataTransactionServiceImpl implements MetadataTransactionServic
      */
     private <T extends MetadataTransactionFactory> Observable<T> processMetadata(
         Observable<Metadata> metadataObservable,
-        Function<String, T> transactionFactory, String newValue) {
-        return metadataObservable.map(metadata -> {
+        BiFunction<String, NetworkType, T> transactionFactory, String newValue) {
+        return networkTypeObservable.flatMap(networkType -> metadataObservable.map(metadata -> {
             byte[] currentValueBytes = StringEncoder
                 .getBytes(metadata.getMetadataEntry().getValue());
             byte[] newValueBytes = StringEncoder.getBytes(newValue);
             String xorValue = StringEncoder
                 .getString(ConvertUtils.xor(currentValueBytes, newValueBytes));
-            T factory = transactionFactory.apply(xorValue);
+            T factory = transactionFactory.apply(xorValue, networkType);
             factory.valueSizeDelta(newValueBytes.length - currentValueBytes.length);
             return factory;
         }).onErrorResumeNext(exception -> {
             if (exception instanceof RepositoryCallException
                 && ((RepositoryCallException) exception).getStatusCode() == 404) {
-                return Observable.just(transactionFactory.apply(newValue));
+                return Observable.just(transactionFactory.apply(newValue, networkType));
             } else {
                 return Observable.error(exception);
             }
-        });
+        }));
+
     }
 }

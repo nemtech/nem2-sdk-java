@@ -46,6 +46,7 @@ class MetadataTransactionServiceTest {
         RepositoryFactory factory = Mockito.mock(RepositoryFactory.class);
         metadataRepositoryMock = Mockito.mock(MetadataRepository.class);
         Mockito.when(factory.createMetadataRepository()).thenReturn(metadataRepositoryMock);
+        Mockito.when(factory.getNetworkType()).thenReturn(Observable.just(networkType));
         service = new MetadataTransactionServiceImpl(factory);
     }
 
@@ -76,7 +77,7 @@ class MetadataTransactionServiceTest {
 
         AccountMetadataTransactionFactory result =
             service.createAccountMetadataTransactionFactory(
-                NetworkType.MIJIN_TEST, targetAccount,
+                targetAccount,
                 metadataKey,
                 newValue, senderPublicKey).toFuture().get();
 
@@ -110,7 +111,7 @@ class MetadataTransactionServiceTest {
 
         AccountMetadataTransactionFactory result =
             service.createAccountMetadataTransactionFactory(
-                NetworkType.MIJIN_TEST, targetAccount,
+                targetAccount,
                 metadataKey,
                 newValue, senderPublicKey).toFuture().get();
 
@@ -146,7 +147,7 @@ class MetadataTransactionServiceTest {
         RepositoryCallException exception = Assertions
             .assertThrows(RepositoryCallException.class, () -> ExceptionUtils.propagate(() ->
                 service.createAccountMetadataTransactionFactory(
-                    NetworkType.MIJIN_TEST, targetAccount,
+                    targetAccount,
                     metadataKey,
                     newValue, senderPublicKey).toFuture().get()));
 
@@ -176,7 +177,7 @@ class MetadataTransactionServiceTest {
         IllegalArgumentException exception = Assertions
             .assertThrows(IllegalArgumentException.class, () -> ExceptionUtils.propagate(() ->
                 service.createAccountMetadataTransactionFactory(
-                    NetworkType.MIJIN_TEST, targetAccount,
+                    targetAccount,
                     metadataKey,
                     newValue, senderPublicKey).toFuture().get()));
 
@@ -210,7 +211,7 @@ class MetadataTransactionServiceTest {
 
         MosaicMetadataTransactionFactory result =
             service.createMosaicMetadataTransactionFactory(
-                NetworkType.MIJIN_TEST, targetAccount,
+                targetAccount,
                 metadataKey,
                 newValue, senderPublicKey,
                 mosaicId).toFuture().get();
@@ -246,7 +247,7 @@ class MetadataTransactionServiceTest {
 
         MosaicMetadataTransactionFactory result =
             service.createMosaicMetadataTransactionFactory(
-                NetworkType.MIJIN_TEST, targetAccount,
+                targetAccount,
                 metadataKey,
                 newValue, senderPublicKey,
                 mosaicId).toFuture().get();
@@ -284,7 +285,7 @@ class MetadataTransactionServiceTest {
         RepositoryCallException exception = Assertions
             .assertThrows(RepositoryCallException.class, () -> ExceptionUtils.propagate(() ->
                 service.createMosaicMetadataTransactionFactory(
-                    NetworkType.MIJIN_TEST, targetAccount,
+                    targetAccount,
                     metadataKey,
                     newValue, senderPublicKey, mosaicId).toFuture().get()));
 
@@ -314,7 +315,7 @@ class MetadataTransactionServiceTest {
         IllegalArgumentException exception = Assertions
             .assertThrows(IllegalArgumentException.class, () -> ExceptionUtils.propagate(() ->
                 service.createMosaicMetadataTransactionFactory(
-                    NetworkType.MIJIN_TEST, targetAccount,
+                    targetAccount,
                     metadataKey,
                     newValue, senderPublicKey, mosaicId).toFuture().get()));
 
@@ -348,7 +349,7 @@ class MetadataTransactionServiceTest {
 
         NamespaceMetadataTransactionFactory result =
             service.createNamespaceMetadataTransactionFactory(
-                NetworkType.MIJIN_TEST, targetAccount,
+                targetAccount,
                 metadataKey,
                 newValue, senderPublicKey, namespaceId).toFuture().get();
 
@@ -383,7 +384,7 @@ class MetadataTransactionServiceTest {
 
         NamespaceMetadataTransactionFactory result =
             service.createNamespaceMetadataTransactionFactory(
-                NetworkType.MIJIN_TEST, targetAccount,
+                targetAccount,
                 metadataKey,
                 newValue, senderPublicKey, namespaceId).toFuture().get();
 
@@ -420,7 +421,7 @@ class MetadataTransactionServiceTest {
         RepositoryCallException exception = Assertions
             .assertThrows(RepositoryCallException.class, () -> ExceptionUtils.propagate(() ->
                 service.createNamespaceMetadataTransactionFactory(
-                    NetworkType.MIJIN_TEST, targetAccount,
+                    targetAccount,
                     metadataKey,
                     newValue, senderPublicKey, namespaceId).toFuture().get()));
 
@@ -450,7 +451,7 @@ class MetadataTransactionServiceTest {
         IllegalArgumentException exception = Assertions
             .assertThrows(IllegalArgumentException.class, () -> ExceptionUtils.propagate(() ->
                 service.createNamespaceMetadataTransactionFactory(
-                    NetworkType.MIJIN_TEST, targetAccount,
+                    targetAccount,
                     metadataKey,
                     newValue, senderPublicKey, namespaceId).toFuture().get()));
 

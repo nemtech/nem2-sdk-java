@@ -45,8 +45,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
 
     private Account testAccount = config().getDefaultAccount();
     private Account testAccount2 = config().getTestAccount2();
-
-    BigInteger restrictionKey = BigInteger.valueOf(22222);
+    private BigInteger restrictionKey = BigInteger.valueOf(22222);
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)

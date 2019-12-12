@@ -19,6 +19,7 @@ package io.nem.sdk.infrastructure;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nem.core.utils.ExceptionUtils;
 import io.nem.sdk.api.Listener;
+import io.nem.sdk.api.MosaicRestrictionTransactionService;
 import io.nem.sdk.api.RepositoryFactory;
 import io.nem.sdk.api.TransactionService;
 import io.nem.sdk.infrastructure.okhttp.RepositoryFactoryOkHttpImpl;
@@ -102,6 +103,7 @@ public abstract class BaseIntegrationTest {
 
     public BaseIntegrationTest() {
         this.config = new Config();
+        System.out.println("Running tests against server: " + config().getApiUrl());
         this.timeoutSeconds = this.config().getTimeoutSeconds();
         this.generationHash = resolveGenerationHash();
         this.networkType = resolveNetworkType();
@@ -109,7 +111,6 @@ public abstract class BaseIntegrationTest {
 
         System.out.println("Network Type: " + networkType);
         System.out.println("Generation Hash: " + generationHash);
-        System.out.println("Running tests against server: " + config().getApiUrl());
     }
 
     @BeforeEach
@@ -294,8 +295,13 @@ public abstract class BaseIntegrationTest {
         return (T) announceCorrectly;
     }
 
-    protected TransactionServiceImpl getTransactionService(RepositoryType type) {
+    protected TransactionService getTransactionService(RepositoryType type) {
         return new TransactionServiceImpl(getRepositoryFactory(type));
+    }
+
+    protected MosaicRestrictionTransactionService getMosaicRestrictionTransactionService(
+        RepositoryType type) {
+        return new MosaicRestrictionTransactionServiceImpl(getRepositoryFactory(type));
     }
 
     /**
@@ -434,16 +440,8 @@ public abstract class BaseIntegrationTest {
         UnresolvedMosaicId unresolvedMosaicId = mosaicId;
 
         if (alias != null) {
-            NamespaceRegistrationTransaction namespaceRegistrationTransaction =
-                NamespaceRegistrationTransactionFactory.createRootNamespace(
-                    getNetworkType(),
-                    alias,
-                    BigInteger.valueOf(100)).maxFee(this.maxFee).build();
 
-            NamespaceId rootNamespaceId = announceAggregateAndValidate(type,
-                namespaceRegistrationTransaction, account
-            ).getLeft().getNamespaceId();
-
+            NamespaceId rootNamespaceId = createRootNamespace(type, account, alias);
             unresolvedMosaicId = rootNamespaceId;
 
             sleep(1000);
@@ -458,7 +456,7 @@ public abstract class BaseIntegrationTest {
             announceAggregateAndValidate(type, addressAliasTransaction, account);
         }
 
-        if (initialSupply.longValue() > 0) {
+        if (initialSupply != null && initialSupply.longValue() > 0) {
             MosaicSupplyChangeTransaction mosaicSupplyChangeTransaction = MosaicSupplyChangeTransactionFactory
                 .create(getNetworkType(), unresolvedMosaicId, MosaicSupplyChangeActionType.INCREASE,
                     initialSupply).maxFee(this.maxFee).build();
