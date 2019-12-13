@@ -59,8 +59,6 @@ class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
         announceAggregateAndValidate(type, originalTransaction, signerAccount);
 
-        sleep(2000);
-
         assertMetadata(key, originalMessage, metadataRepository);
 
         AccountMetadataTransaction updateTransaction = get(service
@@ -69,8 +67,6 @@ class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
                 signerAccount.getPublicAccount().getPublicKey())).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, updateTransaction, signerAccount);
-
-        sleep(2000);
 
         assertMetadata(key, newMessage, metadataRepository);
 

@@ -65,8 +65,6 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
         announceAggregateAndValidate(type, originalTransaction, signerAccount);
 
-        sleep(2000);
-
         assertMetadata(targetMosaicId, key, originalMessage, metadataRepository);
 
         MosaicMetadataTransaction updateTransaction = get(service
@@ -76,8 +74,6 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
             .maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, updateTransaction, signerAccount);
-
-        sleep(2000);
 
         assertMetadata(targetMosaicId, key, newMessage, metadataRepository);
 

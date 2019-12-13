@@ -71,7 +71,8 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
         System.out.println("Removing transaction restriction");
         sendAccountRestrictionTransaction(type, transactionType, false, restrictionFlags);
 
-        Assertions.assertFalse(hasRestriction(type, testAccount, restrictionFlags, transactionType));
+        Assertions
+            .assertFalse(hasRestriction(type, testAccount, restrictionFlags, transactionType));
 
     }
 
@@ -143,7 +144,6 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
     private boolean hasRestriction(RepositoryType type, Account testAccount,
         AccountRestrictionFlags restrictionFlags, Object value) {
         try {
-            sleep(2000);//Need to wait?
             AccountRestrictions restrictions = get(
                 getRepositoryFactory(type).createRestrictionAccountRepository()
                     .getAccountRestrictions(testAccount.getAddress()));
@@ -154,7 +154,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
                 r -> r.getRestrictionFlags()
                     .equals(restrictionFlags) && r.getValues()
                     .contains(value));
-        } catch (RepositoryCallException | InterruptedException e) {
+        } catch (Exception e) {
             //If it fails, it's because is a new account.
             Assertions.assertEquals(
                 "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '"
@@ -185,7 +185,8 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
         AccountOperationRestrictionTransaction processedTransaction = announceAndValidate(type,
             testAccount, transaction);
 
-        Assertions.assertEquals(accountRestrictionFlags, processedTransaction.getRestrictionFlags());
+        Assertions
+            .assertEquals(accountRestrictionFlags, processedTransaction.getRestrictionFlags());
         Assertions.assertEquals(additions, processedTransaction.getRestrictionAdditions());
         Assertions.assertEquals(deletions, processedTransaction.getRestrictionDeletions());
     }
@@ -210,7 +211,8 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
         AccountMosaicRestrictionTransaction processedTransaction = announceAndValidate(type,
             testAccount, transaction);
 
-        Assertions.assertEquals(accountRestrictionFlags, processedTransaction.getRestrictionFlags());
+        Assertions
+            .assertEquals(accountRestrictionFlags, processedTransaction.getRestrictionFlags());
         Assertions.assertEquals(additions, processedTransaction.getRestrictionAdditions());
         Assertions.assertEquals(deletions, processedTransaction.getRestrictionDeletions());
     }
@@ -235,8 +237,10 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
         AccountAddressRestrictionTransaction processedTransaction = announceAndValidate(type,
             testAccount, transaction);
 
-        Assertions.assertEquals(accountRestrictionFlags, processedTransaction.getRestrictionFlags());
-        Assertions.assertEquals(accountRestrictionFlags, processedTransaction.getRestrictionFlags());
+        Assertions
+            .assertEquals(accountRestrictionFlags, processedTransaction.getRestrictionFlags());
+        Assertions
+            .assertEquals(accountRestrictionFlags, processedTransaction.getRestrictionFlags());
         Assertions.assertEquals(additions, processedTransaction.getRestrictionAdditions());
         Assertions.assertEquals(deletions, processedTransaction.getRestrictionDeletions());
 
@@ -249,7 +253,8 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
             .createFromPublicKey("67F69FA4BFCD158F6E1AF1ABC82F725F5C5C4710D6E29217B12BE66397435DFB",
                 getNetworkType());
 
-        RestrictionAccountRepository repository = getRepositoryFactory(type).createRestrictionAccountRepository();
+        RestrictionAccountRepository repository = getRepositoryFactory(type)
+            .createRestrictionAccountRepository();
         Assertions.assertEquals(0, get(repository
             .getAccountsRestrictions(
                 Collections.singletonList(address))).size());
@@ -258,7 +263,8 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getAccountRestrictionsWhenAccountDoesNotExist(RepositoryType type) {
-        RestrictionAccountRepository repository = getRepositoryFactory(type).createRestrictionAccountRepository();
+        RestrictionAccountRepository repository = getRepositoryFactory(type)
+            .createRestrictionAccountRepository();
 
         Address address = Address
             .createFromPublicKey("67F69FA4BFCD158F6E1AF1ABC82F725F5C5C4710D6E29217B12BE66397435DFB",

@@ -50,7 +50,6 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
         throws InterruptedException {
         String hash = transferUsingAliases(config().getNemesisAccount(), type, "cat.currency",
             "testaccount2", BigInteger.TEN).getTransactionInfo().get().getHash().get();
-        sleep(2000);
 
         List<Transaction> transactions = get(
             getTransactionService(type).resolveAliases(Collections.singletonList(hash)));
@@ -82,8 +81,6 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
             config().getNemesisAccount(), type, mosaicAlias,
             "testaccount2", BigInteger.ONE).getTransactionInfo().get().getHash().get();
 
-        sleep(2000);
-
         List<Transaction> transactions = get(
             getTransactionService(type)
                 .resolveAliases(Arrays.asList(transferTransactionHash)));
@@ -105,8 +102,6 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
         String aggregateTransactionHash = transferUsingAliasesAggregate(
             config().getNemesisAccount(), type, mosaicAlias,
             "testaccount2", BigInteger.ONE).getTransactionInfo().get().getHash().get();
-
-        sleep(2000);
 
         List<Transaction> transactions = get(
             getTransactionService(type)
@@ -158,7 +153,6 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
             mosaicId = createMosaic(account, type, BigInteger.valueOf(100000), mosaicAlias);
 
-            sleep(2000);
         }
         return mosaicId;
     }

@@ -326,6 +326,7 @@ public abstract class BaseIntegrationTest {
 
     @SuppressWarnings("squid:S2925")
     protected void sleep(long time) throws InterruptedException {
+        System.out.println("Sleeping for " + time);
         Thread.sleep(time);
     }
 
@@ -443,8 +444,6 @@ public abstract class BaseIntegrationTest {
 
             NamespaceId rootNamespaceId = createRootNamespace(type, account, alias);
             unresolvedMosaicId = rootNamespaceId;
-
-            sleep(1000);
 
             MosaicAliasTransaction addressAliasTransaction =
                 MosaicAliasTransactionFactory.create(

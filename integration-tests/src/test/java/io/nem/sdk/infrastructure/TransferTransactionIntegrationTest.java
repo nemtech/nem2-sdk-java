@@ -108,7 +108,6 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         assertTransferTransactions(transferTransaction, processed);
 
         assertEncryptedMessageTransaction(message, senderKeyPair, recipientKeyPair, processed);
-        sleep(1000);
 
         TransferTransaction restTransaction = (TransferTransaction) get(
             getRepositoryFactory(type).createTransactionRepository()
@@ -162,7 +161,6 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         TransferTransaction processed = announceAndValidate(type, account, transferTransaction);
 
         assertPersistentDelegationTransaction(senderKeyPair, recipientKeyPair, processed);
-        sleep(1000);
 
         TransferTransaction restTransaction = (TransferTransaction) get(
             getRepositoryFactory(type).createTransactionRepository()

@@ -70,7 +70,6 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
         assertTransaction(createTransaction, processedCreateTransaction);
 
         //5) Validate the data from the endpoints
-        sleep(1000);
 
         RestrictionMosaicRepository restrictionRepository = getRepositoryFactory(type)
             .createRestrictionMosaicRepository();
@@ -98,7 +97,6 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
         assertTransaction(updateTransaction, processedUpdateTransaction);
 
         //8) Validating that the endpoints show the new value and type.
-        sleep(1000);
 
         assertMosaicGlobalRestriction(updateTransaction, get(
             restrictionRepository.getMosaicGlobalRestriction(mosaicId)));
@@ -194,7 +192,6 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
         assertTransaction(createTransaction, processedCreateTransaction);
 
         //5) Validate the data from the endpoints
-        sleep(1000);
 
         RestrictionMosaicRepository restrictionRepository = getRepositoryFactory(type)
             .createRestrictionMosaicRepository();
@@ -217,8 +214,6 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
 
         announceAndValidate(
             type, testAccount, createAddressTransaction);
-
-        sleep(2000);
 
         //7) Announcing the update restriction transaction and checking the processed one.
         MosaicAddressRestrictionTransaction updateAddressTransaction =
@@ -245,10 +240,10 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
         throws InterruptedException {
 
         //1) Create mosaic and alias
-        String masaicAliasName = "createUpdateMosaicAddressRestrictionTransactionFactoryUsingAlias"
+        String mosaicAliasName = "createUpdateMosaicAddressRestrictionTransactionFactoryUsingAlias"
             .toLowerCase();
-        NamespaceId mosaicAlias = NamespaceId.createFromName(masaicAliasName);
-        MosaicId mosaicId = createMosaic(testAccount, type, null, masaicAliasName);
+        NamespaceId mosaicAlias = NamespaceId.createFromName(mosaicAliasName);
+        MosaicId mosaicId = createMosaic(testAccount, type, null, mosaicAliasName);
 
         //2) Create a restriction on the mosaic
 
@@ -272,7 +267,6 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
         assertTransaction(createTransaction, processedCreateTransaction);
 
         //5) Validate the data from the endpoints
-        sleep(1000);
 
         RestrictionMosaicRepository restrictionRepository = getRepositoryFactory(type)
             .createRestrictionMosaicRepository();
@@ -295,8 +289,6 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
 
         announceAndValidate(
             type, testAccount, createAddressTransaction);
-
-        sleep(2000);
 
         //7) Announcing the update restriction transaction and checking the processed one.
         MosaicAddressRestrictionTransaction updateAddressTransaction =

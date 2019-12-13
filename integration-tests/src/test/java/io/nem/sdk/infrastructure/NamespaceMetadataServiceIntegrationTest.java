@@ -66,8 +66,6 @@ class NamespaceMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
         announceAggregateAndValidate(type, originalTransaction, signerAccount);
 
-        sleep(2000);
-
         assertMetadata(targetNamespaceId, key, originalMessage, metadataRepository);
 
         NamespaceMetadataTransaction updateTransaction = get(service
@@ -77,8 +75,6 @@ class NamespaceMetadataServiceIntegrationTest extends BaseIntegrationTest {
             .maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, updateTransaction, signerAccount);
-
-        sleep(2000);
 
         assertMetadata(targetNamespaceId, key, newMessage, metadataRepository);
 

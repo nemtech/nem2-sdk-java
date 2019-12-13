@@ -37,7 +37,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
 
     private Account testAccount = config().getDefaultAccount();
 
-    private  BigInteger restrictionKey = BigInteger.valueOf(11111);
+    private BigInteger restrictionKey = BigInteger.valueOf(11111);
 
 
     @ParameterizedTest
@@ -72,7 +72,6 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
         assertTransaction(createTransaction, processedCreateTransaction);
 
         //5) Validate the data from the endpoints
-        sleep(1000);
 
         RestrictionMosaicRepository restrictionRepository = getRepositoryFactory(type)
             .createRestrictionMosaicRepository();
@@ -102,7 +101,6 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
         assertTransaction(updateTransaction, processedUpdateTransaction);
 
         //8) Validating that the endpoints show the new value and type.
-        sleep(1000);
 
         assertMosaicGlobalRestriction(updateTransaction, get(
             restrictionRepository.getMosaicGlobalRestriction(mosaicId)));

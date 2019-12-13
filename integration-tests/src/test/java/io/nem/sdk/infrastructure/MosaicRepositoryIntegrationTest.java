@@ -46,10 +46,9 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
     private MosaicId mosaicId;
 
     @BeforeAll
-    void setup() throws InterruptedException {
+    void setup() {
         mosaicId = createMosaic(DEFAULT_REPOSITORY_TYPE, testAccount);
         mosaicIds.add(mosaicId);
-        sleep(1000);
     }
 
     @ParameterizedTest

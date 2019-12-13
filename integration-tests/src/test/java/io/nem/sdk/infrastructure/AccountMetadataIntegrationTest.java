@@ -64,7 +64,7 @@ public class AccountMetadataIntegrationTest extends BaseIntegrationTest {
         Assertions.assertEquals(transaction.getScopedMetadataKey(),
             processedTransaction.getScopedMetadataKey());
 
-        sleep(2000);
+       // sleep(2000);
 
         Metadata metadata = assertMetadata(transaction,
             get(getRepositoryFactory(type).createMetadataRepository()
