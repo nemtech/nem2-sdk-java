@@ -87,7 +87,6 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
             type, createTransaction, testAccount).getLeft());
 
         //5) Validate that endpoints have the data.
-       // sleep(1000);
 
         RestrictionMosaicRepository restrictionRepository = getRepositoryFactory(type)
             .createRestrictionMosaicRepository();
@@ -114,8 +113,6 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
         //7) Announce and validate.
         assertTransaction(updateTransaction, announceAggregateAndValidate(
             type, updateTransaction, testAccount).getLeft());
-
-        //sleep(1000);
 
         //8) Validates that the endpoints have the new values
         assertMosaicAddressRestriction(targetAddress, updateTransaction, get(
