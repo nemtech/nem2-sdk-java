@@ -16,7 +16,13 @@
 
 package io.nem.sdk.model.receipt;
 
-import io.nem.core.utils.ConvertUtils;
+import io.nem.catapult.builders.AddressDto;
+import io.nem.catapult.builders.AmountDto;
+import io.nem.catapult.builders.BalanceTransferReceiptBuilder;
+import io.nem.catapult.builders.KeyDto;
+import io.nem.catapult.builders.MosaicBuilder;
+import io.nem.catapult.builders.MosaicIdDto;
+import io.nem.catapult.builders.ReceiptTypeDto;
 import io.nem.sdk.infrastructure.SerializationUtils;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
@@ -128,18 +134,26 @@ public class BalanceTransferReceipt extends Receipt {
      *
      * @return receipt bytes
      */
+    @Override
     public byte[] serialize() {
         ByteBuffer recipientBytes = SerializationUtils
             .fromUnresolvedAddressToByteBuffer(getRecipient(),
                 getSender().getAddress().getNetworkType());
-        final ByteBuffer buffer = ByteBuffer.allocate(52 + recipientBytes.remaining());
-        buffer.putShort(Short.reverseBytes((short) getVersion().getValue()));
-        buffer.putShort(Short.reverseBytes((short) getType().getValue()));
-        buffer.putLong(Long.reverseBytes(getMosaicId().getIdAsLong()));
-        buffer.putLong(Long.reverseBytes(getAmount().longValue()));
-        buffer.put(ConvertUtils.getBytes(getSender().getPublicKey().toHex()));
-        buffer.put(recipientBytes);
-        return buffer.array();
+
+        final short version = (short) getVersion().getValue();
+        final ReceiptTypeDto type = ReceiptTypeDto.rawValueOf((short) getType().getValue());
+        final MosaicBuilder mosaic = MosaicBuilder
+            .create(new MosaicIdDto(getMosaicId().getIdAsLong()),
+                new AmountDto(getAmount().longValue()));
+
+        final KeyDto senderPublicKey = SerializationUtils.toKeyDto(getSender().getPublicKey());
+
+        final AddressDto recipientAddress = new AddressDto(recipientBytes);
+
+        return BalanceTransferReceiptBuilder
+            .create(version, type, mosaic, senderPublicKey, recipientAddress).serialize();
+
+
     }
 
     /**

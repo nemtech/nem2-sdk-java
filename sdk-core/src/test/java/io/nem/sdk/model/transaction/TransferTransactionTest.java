@@ -20,10 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.catapult.builders.EmbeddedTransferTransactionBuilder;
+import io.nem.catapult.builders.TransactionBuilderFactory;
+import io.nem.catapult.builders.TransferTransactionBuilder;
 import io.nem.core.crypto.KeyPair;
 import io.nem.core.crypto.PrivateKey;
 import io.nem.sdk.api.BinarySerialization;
 import io.nem.sdk.infrastructure.BinarySerializationImpl;
+import io.nem.sdk.infrastructure.SerializationUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
@@ -159,6 +163,39 @@ class TransferTransactionTest extends AbstractTransactionTester {
             networkType));
 
         assertSerialization(expected, transaction);
+
+    }
+
+    @Test
+    void basicCatbufferSimpleSerialization() {
+        String expected =
+            "c4000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001905441000000000000000001000000000000009151776168d24257d80000000000000000000000000000000001140000000000672b0000ce560000640000000000000000536f6d65204d65737361676520e6bca2e5ad97";
+
+        TransferTransactionBuilder transactionBuilder = (TransferTransactionBuilder) TransactionBuilderFactory
+            .createTransactionBuilder(SerializationUtils.toDataInput(Hex.decode(expected)));
+
+        Assertions.assertEquals(expected, Hex.toHexString(
+            transactionBuilder.serialize()));
+
+
+        Assertions
+            .assertEquals(100L, transactionBuilder.getMosaics().get(0).getAmount().getAmount());
+
+    }
+
+    @Test
+    void basicCatbufferAggregateSerialization() {
+        String expected =
+            "61000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b24000000000190544190e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac01010000000000672b0000ce560000640000000000000000";
+
+        EmbeddedTransferTransactionBuilder transactionBuilder = (EmbeddedTransferTransactionBuilder) TransactionBuilderFactory
+            .createEmbeddedTransactionBuilder(SerializationUtils.toDataInput(Hex.decode(expected)));
+
+        Assertions.assertEquals(expected, Hex.toHexString(
+            transactionBuilder.serialize()));
+
+        Assertions
+            .assertEquals(100L, transactionBuilder.getMosaics().get(0).getAmount().getAmount());
 
     }
 

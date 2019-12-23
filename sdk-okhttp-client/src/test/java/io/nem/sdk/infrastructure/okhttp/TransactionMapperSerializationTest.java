@@ -21,18 +21,13 @@ import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.Transaction;
-import io.nem.sdk.openapi.okhttp_gson.invoker.JSON;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.io.File;
-import java.io.InputStream;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
@@ -88,6 +83,15 @@ public class TransactionMapperSerializationTest {
         BinarySerialization serialization = new BinarySerializationImpl();
         Assertions.assertEquals(Hex.toHexString(serialization.serialize(transactionModel)),
             Hex.toHexString(serialization.serialize(transactionMapper.map(mappedTransactionInfo))));
+
+        originalTransactionInfo.setMeta(null);
+        Map<String, Object> transactionJson = (Map<String, Object>) originalTransactionInfo
+            .getTransaction();
+        if (transactionJson.containsKey("transactions")) {
+            List<Map<String, Object>> transactionsJson = (List<Map<String, Object>>) transactionJson
+                .get("transactions");
+            transactionsJson.forEach(t -> t.remove("meta"));
+        }
 
 
     }

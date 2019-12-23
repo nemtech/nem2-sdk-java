@@ -16,11 +16,16 @@
 
 package io.nem.sdk.model.receipt;
 
-import io.nem.core.utils.ConvertUtils;
+import io.nem.catapult.builders.AmountDto;
+import io.nem.catapult.builders.BalanceChangeReceiptBuilder;
+import io.nem.catapult.builders.KeyDto;
+import io.nem.catapult.builders.MosaicBuilder;
+import io.nem.catapult.builders.MosaicIdDto;
+import io.nem.catapult.builders.ReceiptTypeDto;
+import io.nem.sdk.infrastructure.SerializationUtils;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.util.Optional;
 
 public class BalanceChangeReceipt extends Receipt {
@@ -107,14 +112,17 @@ public class BalanceChangeReceipt extends Receipt {
      *
      * @return receipt bytes
      */
+    @Override
     public byte[] serialize() {
-        final ByteBuffer buffer = ByteBuffer.allocate(52);
-        buffer.putShort(Short.reverseBytes((short) getVersion().getValue()));
-        buffer.putShort(Short.reverseBytes((short) getType().getValue()));
-        buffer.putLong(Long.reverseBytes(getMosaicId().getIdAsLong()));
-        buffer.putLong(Long.reverseBytes(getAmount().longValue()));
-        buffer.put(ConvertUtils.getBytes(getAccount().getPublicKey().toHex()));
-        return buffer.array();
+
+        short version = (short) getVersion().getValue();
+        ReceiptTypeDto type = ReceiptTypeDto.rawValueOf((short) getType().getValue());
+        MosaicBuilder mosaic = MosaicBuilder
+            .create(new MosaicIdDto(getMosaicId().getIdAsLong()),
+                new AmountDto(getAmount().longValue()));
+        KeyDto targetPublicKey = SerializationUtils.toKeyDto(getAccount().getPublicKey());
+        return BalanceChangeReceiptBuilder
+            .create(version, type, mosaic, targetPublicKey).serialize();
     }
 
     /**

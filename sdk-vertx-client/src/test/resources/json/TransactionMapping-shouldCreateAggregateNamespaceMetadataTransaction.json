@@ -33,7 +33,7 @@
           "network": 144,
           "type": 17220,
           "valueSizeDelta": 1,
-          "valueSize": 10,
+          "valueSize": 49,
           "scopedMetadataKey": "3",
           "value": "5468697320697320746865206d65737361676520666f722074686973206163636f756e742120e6b189e5ad973839363634",
           "signerPublicKey": "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",

@@ -25,13 +25,13 @@ import io.nem.catapult.builders.AccountOperationRestrictionTransactionBodyBuilde
 import io.nem.catapult.builders.AccountRestrictionFlagsDto;
 import io.nem.catapult.builders.AddressAliasTransactionBodyBuilder;
 import io.nem.catapult.builders.AddressDto;
+import io.nem.catapult.builders.AggregateTransactionBodyBuilder;
 import io.nem.catapult.builders.AliasActionDto;
 import io.nem.catapult.builders.AmountDto;
 import io.nem.catapult.builders.BlockDurationDto;
 import io.nem.catapult.builders.CosignatureBuilder;
 import io.nem.catapult.builders.EmbeddedTransactionBuilder;
 import io.nem.catapult.builders.EntityTypeDto;
-import io.nem.catapult.builders.GeneratorUtils;
 import io.nem.catapult.builders.Hash256Dto;
 import io.nem.catapult.builders.HashLockTransactionBodyBuilder;
 import io.nem.catapult.builders.KeyDto;
@@ -58,6 +58,7 @@ import io.nem.catapult.builders.Serializer;
 import io.nem.catapult.builders.SignatureDto;
 import io.nem.catapult.builders.TimestampDto;
 import io.nem.catapult.builders.TransactionBuilder;
+import io.nem.catapult.builders.TransactionBuilderFactory;
 import io.nem.catapult.builders.TransferTransactionBodyBuilder;
 import io.nem.catapult.builders.UnresolvedAddressDto;
 import io.nem.catapult.builders.UnresolvedMosaicBuilder;
@@ -144,9 +145,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.tuple.Pair;
 import org.bouncycastle.util.encoders.Hex;
 
 
@@ -248,20 +247,33 @@ public class BinarySerializationImpl implements BinarySerialization {
      */
     public <T extends Transaction> byte[] serializeEmbedded(T transaction) {
         Validate.notNull(transaction, "Transaction must not be null");
-        EmbeddedTransactionBuilder embeddedTransactionBuilder = getEmbeddedTransactionBuilder(
-            transaction);
-        return serializeTransaction(embeddedTransactionBuilder.serialize(), transaction);
-    }
-
-    private <T extends Transaction> EmbeddedTransactionBuilder getEmbeddedTransactionBuilder(
-        T transaction) {
-        return EmbeddedTransactionBuilder.create(
+        EmbeddedTransactionBuilder embeddedTransactionBuilder = EmbeddedTransactionBuilder.create(
             new KeyDto(getRequiredSignerBytes(transaction.getSigner())),
             transaction.getVersion().byteValue(),
             NetworkTypeDto.rawValueOf((byte) transaction.getNetworkType().getValue()),
             EntityTypeDto.rawValueOf((short) transaction.getType().getValue()));
+        return serializeTransaction(embeddedTransactionBuilder.serialize(), transaction);
     }
 
+    /**
+     * Creates the right {@link EmbeddedTransactionBuilder} from the transaction
+     *
+     * @param transaction the transaction
+     * @param <T> the transaction class
+     * @return the {@link EmbeddedTransactionBuilder}
+     */
+    private <T extends Transaction> EmbeddedTransactionBuilder toEmbeddedTransactionBuilder(
+        T transaction) {
+        return TransactionBuilderFactory.createEmbeddedTransactionBuilder(
+            SerializationUtils.toDataInput(serializeEmbedded(transaction)));
+    }
+
+    /**
+     * Gets the top level {@link TransactionBuilder} for the given transaction
+     *
+     * @param transaction the transaction
+     * @return the top level {@link TransactionBuilder}
+     */
     private TransactionBuilder getTransactionBuilder(Transaction transaction) {
 
         final SignatureDto signatureDto = transaction.getSignature()
@@ -294,21 +306,21 @@ public class BinarySerializationImpl implements BinarySerialization {
         Validate.isTrue(
             transactionSerializer.getTransactionClass().isAssignableFrom(transaction.getClass()),
             "Invalid TransactionSerializer's transaction class.");
-        byte[] transactionBytes = transactionSerializer.getBodyBuilder(transaction).serialize();
+        byte[] transactionBytes = transactionSerializer.toBodyBuilder(transaction).serialize();
         return SerializationUtils.concat(commonBytes, transactionBytes);
     }
 
-
+    /**
+     * It returns the transaction's byte array size useful to calculate its fee.
+     *
+     * @param <T> the type of the transaction
+     * @param transaction the transaction
+     * @return the size of the transaction.
+     */
     @Override
     public <T extends Transaction> int getSize(T transaction) {
         return getTransactionBuilder(transaction).getSize() + resolveSerializer(
-            transaction.getType()).getBodyBuilder(transaction)
-            .getSize();
-    }
-
-    private <T extends Transaction> int getEmbeddedSize(T transaction) {
-        return getEmbeddedTransactionBuilder(transaction).getSize() + resolveSerializer(
-            transaction.getType()).getBodyBuilder(transaction)
+            transaction.getType()).toBodyBuilder(transaction)
             .getSize();
     }
 
@@ -335,7 +347,19 @@ public class BinarySerializationImpl implements BinarySerialization {
     public Transaction deserialize(byte[] payload) {
         Validate.notNull(payload, "Payload must not be null");
         DataInputStream stream = SerializationUtils.toDataInput(payload);
-        TransactionBuilder builder = TransactionBuilder.loadFromBinary(stream);
+        TransactionBuilder builder = TransactionBuilderFactory
+            .createTransactionBuilder(stream);
+
+        return toTransaction(builder);
+    }
+
+    /**
+     * It converts a {@link TransactionBuilder} to a {@link Transaction}
+     *
+     * @param builder the builder
+     * @return the {@link Transaction} model.
+     */
+    private Transaction toTransaction(TransactionBuilder builder) {
         TransactionType transactionType = TransactionType
             .rawValueOf(SerializationUtils.shortToUnsignedInt(builder.getType().getValue()));
         NetworkType networkType = NetworkType
@@ -343,8 +367,10 @@ public class BinarySerializationImpl implements BinarySerialization {
 
         Deadline deadline = new Deadline(
             SerializationUtils.toUnsignedBigInteger(builder.getDeadline().getTimestamp()));
+
         TransactionFactory<?> factory = resolveSerializer(transactionType)
-            .fromStream(networkType, stream);
+            .fromBodyBuilder(networkType, builder.getBody());
+
         factory.version(SerializationUtils.byteToUnsignedInt(builder.getVersion()));
         factory.maxFee(SerializationUtils.toUnsignedBigInteger(builder.getFee()));
         factory.deadline(deadline);
@@ -359,6 +385,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
         return factory.build();
     }
+
 
     /**
      * @param array the byte array.
@@ -376,49 +403,37 @@ public class BinarySerializationImpl implements BinarySerialization {
     /**
      * It deserializes a payload of a embedded transaction into a transact model.
      *
-     * @param payload the payload as byte array.
-     * @return the {@link Transaction} model.
-     */
-    public Pair<Transaction, Integer> deserializeEmbedded(byte[] payload) {
-        Validate.notNull(payload, "Payload must not be null");
-        return deserializeEmbedded(SerializationUtils.toDataInput(payload));
-    }
-
-    /**
-     * It deserializes a payload of a embedded transaction into a transact model.
-     *
-     * @param payload the payload as {@link ByteBuffer}. This buffer is the continuation of the top
-     * level payload.
-     * @return the {@link Transaction} model.
-     */
-    public Pair<Transaction, Integer> deserializeEmbedded(ByteBuffer payload) {
-        Validate.notNull(payload, "Payload must not be null");
-        return deserializeEmbedded(new DataInputStream(new ByteBufferBackedInputStream(payload)));
-    }
-
-    /**
-     * It deserializes a payload of a embedded transaction into a transact model.
-     *
      * @param payload the payload as {@link DataInputStream}
      * @return the {@link Transaction} model.
      */
-    private Pair<Transaction, Integer> deserializeEmbedded(DataInputStream payload) {
+    public Transaction deserializeEmbedded(DataInputStream payload) {
 
         return ExceptionUtils.propagate(() -> {
             Validate.notNull(payload, "Payload must not be null");
-            EmbeddedTransactionBuilder builder = EmbeddedTransactionBuilder.loadFromBinary(payload);
-            TransactionType transactionType = TransactionType
-                .rawValueOf(SerializationUtils.shortToUnsignedInt(builder.getType().getValue()));
-            NetworkType networkType = NetworkType
-                .rawValueOf(SerializationUtils.byteToUnsignedInt(builder.getNetwork().getValue()));
-            TransactionFactory<?> factory = resolveSerializer(transactionType)
-                .fromStream(networkType, payload);
-            factory
-                .signer(
-                    SerializationUtils.toPublicAccount(builder.getSignerPublicKey(), networkType));
-            factory.version(SerializationUtils.byteToUnsignedInt(builder.getVersion()));
-            return Pair.of(factory.build(), builder.getStreamSize());
+            EmbeddedTransactionBuilder builder = TransactionBuilderFactory
+                .createEmbeddedTransactionBuilder(payload);
+            return toTransaction(builder);
         });
+    }
+
+    /**
+     * It converts a {@link EmbeddedTransactionBuilder} to a {@link Transaction}
+     *
+     * @param builder the builder
+     * @return the {@link Transaction} model.
+     */
+    private Transaction toTransaction(EmbeddedTransactionBuilder builder) {
+        TransactionType transactionType = TransactionType
+            .rawValueOf(SerializationUtils.shortToUnsignedInt(builder.getType().getValue()));
+        NetworkType networkType = NetworkType
+            .rawValueOf(SerializationUtils.byteToUnsignedInt(builder.getNetwork().getValue()));
+        TransactionFactory<?> factory = resolveSerializer(transactionType)
+            .fromBodyBuilder(networkType, builder.getBody());
+        factory
+            .signer(
+                SerializationUtils.toPublicAccount(builder.getSignerPublicKey(), networkType));
+        factory.version(SerializationUtils.byteToUnsignedInt(builder.getVersion()));
+        return factory.build();
     }
 
 
@@ -445,11 +460,12 @@ public class BinarySerializationImpl implements BinarySerialization {
          * efforts.
          *
          * @param networkType the network type
-         * @param stream the stream containing just the specific transaction values in the right
-         * order.
+         * @param transactionBuilder the stream containing just the specific transaction values in
+         * the right order.
          * @return the TransactionFactory of the transaction type this object handles.
          */
-        TransactionFactory fromStream(NetworkType networkType, DataInputStream stream);
+        TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder);
 
         /**
          * Subclasses would need to know how to serialize the internal components of a transaction,
@@ -459,7 +475,7 @@ public class BinarySerializationImpl implements BinarySerialization {
          * @param transaction the transaction to be serialized
          * @return the catbuffer {@link Serializer}.
          */
-        Serializer getBodyBuilder(T transaction);
+        Serializer toBodyBuilder(T transaction);
 
     }
 
@@ -477,9 +493,9 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory<?> fromStream(NetworkType networkType, DataInputStream stream) {
-            TransferTransactionBodyBuilder builder = TransferTransactionBodyBuilder
-                .loadFromBinary(stream);
+        public TransactionFactory<?> fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
+            TransferTransactionBodyBuilder builder = ((TransferTransactionBodyBuilder) transactionBuilder);
             byte[] messageArray = builder.getMessage().array();
             MessageType messageType = MessageType
                 .rawValueOf(SerializationUtils.byteToUnsignedInt(messageArray[0]));
@@ -495,7 +511,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(TransferTransaction transaction) {
+        public Serializer toBodyBuilder(TransferTransaction transaction) {
             return TransferTransactionBodyBuilder.create(
                 new UnresolvedAddressDto(
                     SerializationUtils
@@ -564,9 +580,9 @@ public class BinarySerializationImpl implements BinarySerialization {
 
 
         @Override
-        public TransactionFactory<?> fromStream(NetworkType networkType, DataInputStream stream) {
-            MosaicSupplyChangeTransactionBodyBuilder builder = MosaicSupplyChangeTransactionBodyBuilder
-                .loadFromBinary(stream);
+        public TransactionFactory<?> fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
+            MosaicSupplyChangeTransactionBodyBuilder builder = ((MosaicSupplyChangeTransactionBodyBuilder) transactionBuilder);
             UnresolvedMosaicId mosaicId = SerializationUtils
                 .toUnresolvedMosaicId(builder.getMosaicId());
             MosaicSupplyChangeActionType action = MosaicSupplyChangeActionType
@@ -577,7 +593,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(MosaicSupplyChangeTransaction transaction) {
+        public Serializer toBodyBuilder(MosaicSupplyChangeTransaction transaction) {
             return MosaicSupplyChangeTransactionBodyBuilder.create(
                 new UnresolvedMosaicIdDto(transaction.getMosaicId().getId().longValue()),
                 new AmountDto(transaction.getDelta().longValue()),
@@ -602,9 +618,9 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory<?> fromStream(NetworkType networkType, DataInputStream stream) {
-            MosaicDefinitionTransactionBodyBuilder builder = MosaicDefinitionTransactionBodyBuilder
-                .loadFromBinary(stream);
+        public TransactionFactory<?> fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
+            MosaicDefinitionTransactionBodyBuilder builder = (MosaicDefinitionTransactionBodyBuilder) transactionBuilder;
             MosaicNonce mosaicNonce = MosaicNonce
                 .createFromBigInteger((long) builder.getNonce().getMosaicNonce());
             MosaicId mosaicId = SerializationUtils.toMosaicId(builder.getId());
@@ -621,7 +637,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(MosaicDefinitionTransaction transaction) {
+        public Serializer toBodyBuilder(MosaicDefinitionTransaction transaction) {
             return MosaicDefinitionTransactionBodyBuilder.create(
                 new MosaicIdDto(transaction.getMosaicId().getId().longValue()),
                 new BlockDurationDto(transaction.getBlockDuration().getDuration()),
@@ -666,9 +682,9 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
-            AccountLinkTransactionBodyBuilder builder = AccountLinkTransactionBodyBuilder
-                .loadFromBinary(stream);
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
+            AccountLinkTransactionBodyBuilder builder = (AccountLinkTransactionBodyBuilder) transactionBuilder;
             PublicAccount remoteAccount = SerializationUtils
                 .toPublicAccount(builder.getRemotePublicKey(), networkType);
             AccountLinkAction linkAction = AccountLinkAction
@@ -678,7 +694,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(AccountLinkTransaction transaction) {
+        public Serializer toBodyBuilder(AccountLinkTransaction transaction) {
             return AccountLinkTransactionBodyBuilder.create(
                 SerializationUtils.toKeyDto(transaction.getRemoteAccount().getPublicKey()),
                 AccountLinkActionDto.rawValueOf(transaction.getLinkAction().getValue()))
@@ -702,9 +718,9 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
-            AccountMetadataTransactionBodyBuilder builder = AccountMetadataTransactionBodyBuilder
-                .loadFromBinary(stream);
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
+            AccountMetadataTransactionBodyBuilder builder = (AccountMetadataTransactionBodyBuilder) transactionBuilder;
             PublicAccount targetAccount = SerializationUtils
                 .toPublicAccount(builder.getTargetPublicKey(), networkType);
             BigInteger scopedMetadataKey = SerializationUtils
@@ -716,7 +732,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(AccountMetadataTransaction transaction) {
+        public Serializer toBodyBuilder(AccountMetadataTransaction transaction) {
             return AccountMetadataTransactionBodyBuilder.create(
                 SerializationUtils.toKeyDto(transaction.getTargetAccount().getPublicKey()),
                 transaction.getScopedMetadataKey().longValue(),
@@ -742,9 +758,9 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
-            MosaicMetadataTransactionBodyBuilder builder = MosaicMetadataTransactionBodyBuilder
-                .loadFromBinary(stream);
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
+            MosaicMetadataTransactionBodyBuilder builder = (MosaicMetadataTransactionBodyBuilder) transactionBuilder;
             PublicAccount targetAccount = SerializationUtils
                 .toPublicAccount(builder.getTargetPublicKey(), networkType);
             BigInteger scopedMetadataKey = SerializationUtils
@@ -758,7 +774,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(MosaicMetadataTransaction transaction) {
+        public Serializer toBodyBuilder(MosaicMetadataTransaction transaction) {
             return MosaicMetadataTransactionBodyBuilder.create(
                 SerializationUtils.toKeyDto(transaction.getTargetAccount().getPublicKey()),
                 transaction.getScopedMetadataKey().longValue(),
@@ -786,9 +802,9 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
-            NamespaceMetadataTransactionBodyBuilder builder = NamespaceMetadataTransactionBodyBuilder
-                .loadFromBinary(stream);
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
+            NamespaceMetadataTransactionBodyBuilder builder = (NamespaceMetadataTransactionBodyBuilder) transactionBuilder;
             PublicAccount targetAccount = SerializationUtils
                 .toPublicAccount(builder.getTargetPublicKey(), networkType);
             BigInteger scopedMetadataKey = SerializationUtils
@@ -802,7 +818,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(NamespaceMetadataTransaction transaction) {
+        public Serializer toBodyBuilder(NamespaceMetadataTransaction transaction) {
             return NamespaceMetadataTransactionBodyBuilder.create(
                 new KeyDto(transaction.getTargetAccount().getPublicKey().getByteBuffer()),
                 transaction.getScopedMetadataKey().longValue(),
@@ -829,10 +845,10 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
 
-            NamespaceRegistrationTransactionBodyBuilder builder = NamespaceRegistrationTransactionBodyBuilder
-                .loadFromBinary(stream);
+            NamespaceRegistrationTransactionBodyBuilder builder = (NamespaceRegistrationTransactionBodyBuilder) transactionBuilder;
 
             NamespaceRegistrationType namespaceRegistrationType = NamespaceRegistrationType
                 .rawValueOf(builder.getRegistrationType().getValue());
@@ -859,7 +875,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(NamespaceRegistrationTransaction transaction) {
+        public Serializer toBodyBuilder(NamespaceRegistrationTransaction transaction) {
             NamespaceRegistrationTransactionBodyBuilder txBuilder;
             ByteBuffer namespaceNameByteBuffer = ByteBuffer
                 .wrap(StringEncoder.getBytes(transaction.getNamespaceName()));
@@ -904,10 +920,10 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
 
-            SecretLockTransactionBodyBuilder builder = SecretLockTransactionBodyBuilder
-                .loadFromBinary(stream);
+            SecretLockTransactionBodyBuilder builder = (SecretLockTransactionBodyBuilder) transactionBuilder;
 
             Mosaic mosaic = SerializationUtils.toMosaic(builder.getMosaic());
             BigInteger duration = SerializationUtils
@@ -922,7 +938,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(SecretLockTransaction transaction) {
+        public Serializer toBodyBuilder(SecretLockTransaction transaction) {
             UnresolvedMosaicIdDto mosaicId = new UnresolvedMosaicIdDto(
                 transaction.getMosaic().getId().getIdAsLong());
             AmountDto amount = new AmountDto(transaction.getMosaic().getAmount().longValue());
@@ -969,24 +985,23 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
 
-            SecretProofTransactionBodyBuilder builder = SecretProofTransactionBodyBuilder
-                .loadFromBinary(stream);
+            SecretProofTransactionBodyBuilder builder = (SecretProofTransactionBodyBuilder) transactionBuilder;
 
             LockHashAlgorithmType hashType = LockHashAlgorithmType.rawValueOf(
                 SerializationUtils.byteToUnsignedInt(builder.getHashAlgorithm().getValue()));
             UnresolvedAddress recipient = SerializationUtils
                 .toUnresolvedAddress(builder.getRecipientAddress());
             String secret = SerializationUtils.toHexString(builder.getSecret());
-            String proof = ConvertUtils.toHex(builder.getProof().array());
-
+            String proof = SerializationUtils.toHexString(builder.getProof());
             return SecretProofTransactionFactory
                 .create(networkType, hashType, recipient, secret, proof);
         }
 
         @Override
-        public Serializer getBodyBuilder(SecretProofTransaction transaction) {
+        public Serializer toBodyBuilder(SecretProofTransaction transaction) {
             return SecretProofTransactionBodyBuilder.create(
                 new Hash256Dto(getSecretBuffer(transaction)),
                 LockHashAlgorithmDto.rawValueOf((byte) transaction.getHashType().getValue()),
@@ -1035,10 +1050,10 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
 
-            AddressAliasTransactionBodyBuilder builder = AddressAliasTransactionBodyBuilder
-                .loadFromBinary(stream);
+            AddressAliasTransactionBodyBuilder builder = (AddressAliasTransactionBodyBuilder) transactionBuilder;
 
             AliasAction aliasAction = AliasAction
                 .rawValueOf(builder.getAliasAction().getValue());
@@ -1051,7 +1066,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(AddressAliasTransaction transaction) {
+        public Serializer toBodyBuilder(AddressAliasTransaction transaction) {
             NamespaceIdDto namespaceIdDto = new NamespaceIdDto(
                 transaction.getNamespaceId().getIdAsLong());
             AliasActionDto aliasActionDto = AliasActionDto
@@ -1079,10 +1094,10 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
 
-            MosaicAliasTransactionBodyBuilder builder = MosaicAliasTransactionBodyBuilder
-                .loadFromBinary(stream);
+            MosaicAliasTransactionBodyBuilder builder = (MosaicAliasTransactionBodyBuilder) transactionBuilder;
 
             AliasAction aliasAction = AliasAction
                 .rawValueOf(builder.getAliasAction().getValue());
@@ -1094,7 +1109,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(MosaicAliasTransaction transaction) {
+        public Serializer toBodyBuilder(MosaicAliasTransaction transaction) {
             return MosaicAliasTransactionBodyBuilder.create(
                 new NamespaceIdDto(transaction.getNamespaceId().getIdAsLong()),
                 new MosaicIdDto(transaction.getMosaicId().getIdAsLong()),
@@ -1118,10 +1133,10 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
 
-            HashLockTransactionBodyBuilder builder = HashLockTransactionBodyBuilder
-                .loadFromBinary(stream);
+            HashLockTransactionBodyBuilder builder = (HashLockTransactionBodyBuilder) transactionBuilder;
 
             Mosaic mosaic = SerializationUtils.toMosaic(builder.getMosaic());
             BigInteger duration = SerializationUtils
@@ -1132,7 +1147,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(HashLockTransaction transaction) {
+        public Serializer toBodyBuilder(HashLockTransaction transaction) {
             return HashLockTransactionBodyBuilder.create(
                 UnresolvedMosaicBuilder.create(
                     new UnresolvedMosaicIdDto(transaction.getMosaic().getId().getIdAsLong()),
@@ -1168,10 +1183,10 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
 
-            AccountAddressRestrictionTransactionBodyBuilder builder = AccountAddressRestrictionTransactionBodyBuilder
-                .loadFromBinary(stream);
+            AccountAddressRestrictionTransactionBodyBuilder builder = (AccountAddressRestrictionTransactionBodyBuilder) transactionBuilder;
 
             long restrictionFlagsValue = builder.getRestrictionFlags().stream()
                 .mapToLong(AccountRestrictionFlagsDto::getValue).sum();
@@ -1194,7 +1209,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(AccountAddressRestrictionTransaction transaction) {
+        public Serializer toBodyBuilder(AccountAddressRestrictionTransaction transaction) {
 
             EnumSet<AccountRestrictionFlagsDto> flags = transaction.getRestrictionFlags().getFlags()
                 .stream().map(f -> AccountRestrictionFlagsDto.rawValueOf(
@@ -1235,11 +1250,10 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
 
-            AccountMosaicRestrictionTransactionBodyBuilder builder = AccountMosaicRestrictionTransactionBodyBuilder
-                .loadFromBinary(stream);
-
+            AccountMosaicRestrictionTransactionBodyBuilder builder = (AccountMosaicRestrictionTransactionBodyBuilder) transactionBuilder;
             long restrictionFlagsValues = builder.getRestrictionFlags().stream()
                 .mapToLong(AccountRestrictionFlagsDto::getValue).sum();
 
@@ -1259,7 +1273,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(AccountMosaicRestrictionTransaction transaction) {
+        public Serializer toBodyBuilder(AccountMosaicRestrictionTransaction transaction) {
 
             EnumSet<AccountRestrictionFlagsDto> flags = transaction.getRestrictionFlags().getFlags()
                 .stream().map(f -> AccountRestrictionFlagsDto.rawValueOf(
@@ -1295,10 +1309,10 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
 
-            AccountOperationRestrictionTransactionBodyBuilder builder = AccountOperationRestrictionTransactionBodyBuilder
-                .loadFromBinary(stream);
+            AccountOperationRestrictionTransactionBodyBuilder builder = (AccountOperationRestrictionTransactionBodyBuilder) transactionBuilder;
 
             long restrictionFlagsValue = builder.getRestrictionFlags().stream()
                 .mapToLong(AccountRestrictionFlagsDto::getValue).sum();
@@ -1321,7 +1335,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(AccountOperationRestrictionTransaction transaction) {
+        public Serializer toBodyBuilder(AccountOperationRestrictionTransaction transaction) {
 
             EnumSet<AccountRestrictionFlagsDto> flags = transaction.getRestrictionFlags().getFlags()
                 .stream().map(f -> AccountRestrictionFlagsDto.rawValueOf(
@@ -1361,10 +1375,10 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
 
-            MosaicAddressRestrictionTransactionBodyBuilder builder = MosaicAddressRestrictionTransactionBodyBuilder
-                .loadFromBinary(stream);
+            MosaicAddressRestrictionTransactionBodyBuilder builder = (MosaicAddressRestrictionTransactionBodyBuilder) transactionBuilder;
 
             UnresolvedMosaicId mosaicId = SerializationUtils
                 .toUnresolvedMosaicId(builder.getMosaicId());
@@ -1382,7 +1396,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(MosaicAddressRestrictionTransaction transaction) {
+        public Serializer toBodyBuilder(MosaicAddressRestrictionTransaction transaction) {
             UnresolvedAddressDto unresolvedAddressDto = SerializationUtils
                 .toUnresolvedAddress(transaction.getTargetAddress(),
                     transaction.getNetworkType());
@@ -1410,10 +1424,9 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
-
-            MosaicGlobalRestrictionTransactionBodyBuilder builder = MosaicGlobalRestrictionTransactionBodyBuilder
-                .loadFromBinary(stream);
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
+            MosaicGlobalRestrictionTransactionBodyBuilder builder = (MosaicGlobalRestrictionTransactionBodyBuilder) transactionBuilder;
             UnresolvedMosaicId mosaicId = SerializationUtils
                 .toUnresolvedMosaicId(builder.getMosaicId());
             BigInteger restrictionKey = SerializationUtils
@@ -1436,7 +1449,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(MosaicGlobalRestrictionTransaction transaction) {
+        public Serializer toBodyBuilder(MosaicGlobalRestrictionTransaction transaction) {
             return MosaicGlobalRestrictionTransactionBodyBuilder.create(
                 new UnresolvedMosaicIdDto(transaction.getMosaicId().getIdAsLong()),
                 new UnresolvedMosaicIdDto(transaction.getReferenceMosaicId().getIdAsLong()),
@@ -1466,10 +1479,10 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory fromStream(NetworkType networkType, DataInputStream stream) {
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
 
-            MultisigAccountModificationTransactionBodyBuilder builder = MultisigAccountModificationTransactionBodyBuilder
-                .loadFromBinary(stream);
+            MultisigAccountModificationTransactionBodyBuilder builder = (MultisigAccountModificationTransactionBodyBuilder) transactionBuilder;
             byte minApprovalDelta = builder.getMinApprovalDelta();
             byte minRemovalDelta = builder.getMinRemovalDelta();
 
@@ -1489,7 +1502,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public Serializer getBodyBuilder(MultisigAccountModificationTransaction transaction) {
+        public Serializer toBodyBuilder(MultisigAccountModificationTransaction transaction) {
 
             List<KeyDto> publicKeyAdditions = transaction.getPublicKeyAdditions()
                 .stream()
@@ -1538,121 +1551,54 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         @Override
-        public TransactionFactory<?> fromStream(NetworkType networkType,
-            DataInputStream stream) {
-            return ExceptionUtils.propagate(
-                () -> {
-                    final Hash256Dto transactionsHash = Hash256Dto.loadFromBinary(stream);
-                    final int payloadSize = Integer.reverseBytes(stream.readInt());
-                    stream.readInt(); //Reserved
-                    final ByteBuffer transactionByteByteBuffer = ByteBuffer.allocate(payloadSize);
-                    stream.read(transactionByteByteBuffer.array());
-                    List<Transaction> transactions = new ArrayList<>();
-                    while (transactionByteByteBuffer.hasRemaining()) {
-                        Pair<Transaction, Integer> transaction = transactionSerialization
-                            .deserializeEmbedded(transactionByteByteBuffer);
-                        transactions.add(transaction.getLeft());
-                        int paddingSize = getPaddingSize(transaction.getRight(), 8);
-                        new ByteBufferBackedInputStream(transactionByteByteBuffer)
-                            .skip(paddingSize);
-                    }
+        public TransactionFactory<?> fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
+            AggregateTransactionBodyBuilder builder = (AggregateTransactionBodyBuilder) transactionBuilder;
+            List<Transaction> transactions = builder.getTransactions().stream()
+                .map(transactionSerialization::toTransaction
+                ).collect(Collectors.toList());
 
-                    List<AggregateTransactionCosignature> cosignatures = new ArrayList<>();
-                    while (stream.available() > 0) {
-                        try {
-                            CosignatureBuilder cosignatureBuilder = CosignatureBuilder
-                                .loadFromBinary(stream);
-                            PublicAccount signer =
-                                SerializationUtils.toPublicAccount(
-                                    cosignatureBuilder.getSignerPublicKey(), networkType);
-                            String cosignature =
-                                ConvertUtils.toHex(
-                                    cosignatureBuilder.getSignature().getSignature().array());
-                            cosignatures
-                                .add(new AggregateTransactionCosignature(cosignature, signer));
-                        } catch (Exception e) {
-                            throw new IllegalStateException(
-                                org.apache.commons.lang3.exception.ExceptionUtils.getMessage(e), e);
-                        }
-                    }
-                    return AggregateTransactionFactory.create(
-                        getTransactionType(), networkType,
-                        SerializationUtils.toHexString(transactionsHash), transactions,
-                        cosignatures);
-                });
+            List<AggregateTransactionCosignature> cosignatures = builder.getCosignatures().stream()
+                .map(cosignatureBuilder -> getAggregateTransactionCosignature(networkType,
+                    cosignatureBuilder)).collect(Collectors.toList());
+            return AggregateTransactionFactory.create(
+                getTransactionType(), networkType,
+                SerializationUtils.toHexString(builder.getTransactionsHash()), transactions,
+                cosignatures);
+        }
+
+        private AggregateTransactionCosignature getAggregateTransactionCosignature(
+            NetworkType networkType, CosignatureBuilder cosignatureBuilder) {
+            PublicAccount signer =
+                SerializationUtils.toPublicAccount(
+                    cosignatureBuilder.getSignerPublicKey(), networkType);
+            String cosignature = SerializationUtils
+                .toHexString(cosignatureBuilder.getSignature().getSignature());
+            return new AggregateTransactionCosignature(cosignature, signer);
         }
 
 
         @Override
-        public Serializer getBodyBuilder(AggregateTransaction transaction) {
-            return io.nem.core.utils.ExceptionUtils.propagate(
-                () -> {
-                    byte[] transactionsBytes = getTransactionBytes(transaction);
-                    byte[] cosignaturesBytes = getConsignaturesBytes(transaction);
-                    byte[] serialize = GeneratorUtils.serialize(
-                        dataOutputStream -> {
-                            final byte[] hashBytes = ConvertUtils
-                                .getBytes(transaction.getTransactionsHash());
-                            final ByteBuffer hashBuffer = ByteBuffer.wrap(hashBytes);
-                            dataOutputStream
-                                .write(hashBuffer.array(), 0, hashBuffer.array().length);
-                            dataOutputStream
-                                .writeInt(Integer.reverseBytes(transactionsBytes.length));
-                            final Integer aggregateTransactionHeader_Reserved1 = 0;
-                            dataOutputStream.writeInt(
-                                Integer.reverseBytes(aggregateTransactionHeader_Reserved1));
-                            dataOutputStream.write(transactionsBytes);
-                            dataOutputStream.write(cosignaturesBytes);
-                        });
-                    return new Serializer() {
-                        @Override
-                        public byte[] serialize() {
-                            return serialize;
-                        }
+        public Serializer toBodyBuilder(AggregateTransaction transaction) {
 
-                        @Override
-                        public int getSize() {
-                            return serialize.length;
-                        }
-                    };
-                });
+            List<EmbeddedTransactionBuilder> transactions = transaction.getInnerTransactions()
+                .stream()
+                .map(transactionSerialization::toEmbeddedTransactionBuilder
+                ).collect(Collectors.toList());
+
+            List<CosignatureBuilder> cosignatures = transaction.getCosignatures().stream()
+                .map(this::getCosignatureBuilder).collect(Collectors.toList());
+
+            return AggregateTransactionBodyBuilder
+                .create(SerializationUtils.toHash256Dto(transaction.getTransactionsHash()),
+                    transactions, cosignatures);
         }
 
-        // Gets the padding size that rounds up \a size to the next multiple of \a alignment.
-        private int getPaddingSize(final int size, final int alignment) {
-            return 0 == size % alignment ? 0 : alignment - (size % alignment);
+        private CosignatureBuilder getCosignatureBuilder(AggregateTransactionCosignature c) {
+            return CosignatureBuilder
+                .create(SerializationUtils.toKeyDto(c.getSigner().getPublicKey()),
+                    SerializationUtils.toSignatureDto(c.getSignature()));
         }
-
-        private byte[] getTransactionBytes(AggregateTransaction transaction) {
-            byte[] transactionsBytes = new byte[0];
-            for (Transaction innerTransaction : transaction.getInnerTransactions()) {
-                final byte[] transactionBytes =
-                    transactionSerialization.serializeEmbedded(innerTransaction);
-                transactionsBytes = ArrayUtils.addAll(transactionsBytes, transactionBytes);
-                final int padding = getPaddingSize(transactionBytes.length, 8);
-                final ByteBuffer paddingBuffer = ByteBuffer.allocate(padding);
-                transactionsBytes = ArrayUtils.addAll(transactionsBytes, paddingBuffer.array());
-            }
-            return transactionsBytes;
-        }
-
-
-        private byte[] getConsignaturesBytes(AggregateTransaction transaction) {
-            byte[] cosignaturesBytes = new byte[0];
-            for (AggregateTransactionCosignature cosignature : transaction.getCosignatures()) {
-                final byte[] signerBytes = cosignature.getSigner().getPublicKey().getBytes();
-
-                final ByteBuffer signerBuffer = ByteBuffer.wrap(signerBytes);
-                final CosignatureBuilder cosignatureBuilder = CosignatureBuilder
-                    .create(new KeyDto(signerBuffer),
-                        SerializationUtils.toSignatureDto(cosignature.getSignature()));
-                byte[] consignaturePayload = cosignatureBuilder.serialize();
-                cosignaturesBytes = ArrayUtils.addAll(cosignaturesBytes, consignaturePayload);
-            }
-            return cosignaturesBytes;
-        }
-
     }
-
 
 }

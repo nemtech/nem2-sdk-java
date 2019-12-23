@@ -236,7 +236,7 @@ public class SerializationUtils {
      * @return the hex string.
      */
     public static String toHexString(Hash256Dto dto) {
-        return ConvertUtils.toHex(dto.getHash256().array());
+        return ConvertUtils.toHex(dto.getHash256().array()).toUpperCase();
     }
 
     /**
@@ -246,7 +246,7 @@ public class SerializationUtils {
      * @return the hex string.
      */
     public static String toHexString(ByteBuffer buffer) {
-        return ConvertUtils.toHex(buffer.array());
+        return ConvertUtils.toHex(buffer.array()).toUpperCase();
     }
 
     /**
@@ -309,10 +309,12 @@ public class SerializationUtils {
 
     /**
      * It creates a catbuffer Hash256Dto from a String hash.
+     *
      * @param hash the hash
      * @return the {@link Hash256Dto}
      */
-    public static Hash256Dto toHash256Dto(String hash){
+    public static Hash256Dto toHash256Dto(String hash) {
         return new Hash256Dto(ByteBuffer.wrap(Hex.decode(hash)));
     }
+
 }
