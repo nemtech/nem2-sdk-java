@@ -1,7 +1,9 @@
 package io.nem.sdk.model.namespace;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.mosaic.MosaicId;
@@ -18,6 +20,7 @@ public class AliasTest {
     void shouldCreateAEmptyAlias() {
         Alias alias = new EmptyAlias();
         assertEquals(AliasType.NONE, alias.getType());
+        assertTrue(alias.isEmpty());
     }
 
     @Test
@@ -25,6 +28,7 @@ public class AliasTest {
         AddressAlias addressAlias = new AddressAlias(address);
         assertEquals(AliasType.ADDRESS, addressAlias.getType());
         assertEquals(address, addressAlias.getAliasValue());
+        assertFalse(addressAlias.isEmpty());
     }
 
     @Test
@@ -32,6 +36,7 @@ public class AliasTest {
         MosaicAlias mosaicAlias = new MosaicAlias(mosaicId);
         assertEquals(AliasType.MOSAIC, mosaicAlias.getType());
         assertEquals(mosaicId, mosaicAlias.getAliasValue());
+        assertFalse(mosaicAlias.isEmpty());
     }
 
     @Test
