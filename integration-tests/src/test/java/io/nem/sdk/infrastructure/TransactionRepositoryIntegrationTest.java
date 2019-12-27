@@ -87,6 +87,8 @@ public class TransactionRepositoryIntegrationTest extends BaseIntegrationTest {
         TransactionStatus transactionStatus =
             get(getTransactionRepository(type).getTransactionStatus(transactionHash));
 
+        System.out.println(transactionHash);
+        System.out.println(transactionStatus.getStatus());
         assertEquals(transactionHash, transactionStatus.getHash());
     }
 

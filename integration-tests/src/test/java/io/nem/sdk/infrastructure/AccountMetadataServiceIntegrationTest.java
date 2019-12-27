@@ -53,24 +53,20 @@ class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
             repositoryFactory);
 
         AccountMetadataTransaction originalTransaction = get(service
-            .createAccountMetadataTransactionFactory(getNetworkType(),
+            .createAccountMetadataTransactionFactory(
                 targetAccount.getPublicAccount(), key, originalMessage,
                 signerAccount.getPublicAccount().getPublicKey())).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, originalTransaction, signerAccount);
 
-        sleep(2000);
-
         assertMetadata(key, originalMessage, metadataRepository);
 
         AccountMetadataTransaction updateTransaction = get(service
-            .createAccountMetadataTransactionFactory(getNetworkType(),
+            .createAccountMetadataTransactionFactory(
                 targetAccount.getPublicAccount(), key, newMessage,
                 signerAccount.getPublicAccount().getPublicKey())).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, updateTransaction, signerAccount);
-
-        sleep(2000);
 
         assertMetadata(key, newMessage, metadataRepository);
 

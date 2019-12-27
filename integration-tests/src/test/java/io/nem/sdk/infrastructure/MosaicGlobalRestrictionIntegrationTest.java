@@ -19,14 +19,9 @@ package io.nem.sdk.infrastructure;
 import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.api.RestrictionMosaicRepository;
 import io.nem.sdk.model.account.Account;
-import io.nem.sdk.model.blockchain.BlockDuration;
-import io.nem.sdk.model.mosaic.MosaicFlags;
 import io.nem.sdk.model.mosaic.MosaicId;
-import io.nem.sdk.model.mosaic.MosaicNonce;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.restriction.MosaicGlobalRestriction;
-import io.nem.sdk.model.transaction.MosaicDefinitionTransaction;
-import io.nem.sdk.model.transaction.MosaicDefinitionTransactionFactory;
 import io.nem.sdk.model.transaction.MosaicGlobalRestrictionTransaction;
 import io.nem.sdk.model.transaction.MosaicGlobalRestrictionTransactionFactory;
 import io.nem.sdk.model.transaction.MosaicRestrictionType;
@@ -40,9 +35,10 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest {
 
-    Account testAccount = config().getDefaultAccount();
+    private Account testAccount = config().getDefaultAccount();
 
-    BigInteger restrictionKey = BigInteger.valueOf(11111);
+    private BigInteger restrictionKey = BigInteger.valueOf(11111);
+
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
@@ -50,9 +46,11 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
         throws InterruptedException {
 
         //1) Create a new mosaic
-        MosaicId mosaicId = createMosaic(type);
-        NamespaceId mosaicAlias = setMosaicAlias(type, mosaicId,
-            ("mosaicAlias" + mosaicId.getIdAsHex()).toLowerCase());
+
+        String mosaicAliasName = "MosaicRestrictionServiceIntegrationTest_createMosaicGlobalRestrictionAndValidateEndpoints"
+            .toLowerCase();
+        NamespaceId mosaicAlias = NamespaceId.createFromName(mosaicAliasName);
+        MosaicId mosaicId = createMosaic(testAccount, type, null, mosaicAliasName);
 
         //2) Create a restriction on the mosaic
 
@@ -74,7 +72,6 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
         assertTransaction(createTransaction, processedCreateTransaction);
 
         //5) Validate the data from the endpoints
-        sleep(1000);
 
         RestrictionMosaicRepository restrictionRepository = getRepositoryFactory(type)
             .createRestrictionMosaicRepository();
@@ -104,7 +101,6 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
         assertTransaction(updateTransaction, processedUpdateTransaction);
 
         //8) Validating that the endpoints show the new value and type.
-        sleep(1000);
 
         assertMosaicGlobalRestriction(updateTransaction, get(
             restrictionRepository.getMosaicGlobalRestriction(mosaicId)));
@@ -114,6 +110,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
                 .getMosaicGlobalRestrictions(Collections.singletonList(mosaicId))).get(0));
 
     }
+
 
     private void assertTransaction(
         MosaicGlobalRestrictionTransaction expectedTransaction,
@@ -170,24 +167,6 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
                 .getReferenceMosaicId());
     }
 
-    private MosaicId createMosaic(RepositoryType type) {
-        MosaicNonce nonce = MosaicNonce.createRandom();
-        MosaicId mosaicId = MosaicId.createFromNonce(nonce, testAccount.getPublicAccount());
-
-        System.out.println(mosaicId.getIdAsHex());
-
-        MosaicDefinitionTransaction mosaicDefinitionTransaction =
-            MosaicDefinitionTransactionFactory.create(getNetworkType(),
-                nonce,
-                mosaicId,
-                MosaicFlags.create(true, true, true),
-                4, new BlockDuration(100)).maxFee(this.maxFee).build();
-
-        MosaicDefinitionTransaction validateTransaction = announceAndValidate(type,
-            testAccount, mosaicDefinitionTransaction);
-        Assertions.assertEquals(mosaicId, validateTransaction.getMosaicId());
-        return mosaicId;
-    }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)

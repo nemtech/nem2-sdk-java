@@ -85,7 +85,6 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
         Assertions.assertEquals(transaction.getScopedMetadataKey(),
             processedTransaction.getScopedMetadataKey());
 
-        sleep(2000);
         List<Metadata> metadata = get(getRepositoryFactory(type).createMetadataRepository()
             .getMosaicMetadata(targetMosaicId,
                 Optional.empty()));

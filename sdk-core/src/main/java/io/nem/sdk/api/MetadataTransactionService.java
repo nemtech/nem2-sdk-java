@@ -2,8 +2,7 @@ package io.nem.sdk.api;
 
 import io.nem.core.crypto.PublicKey;
 import io.nem.sdk.model.account.PublicAccount;
-import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.mosaic.MosaicId;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.AccountMetadataTransactionFactory;
 import io.nem.sdk.model.transaction.MosaicMetadataTransactionFactory;
@@ -21,7 +20,6 @@ public interface MetadataTransactionService {
     /**
      * Create an Account Metadata Transaction that knows how to set or update a value.
      *
-     * @param networkType the network type
      * @param targetPublicAccount the target public account
      * @param key the key of the metadata
      * @param value the value of the metadata.
@@ -30,7 +28,6 @@ public interface MetadataTransactionService {
      * announced.
      */
     Observable<AccountMetadataTransactionFactory> createAccountMetadataTransactionFactory(
-        NetworkType networkType,
         PublicAccount targetPublicAccount,
         BigInteger key,
         String value,
@@ -39,7 +36,6 @@ public interface MetadataTransactionService {
     /**
      * Create an Mosaic Metadata Transaction that knows how to set or update a value.
      *
-     * @param networkType the network type
      * @param targetPublicAccount the target public account
      * @param key the key of the metadata
      * @param value the value of the metadata.
@@ -49,17 +45,15 @@ public interface MetadataTransactionService {
      * announced.
      */
     Observable<MosaicMetadataTransactionFactory> createMosaicMetadataTransactionFactory(
-        NetworkType networkType,
         PublicAccount targetPublicAccount,
         BigInteger key,
         String value,
         PublicKey senderPublicKey,
-        MosaicId targetId);
+        UnresolvedMosaicId targetId);
 
     /**
      * Create an Namespace Metadata Transaction that knows how to set or update a value.
      *
-     * @param networkType the network type
      * @param targetPublicAccount the target public account
      * @param key the key of the metadata
      * @param value the value of the metadata.
@@ -69,7 +63,6 @@ public interface MetadataTransactionService {
      * announced.
      */
     Observable<NamespaceMetadataTransactionFactory> createNamespaceMetadataTransactionFactory(
-        NetworkType networkType,
         PublicAccount targetPublicAccount,
         BigInteger key,
         String value,

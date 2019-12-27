@@ -30,7 +30,7 @@ public interface RepositoryFactory extends Closeable {
 
     /**
      * @return the network type of the network. This method is cached, the server is only called the
-     * first time.
+     * first time if necessary.
      */
     Observable<NetworkType> getNetworkType();
 
