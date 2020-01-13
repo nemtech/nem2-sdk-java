@@ -24,6 +24,7 @@ import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
+import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionAnnounceResponse;
@@ -31,6 +32,7 @@ import io.nem.sdk.model.transaction.TransactionStatus;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import io.nem.sdk.openapi.vertx.model.AnnounceTransactionInfoDTO;
+import io.nem.sdk.openapi.vertx.model.Cosignature;
 import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.nem.sdk.openapi.vertx.model.TransactionStatusDTO;
 import java.math.BigInteger;
@@ -38,6 +40,7 @@ import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * Unit Tests for {@link TransactionRepositoryVertxImpl}
@@ -169,6 +172,32 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
 
         Assertions.assertEquals(announceTransactionInfoDTO.getMessage(),
             announceTransactionInfoDTO.getMessage());
+    }
+
+    @Test
+    public void announceAggregateBondedCosignature() throws Exception {
+
+        CosignatureSignedTransaction signedTransaction = new CosignatureSignedTransaction(
+            "aParentHash", "aSignature", "aSigner");
+
+        AnnounceTransactionInfoDTO announceTransactionInfoDTO = new AnnounceTransactionInfoDTO();
+        announceTransactionInfoDTO.setMessage("SomeMessage");
+        ArgumentCaptor<Object> parameter = mockRemoteCall(announceTransactionInfoDTO);
+
+        TransactionAnnounceResponse response = repository
+            .announceAggregateBondedCosignature(signedTransaction)
+            .toFuture().get();
+
+        Assertions.assertNotNull(response);
+
+        Assertions.assertEquals(announceTransactionInfoDTO.getMessage(),
+            announceTransactionInfoDTO.getMessage());
+
+        Cosignature cosignature = (Cosignature) parameter.getValue();
+
+        Assertions.assertEquals(signedTransaction.getParentHash(), cosignature.getParentHash());
+        Assertions.assertEquals(signedTransaction.getSignature(), cosignature.getSignature());
+        Assertions.assertEquals(signedTransaction.getSigner(), cosignature.getSignerPublicKey());
     }
 
 

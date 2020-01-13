@@ -127,7 +127,7 @@ public class VertxAggregateTransactionTest {
                     transferTx.toAggregate(
                         new PublicAccount(
                             "B694186EE4AB0558CA4AFCFDD43B42114AE71094F5A1FC4A913FE9971CACD21D",
-                            NetworkType.MIJIN_TEST)))).build();
+                            NetworkType.MIJIN_TEST)))).deadline(new VertxFakeDeadline()).build();
 
         Account cosignatoryAccount =
             new Account(

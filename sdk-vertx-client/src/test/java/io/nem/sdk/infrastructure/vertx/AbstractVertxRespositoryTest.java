@@ -32,6 +32,7 @@ import io.vertx.core.http.impl.headers.VertxHttpHeaders;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 
@@ -67,23 +68,25 @@ public abstract class AbstractVertxRespositoryTest {
      * Mocks the api client telling what would it be the next response when any remote call is
      * executed.
      *
-     * @param value the next mocked remote call response
      * @param <T> tye type of the remote response.
+     * @param value the next mocked remote call response
      */
-    protected <T> void mockRemoteCall(T value) {
-        Mockito.doAnswer((Answer<Void>) invocationOnMock -> {
+    protected <T> ArgumentCaptor<Object> mockRemoteCall(T value) {
+        ArgumentCaptor<Object> argument = ArgumentCaptor.forClass(Object.class);
+        Mockito.doAnswer((Answer<Object>) invocationOnMock -> {
 
             Handler<AsyncResult<T>> resultHandler = (Handler<AsyncResult<T>>) invocationOnMock
                 .getArguments()[invocationOnMock.getArguments().length - 1];
             resultHandler.handle(Future.succeededFuture(value));
 
-            return null;
+            Object params = invocationOnMock.getArguments()[3];
+            return params;
         }).when(apiClientMock)
             .invokeAPI(Mockito.anyString(), Mockito.anyString(), Mockito.anyListOf(Pair.class),
-                Mockito.any(),
+                argument.capture(),
                 Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
                 Mockito.any(), Mockito.any());
-
+        return argument;
 
     }
 

@@ -25,6 +25,7 @@ import io.nem.sdk.model.namespace.NamespaceRegistrationType;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +49,12 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
             NamespaceRegistrationTransactionFactory.createRootNamespace(
                 networkType,
                 "root-test-namespace",
-                BigInteger.valueOf(1000)).build();
+                BigInteger.valueOf(1000)).deadline(new FakeDeadline()).build();
+
+        assertEquals(
+            "00000000E803000000000000CFCBE72D994BE69B0013726F6F742D746573742D6E616D657370616365",
+            Hex.toHexString(namespaceRegistrationTransaction.serialize()).toUpperCase()
+                .substring(248));
 
         SignedTransaction signedTransaction =
             namespaceRegistrationTransaction.signWith(testAccount, generationHash);
@@ -58,7 +64,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
             signedTransaction.getPayload().substring(248)
         );
         assertEquals(networkType, namespaceRegistrationTransaction.getNetworkType());
-        assertTrue(1 == namespaceRegistrationTransaction.getVersion());
+        assertEquals(1, (int) namespaceRegistrationTransaction.getVersion());
         assertTrue(
             LocalDateTime.now()
                 .isBefore(namespaceRegistrationTransaction.getDeadline().getLocalDateTime()));
@@ -80,7 +86,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
                 networkType,
                 "root-test-namespace",
                 NamespaceId.createFromName("parent-test-namespace")
-            ).build();
+            ).deadline(new FakeDeadline()).build();
 
         SignedTransaction signedTransaction =
             namespaceRegistrationTransaction.signWith(testAccount, generationHash);
@@ -89,7 +95,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
             "000000004DF55E7F6D8FB7FF924207DF2CA1BBF30113726F6F742D746573742D6E616D657370616365",
             signedTransaction.getPayload().substring(248));
         assertEquals(networkType, namespaceRegistrationTransaction.getNetworkType());
-        assertTrue(1 == namespaceRegistrationTransaction.getVersion());
+        assertEquals(1, (int) namespaceRegistrationTransaction.getVersion());
         assertTrue(
             LocalDateTime.now()
                 .isBefore(namespaceRegistrationTransaction.getDeadline().getLocalDateTime()));
@@ -110,7 +116,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
                 networkType,
                 "root-test-namespace",
                 NamespaceId.createFromId(new BigInteger("18426354100860810573"))
-            ).build();
+            ).deadline(new FakeDeadline()).build();
 
         SignedTransaction signedTransaction =
             namespaceRegistrationTransaction.signWith(testAccount, generationHash);
@@ -119,7 +125,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
             "000000004DF55E7F6D8FB7FF924207DF2CA1BBF30113726F6F742D746573742D6E616D657370616365",
             signedTransaction.getPayload().substring(248));
         assertEquals(networkType, namespaceRegistrationTransaction.getNetworkType());
-        assertTrue(1 == namespaceRegistrationTransaction.getVersion());
+        assertEquals(1, (int) namespaceRegistrationTransaction.getVersion());
         assertTrue(
             LocalDateTime.now()
                 .isBefore(namespaceRegistrationTransaction.getDeadline().getLocalDateTime()));

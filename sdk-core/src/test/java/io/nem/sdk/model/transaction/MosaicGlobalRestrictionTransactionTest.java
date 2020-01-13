@@ -57,7 +57,8 @@ class MosaicGlobalRestrictionTransactionTest extends AbstractTransactionTester {
                 MosaicRestrictionType.GE  // newRestrictionType
             ).referenceMosaicId(new MosaicId(new BigInteger("2")))
                 .previousRestrictionValue(BigInteger.valueOf(9))
-                .previousRestrictionType(MosaicRestrictionType.EQ).build();
+                .previousRestrictionType(MosaicRestrictionType.EQ).deadline(new FakeDeadline())
+                .build();
 
         SignedTransaction signedTransaction = transaction
             .signWith(account, generationHash);

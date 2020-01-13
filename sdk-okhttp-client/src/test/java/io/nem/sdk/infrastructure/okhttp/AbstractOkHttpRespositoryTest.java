@@ -31,8 +31,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import okhttp3.Call;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 /**
@@ -53,13 +53,9 @@ public abstract class AbstractOkHttpRespositoryTest {
 
     @BeforeEach
     public void setUp() {
-        apiClientMock = Mockito.mock(ApiClient.class);
-        Mockito.when(apiClientMock.escapeString(Mockito.anyString()))
-            .then(a -> a.getArguments()[0]);
+        apiClientMock = Mockito.spy(new ApiClient());
         JSON value = new JSON();
         value.setGson(new Gson());
-        Mockito.when(apiClientMock.getJSON()).thenReturn(value);
-
         jsonHelper = new JsonHelperGson(value.getGson());
     }
 
@@ -71,15 +67,24 @@ public abstract class AbstractOkHttpRespositoryTest {
      * Mocks the api client telling what would it be the next response when any remote call is
      * executed.
      *
-     * @param value the next mocked remote call response
      * @param <T> tye type of the remote response.
+     * @param value the next mocked remote call response
+     * @return a {@link ArgumentCaptor} of the call.
      */
 
-    protected <T> void mockRemoteCall(T value) throws ApiException {
+    protected <T> ArgumentCaptor<Object> mockRemoteCall(T value) throws ApiException {
+        ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
         Map<String, List<String>> headers = Collections.emptyMap();
         ApiResponse<T> apiResponse = new ApiResponse<>(200, headers, value);
-        Mockito.when(apiClientMock.<T>execute(Mockito.any(Call.class),
-            Mockito.any(Type.class))).thenReturn(apiResponse);
+
+        Mockito.doCallRealMethod().when(apiClientMock)
+            .buildCall(Mockito.anyString(), Mockito.anyString(), Mockito.anyList(),
+                Mockito.anyList(), captor.capture(), Mockito.anyMap(), Mockito.anyMap(),
+                Mockito.any(), Mockito.any());
+
+        Mockito.doReturn(apiResponse).when(apiClientMock).execute(Mockito.any(),
+            Mockito.any(Type.class));
+        return captor;
     }
 
     /**
@@ -115,8 +120,8 @@ public abstract class AbstractOkHttpRespositoryTest {
         ApiException exception = new ApiException(reasonPhrase,
             statusCode, headers, errorResponse);
 
-        Mockito.when(apiClientMock.execute(Mockito.any(Call.class),
-            Mockito.any(Type.class))).thenThrow(exception);
+        Mockito.doThrow(exception).when(apiClientMock).execute(Mockito.any(),
+            Mockito.any(Type.class));
     }
 
     protected abstract AbstractRepositoryOkHttpImpl getRepository();

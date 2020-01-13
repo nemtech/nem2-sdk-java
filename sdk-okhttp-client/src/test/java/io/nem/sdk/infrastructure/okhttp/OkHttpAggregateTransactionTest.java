@@ -38,7 +38,6 @@ import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
@@ -124,7 +123,7 @@ public class OkHttpAggregateTransactionTest {
                         new PublicAccount(
                             "B694186EE4AB0558CA4AFCFDD43B42114AE71094F5A1FC4A913FE9971CACD21D",
                             NetworkType.MIJIN_TEST)))
-            ).build();
+            ).deadline(new OkHttpFakeDeadline()).build();
 
         Account cosignatoryAccount =
             new Account(

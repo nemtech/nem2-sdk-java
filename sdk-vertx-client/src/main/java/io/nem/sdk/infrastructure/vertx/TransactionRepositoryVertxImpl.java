@@ -143,7 +143,7 @@ public class TransactionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
             .announceCosignatureTransaction(
                 new Cosignature().parentHash(cosignatureSignedTransaction.getParentHash())
                     .signature(cosignatureSignedTransaction.getSignature())
-                    .signature(cosignatureSignedTransaction.getSigner()),
+                    .signerPublicKey(cosignatureSignedTransaction.getSigner()),
                 handler);
         return exceptionHandling(
             call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
