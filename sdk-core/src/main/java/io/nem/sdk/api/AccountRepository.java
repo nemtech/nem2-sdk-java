@@ -111,6 +111,26 @@ public interface AccountRepository {
         PublicAccount publicAccount, TransactionSearchCriteria criteria);
 
     /**
+     * Gets an list of aggregate bonded transactions where the account is the sender or requires to
+     * cosign the transaction.
+     *
+     * @param publicAccount the sender account
+     * @return an observable list of Transaction
+     */
+    Observable<List<Transaction>> partialTransactions(PublicAccount publicAccount);
+
+    /**
+     * Gets an list of aggregate bonded transactions where the account is the sender or requires to
+     * cosign the transaction.
+     *
+     * @param publicAccount the sender account
+     * @param criteria the criteria with the pagination, ordering, filtering, etc
+     * @return an observable list of Transaction
+     */
+    Observable<List<Transaction>> partialTransactions(
+        PublicAccount publicAccount, TransactionSearchCriteria criteria);
+
+    /**
      * Gets an list of transactions for which an account is the sender or has sign the transaction.
      * A transaction is said to be aggregate bonded with respect to an account if there are missing
      * signatures.

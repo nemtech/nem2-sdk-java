@@ -78,6 +78,28 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     }
 
     @Test
+    public void partialTransactions() throws Exception {
+
+        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
+            "shouldCreateStandaloneTransferTransaction.json");
+
+        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
+
+        mockRemoteCall(Collections.singletonList(transferTransactionDTO));
+
+        List<Transaction> transactions = repository.partialTransactions(publicAccount).toFuture()
+            .get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
+
+        transactions = repository
+            .incomingTransactions(publicAccount, new TransactionSearchCriteria())
+            .toFuture().get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
+    }
+
+    @Test
     public void transactions() throws Exception {
 
         TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(

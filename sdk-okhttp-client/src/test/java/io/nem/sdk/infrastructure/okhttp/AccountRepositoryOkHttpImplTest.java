@@ -20,6 +20,7 @@ import static io.nem.sdk.infrastructure.okhttp.TestHelperOkHttp.loadTransactionI
 
 import io.nem.core.utils.ExceptionUtils;
 import io.nem.sdk.api.RepositoryCallException;
+import io.nem.sdk.api.TransactionSearchCriteria;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.AccountInfo;
 import io.nem.sdk.model.account.AccountType;
@@ -182,6 +183,28 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         AccountInfo resolvedAccountInfo = repository.getAccountInfo(address).toFuture().get();
         Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
         Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
+    }
+
+    @Test
+    public void partialTransactions() throws Exception {
+
+        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
+            "shouldCreateStandaloneTransferTransaction.json");
+
+        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
+
+        mockRemoteCall(Collections.singletonList(transferTransactionDTO));
+
+        List<Transaction> transactions = repository.partialTransactions(publicAccount).toFuture()
+            .get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
+
+        transactions = repository
+            .incomingTransactions(publicAccount, new TransactionSearchCriteria())
+            .toFuture().get();
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
     }
 
     @Test

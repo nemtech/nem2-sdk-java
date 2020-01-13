@@ -144,6 +144,25 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
                 .toObservable());
     }
 
+    @Override
+    public Observable<List<Transaction>> partialTransactions(PublicAccount publicAccount) {
+        return this.partialTransactions(publicAccount, new TransactionSearchCriteria());
+    }
+
+    @Override
+    public Observable<List<Transaction>> partialTransactions(
+        PublicAccount publicAccount, TransactionSearchCriteria criteria) {
+
+        Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
+            client.getAccountPartialTransactions(publicAccount.getPublicKey().toHex(),
+                criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
+                toTransactionType(criteria.getTransactionType()), handler);
+
+        return exceptionHandling(
+            call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
+                .toObservable());
+    }
+
     private Transaction toTransaction(TransactionInfoDTO input) {
         return transactionMapper.map(input);
     }

@@ -184,6 +184,23 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
                 .toObservable());
     }
 
+    @Override
+    public Observable<List<Transaction>> partialTransactions(PublicAccount publicAccount) {
+        return this.partialTransactions(publicAccount, new TransactionSearchCriteria());
+    }
+
+    @Override
+    public Observable<List<Transaction>> partialTransactions(
+        PublicAccount publicAccount, TransactionSearchCriteria criteria) {
+        Callable<List<TransactionInfoDTO>> callback = () ->
+            getClient().getAccountPartialTransactions(publicAccount.getPublicKey().toHex(),
+                criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
+                toTransactionType(criteria.getTransactionType()));
+        return exceptionHandling(
+            call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
+                .toObservable());
+    }
+
 
     private AccountInfo toAccountInfo(AccountDTO accountDTO) {
         return new AccountInfo(
