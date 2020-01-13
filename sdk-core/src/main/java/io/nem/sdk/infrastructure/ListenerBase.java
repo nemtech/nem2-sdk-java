@@ -73,12 +73,12 @@ public abstract class ListenerBase implements Listener {
         } else if (jsonHelper.contains(message, "block")) {
             BlockInfo messageObject = toBlockInfo(message);
             onNext(ListenerChannel.BLOCK, messageObject);
-        } else if (jsonHelper.contains(message, "status")) {
+        } else if (jsonHelper.contains(message, "code")) {
             TransactionStatusError messageObject = new TransactionStatusError(
                 MapperUtils
                     .toAddressFromEncoded(jsonHelper.getString(message, "address")),
                 jsonHelper.getString(message, "hash"),
-                jsonHelper.getString(message, "status"),
+                jsonHelper.getString(message, "code"),
                 new Deadline(
                     new BigInteger(jsonHelper.getString(message, "deadline"))));
             onNext(ListenerChannel.STATUS, messageObject);

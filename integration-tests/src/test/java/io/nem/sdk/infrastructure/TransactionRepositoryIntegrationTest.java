@@ -17,14 +17,22 @@
 package io.nem.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.api.TransactionRepository;
+import io.nem.sdk.api.TransactionSearchCriteria;
+import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
+import io.nem.sdk.model.message.PlainMessage;
+import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionStatus;
 import io.nem.sdk.model.transaction.TransactionType;
+import io.nem.sdk.model.transaction.TransferTransaction;
+import io.nem.sdk.model.transaction.TransferTransactionFactory;
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -44,13 +52,34 @@ public class TransactionRepositoryIntegrationTest extends BaseIntegrationTest {
 
     @BeforeAll
     void setup() {
-        AccountRepository accountRepository = getRepositoryFactory(RepositoryType.VERTX)
+        RepositoryType type = RepositoryType.VERTX;
+        AccountRepository accountRepository = getRepositoryFactory(type)
             .createAccountRepository();
+
+        Address recipient = getRecipient();
+
+        String message = "someMessage";
+        TransferTransaction transferTransaction =
+            TransferTransactionFactory.create(
+                getNetworkType(),
+                recipient,
+                Collections
+                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                PlainMessage.create(message)
+            ).maxFee(this.maxFee).build();
+
+        TransferTransaction processed = announceAndValidate(type, config().getDefaultAccount(),
+            transferTransaction);
+
+        Assertions.assertEquals(message, processed.getMessage().getPayload());
+
         PublicAccount account = config().getDefaultAccount().getPublicAccount();
-        List<Transaction> transactions = get(
-            accountRepository.transactions(account))
+        List<Transaction> allTransactions = get(
+            accountRepository.transactions(account, new TransactionSearchCriteria().order("-id")));
+        List<Transaction> transactions = allTransactions
             .stream().filter(t -> t.getType() == TransactionType.TRANSFER).collect(
                 Collectors.toList());
+        Assertions.assertTrue(allTransactions.size() > 0);
         Assertions.assertTrue(transactions.size() > 0);
         transactionHash = transactions.get(0).getTransactionInfo().get().getHash().get();
     }
@@ -86,9 +115,8 @@ public class TransactionRepositoryIntegrationTest extends BaseIntegrationTest {
         TransactionStatus transactionStatus =
             get(getTransactionRepository(type).getTransactionStatus(transactionHash));
 
-        System.out.println(transactionHash);
-        System.out.println(transactionStatus.getCode());
         assertEquals(transactionHash, transactionStatus.getHash());
+        assertNotNull(transactionStatus.getCode());
     }
 
     @ParameterizedTest

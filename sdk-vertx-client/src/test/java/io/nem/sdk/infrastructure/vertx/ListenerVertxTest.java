@@ -237,7 +237,7 @@ public class ListenerVertxTest {
 
         Map<String, Object> transactionStatusError = new HashMap<>();
         transactionStatusError.put("address", address.encoded());
-        transactionStatusError.put("status", "Fail 666");
+        transactionStatusError.put("code", "Fail 666");
         transactionStatusError.put("hash", transactionInfo.getMeta().getHash());
         transactionStatusError.put("deadline", 123);
 
@@ -328,7 +328,7 @@ public class ListenerVertxTest {
 
         Map<String, Object> transactionStatusError = new HashMap<>();
         transactionStatusError.put("address", address.encoded());
-        transactionStatusError.put("status", "Fail 666");
+        transactionStatusError.put("code", "Fail 666");
         transactionStatusError.put("hash", transactionInfo.getMeta().getHash());
         transactionStatusError.put("deadline", 123);
 
@@ -482,14 +482,14 @@ public class ListenerVertxTest {
         Map<String, Object> message = new HashMap<>();
         message.put("hash", "1234hash");
         message.put("address", account1.getAddress().encoded());
-        message.put("status", "some error");
+        message.put("code", "some error");
         message.put("deadline", 5555);
         listener.handle(message, null);
 
         Assertions.assertNotNull(reference.get());
 
         Assertions.assertEquals(message.get("hash"), reference.get().getHash());
-        Assertions.assertEquals(message.get("status"), reference.get().getStatus());
+        Assertions.assertEquals(message.get("code"), reference.get().getStatus());
         Assertions.assertEquals(account1.getAddress(), reference.get().getAddress());
 
         Mockito.verify(webSocketMock).handler(Mockito.any());
@@ -516,7 +516,7 @@ public class ListenerVertxTest {
         Map<String, Object> message = new HashMap<>();
         message.put("hash", "1234hash");
         message.put("address", account1.getAddress().encoded());
-        message.put("status", "some error");
+        message.put("code", "some error");
         message.put("deadline", 5555);
         listener.handle(message, null);
 

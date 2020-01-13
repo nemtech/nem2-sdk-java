@@ -41,14 +41,15 @@ public abstract class Message {
      * @return the Message.
      */
     public static Message createFromPayload(MessageType messageType, String payload) {
+        String decoded = payload == null || payload.isEmpty() ? ""
+            : StringEncoder.getString(Hex.decode(payload));
         switch (messageType) {
             case PLAIN_MESSAGE:
-                return new PlainMessage(StringEncoder.getString(Hex.decode(payload)));
+                return new PlainMessage(decoded);
             case ENCRYPTED_MESSAGE:
-                return new EncryptedMessage(StringEncoder.getString(Hex.decode(payload)));
+                return new EncryptedMessage(decoded);
             case PERSISTENT_HARVESTING_DELEGATION_MESSAGE:
-                return new PersistentHarvestingDelegationMessage(
-                    StringEncoder.getString(Hex.decode(payload)));
+                return new PersistentHarvestingDelegationMessage(decoded);
             default:
                 throw new IllegalStateException("Unknown Message Type " + messageType);
         }

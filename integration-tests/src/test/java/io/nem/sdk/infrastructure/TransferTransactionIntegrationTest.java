@@ -18,6 +18,7 @@ package io.nem.sdk.infrastructure;
 
 import io.nem.core.crypto.KeyPair;
 import io.nem.sdk.model.account.Account;
+import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.message.EncryptedMessage;
@@ -77,8 +78,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    public void standaloneTransferTransactionEncryptedMessage(RepositoryType type)
-        throws InterruptedException {
+    public void standaloneTransferTransactionEncryptedMessage(RepositoryType type) {
         String namespaceName = "testaccount2";
 
         NamespaceId recipient = setAddressAlias(type, getRecipient(), namespaceName);
@@ -119,6 +119,36 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
             restTransaction);
     }
 
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    public void transferTransactionNotEnoughFundAccount(RepositoryType type) {
+
+        Address recipient = config().getTestAccount2().getAddress();
+
+        NetworkType networkType = getNetworkType();
+
+        Account account = Account.generateNewAccount(networkType);
+
+        TransferTransaction transferTransaction =
+            TransferTransactionFactory.create(
+                getNetworkType(),
+                recipient,
+                Collections
+                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                PlainMessage.Empty
+            ).maxFee(this.maxFee).build();
+
+        IllegalArgumentException exceptions = Assertions
+            .assertThrows(IllegalArgumentException.class,
+                () -> announceAndValidate(type, account, transferTransaction));
+
+        Assertions
+            .assertTrue(exceptions.getMessage().startsWith("Failure_Core_Insufficient_Balance"));
+
+
+    }
+
     private void assertTransferTransactions(TransferTransaction expected,
         TransferTransaction processed) {
         Assertions
@@ -144,8 +174,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    public void standaloneCreatePersistentDelegationRequestTransaction(RepositoryType type)
-        throws InterruptedException {
+    public void standaloneCreatePersistentDelegationRequestTransaction(RepositoryType type) {
 
         NetworkType networkType = getNetworkType();
         KeyPair senderKeyPair = KeyPair.random(networkType.resolveSignSchema());
