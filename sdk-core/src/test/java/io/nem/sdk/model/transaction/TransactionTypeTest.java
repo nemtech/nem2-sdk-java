@@ -18,7 +18,11 @@ package io.nem.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.catapult.builders.EntityTypeDto;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class TransactionTypeTest {
 
@@ -149,5 +153,25 @@ class TransactionTypeTest {
         assertEquals(0x414C, transactionType.getValue());
         assertEquals(16716, transactionType.getValue());
         assertEquals(TransactionType.ACCOUNT_LINK, TransactionType.rawValueOf(16716));
+    }
+
+    @ParameterizedTest
+    @EnumSource(TransactionType.class)
+    void validTransactionTypeEnumValues(TransactionType transactionType) {
+
+        Assertions.assertNotNull(EntityTypeDto.rawValueOf((short) transactionType.getValue()),
+            transactionType.getValue() + " not found. Transaction " + transactionType.getValue());
+    }
+
+    @ParameterizedTest
+    @EnumSource(EntityTypeDto.class)
+    void validEntityTypeDtoEnumValue(EntityTypeDto enumTypeDto) {
+        if (enumTypeDto == EntityTypeDto.RESERVED) {
+            return;
+        }
+        Assertions.assertNotNull(TransactionType.rawValueOf(enumTypeDto.getValue()),
+            enumTypeDto.getValue() + " not found. Transaction " + enumTypeDto.getValue());
+
+
     }
 }

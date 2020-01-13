@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.infrastructure.RandomUtils;
+import io.nem.sdk.infrastructure.SerializationUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
@@ -114,7 +115,8 @@ abstract class AbstractTransactionTester {
         T transaction) {
         byte[] actual = binarySerialization.serializeEmbedded(transaction);
         assertEquals(expected, Hex.toHexString(actual));
-        T deserialized = (T) binarySerialization.deserializeEmbedded(actual).getLeft();
+        T deserialized = (T) binarySerialization
+            .deserializeEmbedded(SerializationUtils.toDataInput(actual));
         assertEquals(expected,
             Hex.toHexString(binarySerialization.serializeEmbedded(deserialized)));
         return deserialized;

@@ -16,10 +16,14 @@
 
 package io.nem.sdk.model.receipt;
 
+import io.nem.catapult.builders.MosaicExpiryReceiptBuilder;
+import io.nem.catapult.builders.MosaicIdDto;
+import io.nem.catapult.builders.NamespaceExpiryReceiptBuilder;
+import io.nem.catapult.builders.NamespaceIdDto;
+import io.nem.catapult.builders.ReceiptTypeDto;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.namespace.NamespaceId;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.util.Optional;
 
 public class ArtifactExpiryReceipt<T> extends Receipt {
@@ -87,11 +91,17 @@ public class ArtifactExpiryReceipt<T> extends Receipt {
      * @return receipt bytes
      */
     public byte[] serialize() {
-        final ByteBuffer buffer = ByteBuffer.allocate(12);
-        buffer.putShort(Short.reverseBytes((short) getVersion().getValue()));
-        buffer.putShort(Short.reverseBytes((short) getType().getValue()));
-        buffer.putLong(Long.reverseBytes(getArtifactIdValue().longValue()));
-        return buffer.array();
+        short version = (short) getVersion().getValue();
+        ReceiptTypeDto type = ReceiptTypeDto.rawValueOf((short) getType().getValue());
+        if (this.artifactId instanceof MosaicId) {
+            return MosaicExpiryReceiptBuilder
+                .create(version, type, new MosaicIdDto(getArtifactIdValue().longValue()))
+                .serialize();
+        } else {
+            return NamespaceExpiryReceiptBuilder
+                .create(version, type, new NamespaceIdDto(getArtifactIdValue().longValue()))
+                .serialize();
+        }
     }
 
     /**

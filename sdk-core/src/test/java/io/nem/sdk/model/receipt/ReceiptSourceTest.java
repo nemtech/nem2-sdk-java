@@ -18,6 +18,7 @@ package io.nem.sdk.model.receipt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 
 public class ReceiptSourceTest {
@@ -25,8 +26,10 @@ public class ReceiptSourceTest {
     @Test
     void shouldCreateReceiptSource() {
 
-        ReceiptSource source = new ReceiptSource(1, 1);
-        assertEquals(1, source.getPrimaryId());
-        assertEquals(1, source.getSecondaryId());
+        ReceiptSource source = new ReceiptSource(10, 2);
+        assertEquals(10, source.getPrimaryId());
+        assertEquals(2, source.getSecondaryId());
+
+        assertEquals("0a00000002000000", Hex.toHexString(source.serialize()));
     }
 }

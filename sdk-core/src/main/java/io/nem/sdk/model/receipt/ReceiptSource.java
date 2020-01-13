@@ -16,7 +16,7 @@
 
 package io.nem.sdk.model.receipt;
 
-import java.nio.ByteBuffer;
+import io.nem.catapult.builders.ReceiptSourceBuilder;
 
 /**
  * The Receipt Source class
@@ -61,9 +61,6 @@ public class ReceiptSource {
      * @return receipt bytes
      */
     public byte[] serialize() {
-        final ByteBuffer buffer = ByteBuffer.allocate(8);
-        buffer.putInt(Integer.reverseBytes(getPrimaryId()));
-        buffer.putInt(Integer.reverseBytes(getSecondaryId()));
-        return buffer.array();
+        return ReceiptSourceBuilder.create(getPrimaryId(), getSecondaryId()).serialize();
     }
 }

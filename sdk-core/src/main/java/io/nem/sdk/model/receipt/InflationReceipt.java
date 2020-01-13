@@ -16,9 +16,13 @@
 
 package io.nem.sdk.model.receipt;
 
+import io.nem.catapult.builders.AmountDto;
+import io.nem.catapult.builders.InflationReceiptBuilder;
+import io.nem.catapult.builders.MosaicBuilder;
+import io.nem.catapult.builders.MosaicIdDto;
+import io.nem.catapult.builders.ReceiptTypeDto;
 import io.nem.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.util.Optional;
 
 public class InflationReceipt extends Receipt {
@@ -81,18 +85,20 @@ public class InflationReceipt extends Receipt {
         return this.amount;
     }
 
+
     /**
      * Serialize receipt and returns receipt bytes
      *
      * @return receipt bytes
      */
+    @Override
     public byte[] serialize() {
-        final ByteBuffer buffer = ByteBuffer.allocate(20);
-        buffer.putShort(Short.reverseBytes((short) getVersion().getValue()));
-        buffer.putShort(Short.reverseBytes((short) getType().getValue()));
-        buffer.putLong(Long.reverseBytes(getMosaicId().getIdAsLong()));
-        buffer.putLong(Long.reverseBytes(getAmount().longValue()));
-        return buffer.array();
+        short version = (short) getVersion().getValue();
+        ReceiptTypeDto type = ReceiptTypeDto.rawValueOf((short) getType().getValue());
+        MosaicBuilder mosaic = MosaicBuilder
+            .create(new MosaicIdDto(getMosaicId().getIdAsLong()),
+                new AmountDto(getAmount().longValue()));
+        return InflationReceiptBuilder.create(version, type, mosaic).serialize();
     }
 
     /**

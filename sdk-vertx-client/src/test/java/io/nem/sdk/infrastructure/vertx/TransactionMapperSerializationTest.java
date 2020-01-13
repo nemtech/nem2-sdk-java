@@ -88,6 +88,19 @@ public class TransactionMapperSerializationTest {
         Assertions.assertEquals(Hex.toHexString(serialization.serialize(transactionModel)),
             Hex.toHexString(serialization.serialize(transactionMapper.map(mappedTransactionInfo))));
 
+        originalTransactionInfo.setMeta(null);
+        Map<String, Object> transactionJson = (Map<String, Object>) originalTransactionInfo
+            .getTransaction();
+        if (transactionJson.containsKey("transactions")) {
+            List<Map<String, Object>> transactionsJson = (List<Map<String, Object>>) transactionJson
+                .get("transactions");
+            transactionsJson.forEach(t -> t.remove("meta"));
+        }
+
+        Assertions.assertEquals(jsonHelper.prettyPrint(originalTransactionInfo),
+            jsonHelper.prettyPrint(transactionMapper
+                .map(serialization.deserialize(serialization.serialize(transactionModel)))));
+
     }
 
 
