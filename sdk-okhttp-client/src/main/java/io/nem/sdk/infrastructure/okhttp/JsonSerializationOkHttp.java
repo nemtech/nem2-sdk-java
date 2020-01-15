@@ -42,7 +42,7 @@ public class JsonSerializationOkHttp implements JsonSerialization {
     @Override
     public String transactionToJson(Transaction transaction) {
         Validate.notNull(transaction, "Transaction must not be null");
-        return jsonHelper.print(generalTransactionMapper.map(transaction));
+        return jsonHelper.prettyPrint(generalTransactionMapper.map(transaction));
     }
 
     @Override

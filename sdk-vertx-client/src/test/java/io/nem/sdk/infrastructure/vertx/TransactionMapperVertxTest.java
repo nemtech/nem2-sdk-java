@@ -96,6 +96,18 @@ public class TransactionMapperVertxTest {
         validateStandaloneTransaction(transferTransaction, transferTransactionDTO);
     }
 
+
+    @Test
+    void shouldCreateTransferEmptyMessage() {
+        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
+            "shouldCreateTransferEmptyMessage.json");
+
+        TransferTransaction transferTransaction = (TransferTransaction) map(transferTransactionDTO);
+
+        validateStandaloneTransaction(transferTransaction, transferTransactionDTO);
+        Assertions.assertEquals("", transferTransaction.getMessage().getPayload());
+    }
+
     @Test
     void shouldCreateAggregateTransferTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = loadTransactionInfoDTO(
@@ -727,12 +739,16 @@ public class TransactionMapperVertxTest {
                 transaction.getMosaics().get(0).getAmount());
         }
 
-        assertEquals(
-            new String(
-                Hex.decode(
-                    transferTransaction.getMessage().getPayload()),
-                StandardCharsets.UTF_8),
-            transaction.getMessage().getPayload());
+        if (transaction.getMessage().getPayload().isEmpty()) {
+            assertEquals("", transaction.getMessage().getPayload());
+        } else {
+            assertEquals(
+                new String(
+                    Hex.decode(
+                        transferTransaction.getMessage().getPayload()),
+                    StandardCharsets.UTF_8),
+                transaction.getMessage().getPayload());
+        }
 
         assertEquals((int) transferTransaction.getMessage().getType().getValue(),
             transaction.getMessage().getType().getValue());
