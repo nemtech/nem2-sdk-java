@@ -19,6 +19,8 @@ package io.nem.sdk.infrastructure.vertx;
 import static io.nem.sdk.infrastructure.vertx.TestHelperVertx.loadTransactionInfoDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.core.utils.ExceptionUtils;
+import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -34,6 +36,7 @@ import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import io.nem.sdk.openapi.vertx.model.AnnounceTransactionInfoDTO;
 import io.nem.sdk.openapi.vertx.model.Cosignature;
 import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.sdk.openapi.vertx.model.TransactionMetaDTO;
 import io.nem.sdk.openapi.vertx.model.TransactionStateTypeEnum;
 import io.nem.sdk.openapi.vertx.model.TransactionStatusDTO;
 import io.nem.sdk.openapi.vertx.model.TransactionStatusTypeEnum;
@@ -78,6 +81,50 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     }
 
     @Test
+    public void exceptionWhenMapperFails() {
+
+        TransactionInfoDTO transactionInfoDTO = new TransactionInfoDTO();
+        TransactionMetaDTO meta = new TransactionMetaDTO();
+        meta.setHash("ABC");
+        transactionInfoDTO.setMeta(meta);
+
+        mockRemoteCall(transactionInfoDTO);
+
+        RepositoryCallException exception = Assertions
+            .assertThrows(RepositoryCallException.class, () -> {
+                ExceptionUtils.propagateVoid(() -> {
+                    repository
+                        .getTransaction(transactionInfoDTO.getMeta().getHash()).toFuture().get();
+                });
+            });
+
+        Assertions.assertTrue(exception.getMessage().contains(
+            "Transaction cannot be mapped, object does not not have transaction type."));
+    }
+
+    @Test
+    public void exceptionWhenRestCallFails() {
+
+        TransactionInfoDTO transactionInfoDTO = new TransactionInfoDTO();
+        TransactionMetaDTO meta = new TransactionMetaDTO();
+        meta.setHash("ABC");
+        transactionInfoDTO.setMeta(meta);
+
+        mockErrorCode(400, "The error message");
+
+        RepositoryCallException exception = Assertions
+            .assertThrows(RepositoryCallException.class, () -> {
+                ExceptionUtils.propagateVoid(() -> {
+                    repository
+                        .getTransaction(transactionInfoDTO.getMeta().getHash()).toFuture().get();
+                });
+            });
+
+        Assertions.assertTrue(exception.getMessage().contains(
+            "The error message"));
+    }
+
+    @Test
     public void shouldGetTransactions() throws Exception {
 
         TransactionInfoDTO transactionInfoDTO = loadTransactionInfoDTO(
@@ -116,7 +163,8 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
         Assertions.assertEquals(5L, transaction.getDeadline().getInstant());
         Assertions.assertEquals(BigInteger.valueOf(6L), transaction.getHeight());
         Assertions.assertEquals("Failure_AccountLink_Link_Already_Exists", transaction.getCode());
-        Assertions.assertEquals(transaction.getGroup().getValue(), transactionStatusDTO.getGroup().getValue());
+        Assertions.assertEquals(transaction.getGroup().getValue(),
+            transactionStatusDTO.getGroup().getValue());
     }
 
     @Test
@@ -142,7 +190,8 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
         Assertions.assertEquals(5L, transaction.getDeadline().getInstant());
         Assertions.assertEquals(BigInteger.valueOf(6L), transaction.getHeight());
         Assertions.assertEquals("Failure_AccountLink_Link_Already_Exists", transaction.getCode());
-        Assertions.assertEquals(transaction.getGroup().getValue(), transactionStatusDTO.getGroup().getValue());
+        Assertions.assertEquals(transaction.getGroup().getValue(),
+            transactionStatusDTO.getGroup().getValue());
     }
 
     @Test
