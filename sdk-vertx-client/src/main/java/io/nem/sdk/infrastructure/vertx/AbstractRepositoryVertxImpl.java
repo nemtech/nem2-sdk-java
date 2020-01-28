@@ -63,7 +63,7 @@ public abstract class AbstractRepositoryVertxImpl {
         }
         return new RepositoryCallException(
             extractMessageFromException(e),
-            extractStatusCodeFromException(e), originalException);
+            extractStatusCodeFromException(e), e instanceof ApiException ? originalException : e);
     }
 
     private String extractMessageFromException(Throwable e) {
