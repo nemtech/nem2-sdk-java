@@ -29,7 +29,6 @@ import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionsDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionsInfoDTO;
 import io.reactivex.Observable;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
@@ -89,11 +88,6 @@ public class RestrictionAccountRepositoryOkHttpImpl extends AbstractRepositoryOk
             dto.getValues().stream().filter(Objects::nonNull).map(Object::toString)
                 .map(restrictionFlags.getTargetType()::fromString).collect(
                 Collectors.toList()));
-    }
-
-
-    private BigInteger toBigInteger(String value) {
-        return new BigInteger(value);
     }
 
 

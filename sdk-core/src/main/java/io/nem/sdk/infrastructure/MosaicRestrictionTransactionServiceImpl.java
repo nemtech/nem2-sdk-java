@@ -104,11 +104,15 @@ public class MosaicRestrictionTransactionServiceImpl implements
                 (networkType, mosaicId, targetAddress) -> getGlobalRestrictionEntry(
                     mosaicId,
                     restrictionKey).flatMap(optional -> {
-                    optional.orElseThrow(() -> new IllegalArgumentException(
-                        "Global restriction is not valid for RestrictionKey: "
-                            + restrictionKey));
+                    if (!optional.isPresent()) {
+                        throw new IllegalArgumentException(
+                            "Global restriction is not valid for RestrictionKey: "
+                                + restrictionKey);
+                    }
+
                     return getCurrentMosaicAddressRestrictionValue(
-                        mosaicId, targetAddress,
+                        mosaicId,
+                        targetAddress,
                         restrictionKey)
                         .map(optionalValue -> {
                             MosaicAddressRestrictionTransactionFactory factory = MosaicAddressRestrictionTransactionFactory

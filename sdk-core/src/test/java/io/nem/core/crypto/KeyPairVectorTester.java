@@ -33,7 +33,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 public class KeyPairVectorTester extends AbstractVectorTester {
 
     private static Stream<Arguments> testKeysCatapult() {
-        return createArguments("1.test-keys-catapult.json", KeyPairVectorTester::extractArguments, 0,
+        return createArguments("1.test-keys-catapult.json", KeyPairVectorTester::extractArguments,
+            0,
             10
         );
     }
@@ -53,8 +54,7 @@ public class KeyPairVectorTester extends AbstractVectorTester {
     void testKeysNis1(String privateKey, String publicKey) {
         //Reversing to reuse nis1 tests.
         KeyPair keyPair = KeyPair
-            .fromPrivate(PrivateKey.fromHexString(SignSchema.reverse(privateKey)),
-                SignSchema.KECCAK);
+            .fromPrivate(PrivateKey.fromHexString(privateKey), SignSchema.KECCAK);
         Assertions
             .assertEquals(publicKey.toUpperCase(), keyPair.getPublicKey().toHex().toUpperCase());
     }

@@ -32,7 +32,6 @@ import io.nem.sdk.openapi.vertx.model.AccountRestrictionsInfoDTO;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -91,11 +90,6 @@ public class RestrictionAccountRepositoryVertxImpl extends AbstractRepositoryVer
             dto.getValues().stream().filter(Objects::nonNull).map(Object::toString)
                 .map(restrictionFlags.getTargetType()::fromString).collect(
                 Collectors.toList()));
-    }
-
-
-    private BigInteger toBigInteger(String value) {
-        return new BigInteger(value);
     }
 
     public RestrictionAccountRoutesApi getClient() {

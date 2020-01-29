@@ -45,27 +45,27 @@ public class PersistentHarvestingDelegationMessage extends Message {
      * "plain text" string - utf8 byte array - encrypted byte array - hex string (the encrypted
      * message string)
      *
-     * @param remoteProxyPrivateKey the remote’s account proxy private key.
-     * @param senderPrivateKey Sender private key
+     * @param delegatedPrivateKey the remote’s account proxy private key.
      * @param recipientPublicKey Recipient public key
      * @param networkType Catapult network type
      * @return {@link PersistentHarvestingDelegationMessage}
      */
-    public static PersistentHarvestingDelegationMessage create(PrivateKey remoteProxyPrivateKey,
-        PrivateKey senderPrivateKey,
+    public static PersistentHarvestingDelegationMessage create(PrivateKey delegatedPrivateKey,
         PublicKey recipientPublicKey,
         NetworkType networkType) {
-
         SignSchema signSchema = networkType.resolveSignSchema();
-        CryptoEngine engine = CryptoEngines.defaultEngine();
-        KeyPair sender = KeyPair.fromPrivate(senderPrivateKey, signSchema);
-        KeyPair recipient = KeyPair.onlyPublic(recipientPublicKey, engine);
-        BlockCipher blockCipher = engine
-            .createBlockCipher(sender,
-                recipient, signSchema);
 
-        String payload = MessageMarker.PERSISTENT_DELEGATION_UNLOCK + ConvertUtils
-            .toHex(blockCipher.encrypt(StringEncoder.getBytes(remoteProxyPrivateKey.toHex())));
+        KeyPair ephemeralKeypair = KeyPair.random(signSchema);
+
+        CryptoEngine engine = CryptoEngines.defaultEngine();
+
+        KeyPair recipient = KeyPair.onlyPublic(recipientPublicKey, engine);
+        BlockCipher blockCipher = engine.createBlockCipher(ephemeralKeypair, recipient, signSchema);
+
+        String payload =
+            MessageMarker.PERSISTENT_DELEGATION_UNLOCK + ephemeralKeypair.getPublicKey().toHex()
+                + ConvertUtils
+                .toHex(blockCipher.encrypt(StringEncoder.getBytes(delegatedPrivateKey.toHex())));
 
         return new PersistentHarvestingDelegationMessage(payload.toUpperCase());
     }
@@ -75,13 +75,18 @@ public class PersistentHarvestingDelegationMessage extends Message {
      * Utility method that allow users to decrypt a message if it was created using the Java SDK or
      * the Typescript SDK.
      *
-     * @param senderPublicKey Sender public key.
      * @param recipientPrivateKey Recipient private key
      * @param networkType Catapult network type
      * @return the recipient public key.
      */
-    public String decryptPayload(PublicKey senderPublicKey, PrivateKey recipientPrivateKey,
-        NetworkType networkType) {
+    public String decryptPayload(PrivateKey recipientPrivateKey, NetworkType networkType) {
+
+        int markerLength = MessageMarker.PERSISTENT_DELEGATION_UNLOCK.length();
+        PublicKey senderPublicKey = PublicKey
+            .fromHexString(getPayload().substring(markerLength, markerLength + 64));
+
+        String encryptedPayload = getPayload()
+            .substring(markerLength + senderPublicKey.toHex().length());
 
         SignSchema signSchema = networkType.resolveSignSchema();
         CryptoEngine engine = CryptoEngines.defaultEngine();
@@ -90,9 +95,8 @@ public class PersistentHarvestingDelegationMessage extends Message {
         BlockCipher blockCipher = engine
             .createBlockCipher(sender, recipient, signSchema);
 
-        return StringEncoder.getString(blockCipher.decrypt(ConvertUtils
-            .fromHexToBytes(
-                getPayload().substring(MessageMarker.PERSISTENT_DELEGATION_UNLOCK.length()))))
+        return StringEncoder
+            .getString(blockCipher.decrypt(ConvertUtils.fromHexToBytes(encryptedPayload)))
             .toUpperCase();
     }
 

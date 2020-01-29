@@ -456,7 +456,7 @@ public class Ed25519GroupElement implements Serializable {
 
         for (int i = 0; i < 32; i++) {
             Ed25519GroupElement bij = bi;
-            for (int j = 0; j < 8; j++) {
+            for (int j = 0; j < 8; j++)  {
                 final Ed25519FieldElement inverse = bij.z.invert();
                 final Ed25519FieldElement xElement = bij.x.multiply(inverse);
                 final Ed25519FieldElement yElement = bij.y.multiply(inverse);

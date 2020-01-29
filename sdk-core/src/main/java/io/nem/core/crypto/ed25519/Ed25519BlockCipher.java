@@ -27,12 +27,16 @@ import io.nem.sdk.infrastructure.RandomUtils;
 import java.util.Arrays;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
+import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
 import org.bouncycastle.crypto.modes.CBCBlockCipher;
 import org.bouncycastle.crypto.paddings.BlockCipherPadding;
 import org.bouncycastle.crypto.paddings.PKCS7Padding;
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.params.HKDFParameters;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
@@ -41,9 +45,10 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  */
 public class Ed25519BlockCipher implements BlockCipher {
 
+    private static final int IV_LENGTH = 16;
+
     private final KeyPair senderKeyPair;
     private final KeyPair recipientKeyPair;
-    private final int keyLength;
     private final SignSchema signSchema;
 
     public Ed25519BlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair,
@@ -51,64 +56,58 @@ public class Ed25519BlockCipher implements BlockCipher {
         this.senderKeyPair = senderKeyPair;
         this.recipientKeyPair = recipientKeyPair;
         this.signSchema = signSchema;
-        this.keyLength = recipientKeyPair.getPublicKey().getBytes().length;
     }
 
     @Override
     @SuppressWarnings("squid:S1168")
     public byte[] encrypt(final byte[] input) {
         // Setup salt.
-        final byte[] salt = RandomUtils.generateRandomBytes(this.keyLength);
 
         // Derive shared key.
-        final byte[] sharedKey = getSharedKey(
-            this.senderKeyPair.getPrivateKey(), this.recipientKeyPair.getPublicKey(), salt,
-            signSchema);
+        final byte[] sharedKey = getSharedKey(this.senderKeyPair.getPrivateKey(),
+            this.recipientKeyPair.getPublicKey(), signSchema);
 
         // Setup IV.
-        final byte[] ivData = RandomUtils.generateRandomBytes(16);
+        final byte[] ivData = RandomUtils.generateRandomBytes(IV_LENGTH);
 
         // Setup block cipher.
-        final BufferedBlockCipher cipher = this.setupBlockCipher(sharedKey, ivData, true);
+        final BufferedBlockCipher cipher = setupBlockCipher(sharedKey, ivData, true);
 
         // Encode.
-        final byte[] buf = this.transform(cipher, input);
+        final byte[] buf = transform(cipher, input);
         if (null == buf) {
             return null;
         }
 
-        final byte[] result = new byte[salt.length + ivData.length + buf.length];
-        System.arraycopy(salt, 0, result, 0, salt.length);
-        System.arraycopy(ivData, 0, result, salt.length, ivData.length);
-        System.arraycopy(buf, 0, result, salt.length + ivData.length, buf.length);
+        final byte[] result = new byte[ivData.length + buf.length];
+        System.arraycopy(ivData, 0, result, 0, ivData.length);
+        System.arraycopy(buf, 0, result, ivData.length, buf.length);
         return result;
     }
 
     @Override
     @SuppressWarnings("squid:S1168")
     public byte[] decrypt(final byte[] input) {
-        if (input.length < 64) {
+        if (input.length < 32) {
             return null;
         }
 
-        final byte[] salt = Arrays.copyOfRange(input, 0, this.keyLength);
-        final byte[] ivData = Arrays.copyOfRange(input, this.keyLength, 48);
-        final byte[] encData = Arrays.copyOfRange(input, 48, input.length);
+        final byte[] ivData = Arrays.copyOfRange(input, 0, IV_LENGTH);
+        final byte[] encData = Arrays.copyOfRange(input, IV_LENGTH, input.length);
 
         // Derive shared key.
-        final byte[] sharedKey = getSharedKey(
-            this.recipientKeyPair.getPrivateKey(), this.senderKeyPair.getPublicKey(), salt,
-            signSchema);
+        final byte[] sharedKey = getSharedKey(this.recipientKeyPair.getPrivateKey(),
+            this.senderKeyPair.getPublicKey(), signSchema);
 
         // Setup block cipher.
-        final BufferedBlockCipher cipher = this.setupBlockCipher(sharedKey, ivData, false);
+        final BufferedBlockCipher cipher = setupBlockCipher(sharedKey, ivData, false);
 
         // Decode.
-        return this.transform(cipher, encData);
+        return transform(cipher, encData);
     }
 
     @SuppressWarnings("squid:S1168")
-    private byte[] transform(final BufferedBlockCipher cipher, final byte[] data) {
+    public static byte[] transform(final BufferedBlockCipher cipher, final byte[] data) {
         final byte[] buf = new byte[cipher.getOutputSize(data.length)];
         int length = cipher.processBytes(data, 0, data.length, buf, 0);
         try {
@@ -120,7 +119,7 @@ public class Ed25519BlockCipher implements BlockCipher {
         return Arrays.copyOf(buf, length);
     }
 
-    private BufferedBlockCipher setupBlockCipher(
+    public static BufferedBlockCipher setupBlockCipher(
         final byte[] sharedKey, final byte[] ivData, final boolean forEncryption) {
         // Setup cipher parameters with key and IV.
         final KeyParameter keyParam = new KeyParameter(sharedKey);
@@ -136,20 +135,26 @@ public class Ed25519BlockCipher implements BlockCipher {
     }
 
     public static byte[] getSharedKey(final PrivateKey privateKey, final PublicKey publicKey,
-        final byte[] salt, final SignSchema signSchema) {
-        final byte[] sharedKey = sharedKeyNotSalted(privateKey, publicKey, signSchema);
-        for (int i = 0; i < sharedKey.length; i++) {
-            sharedKey[i] ^= salt[i];
-        }
-        return SignSchema.toHash32Bytes(signSchema, sharedKey);
+        final SignSchema signSchema) {
+        final byte[] sharedSecret = getSharedSecret(privateKey, publicKey, signSchema);
+        Digest hash = new SHA256Digest();
+        byte[] info = "catapult".getBytes();
+        int length = 32;
+        byte[] sharedKey = new byte[length];
+        HKDFParameters params = new HKDFParameters(sharedSecret, null, info);
+        HKDFBytesGenerator hkdf = new HKDFBytesGenerator(hash);
+        hkdf.init(params);
+        hkdf.generateBytes(sharedKey, 0, length);
+        return sharedKey;
     }
 
-    public static byte[] sharedKeyNotSalted(final PrivateKey privateKey, final PublicKey publicKey,
+    public static byte[] getSharedSecret(final PrivateKey privateKey, final PublicKey publicKey,
         final SignSchema signSchema) {
         final Ed25519GroupElement senderA =
             new Ed25519EncodedGroupElement(publicKey.getBytes()).decode();
         senderA.precomputeForScalarMultiplication();
-        return senderA.scalarMultiply(Ed25519Utils.prepareForScalarMultiply(privateKey, signSchema))
+        return senderA
+            .scalarMultiply(Ed25519Utils.prepareForScalarMultiply(privateKey, signSchema))
             .encode()
             .getRaw();
     }
