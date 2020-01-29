@@ -38,7 +38,7 @@ public class Ed25519BlockCipherTest extends BlockCipherTest {
         final BlockCipher blockCipher = this.getBlockCipher(kp, kp, signSchema);
 
         // Act:
-        final byte[] decryptedBytes = blockCipher.decrypt(new byte[63]);
+        final byte[] decryptedBytes = blockCipher.decrypt(new byte[31]);
 
         // Assert:
         Assertions.assertNull(decryptedBytes);

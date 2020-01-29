@@ -25,7 +25,6 @@ import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsInstanceOf;
 import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("squid:S2925")
@@ -120,28 +119,6 @@ public class ExceptionUtilsTest {
             runner.getUnhandledException(), IsInstanceOf.instanceOf(IllegalStateException.class));
     }
 
-    @Test
-    @Disabled //Enable bank when stable in travis oraclejdk9 build
-    public void propagateSetsThreadInterruptFlagWhenMappingInterruptedException()
-        throws InterruptedException {
-        // Arrange:
-        final InterruptedExceptionTestRunner runner =
-            new InterruptedExceptionTestRunner(
-                () ->
-                    ExceptionUtils.propagate(
-                        () -> {
-                            Thread.sleep(1000);
-                            return null;
-                        }));
-
-        // Act:
-        runner.run();
-
-        // Assert:
-        MatcherAssert.assertThat(runner.isInterruptedPreRun(), IsEqual.equalTo(false));
-        MatcherAssert.assertThat(runner.isInterruptedPostRun(), IsEqual.equalTo(true));
-    }
-
     // endregion
 
     // region propagateVoid
@@ -169,7 +146,7 @@ public class ExceptionUtilsTest {
     @Test
     public void propagateVoidWrapsCheckedExceptionsInRuntimeExceptionByDefault() {
         // Act:
-        Assertions.assertThrows(RuntimeException.class, () ->ExceptionUtils.propagateVoid(
+        Assertions.assertThrows(RuntimeException.class, () -> ExceptionUtils.propagateVoid(
             () -> {
                 throw new IOException();
             }));
@@ -178,7 +155,7 @@ public class ExceptionUtilsTest {
     @Test
     public void propagateVoidCanWrapCheckedExceptionsInCustomRuntimeException() {
         // Act:
-        Assertions.assertThrows(IllegalArgumentException.class, () ->ExceptionUtils.propagateVoid(
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ExceptionUtils.propagateVoid(
             () -> {
                 throw new IOException();
             },
@@ -188,7 +165,7 @@ public class ExceptionUtilsTest {
     @Test
     public void propagateVoidUnwrapsUncheckedExecutionExceptions() {
         // Act:
-        Assertions.assertThrows(IllegalArgumentException.class, () ->ExceptionUtils.propagateVoid(
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ExceptionUtils.propagateVoid(
             () -> {
                 throw new MockExecutionException(new IllegalArgumentException());
             }));
@@ -197,7 +174,7 @@ public class ExceptionUtilsTest {
     @Test
     public void propagateVoidWrapsCheckedExecutionExceptionsInRuntimeExceptionByDefault() {
         // Act:
-        Assertions.assertThrows(RuntimeException.class, () ->ExceptionUtils.propagateVoid(
+        Assertions.assertThrows(RuntimeException.class, () -> ExceptionUtils.propagateVoid(
             () -> {
                 throw new MockExecutionException(new IOException());
             }));

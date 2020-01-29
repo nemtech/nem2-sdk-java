@@ -30,6 +30,7 @@ import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
 import java.util.Collections;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -74,10 +75,11 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
         SignedTransaction signedHashLockTransaction = hashLockTransaction.build()
             .signWith(this.cosignatoryAccount, getGenerationHash());
 
-        getTransactionOrFail(getTransactionService(type)
+        AggregateTransaction finalTransaction = getTransactionOrFail(getTransactionService(type)
                 .announceHashLockAggregateBonded(getListener(type), signedHashLockTransaction,
                     signedTransaction),
             aggregateTransaction);
+        Assertions.assertNotNull(finalTransaction);
     }
 
 }

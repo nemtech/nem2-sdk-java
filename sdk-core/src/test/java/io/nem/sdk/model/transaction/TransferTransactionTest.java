@@ -177,7 +177,6 @@ class TransferTransactionTest extends AbstractTransactionTester {
         Assertions.assertEquals(expected, Hex.toHexString(
             transactionBuilder.serialize()));
 
-
         Assertions
             .assertEquals(100L, transactionBuilder.getMosaics().get(0).getAmount().getAmount());
 
@@ -278,9 +277,6 @@ class TransferTransactionTest extends AbstractTransactionTester {
                 .fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C111"),
             networkType.resolveSignSchema());
 
-        KeyPair sender = KeyPair.fromPrivate(PrivateKey
-                .fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C108"),
-            networkType.resolveSignSchema());
         KeyPair recipient = KeyPair.fromPrivate(PrivateKey
                 .fromHexString("B72F2950498111BADF276D6D9D5E345F04E0D5C9B8342DA983C3395B4CF18F08"),
             networkType.resolveSignSchema());
@@ -289,7 +285,6 @@ class TransferTransactionTest extends AbstractTransactionTester {
             TransferTransactionFactory
                 .createPersistentDelegationRequestTransaction(networkType,
                     remoteProxy.getPrivateKey(),
-                    sender.getPrivateKey(),
                     recipient.getPublicKey()
                 ).deadline(new FakeDeadline()).build();
 
@@ -310,7 +305,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
         PersistentHarvestingDelegationMessage message = (PersistentHarvestingDelegationMessage) transferTransaction
             .getMessage();
         Assertions.assertEquals(remoteProxy.getPrivateKey().toHex().toUpperCase(),
-            message.decryptPayload(sender.getPublicKey(), recipient.getPrivateKey(), networkType));
+            message.decryptPayload(recipient.getPrivateKey(), networkType));
 
         byte[] actual = transferTransaction.serialize();
 
@@ -324,7 +319,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
             .getMessage();
         Assertions.assertEquals(remoteProxy.getPrivateKey().toHex().toUpperCase(),
             deserializedMessage
-                .decryptPayload(sender.getPublicKey(), recipient.getPrivateKey(), networkType));
+                .decryptPayload(recipient.getPrivateKey(), networkType));
 
     }
 

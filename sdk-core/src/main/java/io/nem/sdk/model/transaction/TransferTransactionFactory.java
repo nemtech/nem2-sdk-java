@@ -74,18 +74,16 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
      * delegation unlocking
      *
      * @param networkType The network type.
-     * @param remoteProxyPrivateKey the remote’s account proxy private key.
-     * @param senderPrivateKey The sender's private key
+     * @param remoteProxyPrivateKey the remote’s account proxy private key.=
      * @param harvesterPublicKey The harvester public key
      * @return {@link TransferTransactionFactory}
      */
     public static TransferTransactionFactory createPersistentDelegationRequestTransaction(
         NetworkType networkType,
         PrivateKey remoteProxyPrivateKey,
-        PrivateKey senderPrivateKey,
         PublicKey harvesterPublicKey) {
         PersistentHarvestingDelegationMessage message = PersistentHarvestingDelegationMessage
-            .create(remoteProxyPrivateKey, senderPrivateKey, harvesterPublicKey, networkType);
+            .create(remoteProxyPrivateKey, harvesterPublicKey, networkType);
         return new TransferTransactionFactory(networkType,
             Address.createFromPublicKey(harvesterPublicKey.toHex(), networkType),
             Collections.emptyList(), message);

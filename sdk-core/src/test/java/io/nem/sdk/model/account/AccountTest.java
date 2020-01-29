@@ -168,5 +168,4 @@ class AccountTest {
             account1.getPublicKey().toHex());
     }
 
-
 }

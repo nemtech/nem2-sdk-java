@@ -33,6 +33,7 @@ import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -98,7 +99,7 @@ public class CreatingAnEscrowContractWithAggregateBondedTransactionIntegrationTe
             .announceHashLockAggregateBonded(getListener(type), signedHashLockTransaction,
                 signedTransaction));
 
-        System.out.println(toJson(transaction));
+        Assertions.assertNotNull(transaction);
 
     }
 }
