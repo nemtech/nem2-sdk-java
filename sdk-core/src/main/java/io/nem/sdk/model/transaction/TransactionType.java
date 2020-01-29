@@ -48,7 +48,6 @@ public enum TransactionType {
      */
     MOSAIC_ALIAS(17230, 1),
 
-    // Transfer
     /**
      * Transfer Transaction transaction type.
      */
