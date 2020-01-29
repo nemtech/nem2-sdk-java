@@ -120,7 +120,7 @@ public class TransactionServiceImpl implements TransactionService {
         Validate.notNull(signedAggregateTransaction, "signedAggregateTransaction is required");
         Validate.isTrue(signedAggregateTransaction.getType() == TransactionType.AGGREGATE_BONDED,
             "signedAggregateTransaction type must be AGGREGATE_BONDED");
-        Validate.isTrue(signedHashLockTransaction.getType() == TransactionType.LOCK,
+        Validate.isTrue(signedHashLockTransaction.getType() == TransactionType.HASH_LOCK,
             "signedHashLockTransaction type must be LOCK");
         return announce(listener, signedHashLockTransaction)
             .flatMap(t -> announceAggregateBonded(listener, signedAggregateTransaction));
@@ -149,7 +149,7 @@ public class TransactionServiceImpl implements TransactionService {
                 expectedReceiptSource);
         }
 
-        if (transaction.getType() == TransactionType.LOCK) {
+        if (transaction.getType() == TransactionType.HASH_LOCK) {
             return resolveTransactionFactory((HashLockTransaction) transaction,
                 expectedReceiptSource);
         }
@@ -179,7 +179,7 @@ public class TransactionServiceImpl implements TransactionService {
                 expectedReceiptSource);
         }
 
-        if (transaction.getType() == TransactionType.MOSAIC_METADATA_TRANSACTION) {
+        if (transaction.getType() == TransactionType.MOSAIC_METADATA) {
             return resolveTransactionFactory((MosaicMetadataTransaction) transaction,
                 expectedReceiptSource);
         }

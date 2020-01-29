@@ -35,7 +35,7 @@ public class HashLockTransactionFactory extends TransactionFactory<HashLockTrans
         Mosaic mosaic,
         BigInteger duration,
         String hash) {
-        super(TransactionType.LOCK, networkType);
+        super(TransactionType.HASH_LOCK, networkType);
         Validate.notNull(mosaic, "Mosaic must not be null");
         Validate.notNull(duration, "Duration must not be null");
         Validate.notNull(hash, "Hash must not be null");

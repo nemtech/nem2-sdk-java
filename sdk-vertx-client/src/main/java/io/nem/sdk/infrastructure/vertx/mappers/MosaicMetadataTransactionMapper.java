@@ -36,7 +36,7 @@ class MosaicMetadataTransactionMapper extends
     AbstractTransactionMapper<MosaicMetadataTransactionDTO, MosaicMetadataTransaction> {
 
     public MosaicMetadataTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.MOSAIC_METADATA_TRANSACTION,
+        super(jsonHelper, TransactionType.MOSAIC_METADATA,
             MosaicMetadataTransactionDTO.class);
     }
 

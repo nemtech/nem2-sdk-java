@@ -709,7 +709,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
         @Override
         public TransactionType getTransactionType() {
-            return TransactionType.ACCOUNT_METADATA_TRANSACTION;
+            return TransactionType.ACCOUNT_METADATA;
         }
 
         @Override
@@ -749,7 +749,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
         @Override
         public TransactionType getTransactionType() {
-            return TransactionType.MOSAIC_METADATA_TRANSACTION;
+            return TransactionType.MOSAIC_METADATA;
         }
 
         @Override
@@ -793,7 +793,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
         @Override
         public TransactionType getTransactionType() {
-            return TransactionType.NAMESPACE_METADATA_TRANSACTION;
+            return TransactionType.NAMESPACE_METADATA;
         }
 
         @Override
@@ -836,7 +836,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
         @Override
         public TransactionType getTransactionType() {
-            return TransactionType.REGISTER_NAMESPACE;
+            return TransactionType.NAMESPACE_REGISTRATION;
         }
 
         @Override
@@ -1124,7 +1124,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
         @Override
         public TransactionType getTransactionType() {
-            return TransactionType.LOCK;
+            return TransactionType.HASH_LOCK;
         }
 
         @Override
@@ -1470,7 +1470,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
         @Override
         public TransactionType getTransactionType() {
-            return TransactionType.MODIFY_MULTISIG_ACCOUNT;
+            return TransactionType.MULTISIG_ACCOUNT_MODIFICATION;
         }
 
         @Override

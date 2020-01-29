@@ -39,7 +39,7 @@ public class MultisigAccountModificationTransactionFactory extends
         byte minRemovalDelta,
         List<PublicAccount> publicKeyAdditions,
         List<PublicAccount> publicKeyDeletions) {
-        super(TransactionType.MODIFY_MULTISIG_ACCOUNT, networkType);
+        super(TransactionType.MULTISIG_ACCOUNT_MODIFICATION, networkType);
         Validate.notNull(publicKeyAdditions, "PublicKeyAdditions must not be null");
         Validate.notNull(publicKeyDeletions, "PublicKeyDeletions must not be null");
         this.minApprovalDelta = minApprovalDelta;

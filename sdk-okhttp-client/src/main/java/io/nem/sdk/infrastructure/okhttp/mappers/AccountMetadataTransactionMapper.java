@@ -33,7 +33,7 @@ class AccountMetadataTransactionMapper extends
     AbstractTransactionMapper<AccountMetadataTransactionDTO, AccountMetadataTransaction> {
 
     public AccountMetadataTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.ACCOUNT_METADATA_TRANSACTION,
+        super(jsonHelper, TransactionType.ACCOUNT_METADATA,
             AccountMetadataTransactionDTO.class);
     }
 

@@ -44,7 +44,7 @@ public class NamespaceRegistrationTransactionFactory extends
         final NamespaceRegistrationType namespaceRegistrationType,
         final Optional<BigInteger> duration,
         final Optional<NamespaceId> parentId) {
-        super(TransactionType.REGISTER_NAMESPACE, networkType);
+        super(TransactionType.NAMESPACE_REGISTRATION, networkType);
         Validate.notNull(namespaceName, "NamespaceName must not be null");
         Validate.notNull(namespaceRegistrationType, "NamespaceType must not be null");
         Validate.notNull(namespaceId, "NamespaceId must not be null");

@@ -33,7 +33,7 @@ class MultisigAccountModificationTransactionMapper extends
     AbstractTransactionMapper<MultisigAccountModificationTransactionDTO, MultisigAccountModificationTransaction> {
 
     public MultisigAccountModificationTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.MODIFY_MULTISIG_ACCOUNT,
+        super(jsonHelper, TransactionType.MULTISIG_ACCOUNT_MODIFICATION,
             MultisigAccountModificationTransactionDTO.class);
     }
 

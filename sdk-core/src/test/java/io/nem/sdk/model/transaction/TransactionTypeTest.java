@@ -60,18 +60,18 @@ class TransactionTypeTest {
 
     @Test
     void multisigModificationAction() {
-        TransactionType transactionType = TransactionType.MODIFY_MULTISIG_ACCOUNT;
+        TransactionType transactionType = TransactionType.MULTISIG_ACCOUNT_MODIFICATION;
         assertEquals(0x4155, transactionType.getValue());
         assertEquals(16725, transactionType.getValue());
-        assertEquals(TransactionType.MODIFY_MULTISIG_ACCOUNT, TransactionType.rawValueOf(16725));
+        assertEquals(TransactionType.MULTISIG_ACCOUNT_MODIFICATION, TransactionType.rawValueOf(16725));
     }
 
     @Test
     void namespaceCreationType() {
-        TransactionType transactionType = TransactionType.REGISTER_NAMESPACE;
+        TransactionType transactionType = TransactionType.NAMESPACE_REGISTRATION;
         assertEquals(0x414e, transactionType.getValue());
         assertEquals(16718, transactionType.getValue());
-        assertEquals(TransactionType.REGISTER_NAMESPACE, TransactionType.rawValueOf(16718));
+        assertEquals(TransactionType.NAMESPACE_REGISTRATION, TransactionType.rawValueOf(16718));
     }
 
     @Test
@@ -84,10 +84,10 @@ class TransactionTypeTest {
 
     @Test
     void lockFundsType() {
-        TransactionType transactionType = TransactionType.LOCK;
+        TransactionType transactionType = TransactionType.HASH_LOCK;
         assertEquals(0x4148, transactionType.getValue());
         assertEquals(16712, transactionType.getValue());
-        assertEquals(TransactionType.LOCK, TransactionType.rawValueOf(16712));
+        assertEquals(TransactionType.HASH_LOCK, TransactionType.rawValueOf(16712));
     }
 
     @Test

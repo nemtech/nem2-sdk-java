@@ -34,7 +34,7 @@ class HashLockTransactionMapper extends
     AbstractTransactionMapper<HashLockTransactionDTO, HashLockTransaction> {
 
     public HashLockTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.LOCK, HashLockTransactionDTO.class);
+        super(jsonHelper, TransactionType.HASH_LOCK, HashLockTransactionDTO.class);
     }
 
     private Mosaic getMosaic(HashLockTransactionDTO mosaic) {
