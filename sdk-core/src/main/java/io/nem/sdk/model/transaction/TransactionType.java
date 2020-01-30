@@ -23,7 +23,6 @@ import java.util.Arrays;
  */
 public enum TransactionType {
 
-    // Mosaic
     /**
      * Mosaic definition transaction type.
      */
@@ -34,11 +33,10 @@ public enum TransactionType {
      */
     MOSAIC_SUPPLY_CHANGE(16973, 1),
 
-    // Namespace
     /**
      * Register namespace transaction type.
      */
-    REGISTER_NAMESPACE(16718, 1),
+    NAMESPACE_REGISTRATION(16718, 1),
 
     /**
      * Address alias transaction type.
@@ -50,17 +48,15 @@ public enum TransactionType {
      */
     MOSAIC_ALIAS(17230, 1),
 
-    // Transfer
     /**
      * Transfer Transaction transaction type.
      */
     TRANSFER(16724, 1),
 
-    // Multisignature
     /**
-     * Modify multisig account transaction type.
+     * Multisig account  modification transaction type.
      */
-    MODIFY_MULTISIG_ACCOUNT(16725, 1),
+    MULTISIG_ACCOUNT_MODIFICATION(16725, 1),
 
     /**
      * Aggregate complete transaction type.
@@ -75,9 +71,8 @@ public enum TransactionType {
     /**
      * Hash Lock transaction type
      */
-    LOCK(16712, 1),
+    HASH_LOCK(16712, 1),
 
-    // Account filters
     /**
      * Account properties address transaction type
      */
@@ -93,7 +88,6 @@ public enum TransactionType {
      */
     ACCOUNT_OPERATION_RESTRICTION(17232, 1),
 
-    // Cross-chain swaps
     /**
      * Secret Lock Transaction type
      */
@@ -103,26 +97,32 @@ public enum TransactionType {
      * Secret Proof transaction type
      */
     SECRET_PROOF(16978, 1),
+
     /**
-     * Account metadata transaction version
+     * Account metadata transaction type
      */
-    ACCOUNT_METADATA_TRANSACTION(16708, 1),
+    ACCOUNT_METADATA(16708, 1),
+
     /**
-     * Mosaic metadata transaction version
+     * Mosaic metadata transaction type
      */
-    MOSAIC_METADATA_TRANSACTION(16964, 1),
+    MOSAIC_METADATA(16964, 1),
+
     /**
-     * Namespace metadata transaction version
+     * Namespace metadata transaction type
      */
-    NAMESPACE_METADATA_TRANSACTION(17220, 1),
+    NAMESPACE_METADATA(17220, 1),
+
     /**
      * Account link transaction type
      */
     ACCOUNT_LINK(16716, 1),
+
     /**
      * Mosaic address restriction type
      */
     MOSAIC_ADDRESS_RESTRICTION((short) 16977, 1),
+
     /**
      * Mosaic global restriction type
      */

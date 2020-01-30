@@ -36,7 +36,7 @@ class NamespaceMetadataTransactionMapper extends
     AbstractTransactionMapper<NamespaceMetadataTransactionDTO, NamespaceMetadataTransaction> {
 
     public NamespaceMetadataTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.NAMESPACE_METADATA_TRANSACTION,
+        super(jsonHelper, TransactionType.NAMESPACE_METADATA,
             NamespaceMetadataTransactionDTO.class);
     }
 

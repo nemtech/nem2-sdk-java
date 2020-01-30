@@ -38,7 +38,7 @@ class NamespaceRegistrationTransactionMapper extends
     AbstractTransactionMapper<NamespaceRegistrationTransactionDTO, NamespaceRegistrationTransaction> {
 
     public NamespaceRegistrationTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.REGISTER_NAMESPACE,
+        super(jsonHelper, TransactionType.NAMESPACE_REGISTRATION,
             NamespaceRegistrationTransactionDTO.class);
     }
 

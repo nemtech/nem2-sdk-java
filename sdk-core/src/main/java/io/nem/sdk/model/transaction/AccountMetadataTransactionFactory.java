@@ -32,7 +32,7 @@ public class AccountMetadataTransactionFactory extends
         PublicAccount targetAccount,
         BigInteger scopedMetadataKey,
         String value) {
-        super(TransactionType.ACCOUNT_METADATA_TRANSACTION, networkType, targetAccount,
+        super(TransactionType.ACCOUNT_METADATA, networkType, targetAccount,
             scopedMetadataKey, value);
     }
 

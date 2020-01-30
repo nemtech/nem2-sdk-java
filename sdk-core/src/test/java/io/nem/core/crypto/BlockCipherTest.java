@@ -95,14 +95,14 @@ public abstract class BlockCipherTest {
             this.getBlockCipher(skp, KeyPair.onlyPublic(rkp.getPublicKey(), engine), signSchema);
         final BlockCipher blockCipher2 =
             this.getBlockCipher(KeyPair.onlyPublic(rkp.getPublicKey(), engine), skp, signSchema);
-        final byte[] input = RandomUtils.generateRandomBytes();
+        final byte[] input = "Some text".getBytes();
 
         // Act:
         final byte[] encryptedBytes = blockCipher1.encrypt(input);
         final byte[] decryptedBytes = blockCipher2.decrypt(encryptedBytes);
 
         // Assert:
-        MatcherAssert.assertThat(decryptedBytes, IsEqual.equalTo(input));
+        MatcherAssert.assertThat(Hex.toHexString(decryptedBytes), IsEqual.equalTo(Hex.toHexString(input)));
     }
 
     @ParameterizedTest

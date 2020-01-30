@@ -103,7 +103,7 @@ public class AggregateTransactionServiceImpl implements AggregateTransactionServ
         // use minRemoval instead of minApproval for cosignatories validation.
 
         boolean isMultisigRemoval =
-            (innerTransaction.getType() == TransactionType.MODIFY_MULTISIG_ACCOUNT)
+            (innerTransaction.getType() == TransactionType.MULTISIG_ACCOUNT_MODIFICATION)
                 && !((MultisigAccountModificationTransaction) innerTransaction)
                 .getPublicKeyDeletions()
                 .isEmpty();

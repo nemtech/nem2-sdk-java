@@ -443,7 +443,7 @@ public class TransactionMapperVertxTest {
 
         if (transaction.getType() == TransactionType.TRANSFER) {
             validateTransferTx((TransferTransaction) transaction, transactionDTO);
-        } else if (transaction.getType() == TransactionType.REGISTER_NAMESPACE) {
+        } else if (transaction.getType() == TransactionType.NAMESPACE_REGISTRATION) {
             validateNamespaceCreationTx((NamespaceRegistrationTransaction) transaction,
                 transactionDTO);
         } else if (transaction.getType() == TransactionType.MOSAIC_DEFINITION) {
@@ -451,10 +451,10 @@ public class TransactionMapperVertxTest {
         } else if (transaction.getType() == TransactionType.MOSAIC_SUPPLY_CHANGE) {
             validateMosaicSupplyChangeTx((MosaicSupplyChangeTransaction) transaction,
                 transactionDTO);
-        } else if (transaction.getType() == TransactionType.MODIFY_MULTISIG_ACCOUNT) {
+        } else if (transaction.getType() == TransactionType.MULTISIG_ACCOUNT_MODIFICATION) {
             validateMultisigModificationTx((MultisigAccountModificationTransaction) transaction,
                 transactionDTO);
-        } else if (transaction.getType() == TransactionType.LOCK) {
+        } else if (transaction.getType() == TransactionType.HASH_LOCK) {
             validateLockFundsTx((HashLockTransaction) transaction, transactionDTO);
         } else if (transaction.getType() == TransactionType.SECRET_LOCK) {
             validateSecretLockTx((SecretLockTransaction) transaction, transactionDTO);
@@ -635,7 +635,7 @@ public class TransactionMapperVertxTest {
         Assertions.assertEquals(AccountRestrictionFlags.ALLOW_INCOMING_MOSAIC,
             transaction.getRestrictionFlags());
         Assertions.assertEquals(1, transaction.getRestrictionAdditions().size());
-        Assertions.assertEquals(TransactionType.MOSAIC_METADATA_TRANSACTION,
+        Assertions.assertEquals(TransactionType.MOSAIC_METADATA,
             transaction.getRestrictionAdditions().get(0));
     }
 

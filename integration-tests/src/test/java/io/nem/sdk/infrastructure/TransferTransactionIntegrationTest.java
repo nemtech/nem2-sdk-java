@@ -182,25 +182,23 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
 
         TransferTransaction transferTransaction =
             TransferTransactionFactory.createPersistentDelegationRequestTransaction(
-                getNetworkType(),
-                senderKeyPair.getPrivateKey(), senderKeyPair.getPrivateKey(),
+                getNetworkType(), senderKeyPair.getPrivateKey(),
                 recipientKeyPair.getPublicKey()
             ).maxFee(this.maxFee).build();
 
         TransferTransaction processed = announceAndValidate(type, account, transferTransaction);
 
-        assertPersistentDelegationTransaction(senderKeyPair, recipientKeyPair, processed);
+        assertPersistentDelegationTransaction(recipientKeyPair, processed);
 
         TransferTransaction restTransaction = (TransferTransaction) get(
             getRepositoryFactory(type).createTransactionRepository()
                 .getTransaction(processed.getTransactionInfo().get().getHash().get()));
 
-        assertPersistentDelegationTransaction(senderKeyPair, recipientKeyPair, restTransaction);
+        assertPersistentDelegationTransaction(recipientKeyPair, restTransaction);
     }
 
     private void assertPersistentDelegationTransaction(
-        KeyPair senderKeyPair, KeyPair recipientKeyPair, TransferTransaction transaction) {
-
+        KeyPair recipientKeyPair, TransferTransaction transaction) {
         String message = recipientKeyPair.getPublicKey().toHex();
         Assertions
             .assertTrue(transaction.getMessage() instanceof PersistentHarvestingDelegationMessage);
@@ -208,7 +206,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         Assertions.assertEquals(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,
             transaction.getMessage().getType());
         String decryptedMessage = ((PersistentHarvestingDelegationMessage) transaction.getMessage())
-            .decryptPayload(senderKeyPair.getPublicKey(), recipientKeyPair.getPrivateKey(),
+            .decryptPayload(recipientKeyPair.getPrivateKey(),
                 getNetworkType());
         Assertions.assertNotNull(message, decryptedMessage);
     }

@@ -43,7 +43,8 @@ public class DsaSignerVectorTester extends AbstractVectorTester {
         return Stream.concat(catapultArguments, nis1Arguments);
     }
 
-    private static List<Arguments> extractArguments(SignSchema signSchema, Map<String, String> entry) {
+    private static List<Arguments> extractArguments(SignSchema signSchema,
+        Map<String, String> entry) {
         return Collections
             .singletonList(Arguments.of(
                 signSchema,
@@ -54,19 +55,16 @@ public class DsaSignerVectorTester extends AbstractVectorTester {
                 entry.get("signature")));
     }
 
-
     @ParameterizedTest
     @MethodSource("testSignAll")
-    void testSignAll(SignSchema signSchema,  String privateKey, String publicKey,
+    void testSignAll(SignSchema signSchema, String privateKey, String publicKey,
         String data,
         int length, String signature) {
         final CryptoEngine engine = CryptoEngines.defaultEngine();
 
-        //Reusing vector NIS 1 vector tests by reversing the private key when using SignSchema.KECCAK
         final KeyPair keyPair = KeyPair
             .fromPrivate(
-                PrivateKey.fromHexString(
-                    signSchema == SignSchema.KECCAK ? SignSchema.reverse(privateKey) : privateKey),
+                PrivateKey.fromHexString(privateKey),
                 signSchema);
         final DsaSigner signer = engine.createDsaSigner(keyPair, signSchema);
 
