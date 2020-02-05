@@ -21,7 +21,6 @@ import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.message.PlainMessage;
 import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.mosaic.MosaicId;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.HashLockTransaction;
@@ -56,7 +55,7 @@ public class CreatingAnEscrowContractWithAggregateBondedTransactionIntegrationTe
             getNetworkType(),
             ticketDistributorAccount.getAddress(),
             Collections.singletonList(
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(100))),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(100))),
             PlainMessage.create("send 100 cat.currency to distributor")).maxFee(this.maxFee)
             .build();
 
@@ -85,7 +84,7 @@ public class CreatingAnEscrowContractWithAggregateBondedTransactionIntegrationTe
 
         /* start block 03 */
         HashLockTransaction hashLockTransaction = HashLockTransactionFactory
-            .create(getNetworkType(), NetworkCurrencyMosaic.createRelative(BigInteger.TEN),
+            .create(getNetworkType(), getNetworkCurrency().createRelative(BigInteger.TEN),
                 BigInteger.valueOf(480), signedTransaction).maxFee(this.maxFee).build();
 
         SignedTransaction signedHashLockTransaction = aliceAccount

@@ -22,7 +22,6 @@ import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.transaction.IdGenerator;
 import java.math.BigInteger;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * The mosaic id structure describes mosaic id
@@ -33,7 +32,6 @@ public class MosaicId implements UnresolvedMosaicId {
 
     private final BigInteger id;
 
-    private final Optional<String> fullName;
 
     /**
      * Create MosaicId from mosaic Hex string
@@ -44,7 +42,6 @@ public class MosaicId implements UnresolvedMosaicId {
     public MosaicId(String hex) {
         ConvertUtils.validateIsHexString(hex, 16);
         this.id = new BigInteger(hex, 16);
-        this.fullName = Optional.empty();
     }
 
     /**
@@ -54,7 +51,6 @@ public class MosaicId implements UnresolvedMosaicId {
      */
     public MosaicId(BigInteger id) {
         this.id = id;
-        this.fullName = Optional.empty();
     }
 
     /**
@@ -66,7 +62,6 @@ public class MosaicId implements UnresolvedMosaicId {
     public MosaicId(MosaicNonce mosaicNonce, PublicAccount owner) {
         this.id = IdGenerator
             .generateMosaicId(mosaicNonce.getNonce(), owner.getPublicKey().getBytes());
-        this.fullName = Optional.empty();
     }
 
     /**
@@ -98,15 +93,6 @@ public class MosaicId implements UnresolvedMosaicId {
         return this.id.longValue();
     }
 
-
-    /**
-     * Returns optional mosaic alias full name (ex: nem.xem)
-     *
-     * @return namespace full name
-     */
-    public Optional<String> getFullName() {
-        return fullName;
-    }
 
     /**
      * Compares mosaicIds for equality.

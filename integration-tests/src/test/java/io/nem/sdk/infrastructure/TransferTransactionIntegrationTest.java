@@ -26,7 +26,6 @@ import io.nem.sdk.model.message.Message;
 import io.nem.sdk.model.message.MessageType;
 import io.nem.sdk.model.message.PersistentHarvestingDelegationMessage;
 import io.nem.sdk.model.message.PlainMessage;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
@@ -65,7 +64,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
             TransferTransactionFactory.create(
                 getNetworkType(), recipient,
                 Collections
-                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                    .singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
                 new PlainMessage(message)
             ).maxFee(this.maxFee).build();
 
@@ -99,7 +98,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 recipient,
                 Collections
-                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                    .singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
                 encryptedMessage
             ).maxFee(this.maxFee).build();
 
@@ -135,7 +134,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 recipient,
                 Collections
-                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                    .singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
                 PlainMessage.Empty
             ).maxFee(this.maxFee).build();
 

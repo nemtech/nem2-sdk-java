@@ -23,7 +23,7 @@ import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.message.PlainMessage;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
+import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
@@ -116,7 +116,8 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         Assertions.assertEquals(5L, transaction.getDeadline().getInstant());
         Assertions.assertEquals(BigInteger.valueOf(6L), transaction.getHeight());
         Assertions.assertEquals("Failure_AccountLink_Link_Already_Exists", transaction.getCode());
-        Assertions.assertEquals(transaction.getGroup().getValue(), transactionStatusDTO.getGroup().getValue());
+        Assertions.assertEquals(transaction.getGroup().getValue(),
+            transactionStatusDTO.getGroup().getValue());
     }
 
     @Test
@@ -141,7 +142,8 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         Assertions.assertEquals(5L, transaction.getDeadline().getInstant());
         Assertions.assertEquals(BigInteger.valueOf(6L), transaction.getHeight());
         Assertions.assertEquals("Failure_AccountLink_Link_Already_Exists", transaction.getCode());
-        Assertions.assertEquals(transaction.getGroup().getValue(), transactionStatusDTO.getGroup().getValue());
+        Assertions.assertEquals(transaction.getGroup().getValue(),
+            transactionStatusDTO.getGroup().getValue());
     }
 
 
@@ -176,9 +178,7 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
 
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
-                address,
-                Collections
-                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                address, Collections.singletonList(createAbsolute(BigInteger.valueOf(1))),
                 new PlainMessage("E2ETest:standaloneTransferTransaction:message")
             ).build();
 
@@ -186,6 +186,11 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         String payload = signedTransaction.getPayload();
         assertEquals(444, payload.length());
         return signedTransaction;
+    }
+
+    protected io.nem.sdk.model.mosaic.Mosaic createAbsolute(BigInteger amount) {
+        return new io.nem.sdk.model.mosaic.Mosaic(NamespaceId.createFromName("cat.currency"),
+            amount);
     }
 
     @Test

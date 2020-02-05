@@ -1,5 +1,5 @@
 {
-  "apiUrl": "http://localhost:3001",
+  "apiUrl": "http://localhost:3000",
   "timeoutSeconds": 120,
   "testAccount": {
     "privateKey": "D9C23EDDC694D81107E6BB0B2AAB6E3C22C0C59F128F1B8FE0A1094736960074",

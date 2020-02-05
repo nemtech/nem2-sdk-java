@@ -19,6 +19,9 @@ package io.nem.sdk.infrastructure.vertx;
 import io.nem.catapult.builders.GeneratorUtils;
 import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.api.RepositoryFactory;
+import io.nem.sdk.api.RepositoryFactoryConfiguration;
+import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.mosaic.NetworkCurrency;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -68,17 +71,39 @@ public class RepositoryFactoryVertxImplTest {
     }
 
     @Test
+    public void getUserProvidedConfiguration () throws Exception {
+        String baseUrl = "https://localhost:1934/path";
+        RepositoryFactoryConfiguration configuration = new RepositoryFactoryConfiguration(baseUrl);
+        configuration.withGenerationHash("abc");
+        configuration.withNetworkType(NetworkType.MAIN_NET);
+        configuration.withNetworkCurrency(NetworkCurrency.CAT_CURRENCY);
+        configuration.withHarvestCurrency(NetworkCurrency.CAT_HARVEST);
+
+        RepositoryFactory factory = new RepositoryFactoryVertxImpl(configuration);
+
+        Assertions.assertEquals(configuration.getNetworkType(),
+            factory.getNetworkType().toFuture().get());
+
+        Assertions.assertEquals(configuration.getGenerationHash(),
+            factory.getGenerationHash().toFuture().get());
+
+        Assertions.assertEquals(configuration.getHarvestCurrency(),
+            factory.getHarvestCurrency().toFuture().get());
+
+        Assertions.assertEquals(configuration.getNetworkCurrency(),
+            factory.getNetworkCurrency().toFuture().get());
+    }
+
+    @Test
     public void getGenerationHashFailWhenInvalidServer() {
         String baseUrl = "https://localhost:1934/path";
 
         RepositoryCallException e = Assertions.assertThrows(RepositoryCallException.class,
             () -> GeneratorUtils.propagate(
-                () -> new RepositoryFactoryVertxImpl(baseUrl).getGenerationHash().toFuture()
-                    .get()));
+                () -> new RepositoryFactoryVertxImpl(baseUrl).getNetworkType().toFuture().get()));
 
         Assertions.assertTrue(
             e.getMessage().contains("ApiException: Connection refused"));
-
     }
 
 }

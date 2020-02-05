@@ -19,7 +19,6 @@ package io.nem.sdk.infrastructure;
 import io.nem.core.crypto.Hashes;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.LockHashAlgorithmType;
 import io.nem.sdk.model.transaction.SecretLockTransaction;
 import io.nem.sdk.model.transaction.SecretLockTransactionFactory;
@@ -46,7 +45,7 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
         Address recipient = config().getTestAccount2().getAddress();
         SecretLockTransaction secretLockTransaction =
             SecretLockTransactionFactory.create(getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,
@@ -66,7 +65,7 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
         SecretLockTransaction transaction =
             SecretLockTransactionFactory.create(
                 getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,
@@ -88,7 +87,7 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
         SecretLockTransaction secretLockTransaction =
             SecretLockTransactionFactory.create(
                 getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,
@@ -119,7 +118,7 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
         SecretLockTransaction secretLockTransaction =
             SecretLockTransactionFactory.create(
                 getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,

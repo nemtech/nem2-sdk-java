@@ -30,14 +30,12 @@ import io.nem.sdk.api.NetworkRepository;
 import io.nem.sdk.api.NodeRepository;
 import io.nem.sdk.api.ReceiptRepository;
 import io.nem.sdk.api.RepositoryFactory;
+import io.nem.sdk.api.RepositoryFactoryConfiguration;
 import io.nem.sdk.api.RestrictionAccountRepository;
 import io.nem.sdk.api.RestrictionMosaicRepository;
 import io.nem.sdk.api.TransactionRepository;
-import io.nem.sdk.model.blockchain.BlockInfo;
-import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.infrastructure.RepositoryFactoryBase;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
-import io.reactivex.Observable;
-import java.math.BigInteger;
 import okhttp3.OkHttpClient;
 import org.apache.commons.io.IOUtils;
 
@@ -47,35 +45,21 @@ import org.apache.commons.io.IOUtils;
  * @author Fernando Boucquez
  */
 
-public class RepositoryFactoryOkHttpImpl implements RepositoryFactory {
+public class RepositoryFactoryOkHttpImpl extends RepositoryFactoryBase {
 
 
     private final ApiClient apiClient;
 
-    private final String baseUrl;
-
-    private final Observable<NetworkType> networkTypeObservable;
-
-    private final Observable<String> generationHashObservable;
 
     public RepositoryFactoryOkHttpImpl(String baseUrl) {
-        this.baseUrl = baseUrl;
+        this(new RepositoryFactoryConfiguration(baseUrl));
+    }
+
+    public RepositoryFactoryOkHttpImpl(RepositoryFactoryConfiguration configuration) {
+        super(configuration);
         this.apiClient = new ApiClient();
-        this.apiClient.setBasePath(baseUrl);
+        this.apiClient.setBasePath(getBaseUrl());
         this.apiClient.getJSON().setGson(JsonHelperGson.creatGson(false));
-        this.networkTypeObservable = createNetworkRepository().getNetworkType().cache();
-        this.generationHashObservable = createBlockRepository().getBlockByHeight(BigInteger.ONE)
-            .map(BlockInfo::getGenerationHash).cache();
-    }
-
-    @Override
-    public Observable<NetworkType> getNetworkType() {
-        return networkTypeObservable;
-    }
-
-    @Override
-    public Observable<String> getGenerationHash() {
-        return generationHashObservable;
     }
 
     @Override
@@ -150,7 +134,7 @@ public class RepositoryFactoryOkHttpImpl implements RepositoryFactory {
 
     @Override
     public Listener createListener() {
-        return new ListenerOkHttp(apiClient.getHttpClient(), baseUrl, apiClient.getJSON());
+        return new ListenerOkHttp(apiClient.getHttpClient(), getBaseUrl(), apiClient.getJSON());
     }
 
     @Override

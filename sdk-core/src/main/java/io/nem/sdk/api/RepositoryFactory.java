@@ -17,6 +17,7 @@
 package io.nem.sdk.api;
 
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.mosaic.NetworkCurrency;
 import io.reactivex.Observable;
 import java.io.Closeable;
 
@@ -28,17 +29,6 @@ import java.io.Closeable;
  */
 public interface RepositoryFactory extends Closeable {
 
-    /**
-     * @return the network type of the network. This method is cached, the server is only called the
-     * first time if necessary.
-     */
-    Observable<NetworkType> getNetworkType();
-
-    /**
-     * @return the generation hash used to sign transactions. Value retrieved from the block/1
-     * endpoint. This method is cached, the server is only called the first time.
-     */
-    Observable<String> getGenerationHash();
 
     /**
      * @return a newly created {@link AccountRepository}
@@ -126,4 +116,40 @@ public interface RepositoryFactory extends Closeable {
      */
     void close();
 
+    /**
+     * @return the network type of the network. It uses the user configured network type if
+     * provided, if not, the value will be resolved from the server. This method is cached, the
+     * server is only called the first time if necessary.
+     * @see RepositoryFactoryConfiguration
+     */
+    Observable<NetworkType> getNetworkType();
+
+    /**
+     * @return the generation hash used to sign transactions.  It uses the user configured
+     * generation hash if provided, if not, the value will be resolved from the server. Value
+     * retrieved from the block/1 endpoint. This method is cached, the server is only called the
+     * first time.
+     * @see RepositoryFactoryConfiguration
+     */
+    Observable<String> getGenerationHash();
+
+    /**
+     * @return the configured network currency configuration like "cat.harvest", "nem.xem " and
+     * "symbol.xym". This method uses the user configured properties if provided. If it's not
+     * provided, it resolves the configuration by querying block 1 transactions. This method is
+     * cached, the server is only called the first time.
+     * @see NetworkCurrencyService
+     * @see RepositoryFactoryConfiguration
+     */
+    Observable<NetworkCurrency> getNetworkCurrency();
+
+    /**
+     * @return the configured harvest currency configuration like "cat.harvest". This method uses
+     * the user configured properties if provided. If it's not provided, it resolves the
+     * configuration by querying block 1 transactions. This method is cached, the server is only
+     * called the first time. The network currency configuration
+     * @see NetworkCurrencyService
+     * @see RepositoryFactoryConfiguration
+     */
+    Observable<NetworkCurrency> getHarvestCurrency();
 }

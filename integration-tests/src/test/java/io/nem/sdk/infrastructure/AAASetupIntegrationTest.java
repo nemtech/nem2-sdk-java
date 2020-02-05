@@ -24,7 +24,6 @@ import io.nem.sdk.model.account.AccountInfo;
 import io.nem.sdk.model.account.MultisigAccountInfo;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.message.PlainMessage;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.HashLockTransactionFactory;
@@ -145,7 +144,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
 
         SignedTransaction signedHashLocktransaction = HashLockTransactionFactory.create(
             getNetworkType(),
-            NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+            getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
             BigInteger.valueOf(100),
             signedAggregateTransaction)
             .maxFee(this.maxFee).build().signWith(multisigAccount, getGenerationHash());
@@ -174,7 +173,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
             TransferTransactionFactory.create(
                 getNetworkType(),
                 recipient.getAddress(),
-                Collections.singletonList(NetworkCurrencyMosaic.createAbsolute(amount)),
+                Collections.singletonList(getNetworkCurrency().createAbsolute(amount)),
                 new PlainMessage("E2ETest:SetUpAccountsTool")
             );
 
