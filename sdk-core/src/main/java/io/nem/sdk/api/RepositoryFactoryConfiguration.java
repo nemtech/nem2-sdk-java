@@ -20,18 +20,40 @@ import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.NetworkCurrency;
 
 /**
- * This beans
+ * This bean helps the user to create {@link RepositoryFactory}.
+ *
+ * The only required attribute is the network base url. If the user knows the other values, they can
+ * be provided to allow a better offline capability. If the values are not provided, the {@link
+ * RepositoryFactory} will load and cache them using the repositories
+ *
+ * @see RepositoryFactory
+ * @see io.nem.sdk.infrastructure.RepositoryFactoryBase
  */
 public class RepositoryFactoryConfiguration {
 
+    /**
+     * The required base url of the network.
+     */
     private final String baseUrl;
 
+    /**
+     * The known network type. If not provided, the value will be retrieved from rest.
+     */
     private NetworkType networkType;
 
+    /**
+     * The known generation hash. If not provided, the value will be retrieved from rest.
+     */
     private String generationHash;
 
+    /**
+     * The known network currency. If not provided, the value will be retrieved from rest.
+     */
     private NetworkCurrency networkCurrency;
 
+    /**
+     * The known harvest currency. If not provided, the value will be retrieved from rest.
+     */
     private NetworkCurrency harvestCurrency;
 
     public RepositoryFactoryConfiguration(String baseUrl) {

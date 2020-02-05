@@ -20,8 +20,19 @@ import io.nem.sdk.model.mosaic.NetworkCurrency;
 import io.reactivex.Observable;
 import java.util.List;
 
+/**
+ * Service related to network currencies.
+ */
 public interface NetworkCurrencyService {
 
+    /**
+     * This method returns the list of {@link NetworkCurrency} found in block 1.
+     *
+     * The intent of this method is to resolve the configured main (like cat.currency or symbol.xym)
+     * and harvest currencies (cat.harvest). More currencies may be defined in the block one.
+     *
+     * @return the list of {@link NetworkCurrency} found in block 1.
+     */
     Observable<List<NetworkCurrency>> getNetworkCurrencies();
 
 }

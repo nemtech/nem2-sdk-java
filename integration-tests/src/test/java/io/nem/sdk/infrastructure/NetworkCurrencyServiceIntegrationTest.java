@@ -44,5 +44,10 @@ public class NetworkCurrencyServiceIntegrationTest extends BaseIntegrationTest {
         Assertions.assertTrue(mosaicConfigurations.size() > 0);
         Assertions.assertTrue(mosaicConfigurations.size() < 3);
 
+        Assertions
+            .assertTrue(mosaicConfigurations.contains(get(repositoryFactory.getNetworkCurrency())));
+        Assertions
+            .assertTrue(mosaicConfigurations.contains(get(repositoryFactory.getHarvestCurrency())));
+
     }
 }

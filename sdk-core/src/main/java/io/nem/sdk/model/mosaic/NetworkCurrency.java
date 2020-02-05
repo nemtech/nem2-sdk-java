@@ -24,21 +24,40 @@ import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 
 /**
+ * This object holds the configuration of a given currency. The configuration can be provided by
+ * user (offline work) or loaded via rest (online work, currently using block/1 transaction).
  *
+ * Some commonly used and known instances are also provided statically if the user wants to work
+ * offline.
+ *
+ * Objects of this class are created using the {@link NetworkCurrencyBuilder} and they are thread
+ * safe and immutable.
+ *
+ * @see io.nem.sdk.api.NetworkCurrencyService
+ * @see io.nem.sdk.api.RepositoryFactory
+ * @see io.nem.sdk.infrastructure.RepositoryFactoryBase
+ * @see NetworkCurrencyBuilder
  */
 public class NetworkCurrency {
 
+    /**
+     * The original public bootstrap network currency.
+     */
     public static final NetworkCurrency CAT_CURRENCY = new NetworkCurrencyBuilder(
         NamespaceId.createFromName("cat.currency"), 6)
         .withInitialSupply(BigInteger.valueOf(8999999999L)).withSupplyMutable(false)
         .withTransferable(true).build();
-
+    /**
+     * The original public bootstrap havest currency.
+     */
     public static final NetworkCurrency CAT_HARVEST = new NetworkCurrencyBuilder(
         NamespaceId.createFromName("cat.harvest"), 3)
         .withInitialSupply(BigInteger.valueOf(15000000)).withSupplyMutable(true)
         .withTransferable(true).build();
 
-
+    /**
+     * The new public network currency.
+     */
     public static final NetworkCurrency SYMBOL_XYM = new NetworkCurrencyBuilder(
         NamespaceId.createFromName("symbol.xym"), 6)
         .withInitialSupply(BigInteger.valueOf(7831975436000000L)).withSupplyMutable(false)
@@ -46,35 +65,43 @@ public class NetworkCurrency {
 
     /**
      * The selected unresolved mosaic id used when creating {@link Mosaic}. This could either be the
-     * Namespace or the Mosaic id of the
+     * Namespace or the Mosaic id.
      */
     private final UnresolvedMosaicId unresolvedMosaicId;
 
     /**
-     * Namespace id of `currency` namespace.
+     * Mosaic id of this currency. This value is optional if the user only wants to provide the
+     * mosaic id. This value will be set if it's loaded by rest.
      */
     private final Optional<MosaicId> mosaicId;
     /**
-     * Namespace id of `currency` namespace.
+     * The Namespace id of this currency. This value is option if the user only wants to provide the
+     * namespace id. This value will be set if it's loaded by rest.
      */
     private final Optional<NamespaceId> namespaceId;
     /**
-     * Divisibility
+     * Divisibility of this currency, required to create Mosaic from relative amounts.
      */
     private final int divisibility;
     /**
-     * Initial supply
+     * Initial supply of this currency.
      */
     private final BigInteger initialSupply;
     /**
-     * Is transferable
+     * Is this currency transferable.
      */
     private final boolean transferable;
     /**
-     * Is supply mutable
+     * Is this currency supply mutable.
      */
     private final boolean supplyMutable;
 
+    /**
+     * User would create these objects using the builder.
+     *
+     * @param builder the builder.
+     * @see io.nem.sdk.model.blockchain.NetworkType
+     */
     NetworkCurrency(NetworkCurrencyBuilder builder) {
         Validate.notNull(builder, "builder must not be null");
         this.unresolvedMosaicId = builder.getUnresolvedMosaicId();

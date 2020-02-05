@@ -37,14 +37,36 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Implementation of {@link NetworkCurrencyService}
+ */
 public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
 
+    /**
+     * The {@link BlockRepository} used to load the block 1 transactions.
+     */
     private final BlockRepository blockRepository;
 
+    /**
+     * Constructor.
+     *
+     * @param repositoryFactory the repository factory.
+     */
     public NetworkCurrencyServiceImpl(RepositoryFactory repositoryFactory) {
         this.blockRepository = repositoryFactory.createBlockRepository();
     }
 
+    /*
+     * Implementation of the interface getNetworkCurrencies.
+     *
+     * TODO: ATM, rest endpoints doesn't allow proper pagination nor loading transaction per
+     * transaction type. We are just loading the first page, if there are many transaction in block
+     * 1, some of them related to currencies may not be there and the {@link NetworkCurrency} may be
+     * incomplete.
+     *
+     * TODO: If block 1 has 1000s of transactions, this method may not be very efficient. Ideally we
+     * would only load the transaction of a given type signed by the nemesis account.
+     */
     @Override
     public Observable<List<NetworkCurrency>> getNetworkCurrencies() {
         return this.blockRepository.getBlockTransactions(BigInteger.ONE).map(transactions -> {
@@ -74,9 +96,9 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
                     return mosaicAliasTransactions
                         .stream()
                         .map(mosaicAliasTransaction -> getNetworkCurrency(
-                            namespaceRegistrations,
-                            mosaicSupplyChanges, mosaicTransaction,
-                            mosaicAliasTransaction)).filter(Optional::isPresent).map(Optional::get);
+                            mosaicTransaction, mosaicAliasTransaction, mosaicSupplyChanges,
+                            namespaceRegistrations
+                        )).filter(Optional::isPresent).map(Optional::get);
 
                 });
             return streamStream.flatMap(Function.identity())
@@ -84,14 +106,27 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
         });
     }
 
+    /**
+     * This method tries to {@link NetworkCurrency} from the original {@link
+     * MosaicDefinitionTransaction} and {@link MosaicAliasTransaction}.
+     *
+     * @param mosaicTransaction the original mosiac transaction
+     * @param mosaicAliasTransaction the original mosaic alias transaction used to know the
+     * mosaic/currency namespace
+     * @param mosaicSupplyChanges the list of supply changes used to resolve the currency original
+     * supply
+     * @param namespaceRegistrations the list of namespace registration used to resolve the
+     * mosaic/currency full name
+     * @return the {@link NetworkCurrency} if it can be resolved.
+     */
     private Optional<NetworkCurrency> getNetworkCurrency(
-        List<NamespaceRegistrationTransaction> namespaceRegistrations,
-        List<MosaicSupplyChangeTransaction> mosaicSupplyChanges,
         MosaicDefinitionTransaction mosaicTransaction,
-        MosaicAliasTransaction mosaicAliasTransaction) {
+        MosaicAliasTransaction mosaicAliasTransaction,
+        List<MosaicSupplyChangeTransaction> mosaicSupplyChanges,
+        List<NamespaceRegistrationTransaction> namespaceRegistrations) {
         MosaicId mosaicId = mosaicAliasTransaction.getMosaicId();
 
-        Optional<String> namespaceNameOptional = getNemesisMosaicNamespaceName(
+        Optional<String> namespaceNameOptional = getNamespaceFullName(
             namespaceRegistrations,
             mosaicAliasTransaction.getNamespaceId());
         return namespaceNameOptional
@@ -120,20 +155,38 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
             });
     }
 
-    private Optional<String> getNemesisMosaicNamespaceName(
-        List<NamespaceRegistrationTransaction> transactions, NamespaceId subNamespaceId) {
-        Optional<NamespaceRegistrationTransaction> childNamespaceOptional = transactions.stream()
-            .filter(
-                tx -> tx.getNamespaceRegistrationType() == NamespaceRegistrationType.SUB_NAMESPACE
-                    && tx.getNamespaceId().equals(subNamespaceId)).findFirst();
+    /**
+     * This method resolves the full name of a leaf namespace if possible. It used the completed
+     * {@link NamespaceRegistrationTransaction} and creates the full name recursively from button
+     * (leaf) up (root)
+     *
+     * @param transactions the {@link NamespaceRegistrationTransaction} list
+     * @param namespaceId the leaf namespace.
+     * @return the full name of the namespace if all the parents namespace can be resolved.
+     */
+    private Optional<String> getNamespaceFullName(
+        List<NamespaceRegistrationTransaction> transactions, NamespaceId namespaceId) {
+        //If the fullname is already in the NamespaceId, we can shortcut the processing.
+        if (namespaceId.getFullName().isPresent()) {
+            return namespaceId.getFullName();
+        }
+        Optional<NamespaceRegistrationTransaction> namespaceOptional = transactions.stream()
+            .filter(tx -> tx.getNamespaceId().equals(namespaceId)).findFirst();
+        return namespaceOptional.flatMap(childNamespace -> {
+            if (childNamespace.getNamespaceRegistrationType()
+                == NamespaceRegistrationType.ROOT_NAMESPACE) {
+                return Optional.of(childNamespace.getNamespaceName());
+            } else {
+                return childNamespace.getParentId().flatMap(parentId -> {
+                    Optional<String> parentNamespaceName = getNamespaceFullName(
+                        transactions, parentId);
+                    return parentNamespaceName.map(
+                        parentNamespace -> parentNamespaceName + "." + childNamespace
+                            .getNamespaceName());
+                });
+            }
+        });
 
-        return childNamespaceOptional.flatMap(childNamespace -> childNamespace.getParentId()
-            .flatMap(expectedParentId -> transactions.stream().filter(
-                tx -> tx.getNamespaceRegistrationType()
-                    == NamespaceRegistrationType.ROOT_NAMESPACE && tx.getNamespaceId()
-                    .equals(expectedParentId)).findFirst()
-                .map(parentNamespace -> parentNamespace.getNamespaceName() + "." + childNamespace
-                    .getNamespaceName())));
 
     }
 }

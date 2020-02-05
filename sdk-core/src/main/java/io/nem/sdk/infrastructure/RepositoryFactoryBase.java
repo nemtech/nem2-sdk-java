@@ -87,6 +87,7 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
                 if (cs.isEmpty()) {
                     throw new IllegalStateException("No currency could be found in the network.");
                 }
+                //TODO improve how the network currency is resolved from the known list of block 1 network currencies.
                 return cs.stream().filter(c -> !c.isSupplyMutable()).findFirst()
                     .orElse(cs.iterator().next());
             }));
@@ -97,6 +98,7 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
                 if (cs.isEmpty()) {
                     throw new IllegalStateException("No currency could be found in the network.");
                 }
+                //TODO improve how the harvest currency is resolved from the known list of block 1 network currencies.
                 return cs.stream().filter(NetworkCurrency::isSupplyMutable).findFirst()
                     .orElse(cs.iterator().next());
             }));
