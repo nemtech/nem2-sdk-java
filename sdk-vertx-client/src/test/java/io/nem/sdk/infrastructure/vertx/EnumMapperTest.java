@@ -26,6 +26,7 @@ import io.nem.sdk.model.message.MessageType;
 import io.nem.sdk.model.mosaic.MosaicSupplyChangeActionType;
 import io.nem.sdk.model.namespace.AliasAction;
 import io.nem.sdk.model.namespace.NamespaceRegistrationType;
+import io.nem.sdk.model.node.RoleType;
 import io.nem.sdk.model.receipt.ReceiptType;
 import io.nem.sdk.model.restriction.MosaicRestrictionEntryType;
 import io.nem.sdk.model.transaction.AccountLinkAction;
@@ -45,6 +46,7 @@ import io.nem.sdk.openapi.vertx.model.MosaicRestrictionTypeEnum;
 import io.nem.sdk.openapi.vertx.model.MosaicSupplyChangeActionEnum;
 import io.nem.sdk.openapi.vertx.model.NamespaceRegistrationTypeEnum;
 import io.nem.sdk.openapi.vertx.model.ReceiptTypeEnum;
+import io.nem.sdk.openapi.vertx.model.RolesTypeEnum;
 import io.nem.sdk.openapi.vertx.model.TransactionStateTypeEnum;
 import io.nem.sdk.openapi.vertx.model.TransactionTypeEnum;
 import java.util.Arrays;
@@ -450,5 +452,21 @@ public class EnumMapperTest {
 
     }
 
+    @ParameterizedTest
+    @EnumSource(RoleType.class)
+    void validFromRoleType(RoleType roleType) {
+        Assertions.assertNotNull(RolesTypeEnum.fromValue(roleType.getValue()));
+        Assertions
+            .assertEquals(RolesTypeEnum.fromValue(roleType.getValue()).getValue(),
+                roleType.getValue());
+    }
 
+    @ParameterizedTest
+    @EnumSource(RolesTypeEnum.class)
+    void validRoleTypeEnum(RolesTypeEnum rolesType) {
+        Assertions.assertNotNull(RoleType.rawValueOf(rolesType.getValue()));
+        Assertions
+            .assertEquals(RolesTypeEnum.fromValue(rolesType.getValue()).getValue(),
+                rolesType.getValue());
+    }
 }
