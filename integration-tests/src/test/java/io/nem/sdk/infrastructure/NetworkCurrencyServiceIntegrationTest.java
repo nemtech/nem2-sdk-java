@@ -50,4 +50,6 @@ public class NetworkCurrencyServiceIntegrationTest extends BaseIntegrationTest {
             .assertTrue(mosaicConfigurations.contains(get(repositoryFactory.getHarvestCurrency())));
 
     }
+
+
 }
