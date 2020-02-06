@@ -19,7 +19,8 @@ import java.util.Arrays;
 
 public enum RoleType {
     PEER_NODE(1),
-    API_NODE(2);
+    API_NODE(2),
+    DUAL_NODE(3);
 
     private final int value;
 
