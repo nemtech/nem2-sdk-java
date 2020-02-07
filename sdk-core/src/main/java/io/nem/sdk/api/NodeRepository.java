@@ -39,7 +39,7 @@ public interface NodeRepository {
     Observable<NodeTime> getNodeTime();
 
     /**
-     * Gets blockchain storage info.
+     * Gets node storage info.
      *
      * @return Observable of {@link StorageInfo}
      */
@@ -53,7 +53,7 @@ public interface NodeRepository {
     Observable<NodeHealth> getNodeHealth();
 
     /**
-     * Gets blockchain server info.
+     * Gets node server info.
      *
      * @return {@link Observable} of ServerInfo
      */
