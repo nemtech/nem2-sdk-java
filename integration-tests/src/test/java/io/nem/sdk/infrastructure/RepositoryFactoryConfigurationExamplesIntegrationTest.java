@@ -31,11 +31,17 @@ import io.nem.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+
+/**
+ * Samples about how to create repository factories.
+ */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class RepositoryFactoryConfigurationExamplesIntegrationTest extends BaseIntegrationTest {
+@Disabled
+public class RepositoryFactoryConfigurationExamplesIntegrationTest {
 
     @Test
     void bootAppFullyOffline() throws ExecutionException, InterruptedException {
@@ -49,13 +55,13 @@ public class RepositoryFactoryConfigurationExamplesIntegrationTest extends BaseI
             new NetworkCurrencyBuilder(NamespaceId.createFromName("my.custom.currency"), 6)
                 .build());
 
-        configuration.withNetworkCurrency(
+        configuration.withHarvestCurrency(
             new NetworkCurrencyBuilder(NamespaceId.createFromName("my.custom.harvest"), 3)
                 .build());
 
-        RepositoryFactory repositoryFactory = new RepositoryFactoryVertxImpl(configuration);
-
-        appDoSomeStuff(repositoryFactory);
+        try (RepositoryFactory repositoryFactory = new RepositoryFactoryVertxImpl(configuration)) {
+            appDoSomeStuff(repositoryFactory);
+        }
     }
 
     @Test
@@ -64,9 +70,10 @@ public class RepositoryFactoryConfigurationExamplesIntegrationTest extends BaseI
         //Option 2) Client app boot time relaying on the rest configuration:
         RepositoryFactoryConfiguration configuration = new RepositoryFactoryConfiguration(
             "http://localhost:3000/");
-        RepositoryFactory repositoryFactory = new RepositoryFactoryVertxImpl(configuration);
 
-        appDoSomeStuff(repositoryFactory);
+        try (RepositoryFactory repositoryFactory = new RepositoryFactoryVertxImpl(configuration)) {
+            appDoSomeStuff(repositoryFactory);
+        }
     }
 
 
@@ -80,9 +87,9 @@ public class RepositoryFactoryConfigurationExamplesIntegrationTest extends BaseI
         configuration.withNetworkCurrency(NetworkCurrency.CAT_CURRENCY);
         configuration.withHarvestCurrency(NetworkCurrency.CAT_HARVEST);
 
-        RepositoryFactory repositoryFactory = new RepositoryFactoryVertxImpl(configuration);
-
-        appDoSomeStuff(repositoryFactory);
+        try (RepositoryFactory repositoryFactory = new RepositoryFactoryVertxImpl(configuration)) {
+            appDoSomeStuff(repositoryFactory);
+        }
     }
 
     public void appDoSomeStuff(RepositoryFactory repositoryFactory)

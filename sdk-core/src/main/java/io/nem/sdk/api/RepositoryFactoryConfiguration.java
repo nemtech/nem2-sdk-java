@@ -56,9 +56,63 @@ public class RepositoryFactoryConfiguration {
      */
     private NetworkCurrency harvestCurrency;
 
+    /**
+     * It creates a basic configuration with the required base url.
+     *
+     * @param baseUrl the base url.
+     */
     public RepositoryFactoryConfiguration(String baseUrl) {
         this.baseUrl = baseUrl;
     }
+
+    /**
+     * Helper method to setup the networkType when don't want to load it using rest.
+     *
+     * @param networkType the networkType
+     * @return this configuration.
+     */
+    public RepositoryFactoryConfiguration withNetworkType(NetworkType networkType) {
+        this.networkType = networkType;
+        return this;
+    }
+
+    /**
+     * Helper method to setup the main {@link NetworkCurrency} when don't want to load it using
+     * rest.
+     *
+     * @param networkCurrency the main {@link NetworkCurrency}
+     * @return this configuration.
+     */
+    public RepositoryFactoryConfiguration withNetworkCurrency(
+        NetworkCurrency networkCurrency) {
+        this.networkCurrency = networkCurrency;
+        return this;
+    }
+
+    /**
+     * Helper method to setup the generationHash when don't want to load it using rest.
+     *
+     * @param generationHash the generationHash
+     * @return this configuration.
+     */
+    public RepositoryFactoryConfiguration withGenerationHash(String generationHash) {
+        this.generationHash = generationHash;
+        return this;
+    }
+
+    /**
+     * Helper method to setup the harvest {@link NetworkCurrency} when don't want to load it using
+     * rest.
+     *
+     * @param harvestCurrency the harvest {@link NetworkCurrency}
+     * @return this configuration.
+     */
+    public RepositoryFactoryConfiguration withHarvestCurrency(
+        NetworkCurrency harvestCurrency) {
+        this.harvestCurrency = harvestCurrency;
+        return this;
+    }
+
 
     public String getBaseUrl() {
         return baseUrl;
@@ -96,28 +150,5 @@ public class RepositoryFactoryConfiguration {
     public void setHarvestCurrency(
         NetworkCurrency harvestCurrency) {
         this.harvestCurrency = harvestCurrency;
-    }
-
-
-    public RepositoryFactoryConfiguration withNetworkType(NetworkType networkType) {
-        this.networkType = networkType;
-        return this;
-    }
-
-    public RepositoryFactoryConfiguration withNetworkCurrency(
-        NetworkCurrency networkCurrency) {
-        this.networkCurrency = networkCurrency;
-        return this;
-    }
-
-    public RepositoryFactoryConfiguration withGenerationHash(String generationHash) {
-        this.generationHash = generationHash;
-        return this;
-    }
-
-    public RepositoryFactoryConfiguration withHarvestCurrency(
-        NetworkCurrency harvestCurrency) {
-        this.harvestCurrency = harvestCurrency;
-        return this;
     }
 }
