@@ -38,7 +38,6 @@ public class RepositoryFactoryVertxImplTest {
         Assertions.assertNotNull(factory.createBlockRepository());
         Assertions.assertNotNull(factory.createReceiptRepository());
         Assertions.assertNotNull(factory.createChainRepository());
-        Assertions.assertNotNull(factory.createDiagnosticRepository());
         Assertions.assertNotNull(factory.createListener());
         Assertions.assertNotNull(factory.createMosaicRepository());
         Assertions.assertNotNull(factory.createNamespaceRepository());

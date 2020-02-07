@@ -26,6 +26,7 @@ import io.nem.sdk.model.message.MessageType;
 import io.nem.sdk.model.mosaic.MosaicSupplyChangeActionType;
 import io.nem.sdk.model.namespace.AliasAction;
 import io.nem.sdk.model.namespace.NamespaceRegistrationType;
+import io.nem.sdk.model.node.NodeStatus;
 import io.nem.sdk.model.node.RoleType;
 import io.nem.sdk.model.receipt.ReceiptType;
 import io.nem.sdk.model.restriction.MosaicRestrictionEntryType;
@@ -45,6 +46,7 @@ import io.nem.sdk.openapi.vertx.model.MosaicRestrictionEntryTypeEnum;
 import io.nem.sdk.openapi.vertx.model.MosaicRestrictionTypeEnum;
 import io.nem.sdk.openapi.vertx.model.MosaicSupplyChangeActionEnum;
 import io.nem.sdk.openapi.vertx.model.NamespaceRegistrationTypeEnum;
+import io.nem.sdk.openapi.vertx.model.NodeStatusEnum;
 import io.nem.sdk.openapi.vertx.model.ReceiptTypeEnum;
 import io.nem.sdk.openapi.vertx.model.RolesTypeEnum;
 import io.nem.sdk.openapi.vertx.model.TransactionStateTypeEnum;
@@ -469,4 +471,24 @@ public class EnumMapperTest {
             .assertEquals(RolesTypeEnum.fromValue(rolesType.getValue()).getValue(),
                 rolesType.getValue());
     }
+
+    @ParameterizedTest
+    @EnumSource(NodeStatus.class)
+    void validFromNodeStatus(NodeStatus nodeStatus) {
+        Assertions.assertNotNull(NodeStatusEnum.fromValue(nodeStatus.getValue()));
+        Assertions
+            .assertEquals(NodeStatusEnum.fromValue(nodeStatus.getValue()).getValue(),
+                nodeStatus.getValue());
+    }
+
+    @ParameterizedTest
+    @EnumSource(NodeStatusEnum.class)
+    void validNodeStatusEnum(NodeStatusEnum rolesType) {
+        Assertions.assertNotNull(NodeStatus.rawValueOf(rolesType.getValue()));
+        Assertions
+            .assertEquals(NodeStatusEnum.fromValue(rolesType.getValue()).getValue(),
+                rolesType.getValue());
+    }
+
+
 }

@@ -20,13 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-class BlockchainStorageInfoTest {
+class StorageInfoTest {
 
     @Test
-    void createANewBlockchainStorageInfo() {
-        BlockchainStorageInfo blockchainStorageInfo = new BlockchainStorageInfo(1L, 2L, 3L);
-        assertEquals(1L, (long) blockchainStorageInfo.getNumAccounts());
-        assertEquals(2L, (long) blockchainStorageInfo.getNumBlocks());
-        assertEquals(3L, (long) blockchainStorageInfo.getNumTransactions());
+    void createStorageInfo() {
+        StorageInfo storageInfo = new StorageInfo(1L, 2L, 3L);
+        assertEquals(1L, (long) storageInfo.getNumAccounts());
+        assertEquals(2L, (long) storageInfo.getNumBlocks());
+        assertEquals(3L, (long) storageInfo.getNumTransactions());
     }
 }

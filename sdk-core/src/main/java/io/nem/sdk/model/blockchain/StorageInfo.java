@@ -21,13 +21,13 @@ package io.nem.sdk.model.blockchain;
  *
  * @since 1.0
  */
-public class BlockchainStorageInfo {
+public class StorageInfo {
 
     private final Long numAccounts;
     private final Long numBlocks;
     private final Long numTransactions;
 
-    public BlockchainStorageInfo(Long numAccounts, Long numBlocks, Long numTransactions) {
+    public StorageInfo(Long numAccounts, Long numBlocks, Long numTransactions) {
         this.numAccounts = numAccounts;
         this.numBlocks = numBlocks;
         this.numTransactions = numTransactions;

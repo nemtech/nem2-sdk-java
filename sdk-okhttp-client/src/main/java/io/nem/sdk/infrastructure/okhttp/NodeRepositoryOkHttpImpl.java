@@ -18,13 +18,21 @@ package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.sdk.api.NodeRepository;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.blockchain.ServerInfo;
+import io.nem.sdk.model.blockchain.StorageInfo;
+import io.nem.sdk.model.node.NodeHealth;
 import io.nem.sdk.model.node.NodeInfo;
+import io.nem.sdk.model.node.NodeStatus;
 import io.nem.sdk.model.node.NodeTime;
 import io.nem.sdk.model.node.RoleType;
 import io.nem.sdk.openapi.okhttp_gson.api.NodeRoutesApi;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
+import io.nem.sdk.openapi.okhttp_gson.model.NodeHealthInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.NodeInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.NodeTimeDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.ServerDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.ServerInfoDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.StorageInfoDTO;
 import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.concurrent.Callable;
@@ -78,6 +86,55 @@ public class NodeRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imple
         return exceptionHandling(
             call(callback).map(this::toNodeTime));
     }
+
+    /**
+     * Get storage info
+     *
+     * @return {@link Observable} of StorageInfo
+     */
+    @Override
+    public Observable<StorageInfo> getNodeStorage() {
+        Callable<StorageInfoDTO> callback = getClient()::getNodeStorage;
+        return exceptionHandling(call(callback).map(this::toStorageInfo));
+    }
+
+    /**
+     * Get node health information
+     *
+     * @return {@link NodeHealth} of NodeHealth
+     */
+    @Override
+    public Observable<NodeHealth> getNodeHealth() {
+        Callable<NodeHealthInfoDTO> callback = getClient()::getNodeHealth;
+        return exceptionHandling(call(callback)
+            .map(dto -> new NodeHealth(
+                NodeStatus.rawValueOf(dto.getStatus().getApiNode().getValue()),
+                NodeStatus.rawValueOf(dto.getStatus().getDb().getValue()))));
+    }
+
+
+    private StorageInfo toStorageInfo(StorageInfoDTO storageInfoDTO) {
+        return new StorageInfo(
+            storageInfoDTO.getNumAccounts(),
+            storageInfoDTO.getNumBlocks(),
+            storageInfoDTO.getNumTransactions());
+    }
+
+    /**
+     * Get server info
+     *
+     * @return {@link Observable} of ServerInfo
+     */
+    public Observable<ServerInfo> getServerInfo() {
+        Callable<ServerInfoDTO> callback = getClient()::getServerInfo;
+        return exceptionHandling(
+            call(callback).map(ServerInfoDTO::getServerInfo).map(this::toServerInfo));
+    }
+
+    private ServerInfo toServerInfo(ServerDTO serverInfoDTO) {
+        return new ServerInfo(serverInfoDTO.getRestVersion(), serverInfoDTO.getSdkVersion());
+    }
+
 
     private NodeTime toNodeTime(NodeTimeDTO nodeTimeDTO) {
         BigInteger sendTimestamp = (
