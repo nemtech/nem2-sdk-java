@@ -44,23 +44,20 @@ public class NetworkCurrency {
      * The original public bootstrap network currency.
      */
     public static final NetworkCurrency CAT_CURRENCY = new NetworkCurrencyBuilder(
-        NamespaceId.createFromName("cat.currency"), 6)
-        .withInitialSupply(BigInteger.valueOf(8999999999L)).withSupplyMutable(false)
+        NamespaceId.createFromName("cat.currency"), 6).withSupplyMutable(false)
         .withTransferable(true).build();
     /**
      * The original public bootstrap havest currency.
      */
     public static final NetworkCurrency CAT_HARVEST = new NetworkCurrencyBuilder(
-        NamespaceId.createFromName("cat.harvest"), 3)
-        .withInitialSupply(BigInteger.valueOf(15000000)).withSupplyMutable(true)
+        NamespaceId.createFromName("cat.harvest"), 3).withSupplyMutable(true)
         .withTransferable(true).build();
 
     /**
      * The new public network currency.
      */
     public static final NetworkCurrency SYMBOL_XYM = new NetworkCurrencyBuilder(
-        NamespaceId.createFromName("symbol.xym"), 6)
-        .withInitialSupply(BigInteger.valueOf(7831975436000000L)).withSupplyMutable(false)
+        NamespaceId.createFromName("symbol.xym"), 6).withSupplyMutable(false)
         .withTransferable(true).build();
 
     /**
@@ -83,10 +80,7 @@ public class NetworkCurrency {
      * Divisibility of this currency, required to create Mosaic from relative amounts.
      */
     private final int divisibility;
-    /**
-     * Initial supply of this currency.
-     */
-    private final BigInteger initialSupply;
+
     /**
      * Is this currency transferable.
      */
@@ -108,7 +102,6 @@ public class NetworkCurrency {
         this.mosaicId = builder.getMosaicId();
         this.namespaceId = builder.getNamespaceId();
         this.divisibility = builder.getDivisibility();
-        this.initialSupply = builder.getInitialSupply();
         this.transferable = builder.isTransferable();
         this.supplyMutable = builder.isSupplyMutable();
     }
@@ -127,10 +120,6 @@ public class NetworkCurrency {
 
     public int getDivisibility() {
         return divisibility;
-    }
-
-    public BigInteger getInitialSupply() {
-        return initialSupply;
     }
 
     public boolean isTransferable() {
@@ -194,14 +183,13 @@ public class NetworkCurrency {
             supplyMutable == that.supplyMutable &&
             Objects.equals(unresolvedMosaicId, that.unresolvedMosaicId) &&
             Objects.equals(mosaicId, that.mosaicId) &&
-            Objects.equals(namespaceId, that.namespaceId) &&
-            Objects.equals(initialSupply, that.initialSupply);
+            Objects.equals(namespaceId, that.namespaceId);
     }
 
     @Override
     public int hashCode() {
         return Objects
-            .hash(unresolvedMosaicId, mosaicId, namespaceId, divisibility, initialSupply,
+            .hash(unresolvedMosaicId, mosaicId, namespaceId, divisibility,
                 transferable,
                 supplyMutable);
     }

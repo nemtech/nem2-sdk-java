@@ -91,7 +91,6 @@ class NetworkCurrencyServiceTest {
         Assertions.assertFalse(networkCurrency.getNamespaceId().isPresent());
         Assertions.assertTrue(networkCurrency.isTransferable());
         Assertions.assertTrue(networkCurrency.isSupplyMutable());
-        Assertions.assertEquals(supply, networkCurrency.getInitialSupply());
     }
 
     @Test
@@ -120,7 +119,6 @@ class NetworkCurrencyServiceTest {
         Assertions.assertFalse(networkCurrency.getNamespaceId().isPresent());
         Assertions.assertTrue(networkCurrency.isTransferable());
         Assertions.assertTrue(networkCurrency.isSupplyMutable());
-        Assertions.assertEquals(supply, networkCurrency.getInitialSupply());
     }
 
     @Test
@@ -150,7 +148,6 @@ class NetworkCurrencyServiceTest {
         Assertions.assertFalse(networkCurrency.getNamespaceId().isPresent());
         Assertions.assertTrue(networkCurrency.isTransferable());
         Assertions.assertTrue(networkCurrency.isSupplyMutable());
-        Assertions.assertEquals(supply, networkCurrency.getInitialSupply());
     }
 
     @Test
@@ -188,7 +185,6 @@ class NetworkCurrencyServiceTest {
             .get());
         Assertions.assertTrue(networkCurrency.isTransferable());
         Assertions.assertTrue(networkCurrency.isSupplyMutable());
-        Assertions.assertEquals(supply, networkCurrency.getInitialSupply());
     }
 
 
@@ -223,6 +219,5 @@ class NetworkCurrencyServiceTest {
         Assertions.assertEquals(namespaceId, networkCurrency.getNamespaceId().get());
         Assertions.assertTrue(networkCurrency.isTransferable());
         Assertions.assertTrue(networkCurrency.isSupplyMutable());
-        Assertions.assertEquals(supply, networkCurrency.getInitialSupply());
     }
 }

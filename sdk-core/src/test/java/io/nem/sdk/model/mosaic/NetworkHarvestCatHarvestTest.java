@@ -44,7 +44,6 @@ class NetworkHarvestCatHarvestTest {
             networkCurrency.getNamespaceId().get());
         assertEquals("cat.harvest", networkCurrency.getNamespaceId().get().getFullName().get());
         assertEquals(3, networkCurrency.getDivisibility());
-        assertEquals(BigInteger.valueOf(15000000L), networkCurrency.getInitialSupply());
         assertTrue(networkCurrency.isTransferable());
         assertTrue(networkCurrency.isSupplyMutable());
     }

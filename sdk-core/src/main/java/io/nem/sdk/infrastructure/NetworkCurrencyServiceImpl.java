@@ -30,7 +30,6 @@ import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.sdk.model.transaction.MosaicAliasTransaction;
 import io.nem.sdk.model.transaction.MosaicDefinitionTransaction;
-import io.nem.sdk.model.transaction.MosaicSupplyChangeTransaction;
 import io.nem.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionType;
@@ -102,10 +101,6 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
                 .filter(t -> t.getType() == TransactionType.NAMESPACE_REGISTRATION)
                 .map(t -> (NamespaceRegistrationTransaction) t).collect(Collectors.toList());
 
-            List<MosaicSupplyChangeTransaction> mosaicSupplyChanges = transactions.stream()
-                .filter(t -> t.getType() == TransactionType.MOSAIC_SUPPLY_CHANGE)
-                .map(t -> (MosaicSupplyChangeTransaction) t).collect(Collectors.toList());
-
             Stream<Stream<NetworkCurrency>> streamStream = mosaicTransactions
                 .stream()
                 .map(mosaicTransaction -> {
@@ -116,7 +111,7 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
                     return mosaicAliasTransactions
                         .stream()
                         .map(mosaicAliasTransaction -> getNetworkCurrency(
-                            mosaicTransaction, mosaicAliasTransaction, mosaicSupplyChanges,
+                            mosaicTransaction, mosaicAliasTransaction,
                             namespaceRegistrations
                         )).filter(Optional::isPresent).map(Optional::get);
 
@@ -143,14 +138,11 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
                 })
                 .first(Optional.empty()).onErrorReturnItem(Optional.empty()).toObservable();
 
-            return namespaceIdObservable.map(namespaceIdOptional -> {
-                NetworkCurrencyBuilder builder = createNetworkCurrencyBuilder(mosaicId,
-                    namespaceIdOptional.orElse(null), info.getDivisibility());
-                builder.withSupplyMutable(info.isSupplyMutable());
-                builder.withTransferable(info.isTransferable());
-                builder.withInitialSupply(info.getSupply());
-                return builder.build();
-            });
+            return namespaceIdObservable
+                .map(namespaceIdOptional -> createNetworkCurrencyBuilder(mosaicId,
+                    namespaceIdOptional.orElse(null), info.getDivisibility())
+                    .withSupplyMutable(info.isSupplyMutable())
+                    .withTransferable(info.isTransferable()).build());
         });
     }
 
@@ -162,7 +154,6 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
                 .getMosaic(mosaicId)
                 .map(info -> createNetworkCurrencyBuilder(mosaicId, namespaceId,
                     info.getDivisibility()).withSupplyMutable(info.isSupplyMutable())
-                    .withInitialSupply(info.getSupply())
                     .withTransferable(info.isTransferable()).build()));
     }
 
@@ -173,8 +164,6 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
      * @param mosaicTransaction the original mosiac transaction
      * @param mosaicAliasTransaction the original mosaic alias transaction used to know the
      * mosaic/currency namespace
-     * @param mosaicSupplyChanges the list of supply changes used to resolve the currency original
-     * supply
      * @param namespaceRegistrations the list of namespace registration used to resolve the
      * mosaic/currency full name
      * @return the {@link NetworkCurrency} if it can be resolved.
@@ -182,7 +171,6 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
     private Optional<NetworkCurrency> getNetworkCurrency(
         MosaicDefinitionTransaction mosaicTransaction,
         MosaicAliasTransaction mosaicAliasTransaction,
-        List<MosaicSupplyChangeTransaction> mosaicSupplyChanges,
         List<NamespaceRegistrationTransaction> namespaceRegistrations) {
         MosaicId mosaicId = mosaicAliasTransaction.getMosaicId();
 
@@ -199,13 +187,6 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
                     mosaicTransaction.getDivisibility());
                 builder.withSupplyMutable(mosaicTransaction.getMosaicFlags().isSupplyMutable());
                 builder.withTransferable(mosaicTransaction.getMosaicFlags().isTransferable());
-                builder.withInitialSupply(mosaicSupplyChanges.stream()
-                    .filter(
-                        tx -> tx.getMosaicId().equals(mosaicId) || tx
-                            .getMosaicId()
-                            .equals(namespaceId)).findFirst()
-                    .map(MosaicSupplyChangeTransaction::getDelta)
-                    .orElse(BigInteger.ZERO));
                 return builder.build();
             });
     }

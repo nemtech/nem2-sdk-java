@@ -60,7 +60,6 @@ class NetworkCurrencyCatCurrencyTest {
             networkCurrency.getNamespaceId().get());
         assertEquals("cat.currency", networkCurrency.getNamespaceId().get().getFullName().get());
         assertEquals(6, networkCurrency.getDivisibility());
-        assertEquals(BigInteger.valueOf(8999999999L), networkCurrency.getInitialSupply());
         assertTrue(networkCurrency.isTransferable());
         assertFalse(networkCurrency.isSupplyMutable());
     }

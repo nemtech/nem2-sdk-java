@@ -49,8 +49,7 @@ class NetworkCurrencyTest {
     void assertCreatedUsingMosaicId() {
         MosaicId mosaicId = new MosaicId(BigInteger.TEN);
         NetworkCurrency networkCurrency = new NetworkCurrencyBuilder(
-            mosaicId, 6)
-            .withInitialSupply(BigInteger.valueOf(8999999999L)).withSupplyMutable(false)
+            mosaicId, 6).withSupplyMutable(false)
             .withTransferable(true).build();
 
         Assertions.assertEquals(mosaicId, networkCurrency.getMosaicId().get());
@@ -61,9 +60,8 @@ class NetworkCurrencyTest {
     @Test
     void assertCreatedUsingNamespaceId() {
         NamespaceId namespaceId = NamespaceId.createFromName("mycurrency");
-        NetworkCurrency networkCurrency = new NetworkCurrencyBuilder(
-            namespaceId, 6)
-            .withInitialSupply(BigInteger.valueOf(8999999999L)).withSupplyMutable(false)
+        NetworkCurrency networkCurrency = new NetworkCurrencyBuilder(namespaceId, 6)
+            .withSupplyMutable(false)
             .withTransferable(true).build();
 
         Assertions.assertEquals(namespaceId, networkCurrency.getNamespaceId().get());
@@ -76,8 +74,7 @@ class NetworkCurrencyTest {
         MosaicId mosaicId = new MosaicId(BigInteger.TEN);
         NamespaceId namespaceId = NamespaceId.createFromName("mycurrency");
         NetworkCurrency networkCurrency = new NetworkCurrencyBuilder(
-            namespaceId, 6)
-            .withInitialSupply(BigInteger.valueOf(8999999999L)).withSupplyMutable(false)
+            namespaceId, 6).withSupplyMutable(false)
             .withTransferable(true).withMosaicId(mosaicId).build();
 
         Assertions.assertEquals(namespaceId, networkCurrency.getNamespaceId().get());

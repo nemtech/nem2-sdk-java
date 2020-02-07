@@ -76,7 +76,6 @@ class NetworkCurrencySymbolXymTest {
             networkCurrency.getNamespaceId().get());
         assertEquals("symbol.xym", networkCurrency.getNamespaceId().get().getFullName().get());
         assertEquals(6, networkCurrency.getDivisibility());
-        assertEquals(BigInteger.valueOf(7831975436000000L), networkCurrency.getInitialSupply());
         assertTrue(networkCurrency.isTransferable());
         assertFalse(networkCurrency.isSupplyMutable());
     }

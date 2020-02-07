@@ -17,7 +17,6 @@
 package io.nem.sdk.model.mosaic;
 
 import io.nem.sdk.model.namespace.NamespaceId;
-import java.math.BigInteger;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 
@@ -48,10 +47,6 @@ public final class NetworkCurrencyBuilder {
      * namespace id. This value will be set if it's loaded by rest.
      */
     private Optional<NamespaceId> namespaceId = Optional.empty();
-    /**
-     * Initial supply of the {@link NetworkCurrency} to be built.
-     */
-    private BigInteger initialSupply = BigInteger.ZERO;
 
     /**
      * Is the currency transferable.
@@ -100,18 +95,6 @@ public final class NetworkCurrencyBuilder {
     }
 
     /**
-     * Helper method to setup the initial supply.
-     *
-     * @param initialSupply the initial supply
-     * @return this builder.
-     */
-    public NetworkCurrencyBuilder withInitialSupply(BigInteger initialSupply) {
-        Validate.notNull(initialSupply, "initialSupply must not be null");
-        this.initialSupply = initialSupply;
-        return this;
-    }
-
-    /**
      * Helper method to setup the transferable flag.
      *
      * @param transferable the transferable
@@ -156,10 +139,6 @@ public final class NetworkCurrencyBuilder {
 
     public Optional<NamespaceId> getNamespaceId() {
         return namespaceId;
-    }
-
-    public BigInteger getInitialSupply() {
-        return initialSupply;
     }
 
     public boolean isTransferable() {
