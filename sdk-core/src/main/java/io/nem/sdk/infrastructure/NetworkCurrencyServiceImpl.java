@@ -17,25 +17,32 @@
 package io.nem.sdk.infrastructure;
 
 import io.nem.sdk.api.BlockRepository;
+import io.nem.sdk.api.MosaicRepository;
+import io.nem.sdk.api.NamespaceRepository;
 import io.nem.sdk.api.NetworkCurrencyService;
+import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.api.RepositoryFactory;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.NetworkCurrency;
 import io.nem.sdk.model.mosaic.NetworkCurrencyBuilder;
+import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.sdk.model.transaction.MosaicAliasTransaction;
 import io.nem.sdk.model.transaction.MosaicDefinitionTransaction;
 import io.nem.sdk.model.transaction.MosaicSupplyChangeTransaction;
 import io.nem.sdk.model.transaction.NamespaceRegistrationTransaction;
+import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.reactivex.Observable;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.Validate;
 
 /**
  * Implementation of {@link NetworkCurrencyService}
@@ -48,12 +55,24 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
     private final BlockRepository blockRepository;
 
     /**
+     * The {@link MosaicRepository}.
+     */
+    private final MosaicRepository mosaicRepository;
+
+    /**
+     * The {@link NamespaceRepository}.
+     */
+    private final NamespaceRepository namespaceRepository;
+
+    /**
      * Constructor.
      *
      * @param repositoryFactory the repository factory.
      */
     public NetworkCurrencyServiceImpl(RepositoryFactory repositoryFactory) {
         this.blockRepository = repositoryFactory.createBlockRepository();
+        this.mosaicRepository = repositoryFactory.createMosaicRepository();
+        this.namespaceRepository = repositoryFactory.createNamespaceRepository();
     }
 
     /*
@@ -68,8 +87,9 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
      * would only load the transaction of a given type signed by the nemesis account.
      */
     @Override
-    public Observable<List<NetworkCurrency>> getNetworkCurrencies() {
-        return this.blockRepository.getBlockTransactions(BigInteger.ONE).map(transactions -> {
+    public Observable<List<NetworkCurrency>> getNetworkCurrenciesFromNemesis() {
+        return getBlockTransactions(BigInteger.ONE, null).map(transactions -> {
+
             List<MosaicDefinitionTransaction> mosaicTransactions = transactions.stream()
                 .filter(t -> t.getType() == TransactionType.MOSAIC_DEFINITION)
                 .map(t -> (MosaicDefinitionTransaction) t).collect(Collectors.toList());
@@ -106,6 +126,46 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
         });
     }
 
+
+    @Override
+    public Observable<NetworkCurrency> getNetworkCurrencyFromMosaicId(MosaicId mosaicId) {
+        Validate.notNull(mosaicId, "namespaceId is required");
+        return this.mosaicRepository.getMosaic(mosaicId).flatMap(info -> {
+            Observable<Optional<NamespaceId>> namespaceIdObservable = this.namespaceRepository
+                .getMosaicsNames(Collections.singletonList(mosaicId)).flatMapIterable(item -> item)
+                .map(mosaicNames -> {
+                    if (mosaicNames.getNames().isEmpty()) {
+                        return Optional.<NamespaceId>empty();
+                    }
+
+                    return Optional.of(NamespaceId
+                        .createFromName(mosaicNames.getNames().get(0).getName()));
+                })
+                .first(Optional.empty()).onErrorReturnItem(Optional.empty()).toObservable();
+
+            return namespaceIdObservable.map(namespaceIdOptional -> {
+                NetworkCurrencyBuilder builder = createNetworkCurrencyBuilder(mosaicId,
+                    namespaceIdOptional.orElse(null), info.getDivisibility());
+                builder.withSupplyMutable(info.isSupplyMutable());
+                builder.withTransferable(info.isTransferable());
+                builder.withInitialSupply(info.getSupply());
+                return builder.build();
+            });
+        });
+    }
+
+    @Override
+    public Observable<NetworkCurrency> getNetworkCurrencyFromNamespaceId(NamespaceId namespaceId) {
+        Validate.notNull(namespaceId, "namespaceId is required");
+        return this.namespaceRepository.getLinkedMosaicId(namespaceId)
+            .flatMap(mosaicId -> this.mosaicRepository
+                .getMosaic(mosaicId)
+                .map(info -> createNetworkCurrencyBuilder(mosaicId, namespaceId,
+                    info.getDivisibility()).withSupplyMutable(info.isSupplyMutable())
+                    .withInitialSupply(info.getSupply())
+                    .withTransferable(info.isTransferable()).build()));
+    }
+
     /**
      * This method tries to {@link NetworkCurrency} from the original {@link
      * MosaicDefinitionTransaction} and {@link MosaicAliasTransaction}.
@@ -135,15 +195,10 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
                     mosaicAliasTransaction.getNamespaceId().getId(),
                     namespaceName);
 
-                NetworkCurrencyBuilder builder = new NetworkCurrencyBuilder(namespaceId,
+                NetworkCurrencyBuilder builder = createNetworkCurrencyBuilder(mosaicId, namespaceId,
                     mosaicTransaction.getDivisibility());
-                builder.withNamespaceId(namespaceId);
-                builder.withSupplyMutable(
-                    mosaicTransaction.getMosaicFlags().isSupplyMutable());
-                builder
-                    .withTransferable(
-                        mosaicTransaction.getMosaicFlags().isTransferable());
-                builder.withMosaicId(mosaicId);
+                builder.withSupplyMutable(mosaicTransaction.getMosaicFlags().isSupplyMutable());
+                builder.withTransferable(mosaicTransaction.getMosaicFlags().isTransferable());
                 builder.withInitialSupply(mosaicSupplyChanges.stream()
                     .filter(
                         tx -> tx.getMosaicId().equals(mosaicId) || tx
@@ -178,15 +233,63 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
                 return Optional.of(childNamespace.getNamespaceName());
             } else {
                 return childNamespace.getParentId().flatMap(parentId -> {
-                    Optional<String> parentNamespaceName = getNamespaceFullName(
+                    Optional<String> parentNamespaceNameOptional = getNamespaceFullName(
                         transactions, parentId);
-                    return parentNamespaceName.map(
-                        parentNamespace -> parentNamespaceName + "." + childNamespace
+                    return parentNamespaceNameOptional.map(
+                        parentNamespaceName -> parentNamespaceName + "." + childNamespace
                             .getNamespaceName());
                 });
             }
         });
-
-
     }
+
+    /**
+     * It returns all the transactions for the given block starting from the given transaction id.
+     * If the fromId, it will start from the start.
+     *
+     * This method is recursive, moving thorough all the pages.
+     *
+     * @param height the transaction of the given height
+     * @param fromId the start of the transactions to be retrieved.
+     * @return the list of all the transaction of the given height starting from from id
+     */
+    private Observable<List<Transaction>> getBlockTransactions(BigInteger height, String fromId) {
+        int pageSize = 30;
+        QueryParams query = new QueryParams(pageSize, fromId);
+        return this.blockRepository.getBlockTransactions(height, query)
+            .flatMap(transactions -> {
+                if (transactions.size() < query.getPageSize()) {
+                    return Observable.just(transactions);
+                } else {
+                    return getBlockTransactions(height,
+                        transactions.get(transactions.size() - 1)
+                            .getTransactionInfo()
+                            .orElseThrow(IllegalStateException::new)
+                            .getId()
+                            .orElseThrow(IllegalStateException::new))
+                        .map(tail -> Stream.concat(transactions.stream(), tail.stream())
+                            .collect(Collectors.toList()));
+                }
+            });
+    }
+
+
+    private NetworkCurrencyBuilder createNetworkCurrencyBuilder(MosaicId mosaicId,
+        NamespaceId namespaceId, int divisibility) {
+
+        Validate.isTrue(mosaicId != null || namespaceId != null,
+            "Either mosaic id or namespace id must be provided");
+        //NOTE: If both namespace id and mosaic id are provided
+        UnresolvedMosaicId unresolvedMosaicId = mosaicId == null ? namespaceId : mosaicId;
+        NetworkCurrencyBuilder builder = new NetworkCurrencyBuilder(unresolvedMosaicId,
+            divisibility);
+        if (mosaicId != null) {
+            builder.withMosaicId(mosaicId);
+        }
+        if (namespaceId != null) {
+            builder.withNamespaceId(namespaceId);
+        }
+        return builder;
+    }
+
 }

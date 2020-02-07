@@ -109,7 +109,7 @@ public class RepositoryFactoryVertxImplTest {
             @Override
             protected NetworkCurrencyService createNetworkCurrencyService() {
                 NetworkCurrencyService mock = Mockito.mock(NetworkCurrencyService.class);
-                Mockito.when(mock.getNetworkCurrencies()).thenReturn(Observable.just(
+                Mockito.when(mock.getNetworkCurrenciesFromNemesis()).thenReturn(Observable.just(
                     Arrays.asList(NetworkCurrency.CAT_CURRENCY, NetworkCurrency.CAT_HARVEST)));
                 return mock;
             }

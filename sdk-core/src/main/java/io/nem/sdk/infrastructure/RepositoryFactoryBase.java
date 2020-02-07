@@ -79,8 +79,9 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
 
         this.remoteNetworkCurrencies = Observable
             .defer(() -> createNetworkCurrencyService()
-                .getNetworkCurrencies()).cache();
+                .getNetworkCurrenciesFromNemesis()).cache();
 
+        //TODO: once rest returns the main mosaic id, the networkCurrency can be resolved from there and not from the block 1.
         this.networkCurrency = createLazyObservable(
             configuration.getNetworkCurrency(),
             () -> this.remoteNetworkCurrencies.map(cs -> {
@@ -92,6 +93,7 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
                     .orElse(cs.iterator().next());
             }));
 
+        //TODO: once rest returns the harvest mosaic id, the networkCurrency can be resolved from there and not from the nemesis block 1.
         this.harvestCurrency = createLazyObservable(
             configuration.getHarvestCurrency(),
             () -> this.remoteNetworkCurrencies.map(cs -> {

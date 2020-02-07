@@ -17,8 +17,12 @@
 package io.nem.sdk.infrastructure;
 
 import io.nem.sdk.api.NetworkCurrencyService;
+import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.api.RepositoryFactory;
+import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.NetworkCurrency;
+import io.nem.sdk.model.namespace.NamespaceId;
+import java.math.BigInteger;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
@@ -26,7 +30,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class NetworkCurrencyServiceIntegrationTest extends BaseIntegrationTest {
+class NetworkCurrencyServiceIntegrationTest extends BaseIntegrationTest {
 
 
     @ParameterizedTest
@@ -36,18 +40,73 @@ public class NetworkCurrencyServiceIntegrationTest extends BaseIntegrationTest {
         RepositoryFactory repositoryFactory = getRepositoryFactory(type);
         NetworkCurrencyService service = new NetworkCurrencyServiceImpl(repositoryFactory);
 
-        List<NetworkCurrency> mosaicConfigurations = get(
-            service.getNetworkCurrencies());
+        List<NetworkCurrency> networkCurrencies = get(
+            service.getNetworkCurrenciesFromNemesis());
 
-        System.out.println(toJson(mosaicConfigurations));
+        System.out.println(toJson(networkCurrencies));
 
-        Assertions.assertTrue(mosaicConfigurations.size() > 0);
-        Assertions.assertTrue(mosaicConfigurations.size() < 3);
+        Assertions.assertTrue(networkCurrencies.size() > 0);
+        Assertions.assertTrue(networkCurrencies.size() < 3);
 
         Assertions
-            .assertTrue(mosaicConfigurations.contains(get(repositoryFactory.getNetworkCurrency())));
+            .assertTrue(networkCurrencies.contains(get(repositoryFactory.getNetworkCurrency())));
         Assertions
-            .assertTrue(mosaicConfigurations.contains(get(repositoryFactory.getHarvestCurrency())));
+            .assertTrue(networkCurrencies.contains(get(repositoryFactory.getHarvestCurrency())));
+
+        networkCurrencies.forEach(networkCurrency -> {
+
+            Assertions.assertTrue(networkCurrency.getMosaicId().isPresent());
+            Assertions.assertTrue(networkCurrency.getNamespaceId().isPresent());
+            NetworkCurrency loadedFromMosaicId = get(
+                service.getNetworkCurrencyFromMosaicId(networkCurrency.getMosaicId().get()));
+
+            Assertions.assertEquals(toJson(loadedFromMosaicId), toJson(networkCurrency));
+            Assertions.assertEquals(loadedFromMosaicId, networkCurrency);
+
+            NetworkCurrency loadedFromNamespaceId = get(
+                service.getNetworkCurrencyFromNamespaceId(networkCurrency.getNamespaceId().get()));
+
+            Assertions.assertEquals(toJson(loadedFromNamespaceId), toJson(networkCurrency));
+            Assertions.assertEquals(loadedFromNamespaceId, networkCurrency);
+        });
+
+
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void testNetworkCurrencyInvalidNamespaceId(RepositoryType type) {
+        RepositoryFactory repositoryFactory = getRepositoryFactory(type);
+        NetworkCurrencyService service = new NetworkCurrencyServiceImpl(repositoryFactory);
+
+        RepositoryCallException exception = Assertions
+            .assertThrows(RepositoryCallException.class, () -> {
+                get(service
+                    .getNetworkCurrencyFromNamespaceId(
+                        NamespaceId.createFromName("invalid.currency")));
+            });
+
+        Assertions.assertEquals(
+            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'c1df8a076d934a50'",
+            exception.getMessage());
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void testNetworkCurrencyInvaliMosaicId(RepositoryType type) {
+        RepositoryFactory repositoryFactory = getRepositoryFactory(type);
+        NetworkCurrencyService service = new NetworkCurrencyServiceImpl(repositoryFactory);
+
+        RepositoryCallException exception = Assertions
+            .assertThrows(RepositoryCallException.class, () -> {
+                get(service
+                    .getNetworkCurrencyFromMosaicId(
+                        new MosaicId(BigInteger.TEN)));
+            });
+
+        Assertions.assertEquals(
+            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '000000000000000a'",
+            exception.getMessage());
 
     }
 
