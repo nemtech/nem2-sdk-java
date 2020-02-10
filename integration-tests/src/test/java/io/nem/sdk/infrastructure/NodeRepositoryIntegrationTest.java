@@ -16,11 +16,17 @@
 
 package io.nem.sdk.infrastructure;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.sdk.api.NodeRepository;
+import io.nem.sdk.model.blockchain.ServerInfo;
+import io.nem.sdk.model.blockchain.StorageInfo;
+import io.nem.sdk.model.node.NodeHealth;
 import io.nem.sdk.model.node.NodeInfo;
+import io.nem.sdk.model.node.NodeStatus;
 import io.nem.sdk.model.node.NodeTime;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -50,5 +56,35 @@ class NodeRepositoryIntegrationTest extends BaseIntegrationTest {
         NodeTime nodeTime = get(getNodeRepository(type).getNodeTime());
         assertTrue(nodeTime.getReceiveTimestamp().longValue() > 0);
         assertTrue(nodeTime.getSendTimestamp().longValue() > 0);
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    public void getNodeStorage(RepositoryType type) {
+        StorageInfo storageInfo = get(
+            getNodeRepository(type).getNodeStorage());
+
+        assertTrue(storageInfo.getNumAccounts() > 0);
+        assertTrue(storageInfo.getNumTransactions() > 0);
+        assertTrue(storageInfo.getNumBlocks() > 0);
+    }
+
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void getServerInfo(RepositoryType type) {
+        ServerInfo serverInfo = get(getNodeRepository(type).getServerInfo());
+
+        assertNotEquals("", serverInfo.getRestVersion());
+        assertNotEquals("", serverInfo.getSdkVersion());
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void getNodeHealth(RepositoryType type) {
+        NodeHealth serverInfo = get(getNodeRepository(type).getNodeHealth());
+
+        assertEquals(NodeStatus.UP, serverInfo.getDb());
+        assertEquals(NodeStatus.UP, serverInfo.getApiNode());
     }
 }

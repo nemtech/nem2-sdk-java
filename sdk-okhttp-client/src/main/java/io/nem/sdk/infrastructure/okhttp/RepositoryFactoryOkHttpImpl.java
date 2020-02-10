@@ -19,7 +19,6 @@ package io.nem.sdk.infrastructure.okhttp;
 import io.nem.sdk.api.AccountRepository;
 import io.nem.sdk.api.BlockRepository;
 import io.nem.sdk.api.ChainRepository;
-import io.nem.sdk.api.DiagnosticRepository;
 import io.nem.sdk.api.JsonSerialization;
 import io.nem.sdk.api.Listener;
 import io.nem.sdk.api.MetadataRepository;
@@ -85,11 +84,6 @@ public class RepositoryFactoryOkHttpImpl extends RepositoryFactoryBase {
     @Override
     public ChainRepository createChainRepository() {
         return new ChainRepositoryOkHttpImpl(apiClient);
-    }
-
-    @Override
-    public DiagnosticRepository createDiagnosticRepository() {
-        return new DiagnosticRepositoryOkHttpImpl(apiClient);
     }
 
     @Override

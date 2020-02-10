@@ -56,11 +56,6 @@ public interface RepositoryFactory extends Closeable {
     ChainRepository createChainRepository();
 
     /**
-     * @return a newly created {@link DiagnosticRepository}
-     */
-    DiagnosticRepository createDiagnosticRepository();
-
-    /**
      * @return a newly created {@link MosaicRepository}
      */
     MosaicRepository createMosaicRepository();

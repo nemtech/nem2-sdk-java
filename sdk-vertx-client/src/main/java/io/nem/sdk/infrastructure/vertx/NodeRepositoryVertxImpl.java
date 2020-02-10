@@ -18,14 +18,22 @@ package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.sdk.api.NodeRepository;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.blockchain.ServerInfo;
+import io.nem.sdk.model.blockchain.StorageInfo;
+import io.nem.sdk.model.node.NodeHealth;
 import io.nem.sdk.model.node.NodeInfo;
+import io.nem.sdk.model.node.NodeStatus;
 import io.nem.sdk.model.node.NodeTime;
 import io.nem.sdk.model.node.RoleType;
 import io.nem.sdk.openapi.vertx.api.NodeRoutesApi;
 import io.nem.sdk.openapi.vertx.api.NodeRoutesApiImpl;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
+import io.nem.sdk.openapi.vertx.model.NodeHealthInfoDTO;
 import io.nem.sdk.openapi.vertx.model.NodeInfoDTO;
 import io.nem.sdk.openapi.vertx.model.NodeTimeDTO;
+import io.nem.sdk.openapi.vertx.model.ServerDTO;
+import io.nem.sdk.openapi.vertx.model.ServerInfoDTO;
+import io.nem.sdk.openapi.vertx.model.StorageInfoDTO;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -90,6 +98,52 @@ public class NodeRepositoryVertxImpl extends AbstractRepositoryVertxImpl impleme
         BigInteger receiveTimestamp = nodeTimeDTO.getCommunicationTimestamps()
             .getReceiveTimestamp();
         return new NodeTime(sendTimestamp, receiveTimestamp);
+    }
+
+    /**
+     * Get storage info
+     *
+     * @return io.reactivex.Observable of {@link StorageInfo}
+     */
+    @Override
+    public Observable<StorageInfo> getNodeStorage() {
+        Consumer<Handler<AsyncResult<StorageInfoDTO>>> callback = getClient()::getNodeStorage;
+        return exceptionHandling(call(callback).map(this::toStorageInfo));
+    }
+
+    private StorageInfo toStorageInfo(StorageInfoDTO storageInfoDTO) {
+        return new StorageInfo(
+            storageInfoDTO.getNumAccounts(),
+            storageInfoDTO.getNumBlocks(),
+            storageInfoDTO.getNumTransactions());
+    }
+
+    /**
+     * Get node health information
+     *
+     * @return {@link NodeHealth} of NodeHealth
+     */
+    @Override
+    public Observable<NodeHealth> getNodeHealth() {
+        Consumer<Handler<AsyncResult<NodeHealthInfoDTO>>> callback = getClient()::getNodeHealth;
+        return exceptionHandling(call(callback).map(dto -> new NodeHealth(
+            NodeStatus.rawValueOf(dto.getStatus().getApiNode().getValue()),
+            NodeStatus.rawValueOf(dto.getStatus().getDb().getValue()))));
+    }
+
+    /**
+     * Get server info
+     *
+     * @return Observable of {@link ServerInfo}
+     */
+    public Observable<ServerInfo> getServerInfo() {
+        Consumer<Handler<AsyncResult<ServerInfoDTO>>> callback = getClient()::getServerInfo;
+        return exceptionHandling(
+            call(callback).map(ServerInfoDTO::getServerInfo).map(this::toServerInfo));
+    }
+
+    private ServerInfo toServerInfo(ServerDTO serverInfoDTO) {
+        return new ServerInfo(serverInfoDTO.getRestVersion(), serverInfoDTO.getSdkVersion());
     }
 
 }

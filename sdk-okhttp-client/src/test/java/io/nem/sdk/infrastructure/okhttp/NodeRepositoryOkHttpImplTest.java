@@ -17,13 +17,23 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.blockchain.ServerInfo;
+import io.nem.sdk.model.blockchain.StorageInfo;
+import io.nem.sdk.model.node.NodeHealth;
 import io.nem.sdk.model.node.NodeInfo;
+import io.nem.sdk.model.node.NodeStatus;
 import io.nem.sdk.model.node.NodeTime;
 import io.nem.sdk.model.node.RoleType;
 import io.nem.sdk.openapi.okhttp_gson.model.CommunicationTimestampsDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.NodeHealthDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.NodeHealthInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.NodeInfoDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.NodeStatusEnum;
 import io.nem.sdk.openapi.okhttp_gson.model.NodeTimeDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.RolesTypeEnum;
+import io.nem.sdk.openapi.okhttp_gson.model.ServerDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.ServerInfoDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.StorageInfoDTO;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,6 +99,56 @@ public class NodeRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest 
 
         Assertions.assertEquals(BigInteger.valueOf(1L), info.getReceiveTimestamp());
         Assertions.assertEquals(BigInteger.valueOf(2L), info.getSendTimestamp());
+
+    }
+
+    @Test
+    public void getNodeStorage() throws Exception {
+        StorageInfoDTO dto = new StorageInfoDTO();
+        dto.setNumAccounts(1L);
+        dto.setNumBlocks(2L);
+        dto.setNumTransactions(3L);
+
+        mockRemoteCall(dto);
+
+        StorageInfo storageInfo = repository.getNodeStorage().toFuture()
+            .get();
+        Assertions.assertEquals(dto.getNumAccounts(), storageInfo.getNumAccounts());
+        Assertions.assertEquals(dto.getNumBlocks(), storageInfo.getNumBlocks());
+        Assertions
+            .assertEquals(dto.getNumTransactions(), storageInfo.getNumTransactions());
+
+    }
+
+    @Test
+    public void getNodeHealth() throws Exception {
+        NodeHealthInfoDTO dto = new NodeHealthInfoDTO().status(new NodeHealthDTO().apiNode(
+            NodeStatusEnum.DOWN).db(NodeStatusEnum.UP));
+
+        mockRemoteCall(dto);
+
+        NodeHealth nodeHealth = repository.getNodeHealth().toFuture()
+            .get();
+        Assertions.assertEquals(NodeStatus.DOWN, nodeHealth.getApiNode());
+        Assertions.assertEquals(NodeStatus.UP, nodeHealth.getDb());
+
+    }
+
+    @Test
+    public void shouldGetServerInfo() throws Exception {
+        ServerInfoDTO dto = new ServerInfoDTO();
+        ServerDTO serverInfoDto = new ServerDTO();
+        serverInfoDto.setRestVersion("RestVersion1");
+        serverInfoDto.setSdkVersion("SdkVersion1");
+        dto.serverInfo(serverInfoDto);
+
+        mockRemoteCall(dto);
+
+        ServerInfo serverInfo = repository.getServerInfo().toFuture()
+            .get();
+
+        Assertions.assertEquals(dto.getServerInfo().getRestVersion(), serverInfo.getRestVersion());
+        Assertions.assertEquals(dto.getServerInfo().getSdkVersion(), serverInfo.getSdkVersion());
 
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 NEM
+ * Copyright 2020 NEM
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,33 @@
  * limitations under the License.
  */
 
-package io.nem.sdk.api;
+package io.nem.sdk.model.node;
 
-import io.nem.sdk.model.blockchain.BlockchainStorageInfo;
-import io.nem.sdk.model.blockchain.ServerInfo;
-import io.reactivex.Observable;
-
-public interface DiagnosticRepository {
-
-    /**
-     * Gets blockchain storage info.
-     *
-     * @return Observable of {@link BlockchainStorageInfo}
-     */
-    Observable<BlockchainStorageInfo> getBlockchainStorage();
+/**
+ * Object that holds the node health.
+ */
+public class NodeHealth {
 
     /**
-     * Gets blockchain server info.
-     *
-     * @return {@link Observable} of ServerInfo
+     * Is the api up or down?
      */
-    Observable<ServerInfo> getServerInfo();
+    private final NodeStatus apiNode;
+
+    /**
+     * Is the database up or down?
+     */
+    private final NodeStatus db;
+
+    public NodeHealth(NodeStatus apiNode, NodeStatus db) {
+        this.apiNode = apiNode;
+        this.db = db;
+    }
+
+    public NodeStatus getApiNode() {
+        return apiNode;
+    }
+
+    public NodeStatus getDb() {
+        return db;
+    }
 }

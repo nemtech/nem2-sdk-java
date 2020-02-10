@@ -15,6 +15,9 @@
  */
 package io.nem.sdk.api;
 
+import io.nem.sdk.model.blockchain.ServerInfo;
+import io.nem.sdk.model.blockchain.StorageInfo;
+import io.nem.sdk.model.node.NodeHealth;
 import io.nem.sdk.model.node.NodeInfo;
 import io.nem.sdk.model.node.NodeTime;
 import io.reactivex.Observable;
@@ -34,4 +37,27 @@ public interface NodeRepository {
      * @return Get the node time
      */
     Observable<NodeTime> getNodeTime();
+
+    /**
+     * Gets node storage info.
+     *
+     * @return Observable of {@link StorageInfo}
+     */
+    Observable<StorageInfo> getNodeStorage();
+
+    /**
+     * Get node health information
+     *
+     * @return {@link NodeHealth} of NodeHealth
+     */
+    Observable<NodeHealth> getNodeHealth();
+
+    /**
+     * Gets node server info.
+     *
+     * @return {@link Observable} of ServerInfo
+     */
+    Observable<ServerInfo> getServerInfo();
+
+
 }
