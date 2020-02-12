@@ -17,6 +17,7 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.sdk.api.NetworkRepository;
+import io.nem.sdk.model.blockchain.NetworkFees;
 import io.nem.sdk.model.blockchain.NetworkInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.openapi.okhttp_gson.api.NetworkRoutesApi;
@@ -56,10 +57,20 @@ public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
                 .map(info -> new NetworkInfo(info.getName(), info.getDescription())));
     }
 
+    @Override
+    public Observable<NetworkFees> getNetworkFees() {
+        return exceptionHandling(
+            call(getNetworkRoutesApi()::getNetworkFees)
+                .map(info -> new NetworkFees(info.getAverageFeeMultiplier(),
+                    info.getMedianFeeMultiplier(), info.getLowestFeeMultiplier(), info.getHighestFeeMultiplier()
+                )));
+    }
+
+
     public NetworkRoutesApi getNetworkRoutesApi() {
         return networkRoutesApi;
     }
-    
+
     public NodeRoutesApi getNodeRoutesApi() {
         return nodeRoutesApi;
     }
