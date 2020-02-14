@@ -16,8 +16,7 @@
 
 package io.nem.sdk.model.message;
 
-import io.nem.core.utils.StringEncoder;
-import org.bouncycastle.util.encoders.Hex;
+import io.nem.core.utils.ConvertUtils;
 
 /**
  * An abstract message class that serves as the base class of all message types.
@@ -42,7 +41,7 @@ public abstract class Message {
      */
     public static Message createFromPayload(MessageType messageType, String payload) {
         String decoded = payload == null || payload.isEmpty() ? ""
-            : StringEncoder.getString(Hex.decode(payload));
+            : ConvertUtils.fromHexToString(payload);
         switch (messageType) {
             case PLAIN_MESSAGE:
                 return new PlainMessage(decoded);

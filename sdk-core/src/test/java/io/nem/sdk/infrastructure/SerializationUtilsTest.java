@@ -16,9 +16,9 @@
 
 package io.nem.sdk.infrastructure;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.namespace.NamespaceId;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -37,25 +37,25 @@ public class SerializationUtilsTest {
         Assertions.assertEquals("bded68013aaee068", namespaceId.getIdAsHex());
 
         Assertions.assertEquals("9168e0ae3a0168edbd00000000000000000000000000000000",
-            Hex.toHexString(
+            ConvertUtils.toHex(
                 SerializationUtils
                     .fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MIJIN_TEST)
                     .array()));
 
         Assertions.assertEquals("6968e0ae3a0168edbd00000000000000000000000000000000",
-            Hex.toHexString(
+            ConvertUtils.toHex(
                 SerializationUtils
                     .fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MAIN_NET)
                     .array()));
 
         Assertions.assertEquals("6168e0ae3a0168edbd00000000000000000000000000000000",
-            Hex.toHexString(
+            ConvertUtils.toHex(
                 SerializationUtils
                     .fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MIJIN)
                     .array()));
 
         Assertions.assertEquals("6968e0ae3a0168edbd00000000000000000000000000000000",
-            Hex.toHexString(
+            ConvertUtils.toHex(
                 SerializationUtils
                     .fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MAIN_NET)
                     .array()));

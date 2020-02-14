@@ -20,10 +20,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
 import java.util.Optional;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -52,7 +52,7 @@ public class InflationReceiptTest {
         assertEquals("85BBEA6CC462B244", inflationReceipt.getMosaicId().getIdAsHex().toUpperCase());
         assertEquals(BigInteger.TEN, inflationReceipt.getAmount());
 
-        String hex = Hex.toHexString(inflationReceipt.serialize());
+        String hex = ConvertUtils.toHex(inflationReceipt.serialize());
         Assertions.assertEquals("0100435144b262c46ceabb850a00000000000000", hex);
     }
 
@@ -73,7 +73,7 @@ public class InflationReceiptTest {
         assertEquals(BigInteger.TEN, inflationReceipt.getAmount());
         assertEquals(100, inflationReceipt.getSize().get().intValue());
 
-        String hex = Hex.toHexString(inflationReceipt.serialize());
+        String hex = ConvertUtils.toHex(inflationReceipt.serialize());
         Assertions.assertEquals("0100435144b262c46ceabb850a00000000000000", hex);
     }
 

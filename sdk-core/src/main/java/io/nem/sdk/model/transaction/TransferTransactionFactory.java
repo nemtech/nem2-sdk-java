@@ -83,7 +83,7 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
         PrivateKey remoteProxyPrivateKey,
         PublicKey harvesterPublicKey) {
         PersistentHarvestingDelegationMessage message = PersistentHarvestingDelegationMessage
-            .create(remoteProxyPrivateKey, harvesterPublicKey, networkType);
+            .create(remoteProxyPrivateKey, harvesterPublicKey);
         return new TransferTransactionFactory(networkType,
             Address.createFromPublicKey(harvesterPublicKey.toHex(), networkType),
             Collections.emptyList(), message);

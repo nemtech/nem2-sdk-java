@@ -21,19 +21,17 @@ import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
 import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class KeyPairTest {
+class KeyPairTest {
 
     // region basic construction
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void ctorCanCreateNewKeyPair(SignSchema signSchema) {
+    @Test
+    void ctorCanCreateNewKeyPair() {
         // Act:
-        final KeyPair kp = KeyPair.random(signSchema);
+        final KeyPair kp = KeyPair.random();
 
         // Assert:
         MatcherAssert.assertThat(kp.hasPrivateKey(), IsEqual.equalTo(true));
@@ -41,14 +39,13 @@ public class KeyPairTest {
         MatcherAssert.assertThat(kp.getPublicKey(), IsNull.notNullValue());
     }
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void ctorCanCreateKeyPairAroundPrivateKey(SignSchema signSchema) {
+    @Test
+    void ctorCanCreateKeyPairAroundPrivateKey() {
         // Arrange:
-        final KeyPair kp1 = KeyPair.random(signSchema);
+        final KeyPair kp1 = KeyPair.random();
 
         // Act:
-        final KeyPair kp2 = KeyPair.fromPrivate(kp1.getPrivateKey(), signSchema);
+        final KeyPair kp2 = KeyPair.fromPrivate(kp1.getPrivateKey());
 
         // Assert:
         MatcherAssert.assertThat(kp2.hasPrivateKey(), IsEqual.equalTo(true));
@@ -56,11 +53,10 @@ public class KeyPairTest {
         MatcherAssert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
     }
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void ctorCanCreateKeyPairAroundPublicKey(SignSchema signSchema) {
+    @Test
+    void ctorCanCreateKeyPairAroundPublicKey() {
         // Arrange:
-        final KeyPair kp1 = KeyPair.random(signSchema);
+        final KeyPair kp1 = KeyPair.random();
 
         // Act:
         final KeyPair kp2 = KeyPair.onlyPublic(kp1.getPublicKey());
@@ -76,24 +72,24 @@ public class KeyPairTest {
 
     // endregion
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void ctorCreatesDifferentInstancesWithDifferentKeys(
-        SignSchema signSchema) {
+    @Test
+    void ctorCreatesDifferentInstancesWithDifferentKeys(
+    ) {
         // Act:
-        final KeyPair kp1 = KeyPair.random(signSchema);
-        final KeyPair kp2 = KeyPair.random(signSchema);
+        final KeyPair kp1 = KeyPair.random();
+        final KeyPair kp2 = KeyPair.random();
 
         // Assert:
-        MatcherAssert.assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));
-        MatcherAssert.assertThat(kp2.getPublicKey(), IsNot.not(IsEqual.equalTo(kp1.getPublicKey())));
+        MatcherAssert
+            .assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));
+        MatcherAssert
+            .assertThat(kp2.getPublicKey(), IsNot.not(IsEqual.equalTo(kp1.getPublicKey())));
     }
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void ctorFailsIfPublicKeyIsNotCompressed(SignSchema signSchema) {
+    @Test
+    void ctorFailsIfPublicKeyIsNotCompressed() {
         // Arrange:
-        final KeyPairContext context = new KeyPairContext(signSchema);
+        final KeyPairContext context = new KeyPairContext();
         final PublicKey publicKey = Mockito.mock(PublicKey.class);
         Mockito.when(context.analyzer.isKeyCompressed(publicKey)).thenReturn(false);
 
@@ -106,43 +102,49 @@ public class KeyPairTest {
 
     // region delegation
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void ctorCreatesKeyGenerator(SignSchema signSchema) {
+    @Test
+    void ctorCreatesKeyGenerator() {
         // Arrange:
-        final KeyPairContext context = new KeyPairContext(signSchema);
+        final KeyPairContext context = new KeyPairContext();
 
         // Act:
-        KeyPair.random(context.engine, signSchema);
+        KeyPair.random(context.engine);
 
         // Assert:
-        Mockito.verify(context.engine, Mockito.times(1)).createKeyGenerator(signSchema);
+        Mockito.verify(context.engine, Mockito.times(1)).createKeyGenerator();
     }
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void ctorDelegatesKeyGenerationToKeyGenerator(SignSchema signSchema) {
+    @Test
+    void ctorDelegatesKeyGenerationToKeyGenerator() {
         // Arrange:
-        final KeyPairContext context = new KeyPairContext(signSchema);
+        final KeyPairContext context = new KeyPairContext();
 
         // Act:
-        KeyPair.random(context.engine, signSchema);
+        KeyPair.random(context.engine);
 
         // Assert:
         Mockito.verify(context.generator, Mockito.times(1)).generateKeyPair();
     }
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void ctorWithPrivateKeyDelegatesToDerivePublicKey(SignSchema signSchema) {
+    @Test
+    void ctorWithPrivateKeyDelegatesToDerivePublicKey() {
         // Arrange:
-        final KeyPairContext context = new KeyPairContext(signSchema);
+        final KeyPairContext context = new KeyPairContext();
 
         // Act:
-        KeyPair.fromPrivate(context.privateKey, context.engine, signSchema);
+        KeyPair.fromPrivate(context.privateKey, context.engine);
 
         // Assert:
         Mockito.verify(context.generator, Mockito.times(1)).derivePublicKey(context.privateKey);
+    }
+
+    @Test
+    void createFromKnownValue() {
+        KeyPair keyPair = KeyPair.fromPrivate(PrivateKey
+            .fromHexString("575dbb3062267eff57c970a336ebbc8fbcfe12c5bd3ed7bc11eb0481d7704ced"));
+
+        Assertions.assertEquals("2E834140FD66CF87B254A693A2C7862C819217B676D3943267156625E816EC6F",
+            keyPair.getPublicKey().toHex());
     }
 
     private class KeyPairContext {
@@ -154,10 +156,10 @@ public class KeyPairTest {
         private final PublicKey publicKey = Mockito.mock(PublicKey.class);
         private final KeyPair keyPair1 = Mockito.mock(KeyPair.class);
 
-        private KeyPairContext(SignSchema signSchema) {
+        private KeyPairContext() {
             Mockito.when(this.analyzer.isKeyCompressed(Mockito.any())).thenReturn(true);
             Mockito.when(this.engine.createKeyAnalyzer()).thenReturn(this.analyzer);
-            Mockito.when(this.engine.createKeyGenerator(signSchema)).thenReturn(this.generator);
+            Mockito.when(this.engine.createKeyGenerator()).thenReturn(this.generator);
             Mockito.when(this.generator.generateKeyPair()).thenReturn(this.keyPair1);
             Mockito.when(this.generator.derivePublicKey(this.privateKey))
                 .thenReturn(this.publicKey);

@@ -28,6 +28,7 @@ import io.nem.catapult.builders.UnresolvedAddressDto;
 import io.nem.catapult.builders.UnresolvedMosaicBuilder;
 import io.nem.catapult.builders.UnresolvedMosaicIdDto;
 import io.nem.core.crypto.PublicKey;
+import io.nem.core.utils.Base32Encoder;
 import io.nem.core.utils.ConvertUtils;
 import io.nem.core.utils.MapperUtils;
 import io.nem.core.utils.StringEncoder;
@@ -44,9 +45,7 @@ import java.io.DataInputStream;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.lang3.Validate;
-import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Utility class used to serialize/deserialize catbuffer values.
@@ -136,7 +135,7 @@ public class SerializationUtils {
         }
 
         if (unresolvedAddress instanceof Address) {
-            return ByteBuffer.wrap(new Base32().decode(((Address) unresolvedAddress).plain()));
+            return ByteBuffer.wrap(Base32Encoder.getBytes(((Address) unresolvedAddress).plain()));
         }
         throw new IllegalArgumentException(
             "Unexpected UnresolvedAddress type " + unresolvedAddress.getClass());
@@ -314,7 +313,7 @@ public class SerializationUtils {
      * @return the {@link Hash256Dto}
      */
     public static Hash256Dto toHash256Dto(String hash) {
-        return new Hash256Dto(ByteBuffer.wrap(Hex.decode(hash)));
+        return new Hash256Dto(ByteBuffer.wrap(ConvertUtils.fromHexToBytes(hash)));
     }
 
 }

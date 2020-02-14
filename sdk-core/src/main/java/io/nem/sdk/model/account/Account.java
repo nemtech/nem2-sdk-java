@@ -47,8 +47,7 @@ public class Account {
      * @param networkType NetworkType
      */
     public Account(String privateKey, NetworkType networkType) {
-        this.keyPair = KeyPair.fromPrivate(PrivateKey.fromHexString(privateKey),
-            networkType.resolveSignSchema());
+        this.keyPair = KeyPair.fromPrivate(PrivateKey.fromHexString(privateKey));
         this.publicAccount = new PublicAccount(this.getPublicKey(), networkType);
         this.networkType = networkType;
     }
@@ -73,11 +72,11 @@ public class Account {
     /**
      * Generates an new Account for provided network type
      *
-     *  @param networkType the network type
+     * @param networkType the network type
      * @return the account.
      */
     public static Account generateNewAccount(NetworkType networkType) {
-        KeyPair keyPair = KeyPair.random(networkType.resolveSignSchema());
+        KeyPair keyPair = KeyPair.random();
         return new Account(keyPair.getPrivateKey().toHex(), networkType);
     }
 

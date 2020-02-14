@@ -20,11 +20,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.namespace.NamespaceId;
 import java.math.BigInteger;
 import java.util.Optional;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +42,7 @@ public class ArtifactExpiryReceiptTest {
         assertEquals("85BBEA6CC462B244",
             mosaicExpiryReceipt.getArtifactId().getIdAsHex().toUpperCase());
 
-        String hex = Hex.toHexString(mosaicExpiryReceipt.serialize());
+        String hex = ConvertUtils.toHex(mosaicExpiryReceipt.serialize());
         Assertions.assertEquals("01004d4144b262c46ceabb85", hex);
     }
 
@@ -58,7 +58,7 @@ public class ArtifactExpiryReceiptTest {
         assertEquals(
             namespaceExpiryReceipt.getArtifactId().getId(), new BigInteger("9562080086528621131"));
 
-        String hex = Hex.toHexString(namespaceExpiryReceipt.serialize());
+        String hex = ConvertUtils.toHex(namespaceExpiryReceipt.serialize());
         Assertions.assertEquals("01004e414bfa5f372d55b384", hex);
     }
 
@@ -75,7 +75,7 @@ public class ArtifactExpiryReceiptTest {
             mosaicExpiryReceipt.getArtifactId().getIdAsHex().toUpperCase());
         assertEquals(100, mosaicExpiryReceipt.getSize().get().intValue());
 
-        String hex = Hex.toHexString(mosaicExpiryReceipt.serialize());
+        String hex = ConvertUtils.toHex(mosaicExpiryReceipt.serialize());
         Assertions.assertEquals("01004d4144b262c46ceabb85", hex);
     }
 

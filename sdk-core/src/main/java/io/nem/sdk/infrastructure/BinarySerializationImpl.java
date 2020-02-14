@@ -146,7 +146,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
-import org.bouncycastle.util.encoders.Hex;
 
 
 /**
@@ -966,7 +965,7 @@ public class BinarySerializationImpl implements BinarySerialization {
          */
         private ByteBuffer getSecretBuffer(SecretLockTransaction transaction) {
             final ByteBuffer secretBuffer = ByteBuffer.allocate(32);
-            secretBuffer.put(Hex.decode(transaction.getSecret()));
+            secretBuffer.put(ConvertUtils.fromHexToBytes(transaction.getSecret()));
             return secretBuffer;
         }
     }
@@ -1020,7 +1019,7 @@ public class BinarySerializationImpl implements BinarySerialization {
          */
         private ByteBuffer getSecretBuffer(SecretProofTransaction transaction) {
             final ByteBuffer secretBuffer = ByteBuffer.allocate(32);
-            secretBuffer.put(Hex.decode(transaction.getSecret()));
+            secretBuffer.put(ConvertUtils.fromHexToBytes(transaction.getSecret()));
             return secretBuffer;
         }
 
@@ -1031,7 +1030,7 @@ public class BinarySerializationImpl implements BinarySerialization {
          * @return Proof buffer.
          */
         private ByteBuffer getProofBuffer(SecretProofTransaction transaction) {
-            final byte[] proofBytes = Hex.decode(transaction.getProof());
+            final byte[] proofBytes = ConvertUtils.fromHexToBytes(transaction.getProof());
             return ByteBuffer.wrap(proofBytes);
         }
     }
@@ -1164,7 +1163,7 @@ public class BinarySerializationImpl implements BinarySerialization {
          * @return Hash buffer.
          */
         private ByteBuffer getHashBuffer(HashLockTransaction transaction) {
-            return ByteBuffer.wrap(Hex.decode(transaction.getHash()));
+            return ByteBuffer.wrap(ConvertUtils.fromHexToBytes(transaction.getHash()));
         }
     }
 

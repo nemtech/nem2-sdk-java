@@ -44,7 +44,7 @@ public class AccountLinkTransactionTest extends AbstractTransactionTester {
                 AccountLinkAction.LINK).deadline(new FakeDeadline()).build();
         assertEquals(AccountLinkAction.LINK, transaction.getLinkAction());
         assertEquals(
-            "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
+            "F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E6",
             transaction.getRemoteAccount().getPublicKey().toHex());
     }
 
@@ -58,10 +58,10 @@ public class AccountLinkTransactionTest extends AbstractTransactionTester {
                 AccountLinkAction.LINK).signer(account.getPublicAccount())
                 .deadline(new FakeDeadline()).build();
 
-        String expected = "a100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001904c41000000000000000001000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401";
+        String expected = "a10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001904c4100000000000000000100000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e601";
         assertSerialization(expected, transaction);
 
-        String expectedEmbeddedHash = "51000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001904c419a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b2401";
+        String expectedEmbeddedHash = "5100000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001904c41f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e601";
         assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
     }
 }

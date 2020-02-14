@@ -87,12 +87,12 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         String message = "E2ETest:standaloneTransferTransaction:message 漢字";
 
         NetworkType networkType = getNetworkType();
-        KeyPair senderKeyPair = KeyPair.random(networkType.resolveSignSchema());
-        KeyPair recipientKeyPair = KeyPair.random(networkType.resolveSignSchema());
+        KeyPair senderKeyPair = KeyPair.random();
+        KeyPair recipientKeyPair = KeyPair.random();
 
         Message encryptedMessage = EncryptedMessage
-            .create(message, senderKeyPair.getPrivateKey(), recipientKeyPair.getPublicKey(),
-                networkType);
+            .create(message, senderKeyPair.getPrivateKey(), recipientKeyPair.getPublicKey()
+            );
 
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
@@ -166,8 +166,8 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         Assertions.assertTrue(transaction.getMessage() instanceof EncryptedMessage);
         Assertions.assertNotEquals(message, transaction.getMessage().getPayload());
         String decryptedMessage = ((EncryptedMessage) transaction.getMessage())
-            .decryptPayload(senderKeyPair.getPublicKey(), recipientKeyPair.getPrivateKey(),
-                getNetworkType());
+            .decryptPayload(senderKeyPair.getPublicKey(), recipientKeyPair.getPrivateKey()
+            );
         Assertions.assertNotNull(message, decryptedMessage);
     }
 
@@ -177,8 +177,8 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
     public void standaloneCreatePersistentDelegationRequestTransaction(RepositoryType type) {
 
         NetworkType networkType = getNetworkType();
-        KeyPair senderKeyPair = KeyPair.random(networkType.resolveSignSchema());
-        KeyPair recipientKeyPair = KeyPair.random(networkType.resolveSignSchema());
+        KeyPair senderKeyPair = KeyPair.random();
+        KeyPair recipientKeyPair = KeyPair.random();
 
         TransferTransaction transferTransaction =
             TransferTransactionFactory.createPersistentDelegationRequestTransaction(
@@ -206,8 +206,8 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         Assertions.assertEquals(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,
             transaction.getMessage().getType());
         String decryptedMessage = ((PersistentHarvestingDelegationMessage) transaction.getMessage())
-            .decryptPayload(recipientKeyPair.getPrivateKey(),
-                getNetworkType());
+            .decryptPayload(recipientKeyPair.getPrivateKey()
+            );
         Assertions.assertNotNull(message, decryptedMessage);
     }
 

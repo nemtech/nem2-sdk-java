@@ -25,6 +25,7 @@ import io.nem.catapult.builders.TransactionBuilderFactory;
 import io.nem.catapult.builders.TransferTransactionBuilder;
 import io.nem.core.crypto.KeyPair;
 import io.nem.core.crypto.PrivateKey;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.api.BinarySerialization;
 import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.infrastructure.SerializationUtils;
@@ -44,7 +45,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -115,7 +115,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
     void serialization() {
         // Generated at nem2-library-js/test/transactions/TransferTransaction.spec.js
         String expected =
-            "d400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001026d70e1954775749c6811084d6450a3184d977383f0e4282cd47118af3775500000000019054410000000000000000010000000000000090e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac02140000000000671305c6390b00002c01000000000000672b0000ce560000640000000000000000536f6d65204d65737361676520e6bca2e5ad97";
+            "d400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002134e47aee6f2392a5b3d1238cd7714eabeb739361b7ccf24bae127f10df17f200000000019054410000000000000000010000000000000090e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac02140000000000671305c6390b00002c01000000000000672b0000ce560000640000000000000000536f6d65204d65737361676520e6bca2e5ad97";
         Mosaic mosaicId1 = new Mosaic(
             new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100));
         Mosaic mosaicId2 = new Mosaic(
@@ -131,7 +131,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
 
         assertSerialization(expected, transaction);
 
-        String embeddedExpected = "84000000000000001026d70e1954775749c6811084d6450a3184d977383f0e4282cd47118af37755000000000190544190e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac02140000000000671305c6390b00002c01000000000000672b0000ce560000640000000000000000536f6d65204d65737361676520e6bca2e5ad97";
+        String embeddedExpected = "84000000000000002134e47aee6f2392a5b3d1238cd7714eabeb739361b7ccf24bae127f10df17f2000000000190544190e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac02140000000000671305c6390b00002c01000000000000672b0000ce560000640000000000000000536f6d65204d65737361676520e6bca2e5ad97";
 
         assertEmbeddedSerialization(embeddedExpected, transaction);
 
@@ -172,9 +172,10 @@ class TransferTransactionTest extends AbstractTransactionTester {
             "c4000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001905441000000000000000001000000000000009151776168d24257d80000000000000000000000000000000001140000000000672b0000ce560000640000000000000000536f6d65204d65737361676520e6bca2e5ad97";
 
         TransferTransactionBuilder transactionBuilder = (TransferTransactionBuilder) TransactionBuilderFactory
-            .createTransactionBuilder(SerializationUtils.toDataInput(Hex.decode(expected)));
+            .createTransactionBuilder(
+                SerializationUtils.toDataInput(ConvertUtils.fromHexToBytes(expected)));
 
-        Assertions.assertEquals(expected, Hex.toHexString(
+        Assertions.assertEquals(expected, ConvertUtils.toHex(
             transactionBuilder.serialize()));
 
         Assertions
@@ -188,9 +189,10 @@ class TransferTransactionTest extends AbstractTransactionTester {
             "61000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b24000000000190544190e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac01010000000000672b0000ce560000640000000000000000";
 
         EmbeddedTransferTransactionBuilder transactionBuilder = (EmbeddedTransferTransactionBuilder) TransactionBuilderFactory
-            .createEmbeddedTransactionBuilder(SerializationUtils.toDataInput(Hex.decode(expected)));
+            .createEmbeddedTransactionBuilder(
+                SerializationUtils.toDataInput(ConvertUtils.fromHexToBytes(expected)));
 
-        Assertions.assertEquals(expected, Hex.toHexString(
+        Assertions.assertEquals(expected, ConvertUtils.toHex(
             transactionBuilder.serialize()));
 
         Assertions
@@ -237,10 +239,9 @@ class TransferTransactionTest extends AbstractTransactionTester {
         SignedTransaction signedTransaction = transaction.signWith(account, generationHash);
         String payload = signedTransaction.getPayload();
         assertEquals(
-            "0000000090E8FEBD671DD41BEE94EC3BA5831CB608A312C2F203BA84AC01010000000000672B0000CE560000640000000000000000",
+            "0000000090e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac01010000000000672b0000ce560000640000000000000000",
             payload.substring(248));
-        assertEquals(
-            "C86F3B0A954677761671C2D1A273C59B5F45EE7FB19385DB2D094DE5A0270262",
+        assertEquals("779c364b5f0c3f46a61535a8bf1d887eee7e8cc665b72ef2f41b7532635664fa",
             signedTransaction.getHash());
 
 
@@ -258,11 +259,11 @@ class TransferTransactionTest extends AbstractTransactionTester {
                 PlainMessage.create("test-message")).deadline(new Deadline(BigInteger.ONE)).build();
 
         byte[] payload = transaction.serialize();
-        String payloadHex = Hex.toHexString(payload);
+        String payloadHex = ConvertUtils.toHex(payload);
 
         TransferTransaction newTransaction = (TransferTransaction) new BinarySerializationImpl()
             .deserialize(payload);
-        String newPayloadHex = Hex.toHexString(newTransaction.serialize());
+        String newPayloadHex = ConvertUtils.toHex(newTransaction.serialize());
 
         Assertions.assertEquals(transaction.getRecipient().encoded(networkType),
             newTransaction.getRecipient().encoded(networkType));
@@ -274,12 +275,10 @@ class TransferTransactionTest extends AbstractTransactionTester {
     void createPersistentDelegationRequestTransaction() {
 
         KeyPair remoteProxy = KeyPair.fromPrivate(PrivateKey
-                .fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C111"),
-            networkType.resolveSignSchema());
+            .fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C111"));
 
         KeyPair recipient = KeyPair.fromPrivate(PrivateKey
-                .fromHexString("B72F2950498111BADF276D6D9D5E345F04E0D5C9B8342DA983C3395B4CF18F08"),
-            networkType.resolveSignSchema());
+            .fromHexString("B72F2950498111BADF276D6D9D5E345F04E0D5C9B8342DA983C3395B4CF18F08"));
 
         TransferTransaction transferTransaction =
             TransferTransactionFactory
@@ -305,7 +304,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
         PersistentHarvestingDelegationMessage message = (PersistentHarvestingDelegationMessage) transferTransaction
             .getMessage();
         Assertions.assertEquals(remoteProxy.getPrivateKey().toHex().toUpperCase(),
-            message.decryptPayload(recipient.getPrivateKey(), networkType));
+            message.decryptPayload(recipient.getPrivateKey()));
 
         byte[] actual = transferTransaction.serialize();
 
@@ -319,7 +318,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
             .getMessage();
         Assertions.assertEquals(remoteProxy.getPrivateKey().toHex().toUpperCase(),
             deserializedMessage
-                .decryptPayload(recipient.getPrivateKey(), networkType));
+                .decryptPayload(recipient.getPrivateKey()));
 
     }
 

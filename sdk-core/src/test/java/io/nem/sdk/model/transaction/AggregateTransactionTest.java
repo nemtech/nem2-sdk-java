@@ -19,6 +19,7 @@ package io.nem.sdk.model.transaction;
 import io.nem.catapult.builders.AggregateBondedTransactionBuilder;
 import io.nem.catapult.builders.AggregateCompleteTransactionBuilder;
 import io.nem.catapult.builders.TransactionBuilderFactory;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.api.BinarySerialization;
 import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.infrastructure.SerializationUtils;
@@ -33,7 +34,6 @@ import io.nem.sdk.model.mosaic.MosaicSupplyChangeActionType;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -64,9 +64,10 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
             "a80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019041420000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
         AggregateBondedTransactionBuilder transactionBuilder = (AggregateBondedTransactionBuilder) TransactionBuilderFactory
-            .createTransactionBuilder(SerializationUtils.toDataInput(Hex.decode(expected)));
+            .createTransactionBuilder(
+                SerializationUtils.toDataInput(ConvertUtils.fromHexToBytes(expected)));
 
-        Assertions.assertEquals(expected, Hex.toHexString(
+        Assertions.assertEquals(expected, ConvertUtils.toHex(
             transactionBuilder.serialize()));
 
         Assertions
@@ -102,9 +103,9 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
 
         BinarySerializationImpl binarySerialization = new BinarySerializationImpl();
 
-        String expected = "6001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000190414200000000000000000100000000000000e308d7404d8087f995b5c41b671a5c07861e1f8892b10a9cec8526d09e167f52b8000000000000006d000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b24000000000190544190e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac010d0000000000672b0000ce560000640000000000000000536f6d65204d65737361676500000041000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001904d428869746e9b1a70570a000000000000000100000000000000";
+        String expected = "6001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000190414200000000000000000100000000000000fffd5a0ce49a9981342a3f9477261d473becbc5c9db2d8eb335f45996c4f9842b8000000000000006d00000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e6000000000190544190e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac010d0000000000672b0000ce560000640000000000000000536f6d65204d6573736167650000004100000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001904d428869746e9b1a70570a000000000000000100000000000000";
 
-        Assertions.assertEquals(expected, Hex.toHexString(aggregateTransaction.serialize()));
+        Assertions.assertEquals(expected, ConvertUtils.toHex(aggregateTransaction.serialize()));
 
         AggregateTransaction serialized = assertSerialization(expected, aggregateTransaction);
         Assertions.assertEquals(0, serialized.getCosignatures().size());
@@ -128,29 +129,24 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
         BinarySerialization serialization = new BinarySerializationImpl();
 
         AggregateTransaction deserialize = (AggregateTransaction) serialization
-            .deserialize(Hex.decode(expected));
+            .deserialize(ConvertUtils.fromHexToBytes(expected));
 
         Assertions.assertEquals(2, deserialize.getInnerTransactions().size());
         Assertions.assertEquals(0, deserialize.getCosignatures().size());
 
 //        AggregateBondedTransactionBuilder transactionBuilder = (AggregateBondedTransactionBuilder) TransactionBuilderFactory
-//            .createTransactionBuilder(SerializationUtils.toDataInput(Hex.decode(expected)));
+//            .createTransactionBuilder(SerializationUtils.toDataInput(ConvertUtils.fromHexToBytes(expected)));
 
         AggregateBondedTransactionBuilder transactionBuilder = AggregateBondedTransactionBuilder
-            .loadFromBinary(SerializationUtils.toDataInput(Hex.decode(expected)));
+            .loadFromBinary(SerializationUtils.toDataInput(ConvertUtils.fromHexToBytes(expected)));
 
         Assertions.assertEquals(2, transactionBuilder.getTransactions().size());
         Assertions.assertEquals(0, transactionBuilder.getCosignatures().size());
 
-//        Transaction anotherTransaction = serialization.deserialize(transactionBuilder.serialize());
-//
-//        Assertions.assertEquals(expected, Hex.toHexString(
-//            anotherTransaction.serialize()));
-
-        Assertions.assertEquals(expected, Hex.toHexString(
+        Assertions.assertEquals(expected, ConvertUtils.toHex(
             deserialize.serialize()));
 
-        Assertions.assertEquals(expected, Hex.toHexString(
+        Assertions.assertEquals(expected, ConvertUtils.toHex(
             transactionBuilder.serialize()));
     }
 
@@ -218,9 +214,10 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
         String expected = "c801000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000190414100000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456111aaa9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456111aaa9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea654561119a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222bbb9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222bbb9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea654562229a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456333ccc9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222bbb9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222";
 
         AggregateCompleteTransactionBuilder transactionBuilder = (AggregateCompleteTransactionBuilder) TransactionBuilderFactory
-            .createTransactionBuilder(SerializationUtils.toDataInput(Hex.decode(expected)));
+            .createTransactionBuilder(
+                SerializationUtils.toDataInput(ConvertUtils.fromHexToBytes(expected)));
 
-        Assertions.assertEquals(expected, Hex.toHexString(
+        Assertions.assertEquals(expected, ConvertUtils.toHex(
             transactionBuilder.serialize()));
 
         Assertions.assertEquals(0, transactionBuilder.getTransactions().size());
@@ -266,9 +263,10 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
                 Arrays.asList(transaction1, transaction2),
                 Arrays.asList(cosignature1, cosignature2)).deadline(new FakeDeadline()).build();
 
-        String expected = "2002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000190414200000000000000000100000000000000e308d7404d8087f995b5c41b671a5c07861e1f8892b10a9cec8526d09e167f52b8000000000000006d000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b24000000000190544190e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac010d0000000000672b0000ce560000640000000000000000536f6d65204d65737361676500000041000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001904d428869746e9b1a70570a0000000000000001000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456111aaa9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456111aaa9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea654561119a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222bbb9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222bbb9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222";
+        String expected = "2002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000190414200000000000000000100000000000000fffd5a0ce49a9981342a3f9477261d473becbc5c9db2d8eb335f45996c4f9842b8000000000000006d00000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e6000000000190544190e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac010d0000000000672b0000ce560000640000000000000000536f6d65204d6573736167650000004100000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001904d428869746e9b1a70570a0000000000000001000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456111aaa9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456111aaa9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea654561119a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222bbb9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222bbb9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222";
 
-        Assertions.assertEquals(expected, Hex.toHexString(aggregateTransaction.serialize()));
+        Assertions.assertEquals(expected,
+            ConvertUtils.toHex(aggregateTransaction.serialize()));
 
         AggregateTransaction serialized = assertSerialization(expected,
             aggregateTransaction);
@@ -305,9 +303,10 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
         String expected2 = "2002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000190414200000000000000000100000000000000e308d7404d8087f995b5c41b671a5c07861e1f8892b10a9cec8526d09e167f52b8000000000000006d000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b24000000000190544190e8febd671dd41bee94ec3ba5831cb608a312c2f203ba84ac010d0000000000672b0000ce560000640000000000000000536f6d65204d65737361676500000041000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001904d428869746e9b1a70570a0000000000000001000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456111aaa9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456111aaa9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea654561119a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222bbb9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222bbb9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222";
 
         AggregateBondedTransactionBuilder transactionBuilder = (AggregateBondedTransactionBuilder) TransactionBuilderFactory
-            .createTransactionBuilder(SerializationUtils.toDataInput(Hex.decode(expected2)));
+            .createTransactionBuilder(
+                SerializationUtils.toDataInput(ConvertUtils.fromHexToBytes(expected2)));
 
-        Assertions.assertEquals(expected2, Hex.toHexString(
+        Assertions.assertEquals(expected2, ConvertUtils.toHex(
             transactionBuilder.serialize()));
 
         Assertions.assertEquals(2, transactionBuilder.getTransactions().size());

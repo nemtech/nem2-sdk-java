@@ -1,11 +1,9 @@
 package io.nem.sdk.model.mosaic;
 
 import io.nem.core.utils.ByteUtils;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.infrastructure.RandomUtils;
 import java.math.BigInteger;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  * Mosaic nonce class
@@ -46,16 +44,12 @@ public class MosaicNonce {
      * @return MosaicNonce
      */
     public static MosaicNonce createFromHex(String hex) {
-        try {
-            final byte[] bytes = Hex.decodeHex(hex);
-            if (bytes.length != 4) {
-                throw new IllegalIdentifierException(
-                    "Expected 4 bytes for Nonce but got " + bytes.length + " instead.");
-            }
-            return new MosaicNonce(bytes);
-        } catch (DecoderException e) {
-            throw new IllegalIdentifierException(ExceptionUtils.getMessage(e), e);
+        final byte[] bytes = ConvertUtils.fromHexToBytes(hex);
+        if (bytes.length != 4) {
+            throw new IllegalIdentifierException(
+                "Expected 4 bytes for Nonce but got " + bytes.length + " instead.");
         }
+        return new MosaicNonce(bytes);
     }
 
     /**

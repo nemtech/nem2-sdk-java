@@ -18,11 +18,11 @@
 package io.nem.core.crypto;
 
 import io.nem.core.utils.AbstractVectorTester;
+import io.nem.core.utils.ConvertUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -31,23 +31,18 @@ import org.junit.jupiter.params.provider.MethodSource;
 /**
  * Test the signer using the vector test data.
  */
-public class DsaSignerVectorTester extends AbstractVectorTester {
+class DsaSignerVectorTester extends AbstractVectorTester {
 
-    private static Stream<Arguments> testSignAll() throws Exception {
-        Stream<Arguments> catapultArguments = createArguments("2.test-sign-catapult.json",
-            entry -> extractArguments(SignSchema.SHA3, entry), 0, 10
+    private static Stream<Arguments> testSignAll() {
+        return createArguments("2.test-sign.json",
+            DsaSignerVectorTester::extractArguments, 0, 10
         );
-        Stream<Arguments> nis1Arguments = createArguments("2.test-sign-nis1.json",
-            entry -> extractArguments(SignSchema.KECCAK, entry), 0, 10
-        );
-        return Stream.concat(catapultArguments, nis1Arguments);
     }
 
-    private static List<Arguments> extractArguments(SignSchema signSchema,
+    private static List<Arguments> extractArguments(
         Map<String, String> entry) {
         return Collections
             .singletonList(Arguments.of(
-                signSchema,
                 entry.get("privateKey"),
                 entry.get("publicKey"),
                 entry.get("data"),
@@ -57,19 +52,18 @@ public class DsaSignerVectorTester extends AbstractVectorTester {
 
     @ParameterizedTest
     @MethodSource("testSignAll")
-    void testSignAll(SignSchema signSchema, String privateKey, String publicKey,
+    void testSignAll(String privateKey, String publicKey,
         String data,
         int length, String signature) {
         final CryptoEngine engine = CryptoEngines.defaultEngine();
 
         final KeyPair keyPair = KeyPair
             .fromPrivate(
-                PrivateKey.fromHexString(privateKey),
-                signSchema);
-        final DsaSigner signer = engine.createDsaSigner(keyPair, signSchema);
+                PrivateKey.fromHexString(privateKey));
+        final DsaSigner signer = engine.createDsaSigner(keyPair);
 
         // Act:
-        byte[] input = Hex.decode(data);
+        byte[] input = ConvertUtils.fromHexToBytes(data);
         final Signature signatureObject = signer.sign(input);
 
         // Assert:

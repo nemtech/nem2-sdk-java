@@ -20,6 +20,7 @@ package io.nem.sdk.infrastructure.vertx.mappers;
 import static io.nem.core.utils.MapperUtils.toUnresolvedAddress;
 import static io.nem.core.utils.MapperUtils.toUnresolvedMosaicId;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.message.Message;
@@ -97,9 +98,8 @@ class TransferTransactionMapper extends
         if (transaction.getMessage() != null) {
             message = new MessageDTO();
             message.setType(MessageTypeEnum.NUMBER_0);
-            message.setPayload(org.apache.commons.codec.binary.Hex
-                .encodeHexString(
-                    transaction.getMessage().getPayload().getBytes(StandardCharsets.UTF_8)));
+            message.setPayload(ConvertUtils
+                .toHex(transaction.getMessage().getPayload().getBytes(StandardCharsets.UTF_8)));
 
         }
         dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));

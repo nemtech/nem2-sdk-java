@@ -20,12 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.nem.core.utils.ByteUtils;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.mosaic.IllegalIdentifierException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -126,8 +126,8 @@ class IdGeneratorTest {
                 0x66, 0x27, 0xCB, 0x6C, 0x80, 0xDE, 0x62, 0xCD, 0x92, 0xF7, 0xF9, 0xAE, 0xDB, 0x70,
                 0x64, 0xA3, 0xDE, 0x62
             };
-        String hexPublicKey = Hex.toHexString(ByteUtils.intArrayToByteArray(publicKey));
-        String hexNonce = Hex.toHexString(ByteUtils.intArrayToByteArray(nonce));
+        String hexPublicKey = ConvertUtils.toHex(ByteUtils.intArrayToByteArray(publicKey));
+        String hexNonce = ConvertUtils.toHex(ByteUtils.intArrayToByteArray(nonce));
         long[] expected = new long[]{0xC0AFC518, 0x3AD842A8};
         BigInteger id =
             IdGenerator.generateMosaicId(
@@ -139,11 +139,12 @@ class IdGeneratorTest {
     @MethodSource("provider")
     void mosaicIdGeneratesCorrectGivenNonceAndPublicKey(
         String hexPublicKey, String hexNonce, String hexExpectedMosaicId) {
-        byte[] nonceBytes = Hex.decode(hexNonce);
+        byte[] nonceBytes = ConvertUtils.fromHexToBytes(hexNonce);
         //ArrayUtils.reverse(nonceBytes);
-        BigInteger id = IdGenerator.generateMosaicId(nonceBytes, Hex.decode(hexPublicKey));
+        BigInteger id = IdGenerator
+            .generateMosaicId(nonceBytes, ConvertUtils.fromHexToBytes(hexPublicKey));
         assertEquals(hexExpectedMosaicId.toLowerCase(), String.format("%016x", id));
-        assertEquals(hexExpectedMosaicId.toLowerCase(), Hex.toHexString(id.toByteArray()));
+        assertEquals(hexExpectedMosaicId.toLowerCase(), ConvertUtils.toHex(id.toByteArray()));
     }
 
   /*  @Test

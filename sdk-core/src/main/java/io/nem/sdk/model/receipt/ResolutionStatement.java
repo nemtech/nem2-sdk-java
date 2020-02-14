@@ -19,6 +19,7 @@ package io.nem.sdk.model.receipt;
 import io.nem.core.crypto.Hashes;
 import io.nem.core.utils.ArrayUtils;
 import io.nem.core.utils.ByteUtils;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.infrastructure.SerializationUtils;
 import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
@@ -26,7 +27,6 @@ import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
-import org.bouncycastle.util.encoders.Hex;
 
 /**
  * @param <U> the unresolved type {@link UnresolvedAddress} or  {@link UnresolvedMosaicId}
@@ -301,7 +301,7 @@ public abstract class ResolutionStatement<U, R> {
         }
 
         byte[] hash = Hashes.sha3_256(results);
-        return Hex.toHexString(hash).toUpperCase();
+        return ConvertUtils.toHex(hash).toUpperCase();
     }
 
     /**

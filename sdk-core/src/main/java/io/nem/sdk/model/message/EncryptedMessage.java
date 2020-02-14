@@ -22,10 +22,8 @@ import io.nem.core.crypto.CryptoEngines;
 import io.nem.core.crypto.KeyPair;
 import io.nem.core.crypto.PrivateKey;
 import io.nem.core.crypto.PublicKey;
-import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.ConvertUtils;
 import io.nem.core.utils.StringEncoder;
-import io.nem.sdk.model.blockchain.NetworkType;
 
 
 /**
@@ -57,20 +55,17 @@ public class EncryptedMessage extends Message {
      * @param plainTextMessage Plain message to be encrypted
      * @param senderPrivateKey Sender private key
      * @param recipientPublicKey Recipient public key
-     * @param networkType Catapult network type
      * @return EncryptedMessage
      */
     public static EncryptedMessage create(String plainTextMessage,
         PrivateKey senderPrivateKey,
-        PublicKey recipientPublicKey,
-        NetworkType networkType) {
-        SignSchema signSchema = networkType.resolveSignSchema();
+        PublicKey recipientPublicKey) {
         CryptoEngine engine = CryptoEngines.defaultEngine();
-        KeyPair sender = KeyPair.fromPrivate(senderPrivateKey, signSchema);
+        KeyPair sender = KeyPair.fromPrivate(senderPrivateKey);
         KeyPair recipient = KeyPair.onlyPublic(recipientPublicKey, engine);
         BlockCipher blockCipher = engine
             .createBlockCipher(sender,
-                recipient, signSchema);
+                recipient);
         return new EncryptedMessage(
             ConvertUtils.toHex(blockCipher.encrypt(StringEncoder.getBytes(plainTextMessage)))
         );
@@ -83,17 +78,14 @@ public class EncryptedMessage extends Message {
      *
      * @param senderPublicKey Sender public key.
      * @param recipientPrivateKey Recipient private key
-     * @param networkType Catapult network type
      * @return plain string message.
      */
-    public String decryptPayload(PublicKey senderPublicKey, PrivateKey recipientPrivateKey,
-        NetworkType networkType) {
-        SignSchema signSchema = networkType.resolveSignSchema();
+    public String decryptPayload(PublicKey senderPublicKey, PrivateKey recipientPrivateKey) {
         CryptoEngine engine = CryptoEngines.defaultEngine();
         KeyPair sender = KeyPair.onlyPublic(senderPublicKey, engine);
-        KeyPair recipient = KeyPair.fromPrivate(recipientPrivateKey, signSchema);
+        KeyPair recipient = KeyPair.fromPrivate(recipientPrivateKey);
         BlockCipher blockCipher = engine
-            .createBlockCipher(sender, recipient, signSchema);
+            .createBlockCipher(sender, recipient);
         return StringEncoder
             .getString(blockCipher.decrypt(ConvertUtils.fromHexToBytes(getPayload())));
     }

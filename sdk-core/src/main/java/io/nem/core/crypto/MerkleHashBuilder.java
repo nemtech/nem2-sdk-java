@@ -25,16 +25,12 @@ import java.util.List;
 public class MerkleHashBuilder {
 
     private final List<byte[]> hashes;
-    private final SignSchema.Hasher hasher;
 
     /**
      * Constructor.
-     *
-     * @param hasher Hasher used to create the hash.
      */
-    public MerkleHashBuilder(final SignSchema.Hasher hasher) {
+    public MerkleHashBuilder() {
         this.hashes = new ArrayList<>();
-        this.hasher = hasher;
     }
 
     private byte[] getRootHash(List<byte[]> hashes) {
@@ -44,6 +40,8 @@ public class MerkleHashBuilder {
 
         // build the merkle tree
         int numRemainingHashes = hashes.size();
+
+        Hasher hasher = Hashes::sha3_256;
         while (numRemainingHashes > 1) {
 
             for (int i = 0; i < numRemainingHashes; i += 2) {

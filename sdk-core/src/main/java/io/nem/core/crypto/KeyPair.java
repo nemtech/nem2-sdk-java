@@ -45,22 +45,20 @@ public class KeyPair {
     /**
      * Creates a random key pair using the default engine.
      *
-     * @param signSchema the {@link SignSchema}.
      * @return a {@link KeyPair} with both public and private keys.
      */
-    public static KeyPair random(final SignSchema signSchema) {
-        return CryptoEngines.defaultEngine().createKeyGenerator(signSchema).generateKeyPair();
+    public static KeyPair random() {
+        return CryptoEngines.defaultEngine().createKeyGenerator().generateKeyPair();
     }
 
     /**
      * Creates a random key pair using the provided engine.
      *
      * @param engine the engine.
-     * @param signSchema the {@link SignSchema}.
      * @return a {@link KeyPair} with both public and private keys.
      */
-    public static KeyPair random(CryptoEngine engine, final SignSchema signSchema) {
-        return engine.createKeyGenerator(signSchema).generateKeyPair();
+    public static KeyPair random(CryptoEngine engine) {
+        return engine.createKeyGenerator().generateKeyPair();
     }
 
     /**
@@ -68,12 +66,10 @@ public class KeyPair {
      *
      * @param privateKey The private key.
      * @param engine the engine.
-     * @param signSchema The signSchema
      * @return a {@link KeyPair} with both public and private keys.
      */
-    public static KeyPair fromPrivate(final PrivateKey privateKey, final CryptoEngine engine,
-        final SignSchema signSchema) {
-        PublicKey publicKey = engine.createKeyGenerator(signSchema).derivePublicKey(privateKey);
+    public static KeyPair fromPrivate(final PrivateKey privateKey, final CryptoEngine engine) {
+        PublicKey publicKey = engine.createKeyGenerator().derivePublicKey(privateKey);
         return new KeyPair(Optional.of(privateKey), publicKey, engine);
     }
 
@@ -105,12 +101,10 @@ public class KeyPair {
      * calculated from the private key.
      *
      * @param privateKey The private key.
-     * @param signSchema The signSchema
      * @return a {@link KeyPair} with both public and private keys.
      */
-    public static KeyPair fromPrivate(final PrivateKey privateKey,
-        final SignSchema signSchema) {
-        return fromPrivate(privateKey, CryptoEngines.defaultEngine(), signSchema);
+    public static KeyPair fromPrivate(final PrivateKey privateKey) {
+        return fromPrivate(privateKey, CryptoEngines.defaultEngine());
     }
 
 

@@ -28,19 +28,14 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Test of SignSchema.
+ * Test of KeyPair using vector.
  */
 public class KeyPairVectorTester extends AbstractVectorTester {
 
-    private static Stream<Arguments> testKeysCatapult() {
-        return createArguments("1.test-keys-catapult.json", KeyPairVectorTester::extractArguments,
+    private static Stream<Arguments> testKeys() {
+        return createArguments("1.test-keys.json", KeyPairVectorTester::extractArguments,
             0,
             10
-        );
-    }
-
-    private static Stream<Arguments> testKeysNis1() {
-        return createArguments("1.test-keys-nis1.json", KeyPairVectorTester::extractArguments, 0, 10
         );
     }
 
@@ -50,20 +45,9 @@ public class KeyPairVectorTester extends AbstractVectorTester {
     }
 
     @ParameterizedTest
-    @MethodSource("testKeysNis1")
-    void testKeysNis1(String privateKey, String publicKey) {
-        //Reversing to reuse nis1 tests.
-        KeyPair keyPair = KeyPair
-            .fromPrivate(PrivateKey.fromHexString(privateKey), SignSchema.KECCAK);
-        Assertions
-            .assertEquals(publicKey.toUpperCase(), keyPair.getPublicKey().toHex().toUpperCase());
-    }
-
-    @ParameterizedTest
-    @MethodSource("testKeysCatapult")
-    void testKeccakCatapult(String privateKey, String publicKey) {
-        KeyPair keyPair = KeyPair
-            .fromPrivate(PrivateKey.fromHexString(privateKey), SignSchema.SHA3);
+    @MethodSource("testKeys")
+    void testKeys(String privateKey, String publicKey) {
+        KeyPair keyPair = KeyPair.fromPrivate(PrivateKey.fromHexString(privateKey));
         Assertions
             .assertEquals(publicKey.toUpperCase(), keyPair.getPublicKey().toHex().toUpperCase());
     }

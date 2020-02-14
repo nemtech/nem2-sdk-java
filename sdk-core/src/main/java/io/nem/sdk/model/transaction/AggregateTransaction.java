@@ -18,12 +18,12 @@ package io.nem.sdk.model.transaction;
 
 import io.nem.core.crypto.CryptoEngines;
 import io.nem.core.crypto.DsaSigner;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.PublicAccount;
 import java.math.BigInteger;
 import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
-import org.bouncycastle.util.encoders.Hex;
 
 /**
  * The aggregate innerTransactions contain multiple innerTransactions that can be initiated by
@@ -91,14 +91,13 @@ public class AggregateTransaction extends Transaction {
 
         for (Account cosignatory : cosignatories) {
             final DsaSigner signer = CryptoEngines.defaultEngine()
-                .createDsaSigner(cosignatory.getKeyPair(),
-                    cosignatory.getNetworkType().resolveSignSchema());
-            byte[] bytes = Hex.decode(signedTransaction.getHash());
+                .createDsaSigner(cosignatory.getKeyPair());
+            byte[] bytes = ConvertUtils.fromHexToBytes(signedTransaction.getHash());
             byte[] signatureBytes = signer.sign(bytes).getBytes();
-            payload.append(cosignatory.getPublicKey()).append(Hex.toHexString(signatureBytes));
+            payload.append(cosignatory.getPublicKey()).append(ConvertUtils.toHex(signatureBytes));
         }
 
-        byte[] payloadBytes = Hex.decode(payload.toString());
+        byte[] payloadBytes = ConvertUtils.fromHexToBytes(payload.toString());
 
         byte[] size = BigInteger.valueOf(payloadBytes.length).toByteArray();
         ArrayUtils.reverse(size);
@@ -106,7 +105,7 @@ public class AggregateTransaction extends Transaction {
         System.arraycopy(size, 0, payloadBytes, 0, size.length);
 
         return new SignedTransaction(initiatorAccount.getPublicAccount(),
-            Hex.toHexString(payloadBytes), signedTransaction.getHash(), getType());
+            ConvertUtils.toHex(payloadBytes), signedTransaction.getHash(), getType());
     }
 
     /**

@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.account.Address;
@@ -64,7 +65,6 @@ import io.vertx.core.json.Json;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -744,7 +744,7 @@ public class TransactionMapperVertxTest {
         } else {
             assertEquals(
                 new String(
-                    Hex.decode(
+                    ConvertUtils.fromHexToBytes(
                         transferTransaction.getMessage().getPayload()),
                     StandardCharsets.UTF_8),
                 transaction.getMessage().getPayload());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 NEM
+ * Copyright 2020 NEM
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package io.nem.sdk.model.receipt;
+package io.nem.core.crypto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+/**
+ * Function that hashes inputs according to the preconfigured schema.
+ */
+@FunctionalInterface
+public interface Hasher {
 
-import io.nem.core.utils.ConvertUtils;
-import org.junit.jupiter.api.Test;
-
-public class ReceiptSourceTest {
-
-    @Test
-    void shouldCreateReceiptSource() {
-
-        ReceiptSource source = new ReceiptSource(10, 2);
-        assertEquals(10, source.getPrimaryId());
-        assertEquals(2, source.getSecondaryId());
-
-        assertEquals("0a00000002000000", ConvertUtils.toHex(source.serialize()));
-    }
+    byte[] hash(byte[]... inputs);
 }

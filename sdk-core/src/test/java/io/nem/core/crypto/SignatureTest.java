@@ -127,13 +127,15 @@ public class SignatureTest {
     @Test
     public void binaryCtorFailsIfByteArrayOfRIsTooLarge() {
         // Act:
-        Assertions.assertThrows(IllegalArgumentException.class, () -> new Signature(new byte[33], new byte[32]));
+        Assertions.assertThrows(IllegalArgumentException.class,
+            () -> new Signature(new byte[33], new byte[32]));
     }
 
     @Test
     public void binaryCtorFailsIfByteArrayOfSIsTooLarge() {
         // Act:
-        Assertions.assertThrows(IllegalArgumentException.class, () -> new Signature(new byte[32], new byte[33]));
+        Assertions.assertThrows(IllegalArgumentException.class,
+            () -> new Signature(new byte[32], new byte[33]));
     }
 
     // endregion

@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
@@ -41,7 +42,6 @@ import io.vertx.core.json.Json;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -107,7 +107,7 @@ public class VertxAggregateTransactionTest {
             ).deadline(new VertxFakeDeadline()).build();
 
         byte[] actual = aggregateTx.serialize();
-        assertEquals(expected, Hex.toHexString(actual));
+        assertEquals(expected, ConvertUtils.toHex(actual));
     }
 
     @Test

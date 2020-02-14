@@ -17,26 +17,22 @@
 package io.nem.core.crypto.ed25519;
 
 import io.nem.core.crypto.BlockCipher;
+import io.nem.core.crypto.Hashes;
 import io.nem.core.crypto.KeyPair;
 import io.nem.core.crypto.PrivateKey;
 import io.nem.core.crypto.PublicKey;
-import io.nem.core.crypto.SignSchema;
 import io.nem.core.crypto.ed25519.arithmetic.Ed25519EncodedGroupElement;
 import io.nem.core.crypto.ed25519.arithmetic.Ed25519GroupElement;
 import io.nem.sdk.infrastructure.RandomUtils;
 import java.util.Arrays;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
-import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.engines.AESEngine;
-import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
 import org.bouncycastle.crypto.modes.CBCBlockCipher;
 import org.bouncycastle.crypto.paddings.BlockCipherPadding;
 import org.bouncycastle.crypto.paddings.PKCS7Padding;
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
-import org.bouncycastle.crypto.params.HKDFParameters;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
@@ -49,13 +45,10 @@ public class Ed25519BlockCipher implements BlockCipher {
 
     private final KeyPair senderKeyPair;
     private final KeyPair recipientKeyPair;
-    private final SignSchema signSchema;
 
-    public Ed25519BlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair,
-        final SignSchema signSchema) {
+    public Ed25519BlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
         this.senderKeyPair = senderKeyPair;
         this.recipientKeyPair = recipientKeyPair;
-        this.signSchema = signSchema;
     }
 
     @Override
@@ -65,7 +58,7 @@ public class Ed25519BlockCipher implements BlockCipher {
 
         // Derive shared key.
         final byte[] sharedKey = getSharedKey(this.senderKeyPair.getPrivateKey(),
-            this.recipientKeyPair.getPublicKey(), signSchema);
+            this.recipientKeyPair.getPublicKey());
 
         // Setup IV.
         final byte[] ivData = RandomUtils.generateRandomBytes(IV_LENGTH);
@@ -97,7 +90,7 @@ public class Ed25519BlockCipher implements BlockCipher {
 
         // Derive shared key.
         final byte[] sharedKey = getSharedKey(this.recipientKeyPair.getPrivateKey(),
-            this.senderKeyPair.getPublicKey(), signSchema);
+            this.senderKeyPair.getPublicKey());
 
         // Setup block cipher.
         final BufferedBlockCipher cipher = setupBlockCipher(sharedKey, ivData, false);
@@ -134,27 +127,16 @@ public class Ed25519BlockCipher implements BlockCipher {
         return cipher;
     }
 
-    public static byte[] getSharedKey(final PrivateKey privateKey, final PublicKey publicKey,
-        final SignSchema signSchema) {
-        final byte[] sharedSecret = getSharedSecret(privateKey, publicKey, signSchema);
-        Digest hash = new SHA256Digest();
-        byte[] info = "catapult".getBytes();
-        int length = 32;
-        byte[] sharedKey = new byte[length];
-        HKDFParameters params = new HKDFParameters(sharedSecret, null, info);
-        HKDFBytesGenerator hkdf = new HKDFBytesGenerator(hash);
-        hkdf.init(params);
-        hkdf.generateBytes(sharedKey, 0, length);
-        return sharedKey;
+    public static byte[] getSharedKey(final PrivateKey privateKey, final PublicKey publicKey) {
+        return Hashes.sha256ForSharedKey(getSharedSecret(privateKey, publicKey));
     }
 
-    public static byte[] getSharedSecret(final PrivateKey privateKey, final PublicKey publicKey,
-        final SignSchema signSchema) {
+    public static byte[] getSharedSecret(final PrivateKey privateKey, final PublicKey publicKey) {
         final Ed25519GroupElement senderA =
             new Ed25519EncodedGroupElement(publicKey.getBytes()).decode();
         senderA.precomputeForScalarMultiplication();
         return senderA
-            .scalarMultiply(Ed25519Utils.prepareForScalarMultiply(privateKey, signSchema))
+            .scalarMultiply(Ed25519Utils.prepareForScalarMultiply(privateKey))
             .encode()
             .getRaw();
     }

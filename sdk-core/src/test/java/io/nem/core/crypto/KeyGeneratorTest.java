@@ -20,16 +20,14 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
 import org.hamcrest.core.IsNull;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.api.Test;
 
 public abstract class KeyGeneratorTest {
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void generateKeyPairReturnsNewKeyPair(SignSchema signSchema) {
+    @Test
+    public void generateKeyPairReturnsNewKeyPair() {
         // Arrange:
-        final KeyGenerator generator = this.getKeyGenerator(signSchema);
+        final KeyGenerator generator = this.getKeyGenerator();
 
         // Act:
         final KeyPair kp = generator.generateKeyPair();
@@ -39,11 +37,10 @@ public abstract class KeyGeneratorTest {
         MatcherAssert.assertThat(kp.getPublicKey(), IsNull.notNullValue());
     }
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void derivePublicKeyReturnsPublicKey(SignSchema signSchema) {
+    @Test
+    public void derivePublicKeyReturnsPublicKey() {
         // Arrange:
-        final KeyGenerator generator = this.getKeyGenerator(signSchema);
+        final KeyGenerator generator = this.getKeyGenerator();
         final KeyPair kp = generator.generateKeyPair();
 
         // Act:
@@ -51,23 +48,25 @@ public abstract class KeyGeneratorTest {
 
         // Assert:
         MatcherAssert.assertThat(publicKey, IsNull.notNullValue());
-        MatcherAssert.assertThat(publicKey.getBytes(), IsEqual.equalTo(kp.getPublicKey().getBytes()));
+        MatcherAssert
+            .assertThat(publicKey.getBytes(), IsEqual.equalTo(kp.getPublicKey().getBytes()));
     }
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void generateKeyPairCreatesDifferentInstancesWithDifferentKeys(SignSchema signSchema) {
+    @Test
+    public void generateKeyPairCreatesDifferentInstancesWithDifferentKeys() {
         // Act:
-        final KeyPair kp1 = this.getKeyGenerator(signSchema).generateKeyPair();
-        final KeyPair kp2 = this.getKeyGenerator(signSchema).generateKeyPair();
+        final KeyPair kp1 = this.getKeyGenerator().generateKeyPair();
+        final KeyPair kp2 = this.getKeyGenerator().generateKeyPair();
 
         // Assert:
-        MatcherAssert.assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));
-        MatcherAssert.assertThat(kp2.getPublicKey(), IsNot.not(IsEqual.equalTo(kp1.getPublicKey())));
+        MatcherAssert
+            .assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));
+        MatcherAssert
+            .assertThat(kp2.getPublicKey(), IsNot.not(IsEqual.equalTo(kp1.getPublicKey())));
     }
 
-    protected KeyGenerator getKeyGenerator(SignSchema signSchema) {
-        return this.getCryptoEngine().createKeyGenerator(signSchema);
+    protected KeyGenerator getKeyGenerator() {
+        return this.getCryptoEngine().createKeyGenerator();
     }
 
     protected abstract CryptoEngine getCryptoEngine();

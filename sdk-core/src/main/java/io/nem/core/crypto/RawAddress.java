@@ -19,14 +19,12 @@ package io.nem.core.crypto;
 
 import io.nem.core.utils.ArrayUtils;
 import io.nem.core.utils.Base32Encoder;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.Arrays;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 
 /**
- * Utility class that knows how to create an address based on a public key. It supports the
- * different hashes algorithms defined in {@link SignSchema}.
+ * Utility class that knows how to create an address based on a public key.
  */
 public class RawAddress {
 
@@ -50,16 +48,15 @@ public class RawAddress {
      */
     public static String generateAddress(final String publicKey, final NetworkType networkType) {
 
-        SignSchema signSchema = networkType.resolveSignSchema();
         byte version = (byte) networkType.getValue();
         // step 1: sha3 hash of the public key
         byte[] publicKeyBytes;
         try {
-            publicKeyBytes = Hex.decodeHex(publicKey);
-        } catch (DecoderException e) {
+            publicKeyBytes = ConvertUtils.fromHexToBytes(publicKey);
+        } catch (Exception e) {
             throw new IllegalArgumentException("Public key is not valid");
         }
-        final byte[] publicKeyHash = SignSchema.toHash32Bytes(signSchema, publicKeyBytes);
+        final byte[] publicKeyHash = Hashes.sha3_256(publicKeyBytes);
 
         // step 2: ripemd160 hash of (1)
         final byte[] ripemd160StepOneHash = Hashes.ripemd160(publicKeyHash);
@@ -69,7 +66,7 @@ public class RawAddress {
             ArrayUtils.concat(new byte[]{version}, ripemd160StepOneHash);
 
         // step 4: get the checksum of (3)
-        final byte[] stepThreeChecksum = generateChecksum(versionPrefixedRipemd160Hash, signSchema);
+        final byte[] stepThreeChecksum = generateChecksum(versionPrefixedRipemd160Hash);
 
         // step 5: concatenate (3) and (4)
         final byte[] concatStepThreeAndStepSix =
@@ -80,9 +77,9 @@ public class RawAddress {
     }
 
 
-    private static byte[] generateChecksum(final byte[] input, SignSchema signSchema) {
+    private static byte[] generateChecksum(final byte[] input) {
         // step 1: sha3 hash of (input
-        final byte[] stepThreeHash = SignSchema.toHash32Bytes(signSchema, input);
+        final byte[] stepThreeHash = Hashes.sha3_256(input);
 
         // step 2: get the first X bytes of (1)
         return Arrays.copyOfRange(stepThreeHash, 0, NUM_CHECKSUM_BYTES);

@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
@@ -27,7 +28,6 @@ import io.nem.sdk.model.account.UnresolvedAddress;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -75,9 +75,9 @@ public class BalanceTransferReceiptTest {
             balanceTransferReceipt.getMosaicId().getIdAsHex().toUpperCase());
         assertEquals(BigInteger.TEN, balanceTransferReceipt.getAmount());
 
-        String hex = Hex.toHexString(balanceTransferReceipt.serialize());
+        String hex = ConvertUtils.toHex(balanceTransferReceipt.serialize());
         Assertions.assertEquals(
-            "01004d1244b262c46ceabb850a000000000000001026d70e1954775749c6811084d6450a3184d977383f0e4282cd47118af3775590ccb2d8723a173450e6404fda1afaae0bdab524508430c75e",
+            "01004d1244b262c46ceabb850a000000000000002134e47aee6f2392a5b3d1238cd7714eabeb739361b7ccf24bae127f10df17f290ccb2d8723a173450e6404fda1afaae0bdab524508430c75e",
             hex);
 
     }
@@ -96,9 +96,9 @@ public class BalanceTransferReceiptTest {
                 ReceiptType.MOSAIC_RENTAL_FEE,
                 ReceiptVersion.BALANCE_TRANSFER);
 
-        String hex = Hex.toHexString(balanceTransferReceipt.serialize());
+        String hex = ConvertUtils.toHex(balanceTransferReceipt.serialize());
         Assertions.assertEquals(
-            "01004D121C29E1B7B2991294E8030000000000002FC3872A792933617D70E02AFF8FBDE152821A0DF0CA5FB04CB56FC3D21C88639103B60AAF2762688300000000000000000000000000000000",
+            "01004D121C29E1B7B2991294E803000000000000DF9B9967718FFCF2BEE9112A61EECA2BA0CDD29E5E4A3CD04A39FC3A78EAC94F9103B60AAF2762688300000000000000000000000000000000",
             hex.toUpperCase());
     }
 
@@ -125,9 +125,9 @@ public class BalanceTransferReceiptTest {
             balanceTransferReceipt.getMosaicId().getIdAsHex().toUpperCase());
         assertEquals(BigInteger.TEN, balanceTransferReceipt.getAmount());
 
-        String hex = Hex.toHexString(balanceTransferReceipt.serialize());
+        String hex = ConvertUtils.toHex(balanceTransferReceipt.serialize());
         Assertions.assertEquals(
-            "01004e1344b262c46ceabb850a000000000000001026d70e1954775749c6811084d6450a3184d977383f0e4282cd47118af3775590ccb2d8723a173450e6404fda1afaae0bdab524508430c75e",
+            "01004e1344b262c46ceabb850a000000000000002134e47aee6f2392a5b3d1238cd7714eabeb739361b7ccf24bae127f10df17f290ccb2d8723a173450e6404fda1afaae0bdab524508430c75e",
             hex);
 
     }
@@ -155,9 +155,9 @@ public class BalanceTransferReceiptTest {
             balanceTransferReceipt.getMosaicId().getIdAsHex().toUpperCase());
         assertEquals(BigInteger.TEN, balanceTransferReceipt.getAmount());
 
-        String hex = Hex.toHexString(balanceTransferReceipt.serialize());
+        String hex = ConvertUtils.toHex(balanceTransferReceipt.serialize());
         Assertions.assertEquals(
-            "01004e1344b262c46ceabb850a000000000000001026d70e1954775749c6811084d6450a3184d977383f0e4282cd47118af3775590ccb2d8723a173450e6404fda1afaae0bdab524508430c75e",
+            "01004e1344b262c46ceabb850a000000000000002134e47aee6f2392a5b3d1238cd7714eabeb739361b7ccf24bae127f10df17f290ccb2d8723a173450e6404fda1afaae0bdab524508430c75e",
             hex);
 
     }

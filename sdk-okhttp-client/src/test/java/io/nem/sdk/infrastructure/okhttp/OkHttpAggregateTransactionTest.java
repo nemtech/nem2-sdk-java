@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
@@ -39,7 +40,6 @@ import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -102,7 +102,7 @@ public class OkHttpAggregateTransactionTest {
                             NetworkType.MIJIN_TEST)))).deadline(new OkHttpFakeDeadline()).build();
 
         byte[] actual = aggregateTx.serialize();
-        assertEquals(expected, Hex.toHexString(actual));
+        assertEquals(expected, ConvertUtils.toHex(actual));
     }
 
     @Test

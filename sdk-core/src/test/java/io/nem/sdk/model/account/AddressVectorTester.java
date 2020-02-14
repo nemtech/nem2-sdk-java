@@ -33,26 +33,16 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 class AddressVectorTester extends AbstractVectorTester {
 
-    private static Stream<Arguments> testAddressCatapult() throws Exception {
-        return createArguments("1.test-address-catapult.json", AddressVectorTester::extractArgumentsSha,
+    private static Stream<Arguments> testAddress() {
+        return createArguments("1.test-address.json", AddressVectorTester::extractArgumentsSha,
             0, 5
         );
     }
 
-    private static Stream<Arguments> testAddressNis1() throws Exception {
-        return createArguments("1.test-address-nis1.json", AddressVectorTester::extractArgumentsKeccak, 0, 5
-        );
-    }
-
-    private static List<Arguments> extractArgumentsKeccak(Map<String, String> entry) {
+    private static List<Arguments> extractArgumentsSha(Map<String, String> entry) {
         List<Arguments> arguments = new ArrayList<>();
         arguments.add(extractArguments(entry, NetworkType.MAIN_NET, "address_public"));
         arguments.add(extractArguments(entry, NetworkType.TEST_NET, "address_public_test"));
-        return arguments;
-    }
-
-    private static List<Arguments> extractArgumentsSha(Map<String, String> entry) {
-        List<Arguments> arguments = new ArrayList<>();
         arguments.add(extractArguments(entry, NetworkType.MIJIN, "address_mijin"));
         arguments.add(extractArguments(entry, NetworkType.MIJIN_TEST, "address_mijin_test"));
         return arguments;
@@ -69,18 +59,13 @@ class AddressVectorTester extends AbstractVectorTester {
 
 
     @ParameterizedTest
-    @MethodSource("testAddressCatapult")
-    void testAddressCatapult(NetworkType networkType, String publicKey, String encoded) {
+    @MethodSource("testAddress")
+    void testAddress(NetworkType networkType, String publicKey, String encoded) {
         Address address = Address.createFromPublicKey(publicKey, networkType);
         Assertions.assertEquals(encoded, address.plain());
         Assertions.assertEquals(networkType, address.getNetworkType());
+        Assertions.assertTrue(Address.isValidPlainAddress(encoded));
+        Assertions.assertTrue(Address.isValidEncodedAddress(address.encoded()));
     }
 
-    @ParameterizedTest
-    @MethodSource("testAddressNis1")
-    void testAddressNis1(NetworkType networkType, String publicKey, String encoded) {
-        Address address = Address.createFromPublicKey(publicKey, networkType);
-        Assertions.assertEquals(encoded, address.plain());
-        Assertions.assertEquals(networkType, address.getNetworkType());
-    }
 }

@@ -17,7 +17,6 @@
 package io.nem.sdk.model.message;
 
 import io.nem.core.crypto.KeyPair;
-import io.nem.sdk.model.blockchain.NetworkType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,18 +27,17 @@ public class PersistentHarvestingDelegationMessageTest {
 
     @Test
     public void testCreateEncryptedMessage() {
-        NetworkType networkType = NetworkType.MIJIN_TEST;
-        KeyPair proxy = KeyPair.random(networkType.resolveSignSchema());
-        KeyPair harvester = KeyPair.random(networkType.resolveSignSchema());
+        KeyPair proxy = KeyPair.random();
+        KeyPair harvester = KeyPair.random();
 
         PersistentHarvestingDelegationMessage encryptedMessage = PersistentHarvestingDelegationMessage
-            .create(proxy.getPrivateKey(), harvester.getPublicKey(), networkType);
+            .create(proxy.getPrivateKey(), harvester.getPublicKey());
 
         Assertions.assertEquals(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,
             encryptedMessage.getType());
 
         String plainMessage = encryptedMessage
-            .decryptPayload(harvester.getPrivateKey(), networkType);
+            .decryptPayload(harvester.getPrivateKey());
 
         Assertions.assertEquals(proxy.getPrivateKey().toHex().toUpperCase(), plainMessage);
     }

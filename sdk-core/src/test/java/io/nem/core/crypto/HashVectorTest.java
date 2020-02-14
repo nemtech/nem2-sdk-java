@@ -18,29 +18,25 @@
 package io.nem.core.crypto;
 
 import io.nem.core.utils.AbstractVectorTester;
+import io.nem.core.utils.ConvertUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * ex Test of SignSchema.
+ * Test of Hashes using vectors.
  */
-public class SignSchemaVectorTester extends AbstractVectorTester {
+class HashVectorTest extends AbstractVectorTester {
 
-    private static Stream<Arguments> testKeccak256() throws Exception {
-        return createArguments("0.test-keccak-256.json", SignSchemaVectorTester::extractArguments, 0,
-            10
-        );
-    }
 
     private static Stream<Arguments> testSha256() throws Exception {
-        return createArguments("0.test-sha3-256.json", SignSchemaVectorTester::extractArguments, 0, 10
+        return createArguments("0.test-sha3-256.json", HashVectorTest::extractArguments, 0,
+            10
         );
     }
 
@@ -53,20 +49,10 @@ public class SignSchemaVectorTester extends AbstractVectorTester {
     @ParameterizedTest
     @MethodSource("testSha256")
     void testSha256(String data, String hash, int length) {
-        byte[] decode = Hex.decode(data);
+        byte[] decode = ConvertUtils.fromHexToBytes(data);
         Assertions.assertEquals(length, decode.length);
         Assertions.assertEquals(hash.toUpperCase(),
-            Hex.toHexString(SignSchema.toHash32Bytes(SignSchema.SHA3, decode)).toUpperCase());
+            ConvertUtils.toHex(Hashes.sha3_256(decode)).toUpperCase());
     }
-
-    @ParameterizedTest
-    @MethodSource("testKeccak256")
-    void testKeccak256(String data, String hash, int length) {
-        byte[] decode = Hex.decode(data);
-        Assertions.assertEquals(length, decode.length);
-        Assertions.assertEquals(hash.toUpperCase(),
-            Hex.toHexString(SignSchema.toHash32Bytes(SignSchema.KECCAK, decode)).toUpperCase());
-    }
-
 
 }

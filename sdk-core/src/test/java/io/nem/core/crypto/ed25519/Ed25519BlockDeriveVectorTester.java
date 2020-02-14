@@ -19,13 +19,12 @@ package io.nem.core.crypto.ed25519;
 
 import io.nem.core.crypto.PrivateKey;
 import io.nem.core.crypto.PublicKey;
-import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.AbstractVectorTester;
+import io.nem.core.utils.ConvertUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -35,20 +34,15 @@ class Ed25519BlockDeriveVectorTester extends AbstractVectorTester {
 
     private static Stream<Arguments> testResolveSharedKey() {
         //NOTE!! first example of each file is broken?????
-        Stream<Arguments> catapultArguments = createArguments("3.test-derive-catapult.json",
-            entry -> extractArguments(SignSchema.SHA3, entry), 1, 20
+        return createArguments("3.test-derive.json",
+            Ed25519BlockDeriveVectorTester::extractArguments, 1, 20
         );
-        Stream<Arguments> nis1Arguments = createArguments("3.test-derive-nis1.json",
-            entry -> extractArguments(SignSchema.KECCAK, entry), 1, 20
-        );
-        return Stream.concat(catapultArguments, nis1Arguments);
     }
 
-    private static List<Arguments> extractArguments(SignSchema signSchema,
+    private static List<Arguments> extractArguments(
         Map<String, String> entry) {
         return Collections
             .singletonList(Arguments.of(
-                signSchema,
                 entry.get("privateKey"),
                 entry.get("otherPublicKey"),
                 entry.get("scalarMulResult"),
@@ -57,23 +51,23 @@ class Ed25519BlockDeriveVectorTester extends AbstractVectorTester {
 
     @ParameterizedTest
     @MethodSource("testResolveSharedKey")
-    void testResolveSharedKey(SignSchema signSchema, String privateKey,
+    void testResolveSharedKey(String privateKey,
         String otherPublicKey, String scalarMulResult, String sharedKey) {
         PrivateKey privateKeyObject = PrivateKey.fromHexString(privateKey);
         PublicKey otherPublicKeyObject = PublicKey.fromHexString(otherPublicKey);
         byte[] resolvedSharedKey = Ed25519BlockCipher.getSharedKey(
             privateKeyObject,
-            otherPublicKeyObject,
-            signSchema);
+            otherPublicKeyObject
+        );
 
         byte[] resolvedSharedSecret = Ed25519BlockCipher.getSharedSecret(
             privateKeyObject,
-            otherPublicKeyObject,
-            signSchema);
+            otherPublicKeyObject
+        );
 
         Assertions.assertEquals(sharedKey.toUpperCase(),
-            Hex.toHexString(resolvedSharedKey).toUpperCase());
+            ConvertUtils.toHex(resolvedSharedKey).toUpperCase());
         Assertions.assertEquals(scalarMulResult.toUpperCase(),
-            Hex.toHexString(resolvedSharedSecret).toUpperCase());
+            ConvertUtils.toHex(resolvedSharedSecret).toUpperCase());
     }
 }

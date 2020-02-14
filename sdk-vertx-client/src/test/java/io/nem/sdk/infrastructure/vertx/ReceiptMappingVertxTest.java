@@ -42,7 +42,7 @@ public class ReceiptMappingVertxTest {
         Statement statement = getStatement();
         Assertions
             .assertEquals("78E5F66EC55D1331646528F9BF7EC247C68F58E651223E7F05CBD4FBF0BF88FA",
-                statement.getTransactionStatements().get(0).generateHash());
+                statement.getTransactionStatements().get(0).generateHash().toUpperCase());
     }
 
     @Test

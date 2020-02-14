@@ -22,6 +22,7 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  * Static class that contains utility functions for converting hex strings to and from bytes.
@@ -86,7 +87,9 @@ public class ConvertUtils {
         try {
             return codec.decode(StringEncoder.getBytes(hexString));
         } catch (DecoderException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalArgumentException(
+                hexString + " could not be decoded. " + ExceptionUtils
+                    .getMessage(e), e);
         }
     }
 
@@ -224,7 +227,7 @@ public class ConvertUtils {
         final ByteBuffer byteBuffer = ByteBuffer.allocate(hex.length() / 2);
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         byteBuffer.putLong(new BigInteger(hex, 16).longValue());
-        return Hex.encodeHexString(byteBuffer.array());
+        return ConvertUtils.toHex(byteBuffer.array());
     }
 
     /**

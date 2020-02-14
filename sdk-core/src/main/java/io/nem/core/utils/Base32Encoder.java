@@ -41,7 +41,6 @@ public class Base32Encoder {
         if (!codec.isInAlphabet(encodedBytes, true)) {
             throw new IllegalArgumentException("malformed base32 string passed to getBytes");
         }
-
         return codec.decode(encodedBytes);
     }
 
