@@ -94,8 +94,8 @@ public class ResolutionEntry<T> {
     public byte[] serialize() {
         final byte[] resolvedBytes = getResolvedBytes();
         final ByteBuffer buffer = ByteBuffer.allocate(8 + resolvedBytes.length);
-        buffer.put(resolvedBytes);
         buffer.put(getReceiptSource().serialize());
+        buffer.put(resolvedBytes);
         return buffer.array();
     }
 
