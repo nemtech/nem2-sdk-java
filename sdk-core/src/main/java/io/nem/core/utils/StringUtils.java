@@ -16,6 +16,8 @@
 
 package io.nem.core.utils;
 
+import java.util.Optional;
+
 /**
  * Static class that contains string utility functions.
  */
@@ -69,5 +71,24 @@ public class StringUtils {
     public static String replaceVariable(final String string, final String name,
         final String value) {
         return string.replace(String.format("${%s}", name), value);
+    }
+
+    /**
+     * Returns if both strings in the optionals exit and are the case insensitive equals. If one
+     * optional is not present, the result is false;
+     *
+     * @param optionalString1 the first optional
+     * @param optionalString2 the second optional
+     * @return if both strings in the optionals exit and are the case insensitive equals.  If one
+     * optional is not present, the result is false;
+     */
+    public static boolean equalsIgnoreCase(Optional<String> optionalString1,
+        Optional<String> optionalString2) {
+        if (!optionalString1.isPresent() || !optionalString2.isPresent()) {
+            return false;
+        }
+        return optionalString1.flatMap(
+            string1 -> optionalString2.filter(string1::equalsIgnoreCase))
+            .isPresent();
     }
 }

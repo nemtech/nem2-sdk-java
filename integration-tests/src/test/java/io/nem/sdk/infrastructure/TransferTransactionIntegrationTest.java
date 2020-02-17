@@ -82,7 +82,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         String namespaceName = "testaccount2";
 
         NamespaceId recipient = setAddressAlias(type, getRecipient(), namespaceName);
-        Assertions.assertEquals("9188DD7D72227ECAE700000000000000000000000000000000",
+        Assertions.assertEquals("9988DD7D72227ECAE700000000000000000000000000000000",
             recipient.encoded(getNetworkType()));
         String message = "E2ETest:standaloneTransferTransaction:message 漢字";
 
@@ -144,7 +144,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
                 () -> announceAndValidate(type, account, transferTransaction));
 
         Assertions
-            .assertTrue(exceptions.getMessage().startsWith("Failure_Core_Insufficient_Balance"));
+            .assertTrue(exceptions.getMessage().contains("Failure_Core_Insufficient_Balance"));
 
 
     }

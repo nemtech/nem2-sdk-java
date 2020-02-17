@@ -179,7 +179,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
                 () -> get(repository
                     .getMosaicGlobalRestriction(new MosaicId(BigInteger.valueOf(888888)))));
         Assertions.assertEquals(
-            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '00000000000d9038'",
+            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '00000000000D9038'",
             exception.getMessage());
     }
 

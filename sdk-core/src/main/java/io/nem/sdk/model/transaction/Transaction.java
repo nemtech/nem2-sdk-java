@@ -21,6 +21,7 @@ import io.nem.core.crypto.DsaSigner;
 import io.nem.core.crypto.Hashes;
 import io.nem.core.crypto.Signature;
 import io.nem.core.utils.ConvertUtils;
+import io.nem.core.utils.StringUtils;
 import io.nem.sdk.api.BinarySerialization;
 import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.model.account.Account;
@@ -175,7 +176,7 @@ public abstract class Transaction {
         System.arraycopy(bytes, 8, signingBytes, 0, 32);
         System.arraycopy(bytes, 72, signingBytes, 32, 32);
         System.arraycopy(dataBytes, 0, signingBytes, 64, dataBytes.length);
-        byte[] result =  Hashes.sha3_256(signingBytes);
+        byte[] result = Hashes.sha3_256(signingBytes);
         return ConvertUtils.toHex(result);
     }
 
@@ -244,7 +245,8 @@ public abstract class Transaction {
      */
     public boolean isUnconfirmed() {
         return getTransactionInfo().filter(info -> info.getHeight().equals(BigInteger.valueOf(0))
-            && info.getHash().equals(info.getMerkleComponentHash())).isPresent();
+            && StringUtils.equalsIgnoreCase(info.getHash(), info.getMerkleComponentHash()))
+            .isPresent();
 
     }
 
@@ -266,7 +268,8 @@ public abstract class Transaction {
     public boolean hasMissingSignatures() {
         return this.getTransactionInfo()
             .filter(info -> info.getHeight().equals(BigInteger.valueOf(0))
-                && !info.getHash().equals(info.getMerkleComponentHash())).isPresent();
+                && !StringUtils.equalsIgnoreCase(info.getHash(), info.getMerkleComponentHash()))
+            .isPresent();
     }
 
     /**
