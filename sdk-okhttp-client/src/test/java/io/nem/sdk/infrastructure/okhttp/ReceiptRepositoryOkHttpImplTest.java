@@ -17,7 +17,7 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.core.utils.MapperUtils;
-import io.nem.sdk.model.blockchain.MerkelProofInfo;
+import io.nem.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.sdk.model.receipt.Statement;
 import io.nem.sdk.openapi.okhttp_gson.model.MerklePathItemDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MerkleProofInfoDTO;
@@ -98,7 +98,7 @@ public class ReceiptRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         mockRemoteCall(merkleProofInfoDTO);
 
         BigInteger height = BigInteger.valueOf(10L);
-        MerkelProofInfo info = repository.getMerkleReceipts(height, "AnotherHash").toFuture()
+        MerkleProofInfo info = repository.getMerkleReceipts(height, "AnotherHash").toFuture()
             .get();
 
         Assertions.assertNotNull(info);

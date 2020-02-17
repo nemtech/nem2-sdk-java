@@ -17,7 +17,7 @@
 package io.nem.sdk.api;
 
 import io.nem.sdk.model.blockchain.BlockInfo;
-import io.nem.sdk.model.blockchain.MerkelProofInfo;
+import io.nem.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.sdk.model.transaction.Transaction;
 import io.reactivex.Observable;
 import java.math.BigInteger;
@@ -82,7 +82,7 @@ public interface BlockRepository {
      * @param hash the expected hash.
      * @return {@link Observable} of MerkleProofInfo
      */
-    Observable<MerkelProofInfo> getMerkleTransaction(BigInteger height, String hash);
+    Observable<MerkleProofInfo> getMerkleTransaction(BigInteger height, String hash);
 
 
 }

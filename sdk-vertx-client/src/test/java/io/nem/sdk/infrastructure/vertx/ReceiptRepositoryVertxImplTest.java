@@ -17,7 +17,7 @@
 package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.sdk.model.account.Address;
-import io.nem.sdk.model.blockchain.MerkelProofInfo;
+import io.nem.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.sdk.model.receipt.Statement;
 import io.nem.sdk.openapi.vertx.model.MerklePathItemDTO;
 import io.nem.sdk.openapi.vertx.model.MerkleProofInfoDTO;
@@ -97,7 +97,7 @@ public class ReceiptRepositoryVertxImplTest extends AbstractVertxRespositoryTest
         mockRemoteCall(merkleProofInfoDTO);
 
         BigInteger height = BigInteger.valueOf(10L);
-        MerkelProofInfo info = repository.getMerkleReceipts(height, "AnotherHash").toFuture()
+        MerkleProofInfo info = repository.getMerkleReceipts(height, "AnotherHash").toFuture()
             .get();
 
         Assertions.assertNotNull(info);

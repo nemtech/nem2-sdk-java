@@ -20,7 +20,7 @@ import static io.nem.sdk.infrastructure.okhttp.TestHelperOkHttp.loadTransactionI
 
 import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.model.blockchain.BlockInfo;
-import io.nem.sdk.model.blockchain.MerkelProofInfo;
+import io.nem.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionType;
@@ -86,12 +86,12 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
         mockRemoteCall(merkleProofInfoDTO.addMerklePathItem(item));
 
 
-        MerkelProofInfo  merkelProofInfo = repository
+        MerkleProofInfo merkleProofInfo = repository
             .getMerkleTransaction(BigInteger.ONE, "HASH!").toFuture()
             .get();
-        Assertions.assertEquals(1, merkelProofInfo.getMerklePath().size());
-        Assertions.assertEquals("someHash", merkelProofInfo.getMerklePath().get(0).getHash());
-        Assertions.assertEquals(12, merkelProofInfo.getMerklePath().get(0).getPosition());
+        Assertions.assertEquals(1, merkleProofInfo.getMerklePath().size());
+        Assertions.assertEquals("someHash", merkleProofInfo.getMerklePath().get(0).getHash());
+        Assertions.assertEquals(12, merkleProofInfo.getMerklePath().get(0).getPosition());
 
     }
 

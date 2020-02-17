@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 NEM
+ * Copyright 2020 NEM
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,15 @@
 
 package io.nem.sdk.api;
 
-import io.nem.sdk.model.blockchain.MerkleProofInfo;
-import io.nem.sdk.model.receipt.Statement;
 import io.reactivex.Observable;
 import java.math.BigInteger;
 
-public interface ReceiptRepository {
+/**
+ * Service with block related functions.
+ */
+public interface BlockService {
 
-    /**
-     * Get receipts from a block
-     *
-     * @param height the height
-     * @return {@link Observable} of Statement
-     */
-    Observable<Statement> getBlockReceipts(BigInteger height);
+    Observable<Boolean> isValidTransactionInBlock(BigInteger height, String transactionHash);
 
-    /**
-     * @param height the height
-     * @param hash the hash.
-     * @return {@link Observable} of MerkleProofInfo
-     */
-    Observable<MerkleProofInfo> getMerkleReceipts(BigInteger height, String hash);
+    Observable<Boolean> isValidStatementInBlock(BigInteger height, String statementHash);
 }

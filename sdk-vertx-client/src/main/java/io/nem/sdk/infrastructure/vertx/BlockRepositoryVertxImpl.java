@@ -21,8 +21,8 @@ import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.sdk.infrastructure.vertx.mappers.TransactionMapper;
 import io.nem.sdk.model.blockchain.BlockInfo;
-import io.nem.sdk.model.blockchain.MerkelPathItem;
-import io.nem.sdk.model.blockchain.MerkelProofInfo;
+import io.nem.sdk.model.blockchain.MerklePathItem;
+import io.nem.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.openapi.vertx.api.BlockRoutesApi;
@@ -87,21 +87,21 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
     }
 
     @Override
-    public Observable<MerkelProofInfo> getMerkleTransaction(BigInteger height, String hash) {
+    public Observable<MerkleProofInfo> getMerkleTransaction(BigInteger height, String hash) {
         Consumer<Handler<AsyncResult<MerkleProofInfoDTO>>> callback = handler ->
             client.getMerkleTransaction(height, hash, handler);
-        return exceptionHandling(call(callback).map(this::toMerkelProofInfo));
+        return exceptionHandling(call(callback).map(this::toMerkleProofInfo));
 
     }
 
-    private MerkelProofInfo toMerkelProofInfo(MerkleProofInfoDTO dto) {
-        List<MerkelPathItem> pathItems =
+    private MerkleProofInfo toMerkleProofInfo(MerkleProofInfoDTO dto) {
+        List<MerklePathItem> pathItems =
             dto.getMerklePath().stream()
                 .map(
                     pathItem ->
-                        new MerkelPathItem(pathItem.getPosition(), pathItem.getHash()))
+                        new MerklePathItem(pathItem.getPosition(), pathItem.getHash()))
                 .collect(Collectors.toList());
-        return new MerkelProofInfo(pathItems);
+        return new MerkleProofInfo(pathItems);
     }
 
     private Observable<List<Transaction>> getBlockTransactions(

@@ -1,6 +1,6 @@
 package io.nem.sdk.model.blockchain;
 
-public class MerkelPathItem {
+public class MerklePathItem {
 
     private final Integer position;
     private final String hash;
@@ -11,7 +11,7 @@ public class MerkelPathItem {
      * @param position the position in the path.
      * @param hash the hash.
      */
-    public MerkelPathItem(Integer position, String hash) {
+    public MerklePathItem(Integer position, String hash) {
         this.position = position;
         this.hash = hash;
     }
