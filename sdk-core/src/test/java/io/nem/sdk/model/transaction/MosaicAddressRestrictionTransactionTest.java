@@ -74,7 +74,7 @@ class MosaicAddressRestrictionTransactionTest extends AbstractTransactionTester 
         SignedTransaction signedTransaction = transaction
             .signWith(account, generationHash);
 
-        assertEquals("0100000000000000010000000000000001000000000000000900000000000000080000000000000090d66c33420e5411995bacfca2b28cf1c9f5dd7ab1204ea451",
+        assertEquals("0100000000000000010000000000000001000000000000000900000000000000080000000000000090D66C33420E5411995BACFCA2B28CF1C9F5DD7AB1204EA451",
             signedTransaction.getPayload().substring(240));
 
     }

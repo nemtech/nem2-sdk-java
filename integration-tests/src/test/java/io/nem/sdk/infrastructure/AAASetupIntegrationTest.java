@@ -143,7 +143,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
             .signTransactionWithCosigners(multisigAccount, Arrays.asList(accounts),
                 getGenerationHash());
 
-        SignedTransaction signedHashLocktransaction = HashLockTransactionFactory.create(
+        SignedTransaction signedHashLockTransaction = HashLockTransactionFactory.create(
             getNetworkType(),
             NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
             BigInteger.valueOf(100),
@@ -152,7 +152,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
 
         getTransactionOrFail(
             getTransactionService(type)
-                .announceHashLockAggregateBonded(getListener(type), signedHashLocktransaction,
+                .announceHashLockAggregateBonded(getListener(type), signedHashLockTransaction,
                     signedAggregateTransaction), aggregateTransaction);
 
     }
@@ -180,6 +180,8 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
 
         factory.maxFee(this.maxFee);
         TransferTransaction transferTransaction = factory.build();
+
+
 
         TransferTransaction processedTransaction = announceAndValidate(type, nemesisAccount,
             transferTransaction);

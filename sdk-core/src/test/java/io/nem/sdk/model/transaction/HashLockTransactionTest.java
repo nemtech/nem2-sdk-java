@@ -95,11 +95,11 @@ class HashLockTransactionTest extends AbstractTransactionTester {
 
         String payload = lockFundsTransactionSigned.getPayload();
         assertEquals(
-            "010000000000000044b262c46ceabb85809698000000000064000000000000008498b38d89c1dc8a448ea5824938ff828926cd9f7747b1844b59b4b6807e878b",
+            "010000000000000044B262C46CEABB85809698000000000064000000000000008498B38D89C1DC8A448EA5824938FF828926CD9F7747B1844B59B4B6807E878B",
             payload.substring(240)
         );
         assertEquals(
-            "91bbb1f8452bad9ecac1d85e8d21a2eb855ca1552bc76ddeda4083c1700c845b",
+            "91BBB1F8452BAD9ECAC1D85E8D21A2EB855CA1552BC76DDEDA4083C1700C845B",
             lockFundsTransactionSigned.getHash());
     }
 

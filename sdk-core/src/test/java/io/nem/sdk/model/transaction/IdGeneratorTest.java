@@ -143,8 +143,8 @@ class IdGeneratorTest {
         //ArrayUtils.reverse(nonceBytes);
         BigInteger id = IdGenerator
             .generateMosaicId(nonceBytes, ConvertUtils.fromHexToBytes(hexPublicKey));
-        assertEquals(hexExpectedMosaicId.toLowerCase(), String.format("%016x", id));
-        assertEquals(hexExpectedMosaicId.toLowerCase(), ConvertUtils.toHex(id.toByteArray()));
+        assertEquals(hexExpectedMosaicId.toUpperCase(), String.format("%016X", id));
+        assertEquals(hexExpectedMosaicId.toUpperCase(), ConvertUtils.toHex(id.toByteArray()));
     }
 
   /*  @Test

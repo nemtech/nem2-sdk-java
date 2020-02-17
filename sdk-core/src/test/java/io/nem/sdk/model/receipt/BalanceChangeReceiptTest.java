@@ -68,7 +68,7 @@ public class BalanceChangeReceiptTest {
         assertEquals(BigInteger.TEN, balanceChangeReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceChangeReceipt.serialize());
-        Assertions.assertEquals("0100432144b262c46ceabb850a000000000000002134e47aee6f2392a5b3d1238cd7714eabeb739361b7ccf24bae127f10df17f2", hex);
+        Assertions.assertEquals("0100432144B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2", hex);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class BalanceChangeReceiptTest {
         assertEquals(BigInteger.TEN, balanceChangeReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceChangeReceipt.serialize());
-        Assertions.assertEquals("0100483144b262c46ceabb850a000000000000002134e47aee6f2392a5b3d1238cd7714eabeb739361b7ccf24bae127f10df17f2", hex);
+        Assertions.assertEquals("0100483144B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2", hex);
     }
 
     @Test
@@ -117,7 +117,7 @@ public class BalanceChangeReceiptTest {
         assertEquals(BigInteger.TEN, balanceChangeReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceChangeReceipt.serialize());
-        Assertions.assertEquals("0100482344b262c46ceabb850a000000000000002134e47aee6f2392a5b3d1238cd7714eabeb739361b7ccf24bae127f10df17f2", hex);
+        Assertions.assertEquals("0100482344B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2", hex);
     }
 
     @Test
@@ -141,7 +141,7 @@ public class BalanceChangeReceiptTest {
         assertEquals(BigInteger.TEN, balanceChangeReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceChangeReceipt.serialize());
-        Assertions.assertEquals("0100482244b262c46ceabb850a000000000000002134e47aee6f2392a5b3d1238cd7714eabeb739361b7ccf24bae127f10df17f2", hex);
+        Assertions.assertEquals("0100482244B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2", hex);
     }
 
     @Test
@@ -166,7 +166,7 @@ public class BalanceChangeReceiptTest {
         assertEquals(BigInteger.TEN, balanceChangeReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceChangeReceipt.serialize());
-        Assertions.assertEquals("0100523144b262c46ceabb850a000000000000002134e47aee6f2392a5b3d1238cd7714eabeb739361b7ccf24bae127f10df17f2", hex);
+        Assertions.assertEquals("0100523144B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2", hex);
     }
 
     @Test
@@ -191,7 +191,7 @@ public class BalanceChangeReceiptTest {
         assertEquals(BigInteger.TEN, balanceChangeReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceChangeReceipt.serialize());
-        Assertions.assertEquals("0100522344b262c46ceabb850a000000000000002134e47aee6f2392a5b3d1238cd7714eabeb739361b7ccf24bae127f10df17f2", hex);
+        Assertions.assertEquals("0100522344B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2", hex);
     }
 
     @Test
@@ -216,7 +216,7 @@ public class BalanceChangeReceiptTest {
         assertEquals(BigInteger.TEN, balanceChangeReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceChangeReceipt.serialize());
-        Assertions.assertEquals("0100522244b262c46ceabb850a000000000000002134e47aee6f2392a5b3d1238cd7714eabeb739361b7ccf24bae127f10df17f2", hex);
+        Assertions.assertEquals("0100522244B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2", hex);
     }
 
     @Test

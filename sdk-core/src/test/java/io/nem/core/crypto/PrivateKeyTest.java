@@ -139,7 +139,7 @@ public class PrivateKeyTest {
     public void toStringReturnsHexRepresentation() {
         // Assert:
         MatcherAssert.assertThat(PrivateKey.fromHexString("2275").toHex(), IsEqual.equalTo("2275"));
-        MatcherAssert.assertThat(PrivateKey.fromDecimalString("2275").toHex(), IsEqual.equalTo("08e3"));
+        MatcherAssert.assertThat(PrivateKey.fromDecimalString("2275").toHex(), IsEqual.equalTo("08E3"));
     }
 
     // endregion

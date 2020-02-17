@@ -30,6 +30,6 @@ public class ReceiptSourceTest {
         assertEquals(10, source.getPrimaryId());
         assertEquals(2, source.getSecondaryId());
 
-        assertEquals("0a00000002000000", ConvertUtils.toHex(source.serialize()));
+        assertEquals("0A00000002000000", ConvertUtils.toHex(source.serialize()));
     }
 }

@@ -269,7 +269,7 @@ public class SignatureTest {
 
         // Assert:
         final String expectedSignature =
-            "0c00000000000000000000000000000000000000000000000000000000000000"
+            "0C00000000000000000000000000000000000000000000000000000000000000"
                 + "0102000000000000000000000000000000000000000000000000000000000000";
         MatcherAssert.assertThat(signature.toString(), IsEqual.equalTo(expectedSignature));
     }

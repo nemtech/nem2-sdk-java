@@ -14,7 +14,7 @@ class NetworkHarvestMosaicTest {
         NetworkHarvestMosaic currency = new NetworkHarvestMosaic(BigInteger.valueOf(0));
         assertEquals(BigInteger.valueOf(0), currency.getAmount());
         assertEquals(NetworkHarvestMosaic.NAMESPACEID, currency.getId());
-        assertEquals("941299b2b7e1291c", currency.getIdAsHex());
+        assertEquals("941299B2B7E1291C", currency.getIdAsHex());
     }
 
     @Test
@@ -23,7 +23,7 @@ class NetworkHarvestMosaicTest {
             .createRelative(BigInteger.valueOf(1000));
         assertEquals(BigInteger.valueOf(1000 * 1000), currency.getAmount());
         assertEquals(NetworkHarvestMosaic.NAMESPACEID, currency.getId());
-        assertEquals("941299b2b7e1291c", currency.getIdAsHex());
+        assertEquals("941299B2B7E1291C", currency.getIdAsHex());
     }
 
     @Test
@@ -31,7 +31,7 @@ class NetworkHarvestMosaicTest {
         NetworkHarvestMosaic currency = NetworkHarvestMosaic.createAbsolute(BigInteger.valueOf(1));
         assertEquals(BigInteger.valueOf(1), currency.getAmount());
         assertEquals(NetworkHarvestMosaic.NAMESPACEID, currency.getId());
-        assertEquals("941299b2b7e1291c", currency.getIdAsHex());
+        assertEquals("941299B2B7E1291C", currency.getIdAsHex());
     }
 
     @Test

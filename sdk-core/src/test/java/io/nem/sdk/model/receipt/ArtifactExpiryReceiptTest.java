@@ -43,7 +43,7 @@ public class ArtifactExpiryReceiptTest {
             mosaicExpiryReceipt.getArtifactId().getIdAsHex().toUpperCase());
 
         String hex = ConvertUtils.toHex(mosaicExpiryReceipt.serialize());
-        Assertions.assertEquals("01004d4144b262c46ceabb85", hex);
+        Assertions.assertEquals("01004D4144B262C46CEABB85", hex);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class ArtifactExpiryReceiptTest {
             namespaceExpiryReceipt.getArtifactId().getId(), new BigInteger("9562080086528621131"));
 
         String hex = ConvertUtils.toHex(namespaceExpiryReceipt.serialize());
-        Assertions.assertEquals("01004e414bfa5f372d55b384", hex);
+        Assertions.assertEquals("01004E414BFA5F372D55B384", hex);
     }
 
     @Test
@@ -76,7 +76,7 @@ public class ArtifactExpiryReceiptTest {
         assertEquals(100, mosaicExpiryReceipt.getSize().get().intValue());
 
         String hex = ConvertUtils.toHex(mosaicExpiryReceipt.serialize());
-        Assertions.assertEquals("01004d4144b262c46ceabb85", hex);
+        Assertions.assertEquals("01004D4144B262C46CEABB85", hex);
     }
 
     @Test

@@ -356,7 +356,7 @@ public class Ed25519FieldElementTest {
         final String fAsString = f.toString();
         final StringBuilder builder = new StringBuilder();
         for (final byte b : bytes) {
-            builder.append(String.format("%02x", b));
+            builder.append(String.format("%02X", b));
         }
 
         // Assert:

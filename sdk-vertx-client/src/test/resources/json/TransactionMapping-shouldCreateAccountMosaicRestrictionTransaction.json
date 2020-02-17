@@ -16,10 +16,10 @@
     "version": 1,
     "network": 144,
     "restrictionAdditions": [
-      "00003646934825aa"
+      "00003646934825AA"
     ],
     "restrictionDeletions": [
-      "00003646934825bb"
+      "00003646934825BB"
     ]
   }
 }

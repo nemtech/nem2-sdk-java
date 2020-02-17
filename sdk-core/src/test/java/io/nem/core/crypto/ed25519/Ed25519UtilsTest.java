@@ -68,7 +68,7 @@ public class Ed25519UtilsTest {
         // Arrange:
         final PrivateKey privateKey = PrivateKey.fromHexString(input);
         Assertions.assertEquals(input.toUpperCase(), privateKey.toHex().toUpperCase());
-        Assertions.assertEquals(expected,
+        Assertions.assertEquals(expected.toUpperCase(),
             ConvertUtils.toHex(
                 Ed25519Utils.prepareForScalarMultiply(privateKey).getRaw()));
     }

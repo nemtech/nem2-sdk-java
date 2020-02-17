@@ -54,7 +54,7 @@ public class MapperUtilsTest {
 
         Assertions.assertNull(MapperUtils.toAddressFromEncoded(null));
         Address address = MapperUtils
-            .toAddressFromEncoded("9050b9837efab4bbe8a4b9bb32d812f9885c00d8fc1650e142");
+            .toAddressFromEncoded("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142");
         Assertions.assertNotNull(
             address);
 
@@ -75,7 +75,7 @@ public class MapperUtilsTest {
 
         NamespaceId namespaceId = NamespaceId.createFromName("some.name");
 
-        Assertions.assertEquals("91d9e338f78767ed9500000000000000000000000000000000",
+        Assertions.assertEquals("91D9E338F78767ED9500000000000000000000000000000000",
             namespaceId.encoded(networkType));
         Assertions
             .assertEquals(namespaceId.encoded(networkType),

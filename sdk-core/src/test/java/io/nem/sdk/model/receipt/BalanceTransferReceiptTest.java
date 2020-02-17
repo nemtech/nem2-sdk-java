@@ -77,7 +77,7 @@ public class BalanceTransferReceiptTest {
 
         String hex = ConvertUtils.toHex(balanceTransferReceipt.serialize());
         Assertions.assertEquals(
-            "01004d1244b262c46ceabb850a000000000000002134e47aee6f2392a5b3d1238cd7714eabeb739361b7ccf24bae127f10df17f290ccb2d8723a173450e6404fda1afaae0bdab524508430c75e",
+            "01004D1244B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F290CCB2D8723A173450E6404FDA1AFAAE0BDAB524508430C75E",
             hex);
 
     }
@@ -127,7 +127,7 @@ public class BalanceTransferReceiptTest {
 
         String hex = ConvertUtils.toHex(balanceTransferReceipt.serialize());
         Assertions.assertEquals(
-            "01004e1344b262c46ceabb850a000000000000002134e47aee6f2392a5b3d1238cd7714eabeb739361b7ccf24bae127f10df17f290ccb2d8723a173450e6404fda1afaae0bdab524508430c75e",
+            "01004E1344B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F290CCB2D8723A173450E6404FDA1AFAAE0BDAB524508430C75E",
             hex);
 
     }
@@ -157,7 +157,7 @@ public class BalanceTransferReceiptTest {
 
         String hex = ConvertUtils.toHex(balanceTransferReceipt.serialize());
         Assertions.assertEquals(
-            "01004e1344b262c46ceabb850a000000000000002134e47aee6f2392a5b3d1238cd7714eabeb739361b7ccf24bae127f10df17f290ccb2d8723a173450e6404fda1afaae0bdab524508430c75e",
+            "01004E1344B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F290CCB2D8723A173450E6404FDA1AFAAE0BDAB524508430C75E",
             hex);
 
     }

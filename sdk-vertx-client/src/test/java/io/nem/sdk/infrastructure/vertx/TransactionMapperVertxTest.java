@@ -527,7 +527,7 @@ public class TransactionMapperVertxTest {
         Assertions.assertEquals(BigInteger.valueOf(3), transaction.getScopedMetadataKey());
         Assertions
             .assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
-        Assertions.assertEquals("0003070467832aaa", transaction.getTargetMosaicId().getIdAsHex());
+        Assertions.assertEquals("0003070467832AAA", transaction.getTargetMosaicId().getIdAsHex());
     }
 
     @Test
@@ -552,7 +552,7 @@ public class TransactionMapperVertxTest {
         Assertions
             .assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
         Assertions
-            .assertEquals("0003070467832aaa", transaction.getTargetNamespaceId().getIdAsHex());
+            .assertEquals("0003070467832AAA", transaction.getTargetNamespaceId().getIdAsHex());
     }
 
     @Test
@@ -594,11 +594,11 @@ public class TransactionMapperVertxTest {
             transaction.getRestrictionFlags());
         Assertions.assertEquals(1, transaction.getRestrictionAdditions().size());
         Assertions.assertEquals(
-            MapperUtils.toAddressFromEncoded("9050b9837efab4bbe8a4b9bb32d812f9885c00d8fc16501111"),
+            MapperUtils.toAddressFromEncoded("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC16501111"),
             transaction.getRestrictionAdditions().get(0));
 
         Assertions.assertEquals(
-            MapperUtils.toAddressFromEncoded("9050b9837efab4bbe8a4b9bb32d812f9885c00d8fc16502222"),
+            MapperUtils.toAddressFromEncoded("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC16502222"),
             transaction.getRestrictionDeletions().get(0));
 
     }
@@ -617,7 +617,7 @@ public class TransactionMapperVertxTest {
         Assertions.assertEquals(AccountRestrictionFlags.ALLOW_INCOMING_MOSAIC,
             transaction.getRestrictionFlags());
         Assertions.assertEquals(1, transaction.getRestrictionAdditions().size());
-        Assertions.assertEquals("00003646934825aa",
+        Assertions.assertEquals("00003646934825AA",
             transaction.getRestrictionAdditions().get(0).getIdAsHex());
     }
 

@@ -41,7 +41,7 @@ public class MerkleHashBuilderTest {
             .update(ConvertUtils.fromHexToBytes(
                 "215b158f0bd416b596271bce527cd9dc8e4a639cc271d896f9156af6f441eeb9"));
         Assertions.assertEquals(
-            "215b158f0bd416b596271bce527cd9dc8e4a639cc271d896f9156af6f441eeb9",
+            "215B158F0BD416B596271BCE527CD9DC8E4A639CC271D896F9156AF6F441EEB9",
             ConvertUtils.toHex(builder.getRootHash()));
     }
 
@@ -58,7 +58,7 @@ public class MerkleHashBuilderTest {
                 "976c5ce6bf3f797113e5a3a094c7801c885daf783c50563ffd3ca6a5ef580e25"));
 
         Assertions.assertEquals(
-            "1c704e3ac99b124f92d2648649ec72c7a19ea4e2bb24f669b976180a295876fa",
+            "1C704E3AC99B124F92D2648649EC72C7A19EA4E2BB24F669B976180A295876FA",
             ConvertUtils.toHex(builder.getRootHash()));
     }
 
@@ -78,7 +78,7 @@ public class MerkleHashBuilderTest {
                 "e926cc323886d47234bb0b49219c81e280e8a65748b437c2ae83b09b37a5aaf2"));
 
         Assertions.assertEquals(
-            "5dc17b2409d50bcc7c1faa720d0ec8b79a1705d0c517bcc0bdbd316540974d5e",
+            "5DC17B2409D50BCC7C1FAA720D0EC8B79A1705D0C517BCC0BDBD316540974D5E",
             ConvertUtils.toHex(builder.getRootHash()));
     }
 

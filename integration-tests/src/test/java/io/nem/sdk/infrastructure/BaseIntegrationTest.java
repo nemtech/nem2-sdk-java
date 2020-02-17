@@ -268,7 +268,9 @@ public abstract class BaseIntegrationTest {
         AggregateTransaction announcedAggregateTransaction = announceAndValidate(
             type, signers[0], aggregateTransaction);
         T announcedCorrectly = (T) announcedAggregateTransaction.getInnerTransactions().get(0);
-        System.out.println("Transaction completed");
+        System.out
+            .println("Transaction completed, Transaction hash " + announcedAggregateTransaction
+                .getTransactionInfo().get().getHash().get());
         return Pair.of(announcedCorrectly, announcedAggregateTransaction);
     }
 
@@ -285,12 +287,14 @@ public abstract class BaseIntegrationTest {
         }
         SignedTransaction signedTransaction = testAccount
             .sign(transaction, getGenerationHash());
+
         TransactionService transactionService = getTransactionService(type);
         Transaction announceCorrectly = getTransactionOrFail(
             transactionService.announce(getListener(type), signedTransaction), transaction);
         Assertions.assertEquals(announceCorrectly.getType(), transaction.getType());
         if (transaction.getType() != TransactionType.AGGREGATE_COMPLETE) {
-            System.out.println("Transaction completed");
+            System.out
+                .println("Transaction completed, Transaction hash " + signedTransaction.getHash());
         }
         return (T) announceCorrectly;
     }

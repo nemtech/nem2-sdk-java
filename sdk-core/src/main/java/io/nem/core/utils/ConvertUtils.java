@@ -73,7 +73,7 @@ public class ConvertUtils {
     public static String toHex(final byte[] bytes) {
         final Hex codec = new Hex();
         final byte[] decodedBytes = codec.encode(bytes);
-        return StringEncoder.getString(decodedBytes);
+        return StringEncoder.getString(decodedBytes).toUpperCase();
     }
 
     /**
@@ -227,7 +227,7 @@ public class ConvertUtils {
         final ByteBuffer byteBuffer = ByteBuffer.allocate(hex.length() / 2);
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         byteBuffer.putLong(new BigInteger(hex, 16).longValue());
-        return ConvertUtils.toHex(byteBuffer.array());
+        return ConvertUtils.toHex(byteBuffer.array()).toUpperCase();
     }
 
     /**

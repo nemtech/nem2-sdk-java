@@ -53,7 +53,7 @@ public class InflationReceiptTest {
         assertEquals(BigInteger.TEN, inflationReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(inflationReceipt.serialize());
-        Assertions.assertEquals("0100435144b262c46ceabb850a00000000000000", hex);
+        Assertions.assertEquals("0100435144B262C46CEABB850A00000000000000", hex);
     }
 
     @Test
@@ -74,7 +74,7 @@ public class InflationReceiptTest {
         assertEquals(100, inflationReceipt.getSize().get().intValue());
 
         String hex = ConvertUtils.toHex(inflationReceipt.serialize());
-        Assertions.assertEquals("0100435144b262c46ceabb850a00000000000000", hex);
+        Assertions.assertEquals("0100435144B262C46CEABB850A00000000000000", hex);
     }
 
     @Test

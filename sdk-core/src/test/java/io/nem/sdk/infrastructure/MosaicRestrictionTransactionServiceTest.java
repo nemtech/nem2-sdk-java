@@ -243,7 +243,7 @@ public class MosaicRestrictionTransactionServiceTest {
                         restrictionKey,
                         BigInteger.valueOf(30), MosaicRestrictionType.GE).toFuture().get()));
 
-        Assertions.assertEquals("MosaicId could not be resolved from alias e6f4c6cb5111b127",
+        Assertions.assertEquals("MosaicId could not be resolved from alias E6F4C6CB5111B127",
             exception.getMessage());
 
     }
@@ -324,7 +324,7 @@ public class MosaicRestrictionTransactionServiceTest {
                         restrictionKey, NamespaceId.createFromName("invalidaddressaslias"),
                         BigInteger.valueOf(30)).toFuture().get()));
 
-        Assertions.assertEquals("MosaicId could not be resolved from alias 9ca319e451849811",
+        Assertions.assertEquals("MosaicId could not be resolved from alias 9CA319E451849811",
             exception.getMessage());
 
     }
@@ -340,7 +340,7 @@ public class MosaicRestrictionTransactionServiceTest {
                         restrictionKey, NamespaceId.createFromName("invalidaddressaslias"),
                         BigInteger.valueOf(30)).toFuture().get()));
 
-        Assertions.assertEquals("Address could not be resolved from alias 98cc55cca3f13503",
+        Assertions.assertEquals("Address could not be resolved from alias 98CC55CCA3F13503",
             exception.getMessage());
 
     }

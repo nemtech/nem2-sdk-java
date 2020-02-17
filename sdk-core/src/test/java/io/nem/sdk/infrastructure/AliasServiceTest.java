@@ -152,7 +152,7 @@ public class AliasServiceTest {
                     .resolveAddress(NamespaceId.createFromName("invalidaddressaslias")).toFuture()
                     .get()));
 
-        Assertions.assertEquals("Address could not be resolved from alias 98cc55cca3f13503",
+        Assertions.assertEquals("Address could not be resolved from alias 98CC55CCA3F13503",
             exception.getMessage());
 
     }
@@ -166,7 +166,7 @@ public class AliasServiceTest {
                     .resolveMosaicId(NamespaceId.createFromName("invalidaddressaslias")).toFuture()
                     .get()));
 
-        Assertions.assertEquals("MosaicId could not be resolved from alias 98cc55cca3f13503",
+        Assertions.assertEquals("MosaicId could not be resolved from alias 98CC55CCA3F13503",
             exception.getMessage());
 
     }

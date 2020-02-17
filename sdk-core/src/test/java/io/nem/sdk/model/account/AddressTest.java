@@ -78,7 +78,7 @@ class AddressTest {
         String encoded = "901508D3519B6CC0936A04233073D3D903E1DFBEF95DC204AB";
         Address address = Address
             .createFromEncoded(encoded);
-        assertEquals(encoded, address.encoded().toUpperCase());
+        assertEquals(encoded, address.encoded());
         assertEquals(encoded, address.encoded(NetworkType.MIJIN_TEST).toUpperCase());
     }
 

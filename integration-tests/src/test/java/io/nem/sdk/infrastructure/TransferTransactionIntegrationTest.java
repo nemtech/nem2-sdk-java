@@ -82,7 +82,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         String namespaceName = "testaccount2";
 
         NamespaceId recipient = setAddressAlias(type, getRecipient(), namespaceName);
-        Assertions.assertEquals("9188dd7d72227ecae700000000000000000000000000000000",
+        Assertions.assertEquals("9188DD7D72227ECAE700000000000000000000000000000000",
             recipient.encoded(getNetworkType()));
         String message = "E2ETest:standaloneTransferTransaction:message 漢字";
 

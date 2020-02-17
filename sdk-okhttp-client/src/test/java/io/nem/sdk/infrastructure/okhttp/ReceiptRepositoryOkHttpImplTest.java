@@ -53,7 +53,7 @@ public class ReceiptRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
 
         ResolutionStatementBodyDTO statement1 = new ResolutionStatementBodyDTO();
         addressResolutionStatement.setStatement(statement1);
-        statement1.setUnresolved("9050b9837efab4bbe8a4b9bb32d812f9885c00d8fc1650e142");
+        statement1.setUnresolved("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142");
         statement1.setHeight(BigInteger.valueOf(6L));
         dto.setAddressResolutionStatements(Collections.singletonList(addressResolutionStatement));
 
