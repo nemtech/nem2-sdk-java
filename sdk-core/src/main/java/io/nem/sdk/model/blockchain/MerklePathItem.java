@@ -2,7 +2,7 @@ package io.nem.sdk.model.blockchain;
 
 public class MerklePathItem {
 
-    private final Integer position;
+    private final Position position;
     private final String hash;
 
     /**
@@ -11,7 +11,7 @@ public class MerklePathItem {
      * @param position the position in the path.
      * @param hash the hash.
      */
-    public MerklePathItem(Integer position, String hash) {
+    public MerklePathItem(Position position, String hash) {
         this.position = position;
         this.hash = hash;
     }
@@ -21,7 +21,7 @@ public class MerklePathItem {
      *
      * @return Integer
      */
-    public Integer getPosition() {
+    public Position getPosition() {
         return this.position;
     }
 

@@ -22,6 +22,7 @@ import io.nem.catapult.builders.MosaicRestrictionTypeDto;
 import io.nem.catapult.builders.MosaicSupplyChangeActionDto;
 import io.nem.catapult.builders.NamespaceRegistrationTypeDto;
 import io.nem.sdk.model.account.AccountType;
+import io.nem.sdk.model.blockchain.Position;
 import io.nem.sdk.model.message.MessageType;
 import io.nem.sdk.model.mosaic.MosaicSupplyChangeActionType;
 import io.nem.sdk.model.namespace.AliasAction;
@@ -47,6 +48,7 @@ import io.nem.sdk.openapi.okhttp_gson.model.MosaicRestrictionTypeEnum;
 import io.nem.sdk.openapi.okhttp_gson.model.MosaicSupplyChangeActionEnum;
 import io.nem.sdk.openapi.okhttp_gson.model.NamespaceRegistrationTypeEnum;
 import io.nem.sdk.openapi.okhttp_gson.model.NodeStatusEnum;
+import io.nem.sdk.openapi.okhttp_gson.model.PositionEnum;
 import io.nem.sdk.openapi.okhttp_gson.model.ReceiptTypeEnum;
 import io.nem.sdk.openapi.okhttp_gson.model.RolesTypeEnum;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionStateTypeEnum;
@@ -489,4 +491,23 @@ public class EnumMapperTest {
             .assertEquals(NodeStatusEnum.fromValue(rolesType.getValue()).getValue(),
                 rolesType.getValue());
     }
+
+    @ParameterizedTest
+    @EnumSource(Position.class)
+    void validFromNodeStatus(Position position) {
+        Assertions.assertNotNull(PositionEnum.fromValue(position.getValue()));
+        Assertions
+            .assertEquals(PositionEnum.fromValue(position.getValue()).getValue(),
+                position.getValue());
+    }
+
+    @ParameterizedTest
+    @EnumSource(PositionEnum.class)
+    void validPositionEnum(PositionEnum rolesType) {
+        Assertions.assertNotNull(Position.rawValueOf(rolesType.getValue()));
+        Assertions
+            .assertEquals(PositionEnum.fromValue(rolesType.getValue()).getValue(),
+                rolesType.getValue());
+    }
+
 }

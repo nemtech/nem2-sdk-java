@@ -22,6 +22,7 @@ import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.model.blockchain.BlockInfo;
 import io.nem.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.blockchain.Position;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.openapi.okhttp_gson.model.BlockDTO;
@@ -30,6 +31,7 @@ import io.nem.sdk.openapi.okhttp_gson.model.BlockMetaDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MerklePathItemDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MerkleProofInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.NetworkTypeEnum;
+import io.nem.sdk.openapi.okhttp_gson.model.PositionEnum;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -82,7 +84,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
 
         MerkleProofInfoDTO merkleProofInfoDTO = new MerkleProofInfoDTO();
 
-        MerklePathItemDTO item = new MerklePathItemDTO().hash("someHash").position(12);
+        MerklePathItemDTO item = new MerklePathItemDTO().hash("someHash").position(PositionEnum.LEFT);
         mockRemoteCall(merkleProofInfoDTO.addMerklePathItem(item));
 
 
@@ -91,7 +93,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
             .get();
         Assertions.assertEquals(1, merkleProofInfo.getMerklePath().size());
         Assertions.assertEquals("someHash", merkleProofInfo.getMerklePath().get(0).getHash());
-        Assertions.assertEquals(12, merkleProofInfo.getMerklePath().get(0).getPosition());
+        Assertions.assertEquals(Position.LEFT, merkleProofInfo.getMerklePath().get(0).getPosition());
 
     }
 

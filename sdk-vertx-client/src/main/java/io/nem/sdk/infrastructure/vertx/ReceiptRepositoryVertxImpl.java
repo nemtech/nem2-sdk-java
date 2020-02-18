@@ -20,6 +20,7 @@ import io.nem.sdk.api.ReceiptRepository;
 import io.nem.sdk.model.blockchain.MerklePathItem;
 import io.nem.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.blockchain.Position;
 import io.nem.sdk.model.receipt.Statement;
 import io.nem.sdk.openapi.vertx.api.ReceiptRoutesApi;
 import io.nem.sdk.openapi.vertx.api.ReceiptRoutesApiImpl;
@@ -77,7 +78,9 @@ public class ReceiptRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
             dto.getMerklePath().stream()
                 .map(
                     pathItem ->
-                        new MerklePathItem(pathItem.getPosition(), pathItem.getHash()))
+                        new MerklePathItem(pathItem.getPosition() == null ? null
+                            : Position.rawValueOf(pathItem.getPosition().getValue()),
+                            pathItem.getHash()))
                 .collect(Collectors.toList());
         return new MerkleProofInfo(pathItems);
     }

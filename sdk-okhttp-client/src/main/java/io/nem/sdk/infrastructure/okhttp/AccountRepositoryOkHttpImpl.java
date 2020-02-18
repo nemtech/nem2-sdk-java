@@ -37,7 +37,6 @@ import io.nem.sdk.openapi.okhttp_gson.model.AccountDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountIds;
 import io.nem.sdk.openapi.okhttp_gson.model.AccountInfoDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.TransactionTypeEnum;
 import io.reactivex.Observable;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -96,7 +95,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         Callable<List<TransactionInfoDTO>> callback = () ->
             getClient().getAccountConfirmedTransactions(publicAccount.getPublicKey().toHex(),
                 criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionType(criteria.getTransactionType()));
+                toTransactionType(criteria.getTransactionTypes()));
 
         return exceptionHandling(
             call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
@@ -115,7 +114,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         Callable<List<TransactionInfoDTO>> callback = () ->
             getClient().getAccountIncomingTransactions(publicAccount.getPublicKey().toHex(),
                 criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionType(criteria.getTransactionType()));
+                toTransactionType(criteria.getTransactionTypes()));
 
         return exceptionHandling(
             call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
@@ -134,7 +133,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         Callable<List<TransactionInfoDTO>> callback = () ->
             getClient().getAccountOutgoingTransactions(publicAccount.getPublicKey().toHex(),
                 criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionType(criteria.getTransactionType()));
+                toTransactionType(criteria.getTransactionTypes()));
 
         return exceptionHandling(
             call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
@@ -159,7 +158,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         Callable<List<TransactionInfoDTO>> callback = () ->
             getClient().getAccountPartialTransactions(publicAccount.getPublicKey().toHex(),
                 criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionType(criteria.getTransactionType()));
+                toTransactionType(criteria.getTransactionTypes()));
 
         return exceptionHandling(
             call(callback).flatMapIterable(item -> item).map(this::toTransaction)
@@ -178,7 +177,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         Callable<List<TransactionInfoDTO>> callback = () ->
             getClient().getAccountUnconfirmedTransactions(publicAccount.getPublicKey().toHex(),
                 criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionType(criteria.getTransactionType()));
+                toTransactionType(criteria.getTransactionTypes()));
         return exceptionHandling(
             call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
                 .toObservable());
@@ -195,7 +194,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         Callable<List<TransactionInfoDTO>> callback = () ->
             getClient().getAccountPartialTransactions(publicAccount.getPublicKey().toHex(),
                 criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionType(criteria.getTransactionType()));
+                toTransactionType(criteria.getTransactionTypes()));
         return exceptionHandling(
             call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
                 .toObservable());
@@ -221,8 +220,10 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         return client;
     }
 
-    private TransactionTypeEnum toTransactionType(TransactionType transactionType) {
-        return transactionType == null ? null
-            : TransactionTypeEnum.fromValue(transactionType.getValue());
+    private String toTransactionType(List<TransactionType> transactionTypes) {
+        return transactionTypes == null ? null
+            : transactionTypes.stream()
+                .map(transactionType -> Integer.toString(transactionType.getValue()))
+                .collect(Collectors.joining(","));
     }
 }

@@ -61,7 +61,8 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getAccountsInfoFromAddresses(RepositoryType type) {
-        Address address = this.config().getTestAccount().getAddress();
+        Account account = this.config().getDefaultAccount();
+        Address address = account.getAddress();
         List<AccountInfo> accountInfos =
             get(this.getAccountRepository(type)
                 .getAccountsInfo(
@@ -99,9 +100,9 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
         RepositoryCallException exception = Assertions
             .assertThrows(RepositoryCallException.class,
                 () -> get(accountHttp.getAccountInfo(addressObject)));
-        Assertions.assertEquals(
-            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'SCGEGBEHICF5PPOGIP2JSCQ5OYGZXOOJF7KUSUQJ'",
-            exception.getMessage());
+        Assertions.assertTrue(
+            exception.getMessage().contains(
+                "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id"));
     }
 
     @ParameterizedTest
@@ -111,8 +112,8 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
         Account account = config().getDefaultAccount();
         TransactionType transactionType = TransactionType.TRANSFER;
         List<Transaction> transactions = get(accountHttp.transactions(account.getPublicAccount(),
-            new TransactionSearchCriteria().transactionType(
-                transactionType)));
+            new TransactionSearchCriteria().transactionTypes(
+                Collections.singletonList(transactionType))));
         Assertions.assertFalse(transactions.isEmpty());
 
         transactions.forEach(t -> Assertions.assertEquals(transactionType, t.getType()));
@@ -125,7 +126,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
         Account account = config().getDefaultAccount();
         List<Transaction> transactions = get(accountHttp.transactions(account.getPublicAccount(),
             new TransactionSearchCriteria().pageSize(10).order("id")));
-        Assertions.assertTrue(transactions.size() > 1);
+        Assertions.assertTrue(transactions.size() > 0);
 
         String lastOne = transactions.get(0).getTransactionInfo().get().getId().get();
         String id = transactions.get(1).getTransactionInfo().get().getId().get();
@@ -144,15 +145,17 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
     void outgoingTransactionsById(RepositoryType type) {
         AccountRepository accountHttp = getRepositoryFactory(type).createAccountRepository();
         Account account = config().getDefaultAccount();
-        List<Transaction> transactions = get(accountHttp.outgoingTransactions(account.getPublicAccount(),
-            new TransactionSearchCriteria().pageSize(10).order("id")));
+        List<Transaction> transactions = get(
+            accountHttp.outgoingTransactions(account.getPublicAccount(),
+                new TransactionSearchCriteria().pageSize(10).order("id")));
         Assertions.assertTrue(transactions.size() > 1);
 
         String lastOne = transactions.get(0).getTransactionInfo().get().getId().get();
         String id = transactions.get(1).getTransactionInfo().get().getId().get();
-        List<Transaction> transactions2 = get(accountHttp.outgoingTransactions(account.getPublicAccount(),
-            new TransactionSearchCriteria()
-                .id(id)));
+        List<Transaction> transactions2 = get(
+            accountHttp.outgoingTransactions(account.getPublicAccount(),
+                new TransactionSearchCriteria()
+                    .id(id)));
 
         Assertions.assertEquals(1, transactions2.size());
         transactions2
@@ -167,8 +170,8 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
         Account account = config().getDefaultAccount();
         TransactionType transactionType = TransactionType.MOSAIC_GLOBAL_RESTRICTION;
         List<Transaction> transactions = get(accountHttp.transactions(account.getPublicAccount(),
-            new TransactionSearchCriteria().transactionType(
-                transactionType)));
+            new TransactionSearchCriteria()
+                .transactionTypes(Collections.singletonList(transactionType))));
         System.out.println(transactions.size());
         Assertions.assertFalse(transactions.isEmpty());
 
@@ -179,11 +182,11 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void transactionsWithPagination(RepositoryType type) {
-        Account account = this.config().getTestAccount();
+        Account account = this.config().getDefaultAccount();
         List<Transaction> transactions = get(
             this.getAccountRepository(type).transactions(account.getPublicAccount()));
 
-        Assertions.assertTrue(transactions.size() > 1);
+        Assertions.assertTrue(transactions.size() > 0);
 
         System.out.println(transactions.size());
         List<Transaction> nextTransactions =

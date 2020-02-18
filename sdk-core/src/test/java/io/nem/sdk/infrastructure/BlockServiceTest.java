@@ -22,6 +22,7 @@ import io.nem.sdk.api.RepositoryFactory;
 import io.nem.sdk.model.blockchain.BlockInfo;
 import io.nem.sdk.model.blockchain.MerklePathItem;
 import io.nem.sdk.model.blockchain.MerkleProofInfo;
+import io.nem.sdk.model.blockchain.Position;
 import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -115,10 +116,10 @@ class BlockServiceTest {
             .thenReturn(Observable.just(blockInfo));
 
         List<MerklePathItem> merklePath = new ArrayList<>();
-        merklePath.add(new MerklePathItem(1,"11"));
-        merklePath.add(new MerklePathItem(2,"22"));
-        merklePath.add(new MerklePathItem(1,"33"));
-        merklePath.add(new MerklePathItem(2,"44"));
+        merklePath.add(new MerklePathItem(Position.LEFT,"11"));
+        merklePath.add(new MerklePathItem(Position.RIGHT,"22"));
+        merklePath.add(new MerklePathItem(Position.LEFT,"33"));
+        merklePath.add(new MerklePathItem(Position.RIGHT,"44"));
         MerkleProofInfo merkleProofInfo = new MerkleProofInfo(merklePath);
         Mockito.when(blockRepositoryMock.getMerkleTransaction(height, hash))
             .thenReturn(Observable.just(merkleProofInfo));
@@ -141,10 +142,10 @@ class BlockServiceTest {
             .thenReturn(Observable.just(blockInfo));
 
         List<MerklePathItem> merklePath = new ArrayList<>();
-        merklePath.add(new MerklePathItem(1,"11"));
-        merklePath.add(new MerklePathItem(2,"22"));
-        merklePath.add(new MerklePathItem(1,"33"));
-        merklePath.add(new MerklePathItem(2,"44"));
+        merklePath.add(new MerklePathItem(Position.LEFT,"11"));
+        merklePath.add(new MerklePathItem(Position.RIGHT,"22"));
+        merklePath.add(new MerklePathItem(Position.LEFT,"33"));
+        merklePath.add(new MerklePathItem(Position.RIGHT,"44"));
         MerkleProofInfo merkleProofInfo = new MerkleProofInfo(merklePath);
         Mockito.when(blockRepositoryMock.getMerkleTransaction(height, leaf))
             .thenReturn(Observable.just(merkleProofInfo));
@@ -212,10 +213,10 @@ class BlockServiceTest {
             .thenReturn(Observable.just(blockInfo));
 
         List<MerklePathItem> merklePath = new ArrayList<>();
-        merklePath.add(new MerklePathItem(1,"11"));
-        merklePath.add(new MerklePathItem(2,"22"));
-        merklePath.add(new MerklePathItem(1,"33"));
-        merklePath.add(new MerklePathItem(2,"44"));
+        merklePath.add(new MerklePathItem(Position.LEFT,"11"));
+        merklePath.add(new MerklePathItem(Position.RIGHT,"22"));
+        merklePath.add(new MerklePathItem(Position.LEFT,"33"));
+        merklePath.add(new MerklePathItem(Position.RIGHT,"44"));
         MerkleProofInfo merkleProofInfo = new MerkleProofInfo(merklePath);
         Mockito.when(receiptRepositoryMock.getMerkleReceipts(height, hash))
             .thenReturn(Observable.just(merkleProofInfo));
@@ -238,10 +239,10 @@ class BlockServiceTest {
             .thenReturn(Observable.just(blockInfo));
 
         List<MerklePathItem> merklePath = new ArrayList<>();
-        merklePath.add(new MerklePathItem(1,"11"));
-        merklePath.add(new MerklePathItem(2,"22"));
-        merklePath.add(new MerklePathItem(1,"33"));
-        merklePath.add(new MerklePathItem(2,"44"));
+        merklePath.add(new MerklePathItem(Position.LEFT,"11"));
+        merklePath.add(new MerklePathItem(Position.RIGHT,"22"));
+        merklePath.add(new MerklePathItem(Position.LEFT,"33"));
+        merklePath.add(new MerklePathItem(Position.RIGHT,"44"));
         MerkleProofInfo merkleProofInfo = new MerkleProofInfo(merklePath);
         Mockito.when(receiptRepositoryMock.getMerkleReceipts(height, leaf))
             .thenReturn(Observable.just(merkleProofInfo));

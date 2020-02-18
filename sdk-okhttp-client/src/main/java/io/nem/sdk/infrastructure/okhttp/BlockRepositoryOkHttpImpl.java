@@ -23,6 +23,7 @@ import io.nem.sdk.model.blockchain.BlockInfo;
 import io.nem.sdk.model.blockchain.MerklePathItem;
 import io.nem.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.blockchain.Position;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.openapi.okhttp_gson.api.BlockRoutesApi;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
@@ -109,7 +110,8 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
     private MerkleProofInfo toMerkleProofInfo(MerkleProofInfoDTO dto) {
         List<MerklePathItem> pathItems =
             dto.getMerklePath().stream()
-                .map(pathItem -> new MerklePathItem(pathItem.getPosition(), pathItem.getHash()))
+                .map(pathItem -> new MerklePathItem(pathItem.getPosition() == null ? null
+                    : Position.rawValueOf(pathItem.getPosition().getValue()), pathItem.getHash()))
                 .collect(Collectors.toList());
         return new MerkleProofInfo(pathItems);
     }

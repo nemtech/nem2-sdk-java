@@ -18,9 +18,11 @@ package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.MerkleProofInfo;
+import io.nem.sdk.model.blockchain.Position;
 import io.nem.sdk.model.receipt.Statement;
 import io.nem.sdk.openapi.vertx.model.MerklePathItemDTO;
 import io.nem.sdk.openapi.vertx.model.MerkleProofInfoDTO;
+import io.nem.sdk.openapi.vertx.model.PositionEnum;
 import io.nem.sdk.openapi.vertx.model.ResolutionStatementBodyDTO;
 import io.nem.sdk.openapi.vertx.model.ResolutionStatementDTO;
 import io.nem.sdk.openapi.vertx.model.StatementsDTO;
@@ -91,7 +93,7 @@ public class ReceiptRepositoryVertxImplTest extends AbstractVertxRespositoryTest
         MerkleProofInfoDTO merkleProofInfoDTO = new MerkleProofInfoDTO();
         MerklePathItemDTO marklePathItem = new MerklePathItemDTO();
         marklePathItem.setHash("SomeHash");
-        marklePathItem.setPosition(123);
+        marklePathItem.setPosition(PositionEnum.LEFT);
         merkleProofInfoDTO.setMerklePath(Collections.singletonList(marklePathItem));
 
         mockRemoteCall(merkleProofInfoDTO);
@@ -104,8 +106,7 @@ public class ReceiptRepositoryVertxImplTest extends AbstractVertxRespositoryTest
 
         Assertions.assertEquals(1, info.getMerklePath().size());
         Assertions.assertEquals(marklePathItem.getHash(), info.getMerklePath().get(0).getHash());
-        Assertions
-            .assertEquals(marklePathItem.getPosition(), info.getMerklePath().get(0).getPosition());
+        Assertions.assertEquals(Position.LEFT, info.getMerklePath().get(0).getPosition());
     }
 
 }

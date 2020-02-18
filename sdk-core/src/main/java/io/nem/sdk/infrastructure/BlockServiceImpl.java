@@ -26,6 +26,7 @@ import io.nem.sdk.api.RepositoryFactory;
 import io.nem.sdk.model.blockchain.BlockInfo;
 import io.nem.sdk.model.blockchain.MerklePathItem;
 import io.nem.sdk.model.blockchain.MerkleProofInfo;
+import io.nem.sdk.model.blockchain.Position;
 import io.reactivex.Observable;
 import io.reactivex.functions.BiFunction;
 import java.math.BigInteger;
@@ -91,8 +92,9 @@ public class BlockServiceImpl implements BlockService {
             java.util.function.BiFunction<String, MerklePathItem, String> accumulator = (proofHash, pathItem) -> ConvertUtils
                 .toHex(Hashes
                     .sha3_256(ConvertUtils
-                        .fromHexToBytes(pathItem.getPosition() == 1 ? pathItem.getHash() + proofHash
-                            : proofHash + pathItem.getHash())));
+                        .fromHexToBytes(
+                            pathItem.getPosition() == Position.LEFT ? pathItem.getHash() + proofHash
+                                : proofHash + pathItem.getHash())));
 
             String hroot0 = merklePath.stream().reduce(leaf, accumulator, (s1, s2) -> s1);
             return root.equalsIgnoreCase(hroot0);
