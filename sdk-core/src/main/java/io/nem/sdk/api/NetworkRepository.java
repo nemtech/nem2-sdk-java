@@ -16,6 +16,7 @@
 
 package io.nem.sdk.api;
 
+import io.nem.sdk.model.blockchain.NetworkFees;
 import io.nem.sdk.model.blockchain.NetworkInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.reactivex.Observable;
@@ -33,6 +34,12 @@ public interface NetworkRepository {
      * @return network type enum.
      */
     Observable<NetworkType> getNetworkType();
+
+    /**
+     * Returns information about the average, median, highest and lower fee multiplier over the last "numBlocksTransactionFeeStats".
+     * @return the NetworkFees
+     */
+    Observable<NetworkFees> getNetworkFees();
 
     /**
      * @return the network information with like the network's name and description.

@@ -33,7 +33,7 @@ public class ReceiptMappingVertxTest {
     public void getMosaicResolutionStatementHash() {
         Statement statement = getStatement();
         Assertions
-            .assertEquals("99381CE398D3AAE110FC97E984D7D35A710A5C525A4F959EC8916B382DE78A63",
+            .assertEquals("DE29FB6356530E5D1FBEE0A84202520C155D882C46EA74456752D6C75F0707B3",
                 statement.getMosaicResolutionStatement().get(0).generateHash(networkType));
     }
 
@@ -49,7 +49,7 @@ public class ReceiptMappingVertxTest {
     public void getAddressResolutionStatementsHash() {
         Statement statement = getStatement();
         Assertions
-            .assertEquals("6967470641BC527768CDC29998F4A3350813FDF2E40D1C97AB0BBA36B9AF649E",
+            .assertEquals("812AA120525990BE821035BC9CBCCD569F807B5338BA9D13DD63D99F3697ACCA",
                 statement.getAddressResolutionStatements().get(0).generateHash(networkType));
     }
 

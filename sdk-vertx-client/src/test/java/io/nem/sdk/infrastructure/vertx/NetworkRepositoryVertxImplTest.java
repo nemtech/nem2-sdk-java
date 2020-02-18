@@ -16,8 +16,10 @@
 
 package io.nem.sdk.infrastructure.vertx;
 
+import io.nem.sdk.model.blockchain.NetworkFees;
 import io.nem.sdk.model.blockchain.NetworkInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.openapi.vertx.model.NetworkFeesDTO;
 import io.nem.sdk.openapi.vertx.model.NetworkTypeDTO;
 import io.nem.sdk.openapi.vertx.model.NodeInfoDTO;
 import org.junit.jupiter.api.Assertions;
@@ -71,6 +73,28 @@ public class NetworkRepositoryVertxImplTest extends AbstractVertxRespositoryTest
 
         Assertions.assertEquals("mijinTest", info.getName());
         Assertions.assertEquals("some description", info.getDescription());
+
+    }
+
+    @Test
+    public void getNetworkFees() throws Exception {
+
+        NetworkFeesDTO dto = new NetworkFeesDTO();
+        dto.setAverageFeeMultiplier(0.1);
+        dto.setMedianFeeMultiplier(0.2);
+        dto.setLowestFeeMultiplier(3);;
+        dto.setHighestFeeMultiplier(4);
+
+        mockRemoteCall(dto);
+
+        NetworkFees info = repository.getNetworkFees().toFuture().get();
+
+        Assertions.assertNotNull(info);
+
+        Assertions.assertEquals(dto.getAverageFeeMultiplier(), info.getAverageFeeMultiplier());
+        Assertions.assertEquals(dto.getMedianFeeMultiplier(), info.getMedianFeeMultiplier());
+        Assertions.assertEquals(dto.getLowestFeeMultiplier(), info.getLowestFeeMultiplier());
+        Assertions.assertEquals(dto.getHighestFeeMultiplier(), info.getHighestFeeMultiplier());
 
     }
 

@@ -19,6 +19,7 @@ package io.nem.sdk.infrastructure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.sdk.api.NetworkRepository;
+import io.nem.sdk.model.blockchain.NetworkFees;
 import io.nem.sdk.model.blockchain.NetworkInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
 import org.junit.jupiter.api.Assertions;
@@ -43,6 +44,17 @@ class NetworkRepositoryIntegrationTest extends BaseIntegrationTest {
         NetworkInfo networkInfo = get(getNetworkRepository(type).getNetworkInfo());
         assertEquals(getNetworkType().getNetworkName(), networkInfo.getName());
         Assertions.assertNotNull(networkInfo.getDescription());
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void getNetworkFees(RepositoryType type) {
+        NetworkFees networkInfo = get(getNetworkRepository(type).getNetworkFees());
+        Assertions.assertNotNull(networkInfo.getAverageFeeMultiplier());
+        Assertions.assertNotNull(networkInfo.getHighestFeeMultiplier());
+        Assertions.assertNotNull(networkInfo.getLowestFeeMultiplier());
+        Assertions.assertNotNull(networkInfo.getMedianFeeMultiplier());
+        System.out.println(jsonHelper().prettyPrint(networkInfo));
     }
 
     private NetworkRepository getNetworkRepository(RepositoryType type) {
