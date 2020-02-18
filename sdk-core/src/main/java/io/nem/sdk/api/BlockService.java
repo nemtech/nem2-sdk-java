@@ -24,7 +24,23 @@ import java.math.BigInteger;
  */
 public interface BlockService {
 
+
+    /**
+     * Validate transaction hash in block
+     *
+     * @param height block height
+     * @param transactionHash transaction hash
+     * @return if the transaction is valid in a block.
+     */
     Observable<Boolean> isValidTransactionInBlock(BigInteger height, String transactionHash);
 
+
+    /**
+     * Validate statement hash in block
+     *
+     * @param height block height
+     * @param statementHash statement hash
+     * @return if the statement is valid in a block.
+     */
     Observable<Boolean> isValidStatementInBlock(BigInteger height, String statementHash);
 }

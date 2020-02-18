@@ -32,7 +32,7 @@ class BlockServiceIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void testTransferCatCurrencyFromNemesis(RepositoryType type) {
+    void isValidTransactionInBlock(RepositoryType type) {
         BigInteger height = BigInteger.ONE;
         RepositoryFactory repositoryFactory = getRepositoryFactory(type);
 
@@ -49,6 +49,5 @@ class BlockServiceIntegrationTest extends BaseIntegrationTest {
             Assertions.assertTrue(valid);
         });
     }
-
 
 }
