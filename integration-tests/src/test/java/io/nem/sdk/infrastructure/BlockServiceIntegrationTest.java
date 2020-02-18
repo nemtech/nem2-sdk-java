@@ -18,7 +18,9 @@ package io.nem.sdk.infrastructure;
 
 import io.nem.sdk.api.BlockService;
 import io.nem.sdk.api.RepositoryFactory;
+import io.nem.sdk.model.transaction.Transaction;
 import java.math.BigInteger;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,13 +36,19 @@ class BlockServiceIntegrationTest extends BaseIntegrationTest {
         BigInteger height = BigInteger.ONE;
         RepositoryFactory repositoryFactory = getRepositoryFactory(type);
 
-        String hash = get(repositoryFactory.createBlockRepository().getBlockTransactions(
-            height)).get(0).getTransactionInfo().get().getHash().get();
-
         BlockService service = new BlockServiceImpl(repositoryFactory);
 
-        Boolean valid = get(service.isValidTransactionInBlock(height, hash));
-        Assertions.assertTrue(valid);
+        List<Transaction> transactions = get(
+            repositoryFactory.createBlockRepository().getBlockTransactions(
+                height));
+
+        transactions.forEach(t -> {
+            String hash = t.getTransactionInfo().get().getHash().get();
+
+            Boolean valid = get(service.isValidTransactionInBlock(height, hash));
+            Assertions.assertTrue(valid);
+        });
     }
+
 
 }
