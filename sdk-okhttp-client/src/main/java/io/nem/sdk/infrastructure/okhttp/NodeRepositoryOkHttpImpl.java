@@ -72,7 +72,8 @@ public class NodeRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imple
             nodeInfoDTO.getVersion(),
             RoleType.rawValueOf(nodeInfoDTO.getRoles().getValue()),
             nodeInfoDTO.getHost(),
-            nodeInfoDTO.getFriendlyName());
+            nodeInfoDTO.getFriendlyName(),
+            nodeInfoDTO.getNetworkGenerationHash());
     }
 
     /**
