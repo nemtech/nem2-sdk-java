@@ -76,7 +76,7 @@ public class AddressAliasTransactionIntegrationTest extends BaseIntegrationTest 
             ).maxFee(this.maxFee).build();
 
         announceAndValidate(type, account, aggregateTransaction2);
-
+        sleep(1000);
         List<AccountNames> accountNames = get(getRepositoryFactory(type).createNamespaceRepository()
             .getAccountsNames(Collections.singletonList(account.getAddress())));
 

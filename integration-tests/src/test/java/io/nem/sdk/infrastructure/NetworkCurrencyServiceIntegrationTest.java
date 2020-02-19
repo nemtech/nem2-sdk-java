@@ -87,7 +87,7 @@ class NetworkCurrencyServiceIntegrationTest extends BaseIntegrationTest {
             });
 
         Assertions.assertEquals(
-            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'c1df8a076d934a50'",
+            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'C1DF8A076D934A50'",
             exception.getMessage());
     }
 
@@ -105,7 +105,7 @@ class NetworkCurrencyServiceIntegrationTest extends BaseIntegrationTest {
             });
 
         Assertions.assertEquals(
-            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '000000000000000a'",
+            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '000000000000000A'",
             exception.getMessage());
 
     }

@@ -40,8 +40,9 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void standaloneMosaicDefinitionTransaction(RepositoryType type) {
+    void standaloneMosaicDefinitionTransaction(RepositoryType type) throws InterruptedException {
         MosaicId mosaicId = createMosaic(type);
+        sleep(1000);
         MosaicInfo mosaicInfo = get(
             getRepositoryFactory(type).createMosaicRepository().getMosaic(mosaicId));
 

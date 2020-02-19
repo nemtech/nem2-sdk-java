@@ -34,7 +34,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-//TODO Broken!!
 class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
 
     private NamespaceId namespaceId;

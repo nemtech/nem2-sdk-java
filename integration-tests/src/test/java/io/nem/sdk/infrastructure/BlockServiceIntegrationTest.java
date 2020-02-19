@@ -49,5 +49,4 @@ class BlockServiceIntegrationTest extends BaseIntegrationTest {
             Assertions.assertTrue(valid);
         });
     }
-
 }

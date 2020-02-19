@@ -122,7 +122,7 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
             .assertThrows(RepositoryCallException.class, () -> get(getMosaicRepository(type)
                 .getMosaic(new MosaicId("AAAAAE18BE375DA2"))));
         Assertions.assertEquals(
-            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'aaaaae18be375da2'",
+            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'AAAAAE18BE375DA2'",
             exception.getMessage());
     }
 

@@ -69,7 +69,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
                     Collections.singletonList(address)));
 
         assertEquals(1, accountInfos.size());
-        assertEquals(this.getTestAccount().getAddress(), accountInfos.get(0).getAddress());
+        assertEquals(account.getAddress(), accountInfos.get(0).getAddress());
         assertEquals(AccountType.UNLINKED, accountInfos.get(0).getAccountType());
     }
 

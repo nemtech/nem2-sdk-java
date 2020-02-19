@@ -48,7 +48,7 @@ public class RepositoryFactoryConfigurationExamplesIntegrationTest {
 
         //Option 1) Client app boot time. The clients defines the configuration to work offline.
         RepositoryFactoryConfiguration configuration = new RepositoryFactoryConfiguration(
-            "http://localhost:3000/");
+            "http://localhost:3000");
         configuration.withNetworkType(NetworkType.MAIN_NET);
         configuration.withGenerationHash("abc");
         configuration.withNetworkCurrency(
@@ -69,7 +69,7 @@ public class RepositoryFactoryConfigurationExamplesIntegrationTest {
 
         //Option 2) Client app boot time relaying on the rest configuration:
         RepositoryFactoryConfiguration configuration = new RepositoryFactoryConfiguration(
-            "http://localhost:3000/");
+            "http://localhost:3000");
 
         try (RepositoryFactory repositoryFactory = new RepositoryFactoryVertxImpl(configuration)) {
             appDoSomeStuff(repositoryFactory);
@@ -82,7 +82,7 @@ public class RepositoryFactoryConfigurationExamplesIntegrationTest {
 
         //Option 3) Client app boot time relaying on some of the rest configuration. User uses the legacy hardcoded sdk currencies
         RepositoryFactoryConfiguration configuration = new RepositoryFactoryConfiguration(
-            "http://localhost:3000/");
+            "http://localhost:3000");
 
         configuration.withNetworkCurrency(NetworkCurrency.CAT_CURRENCY);
         configuration.withHarvestCurrency(NetworkCurrency.CAT_HARVEST);
