@@ -17,9 +17,10 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.sdk.api.ReceiptRepository;
-import io.nem.sdk.model.blockchain.MerkelPathItem;
-import io.nem.sdk.model.blockchain.MerkelProofInfo;
+import io.nem.sdk.model.blockchain.MerklePathItem;
+import io.nem.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.blockchain.Position;
 import io.nem.sdk.model.receipt.Statement;
 import io.nem.sdk.openapi.okhttp_gson.api.ReceiptRoutesApi;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
@@ -60,22 +61,24 @@ public class ReceiptRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
     }
 
 
-    public Observable<MerkelProofInfo> getMerkleReceipts(BigInteger height, String hash) {
+    public Observable<MerkleProofInfo> getMerkleReceipts(BigInteger height, String hash) {
 
         Callable<MerkleProofInfoDTO> callback = () ->
             getClient().getMerkleReceipts(height, hash);
-        return exceptionHandling(call(callback).map(this::toMerkelProofInfo));
+        return exceptionHandling(call(callback).map(this::toMerkleProofInfo));
     }
 
 
-    private MerkelProofInfo toMerkelProofInfo(MerkleProofInfoDTO dto) {
-        List<MerkelPathItem> pathItems =
+    private MerkleProofInfo toMerkleProofInfo(MerkleProofInfoDTO dto) {
+        List<MerklePathItem> pathItems =
             dto.getMerklePath().stream()
                 .map(
                     pathItem ->
-                        new MerkelPathItem(pathItem.getPosition(), pathItem.getHash()))
+                        new MerklePathItem(pathItem.getPosition() == null ? null
+                            : Position.rawValueOf(pathItem.getPosition().getValue()),
+                            pathItem.getHash()))
                 .collect(Collectors.toList());
-        return new MerkelProofInfo(pathItems);
+        return new MerkleProofInfo(pathItems);
     }
 
     public ReceiptRoutesApi getClient() {

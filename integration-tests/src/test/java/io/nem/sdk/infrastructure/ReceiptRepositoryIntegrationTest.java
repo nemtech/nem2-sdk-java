@@ -19,7 +19,7 @@ package io.nem.sdk.infrastructure;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.sdk.api.ReceiptRepository;
-import io.nem.sdk.model.blockchain.MerkelProofInfo;
+import io.nem.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.sdk.model.receipt.Statement;
 import java.math.BigInteger;
 import org.junit.jupiter.api.TestInstance;
@@ -49,7 +49,7 @@ class ReceiptRepositoryIntegrationTest extends BaseIntegrationTest {
             getReceiptRepository(type).getBlockReceipts(BigInteger.valueOf(2)));
         String hash = statement.getTransactionStatements().get(0).generateHash();
 
-        MerkelProofInfo merkleInfo = get(
+        MerkleProofInfo merkleInfo = get(
             getReceiptRepository(type).getMerkleReceipts(BigInteger.valueOf(2), hash));
         assertTrue(merkleInfo.getMerklePath().size() >= 0);
     }

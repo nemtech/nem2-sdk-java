@@ -2,16 +2,16 @@ package io.nem.sdk.model.blockchain;
 
 import java.util.List;
 
-public class MerkelProofInfo {
+public class MerkleProofInfo {
 
-    private final List<MerkelPathItem> merklePath;
+    private final List<MerklePathItem> merklePath;
 
     /**
      * Constructor
      *
      * @param merklePath the path.
      */
-    public MerkelProofInfo(List<MerkelPathItem> merklePath) {
+    public MerkleProofInfo(List<MerklePathItem> merklePath) {
         this.merklePath = merklePath;
     }
 
@@ -19,9 +19,9 @@ public class MerkelProofInfo {
     /**
      * Return Payload
      *
-     * @return {@link List} of MerkelPathItem
+     * @return {@link List} of MerklePathItem
      */
-    public List<MerkelPathItem> getMerklePath() {
+    public List<MerklePathItem> getMerklePath() {
         return this.merklePath;
     }
 }

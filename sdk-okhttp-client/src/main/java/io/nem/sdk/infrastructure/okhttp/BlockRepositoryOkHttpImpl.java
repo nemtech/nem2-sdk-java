@@ -20,9 +20,10 @@ import io.nem.sdk.api.BlockRepository;
 import io.nem.sdk.api.QueryParams;
 import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.blockchain.BlockInfo;
-import io.nem.sdk.model.blockchain.MerkelPathItem;
-import io.nem.sdk.model.blockchain.MerkelProofInfo;
+import io.nem.sdk.model.blockchain.MerklePathItem;
+import io.nem.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.blockchain.Position;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.openapi.okhttp_gson.api.BlockRoutesApi;
 import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
@@ -84,10 +85,10 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
 
 
     @Override
-    public Observable<MerkelProofInfo> getMerkleTransaction(BigInteger height, String hash) {
+    public Observable<MerkleProofInfo> getMerkleTransaction(BigInteger height, String hash) {
         Callable<MerkleProofInfoDTO> callback = () ->
             getClient().getMerkleTransaction(height, hash);
-        return exceptionHandling(call(callback).map(this::toMerkelProofInfo));
+        return exceptionHandling(call(callback).map(this::toMerkleProofInfo));
 
     }
 
@@ -106,12 +107,13 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
     }
 
 
-    private MerkelProofInfo toMerkelProofInfo(MerkleProofInfoDTO dto) {
-        List<MerkelPathItem> pathItems =
+    private MerkleProofInfo toMerkleProofInfo(MerkleProofInfoDTO dto) {
+        List<MerklePathItem> pathItems =
             dto.getMerklePath().stream()
-                .map(pathItem -> new MerkelPathItem(pathItem.getPosition(), pathItem.getHash()))
+                .map(pathItem -> new MerklePathItem(pathItem.getPosition() == null ? null
+                    : Position.rawValueOf(pathItem.getPosition().getValue()), pathItem.getHash()))
                 .collect(Collectors.toList());
-        return new MerkelProofInfo(pathItems);
+        return new MerkleProofInfo(pathItems);
     }
 
     private Transaction toTransaction(TransactionInfoDTO input) {

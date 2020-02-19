@@ -17,10 +17,12 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.core.utils.MapperUtils;
-import io.nem.sdk.model.blockchain.MerkelProofInfo;
+import io.nem.sdk.model.blockchain.MerkleProofInfo;
+import io.nem.sdk.model.blockchain.Position;
 import io.nem.sdk.model.receipt.Statement;
 import io.nem.sdk.openapi.okhttp_gson.model.MerklePathItemDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.MerkleProofInfoDTO;
+import io.nem.sdk.openapi.okhttp_gson.model.PositionEnum;
 import io.nem.sdk.openapi.okhttp_gson.model.ResolutionStatementBodyDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.ResolutionStatementDTO;
 import io.nem.sdk.openapi.okhttp_gson.model.StatementsDTO;
@@ -92,21 +94,20 @@ public class ReceiptRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         MerkleProofInfoDTO merkleProofInfoDTO = new MerkleProofInfoDTO();
         MerklePathItemDTO marklePathItem = new MerklePathItemDTO();
         marklePathItem.setHash("SomeHash");
-        marklePathItem.setPosition(123);
+        marklePathItem.setPosition(PositionEnum.LEFT);
         merkleProofInfoDTO.setMerklePath(Collections.singletonList(marklePathItem));
 
         mockRemoteCall(merkleProofInfoDTO);
 
         BigInteger height = BigInteger.valueOf(10L);
-        MerkelProofInfo info = repository.getMerkleReceipts(height, "AnotherHash").toFuture()
+        MerkleProofInfo info = repository.getMerkleReceipts(height, "AnotherHash").toFuture()
             .get();
 
         Assertions.assertNotNull(info);
 
         Assertions.assertEquals(1, info.getMerklePath().size());
         Assertions.assertEquals(marklePathItem.getHash(), info.getMerklePath().get(0).getHash());
-        Assertions
-            .assertEquals(marklePathItem.getPosition(), info.getMerklePath().get(0).getPosition());
+        Assertions.assertEquals(Position.LEFT, info.getMerklePath().get(0).getPosition());
 
     }
 

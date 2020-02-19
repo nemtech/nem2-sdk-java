@@ -17,6 +17,7 @@
 package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.sdk.api.NetworkRepository;
+import io.nem.sdk.model.blockchain.NetworkFees;
 import io.nem.sdk.model.blockchain.NetworkInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.openapi.vertx.api.NetworkRoutesApi;
@@ -24,6 +25,7 @@ import io.nem.sdk.openapi.vertx.api.NetworkRoutesApiImpl;
 import io.nem.sdk.openapi.vertx.api.NodeRoutesApi;
 import io.nem.sdk.openapi.vertx.api.NodeRoutesApiImpl;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
+import io.nem.sdk.openapi.vertx.model.NetworkFeesDTO;
 import io.nem.sdk.openapi.vertx.model.NetworkTypeDTO;
 import io.nem.sdk.openapi.vertx.model.NodeInfoDTO;
 import io.reactivex.Observable;
@@ -55,6 +57,17 @@ public class NetworkRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         return exceptionHandling(
             call(callback).map(info -> NetworkType.rawValueOf(info.getNetworkIdentifier())));
     }
+
+    @Override
+    public Observable<NetworkFees> getNetworkFees() {
+        Consumer<Handler<AsyncResult<NetworkFeesDTO>>> callback = handler -> getNetworkRoutesApi()
+            .getNetworkFees(handler);
+        return exceptionHandling(
+            call(callback).map(info -> new NetworkFees(info.getAverageFeeMultiplier(),
+                info.getMedianFeeMultiplier(), info.getLowestFeeMultiplier(), info.getHighestFeeMultiplier()
+            )));
+    }
+
 
     @Override
     public Observable<NetworkInfo> getNetworkInfo() {
