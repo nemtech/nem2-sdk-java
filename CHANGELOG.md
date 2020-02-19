@@ -3,7 +3,32 @@ All notable changes to this project will be documented in this file.
 
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [0.16.3] - 30-Jan-2020
+## [0.17.0] - 19-Feb-2020
+
+**Milestone**: Fushicho.4(RC3 0.9.3.1)
+
+ Versions  |   |
+---|---|---
+SDK OkHttp| v0.17.0 | https://repo.maven.apache.org/maven2/io/nem/sdk-okhttp-client
+SDK Vertx| v0.17.0 | https://repo.maven.apache.org/maven2/io/nem/sdk-vertx-client
+Catbuffer Library| v2.0.1 | https://repo.maven.apache.org/maven2/io/nem/catbuffer
+Client OkHttp | v0.8.4  | https://repo.maven.apache.org/maven2/io/nem/api-okhttp-gson-client
+Client Vertx | v0.8.4  | https://repo.maven.apache.org/maven2/io/nem/sdk-vertx-client
+
+- **[BREAKING CHANGE]** Changed hashing algorithm to cope catapult-server changes. All Key derivation and signing are now using `SHA512`. Removed `SignSchema` so `NetworkType` is no longer bonded to the schema anymore (sha3 / keccak). This change will affect all existing keypairs / address (derived from public key) and  transaction signatures.
+- **[BREAKING CHANGE]** `NetworkCurrencyMosaic` and `NetworkHarvestMosaic` subclasses have been replaced with `NetworkCurrency.CAT_CURRENCY` and `NetworkCurrency.CAT_HARVEST` static values. `NetworkCurrency.SYMBOL_XYM` has been added describing the new currency.
+- Added `NetworkGenerationHash` to the payload in `node/info` endpoint.
+- Added enum for block merkle path item positions (`left / right`) to replace previous number type value (`1 / 2`).
+- Added new `BlockService` for `Transaction` and `Receipt` block merkle proof auditing.
+- Added new node type `Dual` to the existing `RoleType`.
+- Added new endpoint `node/health` in `NodeRespository`.
+- Moved `getStorageInfo` and `getServerInfo` from `DiagnosticRespository` to `NodeRespository`. `NodeRespository` has been removed.
+- Generated hashes are uppercase.
+- Fixed ResolutionStatement hash generation.
+- Fixed Jackson version compatibility issue.
+- General legacy code refactoring and cleanup.
+
+## [0.17.0] - 30-Jan-2020
 
 **Milestone**: Fuschicho 3
 
