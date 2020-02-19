@@ -18,7 +18,7 @@ class NetworkCurrencyCatCurrencyTest {
         Mosaic currency = networkCurrency.createRelative(BigInteger.valueOf(1000));
         assertEquals(BigInteger.valueOf(1000 * 1000000), currency.getAmount());
         assertEquals(networkCurrency.getNamespaceId().get(), currency.getId());
-        assertEquals("85bbea6cc462b244", currency.getIdAsHex());
+        assertEquals("85BBEA6CC462B244", currency.getIdAsHex());
     }
 
     @Test
@@ -26,7 +26,7 @@ class NetworkCurrencyCatCurrencyTest {
         Mosaic currency = networkCurrency.createRelative(BigDecimal.valueOf(0.000001));
         assertEquals(BigInteger.valueOf((long) (0.000001 * 1000000)), currency.getAmount());
         assertEquals(networkCurrency.getNamespaceId().get(), currency.getId());
-        assertEquals("85bbea6cc462b244", currency.getIdAsHex());
+        assertEquals("85BBEA6CC462B244", currency.getIdAsHex());
     }
 
     @Test
@@ -34,7 +34,7 @@ class NetworkCurrencyCatCurrencyTest {
         Mosaic currency = networkCurrency.createAbsolute(BigInteger.valueOf(1));
         assertEquals(BigInteger.valueOf(1), currency.getAmount());
         assertEquals(networkCurrency.getNamespaceId().get(), currency.getId());
-        assertEquals("85bbea6cc462b244", currency.getIdAsHex());
+        assertEquals("85BBEA6CC462B244", currency.getIdAsHex());
     }
 
     @Test
