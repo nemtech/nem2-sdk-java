@@ -29,18 +29,16 @@ import io.nem.sdk.api.NetworkRepository;
 import io.nem.sdk.api.NodeRepository;
 import io.nem.sdk.api.ReceiptRepository;
 import io.nem.sdk.api.RepositoryFactory;
+import io.nem.sdk.api.RepositoryFactoryConfiguration;
 import io.nem.sdk.api.RestrictionAccountRepository;
 import io.nem.sdk.api.RestrictionMosaicRepository;
 import io.nem.sdk.api.TransactionRepository;
-import io.nem.sdk.model.blockchain.BlockInfo;
-import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.infrastructure.RepositoryFactoryBase;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
-import io.reactivex.Observable;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
-import java.math.BigInteger;
 
 /**
  * Vertx implementation of a {@link RepositoryFactory}
@@ -48,25 +46,23 @@ import java.math.BigInteger;
  * @author Fernando Boucquez
  */
 
-public class RepositoryFactoryVertxImpl implements RepositoryFactory {
+public class RepositoryFactoryVertxImpl extends RepositoryFactoryBase {
 
     private final ApiClient apiClient;
 
     private final WebClient webClient;
 
-    private final String baseUrl;
-
     private final Vertx vertx;
 
-    private final Observable<NetworkType> networkTypeObservable;
-
-    private final Observable<String> generationHashObservable;
-
     public RepositoryFactoryVertxImpl(String baseUrl) {
-        this.baseUrl = baseUrl;
+        this(new RepositoryFactoryConfiguration(baseUrl));
+    }
+
+    public RepositoryFactoryVertxImpl(RepositoryFactoryConfiguration configuration) {
+        super(configuration);
         vertx = Vertx.vertx();
         webClient = WebClient.create(vertx);
-        this.apiClient = new ApiClient(vertx, new JsonObject().put("basePath", baseUrl)) {
+        this.apiClient = new ApiClient(vertx, new JsonObject().put("basePath", getBaseUrl())) {
             @Override
             public synchronized WebClient getWebClient() {
                 return webClient;
@@ -75,20 +71,8 @@ public class RepositoryFactoryVertxImpl implements RepositoryFactory {
         //Note: For some reason the generated code use to mapper instances.
         JsonHelperJackson2.configureMapper(apiClient.getObjectMapper());
         JsonHelperJackson2.configureMapper(Json.mapper);
-        this.networkTypeObservable = createNetworkRepository().getNetworkType().cache();
-        this.generationHashObservable = createBlockRepository().getBlockByHeight(BigInteger.ONE)
-            .map(BlockInfo::getGenerationHash).cache();
     }
 
-    @Override
-    public Observable<NetworkType> getNetworkType() {
-        return networkTypeObservable;
-    }
-
-    @Override
-    public Observable<String> getGenerationHash() {
-        return generationHashObservable;
-    }
 
     @Override
     public AccountRepository createAccountRepository() {
@@ -97,7 +81,7 @@ public class RepositoryFactoryVertxImpl implements RepositoryFactory {
 
     @Override
     public MultisigRepository createMultisigRepository() {
-        return new MultisigRepositoryVertxImpl(apiClient, networkTypeObservable);
+        return new MultisigRepositoryVertxImpl(apiClient, getNetworkType());
     }
 
     @Override
@@ -107,7 +91,7 @@ public class RepositoryFactoryVertxImpl implements RepositoryFactory {
 
     @Override
     public ReceiptRepository createReceiptRepository() {
-        return new ReceiptRepositoryVertxImpl(apiClient, networkTypeObservable);
+        return new ReceiptRepositoryVertxImpl(apiClient, getNetworkType());
     }
 
     @Override
@@ -117,12 +101,12 @@ public class RepositoryFactoryVertxImpl implements RepositoryFactory {
 
     @Override
     public MosaicRepository createMosaicRepository() {
-        return new MosaicRepositoryVertxImpl(apiClient, networkTypeObservable);
+        return new MosaicRepositoryVertxImpl(apiClient, getNetworkType());
     }
 
     @Override
     public NamespaceRepository createNamespaceRepository() {
-        return new NamespaceRepositoryVertxImpl(apiClient, networkTypeObservable);
+        return new NamespaceRepositoryVertxImpl(apiClient, getNetworkType());
     }
 
     @Override
@@ -157,7 +141,7 @@ public class RepositoryFactoryVertxImpl implements RepositoryFactory {
 
     @Override
     public Listener createListener() {
-        return new ListenerVertx(vertx.createHttpClient(), baseUrl);
+        return new ListenerVertx(vertx.createHttpClient(), getBaseUrl());
     }
 
     @Override

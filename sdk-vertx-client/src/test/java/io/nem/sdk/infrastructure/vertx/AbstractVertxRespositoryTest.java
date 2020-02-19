@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nem.core.utils.HttpStatus;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
+import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.sdk.openapi.vertx.invoker.ApiException;
@@ -29,6 +30,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.impl.headers.VertxHttpHeaders;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -133,6 +135,11 @@ public abstract class AbstractVertxRespositoryTest {
             .invokeAPI(Mockito.anyString(), Mockito.anyString(), Mockito.anyList(), Mockito.any(),
                 Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
                 Mockito.any(), Mockito.any());
+    }
+
+    protected io.nem.sdk.model.mosaic.Mosaic createAbsolute(BigInteger amount) {
+        return new io.nem.sdk.model.mosaic.Mosaic(NamespaceId.createFromName("xem.currency"),
+            amount);
     }
 
 

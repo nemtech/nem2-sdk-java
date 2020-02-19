@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.nem.sdk.api.NamespaceRepository;
 import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.model.account.Account;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.namespace.NamespaceInfo;
 import io.nem.sdk.model.namespace.NamespaceName;
@@ -42,7 +41,9 @@ class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
 
     @BeforeAll
     void setup() {
-        namespaceId = NetworkCurrencyMosaic.NAMESPACEID;
+        namespaceId = getNetworkCurrency().getNamespaceId().orElseThrow(() ->
+            new IllegalStateException(
+                "Network currency namespace id must be provided must be provided"));
     }
 
     @ParameterizedTest

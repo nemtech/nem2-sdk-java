@@ -19,7 +19,6 @@ package io.nem.sdk.infrastructure;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.message.PlainMessage;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.HashLockTransaction;
@@ -51,7 +50,7 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
                 getNetworkType(),
                 recipient,
                 Collections
-                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                    .singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
                 PlainMessage.create("test-message")
             ).maxFee(this.maxFee).build();
 
@@ -68,7 +67,7 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
         TransactionFactory<HashLockTransaction> hashLockTransaction = HashLockTransactionFactory
             .create(
                 getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 signedTransaction)
             .maxFee(this.maxFee);

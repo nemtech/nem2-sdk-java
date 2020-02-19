@@ -26,7 +26,6 @@ import io.nem.sdk.api.TransactionSearchCriteria;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.message.PlainMessage;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionStatus;
 import io.nem.sdk.model.transaction.TransactionType;
@@ -64,7 +63,7 @@ public class TransactionRepositoryIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 recipient,
                 Collections
-                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                    .singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
                 PlainMessage.create(message)
             ).maxFee(this.maxFee).build();
 

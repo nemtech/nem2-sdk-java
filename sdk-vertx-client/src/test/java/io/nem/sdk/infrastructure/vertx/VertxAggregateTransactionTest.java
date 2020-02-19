@@ -28,9 +28,7 @@ import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.message.PlainMessage;
-import io.nem.sdk.model.mosaic.Mosaic;
-import io.nem.sdk.model.mosaic.MosaicId;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
+import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.JsonHelper;
@@ -91,9 +89,7 @@ public class VertxAggregateTransactionTest {
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST),
-                Collections.singletonList(
-                    new Mosaic(new MosaicId(NetworkCurrencyMosaic.NAMESPACEID.getId()),
-                        BigInteger.valueOf(10000000))),
+                Collections.singletonList(createAbsolute(BigInteger.valueOf(10000000))),
                 PlainMessage.Empty).deadline(new VertxFakeDeadline()).build();
 
         AggregateTransaction aggregateTx =
@@ -108,6 +104,11 @@ public class VertxAggregateTransactionTest {
 
         byte[] actual = aggregateTx.serialize();
         assertEquals(expected, ConvertUtils.toHex(actual));
+    }
+
+    protected io.nem.sdk.model.mosaic.Mosaic createAbsolute(BigInteger amount) {
+        return new io.nem.sdk.model.mosaic.Mosaic(NamespaceId.createFromName("cat.currency"),
+            amount);
     }
 
     @Test

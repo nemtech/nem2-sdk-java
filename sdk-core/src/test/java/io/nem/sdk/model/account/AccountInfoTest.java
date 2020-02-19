@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.Mosaic;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
+import io.nem.sdk.model.mosaic.NetworkCurrency;
 import java.math.BigInteger;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ class AccountInfoTest {
     @Test
     void shouldCreateAccountInfoViaConstructor() {
         List<Mosaic> mosaics =
-            Arrays.asList(NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)));
+            Collections.singletonList(NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)));
         AccountInfo accountInfo =
             new AccountInfo(
                 Address.createFromRawAddress("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR26"),
