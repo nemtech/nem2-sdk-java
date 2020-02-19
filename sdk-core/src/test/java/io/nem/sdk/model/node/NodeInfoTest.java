@@ -45,7 +45,7 @@ public class NodeInfoTest {
                 0,
                 RoleType.API_NODE,
                 "localhost",
-                "test");
+                "test", "abc");
         assertEquals("localhost", nodeInfo.getHost());
         assertEquals(0, nodeInfo.getVersion());
         assertEquals(3000, nodeInfo.getPort());
@@ -53,5 +53,6 @@ public class NodeInfoTest {
         assertEquals(NetworkType.MIJIN_TEST, nodeInfo.getNetworkIdentifier());
         assertEquals(2, nodeInfo.getRoles().getValue());
         assertEquals(nodeInfo.getPublicKey(), account.getPublicKey());
+        assertEquals("abc", nodeInfo.getNetworkGenerationHash());
     }
 }

@@ -135,7 +135,20 @@ public class ResolutionStatementTest {
     }
 
     @Test
-    void shouldGenerateHash() {
+    void shouldGenerateHashAddress() {
+        List<ResolutionEntry<Address>> resolutionEntries = new ArrayList<>();
+        resolutionEntries.add(addressResolutionEntry);
+        AddressResolutionStatement resolutionStatement = new AddressResolutionStatement(
+            BigInteger.TEN, address, resolutionEntries);
+
+        String hash = resolutionStatement.generateHash(networkType);
+
+        assertFalse(hash.isEmpty());
+        assertEquals("DD7E0D121A33C7133366F8FD36DD6CD5DE01D9008BA9369D2B7DA1BCCBB04A72", hash);
+    }
+
+    @Test
+    void shouldGenerateHashMosaic() {
         List<ResolutionEntry<MosaicId>> resolutionEntries = new ArrayList<>();
         resolutionEntries.add(mosaicResolutionEntry);
         MosaicResolutionStatement resolutionStatement = new MosaicResolutionStatement(
@@ -144,7 +157,7 @@ public class ResolutionStatementTest {
         String hash = resolutionStatement.generateHash(networkType);
 
         assertFalse(hash.isEmpty());
-        assertEquals("C965152CBD197283CC9F7AFD7F8C4C3FF03B0B54FCE7C8F4820F966AB0591A5C", hash);
+        assertEquals("9BB7E01FAEA831E790E4A2DE8DBEDB32F73889493F6B1BC02031457CB655F6D0", hash);
     }
 
 }

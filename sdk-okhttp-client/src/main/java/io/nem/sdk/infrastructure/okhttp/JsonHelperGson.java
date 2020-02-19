@@ -28,8 +28,6 @@ import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.openapi.okhttp_gson.invoker.JSON;
 import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.ByteArrayAdapter;
 import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.DateTypeAdapter;
-import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.LocalDateTypeAdapter;
-import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.OffsetDateTimeTypeAdapter;
 import io.nem.sdk.openapi.okhttp_gson.invoker.JSON.SqlDateTypeAdapter;
 import java.lang.reflect.Type;
 import java.math.BigInteger;
@@ -38,8 +36,6 @@ import java.util.Date;
 import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.threeten.bp.LocalDate;
-import org.threeten.bp.OffsetDateTime;
 
 /**
  * Created by fernando on 06/08/19.
@@ -69,8 +65,6 @@ public class JsonHelperGson implements JsonHelper {
         JSON json = new JSON();
         DateTypeAdapter dateTypeAdapter = new DateTypeAdapter();
         SqlDateTypeAdapter sqlDateTypeAdapter = new SqlDateTypeAdapter();
-        OffsetDateTimeTypeAdapter offsetDateTimeTypeAdapter = new OffsetDateTimeTypeAdapter();
-        LocalDateTypeAdapter localDateTypeAdapter = json.new LocalDateTypeAdapter();
         ByteArrayAdapter byteArrayAdapter = json.new ByteArrayAdapter();
         GsonBuilder builder = JSON.createGson().registerTypeHierarchyAdapter(
             Collection.class, new CollectionAdapter())
@@ -79,8 +73,6 @@ public class JsonHelperGson implements JsonHelper {
             .registerTypeAdapter(Double.class, new DoubleJsonSerializer())
             .registerTypeAdapter(Date.class, dateTypeAdapter)
             .registerTypeAdapter(java.sql.Date.class, sqlDateTypeAdapter)
-            .registerTypeAdapter(OffsetDateTime.class, offsetDateTimeTypeAdapter)
-            .registerTypeAdapter(LocalDate.class, localDateTypeAdapter)
             .registerTypeAdapter(byte[].class, byteArrayAdapter);
         if (pretty) {
             builder.setPrettyPrinting();
