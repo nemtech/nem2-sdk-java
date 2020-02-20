@@ -27,7 +27,6 @@ import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
 import java.util.Collections;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 
 /**
@@ -54,12 +53,13 @@ abstract class AbstractTransactionTester {
     protected <T extends Transaction> T assertSerialization(String expected, T transaction) {
         byte[] actual = transaction.serialize();
 
-        assertEquals(expected, Hex.toHexString(actual));
+        assertEquals(expected.toUpperCase(), ConvertUtils.toHex(actual));
         Assertions
             .assertEquals(ConvertUtils.fromHexToBytes(expected).length, transaction.getSize());
         T deserialized = (T) binarySerialization.deserialize(actual);
 
-        assertEquals(expected, Hex.toHexString(binarySerialization.serialize(deserialized)));
+        assertEquals(expected.toUpperCase(),
+            ConvertUtils.toHex(binarySerialization.serialize(deserialized)));
         if (!AggregateTransaction.class.isInstance(transaction)) {
             assertAggregate(transaction);
         }
@@ -94,8 +94,8 @@ abstract class AbstractTransactionTester {
 
         Assertions.assertEquals(serializedAggregate.length, aggregateTransaction.getSize());
 
-        assertEquals(Hex.toHexString(serializedAggregate),
-            Hex.toHexString(binarySerialization.deserialize(serializedAggregate).serialize()));
+        assertEquals(ConvertUtils.toHex(serializedAggregate),
+            ConvertUtils.toHex(binarySerialization.deserialize(serializedAggregate).serialize()));
         return deserialized;
     }
 
@@ -114,11 +114,11 @@ abstract class AbstractTransactionTester {
     protected <T extends Transaction> T assertEmbeddedSerialization(String expected,
         T transaction) {
         byte[] actual = binarySerialization.serializeEmbedded(transaction);
-        assertEquals(expected, Hex.toHexString(actual));
+        assertEquals(expected.toUpperCase(), ConvertUtils.toHex(actual));
         T deserialized = (T) binarySerialization
             .deserializeEmbedded(SerializationUtils.toDataInput(actual));
-        assertEquals(expected,
-            Hex.toHexString(binarySerialization.serializeEmbedded(deserialized)));
+        assertEquals(expected.toUpperCase(),
+            ConvertUtils.toHex(binarySerialization.serializeEmbedded(deserialized)));
         return deserialized;
     }
 

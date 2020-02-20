@@ -16,7 +16,6 @@
 
 package io.nem.sdk.infrastructure.okhttp;
 
-import com.google.gson.Gson;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.io.InputStream;

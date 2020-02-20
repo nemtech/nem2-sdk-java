@@ -17,6 +17,7 @@
 package io.nem.sdk.infrastructure;
 
 import io.nem.core.crypto.PublicKey;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.api.AggregateTransactionService;
 import io.nem.sdk.api.MultisigRepository;
 import io.nem.sdk.api.RepositoryFactory;
@@ -37,7 +38,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
-import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Implementation of the {@link AggregateTransactionService}
@@ -60,7 +60,7 @@ public class AggregateTransactionServiceImpl implements AggregateTransactionServ
 
         AggregateTransaction transaction = (AggregateTransaction) BinarySerializationImpl.INSTANCE
             .deserialize(
-                Hex.decode(signedTransaction.getPayload()));
+                ConvertUtils.fromHexToBytes(signedTransaction.getPayload()));
 
         /*
          * Include both initiator & cosigners

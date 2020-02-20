@@ -28,7 +28,6 @@ import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.BlockInfo;
 import io.nem.sdk.model.message.PlainMessage;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
@@ -226,7 +225,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 this.getRecipient(),
                 Collections.singletonList(
-                    NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(10000L))),
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(10000L))),
                 PlainMessage.create("test-message")
             ).maxFee(this.maxFee).build();
 
@@ -247,7 +246,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
             TransferTransactionFactory.create(getNetworkType(),
                 new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", getNetworkType()),
                 Collections.singletonList(
-                    NetworkCurrencyMosaic.createRelative(new BigInteger("100000000000"))),
+                    getNetworkCurrency().createRelative(new BigInteger("100000000000"))),
                 PlainMessage.create("test-message")
             ).maxFee(this.maxFee).build();
 
@@ -260,7 +259,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     private SignedTransaction createAggregateBondedTransaction() {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(getNetworkType(),
-                new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", getNetworkType()),
+                Account.generateNewAccount(getNetworkType()).getAddress(),
                 Collections.emptyList(),
                 PlainMessage.create("test-message")
             ).maxFee(this.maxFee).build();
@@ -272,10 +271,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
                     transferTransaction.toAggregate(this.multisigAccount.getPublicAccount())))
                 .maxFee(this.maxFee).build();
 
-        SignedTransaction signedTransaction =
-            this.cosignatoryAccount.sign(aggregateTransaction, getGenerationHash());
-
-        return signedTransaction;
+        return this.cosignatoryAccount.sign(aggregateTransaction, getGenerationHash());
     }
 
     private CosignatureSignedTransaction announceCosignatureTransaction(

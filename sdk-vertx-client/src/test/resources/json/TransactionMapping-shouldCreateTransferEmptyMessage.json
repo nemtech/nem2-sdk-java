@@ -14,14 +14,14 @@
     "type": 16724,
     "maxFee": "10000000",
     "deadline": "4604134480",
-    "recipientAddress": "98b6e171752d1d5850be01a937a107810a4ae3e34ce31abb61",
+    "recipientAddress": "98B6E171752D1D5850BE01A937A107810A4AE3E34CE31ABB61",
     "message": {
       "type": 0,
       "payload": ""
     },
     "mosaics": [
       {
-        "id": "85bbea6cc462b244",
+        "id": "85BBEA6CC462B244",
         "amount": "100000000"
       }
     ]

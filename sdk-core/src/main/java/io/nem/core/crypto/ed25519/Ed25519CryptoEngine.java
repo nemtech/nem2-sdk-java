@@ -23,7 +23,6 @@ import io.nem.core.crypto.DsaSigner;
 import io.nem.core.crypto.KeyAnalyzer;
 import io.nem.core.crypto.KeyGenerator;
 import io.nem.core.crypto.KeyPair;
-import io.nem.core.crypto.SignSchema;
 
 /**
  * Class that wraps the Ed25519 specific implementation.
@@ -36,19 +35,19 @@ public class Ed25519CryptoEngine implements CryptoEngine {
     }
 
     @Override
-    public DsaSigner createDsaSigner(final KeyPair keyPair, SignSchema signSchema) {
-        return new Ed25519DsaSigner(keyPair, signSchema);
+    public DsaSigner createDsaSigner(final KeyPair keyPair) {
+        return new Ed25519DsaSigner(keyPair);
     }
 
     @Override
-    public KeyGenerator createKeyGenerator(SignSchema signSchema) {
-        return new Ed25519KeyGenerator(signSchema);
+    public KeyGenerator createKeyGenerator( ) {
+        return new Ed25519KeyGenerator();
     }
 
     @Override
     public BlockCipher createBlockCipher(final KeyPair senderKeyPair,
-        final KeyPair recipientKeyPair, final SignSchema signSchema) {
-        return new Ed25519BlockCipher(senderKeyPair, recipientKeyPair, signSchema);
+        final KeyPair recipientKeyPair) {
+        return new Ed25519BlockCipher(senderKeyPair, recipientKeyPair);
     }
 
     @Override

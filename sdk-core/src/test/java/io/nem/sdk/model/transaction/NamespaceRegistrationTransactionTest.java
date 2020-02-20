@@ -19,13 +19,13 @@ package io.nem.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.namespace.NamespaceRegistrationType;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +53,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
 
         assertEquals(
             "00000000E803000000000000CFCBE72D994BE69B0013726F6F742D746573742D6E616D657370616365",
-            Hex.toHexString(namespaceRegistrationTransaction.serialize()).toUpperCase()
+            ConvertUtils.toHex(namespaceRegistrationTransaction.serialize()).toUpperCase()
                 .substring(248));
 
         SignedTransaction signedTransaction =
@@ -153,11 +153,11 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
                 .build();
 
         String expected =
-            "9e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001904e410000000000000000010000000000000010270000000000007ee9b3b8afdf53c0000c6e65776e616d657370616365";
+            "9e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001904e410000000000000000010000000000000010270000000000007ee9b3b8afdf53c0000c6e65776e616d657370616365";
         assertSerialization(expected, transaction);
 
         String expectedEmbedded =
-            "4e000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001904e4110270000000000007ee9b3b8afdf53c0000c6e65776e616d657370616365";
+            "4e00000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001904e4110270000000000007ee9b3b8afdf53c0000c6e65776e616d657370616365";
         assertEmbeddedSerialization(expectedEmbedded, transaction);
 
     }
@@ -175,11 +175,11 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
                 .deadline(new FakeDeadline()).build();
 
         String expected =
-            "9e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001904e41000000000000000001000000000000007ee9b3b8afdf53400312981b7879a3f1010c7375626e616d657370616365";
+            "9e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001904e41000000000000000001000000000000007ee9b3b8afdf53400312981b7879a3f1010c7375626e616d657370616365";
         assertSerialization(expected, transaction);
 
         String expectedEmbedded =
-            "4e000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456b240000000001904e417ee9b3b8afdf53400312981b7879a3f1010c7375626e616d657370616365";
+            "4e00000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001904e417ee9b3b8afdf53400312981b7879a3f1010c7375626e616d657370616365";
         assertEmbeddedSerialization(expectedEmbedded, transaction);
     }
 }

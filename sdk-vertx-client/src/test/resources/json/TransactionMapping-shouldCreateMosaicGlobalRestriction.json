@@ -7,7 +7,7 @@
   "transaction": {
     "deadline": "110764074087",
     "maxFee": "0",
-    "mosaicId": "2162bab25e6f6e1a",
+    "mosaicId": "2162BAB25E6F6E1A",
     "newRestrictionType": 6,
     "newRestrictionValue": "20",
     "previousRestrictionType": 0,

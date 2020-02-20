@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.nem.sdk.api.NamespaceRepository;
 import io.nem.sdk.api.RepositoryCallException;
 import io.nem.sdk.model.account.Account;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.namespace.NamespaceInfo;
 import io.nem.sdk.model.namespace.NamespaceName;
@@ -35,14 +34,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-//TODO Broken!!
 class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
 
     private NamespaceId namespaceId;
 
     @BeforeAll
     void setup() {
-        namespaceId = NetworkCurrencyMosaic.NAMESPACEID;
+        namespaceId = getNetworkCurrency().getNamespaceId().orElseThrow(() ->
+            new IllegalStateException(
+                "Network currency namespace id must be provided must be provided"));
     }
 
     @ParameterizedTest
@@ -105,7 +105,7 @@ class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
             .assertThrows(RepositoryCallException.class, () -> get(getNamespaceRepository(type)
                 .getNamespace(NamespaceId.createFromName("nonregisterednamespace"))));
         Assertions.assertEquals(
-            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'f75cf605c224a9e7'",
+            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'F75CF605C224A9E7'",
             exception.getMessage());
     }
 

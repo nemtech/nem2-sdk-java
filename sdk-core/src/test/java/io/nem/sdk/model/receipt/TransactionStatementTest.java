@@ -86,6 +86,6 @@ public class TransactionStatementTest {
         String hash = transactionStatement.generateHash();
 
         assertTrue(!hash.isEmpty());
-        assertEquals("25C481C1B50D6D64510C44310CF8A8DE9084EC4F2DD07A23196605435606EF2D", hash);
+        assertEquals("0C34C53E84366FF2662C60D60D61608831E0F3239BD32B729D94DA27FB917C5F", hash);
     }
 }

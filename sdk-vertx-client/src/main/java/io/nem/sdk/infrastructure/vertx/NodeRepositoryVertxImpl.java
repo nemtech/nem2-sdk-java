@@ -78,7 +78,7 @@ public class NodeRepositoryVertxImpl extends AbstractRepositoryVertxImpl impleme
             nodeInfoDTO.getVersion(),
             RoleType.rawValueOf(nodeInfoDTO.getRoles().getValue()),
             nodeInfoDTO.getHost(),
-            nodeInfoDTO.getFriendlyName());
+            nodeInfoDTO.getFriendlyName(), nodeInfoDTO.getNetworkGenerationHash());
     }
 
     /**

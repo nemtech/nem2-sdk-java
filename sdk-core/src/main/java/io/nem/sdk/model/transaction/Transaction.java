@@ -18,9 +18,10 @@ package io.nem.sdk.model.transaction;
 
 import io.nem.core.crypto.CryptoEngines;
 import io.nem.core.crypto.DsaSigner;
-import io.nem.core.crypto.SignSchema;
+import io.nem.core.crypto.Hashes;
 import io.nem.core.crypto.Signature;
 import io.nem.core.utils.ConvertUtils;
+import io.nem.core.utils.StringUtils;
 import io.nem.sdk.api.BinarySerialization;
 import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.model.account.Account;
@@ -28,7 +29,6 @@ import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.math.BigInteger;
 import java.util.Optional;
-import org.bouncycastle.util.encoders.Hex;
 
 /**
  * An abstract transaction class that serves as the base class of all NEM transactions.
@@ -170,14 +170,14 @@ public abstract class Transaction {
      */
     public String createTransactionHash(
         String transactionPayload, final byte[] generationHashBytes) {
-        byte[] bytes = Hex.decode(transactionPayload);
+        byte[] bytes = ConvertUtils.fromHexToBytes(transactionPayload);
         final byte[] dataBytes = getSignBytes(bytes, generationHashBytes);
         byte[] signingBytes = new byte[dataBytes.length + 64];
         System.arraycopy(bytes, 8, signingBytes, 0, 32);
         System.arraycopy(bytes, 72, signingBytes, 32, 32);
         System.arraycopy(dataBytes, 0, signingBytes, 64, dataBytes.length);
-        byte[] result = SignSchema.toHash32Bytes(SignSchema.SHA3, signingBytes);
-        return Hex.toHexString(result).toUpperCase();
+        byte[] result = Hashes.sha3_256(signingBytes);
+        return ConvertUtils.toHex(result);
     }
 
     /**
@@ -207,7 +207,7 @@ public abstract class Transaction {
      */
     public SignedTransaction signWith(final Account account, final String generationHash) {
         final DsaSigner theSigner = CryptoEngines.defaultEngine()
-            .createDsaSigner(account.getKeyPair(), getNetworkType().resolveSignSchema());
+            .createDsaSigner(account.getKeyPair());
         final byte[] bytes = this.serialize();
         final byte[] generationHashBytes = ConvertUtils.getBytes(generationHash);
         final byte[] signingBytes = getSignBytes(bytes, generationHashBytes);
@@ -222,9 +222,9 @@ public abstract class Transaction {
             account.getKeyPair().getPublicKey().getBytes().length); // Signer
         System.arraycopy(bytes, 104, payload, 104, bytes.length - 104);
 
-        final String hash = createTransactionHash(Hex.toHexString(payload), generationHashBytes);
-        return new SignedTransaction(account.getPublicAccount(),
-            Hex.toHexString(payload).toUpperCase(), hash, type);
+        final String hash = createTransactionHash(ConvertUtils.toHex(payload), generationHashBytes);
+        return new SignedTransaction(account.getPublicAccount(), ConvertUtils.toHex(payload), hash,
+            type);
     }
 
     /**
@@ -245,7 +245,8 @@ public abstract class Transaction {
      */
     public boolean isUnconfirmed() {
         return getTransactionInfo().filter(info -> info.getHeight().equals(BigInteger.valueOf(0))
-            && info.getHash().equals(info.getMerkleComponentHash())).isPresent();
+            && StringUtils.equalsIgnoreCase(info.getHash(), info.getMerkleComponentHash()))
+            .isPresent();
 
     }
 
@@ -267,7 +268,8 @@ public abstract class Transaction {
     public boolean hasMissingSignatures() {
         return this.getTransactionInfo()
             .filter(info -> info.getHeight().equals(BigInteger.valueOf(0))
-                && !info.getHash().equals(info.getMerkleComponentHash())).isPresent();
+                && !StringUtils.equalsIgnoreCase(info.getHash(), info.getMerkleComponentHash()))
+            .isPresent();
     }
 
     /**

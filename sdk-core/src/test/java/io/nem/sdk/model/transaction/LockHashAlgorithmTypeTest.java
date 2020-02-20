@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.core.crypto.Hashes;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.infrastructure.RandomUtils;
-import org.apache.commons.codec.binary.Hex;
 import org.junit.jupiter.api.Test;
 
 class LockHashAlgorithmTypeTest {
@@ -30,7 +30,7 @@ class LockHashAlgorithmTypeTest {
     void SHA3_256ShouldBeExactly64CharactersLength() {
         byte[] secretBytes = RandomUtils.generateRandomBytes(20);
         byte[] result = Hashes.sha3_256(secretBytes);
-        String secret = Hex.encodeHexString(result);
+        String secret = ConvertUtils.toHex(result);
 
         assertTrue(LockHashAlgorithmType.validator(LockHashAlgorithmType.SHA3_256, secret));
     }
@@ -39,7 +39,7 @@ class LockHashAlgorithmTypeTest {
     void SHA3_256ShouldReturnFalseIfItIsNot64CharsLength() {
         byte[] secretBytes = RandomUtils.generateRandomBytes(20);
         byte[] result = Hashes.sha3_512(secretBytes);
-        String secret = Hex.encodeHexString(result);
+        String secret = ConvertUtils.toHex(result);
 
         assertFalse(LockHashAlgorithmType.validator(LockHashAlgorithmType.SHA3_256, secret));
     }
@@ -50,20 +50,12 @@ class LockHashAlgorithmTypeTest {
         assertFalse(LockHashAlgorithmType.validator(LockHashAlgorithmType.SHA3_256, secret));
     }
 
-    @Test
-    void KECCAK_256ShouldBeExactly64CharactersLength() {
-        byte[] secretBytes = RandomUtils.generateRandomBytes(20);
-        byte[] result = Hashes.keccak256(secretBytes);
-        String secret = Hex.encodeHexString(result);
-
-        assertTrue(LockHashAlgorithmType.validator(LockHashAlgorithmType.KECCAK_256, secret));
-    }
 
     @Test
     void KECCAK_256ShouldReturnFalseIfItIsNot64CharsLength() {
         byte[] secretBytes = RandomUtils.generateRandomBytes(20);
         byte[] result = Hashes.ripemd160(secretBytes);
-        String secret = Hex.encodeHexString(result);
+        String secret = ConvertUtils.toHex(result);
 
         assertFalse(LockHashAlgorithmType.validator(LockHashAlgorithmType.KECCAK_256, secret));
     }
@@ -77,17 +69,19 @@ class LockHashAlgorithmTypeTest {
     @Test
     void HASH_160ShouldBeExactly40CharactersLength() {
         byte[] secretBytes = RandomUtils.generateRandomBytes(20);
-        byte[] result = Hashes.hash160(secretBytes);
-        String secret = Hex.encodeHexString(result);
-
+        byte[] result = Hashes.ripemd160(secretBytes);
+        String secret = ConvertUtils.toHex(result);
         assertTrue(LockHashAlgorithmType.validator(LockHashAlgorithmType.HASH_160, secret));
     }
 
     @Test
     void HASH_160ShouldReturnFalseIfItIsNot40CharsLength() {
+
+        System.out.println(ConvertUtils.toHex(Hashes.hash256(ConvertUtils.fromHexToBytes("ABCD"))));
+
         byte[] secretBytes = RandomUtils.generateRandomBytes(20);
         byte[] result = Hashes.sha3_256(secretBytes);
-        String secret = Hex.encodeHexString(result);
+        String secret = ConvertUtils.toHex(result);
 
         assertFalse(LockHashAlgorithmType.validator(LockHashAlgorithmType.HASH_160, secret));
     }
@@ -102,8 +96,7 @@ class LockHashAlgorithmTypeTest {
     void HASH_256ShouldBeExactly64CharactersLength() {
         byte[] secretBytes = RandomUtils.generateRandomBytes(20);
         byte[] result = Hashes.hash256(secretBytes);
-        String secret = Hex.encodeHexString(result);
-
+        String secret = ConvertUtils.toHex(result);
         assertTrue(LockHashAlgorithmType.validator(LockHashAlgorithmType.HASH_256, secret));
     }
 
@@ -111,7 +104,7 @@ class LockHashAlgorithmTypeTest {
     void HASH_256ShouldReturnFalseIfItIsNot64CharsLength() {
         byte[] secretBytes = RandomUtils.generateRandomBytes(20);
         byte[] result = Hashes.ripemd160(secretBytes);
-        String secret = Hex.encodeHexString(result);
+        String secret = ConvertUtils.toHex(result);
 
         assertFalse(LockHashAlgorithmType.validator(LockHashAlgorithmType.HASH_256, secret));
     }

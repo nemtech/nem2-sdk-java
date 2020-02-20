@@ -43,9 +43,12 @@ class NamespaceMetadataServiceIntegrationTest extends BaseIntegrationTest {
     @EnumSource(RepositoryType.class)
     void setAndUpdateNamespaceMetadata(RepositoryType type) throws InterruptedException {
 
-        NamespaceId targetNamespaceId = super
-            .createRootNamespace(type, signerAccount,
-                "namespace-id-metadata-service-integration-test");
+        String namespaceName =
+            "namespace-id-metadata-service-integration-test-" + new Double(
+                Math.floor(Math.random() * 10000))
+                .intValue();
+
+        NamespaceId targetNamespaceId = super.createRootNamespace(type, signerAccount, namespaceName);
 
         BigInteger key = BigInteger.valueOf(RandomUtils.generateRandomInt(100000));
 

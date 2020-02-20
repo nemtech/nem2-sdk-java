@@ -19,7 +19,6 @@ package io.nem.sdk.model.account;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.stream.Stream;
@@ -53,90 +52,6 @@ class AddressTest {
     }
 
 
-    private static Stream<Arguments> publicKeys() {
-        return Stream.of(
-            Arguments.of(
-                "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf",
-                NetworkType.MIJIN_TEST,
-                "SARNASAS2BIAB6LMFA3FPMGBPGIJGK6IJETM3ZSP"),
-            Arguments.of(
-                "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf",
-                NetworkType.MIJIN,
-                "MARNASAS2BIAB6LMFA3FPMGBPGIJGK6IJE5K5RYU"),
-            Arguments.of(
-                "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf",
-                NetworkType.TEST_NET,
-                "TDGMF64NDRRK6RLTDRG3LIGZ2C5LVFMTDXXPJNGI"),
-            Arguments.of(
-                "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf",
-                NetworkType.MAIN_NET,
-                "NDGMF64NDRRK6RLTDRG3LIGZ2C5LVFMTDVFEAGXC"),
-            Arguments.of(
-                "c5f54ba980fcbb657dbaaa42700539b207873e134d2375efeab5f1ab52f87844",
-                NetworkType.MIJIN,
-                "MAKIIYW7AXR3YGQBH5L5PF7JUFULUKJYQ4FB7MFF"),
-            Arguments.of(
-                "c5f54ba980fcbb657dbaaa42700539b207873e134d2375efeab5f1ab52f87844",
-                NetworkType.MIJIN_TEST,
-                "SAKIIYW7AXR3YGQBH5L5PF7JUFULUKJYQ6FYMGNN"),
-            Arguments.of(
-                "c5f54ba980fcbb657dbaaa42700539b207873e134d2375efeab5f1ab52f87844",
-                NetworkType.TEST_NET,
-                "TDD2CT6LQLIYQ56KIXI3ENTM6EK3D44P5KZPFMK2"),
-            Arguments.of(
-                "fbb91b16df828e21a9802980a44fc757c588bc1382a4cea429d6fa2ae0333f56",
-                NetworkType.MAIN_NET,
-                "NBAF3BFLLPWH33MYE6VUPP5T6DQBZBKIDEQKZQOE"),
-            Arguments.of(
-                "fbb91b16df828e21a9802980a44fc757c588bc1382a4cea429d6fa2ae0333f56",
-                NetworkType.TEST_NET,
-                "TBAF3BFLLPWH33MYE6VUPP5T6DQBZBKIDGA56VWB"),
-            Arguments.of(
-                "fbb91b16df828e21a9802980a44fc757c588bc1382a4cea429d6fa2ae0333f56",
-                NetworkType.MIJIN,
-                "MCC3LX5AJZFAU7KC24GK32JSQARCFAHXDEUVY6Y5"),
-            Arguments.of(
-                "6d34c04f3a0e42f0c3c6f50e475ae018cfa2f56df58c481ad4300424a6270cbb",
-                NetworkType.MAIN_NET,
-                "NA5IG3XFXZHIPJ5QLKX2FBJPEZYPMBPPK2ZRC3EH"),
-            Arguments.of(
-                "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf",
-                NetworkType.MIJIN_TEST,
-                "SARNASAS2BIAB6LMFA3FPMGBPGIJGK6IJETM3ZSP"),
-            Arguments.of(
-                "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf",
-                NetworkType.MIJIN,
-                "MARNASAS2BIAB6LMFA3FPMGBPGIJGK6IJE5K5RYU"),
-            Arguments.of(
-                "c5f54ba980fcbb657dbaaa42700539b207873e134d2375efeab5f1ab52f87844",
-                NetworkType.MIJIN,
-                "MAKIIYW7AXR3YGQBH5L5PF7JUFULUKJYQ4FB7MFF"),
-            Arguments.of(
-                "c5f54ba980fcbb657dbaaa42700539b207873e134d2375efeab5f1ab52f87844",
-                NetworkType.MIJIN,
-                "MAKIIYW7AXR3YGQBH5L5PF7JUFULUKJYQ4FB7MFF"),
-            Arguments.of(
-                "c5f54ba980fcbb657dbaaa42700539b207873e134d2375efeab5f1ab52f87844",
-                NetworkType.TEST_NET,
-                "TDD2CT6LQLIYQ56KIXI3ENTM6EK3D44P5KZPFMK2"),
-            Arguments.of(
-                "fbb91b16df828e21a9802980a44fc757c588bc1382a4cea429d6fa2ae0333f56",
-                NetworkType.MAIN_NET,
-                "NBAF3BFLLPWH33MYE6VUPP5T6DQBZBKIDEQKZQOE"),
-            Arguments.of(
-                "fbb91b16df828e21a9802980a44fc757c588bc1382a4cea429d6fa2ae0333f56",
-                NetworkType.TEST_NET,
-                "TBAF3BFLLPWH33MYE6VUPP5T6DQBZBKIDGA56VWB"),
-            Arguments.of(
-                "fbb91b16df828e21a9802980a44fc757c588bc1382a4cea429d6fa2ae0333f56",
-                NetworkType.MIJIN,
-                "MCC3LX5AJZFAU7KC24GK32JSQARCFAHXDEUVY6Y5"),
-            Arguments.of(
-                "6d34c04f3a0e42f0c3c6f50e475ae018cfa2f56df58c481ad4300424a6270cbb",
-                NetworkType.MAIN_NET,
-                "NA5IG3XFXZHIPJ5QLKX2FBJPEZYPMBPPK2ZRC3EH"));
-    }
-
     @Test
     void testAddressCreation() {
         Address address =
@@ -163,7 +78,7 @@ class AddressTest {
         String encoded = "901508D3519B6CC0936A04233073D3D903E1DFBEF95DC204AB";
         Address address = Address
             .createFromEncoded(encoded);
-        assertEquals(encoded, address.encoded().toUpperCase());
+        assertEquals(encoded, address.encoded());
         assertEquals(encoded, address.encoded(NetworkType.MIJIN_TEST).toUpperCase());
     }
 
@@ -248,15 +163,6 @@ class AddressTest {
             () -> Address.createFromPublicKey("InvalidPublicKey", networkType)).getMessage());
     }
 
-    @ParameterizedTest
-    @MethodSource("publicKeys")
-    void testCreateAddressFromPublicKeys(String publicKey, NetworkType networkType,
-        String input) {
-        Address address = Address.createFromPublicKey(publicKey, networkType);
-        assertEquals(input, address.plain());
-        assertEquals(networkType, address.getNetworkType());
-    }
-
 
     @ParameterizedTest
     @MethodSource("provider")
@@ -264,16 +170,6 @@ class AddressTest {
         Address address = new Address(rawAddress, input);
         assertEquals(input, address.getNetworkType());
         Assertions.assertEquals(validChecksum, Address.isValidPlainAddress(address.plain()));
-    }
-
-    @ParameterizedTest
-    @MethodSource("publicKeys")
-    void isValidAddressFromPublicKeys(String publicKey, NetworkType networkType,
-        String input) {
-        Address address = Address.createFromPublicKey(publicKey, networkType);
-        assertEquals(input, address.plain());
-        assertTrue(Address.isValidPlainAddress(address.plain()));
-        assertTrue(Address.isValidEncodedAddress(address.encoded()));
     }
 
     @ParameterizedTest

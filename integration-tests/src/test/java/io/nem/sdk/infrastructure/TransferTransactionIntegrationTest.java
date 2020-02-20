@@ -26,7 +26,6 @@ import io.nem.sdk.model.message.Message;
 import io.nem.sdk.model.message.MessageType;
 import io.nem.sdk.model.message.PersistentHarvestingDelegationMessage;
 import io.nem.sdk.model.message.PlainMessage;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
@@ -65,7 +64,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
             TransferTransactionFactory.create(
                 getNetworkType(), recipient,
                 Collections
-                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                    .singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
                 new PlainMessage(message)
             ).maxFee(this.maxFee).build();
 
@@ -82,24 +81,24 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         String namespaceName = "testaccount2";
 
         NamespaceId recipient = setAddressAlias(type, getRecipient(), namespaceName);
-        Assertions.assertEquals("9188dd7d72227ecae700000000000000000000000000000000",
+        Assertions.assertEquals("9988DD7D72227ECAE700000000000000000000000000000000",
             recipient.encoded(getNetworkType()));
         String message = "E2ETest:standaloneTransferTransaction:message 漢字";
 
         NetworkType networkType = getNetworkType();
-        KeyPair senderKeyPair = KeyPair.random(networkType.resolveSignSchema());
-        KeyPair recipientKeyPair = KeyPair.random(networkType.resolveSignSchema());
+        KeyPair senderKeyPair = KeyPair.random();
+        KeyPair recipientKeyPair = KeyPair.random();
 
         Message encryptedMessage = EncryptedMessage
-            .create(message, senderKeyPair.getPrivateKey(), recipientKeyPair.getPublicKey(),
-                networkType);
+            .create(message, senderKeyPair.getPrivateKey(), recipientKeyPair.getPublicKey()
+            );
 
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 getNetworkType(),
                 recipient,
                 Collections
-                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                    .singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
                 encryptedMessage
             ).maxFee(this.maxFee).build();
 
@@ -135,7 +134,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 recipient,
                 Collections
-                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                    .singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1000000000))),
                 PlainMessage.Empty
             ).maxFee(this.maxFee).build();
 
@@ -144,7 +143,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
                 () -> announceAndValidate(type, account, transferTransaction));
 
         Assertions
-            .assertTrue(exceptions.getMessage().startsWith("Failure_Core_Insufficient_Balance"));
+            .assertTrue(exceptions.getMessage().contains("Failure_Core_Insufficient_Balance"));
 
 
     }
@@ -166,8 +165,8 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         Assertions.assertTrue(transaction.getMessage() instanceof EncryptedMessage);
         Assertions.assertNotEquals(message, transaction.getMessage().getPayload());
         String decryptedMessage = ((EncryptedMessage) transaction.getMessage())
-            .decryptPayload(senderKeyPair.getPublicKey(), recipientKeyPair.getPrivateKey(),
-                getNetworkType());
+            .decryptPayload(senderKeyPair.getPublicKey(), recipientKeyPair.getPrivateKey()
+            );
         Assertions.assertNotNull(message, decryptedMessage);
     }
 
@@ -177,8 +176,8 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
     public void standaloneCreatePersistentDelegationRequestTransaction(RepositoryType type) {
 
         NetworkType networkType = getNetworkType();
-        KeyPair senderKeyPair = KeyPair.random(networkType.resolveSignSchema());
-        KeyPair recipientKeyPair = KeyPair.random(networkType.resolveSignSchema());
+        KeyPair senderKeyPair = KeyPair.random();
+        KeyPair recipientKeyPair = KeyPair.random();
 
         TransferTransaction transferTransaction =
             TransferTransactionFactory.createPersistentDelegationRequestTransaction(
@@ -206,8 +205,8 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         Assertions.assertEquals(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,
             transaction.getMessage().getType());
         String decryptedMessage = ((PersistentHarvestingDelegationMessage) transaction.getMessage())
-            .decryptPayload(recipientKeyPair.getPrivateKey(),
-                getNetworkType());
+            .decryptPayload(recipientKeyPair.getPrivateKey()
+            );
         Assertions.assertNotNull(message, decryptedMessage);
     }
 

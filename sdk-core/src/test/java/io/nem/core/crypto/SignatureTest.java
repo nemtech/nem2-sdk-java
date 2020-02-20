@@ -127,13 +127,15 @@ public class SignatureTest {
     @Test
     public void binaryCtorFailsIfByteArrayOfRIsTooLarge() {
         // Act:
-        Assertions.assertThrows(IllegalArgumentException.class, () -> new Signature(new byte[33], new byte[32]));
+        Assertions.assertThrows(IllegalArgumentException.class,
+            () -> new Signature(new byte[33], new byte[32]));
     }
 
     @Test
     public void binaryCtorFailsIfByteArrayOfSIsTooLarge() {
         // Act:
-        Assertions.assertThrows(IllegalArgumentException.class, () -> new Signature(new byte[32], new byte[33]));
+        Assertions.assertThrows(IllegalArgumentException.class,
+            () -> new Signature(new byte[32], new byte[33]));
     }
 
     // endregion
@@ -267,7 +269,7 @@ public class SignatureTest {
 
         // Assert:
         final String expectedSignature =
-            "0c00000000000000000000000000000000000000000000000000000000000000"
+            "0C00000000000000000000000000000000000000000000000000000000000000"
                 + "0102000000000000000000000000000000000000000000000000000000000000";
         MatcherAssert.assertThat(signature.toString(), IsEqual.equalTo(expectedSignature));
     }

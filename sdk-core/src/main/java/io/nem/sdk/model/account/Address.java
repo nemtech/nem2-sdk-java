@@ -16,16 +16,14 @@
 
 package io.nem.sdk.model.account;
 
+import io.nem.core.crypto.Hashes;
 import io.nem.core.crypto.RawAddress;
-import io.nem.core.crypto.SignSchema;
+import io.nem.core.utils.Base32Encoder;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.Arrays;
 import java.util.Objects;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base32;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  * The address structure describes an address with its network.
@@ -129,13 +127,8 @@ public class Address implements UnresolvedAddress {
      * @return {@link Address}
      */
     public static Address createFromEncoded(String encodedAddress) {
-        try {
-            return Address.createFromRawAddress(
-                new String(new Base32().encode(Hex.decodeHex(encodedAddress))));
-        } catch (DecoderException e) {
-            throw new IllegalArgumentException(
-                encodedAddress + " could not be decoded. " + ExceptionUtils.getMessage(e), e);
-        }
+        return Address.createFromRawAddress(
+            Base32Encoder.getString(ConvertUtils.fromHexToBytes(encodedAddress)));
     }
 
     /**
@@ -159,13 +152,11 @@ public class Address implements UnresolvedAddress {
      */
     public static boolean isValidPlainAddress(String rawAddress) {
         try {
-            NetworkType networkType = resolveNetworkType(toPlainAddress(rawAddress));
-            byte[] decodedArray = new Base32().decode(rawAddress);
+            byte[] decodedArray = Base32Encoder.getBytes(rawAddress);
             Validate.isTrue(decodedArray.length == 25);
             int checksumBegin = RAW_ADDRESS_SIZE - CHECKSUM_SIZE;
             byte[] expectedChecksum = Arrays
-                .copyOf(SignSchema.toHash32Bytes(networkType.resolveSignSchema(),
-                    Arrays.copyOf(decodedArray, checksumBegin)), CHECKSUM_SIZE);
+                .copyOf(Hashes.sha3_256(Arrays.copyOf(decodedArray, checksumBegin)), CHECKSUM_SIZE);
             Validate.isTrue(expectedChecksum.length == 4);
             byte[] providedChecksum = Arrays
                 .copyOfRange(decodedArray, checksumBegin, decodedArray.length);
@@ -185,8 +176,8 @@ public class Address implements UnresolvedAddress {
     public static boolean isValidEncodedAddress(String encodedAddress) {
         try {
             return isValidPlainAddress(
-                new String(new Base32().encode(Hex.decodeHex(encodedAddress))));
-        } catch (DecoderException e) {
+                Base32Encoder.getString(ConvertUtils.fromHexToBytes(encodedAddress)));
+        } catch (Exception e) {
             return false;
         }
     }
@@ -227,7 +218,7 @@ public class Address implements UnresolvedAddress {
      * @return the encoded plain address.
      */
     public String encoded() {
-        return Hex.encodeHexString(new Base32().decode(plain()));
+        return ConvertUtils.toHex(Base32Encoder.getBytes(plain()));
     }
 
 

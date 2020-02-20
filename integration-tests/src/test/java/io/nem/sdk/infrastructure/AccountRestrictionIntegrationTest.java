@@ -274,9 +274,9 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
             .assertThrows(RepositoryCallException.class,
                 () -> get(repository
                     .getAccountRestrictions(address)));
-        Assertions.assertEquals(
-            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'SCGEGBEHICF5PPOGIP2JSCQ5OYGZXOOJF7KUSUQJ'",
-            exception.getMessage());
+        Assertions.assertTrue(
+            exception.getMessage().contains(
+                "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id"));
     }
 
 }

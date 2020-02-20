@@ -21,21 +21,18 @@ import io.nem.core.crypto.BlockCipherTest;
 import io.nem.core.crypto.CryptoEngine;
 import io.nem.core.crypto.CryptoEngines;
 import io.nem.core.crypto.KeyPair;
-import io.nem.core.crypto.SignSchema;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.api.Test;
 
 public class Ed25519BlockCipherTest extends BlockCipherTest {
 
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void decryptReturnsNullIfInputIsTooSmallInLength(SignSchema signSchema) {
+    @Test
+    public void decryptReturnsNullIfInputIsTooSmallInLength() {
         // Arrange:
         final CryptoEngine engine = this.getCryptoEngine();
-        final KeyPair kp = KeyPair.random(engine, signSchema);
-        final BlockCipher blockCipher = this.getBlockCipher(kp, kp, signSchema);
+        final KeyPair kp = KeyPair.random(engine);
+        final BlockCipher blockCipher = this.getBlockCipher(kp, kp);
 
         // Act:
         final byte[] decryptedBytes = blockCipher.decrypt(new byte[31]);
@@ -46,8 +43,8 @@ public class Ed25519BlockCipherTest extends BlockCipherTest {
 
     @Override
     protected BlockCipher getBlockCipher(
-        final KeyPair senderKeyPair, final KeyPair recipientKeyPair, final SignSchema signSchema) {
-        return new Ed25519BlockCipher(senderKeyPair, recipientKeyPair, signSchema);
+        final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
+        return new Ed25519BlockCipher(senderKeyPair, recipientKeyPair);
     }
 
     @Override

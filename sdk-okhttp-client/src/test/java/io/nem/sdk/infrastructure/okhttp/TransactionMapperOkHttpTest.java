@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.core.utils.MapperUtils;
 import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.account.Address;
@@ -63,7 +64,6 @@ import io.nem.sdk.openapi.okhttp_gson.model.UnresolvedMosaic;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -518,7 +518,7 @@ public class TransactionMapperOkHttpTest {
         Assertions.assertEquals(BigInteger.valueOf(3), transaction.getScopedMetadataKey());
         Assertions
             .assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
-        Assertions.assertEquals("0003070467832aaa", transaction.getTargetMosaicId().getIdAsHex());
+        Assertions.assertEquals("0003070467832AAA", transaction.getTargetMosaicId().getIdAsHex());
     }
 
     @Test
@@ -543,7 +543,7 @@ public class TransactionMapperOkHttpTest {
         Assertions
             .assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
         Assertions
-            .assertEquals("0003070467832aaa", transaction.getTargetNamespaceId().getIdAsHex());
+            .assertEquals("0003070467832AAA", transaction.getTargetNamespaceId().getIdAsHex());
     }
 
     @Test
@@ -584,11 +584,11 @@ public class TransactionMapperOkHttpTest {
             transaction.getRestrictionFlags());
         Assertions.assertEquals(1, transaction.getRestrictionAdditions().size());
         Assertions.assertEquals(
-            MapperUtils.toAddressFromEncoded("9050b9837efab4bbe8a4b9bb32d812f9885c00d8fc16501111"),
+            MapperUtils.toAddressFromEncoded("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC16501111"),
             transaction.getRestrictionAdditions().get(0));
 
         Assertions.assertEquals(
-            MapperUtils.toAddressFromEncoded("9050b9837efab4bbe8a4b9bb32d812f9885c00d8fc16502222"),
+            MapperUtils.toAddressFromEncoded("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC16502222"),
             transaction.getRestrictionDeletions().get(0));
 
     }
@@ -607,7 +607,7 @@ public class TransactionMapperOkHttpTest {
         Assertions.assertEquals(AccountRestrictionFlags.ALLOW_INCOMING_MOSAIC,
             transaction.getRestrictionFlags());
         Assertions.assertEquals(1, transaction.getRestrictionAdditions().size());
-        Assertions.assertEquals("00003646934825aa",
+        Assertions.assertEquals("00003646934825AA",
             transaction.getRestrictionAdditions().get(0).getIdAsHex());
     }
 
@@ -724,7 +724,7 @@ public class TransactionMapperOkHttpTest {
         } else {
             assertEquals(
                 new String(
-                    Hex.decode(
+                    ConvertUtils.fromHexToBytes(
                         transferTransaction.getMessage().getPayload()),
                     StandardCharsets.UTF_8),
                 transaction.getMessage().getPayload());

@@ -16,8 +16,10 @@
 
 package io.nem.core.utils;
 
+import java.util.Optional;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class StringUtilsTest {
@@ -45,12 +47,26 @@ public class StringUtilsTest {
     }
 
     @Test
+    public void equalsIgnoreCase() {
+        // Assert:
+        Assertions.assertTrue(StringUtils.equalsIgnoreCase(Optional.of("A"), Optional.of("A")));
+        Assertions.assertTrue(StringUtils.equalsIgnoreCase(Optional.of("A"), Optional.of("a")));
+        Assertions.assertTrue(StringUtils.equalsIgnoreCase(Optional.of("a"), Optional.of("A")));
+        Assertions.assertFalse(StringUtils.equalsIgnoreCase(Optional.of("a"), Optional.of("b")));
+        Assertions.assertFalse(StringUtils.equalsIgnoreCase(Optional.empty(), Optional.of("b")));
+        Assertions.assertFalse(StringUtils.equalsIgnoreCase(Optional.of("a"), Optional.empty()));
+        Assertions.assertFalse(StringUtils.equalsIgnoreCase(Optional.empty(), Optional.empty()));
+    }
+
+
+    @Test
     public void replaceVariableOnStringWithoutVariablesReturnsStringItself() {
         // Assert:
         MatcherAssert.assertThat(
             StringUtils.replaceVariable("quick brown fox", "variable", "-"),
             IsEqual.equalTo("quick brown fox"));
-        MatcherAssert.assertThat(StringUtils.replaceVariable("", "variable", "-"), IsEqual.equalTo(""));
+        MatcherAssert
+            .assertThat(StringUtils.replaceVariable("", "variable", "-"), IsEqual.equalTo(""));
         MatcherAssert.assertThat(
             StringUtils.replaceVariable("variable", "variable", "-"), IsEqual.equalTo("variable"));
     }
@@ -67,7 +83,8 @@ public class StringUtilsTest {
     public void replaceVariableOnStringWithVariablesReturnsCorrectResults() {
         MatcherAssert.assertThat(
             StringUtils.replaceVariable("${variable}", "variable", "-"), IsEqual.equalTo("-"));
-        MatcherAssert.assertThat(StringUtils.replaceVariable("${ }", " ", "-"), IsEqual.equalTo("-"));
+        MatcherAssert
+            .assertThat(StringUtils.replaceVariable("${ }", " ", "-"), IsEqual.equalTo("-"));
         MatcherAssert
             .assertThat(StringUtils.replaceVariable("${    }", "    ", "-"), IsEqual.equalTo("-"));
     }

@@ -18,10 +18,9 @@ package io.nem.core.crypto.ed25519;
 
 import io.nem.core.crypto.CryptoException;
 import io.nem.core.crypto.DsaSigner;
+import io.nem.core.crypto.Hasher;
+import io.nem.core.crypto.Hashes;
 import io.nem.core.crypto.KeyPair;
-import io.nem.core.crypto.SignSchema;
-import io.nem.core.crypto.SignSchema.HashSize;
-import io.nem.core.crypto.SignSchema.Hasher;
 import io.nem.core.crypto.Signature;
 import io.nem.core.crypto.ed25519.arithmetic.Ed25519EncodedFieldElement;
 import io.nem.core.crypto.ed25519.arithmetic.Ed25519EncodedGroupElement;
@@ -36,7 +35,6 @@ import java.util.Arrays;
  */
 public class Ed25519DsaSigner implements DsaSigner {
 
-    private final SignSchema signSchema;
 
     private final KeyPair keyPair;
 
@@ -44,11 +42,9 @@ public class Ed25519DsaSigner implements DsaSigner {
      * Creates a Ed25519 DSA signer.
      *
      * @param keyPair The key pair to use.
-     * @param signSchema the schema used to create and hash private keys.
      */
-    public Ed25519DsaSigner(final KeyPair keyPair, final SignSchema signSchema) {
+    public Ed25519DsaSigner(final KeyPair keyPair) {
         this.keyPair = keyPair;
-        this.signSchema = signSchema;
     }
 
     /**
@@ -67,15 +63,17 @@ public class Ed25519DsaSigner implements DsaSigner {
             throw new CryptoException("cannot sign without private key");
         }
 
+        Hasher hasher32 = Hashes::sha512;
+        Hasher hasher64 = Hashes::sha512;
+
         // Hash the private key to improve randomness.
-        final byte[] hash = SignSchema.toHash(this.getKeyPair().getPrivateKey(), signSchema);
+        final byte[] hash = hasher32.hash(this.getKeyPair().getPrivateKey().getBytes());
 
         // r = H(hash_b,...,hash_2b-1, data) where b=256.
         final Ed25519EncodedFieldElement r =
             new Ed25519EncodedFieldElement(
-                SignSchema.toHash64Bytes(signSchema,
-                    Arrays.copyOfRange(
-                        hash, 32, 64), // only include the last 32 bytes of the private key hash
+                hasher64.hash(Arrays.copyOfRange(
+                    hash, 32, 64), // only include the last 32 bytes of the private key hash
                     data));
 
         // Reduce size of r since we are calculating mod group order anyway
@@ -91,14 +89,14 @@ public class Ed25519DsaSigner implements DsaSigner {
         // a is the lower 32 bytes of hash after clamping.
         final Ed25519EncodedFieldElement h =
             new Ed25519EncodedFieldElement(
-                SignSchema.toHash64Bytes(signSchema, encodedR.getRaw(),
+                hasher64.hash(encodedR.getRaw(),
                     this.getKeyPair().getPublicKey().getBytes(),
                     data));
         final Ed25519EncodedFieldElement hModQ = h.modQ();
         final Ed25519EncodedFieldElement encodedS =
             hModQ.multiplyAndAddModQ(
                 Ed25519Utils
-                    .prepareForScalarMultiply(this.getKeyPair().getPrivateKey(), signSchema),
+                    .prepareForScalarMultiply(this.getKeyPair().getPrivateKey()),
                 rModQ);
 
         // Signature is (encodedR, encodedS)
@@ -119,12 +117,13 @@ public class Ed25519DsaSigner implements DsaSigner {
             this.getKeyPair().getPublicKey().getBytes(), new byte[32])) {
             return false;
         }
-        Hasher hasher = SignSchema.getHasher(signSchema, HashSize.HASH_SIZE_64_BYTES);
+
+        Hasher hasher64 = Hashes::sha512;
         // h = H(encodedR, encodedA, data).
         final byte[] rawEncodedR = signature.getBinaryR();
         final byte[] rawEncodedA = this.getKeyPair().getPublicKey().getBytes();
         final Ed25519EncodedFieldElement h =
-            new Ed25519EncodedFieldElement(hasher.hash(rawEncodedR, rawEncodedA, data));
+            new Ed25519EncodedFieldElement(hasher64.hash(rawEncodedR, rawEncodedA, data));
 
         // hReduced = h mod group order
         final Ed25519EncodedFieldElement hModQ = h.modQ();

@@ -36,6 +36,7 @@ import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicNames;
 import io.nem.sdk.model.mosaic.MosaicNonce;
 import io.nem.sdk.model.mosaic.MosaicSupplyChangeActionType;
+import io.nem.sdk.model.mosaic.NetworkCurrency;
 import io.nem.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.sdk.model.namespace.AliasAction;
 import io.nem.sdk.model.namespace.NamespaceId;
@@ -100,6 +101,7 @@ public abstract class BaseIntegrationTest {
         JsonHelperJackson2.configureMapper(new ObjectMapper()));
     private final String generationHash;
     private final NetworkType networkType;
+    private final NetworkCurrency networkCurrency;
 
     public BaseIntegrationTest() {
         this.config = new Config();
@@ -108,6 +110,7 @@ public abstract class BaseIntegrationTest {
         this.generationHash = resolveGenerationHash();
         this.networkType = resolveNetworkType();
         this.config.init(networkType);
+        this.networkCurrency = resolveNetworkCurrency();
 
         System.out.println("Network Type: " + networkType);
         System.out.println("Generation Hash: " + generationHash);
@@ -118,6 +121,11 @@ public abstract class BaseIntegrationTest {
         //To avoid rate-limiting errors from server. (5 per seconds)
         sleep(500);
     }
+
+    private NetworkCurrency resolveNetworkCurrency() {
+        return get(getRepositoryFactory(DEFAULT_REPOSITORY_TYPE).getNetworkCurrency());
+    }
+
 
     private String resolveGenerationHash() {
         return get(getRepositoryFactory(DEFAULT_REPOSITORY_TYPE).getGenerationHash());
@@ -268,7 +276,9 @@ public abstract class BaseIntegrationTest {
         AggregateTransaction announcedAggregateTransaction = announceAndValidate(
             type, signers[0], aggregateTransaction);
         T announcedCorrectly = (T) announcedAggregateTransaction.getInnerTransactions().get(0);
-        System.out.println("Transaction completed");
+        System.out
+            .println("Transaction completed, Transaction hash " + announcedAggregateTransaction
+                .getTransactionInfo().get().getHash().get());
         return Pair.of(announcedCorrectly, announcedAggregateTransaction);
     }
 
@@ -285,12 +295,14 @@ public abstract class BaseIntegrationTest {
         }
         SignedTransaction signedTransaction = testAccount
             .sign(transaction, getGenerationHash());
+
         TransactionService transactionService = getTransactionService(type);
         Transaction announceCorrectly = getTransactionOrFail(
             transactionService.announce(getListener(type), signedTransaction), transaction);
         Assertions.assertEquals(announceCorrectly.getType(), transaction.getType());
         if (transaction.getType() != TransactionType.AGGREGATE_COMPLETE) {
-            System.out.println("Transaction completed");
+            System.out
+                .println("Transaction completed, Transaction hash " + signedTransaction.getHash());
         }
         return (T) announceCorrectly;
     }
@@ -324,12 +336,19 @@ public abstract class BaseIntegrationTest {
             .transactionToJson(originalTransaction);
     }
 
+    protected String toJson(Object anyObject) {
+        return jsonHelper.prettyPrint(anyObject);
+    }
+
     @SuppressWarnings("squid:S2925")
     protected void sleep(long time) throws InterruptedException {
         System.out.println("Sleeping for " + time);
         Thread.sleep(time);
     }
 
+    public NetworkCurrency getNetworkCurrency() {
+        return networkCurrency;
+    }
 
     protected NamespaceId setAddressAlias(RepositoryType type, Address address,
         String namespaceName) {

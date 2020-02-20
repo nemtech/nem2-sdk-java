@@ -49,9 +49,9 @@ class AccountTest {
             "787225AAFF3D2C71F4FFA32D4F19EC4922F3CD869747F267378F81F8E3FCB12D",
             account.getPrivateKey());
         assertEquals(
-            "1026D70E1954775749C6811084D6450A3184D977383F0E4282CD47118AF37755",
+            "2134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2",
             account.getPublicKey());
-        assertEquals("SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZY", account.getAddress().plain());
+        assertEquals("SAEJCCEGA5SMEL65GTVYS6P6V2F5TOPDAOVAC5XI", account.getAddress().plain());
     }
 
     @Test
@@ -64,9 +64,9 @@ class AccountTest {
             "787225AAFF3D2C71F4FFA32D4F19EC4922F3CD869747F267378F81F8E3FCB12D",
             account.getPrivateKey());
         assertEquals(
-            "1026D70E1954775749C6811084D6450A3184D977383F0E4282CD47118AF37755",
+            "2134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2",
             account.getPublicKey());
-        assertEquals("SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZY", account.getAddress().plain());
+        assertEquals("SAEJCCEGA5SMEL65GTVYS6P6V2F5TOPDAOVAC5XI", account.getAddress().plain());
     }
 
     @Test
@@ -79,9 +79,9 @@ class AccountTest {
             "5098D500390934F81EA416D9A2F50F276DE446E28488E1801212931E3470DA31",
             account.getPrivateKey());
         assertEquals(
-            "9B800145F7228CE0014FC6FB44AD899BFCAD7B0CDF48DB63A7CC7299E373D734",
+            "8A6ADEDF033FFDA38E2E762F5A729AAF2AAE4EEACF9297CC886FFFE2765333AB",
             account.getPublicKey());
-        assertEquals("SAQC5A-K6X2K6-YYAI4L-2TQI2T-4ZRWAO-URYDYT-UO77",
+        assertEquals("SD3LI4-KBRLPF-4VEHE5-VGEXT2-UWS4GE-EBRMBB-JREK",
             account.getAddress().pretty());
     }
 
@@ -95,9 +95,9 @@ class AccountTest {
             "B8AFAE6F4AD13A1B8AAD047B488E0738A437C7389D4FF30C359AC068910C1D59",
             account.getPrivateKey());
         assertEquals(
-            "68B3FBB18729C1FDE225C57F8CE080FA828F0067E451A3FD81FA628842B0B763",
+            "F9D6329A1A927F5D8918D3D313524CF179DE126AF8F0E83F0FBF2782B5D8F68C",
             account.getPublicKey());
-        assertEquals("SBE6CS7LZKJXLDVTNAC3VZ3AUVZDTF3PACNFIXFN", account.getAddress().plain());
+        assertEquals("SDICGGG5273NEYOPJPRN5RXFLENIVYTEBC3F3A2A", account.getAddress().plain());
     }
 
     @Test
@@ -130,7 +130,7 @@ class AccountTest {
             "010000000000000090E8FEBD671DD41BEE94EC3BA5831CB608A312C2F203BA84AC01010000000000672B0000CE560000640000000000000000",
             payload.substring(240));
         assertEquals(
-            "C86F3B0A954677761671C2D1A273C59B5F45EE7FB19385DB2D094DE5A0270262",
+            "779C364B5F0C3F46A61535A8BF1D887EEE7E8CC665B72EF2F41B7532635664FA",
             signedTransaction.getHash());
     }
 
@@ -138,7 +138,7 @@ class AccountTest {
     void shouldAcceptKeyPairAsConstructor() {
         NetworkType networkType = NetworkType.MIJIN_TEST;
         KeyPair random = KeyPair
-            .random(new Ed25519CryptoEngine(), networkType.resolveSignSchema());
+            .random(new Ed25519CryptoEngine());
         Account account = new Account(random, networkType);
         assertEquals(random.getPrivateKey().toHex().toUpperCase(), account.getPrivateKey());
         assertEquals(networkType, account.getAddress().getNetworkType());

@@ -17,16 +17,15 @@
 package io.nem.sdk.infrastructure;
 
 import io.nem.core.crypto.Hashes;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.LockHashAlgorithmType;
 import io.nem.sdk.model.transaction.SecretLockTransaction;
 import io.nem.sdk.model.transaction.SecretLockTransactionFactory;
 import io.nem.sdk.model.transaction.SecretProofTransaction;
 import io.nem.sdk.model.transaction.SecretProofTransactionFactory;
 import java.math.BigInteger;
-import org.apache.commons.codec.binary.Hex;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -42,11 +41,11 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
     void standaloneSecretLockTransaction(RepositoryType type) {
         byte[] secretBytes = RandomUtils.generateRandomBytes(20);
         byte[] result = Hashes.sha3_256(secretBytes);
-        String secret = Hex.encodeHexString(result);
+        String secret = ConvertUtils.toHex(result);
         Address recipient = config().getTestAccount2().getAddress();
         SecretLockTransaction secretLockTransaction =
             SecretLockTransactionFactory.create(getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,
@@ -61,12 +60,12 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
     void aggregateSecretLockTransaction(RepositoryType type) {
         byte[] secretBytes = RandomUtils.generateRandomBytes(20);
         byte[] result = Hashes.sha3_256(secretBytes);
-        String secret = Hex.encodeHexString(result);
+        String secret = ConvertUtils.toHex(result);
         Address recipient = config().getTestAccount2().getAddress();
         SecretLockTransaction transaction =
             SecretLockTransactionFactory.create(
                 getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,
@@ -82,13 +81,13 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
     void standaloneSecretProofTransaction(RepositoryType type) {
         byte[] secretBytes = RandomUtils.generateRandomBytes(20);
         byte[] result = Hashes.sha3_256(secretBytes);
-        String secret = Hex.encodeHexString(result);
-        String proof = Hex.encodeHexString(secretBytes);
+        String secret = ConvertUtils.toHex(result);
+        String proof = ConvertUtils.toHex(secretBytes);
         Address recipient = config().getTestAccount2().getAddress();
         SecretLockTransaction secretLockTransaction =
             SecretLockTransactionFactory.create(
                 getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,
@@ -113,13 +112,13 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
     void aggregateSecretProofTransaction(RepositoryType type) {
         byte[] secretBytes = RandomUtils.generateRandomBytes(20);
         byte[] result = Hashes.sha3_256(secretBytes);
-        String secret = Hex.encodeHexString(result);
-        String proof = Hex.encodeHexString(secretBytes);
+        String secret = ConvertUtils.toHex(result);
+        String proof = ConvertUtils.toHex(secretBytes);
         Address recipient = config().getTestAccount2().getAddress();
         SecretLockTransaction secretLockTransaction =
             SecretLockTransactionFactory.create(
                 getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,

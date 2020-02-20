@@ -16,7 +16,7 @@
 
 package io.nem.sdk.api;
 
-import io.nem.sdk.model.blockchain.MerkelProofInfo;
+import io.nem.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.sdk.model.receipt.Statement;
 import io.reactivex.Observable;
 import java.math.BigInteger;
@@ -36,5 +36,5 @@ public interface ReceiptRepository {
      * @param hash the hash.
      * @return {@link Observable} of MerkleProofInfo
      */
-    Observable<MerkelProofInfo> getMerkleReceipts(BigInteger height, String hash);
+    Observable<MerkleProofInfo> getMerkleReceipts(BigInteger height, String hash);
 }

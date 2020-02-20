@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 public class Config {
@@ -46,6 +47,15 @@ public class Config {
 
     private static List<Account> loadNemesisAccountsFromBootstrap(NetworkType networkType) {
         String homeFolder = System.getProperty("user.home");
+
+        String bootstrapFolder = System.getenv("CATAPULT_SERVICE_BOOTSTRAP");
+
+        if (StringUtils.isNotBlank(bootstrapFolder)) {
+            File generatedAddressesOption = new File(
+                StringUtils.removeEnd(bootstrapFolder, "/")
+                    + "/build/generated-addresses/addresses.yaml");
+            return loadNemesisAccountsFromBootstrap(networkType, generatedAddressesOption);
+        }
         File generatedAddressesOption = new File(
             homeFolder
                 + "/develop/workspace-nem/catapult-service-bootstrap/build/generated-addresses/addresses.yaml");

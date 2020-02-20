@@ -22,10 +22,8 @@ import io.nem.core.crypto.CryptoEngines;
 import io.nem.core.crypto.KeyPair;
 import io.nem.core.crypto.PrivateKey;
 import io.nem.core.crypto.PublicKey;
-import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.ConvertUtils;
 import io.nem.core.utils.StringEncoder;
-import io.nem.sdk.model.blockchain.NetworkType;
 
 public class PersistentHarvestingDelegationMessage extends Message {
 
@@ -47,20 +45,17 @@ public class PersistentHarvestingDelegationMessage extends Message {
      *
      * @param delegatedPrivateKey the remote’s account proxy private key.
      * @param recipientPublicKey Recipient public key
-     * @param networkType Catapult network type
      * @return {@link PersistentHarvestingDelegationMessage}
      */
     public static PersistentHarvestingDelegationMessage create(PrivateKey delegatedPrivateKey,
-        PublicKey recipientPublicKey,
-        NetworkType networkType) {
-        SignSchema signSchema = networkType.resolveSignSchema();
+        PublicKey recipientPublicKey) {
 
-        KeyPair ephemeralKeypair = KeyPair.random(signSchema);
+        KeyPair ephemeralKeypair = KeyPair.random();
 
         CryptoEngine engine = CryptoEngines.defaultEngine();
 
         KeyPair recipient = KeyPair.onlyPublic(recipientPublicKey, engine);
-        BlockCipher blockCipher = engine.createBlockCipher(ephemeralKeypair, recipient, signSchema);
+        BlockCipher blockCipher = engine.createBlockCipher(ephemeralKeypair, recipient);
 
         String payload =
             MessageMarker.PERSISTENT_DELEGATION_UNLOCK + ephemeralKeypair.getPublicKey().toHex()
@@ -76,10 +71,9 @@ public class PersistentHarvestingDelegationMessage extends Message {
      * the Typescript SDK.
      *
      * @param recipientPrivateKey Recipient private key
-     * @param networkType Catapult network type
      * @return the recipient public key.
      */
-    public String decryptPayload(PrivateKey recipientPrivateKey, NetworkType networkType) {
+    public String decryptPayload(PrivateKey recipientPrivateKey) {
 
         int markerLength = MessageMarker.PERSISTENT_DELEGATION_UNLOCK.length();
         PublicKey senderPublicKey = PublicKey
@@ -88,12 +82,11 @@ public class PersistentHarvestingDelegationMessage extends Message {
         String encryptedPayload = getPayload()
             .substring(markerLength + senderPublicKey.toHex().length());
 
-        SignSchema signSchema = networkType.resolveSignSchema();
         CryptoEngine engine = CryptoEngines.defaultEngine();
         KeyPair sender = KeyPair.onlyPublic(senderPublicKey, engine);
-        KeyPair recipient = KeyPair.fromPrivate(recipientPrivateKey, signSchema);
+        KeyPair recipient = KeyPair.fromPrivate(recipientPrivateKey);
         BlockCipher blockCipher = engine
-            .createBlockCipher(sender, recipient, signSchema);
+            .createBlockCipher(sender, recipient);
 
         return StringEncoder
             .getString(blockCipher.decrypt(ConvertUtils.fromHexToBytes(encryptedPayload)))

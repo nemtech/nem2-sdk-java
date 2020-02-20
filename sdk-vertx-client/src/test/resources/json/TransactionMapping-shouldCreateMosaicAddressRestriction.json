@@ -13,12 +13,12 @@
     "transactions": [
       {
         "transaction": {
-          "mosaicId": "6542a217a3d0ec30",
+          "mosaicId": "6542A217A3D0EC30",
           "newRestrictionValue": "30",
           "previousRestrictionValue": "18446744073709551615",
           "restrictionKey": "abc60642",
           "signerPublicKey": "5D03190865D3A1AA4093D1E7F82975A434844927E47AADEB1A19BB94F8FC8EF0",
-          "targetAddress": "90e6ff7755a80b6aa935a5c31b6d3d0cfaf82e06bf2b9cc9e0",
+          "targetAddress": "90E6FF7755A80B6AA935A5C31B6D3D0CFAF82E06BF2B9CC9E0",
           "type": 16977,
           "version": 1,
           "network": 144

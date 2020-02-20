@@ -16,24 +16,22 @@
 
 package io.nem.core.crypto;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.infrastructure.RandomUtils;
-import org.bouncycastle.util.encoders.Hex;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.api.Test;
 
 public abstract class BlockCipherTest {
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void encryptedDataCanBeDecrypted(SignSchema signSchema) {
+    @Test
+    void encryptedDataCanBeDecrypted() {
         // Arrange:
         final CryptoEngine engine = this.getCryptoEngine();
-        final KeyPair kp = KeyPair.random(engine, signSchema);
-        final BlockCipher blockCipher = this.getBlockCipher(kp, kp, signSchema);
+        final KeyPair kp = KeyPair.random(engine);
+        final BlockCipher blockCipher = this.getBlockCipher(kp, kp);
         final byte[] input = RandomUtils.generateRandomBytes();
 
         // Act:
@@ -45,15 +43,14 @@ public abstract class BlockCipherTest {
         MatcherAssert.assertThat(decryptedBytes, IsEqual.equalTo(input));
     }
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void dataCanBeEncryptedWithSenderPrivateKeyAndRecipientPublicKey(SignSchema signSchema) {
+    @Test
+    void dataCanBeEncryptedWithSenderPrivateKeyAndRecipientPublicKey() {
         // Arrange:
         final CryptoEngine engine = this.getCryptoEngine();
-        final KeyPair skp = KeyPair.random(engine, signSchema);
-        final KeyPair rkp = KeyPair.random(engine, signSchema);
+        final KeyPair skp = KeyPair.random(engine);
+        final KeyPair rkp = KeyPair.random(engine);
         final BlockCipher blockCipher =
-            this.getBlockCipher(skp, KeyPair.onlyPublic(rkp.getPublicKey(), engine), signSchema);
+            this.getBlockCipher(skp, KeyPair.onlyPublic(rkp.getPublicKey(), engine));
         final byte[] input = RandomUtils.generateRandomBytes();
 
         // Act:
@@ -63,17 +60,16 @@ public abstract class BlockCipherTest {
         MatcherAssert.assertThat(encryptedBytes, IsNot.not(IsEqual.equalTo(input)));
     }
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void dataCanBeDecryptedWithSenderPublicKeyAndRecipientPrivateKey(SignSchema signSchema) {
+    @Test
+    void dataCanBeDecryptedWithSenderPublicKeyAndRecipientPrivateKey() {
         // Arrange:
         final CryptoEngine engine = this.getCryptoEngine();
-        final KeyPair skp = KeyPair.random(engine, signSchema);
-        final KeyPair rkp = KeyPair.random(engine, signSchema);
+        final KeyPair skp = KeyPair.random(engine);
+        final KeyPair rkp = KeyPair.random(engine);
         final BlockCipher blockCipher1 =
-            this.getBlockCipher(skp, KeyPair.onlyPublic(rkp.getPublicKey(), engine), signSchema);
+            this.getBlockCipher(skp, KeyPair.onlyPublic(rkp.getPublicKey(), engine));
         final BlockCipher blockCipher2 =
-            this.getBlockCipher(KeyPair.onlyPublic(skp.getPublicKey(), engine), rkp, signSchema);
+            this.getBlockCipher(KeyPair.onlyPublic(skp.getPublicKey(), engine), rkp);
         final byte[] input = RandomUtils.generateRandomBytes();
 
         // Act:
@@ -81,20 +77,19 @@ public abstract class BlockCipherTest {
         final byte[] decryptedBytes = blockCipher2.decrypt(encryptedBytes);
 
         // Assert:
-        Assertions.assertEquals(Hex.toHexString(decryptedBytes), Hex.toHexString(input));
+        Assertions.assertEquals(ConvertUtils.toHex(decryptedBytes), ConvertUtils.toHex(input));
     }
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void dataCanBeDecryptedWithSenderPrivateKeyAndRecipientPublicKey(SignSchema signSchema) {
+    @Test
+    void dataCanBeDecryptedWithSenderPrivateKeyAndRecipientPublicKey() {
         // Arrange:
         final CryptoEngine engine = this.getCryptoEngine();
-        final KeyPair skp = KeyPair.random(engine, signSchema);
-        final KeyPair rkp = KeyPair.random(engine, signSchema);
+        final KeyPair skp = KeyPair.random(engine);
+        final KeyPair rkp = KeyPair.random(engine);
         final BlockCipher blockCipher1 =
-            this.getBlockCipher(skp, KeyPair.onlyPublic(rkp.getPublicKey(), engine), signSchema);
+            this.getBlockCipher(skp, KeyPair.onlyPublic(rkp.getPublicKey(), engine));
         final BlockCipher blockCipher2 =
-            this.getBlockCipher(KeyPair.onlyPublic(rkp.getPublicKey(), engine), skp, signSchema);
+            this.getBlockCipher(KeyPair.onlyPublic(rkp.getPublicKey(), engine), skp);
         final byte[] input = "Some text".getBytes();
 
         // Act:
@@ -102,21 +97,19 @@ public abstract class BlockCipherTest {
         final byte[] decryptedBytes = blockCipher2.decrypt(encryptedBytes);
 
         // Assert:
-        MatcherAssert.assertThat(Hex.toHexString(decryptedBytes), IsEqual.equalTo(Hex.toHexString(input)));
+        MatcherAssert.assertThat(ConvertUtils.toHex(decryptedBytes),
+            IsEqual.equalTo(ConvertUtils.toHex(input)));
     }
 
-    @ParameterizedTest
-    @EnumSource(SignSchema.class)
-    public void dataEncryptedWithPrivateKeyCanOnlyBeDecryptedByMatchingPublicKey(
-        SignSchema signSchema) {
+    @Test
+    void dataEncryptedWithPrivateKeyCanOnlyBeDecryptedByMatchingPublicKey(
+    ) {
         // Arrange:
         final CryptoEngine engine = this.getCryptoEngine();
         final BlockCipher blockCipher1 =
-            this.getBlockCipher(KeyPair.random(engine, signSchema), KeyPair.random(engine,
-                signSchema), signSchema);
+            this.getBlockCipher(KeyPair.random(engine), KeyPair.random(engine));
         final BlockCipher blockCipher2 =
-            this.getBlockCipher(KeyPair.random(engine, signSchema), KeyPair.random(engine,
-                signSchema), signSchema);
+            this.getBlockCipher(KeyPair.random(engine), KeyPair.random(engine));
         final byte[] input = RandomUtils.generateRandomBytes();
 
         // Act:
@@ -125,15 +118,17 @@ public abstract class BlockCipherTest {
 
         // Assert:
         MatcherAssert.assertThat(blockCipher1.decrypt(encryptedBytes1), IsEqual.equalTo(input));
-        MatcherAssert.assertThat(blockCipher1.decrypt(encryptedBytes2), IsNot.not(IsEqual.equalTo(input)));
-        MatcherAssert.assertThat(blockCipher2.decrypt(encryptedBytes1), IsNot.not(IsEqual.equalTo(input)));
+        MatcherAssert
+            .assertThat(blockCipher1.decrypt(encryptedBytes2), IsNot.not(IsEqual.equalTo(input)));
+        MatcherAssert
+            .assertThat(blockCipher2.decrypt(encryptedBytes1), IsNot.not(IsEqual.equalTo(input)));
         MatcherAssert.assertThat(blockCipher2.decrypt(encryptedBytes2), IsEqual.equalTo(input));
     }
 
     protected BlockCipher getBlockCipher(
-        final KeyPair senderKeyPair, final KeyPair recipientKeyPair, SignSchema signSchema) {
+        final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
         return this.getCryptoEngine()
-            .createBlockCipher(senderKeyPair, recipientKeyPair, signSchema);
+            .createBlockCipher(senderKeyPair, recipientKeyPair);
     }
 
     protected abstract CryptoEngine getCryptoEngine();

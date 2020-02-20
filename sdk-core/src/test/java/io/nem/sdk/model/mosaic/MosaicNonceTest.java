@@ -36,10 +36,10 @@ public class MosaicNonceTest {
 
     @Test
     void shouldFailWhenCreatingFromAndInvalidHex() {
-        IllegalIdentifierException exception = Assertions
-            .assertThrows(IllegalIdentifierException.class,
+        IllegalArgumentException exception = Assertions
+            .assertThrows(IllegalArgumentException.class,
                 () -> MosaicNonce.createFromHex("Z0000000"));
-        Assertions.assertEquals("DecoderException: Illegal hexadecimal character Z at index 0",
+        Assertions.assertEquals("Z0000000 could not be decoded. DecoderException: Illegal hexadecimal character Z at index 0",
             exception.getMessage());
     }
 

@@ -68,6 +68,8 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
         announceAndValidate(
             type, testAccount, mosaicGlobalRestrictionTransaction);
 
+        sleep(1000);
+
         //3)Create a new MosaicAddressRestrictionTransaction
         BigInteger originalRestrictionValue = BigInteger.valueOf(30);
 
@@ -83,10 +85,15 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
             ).maxFee(this.maxFee).build();
 
         //4)Announce and validate
-        assertTransaction(createTransaction, announceAggregateAndValidate(
-            type, createTransaction, testAccount).getLeft());
+        MosaicAddressRestrictionTransaction announce1 = announceAggregateAndValidate(
+            type, createTransaction, testAccount).getLeft();
+
+        sleep(1000);
+        assertTransaction(createTransaction, announce1);
 
         //5) Validate that endpoints have the data.
+
+        sleep(1000);
 
         RestrictionMosaicRepository restrictionRepository = getRepositoryFactory(type)
             .createRestrictionMosaicRepository();
@@ -111,8 +118,11 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
             ).previousRestrictionValue(originalRestrictionValue).maxFee(this.maxFee).build();
 
         //7) Announce and validate.
-        assertTransaction(updateTransaction, announceAggregateAndValidate(
-            type, updateTransaction, testAccount).getLeft());
+        MosaicAddressRestrictionTransaction announced = announceAggregateAndValidate(
+            type, updateTransaction, testAccount).getLeft();
+
+        sleep(1000);
+        assertTransaction(updateTransaction, announced);
 
         //8) Validates that the endpoints have the new values
         assertMosaicAddressRestriction(targetAddress, updateTransaction, get(
@@ -201,7 +211,8 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
                     .getMosaicAddressRestriction(new MosaicId(BigInteger.valueOf(888888)),
                         address)));
         Assertions.assertEquals(
-            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'SCGEGBEHICF5PPOGIP2JSCQ5OYGZXOOJF7KUSUQJ'",
+            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '"
+                + address.plain() + "'",
             exception.getMessage());
     }
 

@@ -29,16 +29,16 @@
         },
         "transaction": {
           "message": {
-            "payload": "746573742d6d657373616765",
+            "payload": "746573742D6D657373616765",
             "type": 0
           },
           "mosaics": [
             {
               "amount": "386399059211",
-              "id": "00003646934825aa"
+              "id": "00003646934825AA"
             }
           ],
-          "recipientAddress": "9188dd7d72227ecae700000000000000000000000000000000",
+          "recipientAddress": "9188DD7D72227ECAE700000000000000000000000000000000",
           "signerPublicKey": "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
           "type": 16724,
           "version": 1,

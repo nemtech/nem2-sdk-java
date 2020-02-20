@@ -106,13 +106,13 @@ public class ConvertUtilsTest {
     @Test
     void getStringCanConvertBytesToHexString() {
         // Assert:
-        assertGetStringConversion(new byte[]{0x4e, 0x45, 0x4d, 0x46, 0x54, 0x57}, "4e454d465457");
+        assertGetStringConversion(new byte[]{0x4e, 0x45, 0x4d, 0x46, 0x54, 0x57}, "4E454D465457");
     }
 
     @Test
     void getStringCanConvertBytesWithLeadingZerosToHexString() {
         // Assert:
-        assertGetStringConversion(new byte[]{0x00, 0x00, 0x0d, 0x46, 0x54, 0x57}, "00000d465457");
+        assertGetStringConversion(new byte[]{0x00, 0x00, 0x0d, 0x46, 0x54, 0x57}, "00000D465457");
     }
 
     @Test
@@ -207,9 +207,9 @@ public class ConvertUtilsTest {
 
     @Test
     void reverseHex() {
-        String hex = "d9e338f78767ed95";
+        String hex = "D9E338F78767ED95";
         String reverseHex = ConvertUtils.reverseHexString(hex);
-        Assertions.assertEquals("95ed6787f738e3d9",reverseHex);
+        Assertions.assertEquals("95ED6787F738E3D9",reverseHex);
         Assertions.assertEquals(hex,ConvertUtils.reverseHexString(reverseHex));
     }
 

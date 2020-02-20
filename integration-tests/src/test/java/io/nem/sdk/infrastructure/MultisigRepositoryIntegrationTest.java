@@ -18,12 +18,17 @@ package io.nem.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.MultisigAccountGraphInfo;
 import io.nem.sdk.model.account.MultisigAccountInfo;
+import io.nem.sdk.model.account.PublicAccount;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.internal.util.collections.Sets;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 //TODO BROKEN!
@@ -37,17 +42,19 @@ public class MultisigRepositoryIntegrationTest extends BaseIntegrationTest {
             .getMultisigAccountInfo(
                 config().getMultisigAccount().getAddress())
         );
+
+        Set<Address> cosignatoriesSet = multisigAccountInfo.getCosignatories().stream()
+            .map(PublicAccount::getAddress).collect(
+                Collectors.toSet());
+
+        Assertions.assertEquals(Sets.newSet(config().getCosignatoryAccount().getAddress(),
+            config().getCosignatory2Account().getAddress()), cosignatoriesSet);
+
+        Assertions.assertTrue(multisigAccountInfo.isMultisig());
+
         assertEquals(
             config().getMultisigAccount().getPublicKey(),
             multisigAccountInfo.getAccount().getPublicKey().toHex());
-
-        Assertions.assertTrue(multisigAccountInfo.isMultisig());
-        Assertions.assertEquals(2, multisigAccountInfo.getCosignatories().size());
-        Assertions.assertEquals(config().getCosignatory2Account().getAddress(),
-            multisigAccountInfo.getCosignatories().get(0).getAddress());
-
-        Assertions.assertEquals(config().getCosignatoryAccount().getAddress(),
-            multisigAccountInfo.getCosignatories().get(1).getAddress());
 
         Assertions.assertEquals(1,
             multisigAccountInfo.getMinApproval());

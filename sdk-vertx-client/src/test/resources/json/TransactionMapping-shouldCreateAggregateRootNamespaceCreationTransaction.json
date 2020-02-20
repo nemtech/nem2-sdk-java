@@ -30,7 +30,7 @@
         "transaction": {
           "duration": "1000",
           "name": "a2p1mg",
-          "id": "0000437145074abc",
+          "id": "0000437145074ABC",
           "registrationType": 0,
           "signerPublicKey": "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
           "type": 16718,

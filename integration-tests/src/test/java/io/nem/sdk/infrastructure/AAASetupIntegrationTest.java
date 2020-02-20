@@ -24,7 +24,6 @@ import io.nem.sdk.model.account.AccountInfo;
 import io.nem.sdk.model.account.MultisigAccountInfo;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.message.PlainMessage;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.HashLockTransactionFactory;
@@ -143,16 +142,16 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
             .signTransactionWithCosigners(multisigAccount, Arrays.asList(accounts),
                 getGenerationHash());
 
-        SignedTransaction signedHashLocktransaction = HashLockTransactionFactory.create(
+        SignedTransaction signedHashLockTransaction = HashLockTransactionFactory.create(
             getNetworkType(),
-            NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+            getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
             BigInteger.valueOf(100),
             signedAggregateTransaction)
             .maxFee(this.maxFee).build().signWith(multisigAccount, getGenerationHash());
 
         getTransactionOrFail(
             getTransactionService(type)
-                .announceHashLockAggregateBonded(getListener(type), signedHashLocktransaction,
+                .announceHashLockAggregateBonded(getListener(type), signedHashLockTransaction,
                     signedAggregateTransaction), aggregateTransaction);
 
     }
@@ -174,12 +173,14 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
             TransferTransactionFactory.create(
                 getNetworkType(),
                 recipient.getAddress(),
-                Collections.singletonList(NetworkCurrencyMosaic.createAbsolute(amount)),
+                Collections.singletonList(getNetworkCurrency().createAbsolute(amount)),
                 new PlainMessage("E2ETest:SetUpAccountsTool")
             );
 
         factory.maxFee(this.maxFee);
         TransferTransaction transferTransaction = factory.build();
+
+
 
         TransferTransaction processedTransaction = announceAndValidate(type, nemesisAccount,
             transferTransaction);

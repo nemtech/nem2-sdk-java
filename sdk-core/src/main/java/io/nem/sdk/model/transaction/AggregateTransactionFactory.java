@@ -17,15 +17,15 @@
 
 package io.nem.sdk.model.transaction;
 
+import io.nem.core.crypto.Hasher;
+import io.nem.core.crypto.Hashes;
 import io.nem.core.crypto.MerkleHashBuilder;
-import io.nem.core.crypto.SignSchema;
 import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.model.blockchain.NetworkType;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
-import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Factory of {@link AggregateTransaction}
@@ -163,22 +163,18 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
      * @return the added transaction hash.
      */
     private static String calculateTransactionsHash(final List<Transaction> transactions) {
-        final SignSchema.Hasher hasher = SignSchema
-            .getHasher(SignSchema.SHA3, SignSchema.HashSize.HASH_SIZE_32_BYTES);
-        final MerkleHashBuilder transactionsHashBuilder = new MerkleHashBuilder(hasher
-        );
+
+        final MerkleHashBuilder transactionsHashBuilder = new MerkleHashBuilder();
         final BinarySerializationImpl transactionSerialization = new BinarySerializationImpl();
 
+        Hasher hasher = Hashes::sha3_256;
         for (final Transaction transaction : transactions) {
             final byte[] bytes = transactionSerialization.serializeEmbedded(transaction);
-
-            byte[] transactionHash = SignSchema
-                .toHash32Bytes(transaction.getNetworkType().resolveSignSchema(), bytes);
-
+            byte[] transactionHash = hasher.hash(bytes);
             transactionsHashBuilder.update(transactionHash);
         }
 
         final byte[] hash = transactionsHashBuilder.getRootHash();
-        return Hex.toHexString(hash).toUpperCase();
+        return ConvertUtils.toHex(hash);
     }
 }

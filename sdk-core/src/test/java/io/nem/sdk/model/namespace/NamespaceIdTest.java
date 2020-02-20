@@ -34,12 +34,12 @@ class NamespaceIdTest {
 
     static Stream<Arguments> provider() {
         return Stream.of(
-            Arguments.of("84b3552d375ffa4b", -8884663987180930485L),
-            Arguments.of("f8495aee892fa108", -555813098453229304L),
-            Arguments.of("abaef4e86505811f", -6075649568311770849L),
-            Arguments.of("aeb8c92b0a1c2d55", -5856710128704934571L),
+            Arguments.of("84B3552D375FFA4B", -8884663987180930485L),
+            Arguments.of("F8495AEE892FA108", -555813098453229304L),
+            Arguments.of("ABAEF4E86505811F", -6075649568311770849L),
+            Arguments.of("AEB8C92B0A1C2D55", -5856710128704934571L),
             Arguments.of("90e09ad44014cabf", -8007229901065893185L),
-            Arguments.of("ab114281960bf1cc", -6120037294284213812L)
+            Arguments.of("AB114281960BF1CC", -6120037294284213812L)
         );
     }
 
@@ -48,7 +48,7 @@ class NamespaceIdTest {
     void createNamespaceIdsFromLong(
         String expectedIdAsHex, long idAsLong) {
         NamespaceId namespaceId = NamespaceId.createFromId(BigInteger.valueOf(idAsLong));
-        assertEquals(expectedIdAsHex, namespaceId.getIdAsHex());
+        assertEquals(expectedIdAsHex.toUpperCase(), namespaceId.getIdAsHex());
         assertEquals(idAsLong, namespaceId.getIdAsLong());
         assertTrue(namespaceId.getId().compareTo(BigInteger.ZERO) > 0);
         assertEquals(ConvertUtils.toUnsignedBigInteger(idAsLong), namespaceId.getId());
@@ -60,7 +60,7 @@ class NamespaceIdTest {
         String expectedIdAsHex, long idAsLong) {
         NamespaceId namespaceId = NamespaceId
             .createFromId(ConvertUtils.toUnsignedBigInteger(idAsLong));
-        assertEquals(expectedIdAsHex, namespaceId.getIdAsHex());
+        assertEquals(expectedIdAsHex.toUpperCase(), namespaceId.getIdAsHex());
         assertEquals(idAsLong, namespaceId.getIdAsLong());
         assertTrue(namespaceId.getId().compareTo(BigInteger.ZERO) > 0);
         assertEquals(ConvertUtils.toUnsignedBigInteger(idAsLong), namespaceId.getId());
@@ -70,7 +70,7 @@ class NamespaceIdTest {
     @MethodSource("provider")
     void createNamespaceIdsFromHex(String hex, long idAsLong) {
         NamespaceId namespaceId = NamespaceId.createFromId(new BigInteger(hex, 16));
-        assertEquals(hex, namespaceId.getIdAsHex());
+        assertEquals(hex.toUpperCase(), namespaceId.getIdAsHex());
         assertEquals(idAsLong, namespaceId.getIdAsLong());
         assertTrue(namespaceId.getId().compareTo(BigInteger.ZERO) > 0);
         assertEquals(ConvertUtils.toUnsignedBigInteger(idAsLong), namespaceId.getId());

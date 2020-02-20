@@ -18,8 +18,8 @@ package io.nem.sdk.model.transaction;
 
 import io.nem.core.crypto.CryptoEngines;
 import io.nem.core.crypto.DsaSigner;
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.account.Account;
-import org.bouncycastle.util.encoders.Hex;
 
 /**
  * The cosignature transaction is used to sign an aggregate transactions with missing cosignatures.
@@ -70,11 +70,10 @@ public class CosignatureTransaction {
      * @return {@link CosignatureSignedTransaction}
      */
     public CosignatureSignedTransaction signWith(Account account) {
-        DsaSigner signer = CryptoEngines.defaultEngine().createDsaSigner(account.getKeyPair(),
-            account.getNetworkType().resolveSignSchema());
-        byte[] bytes = Hex.decode(transactionHash);
+        DsaSigner signer = CryptoEngines.defaultEngine().createDsaSigner(account.getKeyPair());
+        byte[] bytes = ConvertUtils.fromHexToBytes(transactionHash);
         byte[] signatureBytes = signer.sign(bytes).getBytes();
-        return new CosignatureSignedTransaction(transactionHash, Hex.toHexString(signatureBytes),
+        return new CosignatureSignedTransaction(transactionHash, ConvertUtils.toHex(signatureBytes),
             account.getPublicKey());
     }
 }

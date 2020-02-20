@@ -19,12 +19,12 @@ package io.nem.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.mosaic.MosaicId;
 import io.nem.sdk.model.mosaic.MosaicSupplyChangeActionType;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -57,7 +57,7 @@ class MosaicSupplyChangeTransactionTest extends AbstractTransactionTester {
     void serialization() {
         // Generated at nem2-library-js/test/transactions/MosaicSupplyChangeTransaction.spec.js
         String expected =
-            "91000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904d42000000000000000001000000000000008869746e9b1a70570a0000000000000001";
+            "91000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904D42000000000000000001000000000000008869746E9B1A70570A0000000000000001";
 
         MosaicSupplyChangeTransaction transaction =
             MosaicSupplyChangeTransactionFactory.create(
@@ -68,7 +68,7 @@ class MosaicSupplyChangeTransactionTest extends AbstractTransactionTester {
             ).deadline(new FakeDeadline()).build();
 
         byte[] actual = transaction.serialize();
-        assertEquals(expected, Hex.toHexString(actual));
+        assertEquals(expected, ConvertUtils.toHex(actual));
 
         assertSerialization(expected, transaction);
     }

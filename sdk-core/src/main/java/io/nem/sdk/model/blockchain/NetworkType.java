@@ -16,7 +16,6 @@
 
 package io.nem.sdk.model.blockchain;
 
-import io.nem.core.crypto.SignSchema;
 import java.util.Arrays;
 
 /**
@@ -82,14 +81,6 @@ public enum NetworkType {
      */
     public int getValue() {
         return this.value;
-    }
-
-    /**
-     * @return the {@link SignSchema} to be used when working on this network;
-     */
-    public SignSchema resolveSignSchema() {
-        return this == NetworkType.MIJIN_TEST || this == NetworkType.MIJIN
-            ? SignSchema.SHA3 : SignSchema.KECCAK;
     }
 
     /**

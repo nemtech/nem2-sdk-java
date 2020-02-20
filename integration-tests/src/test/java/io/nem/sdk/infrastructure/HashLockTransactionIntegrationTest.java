@@ -17,7 +17,6 @@
 package io.nem.sdk.infrastructure;
 
 import io.nem.sdk.model.account.Account;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.HashLockTransaction;
@@ -47,7 +46,7 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
 
         HashLockTransaction hashLockTransaction =
             HashLockTransactionFactory.create(getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 signedTransaction
             ).maxFee(this.maxFee).build();
@@ -67,7 +66,7 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
         HashLockTransaction hashLockTransaction =
             HashLockTransactionFactory.create(
                 getNetworkType(),
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 signedTransaction).maxFee(this.maxFee).build();
 

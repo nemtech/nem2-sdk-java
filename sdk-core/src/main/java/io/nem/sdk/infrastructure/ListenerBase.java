@@ -257,7 +257,8 @@ public abstract class ListenerBase implements Listener {
 
         Observable<Transaction> transactionListener = confirmed(address)
             .filter(t -> t.getTransactionInfo()
-                .filter(info -> info.getHash().filter(transactionHash::equals).isPresent())
+                .filter(
+                    info -> info.getHash().filter(transactionHash::equalsIgnoreCase).isPresent())
                 .isPresent());
 
         return getTransactionOrRaiseError(address, transactionHash, transactionListener);
@@ -272,7 +273,8 @@ public abstract class ListenerBase implements Listener {
         // I may move this method to the Listener
         Observable<AggregateTransaction> transactionListener = aggregateBondedAdded(address)
             .filter(t -> t.getTransactionInfo()
-                .filter(info -> info.getHash().filter(transactionHash::equals).isPresent())
+                .filter(
+                    info -> info.getHash().filter(transactionHash::equalsIgnoreCase).isPresent())
                 .isPresent());
 
         return getTransactionOrRaiseError(address, transactionHash, transactionListener);
@@ -285,7 +287,7 @@ public abstract class ListenerBase implements Listener {
         // I may move this method to the Listener
         IllegalStateException caller = new IllegalStateException("The Caller");
         Observable<TransactionStatusError> errorListener = status(address)
-            .filter(m -> transactionHash.equals(m.getHash()));
+            .filter(m -> transactionHash.equalsIgnoreCase(m.getHash()));
         Observable<Object> errorOrTransactionObservable = Observable
             .merge(transactionListener, errorListener);
         return errorOrTransactionObservable.map(errorOrTransaction -> {

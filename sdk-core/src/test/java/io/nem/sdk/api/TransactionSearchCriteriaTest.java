@@ -17,6 +17,7 @@
 package io.nem.sdk.api;
 
 import io.nem.sdk.model.transaction.TransactionType;
+import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +32,8 @@ public class TransactionSearchCriteriaTest {
         Assertions.assertNull(criteria.getId());
         Assertions.assertNull(criteria.getOrder());
         Assertions.assertNull(criteria.getPageSize());
-        Assertions.assertNull(criteria.getTransactionType());
+        Assertions.assertNotNull(criteria.getTransactionTypes());
+        Assertions.assertTrue(criteria.getTransactionTypes().isEmpty());
     }
 
     @Test
@@ -41,13 +43,15 @@ public class TransactionSearchCriteriaTest {
         criteria.setId("theId");
         criteria.setOrder("TheOder");
         criteria.setPageSize(10);
-        criteria.setTransactionType(TransactionType.MOSAIC_GLOBAL_RESTRICTION);
+        criteria.setTransactionTypes(
+            Collections.singletonList(TransactionType.MOSAIC_GLOBAL_RESTRICTION));
 
         Assertions.assertEquals("theId", criteria.getId());
         Assertions.assertEquals("TheOder", criteria.getOrder());
         Assertions.assertEquals(10, criteria.getPageSize());
         Assertions
-            .assertEquals(TransactionType.MOSAIC_GLOBAL_RESTRICTION, criteria.getTransactionType());
+            .assertEquals(Collections.singletonList(TransactionType.MOSAIC_GLOBAL_RESTRICTION),
+                criteria.getTransactionTypes());
     }
 
     @Test
@@ -55,13 +59,14 @@ public class TransactionSearchCriteriaTest {
         TransactionSearchCriteria criteria = new TransactionSearchCriteria();
 
         criteria.id("theId").order("TheOder").pageSize(10)
-            .transactionType(TransactionType.MOSAIC_GLOBAL_RESTRICTION);
+            .transactionTypes(Collections.singletonList(TransactionType.MOSAIC_GLOBAL_RESTRICTION));
 
         Assertions.assertEquals("theId", criteria.getId());
         Assertions.assertEquals("TheOder", criteria.getOrder());
         Assertions.assertEquals(10, criteria.getPageSize());
         Assertions
-            .assertEquals(TransactionType.MOSAIC_GLOBAL_RESTRICTION, criteria.getTransactionType());
+            .assertEquals(Collections.singletonList(TransactionType.MOSAIC_GLOBAL_RESTRICTION),
+                criteria.getTransactionTypes());
     }
 
 }

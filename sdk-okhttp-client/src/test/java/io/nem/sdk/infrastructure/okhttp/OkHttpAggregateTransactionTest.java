@@ -20,15 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.core.utils.ConvertUtils;
 import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.message.PlainMessage;
-import io.nem.sdk.model.mosaic.Mosaic;
-import io.nem.sdk.model.mosaic.MosaicId;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
+import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.JsonHelper;
@@ -39,7 +38,6 @@ import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -81,15 +79,14 @@ public class OkHttpAggregateTransactionTest {
     void serialization() {
         // Generated at nem2-library-js/test/transactions/RegisterNamespaceTransaction.spec.js
         String expected =
-            "1001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000190414100000000000000000100000000000000de78f6d81ae02ad16559f6e4d3d4acc5ed343ee0ae65b1c9ad4fc0091a3903b568000000000000006100000000000000846b4439154579a5903b1459c9cf69cb8153f6d0110a7a0ed61de29ae4810bf200000000019054419050b9837efab4bbe8a4b9bb32d812f9885c00d8fc1650e1420101000000000044b262c46ceabb8580969800000000000000000000000000";
+            "1001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000190414100000000000000000100000000000000DE78F6D81AE02AD16559F6E4D3D4ACC5ED343EE0AE65B1C9AD4FC0091A3903B568000000000000006100000000000000846B4439154579A5903B1459C9CF69CB8153F6D0110A7A0ED61DE29AE4810BF200000000019054419050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1420101000000000044B262C46CEABB8580969800000000000000000000000000";
 
         TransferTransaction transferTx =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", NetworkType.MIJIN_TEST),
                 Collections.singletonList(
-                    new Mosaic(new MosaicId(NetworkCurrencyMosaic.NAMESPACEID.getId()),
-                        BigInteger.valueOf(10000000))),
+                    createAbsolute(BigInteger.valueOf(10000000))),
                 PlainMessage.Empty).deadline(new OkHttpFakeDeadline()).build();
 
         AggregateTransaction aggregateTx =
@@ -102,7 +99,12 @@ public class OkHttpAggregateTransactionTest {
                             NetworkType.MIJIN_TEST)))).deadline(new OkHttpFakeDeadline()).build();
 
         byte[] actual = aggregateTx.serialize();
-        assertEquals(expected, Hex.toHexString(actual));
+        assertEquals(expected, ConvertUtils.toHex(actual));
+    }
+
+    protected io.nem.sdk.model.mosaic.Mosaic createAbsolute(BigInteger amount) {
+        return new io.nem.sdk.model.mosaic.Mosaic(NamespaceId.createFromName("cat.currency"),
+            amount);
     }
 
     @Test
@@ -139,7 +141,7 @@ public class OkHttpAggregateTransactionTest {
                 aggregateTx, Collections.singletonList(cosignatoryAccount2), generationHash);
 
         assertEquals("6801000000000000", signedTransaction.getPayload().substring(0, 16));
-        assertEquals("00000000d6a52a97", signedTransaction.getPayload().substring(248, 264));
+        assertEquals("00000000D6A52A97", signedTransaction.getPayload().substring(248, 264));
 
     }
 

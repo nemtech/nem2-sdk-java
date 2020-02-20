@@ -16,8 +16,8 @@
 
 package io.nem.core.crypto.ed25519;
 
+import io.nem.core.crypto.Hashes;
 import io.nem.core.crypto.PrivateKey;
-import io.nem.core.crypto.SignSchema;
 import io.nem.core.crypto.ed25519.arithmetic.Ed25519EncodedFieldElement;
 import java.util.Arrays;
 
@@ -37,12 +37,10 @@ public class Ed25519Utils {
      * better randomness and the clamping prevents small subgroup attacks.
      *
      * @param key The private key.
-     * @param signSchema signSchema.
      * @return The prepared encoded field element.
      */
-    public static Ed25519EncodedFieldElement prepareForScalarMultiply(final PrivateKey key,
-        SignSchema signSchema) {
-        final byte[] hash = SignSchema.toHash(key, signSchema);
+    public static Ed25519EncodedFieldElement prepareForScalarMultiply(final PrivateKey key) {
+        final byte[] hash = Hashes.sha512(key.getBytes());
         final byte[] a = Arrays.copyOfRange(hash, 0, 32);
         a[31] &= 0x7F;
         a[31] |= 0x40;

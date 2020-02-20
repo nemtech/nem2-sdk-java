@@ -16,10 +16,11 @@
 
 package io.nem.core.crypto.ed25519.arithmetic;
 
+import io.nem.core.crypto.Hasher;
+import io.nem.core.crypto.Hashes;
 import io.nem.core.crypto.KeyPair;
 import io.nem.core.crypto.PrivateKey;
 import io.nem.core.crypto.PublicKey;
-import io.nem.core.crypto.SignSchema;
 import io.nem.core.crypto.Signature;
 import io.nem.core.utils.ArrayUtils;
 import io.nem.sdk.infrastructure.RandomUtils;
@@ -522,11 +523,10 @@ public class MathUtils {
      * Derives the public key from a private key.
      *
      * @param privateKey The private key.
-     * @param signSchema signSchema
      * @return The public key.
      */
-    public static PublicKey derivePublicKey(final PrivateKey privateKey, SignSchema signSchema) {
-        final byte[] hash = SignSchema.toHash(privateKey, signSchema);
+    public static PublicKey derivePublicKey(final PrivateKey privateKey) {
+        final byte[] hash = Hashes.sha512(privateKey.getBytes());
         final byte[] a = Arrays.copyOfRange(hash, 0, 32);
         a[31] &= 0x7F;
         a[31] |= 0x40;
@@ -542,27 +542,29 @@ public class MathUtils {
      *
      * @param keyPair The key pair.
      * @param data The message.
-     * @param signSchema signSchema
      * @return The signature.
      */
-    public static Signature sign(final KeyPair keyPair, final byte[] data, SignSchema signSchema) {
-        final byte[] hash = SignSchema.toHash(keyPair.getPrivateKey(), signSchema);
+    public static Signature sign(final KeyPair keyPair, final byte[] data) {
+
+        Hasher hasher64 = Hashes::sha512;
+        Hasher hasher32 = Hashes::sha512;
+
+        final byte[] hash = hasher32.hash(keyPair.getPrivateKey().getBytes());
         final byte[] a = Arrays.copyOfRange(hash, 0, 32);
         a[31] &= 0x7F;
         a[31] |= 0x40;
         a[0] &= 0xF8;
         final Ed25519EncodedFieldElement r =
             new Ed25519EncodedFieldElement(
-                SignSchema.toHash64Bytes(signSchema, Arrays.copyOfRange(hash, 32, 64), data));
+                hasher64.hash(Arrays.copyOfRange(hash, 32, 64), data));
         final Ed25519EncodedFieldElement rReduced = reduceModGroupOrder(r);
         final Ed25519GroupElement R = scalarMultiplyGroupElement(Ed25519Group.BASE_POINT,
             toFieldElement(toBigInteger(rReduced)));
         final Ed25519EncodedFieldElement h =
             new Ed25519EncodedFieldElement(
-                SignSchema
-                    .toHash64Bytes(signSchema, R.encode().getRaw(),
-                        keyPair.getPublicKey().getBytes(),
-                        data));
+                hasher64.hash(R.encode().getRaw(),
+                    keyPair.getPublicKey().getBytes(),
+                    data));
         final Ed25519EncodedFieldElement hReduced = reduceModGroupOrder(h);
         final BigInteger S =
             toBigInteger(rReduced)

@@ -19,9 +19,9 @@ package io.nem.sdk.model.receipt;
 import io.nem.core.crypto.Hashes;
 import io.nem.core.utils.ArrayUtils;
 import io.nem.core.utils.ByteUtils;
+import io.nem.core.utils.ConvertUtils;
 import java.math.BigInteger;
 import java.util.List;
-import org.bouncycastle.util.encoders.Hex;
 
 public class TransactionStatement {
 
@@ -90,6 +90,6 @@ public class TransactionStatement {
         }
 
         byte[] hash = Hashes.sha3_256(results);
-        return Hex.toHexString(hash).toUpperCase();
+        return ConvertUtils.toHex(hash);
     }
 }

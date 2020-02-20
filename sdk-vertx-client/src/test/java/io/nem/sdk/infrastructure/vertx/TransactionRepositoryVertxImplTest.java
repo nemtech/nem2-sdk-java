@@ -25,7 +25,7 @@ import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.message.PlainMessage;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
+import io.nem.sdk.model.namespace.NamespaceId;
 import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.Transaction;
@@ -274,7 +274,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
                 NetworkType.MIJIN_TEST,
                 recipientAddress,
                 Collections
-                    .singletonList(NetworkCurrencyMosaic.createAbsolute(BigInteger.valueOf(1))),
+                    .singletonList(createAbsolute(BigInteger.valueOf(1))),
                 new PlainMessage("E2ETest:standaloneTransferTransaction:message")
             ).build();
 
@@ -284,5 +284,9 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
         return signedTransaction;
     }
 
+    protected io.nem.sdk.model.mosaic.Mosaic createAbsolute(BigInteger amount) {
+        return new io.nem.sdk.model.mosaic.Mosaic(NamespaceId.createFromName("xem.currency"),
+            amount);
+    }
 
 }

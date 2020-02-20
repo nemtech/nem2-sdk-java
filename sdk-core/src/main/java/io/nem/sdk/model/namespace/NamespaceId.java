@@ -69,6 +69,18 @@ public class NamespaceId implements UnresolvedMosaicId, UnresolvedAddress {
     }
 
     /**
+     * Creates a NamespaceId when the id and the full name is known.
+     *
+     * @param id the id.
+     * @param fullName the full name that includes the parent namespaces (ex: nem or
+     * domain.subdom.subdome)
+     * @return the new {@link NamespaceId}
+     */
+    public static NamespaceId createFromIdAndFullName(BigInteger id, String fullName) {
+        return new NamespaceId(id, Optional.of(fullName));
+    }
+
+    /**
      * Create NamespaceId from namespace string name (ex: nem or domain.subdom.subdome) and parent
      * id
      *

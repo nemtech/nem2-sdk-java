@@ -18,7 +18,6 @@ package io.nem.sdk.model.message;
 
 import io.nem.core.crypto.KeyPair;
 import io.nem.core.crypto.PrivateKey;
-import io.nem.sdk.model.blockchain.NetworkType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,18 +28,18 @@ public class EncryptedMessageTest {
 
     @Test
     public void testCreateEncryptedMessage() {
-        NetworkType networkType = NetworkType.MIJIN_TEST;
+
         String message = "This is a plain message 漢字";
-        KeyPair sender = KeyPair.random(networkType.resolveSignSchema());
-        KeyPair recipient = KeyPair.random(networkType.resolveSignSchema());
+        KeyPair sender = KeyPair.random();
+        KeyPair recipient = KeyPair.random();
 
         EncryptedMessage encryptedMessage = EncryptedMessage
-            .create(message, sender.getPrivateKey(), recipient.getPublicKey(), networkType);
+            .create(message, sender.getPrivateKey(), recipient.getPublicKey());
 
         Assertions.assertEquals(MessageType.ENCRYPTED_MESSAGE, encryptedMessage.getType());
 
         String plainMessage = encryptedMessage
-            .decryptPayload(sender.getPublicKey(), recipient.getPrivateKey(), networkType);
+            .decryptPayload(sender.getPublicKey(), recipient.getPrivateKey());
 
         Assertions.assertEquals(message, plainMessage);
     }
@@ -55,20 +54,16 @@ public class EncryptedMessageTest {
         // Although using the same encryption algorithm, outcome may be different if the encoding
         // process is different. Both TS and Java are using utf-8 and hex encodings,
 
-        NetworkType networkType = NetworkType.MIJIN_TEST;
-
         KeyPair sender = KeyPair.fromPrivate(PrivateKey
-                .fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C108"),
-            networkType.resolveSignSchema());
+            .fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C108"));
         KeyPair recipient = KeyPair.fromPrivate(PrivateKey
-                .fromHexString("B72F2950498111BADF276D6D9D5E345F04E0D5C9B8342DA983C3395B4CF18F08"),
-            networkType.resolveSignSchema());
+            .fromHexString("B72F2950498111BADF276D6D9D5E345F04E0D5C9B8342DA983C3395B4CF18F08"));
 
-        String typescriptEncryptedKey = "3A1B688733D1974BBA96BEEF4FB03E7A5379C343B057701B77E9E063C887A6936BF63900524E4E05F006FFF0D078D1DE";
+        String typescriptEncryptedKey = "DA5E78D71024C49567855E83C0420855976FCF6CCDD68173A408FA31207DC92AB993348AC02411673E5602DAF994601A";
 
         EncryptedMessage encryptedMessage = new EncryptedMessage(typescriptEncryptedKey);
         String plainMessage = encryptedMessage
-            .decryptPayload(sender.getPublicKey(), recipient.getPrivateKey(), networkType);
+            .decryptPayload(sender.getPublicKey(), recipient.getPrivateKey());
 
         Assertions.assertEquals("test transaction 漢字", plainMessage);
 

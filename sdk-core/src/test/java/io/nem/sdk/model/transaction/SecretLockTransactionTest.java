@@ -23,7 +23,7 @@ import io.nem.sdk.model.account.Account;
 import io.nem.sdk.model.account.Address;
 import io.nem.sdk.model.account.PublicAccount;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.model.mosaic.NetworkCurrencyMosaic;
+import io.nem.sdk.model.mosaic.NetworkCurrency;
 import java.math.BigInteger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
         SecretLockTransaction transaction =
             SecretLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,
@@ -69,7 +69,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
         SecretLockTransaction transaction =
             SecretLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,
@@ -93,7 +93,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
         SecretLockTransaction transaction =
             SecretLockTransactionFactory.create(NetworkType.MIJIN_TEST,
-                NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithmType.SHA3_256,
                 secret,
@@ -102,10 +102,10 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
         SignedTransaction signedTransaction = transaction.signWith(account, generationHash);
         String payload = signedTransaction.getPayload();
         assertEquals(
-            "D200000000000000098C22E248A5459823C48F16C8B5FA66D72127256FFDE4D48BAB78F775F3BA5C44CC77838273A232B1B8CC7C63F45DE512957C4DDDAB0EDDF0BC4C5640C4B4061026D70E1954775749C6811084D6450A3184D977383F0E4282CD47118AF377550000000001905241000000000000000001000000000000003FC8BA10229AB5778D05D9C4B7F56676A88BF9295C185ACFC0F961DB5408CAFE44B262C46CEABB85809698000000000064000000000000000090E8FEBD671DD41BEE94EC3BA5831CB608A312C2F203BA84AC",
+            "D2000000000000006F55053776B9CAF82B84A0B42A2E5ECF110BC4ABCF238B000E520714A6AC290B8B1ED5BBEB882E8D047A90DC5689A7CE7CC6FF6093427FA7C590359C5583D9092134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F20000000001905241000000000000000001000000000000003FC8BA10229AB5778D05D9C4B7F56676A88BF9295C185ACFC0F961DB5408CAFE44B262C46CEABB85809698000000000064000000000000000090E8FEBD671DD41BEE94EC3BA5831CB608A312C2F203BA84AC",
             payload);
         assertEquals(
-            "B9E1C03CE6C18E92E4F404611C29586DDDFA534C8373031EB917A6A81CCCA765",
+            "E9A337ADA16A26403399C0203E0FDBE2D62D1230219AD56756D158DC9DC6671A",
             signedTransaction.getHash());
 
     }
@@ -118,7 +118,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
                 SecretLockTransaction transaction =
                     SecretLockTransactionFactory.create(
                         NetworkType.MIJIN_TEST,
-                        NetworkCurrencyMosaic.createRelative(BigInteger.valueOf(10)),
+                        NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                         BigInteger.valueOf(100),
                         LockHashAlgorithmType.SHA3_256,
                         "non valid hash",

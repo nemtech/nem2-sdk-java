@@ -17,6 +17,8 @@
 package io.nem.sdk.api;
 
 import io.nem.sdk.model.transaction.TransactionType;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Defines the params used to search transactions. With is criteria, you can sort and filter
@@ -41,9 +43,9 @@ public class TransactionSearchCriteria {
     private String order;
 
     /**
-     * Transaction type to filter by. (optional)
+     * Transaction types to filter by. (optional)
      */
-    private TransactionType transactionType;
+    private List<TransactionType> transactionTypes = Collections.emptyList();
 
     public Integer getPageSize() {
         return pageSize;
@@ -69,13 +71,15 @@ public class TransactionSearchCriteria {
         return order;
     }
 
-    public void setTransactionType(TransactionType transactionType) {
-        this.transactionType = transactionType;
+    public void setTransactionTypes(
+        List<TransactionType> transactionTypes) {
+        this.transactionTypes = transactionTypes;
     }
 
-    public TransactionType getTransactionType() {
-        return transactionType;
+    public List<TransactionType> getTransactionTypes() {
+        return transactionTypes;
     }
+
 
     /**
      * Sets the id filter returning this criteria to nest criteria configuration.
@@ -112,13 +116,15 @@ public class TransactionSearchCriteria {
     }
 
     /**
-     * Sets the transactionType filter returning this criteria to nest criteria configuration.
+     * Sets the transactionTypes filter returning this criteria to nest criteria configuration.
      *
-     * @param transactionType Transaction type to filter by. (optional)
+     * @param transactionTypes Transaction type to filter by. (optional)
      * @return this criteria
      */
-    public TransactionSearchCriteria transactionType(TransactionType transactionType) {
-        this.transactionType = transactionType;
+    public TransactionSearchCriteria transactionTypes(List<TransactionType> transactionTypes) {
+        this.transactionTypes = transactionTypes;
         return this;
     }
+
+
 }

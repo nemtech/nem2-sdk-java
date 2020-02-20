@@ -69,7 +69,7 @@ public class VertxCosignatureTransactionTest {
             aggregateTransaction.getTransactionInfo().get().getHash().get(),
             cosignatureSignedTransaction.getParentHash());
         assertEquals(
-            "bf3bc39f2292c028cb0ffa438a9f567a7c4d793d2f8522c8deac74befbcb61af6414adf27b2176d6a24fef612aa6db2f562176a11c46ba6d5e05430042cb5705",
+            "5EA75D1A2C8AD25DA4F400C1BD2DA84449FAF583AFD813E1179E72AF0CDF5AC1C0F7404AF6FC7268EE416204240DD3D5B11420D80215F19AA314FC86D6E03E0D",
             cosignatureSignedTransaction.getSignature());
         assertEquals(
             "671653C94E2254F2A23EFEDB15D67C38332AED1FBD24B063C0A8E675582B6A96",
