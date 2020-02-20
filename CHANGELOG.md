@@ -28,7 +28,7 @@ Client Vertx | v0.8.4  | https://repo.maven.apache.org/maven2/io/nem/sdk-vertx-c
 - Fixed Jackson version compatibility issue.
 - General legacy code refactoring and cleanup.
 
-## [0.17.0] - 30-Jan-2020
+## [0.16.2] - 30-Jan-2020
 
 **Milestone**: Fuschicho 3
 
