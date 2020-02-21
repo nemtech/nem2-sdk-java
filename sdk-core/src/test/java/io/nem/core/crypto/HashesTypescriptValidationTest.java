@@ -80,32 +80,53 @@ public class HashesTypescriptValidationTest {
                 "050080ABD9C4EC49AD7EBFD4136179BF445FF5F2B15A022C57D4E022605FBF20",
                 "0B82AE38620F3F92EB00D0E956F88D7A6A78D5275C94F931561629B992176319");
 
-        params.addAll(IntStream.range(0, inputs.size())
-            .mapToObj(
-                i -> Arguments.of(namedHasher(Hashes::sha3_256, "sha3_256"), inputs.get(i),
-                    sha3_256Result.get(i)))
-            .collect(Collectors.toList()));
+        List<String> keccak256Results = Arrays
+            .asList(
+                "C5D2460186F7233C927E7DB2DCC703C0E500B653CA82273B7BFAD8045D85A470",
+                "EEAD6DBFC7340A56CAEDC044696A168870549A6A7F6F56961E84A54BD9970B8A",
+                "A8EACEDA4D47B3281A795AD9E1EA2122B407BAF9AABCB9E18B5717B7873537D2",
+                "627D7BC1491B2AB127282827B8DE2D276B13D7D70FB4C5957FDF20655BC7AC30",
+                "B149E766D7612EAF7D55F74E1A4FDD63709A8115B14F61FCD22AA4ABC8B8E122",
+                "24DD2EE02482144F539F810D2CAA8A7B75D0FA33657E47932122D273C3F6F6D1",
+                "F7109E626287D2FE00E05281F0E8EBF2FEDBCFDE5FA1F2667E2055309092BFB3");
 
-        params.addAll(IntStream.range(0, inputs.size())
-            .mapToObj(
-                i -> Arguments.of(namedHasher(Hashes::sha3_512, "sha3_512"), inputs.get(i),
-                    sha3_512Result.get(i)))
-            .collect(Collectors.toList()));
+        List<String> keccak512Results = Arrays
+            .asList(
+                "0EAB42DE4C3CEB9235FC91ACFFE746B29C29A8C366B7C60E4E67C466F36A4304C00FA9CAF9D87976BA469BCBE06713B435F091EF2769FB160CDAB33D3670680E",
+                "8630C13CBD066EA74BBE7FE468FEC1DEE10EDC1254FB4C1B7C5FD69B646E44160B8CE01D05A0908CA790DFB080F4B513BC3B6225ECE7A810371441A5AC666EB9",
+                "551DA6236F8B96FCE9F97F1190E901324F0B45E06DBBB5CDB8355D6ED1DC34B3F0EAE7DCB68622FF232FA3CECE0D4616CDEB3931F93803662A28DF1CD535B731",
+                "EB7F2A98E00AF37D964F7D8C44C1FB6E114D8EE21A7B976AE736539EFDC1E3FE43BECEF5015171E6DA30168CAE99A82C53FA99042774EF982C01626A540F08C0",
+                "952D4C0A6F0EF5CE438C52E3EDD345EA00F91CF5DA8097C1168A16069E958FC05BAD90A0C5FB4DD9EC28E84B226B94A847D6BB89235692EF4C9712F0C7030FAE",
+                "1EAFEDCE7292BA73B80AE6151745F43AC95BFC9F31694D422473ABCA2E69D695CB6544DB65506078CB20DBE0762F84AA6AFD14A60AB597955BE73F3F5C50F7A8",
+                "606A7B3E93570BC8833B9C568BE5111C37A6C7355FED878F135764044A3BB0D9D0CBDF397C72A731A6D5608F3A6B244293818A4D8D16840087809B4D33041999");
 
-        params.addAll(IntStream.range(0, inputs.size())
-            .mapToObj(
-                i -> Arguments
-                    .of(namedHasher(Hashes::sha512, "sha512"), inputs.get(i), sha512Result.get(i)))
-            .collect(Collectors.toList()));
+        List<String> hash160Results = Arrays
+            .asList(
+                "BA084D3F143F2896809D3F1D7DFFED472B39D8DE",
+                "6D5914CA0B1C7EC9F25B976F6E405CA60BC93283",
+                "4E20B2B1AF7F39B2A4E2114406838C1784978979",
+                "2F79F0278AFCA8BB7A24487BE75C517F0367B8A2",
+                "16A85F134EF46C2FF70163DC22963BE583727AE0",
+                "BF6029B29DF43C54425549867DB1EC46478A9653",
+                "DCB60AB6DDB5A3A35D62CA60E2DB675341DBCDD6");
 
-        params.addAll(IntStream.range(0, inputs.size())
-            .mapToObj(
-                i -> Arguments
-                    .of(namedHasher(Hashes::hash256, "hash256"), inputs.get(i),
-                        hash256Result.get(i)))
-            .collect(Collectors.toList()));
-
+        params.addAll(createParams("sha3_256", Hashes::sha3_256, inputs, sha3_256Result));
+        params.addAll(createParams("sha3_512", Hashes::sha3_512, inputs, sha3_512Result));
+        params.addAll(createParams("sha512", Hashes::sha512, inputs, sha512Result));
+        params.addAll(createParams("hash256", Hashes::hash256, inputs, hash256Result));
+        params.addAll(createParams("keccak256", Hashes::keccak256, inputs, keccak256Results));
+        params.addAll(createParams("keccak512", Hashes::keccak512, inputs, keccak512Results));
+        params.addAll(createParams("hash160", Hashes::hash160, inputs, hash160Results));
         return params.stream();
+    }
+
+    private static List<Arguments> createParams(String name, Hasher hasher, List<String> inputs,
+        List<String> sha512Result) {
+        return IntStream.range(0, inputs.size())
+            .mapToObj(
+                i -> Arguments
+                    .of(namedHasher(hasher, name), inputs.get(i), sha512Result.get(i)))
+            .collect(Collectors.toList());
     }
 
     private static Hasher namedHasher(Hasher delegate, String name) {
@@ -137,9 +158,10 @@ public class HashesTypescriptValidationTest {
     }
 
     @Test
-     void SHA256Hash() {
+    void SHA256Hash() {
         Assertions.assertEquals("E618ACB2558E1721492E4AE3BED3F4D86F26C2B0CE6AD939943A6A540855D23F",
-            ConvertUtils.toHex(Hashes.sha256ForSharedKey("string-or-buffer".getBytes())).toUpperCase());
+            ConvertUtils.toHex(Hashes.sha256ForSharedKey("string-or-buffer".getBytes()))
+                .toUpperCase());
     }
 
     byte[][] create(int size) {
