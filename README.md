@@ -75,8 +75,8 @@ If you want to change or tune the generated libraries, you would need to clone/f
 The SDK is composed of multiple sub-modules/folders:
 
 - **sdk-core:** This module includes the model objects, interfaces and common utility classes. It is Vertx, ok-http, gson, etc agnostic. Clients won't depend on this jar directly, they will depend on one of the implementations below.
-- **sdk-vertx-client:** The symbol-sdk-java Implementation that uses Vertx and generated `api-vertx-client` lib and dtos. A client may depend on this SDK implementation if Vertx is the selected implementation (e.g. server users).
-- **sdk-okhttp-client:** The symbol-sdk-java Implementation that uses OkHttp and the generated `api-okhttp-gson-client`. A client may depend on this SDK implementation if OkHttp is the selected implementation (e.g. android users).
+- **sdk-vertx-client:** The symbol-sdk-java Implementation that uses Vertx and generated `symbol-openapi-vertx-client` lib and dtos. A client may depend on this SDK implementation if Vertx is the selected implementation (e.g. server users).
+- **sdk-okhttp-client:** The symbol-sdk-java Implementation that uses OkHttp and the generated `symbol-openapi-okhttp-gson-client`. A client may depend on this SDK implementation if OkHttp is the selected implementation (e.g. android users).
 - **integration-tests:** This module is in charge of running integration tests against all implementations. The integration tests exercise how the implementation work against a given catapult server.
 
 
