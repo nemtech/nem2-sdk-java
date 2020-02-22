@@ -27,8 +27,8 @@ import io.nem.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.vertx.model.NamespaceRegistrationTransactionDTO;
-import io.nem.sdk.openapi.vertx.model.NamespaceRegistrationTypeEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.NamespaceRegistrationTransactionDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.NamespaceRegistrationTypeEnum;
 import java.util.Optional;
 
 /**

@@ -23,7 +23,7 @@ import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.vertx.model.MultisigAccountModificationTransactionDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.MultisigAccountModificationTransactionDTO;
 import java.util.List;
 import java.util.stream.Collectors;
 

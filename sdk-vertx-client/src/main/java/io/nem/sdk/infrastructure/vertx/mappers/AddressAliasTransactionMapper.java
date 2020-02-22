@@ -28,8 +28,8 @@ import io.nem.sdk.model.transaction.AddressAliasTransaction;
 import io.nem.sdk.model.transaction.AddressAliasTransactionFactory;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.vertx.model.AddressAliasTransactionDTO;
-import io.nem.sdk.openapi.vertx.model.AliasActionEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.AddressAliasTransactionDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.AliasActionEnum;
 
 /**
  * Account alias transaction mapper.

@@ -17,8 +17,8 @@
 package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.sdk.model.blockchain.BlockchainScore;
-import io.nem.sdk.openapi.vertx.model.ChainScoreDTO;
-import io.nem.sdk.openapi.vertx.model.HeightInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.ChainScoreDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.HeightInfoDTO;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

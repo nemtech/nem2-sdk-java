@@ -18,10 +18,10 @@ package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.sdk.api.ChainRepository;
 import io.nem.sdk.model.blockchain.BlockchainScore;
-import io.nem.sdk.openapi.okhttp_gson.api.ChainRoutesApi;
-import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
-import io.nem.sdk.openapi.okhttp_gson.model.ChainScoreDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.HeightInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.api.ChainRoutesApi;
+import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.ChainScoreDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.HeightInfoDTO;
 import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.concurrent.Callable;

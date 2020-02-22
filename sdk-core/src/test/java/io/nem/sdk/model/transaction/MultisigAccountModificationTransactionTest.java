@@ -71,7 +71,7 @@ class MultisigAccountModificationTransactionTest extends AbstractTransactionTest
     @Test
     @DisplayName("Serialization")
     void serialization() {
-        // Generated at nem2-library-js/test/transactions/ModifyMultisigAccountTransaction.spec.js
+        // Generated at symbol-library-js/test/transactions/ModifyMultisigAccountTransaction.spec.js
         List<PublicAccount> additions = Collections.singletonList(
             PublicAccount.createFromPublicKey(
                 "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b111",

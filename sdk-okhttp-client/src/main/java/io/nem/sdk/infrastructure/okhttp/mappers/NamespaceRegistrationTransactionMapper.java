@@ -26,8 +26,8 @@ import io.nem.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.okhttp_gson.model.NamespaceRegistrationTransactionDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.NamespaceRegistrationTypeEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.NamespaceRegistrationTransactionDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.NamespaceRegistrationTypeEnum;
 import java.util.Optional;
 
 /**

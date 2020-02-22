@@ -29,7 +29,7 @@ import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.sdk.model.transaction.CosignatureTransaction;
 import io.nem.sdk.model.transaction.JsonHelper;
-import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.vertx.core.json.Json;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeAll;

@@ -40,5 +40,5 @@ before_install:
       echo "No signing the artifacts"
     else
       echo "Signing artifacts"
-      openssl aes-256-cbc -K $encrypted_98cf1ffdea51_key -iv $encrypted_98cf1ffdea51_iv -in travis/nem2-sdk-java.gpg.enc -out nem2-sdk-java.gpg -d
+      openssl aes-256-cbc -K $encrypted_98cf1ffdea51_key -iv $encrypted_98cf1ffdea51_iv -in travis/symbol-sdk-java.gpg.enc -out symbol-sdk-java.gpg -d
     fi

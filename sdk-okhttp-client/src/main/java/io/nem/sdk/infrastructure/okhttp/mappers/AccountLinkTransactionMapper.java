@@ -23,8 +23,8 @@ import io.nem.sdk.model.transaction.AccountLinkTransaction;
 import io.nem.sdk.model.transaction.AccountLinkTransactionFactory;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountLinkActionEnum;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountLinkTransactionDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountLinkActionEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountLinkTransactionDTO;
 
 /**
  * Account link transaction mapper.

@@ -17,7 +17,7 @@
 package io.nem.sdk.model.message;
 
 /**
- * Special message prefix for catapult.
+ * Special message prefix for symbol.
  */
 public class MessageMarker {
 

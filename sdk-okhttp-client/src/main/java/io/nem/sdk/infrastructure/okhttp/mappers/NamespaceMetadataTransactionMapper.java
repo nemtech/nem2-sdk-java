@@ -25,7 +25,7 @@ import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.NamespaceMetadataTransaction;
 import io.nem.sdk.model.transaction.NamespaceMetadataTransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.okhttp_gson.model.NamespaceMetadataTransactionDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.NamespaceMetadataTransactionDTO;
 import java.math.BigInteger;
 
 /**

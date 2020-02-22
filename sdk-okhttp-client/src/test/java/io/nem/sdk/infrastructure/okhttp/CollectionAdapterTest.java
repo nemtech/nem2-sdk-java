@@ -18,7 +18,7 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import com.google.gson.Gson;
-import io.nem.sdk.openapi.okhttp_gson.invoker.JSON;
+import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.JSON;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;

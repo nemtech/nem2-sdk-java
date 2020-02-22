@@ -145,7 +145,6 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
     @Test
     @DisplayName("Serialization root namespace")
     void serializationRootNamespace() {
-        // Generated at nem2-library-js/test/transactions/RegisterNamespaceTransaction.spec.js
         NamespaceRegistrationTransaction transaction =
             NamespaceRegistrationTransactionFactory.createRootNamespace(
                 networkType, "newnamespace", BigInteger.valueOf(10000))
@@ -165,7 +164,7 @@ class NamespaceRegistrationTransactionTest extends AbstractTransactionTester {
     @Test
     @DisplayName("Serialization sub namespace")
     void serializationSubNamespace() {
-        // Generated at nem2-library-js/test/transactions/RegisterNamespaceTransaction.spec.js
+        // Generated at symbol-library-js/test/transactions/RegisterNamespaceTransaction.spec.js
         NamespaceRegistrationTransaction transaction =
             NamespaceRegistrationTransactionFactory.createSubNamespace(
                 networkType,

@@ -28,7 +28,7 @@ import io.nem.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.sdk.model.transaction.CosignatureTransaction;
 import io.nem.sdk.model.transaction.JsonHelper;
-import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

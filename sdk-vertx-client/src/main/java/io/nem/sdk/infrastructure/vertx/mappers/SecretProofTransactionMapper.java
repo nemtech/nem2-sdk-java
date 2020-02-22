@@ -25,8 +25,8 @@ import io.nem.sdk.model.transaction.SecretProofTransaction;
 import io.nem.sdk.model.transaction.SecretProofTransactionFactory;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.vertx.model.LockHashAlgorithmEnum;
-import io.nem.sdk.openapi.vertx.model.SecretProofTransactionDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.LockHashAlgorithmEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.SecretProofTransactionDTO;
 
 /**
  * Secret proof transaction mapper.

@@ -27,8 +27,8 @@ import io.nem.sdk.model.transaction.MosaicAliasTransaction;
 import io.nem.sdk.model.transaction.MosaicAliasTransactionFactory;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.okhttp_gson.model.AliasActionEnum;
-import io.nem.sdk.openapi.okhttp_gson.model.MosaicAliasTransactionDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.AliasActionEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicAliasTransactionDTO;
 
 /**
  * Mosaic alias transaction mapper.

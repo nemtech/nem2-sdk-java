@@ -25,7 +25,7 @@ import io.nem.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.okhttp_gson.model.HashLockTransactionDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.HashLockTransactionDTO;
 
 /**
  * Hash lock transaction mapper.

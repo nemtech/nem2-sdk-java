@@ -22,7 +22,7 @@ import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.Transaction;
-import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;

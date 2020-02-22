@@ -18,11 +18,11 @@ package io.nem.sdk.infrastructure.vertx;
 
 import io.nem.sdk.api.ChainRepository;
 import io.nem.sdk.model.blockchain.BlockchainScore;
-import io.nem.sdk.openapi.vertx.api.ChainRoutesApi;
-import io.nem.sdk.openapi.vertx.api.ChainRoutesApiImpl;
-import io.nem.sdk.openapi.vertx.invoker.ApiClient;
-import io.nem.sdk.openapi.vertx.model.ChainScoreDTO;
-import io.nem.sdk.openapi.vertx.model.HeightInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.api.ChainRoutesApi;
+import io.nem.symbol.sdk.openapi.vertx.api.ChainRoutesApiImpl;
+import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
+import io.nem.symbol.sdk.openapi.vertx.model.ChainScoreDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.HeightInfoDTO;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;

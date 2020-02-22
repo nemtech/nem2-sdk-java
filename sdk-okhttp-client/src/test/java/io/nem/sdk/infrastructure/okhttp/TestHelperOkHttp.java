@@ -17,7 +17,7 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.sdk.model.transaction.JsonHelper;
-import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;

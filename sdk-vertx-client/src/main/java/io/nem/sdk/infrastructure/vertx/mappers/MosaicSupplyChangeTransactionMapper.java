@@ -27,8 +27,8 @@ import io.nem.sdk.model.transaction.MosaicSupplyChangeTransaction;
 import io.nem.sdk.model.transaction.MosaicSupplyChangeTransactionFactory;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.vertx.model.MosaicSupplyChangeActionEnum;
-import io.nem.sdk.openapi.vertx.model.MosaicSupplyChangeTransactionDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.MosaicSupplyChangeActionEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.MosaicSupplyChangeTransactionDTO;
 
 /**
  * Mosaic supply change transaction mapper.

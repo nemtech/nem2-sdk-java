@@ -22,7 +22,7 @@ import io.nem.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.Transaction;
-import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.vertx.core.json.Json;
 import java.io.File;
 import java.net.URL;

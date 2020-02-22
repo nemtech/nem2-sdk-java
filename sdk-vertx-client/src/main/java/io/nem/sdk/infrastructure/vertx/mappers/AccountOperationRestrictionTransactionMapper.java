@@ -23,9 +23,9 @@ import io.nem.sdk.model.transaction.AccountOperationRestrictionTransactionFactor
 import io.nem.sdk.model.transaction.AccountRestrictionFlags;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.vertx.model.AccountOperationRestrictionTransactionDTO;
-import io.nem.sdk.openapi.vertx.model.AccountRestrictionFlagsEnum;
-import io.nem.sdk.openapi.vertx.model.TransactionTypeEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.AccountOperationRestrictionTransactionDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.AccountRestrictionFlagsEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionTypeEnum;
 import java.util.List;
 import java.util.stream.Collectors;
 

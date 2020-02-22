@@ -25,12 +25,12 @@ import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionInfo;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.okhttp_gson.model.EmbeddedTransactionInfoDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.EmbeddedTransactionMetaDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.NetworkTypeEnum;
-import io.nem.sdk.openapi.okhttp_gson.model.TransactionDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.TransactionMetaDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.EmbeddedTransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.EmbeddedTransactionMetaDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.NetworkTypeEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionMetaDTO;
 
 /**
  * Abstract transaction mapper for the transaction mappers that support a specific type of

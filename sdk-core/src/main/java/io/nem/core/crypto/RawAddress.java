@@ -38,7 +38,7 @@ public class RawAddress {
     }
 
     /**
-     * This method generates an address based on the public key and the Catapult configuration
+     * This method generates an address based on the public key and the Symbol configuration
      * network type. The sign schema is resolved based on the network type. MIJIN networks use SHA3,
      * Public network use KECCAK.
      *

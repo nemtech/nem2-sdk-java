@@ -24,8 +24,8 @@ import io.nem.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
 import io.nem.sdk.model.transaction.AccountRestrictionFlags;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountAddressRestrictionTransactionDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.AccountRestrictionFlagsEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountAddressRestrictionTransactionDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionFlagsEnum;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -25,7 +25,7 @@ import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.MosaicMetadataTransaction;
 import io.nem.sdk.model.transaction.MosaicMetadataTransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.okhttp_gson.model.MosaicMetadataTransactionDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicMetadataTransactionDTO;
 import java.math.BigInteger;
 
 /**

@@ -19,7 +19,7 @@ package io.nem.sdk.infrastructure.vertx;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.receipt.Statement;
 import io.nem.sdk.model.transaction.JsonHelper;
-import io.nem.sdk.openapi.vertx.model.StatementsDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.StatementsDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

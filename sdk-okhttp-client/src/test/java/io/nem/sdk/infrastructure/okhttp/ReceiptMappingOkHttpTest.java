@@ -21,7 +21,7 @@ import static io.nem.sdk.infrastructure.okhttp.TestHelperOkHttp.loadResource;
 import io.nem.sdk.model.blockchain.NetworkType;
 import io.nem.sdk.model.receipt.Statement;
 import io.nem.sdk.model.transaction.JsonHelper;
-import io.nem.sdk.openapi.okhttp_gson.model.StatementsDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.StatementsDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

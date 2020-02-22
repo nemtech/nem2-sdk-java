@@ -19,8 +19,8 @@ package io.nem.sdk.infrastructure.vertx.mappers;
 
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.vertx.model.EmbeddedTransactionInfoDTO;
-import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.EmbeddedTransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 
 /**
  * A transaction mapper knows how to map DTO for standard and embedded transactions into a {@link

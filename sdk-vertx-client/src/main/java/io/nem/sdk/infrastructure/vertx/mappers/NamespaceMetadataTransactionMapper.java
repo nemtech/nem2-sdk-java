@@ -26,7 +26,7 @@ import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.NamespaceMetadataTransaction;
 import io.nem.sdk.model.transaction.NamespaceMetadataTransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.vertx.model.NamespaceMetadataTransactionDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.NamespaceMetadataTransactionDTO;
 import java.math.BigInteger;
 
 /**

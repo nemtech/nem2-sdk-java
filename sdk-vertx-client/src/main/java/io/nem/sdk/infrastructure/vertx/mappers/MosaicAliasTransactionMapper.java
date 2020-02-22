@@ -28,8 +28,8 @@ import io.nem.sdk.model.transaction.MosaicAliasTransaction;
 import io.nem.sdk.model.transaction.MosaicAliasTransactionFactory;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.vertx.model.AliasActionEnum;
-import io.nem.sdk.openapi.vertx.model.MosaicAliasTransactionDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.AliasActionEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.MosaicAliasTransactionDTO;
 
 /**
  * Mosaic alias transaction mapper.

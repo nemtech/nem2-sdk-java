@@ -34,7 +34,7 @@ import io.nem.sdk.api.RestrictionAccountRepository;
 import io.nem.sdk.api.RestrictionMosaicRepository;
 import io.nem.sdk.api.TransactionRepository;
 import io.nem.sdk.infrastructure.RepositoryFactoryBase;
-import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
+import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import okhttp3.OkHttpClient;
 import org.apache.commons.io.IOUtils;
 

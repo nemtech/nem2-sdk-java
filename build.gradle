@@ -44,7 +44,7 @@ ext {
     vertxVersion = "3.5.0"
     rxjavaVersion = "2.1.7"
     junitVersion = "5.4.0"
-    restApiVersion = "0.8.4"
+    restApiVersion = "0.8.5-SNAPSHOT"
     jackson_version = "2.9.9"
     junit4Version = '4.12'
     jackson_databind_version = "2.9.9"
@@ -75,8 +75,7 @@ def signingKeyId = getPropertyValue('signingKeyId')
 def signingPassword = getPropertyValue('signingPassword')
 
 def githubToken = getPropertyValue('GRGIT_USER')
-def repoPath = getPropertyValue('TRAVIS_REPO_SLUG', "nemtech/nem2-sdk-java")
-def excludedCoverage = ['**catapult**']
+def repoPath = getPropertyValue('TRAVIS_REPO_SLUG', "nemtech/symbol-sdk-java")
 
 allprojects {
     ext."signing.keyId" = signingKeyId
@@ -205,7 +204,7 @@ subprojects {
                         packaging = 'jar'
                         url = "https://github.com/${repoPath}"
                         name = "${project.name}"
-                        description = "${project.name} lib for NEM2 sdk Java"
+                        description = "${project.name} lib for Sybol SDK Java"
 
                         scm {
                             connection = "scm:git:https://github.com/${repoPath}.git"
@@ -279,7 +278,7 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
     }
     afterEvaluate {
         classDirectories.from = files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: excludedCoverage)
+            fileTree(dir: it)
         })
     }
 }
@@ -348,6 +347,5 @@ sonarqube {
         property "sonar.organization", sonarOrganization
         property "sonar.login", sonarLogin
         property "sonar.host.url", sonarHostUrl
-        property "sonar.exclusions", excludedCoverage.join(",")
     }
 }

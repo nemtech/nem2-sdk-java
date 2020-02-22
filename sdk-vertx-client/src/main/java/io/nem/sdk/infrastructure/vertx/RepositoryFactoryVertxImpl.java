@@ -34,7 +34,7 @@ import io.nem.sdk.api.RestrictionAccountRepository;
 import io.nem.sdk.api.RestrictionMosaicRepository;
 import io.nem.sdk.api.TransactionRepository;
 import io.nem.sdk.infrastructure.RepositoryFactoryBase;
-import io.nem.sdk.openapi.vertx.invoker.ApiClient;
+import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;

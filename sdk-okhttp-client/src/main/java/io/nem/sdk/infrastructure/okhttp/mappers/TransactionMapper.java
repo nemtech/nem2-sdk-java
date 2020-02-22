@@ -18,8 +18,8 @@ package io.nem.sdk.infrastructure.okhttp.mappers;
 
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.okhttp_gson.model.EmbeddedTransactionInfoDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.EmbeddedTransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 
 /**
  * A transaction mapper knows how to map DTO for standard and embedded transactions into a {@link

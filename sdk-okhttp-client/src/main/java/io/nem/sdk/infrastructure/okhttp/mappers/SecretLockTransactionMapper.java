@@ -27,8 +27,8 @@ import io.nem.sdk.model.transaction.SecretLockTransaction;
 import io.nem.sdk.model.transaction.SecretLockTransactionFactory;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.okhttp_gson.model.LockHashAlgorithmEnum;
-import io.nem.sdk.openapi.okhttp_gson.model.SecretLockTransactionDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.LockHashAlgorithmEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretLockTransactionDTO;
 
 /**
  * Secret lock transaction mapper.

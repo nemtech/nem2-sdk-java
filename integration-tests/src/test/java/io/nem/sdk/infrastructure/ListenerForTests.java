@@ -22,7 +22,7 @@ import io.nem.sdk.model.account.Account;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Main class that listen to catapult in order to troubleshooting integration tests.
+ * Main class that listen to symbol in order to troubleshooting integration tests.
  */
 public class ListenerForTests extends BaseIntegrationTest {
 

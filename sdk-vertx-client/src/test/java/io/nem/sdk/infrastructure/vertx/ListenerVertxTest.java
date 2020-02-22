@@ -45,7 +45,7 @@ import io.nem.sdk.model.transaction.TransactionStatusException;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
-import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.buffer.impl.BufferFactoryImpl;

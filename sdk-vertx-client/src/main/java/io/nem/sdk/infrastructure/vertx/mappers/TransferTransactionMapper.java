@@ -32,10 +32,10 @@ import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
-import io.nem.sdk.openapi.vertx.model.MessageDTO;
-import io.nem.sdk.openapi.vertx.model.MessageTypeEnum;
-import io.nem.sdk.openapi.vertx.model.TransferTransactionDTO;
-import io.nem.sdk.openapi.vertx.model.UnresolvedMosaic;
+import io.nem.symbol.sdk.openapi.vertx.model.MessageDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.MessageTypeEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.TransferTransactionDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.UnresolvedMosaic;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +86,7 @@ class TransferTransactionMapper extends
                 transaction.getMosaics().stream()
                     .map(
                         mosaic -> {
-                            io.nem.sdk.openapi.vertx.model.UnresolvedMosaic mosaicDto = new io.nem.sdk.openapi.vertx.model.UnresolvedMosaic();
+                            io.nem.symbol.sdk.openapi.vertx.model.UnresolvedMosaic mosaicDto = new io.nem.symbol.sdk.openapi.vertx.model.UnresolvedMosaic();
                             mosaicDto.setAmount(mosaic.getAmount());
                             mosaicDto.setId(MapperUtils.getIdAsHex(mosaic.getId()));
                             return mosaicDto;

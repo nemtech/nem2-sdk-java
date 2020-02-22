@@ -21,7 +21,7 @@ import io.nem.sdk.api.JsonSerialization;
 import io.nem.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.Transaction;
-import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import org.apache.commons.lang3.Validate;
 
 /**

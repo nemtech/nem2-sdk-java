@@ -31,13 +31,14 @@ import io.nem.sdk.model.mosaic.Mosaic;
 import io.nem.sdk.model.transaction.AggregateTransaction;
 import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.vertx.api.AccountRoutesApi;
-import io.nem.sdk.openapi.vertx.api.AccountRoutesApiImpl;
-import io.nem.sdk.openapi.vertx.invoker.ApiClient;
-import io.nem.sdk.openapi.vertx.model.AccountDTO;
-import io.nem.sdk.openapi.vertx.model.AccountIds;
-import io.nem.sdk.openapi.vertx.model.AccountInfoDTO;
-import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.api.AccountRoutesApi;
+import io.nem.symbol.sdk.openapi.vertx.api.AccountRoutesApiImpl;
+import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
+import io.nem.symbol.sdk.openapi.vertx.model.AccountDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.AccountIds;
+import io.nem.symbol.sdk.openapi.vertx.model.AccountInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionTypeEnum;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -98,7 +99,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
             client.getAccountConfirmedTransactions(publicAccount.getPublicKey().toHex(),
                 criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionType(criteria.getTransactionTypes()), handler);
+                toTransactionTypes(criteria.getTransactionTypes()), handler);
 
         return exceptionHandling(
             call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
@@ -117,7 +118,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
             client.getAccountIncomingTransactions(publicAccount.getPublicKey().toHex(),
                 criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionType(criteria.getTransactionTypes()), handler);
+                toTransactionTypes(criteria.getTransactionTypes()), handler);
 
         return exceptionHandling(
             call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
@@ -136,7 +137,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
             client.getAccountOutgoingTransactions(publicAccount.getPublicKey().toHex(),
                 criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionType(criteria.getTransactionTypes()), handler);
+                toTransactionTypes(criteria.getTransactionTypes()), handler);
 
         return exceptionHandling(
             call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
@@ -155,7 +156,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
             client.getAccountPartialTransactions(publicAccount.getPublicKey().toHex(),
                 criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionType(criteria.getTransactionTypes()), handler);
+                toTransactionTypes(criteria.getTransactionTypes()), handler);
 
         return exceptionHandling(
             call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
@@ -180,7 +181,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
             client.getAccountPartialTransactions(publicAccount.getPublicKey().toHex(),
                 criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionType(criteria.getTransactionTypes()), handler);
+                toTransactionTypes(criteria.getTransactionTypes()), handler);
 
         return exceptionHandling(
             call(callback).flatMapIterable(item -> item).map(this::toTransaction)
@@ -200,7 +201,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
             client.getAccountUnconfirmedTransactions(publicAccount.getPublicKey().toHex(),
                 criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionType(criteria.getTransactionTypes()), handler);
+                toTransactionTypes(criteria.getTransactionTypes()), handler);
         return exceptionHandling(
             call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
                 .toObservable());
@@ -230,11 +231,11 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         return client;
     }
 
-    private String toTransactionType(List<TransactionType> transactionTypes) {
-        return transactionTypes == null ? null
+    private List<TransactionTypeEnum> toTransactionTypes(List<TransactionType> transactionTypes) {
+        return transactionTypes == null || transactionTypes.isEmpty() ? null
             : transactionTypes.stream()
-                .map(transactionType -> Integer.toString(transactionType.getValue()))
-                .collect(Collectors.joining(","));
+                .map(transactionType -> TransactionTypeEnum.fromValue(transactionType.getValue()))
+                .collect(Collectors.toList());
     }
 
 }

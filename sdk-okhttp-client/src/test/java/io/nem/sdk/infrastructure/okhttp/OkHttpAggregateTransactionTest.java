@@ -34,7 +34,7 @@ import io.nem.sdk.model.transaction.JsonHelper;
 import io.nem.sdk.model.transaction.SignedTransaction;
 import io.nem.sdk.model.transaction.TransferTransaction;
 import io.nem.sdk.model.transaction.TransferTransactionFactory;
-import io.nem.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -77,7 +77,7 @@ public class OkHttpAggregateTransactionTest {
     @Test
     @DisplayName("Serialization")
     void serialization() {
-        // Generated at nem2-library-js/test/transactions/RegisterNamespaceTransaction.spec.js
+        // Generated at symbol-library-js/test/transactions/RegisterNamespaceTransaction.spec.js
         String expected =
             "1001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000190414100000000000000000100000000000000DE78F6D81AE02AD16559F6E4D3D4ACC5ED343EE0AE65B1C9AD4FC0091A3903B568000000000000006100000000000000846B4439154579A5903B1459C9CF69CB8153F6D0110A7A0ED61DE29AE4810BF200000000019054419050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1420101000000000044B262C46CEABB8580969800000000000000000000000000";
 

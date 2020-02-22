@@ -17,8 +17,8 @@
 package io.nem.sdk.infrastructure.okhttp;
 
 import io.nem.sdk.model.blockchain.BlockchainScore;
-import io.nem.sdk.openapi.okhttp_gson.model.ChainScoreDTO;
-import io.nem.sdk.openapi.okhttp_gson.model.HeightInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.ChainScoreDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.HeightInfoDTO;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

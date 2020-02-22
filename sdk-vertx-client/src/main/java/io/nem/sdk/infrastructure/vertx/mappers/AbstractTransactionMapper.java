@@ -26,12 +26,12 @@ import io.nem.sdk.model.transaction.Transaction;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionInfo;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.vertx.model.EmbeddedTransactionInfoDTO;
-import io.nem.sdk.openapi.vertx.model.EmbeddedTransactionMetaDTO;
-import io.nem.sdk.openapi.vertx.model.NetworkTypeEnum;
-import io.nem.sdk.openapi.vertx.model.TransactionDTO;
-import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
-import io.nem.sdk.openapi.vertx.model.TransactionMetaDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.EmbeddedTransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.EmbeddedTransactionMetaDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.NetworkTypeEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionMetaDTO;
 
 /**
  * Abstract transaction mapper for the transaction mappers that support a specific type of

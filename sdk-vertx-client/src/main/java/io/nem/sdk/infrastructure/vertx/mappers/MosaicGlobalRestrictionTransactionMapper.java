@@ -28,8 +28,8 @@ import io.nem.sdk.model.transaction.MosaicGlobalRestrictionTransactionFactory;
 import io.nem.sdk.model.transaction.MosaicRestrictionType;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.vertx.model.MosaicGlobalRestrictionTransactionDTO;
-import io.nem.sdk.openapi.vertx.model.MosaicRestrictionTypeEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.MosaicGlobalRestrictionTransactionDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.MosaicRestrictionTypeEnum;
 
 /**
  * Mosaic global restriction transaction mapper.

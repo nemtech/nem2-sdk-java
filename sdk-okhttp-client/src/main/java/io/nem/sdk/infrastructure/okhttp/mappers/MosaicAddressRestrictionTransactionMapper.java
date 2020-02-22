@@ -26,7 +26,7 @@ import io.nem.sdk.model.transaction.MosaicAddressRestrictionTransaction;
 import io.nem.sdk.model.transaction.MosaicAddressRestrictionTransactionFactory;
 import io.nem.sdk.model.transaction.TransactionFactory;
 import io.nem.sdk.model.transaction.TransactionType;
-import io.nem.sdk.openapi.okhttp_gson.model.MosaicAddressRestrictionTransactionDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicAddressRestrictionTransactionDTO;
 
 /**
  * Mosaic address restriction transaction mapper.

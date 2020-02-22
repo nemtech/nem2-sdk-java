@@ -20,9 +20,9 @@ import io.nem.sdk.api.NetworkRepository;
 import io.nem.sdk.model.blockchain.NetworkFees;
 import io.nem.sdk.model.blockchain.NetworkInfo;
 import io.nem.sdk.model.blockchain.NetworkType;
-import io.nem.sdk.openapi.okhttp_gson.api.NetworkRoutesApi;
-import io.nem.sdk.openapi.okhttp_gson.api.NodeRoutesApi;
-import io.nem.sdk.openapi.okhttp_gson.invoker.ApiClient;
+import io.nem.symbol.sdk.openapi.okhttp_gson.api.NetworkRoutesApi;
+import io.nem.symbol.sdk.openapi.okhttp_gson.api.NodeRoutesApi;
+import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.reactivex.Observable;
 
 /**

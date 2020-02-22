@@ -18,7 +18,7 @@ package io.nem.sdk.infrastructure.vertx;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nem.sdk.model.transaction.JsonHelper;
-import io.nem.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
