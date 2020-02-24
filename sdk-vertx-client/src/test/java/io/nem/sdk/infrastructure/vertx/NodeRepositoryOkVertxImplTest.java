@@ -35,6 +35,7 @@ import io.nem.symbol.sdk.openapi.vertx.model.ServerDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.ServerInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.StorageInfoDTO;
 import java.math.BigInteger;
+import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -85,6 +86,36 @@ public class NodeRepositoryOkVertxImplTest extends AbstractVertxRespositoryTest 
     }
 
     @Test
+    public void getNodePeers() throws Exception {
+
+        NodeInfoDTO dto = new NodeInfoDTO();
+        dto.setPort(3000);
+        dto.setHost("http://hostname");
+        dto.setFriendlyName("friendlyName");
+        dto.setNetworkIdentifier(104);
+        dto.setRoles(RolesTypeEnum.NUMBER_2);
+        dto.setVersion(1234);
+        dto.setPublicKey("somePublicKey");
+        dto.setNetworkGenerationHash("abc");
+
+        mockRemoteCall(Arrays.asList(dto));
+
+        NodeInfo info = repository.getNodePeers().toFuture().get().get(0);
+
+        Assertions.assertNotNull(info);
+
+        Assertions.assertEquals(dto.getPort().intValue(), info.getPort());
+        Assertions.assertEquals(dto.getHost(), info.getHost());
+        Assertions.assertEquals(dto.getPublicKey(), info.getPublicKey());
+        Assertions.assertEquals(dto.getFriendlyName(), info.getFriendlyName());
+        Assertions.assertEquals(NetworkType.MAIN_NET, info.getNetworkIdentifier());
+        Assertions.assertEquals(RoleType.API_NODE, info.getRoles());
+        Assertions.assertEquals(dto.getVersion().intValue(), info.getVersion());
+        Assertions.assertEquals(dto.getNetworkGenerationHash(), info.getNetworkGenerationHash());
+
+    }
+
+    @Test
     public void shouldGetNodeTime() throws Exception {
 
         NodeTimeDTO dto = new NodeTimeDTO();
@@ -103,6 +134,8 @@ public class NodeRepositoryOkVertxImplTest extends AbstractVertxRespositoryTest 
         Assertions.assertEquals(BigInteger.valueOf(2L), info.getSendTimestamp());
 
     }
+
+
 
 
     @Test

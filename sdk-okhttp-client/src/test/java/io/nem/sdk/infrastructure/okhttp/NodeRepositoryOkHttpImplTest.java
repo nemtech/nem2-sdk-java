@@ -35,6 +35,7 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.ServerDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.ServerInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.StorageInfoDTO;
 import java.math.BigInteger;
+import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -101,6 +102,36 @@ public class NodeRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest 
 
         Assertions.assertEquals(BigInteger.valueOf(1L), info.getReceiveTimestamp());
         Assertions.assertEquals(BigInteger.valueOf(2L), info.getSendTimestamp());
+
+    }
+
+    @Test
+    public void getNodePeers() throws Exception {
+
+        NodeInfoDTO dto = new NodeInfoDTO();
+        dto.setPort(3000);
+        dto.setHost("http://hostname");
+        dto.setFriendlyName("friendlyName");
+        dto.setNetworkIdentifier(104);
+        dto.setRoles(RolesTypeEnum.NUMBER_2);
+        dto.setVersion(1234);
+        dto.setPublicKey("somePublicKey");
+        dto.setNetworkGenerationHash("abc");
+
+        mockRemoteCall(Collections.singletonList(dto));
+
+        NodeInfo info = repository.getNodePeers().toFuture().get().get(0);
+
+        Assertions.assertNotNull(info);
+
+        Assertions.assertEquals(dto.getPort().intValue(), info.getPort());
+        Assertions.assertEquals(dto.getHost(), info.getHost());
+        Assertions.assertEquals(dto.getPublicKey(), info.getPublicKey());
+        Assertions.assertEquals(dto.getFriendlyName(), info.getFriendlyName());
+        Assertions.assertEquals(NetworkType.MAIN_NET, info.getNetworkIdentifier());
+        Assertions.assertEquals(RoleType.API_NODE, info.getRoles());
+        Assertions.assertEquals(dto.getVersion().intValue(), info.getVersion());
+        Assertions.assertEquals(dto.getNetworkGenerationHash(), info.getNetworkGenerationHash());
 
     }
 

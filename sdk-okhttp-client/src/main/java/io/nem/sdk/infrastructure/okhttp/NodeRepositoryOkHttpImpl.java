@@ -35,7 +35,9 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.ServerInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.StorageInfoDTO;
 import io.reactivex.Observable;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 /**
  * Node http repository.
@@ -75,6 +77,19 @@ public class NodeRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imple
             nodeInfoDTO.getFriendlyName(),
             nodeInfoDTO.getNetworkGenerationHash());
     }
+
+    /**
+     * Get node info of the pears visible by the node.
+     *
+     * @return {@link Observable} of a list of {@link NodeInfo}
+     */
+    @Override
+    public Observable<List<NodeInfo>> getNodePeers() {
+        return exceptionHandling(
+            call(getClient()::getNodePeers)).map(l -> l.stream().map(this::toNodeInfo).collect(
+            Collectors.toList()));
+    }
+
 
     /**
      * Get node time

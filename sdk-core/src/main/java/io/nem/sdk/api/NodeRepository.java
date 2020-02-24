@@ -21,6 +21,7 @@ import io.nem.sdk.model.node.NodeHealth;
 import io.nem.sdk.model.node.NodeInfo;
 import io.nem.sdk.model.node.NodeTime;
 import io.reactivex.Observable;
+import java.util.List;
 
 public interface NodeRepository {
 
@@ -30,6 +31,13 @@ public interface NodeRepository {
      * @return Get the node information
      */
     Observable<NodeInfo> getNodeInfo();
+
+    /**
+     * Get node info of the pears visible by the node.
+     *
+     * @return {@link Observable} of a list of {@link NodeInfo}
+     */
+    Observable<List<NodeInfo>> getNodePeers();
 
     /**
      * Gets the node time at the moment the reply was sent and received.

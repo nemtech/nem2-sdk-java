@@ -38,7 +38,9 @@ import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Node http repository.
@@ -68,6 +70,20 @@ public class NodeRepositoryVertxImpl extends AbstractRepositoryVertxImpl impleme
             .getNodeInfo(handler);
         return exceptionHandling(
             call(callback).map(this::toNodeInfo));
+    }
+
+    /**
+     * Get node info of the pears visible by the node.
+     *
+     * @return {@link Observable} of a list of {@link NodeInfo}
+     */
+    @Override
+    public Observable<List<NodeInfo>> getNodePeers() {
+        Consumer<Handler<AsyncResult<List<NodeInfoDTO>>>> callback = handler -> getClient()
+            .getNodePeers(handler);
+        return exceptionHandling(
+            call(callback).map(l -> l.stream().map(this::toNodeInfo).collect(
+                Collectors.toList())));
     }
 
     private NodeInfo toNodeInfo(NodeInfoDTO nodeInfoDTO) {
