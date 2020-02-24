@@ -89,7 +89,7 @@ Feel free to start an issue or create a pull request. Check [CONTRIBUTING](CONTR
 We use GitHub issues for tracking bugs and have limited bandwidth to address them.
 Please, use the following available resources to get help:
 
-- [symbol-cli documentation][docs]
+- [Symbol SDK Java Reference][sdk-ref]
 - If you found a bug, [open a new issue][issues]
 
 ## License
