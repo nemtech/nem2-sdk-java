@@ -1,5 +1,4 @@
-# symbol-sdk for Java/Kotlin/Scala
-#
+# Symbol SDK for Java/Kotlin/Scala
 
 [![symbol-sdk-vertx-client](https://maven-badges.herokuapp.com/maven-central/io.nem/symbol-sdk-vertx-client/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.nem/symbol-sdk-vertx-client)
 [![symbol-sdk-okhttp-client](https://maven-badges.herokuapp.com/maven-central/io.nem/symbol-sdk-okhttp-client/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.nem/symbol-sdk-okhttp-client)
@@ -7,8 +6,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/nemtech/symbol-sdk-java/badge.svg?branch=master)](https://coveralls.io/github/nemtech/symbol-sdk-java?branch=master)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-
-The official symbol-sdk for Java, Kotlin and Scala to work with the SYMBOL (a.k.a Catapult).
+The Symbol SDK for Java, Kotlin and Scala.
 
 ## Requirements
 
@@ -39,7 +37,6 @@ OR
 </dependency>
 ```
 
-
 ### Gradle
 
 ```compile 'io.nem:symbol-sdk-vertx-client:0.17.0```
@@ -48,7 +45,6 @@ OR
 
 ```compile 'io.nem:symbol-sdk-okhttp-client:0.17.0```
 
-
 ### SBT
 
 ```libraryDependencies += "io.nem" % "symbol-sdk-vertx-client" % "0.17.0"```
@@ -56,7 +52,6 @@ OR
 OR
 
 ```libraryDependencies += "io.nem" % "symbol-sdk-okhttp-client" % "0.17.0"```
-
 
 ## Documentation and Getting Started
 
@@ -80,7 +75,7 @@ The SDK is composed of multiple sub-modules/folders:
 - **integration-tests:** This module is in charge of running integration tests against all implementations. The integration tests exercise how the implementation work against a given catapult server.
 
 
-## symbol-sdk Releases
+## Releases
 
 The release notes for the symbol-sdk can be found [here](CHANGELOG.md).
 
