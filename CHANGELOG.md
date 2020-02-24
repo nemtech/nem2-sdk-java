@@ -11,7 +11,7 @@ The changelog format is based on [Keep a Changelog](https://keepachangelog.com/e
 ---|---|---
 SDK OkHttp| v0.17.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-okhttp-client
 SDK Vertx| v0.17.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-vertx-client
-Catbuffer Library| v2.0.1 | https://repo.maven.apache.org/maven2/io/nem/catbuffer
+Catbuffer Library| v2.0.2 | https://repo.maven.apache.org/maven2/io/nem/catbuffer-java
 Client OkHttp | v0.8.5  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-okhttp-gson-client
 Client Vertx | v0.8.5  | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-vertx-client
 

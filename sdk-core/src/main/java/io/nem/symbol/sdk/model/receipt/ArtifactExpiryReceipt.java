@@ -16,11 +16,11 @@
 
 package io.nem.symbol.sdk.model.receipt;
 
-import io.nem.catapult.builders.MosaicExpiryReceiptBuilder;
-import io.nem.catapult.builders.MosaicIdDto;
-import io.nem.catapult.builders.NamespaceExpiryReceiptBuilder;
-import io.nem.catapult.builders.NamespaceIdDto;
-import io.nem.catapult.builders.ReceiptTypeDto;
+import io.nem.symbol.catapult.builders.MosaicExpiryReceiptBuilder;
+import io.nem.symbol.catapult.builders.MosaicIdDto;
+import io.nem.symbol.catapult.builders.NamespaceExpiryReceiptBuilder;
+import io.nem.symbol.catapult.builders.NamespaceIdDto;
+import io.nem.symbol.catapult.builders.ReceiptTypeDto;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import java.math.BigInteger;

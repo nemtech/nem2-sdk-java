@@ -16,17 +16,17 @@
 
 package io.nem.symbol.sdk.infrastructure;
 
-import io.nem.catapult.builders.AddressDto;
-import io.nem.catapult.builders.AmountDto;
-import io.nem.catapult.builders.GeneratorUtils;
-import io.nem.catapult.builders.Hash256Dto;
-import io.nem.catapult.builders.KeyDto;
-import io.nem.catapult.builders.MosaicIdDto;
-import io.nem.catapult.builders.NamespaceIdDto;
-import io.nem.catapult.builders.SignatureDto;
-import io.nem.catapult.builders.UnresolvedAddressDto;
-import io.nem.catapult.builders.UnresolvedMosaicBuilder;
-import io.nem.catapult.builders.UnresolvedMosaicIdDto;
+import io.nem.symbol.catapult.builders.AddressDto;
+import io.nem.symbol.catapult.builders.AmountDto;
+import io.nem.symbol.catapult.builders.GeneratorUtils;
+import io.nem.symbol.catapult.builders.Hash256Dto;
+import io.nem.symbol.catapult.builders.KeyDto;
+import io.nem.symbol.catapult.builders.MosaicIdDto;
+import io.nem.symbol.catapult.builders.NamespaceIdDto;
+import io.nem.symbol.catapult.builders.SignatureDto;
+import io.nem.symbol.catapult.builders.UnresolvedAddressDto;
+import io.nem.symbol.catapult.builders.UnresolvedMosaicBuilder;
+import io.nem.symbol.catapult.builders.UnresolvedMosaicIdDto;
 import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.core.utils.Base32Encoder;
 import io.nem.symbol.core.utils.ConvertUtils;

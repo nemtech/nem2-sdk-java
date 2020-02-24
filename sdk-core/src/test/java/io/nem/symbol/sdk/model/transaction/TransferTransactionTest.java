@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.nem.catapult.builders.EmbeddedTransferTransactionBuilder;
-import io.nem.catapult.builders.TransactionBuilderFactory;
-import io.nem.catapult.builders.TransferTransactionBuilder;
+import io.nem.symbol.catapult.builders.EmbeddedTransferTransactionBuilder;
+import io.nem.symbol.catapult.builders.TransactionBuilderFactory;
+import io.nem.symbol.catapult.builders.TransferTransactionBuilder;
 import io.nem.symbol.core.crypto.KeyPair;
 import io.nem.symbol.core.crypto.PrivateKey;
 import io.nem.symbol.core.utils.ConvertUtils;

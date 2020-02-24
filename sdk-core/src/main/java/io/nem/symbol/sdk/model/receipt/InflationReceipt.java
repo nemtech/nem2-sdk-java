@@ -16,11 +16,11 @@
 
 package io.nem.symbol.sdk.model.receipt;
 
-import io.nem.catapult.builders.AmountDto;
-import io.nem.catapult.builders.InflationReceiptBuilder;
-import io.nem.catapult.builders.MosaicBuilder;
-import io.nem.catapult.builders.MosaicIdDto;
-import io.nem.catapult.builders.ReceiptTypeDto;
+import io.nem.symbol.catapult.builders.AmountDto;
+import io.nem.symbol.catapult.builders.InflationReceiptBuilder;
+import io.nem.symbol.catapult.builders.MosaicBuilder;
+import io.nem.symbol.catapult.builders.MosaicIdDto;
+import io.nem.symbol.catapult.builders.ReceiptTypeDto;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
 import java.util.Optional;

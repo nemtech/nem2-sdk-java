@@ -16,12 +16,12 @@
 
 package io.nem.symbol.sdk.model.receipt;
 
-import io.nem.catapult.builders.AmountDto;
-import io.nem.catapult.builders.BalanceChangeReceiptBuilder;
-import io.nem.catapult.builders.KeyDto;
-import io.nem.catapult.builders.MosaicBuilder;
-import io.nem.catapult.builders.MosaicIdDto;
-import io.nem.catapult.builders.ReceiptTypeDto;
+import io.nem.symbol.catapult.builders.AmountDto;
+import io.nem.symbol.catapult.builders.BalanceChangeReceiptBuilder;
+import io.nem.symbol.catapult.builders.KeyDto;
+import io.nem.symbol.catapult.builders.MosaicBuilder;
+import io.nem.symbol.catapult.builders.MosaicIdDto;
+import io.nem.symbol.catapult.builders.ReceiptTypeDto;
 import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;

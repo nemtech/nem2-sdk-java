@@ -16,11 +16,11 @@
 
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
-import io.nem.catapult.builders.AliasActionDto;
-import io.nem.catapult.builders.LockHashAlgorithmDto;
-import io.nem.catapult.builders.MosaicRestrictionTypeDto;
-import io.nem.catapult.builders.MosaicSupplyChangeActionDto;
-import io.nem.catapult.builders.NamespaceRegistrationTypeDto;
+import io.nem.symbol.catapult.builders.AliasActionDto;
+import io.nem.symbol.catapult.builders.LockHashAlgorithmDto;
+import io.nem.symbol.catapult.builders.MosaicRestrictionTypeDto;
+import io.nem.symbol.catapult.builders.MosaicSupplyChangeActionDto;
+import io.nem.symbol.catapult.builders.NamespaceRegistrationTypeDto;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.blockchain.Position;
 import io.nem.symbol.sdk.model.message.MessageType;

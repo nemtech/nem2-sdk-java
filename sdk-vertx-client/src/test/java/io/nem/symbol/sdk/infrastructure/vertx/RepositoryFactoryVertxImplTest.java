@@ -16,7 +16,7 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx;
 
-import io.nem.catapult.builders.GeneratorUtils;
+import io.nem.symbol.catapult.builders.GeneratorUtils;
 import io.nem.symbol.sdk.api.NetworkCurrencyService;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.api.RepositoryFactory;

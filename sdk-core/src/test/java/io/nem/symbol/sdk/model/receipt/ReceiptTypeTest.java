@@ -16,7 +16,7 @@
 
 package io.nem.symbol.sdk.model.receipt;
 
-import io.nem.catapult.builders.ReceiptTypeDto;
+import io.nem.symbol.catapult.builders.ReceiptTypeDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;

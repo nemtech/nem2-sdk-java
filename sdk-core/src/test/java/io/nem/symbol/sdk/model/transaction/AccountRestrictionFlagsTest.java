@@ -17,7 +17,7 @@
 package io.nem.symbol.sdk.model.transaction;
 
 
-import io.nem.catapult.builders.AccountRestrictionFlagsDto;
+import io.nem.symbol.catapult.builders.AccountRestrictionFlagsDto;
 import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

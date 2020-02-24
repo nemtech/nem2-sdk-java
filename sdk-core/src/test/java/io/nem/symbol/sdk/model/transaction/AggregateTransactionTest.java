@@ -16,9 +16,9 @@
 
 package io.nem.symbol.sdk.model.transaction;
 
-import io.nem.catapult.builders.AggregateBondedTransactionBuilder;
-import io.nem.catapult.builders.AggregateCompleteTransactionBuilder;
-import io.nem.catapult.builders.TransactionBuilderFactory;
+import io.nem.symbol.catapult.builders.AggregateBondedTransactionBuilder;
+import io.nem.symbol.catapult.builders.AggregateCompleteTransactionBuilder;
+import io.nem.symbol.catapult.builders.TransactionBuilderFactory;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.api.BinarySerialization;
 import io.nem.symbol.sdk.infrastructure.BinarySerializationImpl;

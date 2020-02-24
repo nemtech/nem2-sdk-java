@@ -16,7 +16,7 @@
 
 package io.nem.symbol.sdk.model.receipt;
 
-import io.nem.catapult.builders.ReceiptSourceBuilder;
+import io.nem.symbol.catapult.builders.ReceiptSourceBuilder;
 
 /**
  * The Receipt Source class

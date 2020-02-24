@@ -18,7 +18,7 @@ package io.nem.symbol.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.nem.catapult.builders.EntityTypeDto;
+import io.nem.symbol.catapult.builders.EntityTypeDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
