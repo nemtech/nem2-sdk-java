@@ -51,7 +51,6 @@ class BlockServiceTest {
         blockRepositoryMock = Mockito.mock(BlockRepository.class);
         Mockito.when(factory.createBlockRepository()).thenReturn(blockRepositoryMock);
 
-
         receiptRepositoryMock = Mockito.mock(ReceiptRepository.class);
         Mockito.when(factory.createReceiptRepository()).thenReturn(receiptRepositoryMock);
 
@@ -117,10 +116,10 @@ class BlockServiceTest {
             .thenReturn(Observable.just(blockInfo));
 
         List<MerklePathItem> merklePath = new ArrayList<>();
-        merklePath.add(new MerklePathItem(Position.LEFT,"11"));
-        merklePath.add(new MerklePathItem(Position.RIGHT,"22"));
-        merklePath.add(new MerklePathItem(Position.LEFT,"33"));
-        merklePath.add(new MerklePathItem(Position.RIGHT,"44"));
+        merklePath.add(new MerklePathItem(Position.LEFT, "11"));
+        merklePath.add(new MerklePathItem(Position.RIGHT, "22"));
+        merklePath.add(new MerklePathItem(Position.LEFT, "33"));
+        merklePath.add(new MerklePathItem(Position.RIGHT, "44"));
         MerkleProofInfo merkleProofInfo = new MerkleProofInfo(merklePath);
         Mockito.when(blockRepositoryMock.getMerkleTransaction(height, hash))
             .thenReturn(Observable.just(merkleProofInfo));
@@ -130,7 +129,31 @@ class BlockServiceTest {
     }
 
     @Test
-    void isValidTransactionInBlockMultipleNotEquals() throws ExecutionException, InterruptedException {
+    void isValidTransactionInBlockOnError()
+        throws ExecutionException, InterruptedException {
+
+        BigInteger height = BigInteger.ONE;
+        String hash = "1234";
+
+        Mockito.when(blockRepositoryMock.getBlockByHeight(height))
+            .thenReturn(Observable.error(new RuntimeException("Some Error When getting Block")));
+
+        List<MerklePathItem> merklePath = new ArrayList<>();
+        merklePath.add(new MerklePathItem(Position.LEFT, "11"));
+        merklePath.add(new MerklePathItem(Position.RIGHT, "22"));
+        merklePath.add(new MerklePathItem(Position.LEFT, "33"));
+        merklePath.add(new MerklePathItem(Position.RIGHT, "44"));
+        MerkleProofInfo merkleProofInfo = new MerkleProofInfo(merklePath);
+        Mockito.when(blockRepositoryMock.getMerkleTransaction(height, hash))
+            .thenReturn(Observable.just(merkleProofInfo));
+
+        Assertions.assertFalse(service.isValidTransactionInBlock(height, hash).toFuture().get());
+
+    }
+
+    @Test
+    void isValidTransactionInBlockMultipleNotEquals()
+        throws ExecutionException, InterruptedException {
 
         BigInteger height = BigInteger.ONE;
         String leaf = "1234";
@@ -143,10 +166,10 @@ class BlockServiceTest {
             .thenReturn(Observable.just(blockInfo));
 
         List<MerklePathItem> merklePath = new ArrayList<>();
-        merklePath.add(new MerklePathItem(Position.LEFT,"11"));
-        merklePath.add(new MerklePathItem(Position.RIGHT,"22"));
-        merklePath.add(new MerklePathItem(Position.LEFT,"33"));
-        merklePath.add(new MerklePathItem(Position.RIGHT,"44"));
+        merklePath.add(new MerklePathItem(Position.LEFT, "11"));
+        merklePath.add(new MerklePathItem(Position.RIGHT, "22"));
+        merklePath.add(new MerklePathItem(Position.LEFT, "33"));
+        merklePath.add(new MerklePathItem(Position.RIGHT, "44"));
         MerkleProofInfo merkleProofInfo = new MerkleProofInfo(merklePath);
         Mockito.when(blockRepositoryMock.getMerkleTransaction(height, leaf))
             .thenReturn(Observable.just(merkleProofInfo));
@@ -154,6 +177,7 @@ class BlockServiceTest {
         Assertions.assertFalse(service.isValidTransactionInBlock(height, leaf).toFuture().get());
 
     }
+
 
     @Test
     void isValidStatementInBlockEmtpyNotEquals()
@@ -179,14 +203,14 @@ class BlockServiceTest {
     }
 
     @Test
-    void isValidTransactionInBlockEmtyEquals() throws ExecutionException, InterruptedException {
+    void isValidStatementInBlockEmpty() throws ExecutionException, InterruptedException {
 
         BigInteger height = BigInteger.ONE;
         String leaf = "ABCD";
         String root = "ABCD";
 
         BlockInfo blockInfo = Mockito.mock(BlockInfo.class);
-        Mockito.when(blockInfo.getBlockTransactionsHash()).thenReturn(root);
+        Mockito.when(blockInfo.getBlockReceiptsHash()).thenReturn(root);
 
         Mockito.when(blockRepositoryMock.getBlockByHeight(height))
             .thenReturn(Observable.just(blockInfo));
@@ -208,16 +232,16 @@ class BlockServiceTest {
         String root = "d7de53a6ec87b3cb8e0fb4d6d9aa40b96a17a54b7206702229a6517e91d88dcb";
 
         BlockInfo blockInfo = Mockito.mock(BlockInfo.class);
-        Mockito.when(blockInfo.getBlockTransactionsHash()).thenReturn(root);
+        Mockito.when(blockInfo.getBlockReceiptsHash()).thenReturn(root);
 
         Mockito.when(blockRepositoryMock.getBlockByHeight(height))
             .thenReturn(Observable.just(blockInfo));
 
         List<MerklePathItem> merklePath = new ArrayList<>();
-        merklePath.add(new MerklePathItem(Position.LEFT,"11"));
-        merklePath.add(new MerklePathItem(Position.RIGHT,"22"));
-        merklePath.add(new MerklePathItem(Position.LEFT,"33"));
-        merklePath.add(new MerklePathItem(Position.RIGHT,"44"));
+        merklePath.add(new MerklePathItem(Position.LEFT, "11"));
+        merklePath.add(new MerklePathItem(Position.RIGHT, "22"));
+        merklePath.add(new MerklePathItem(Position.LEFT, "33"));
+        merklePath.add(new MerklePathItem(Position.RIGHT, "44"));
         MerkleProofInfo merkleProofInfo = new MerkleProofInfo(merklePath);
         Mockito.when(receiptRepositoryMock.getMerkleReceipts(height, hash))
             .thenReturn(Observable.just(merkleProofInfo));
@@ -227,7 +251,27 @@ class BlockServiceTest {
     }
 
     @Test
-    void isValidStatementInBlockMultipleNotEquals() throws ExecutionException, InterruptedException {
+    void isValidStatementInBlockOnError() throws ExecutionException, InterruptedException {
+
+        BigInteger height = BigInteger.ONE;
+        String hash = "1234";
+        String root = "d7de53a6ec87b3cb8e0fb4d6d9aa40b96a17a54b7206702229a6517e91d88dcb";
+
+        BlockInfo blockInfo = Mockito.mock(BlockInfo.class);
+        Mockito.when(blockInfo.getBlockReceiptsHash()).thenReturn(root);
+
+        Mockito.when(blockRepositoryMock.getBlockByHeight(height))
+            .thenReturn(Observable.just(blockInfo));
+        Mockito.when(receiptRepositoryMock.getMerkleReceipts(height, hash))
+            .thenReturn(
+                Observable.error(new RuntimeException("Some Error When getMerkleReceipts")));
+        Assertions.assertFalse(service.isValidStatementInBlock(height, hash).toFuture().get());
+
+    }
+
+    @Test
+    void isValidStatementInBlockMultipleNotEquals()
+        throws ExecutionException, InterruptedException {
 
         BigInteger height = BigInteger.ONE;
         String leaf = "1234";
@@ -240,10 +284,10 @@ class BlockServiceTest {
             .thenReturn(Observable.just(blockInfo));
 
         List<MerklePathItem> merklePath = new ArrayList<>();
-        merklePath.add(new MerklePathItem(Position.LEFT,"11"));
-        merklePath.add(new MerklePathItem(Position.RIGHT,"22"));
-        merklePath.add(new MerklePathItem(Position.LEFT,"33"));
-        merklePath.add(new MerklePathItem(Position.RIGHT,"44"));
+        merklePath.add(new MerklePathItem(Position.LEFT, "11"));
+        merklePath.add(new MerklePathItem(Position.RIGHT, "22"));
+        merklePath.add(new MerklePathItem(Position.LEFT, "33"));
+        merklePath.add(new MerklePathItem(Position.RIGHT, "44"));
         MerkleProofInfo merkleProofInfo = new MerkleProofInfo(merklePath);
         Mockito.when(receiptRepositoryMock.getMerkleReceipts(height, leaf))
             .thenReturn(Observable.just(merkleProofInfo));

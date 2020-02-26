@@ -61,27 +61,26 @@ public class BlockServiceImpl implements BlockService {
         String transactionHash) {
         Validate.notNull(height, "height is required");
         Validate.notNull(transactionHash, "transactionHash is required");
-        Observable<MerkleProofInfo> merkleTransactionObservable = blockRepository
-            .getMerkleTransaction(height, transactionHash);
-
-        return getBooleanObservable(height, transactionHash, merkleTransactionObservable);
+        return getBooleanObservable(
+            blockRepository.getBlockByHeight(height).map(BlockInfo::getBlockTransactionsHash),
+            transactionHash, blockRepository
+                .getMerkleTransaction(height, transactionHash));
     }
 
     @Override
     public Observable<Boolean> isValidStatementInBlock(BigInteger height, String statementHash) {
         Validate.notNull(height, "height is required");
         Validate.notNull(statementHash, "statementHash is required");
-        Observable<MerkleProofInfo> merkleTransactionObservable = receiptRepository
-            .getMerkleReceipts(height, statementHash);
-        return getBooleanObservable(height, statementHash, merkleTransactionObservable);
+        return getBooleanObservable(
+            blockRepository.getBlockByHeight(height).map(BlockInfo::getBlockReceiptsHash),
+            statementHash, receiptRepository
+                .getMerkleReceipts(height, statementHash));
     }
 
-    private Observable<Boolean> getBooleanObservable(BigInteger height, String leaf,
+    private Observable<Boolean> getBooleanObservable(Observable<String> rootObservable, String leaf,
         Observable<MerkleProofInfo> merkleTransactionObservable) {
 
-        Observable<BlockInfo> blockByHeightObservable = blockRepository.getBlockByHeight(height);
-        BiFunction<BlockInfo, MerkleProofInfo, Boolean> zipper = (blockInfo, merkleProofInfo) -> {
-            String root = blockInfo.getBlockTransactionsHash();
+        BiFunction<String, MerkleProofInfo, Boolean> zipper = (root, merkleProofInfo) -> {
             List<MerklePathItem> merklePath = merkleProofInfo.getMerklePath();
             if (merklePath.isEmpty()) {
                 // Single item tree, so leaf = HRoot0
@@ -99,6 +98,7 @@ public class BlockServiceImpl implements BlockService {
             String hroot0 = merklePath.stream().reduce(leaf, accumulator, (s1, s2) -> s1);
             return root.equalsIgnoreCase(hroot0);
         };
-        return Observable.zip(blockByHeightObservable, merkleTransactionObservable, zipper);
+        return Observable.zip(rootObservable, merkleTransactionObservable, zipper)
+            .onErrorReturnItem(false);
     }
 }
