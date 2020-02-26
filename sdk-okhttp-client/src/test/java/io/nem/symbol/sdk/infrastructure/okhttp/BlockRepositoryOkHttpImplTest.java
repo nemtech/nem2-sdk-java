@@ -145,7 +145,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
         Assertions.assertEquals(metaDTO.getHash(), info.getHash());
         Assertions.assertEquals(metaDTO.getNumTransactions(), info.getNumTransactions());
         Assertions.assertEquals(metaDTO.getGenerationHash(), info.getGenerationHash());
-        Assertions.assertEquals(metaDTO.getNumStatements(), info.getNumStatements());
+        Assertions.assertEquals(metaDTO.getNumStatements(), info.getNumStatements().get());
         Assertions
             .assertEquals(metaDTO.getStateHashSubCacheMerkleRoots(), info.getSubCacheMerkleRoots());
         Assertions

@@ -22,6 +22,7 @@ import io.nem.symbol.sdk.model.account.PublicAccount;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -64,7 +65,7 @@ class BlockInfoTest {
                 generationHash,
                 BigInteger.ZERO,
                 25,
-                35,
+                Optional.of(35),
                 subCacheMerkleRoots,
                 signature,
                 signer,
@@ -88,7 +89,7 @@ class BlockInfoTest {
         assertEquals(generationHash, blockInfo.getGenerationHash());
         assertEquals(BigInteger.valueOf(0), blockInfo.getTotalFee());
         assertEquals(25, blockInfo.getNumTransactions());
-        assertEquals(35, blockInfo.getNumStatements());
+        assertEquals(35, blockInfo.getNumStatements().get());
         assertEquals(signature, blockInfo.getSignature());
         Assertions.assertEquals(
             new PublicAccount(signer, NetworkType.MIJIN_TEST), blockInfo.getSignerPublicAccount());

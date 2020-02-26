@@ -30,7 +30,7 @@ public class BlockInfo {
     private final String generationHash;
     private final BigInteger totalFee;
     private final Integer numTransactions;
-    private final Integer numStatements;
+    private final Optional<Integer> numStatements;
     private final List<String> subCacheMerkleRoots;
     private final String signature;
     private final PublicAccount signerPublicAccount;
@@ -53,7 +53,7 @@ public class BlockInfo {
         String generationHash,
         BigInteger totalFee,
         Integer numTransactions,
-        Integer numStatements,
+        Optional<Integer> numStatements,
         List<String> subCacheMerkleRoots,
         String signature,
         PublicAccount signerPublicAccount,
@@ -97,7 +97,7 @@ public class BlockInfo {
         String generationHash,
         BigInteger totalFee,
         Integer numTransactions,
-        Integer numStatements,
+        Optional<Integer> numStatements,
         List<String> subCacheMerkleRoots,
         String signature,
         String signer,
@@ -205,9 +205,9 @@ public class BlockInfo {
     /**
      * Returns number of statements included the block.
      *
-     * @return Integer
+     * @return optional of Integer
      */
-    public Integer getNumStatements() {
+    public Optional<Integer> getNumStatements() {
         return numStatements;
     }
 
