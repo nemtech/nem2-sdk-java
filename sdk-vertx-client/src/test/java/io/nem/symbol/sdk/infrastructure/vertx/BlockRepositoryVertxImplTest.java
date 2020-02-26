@@ -141,8 +141,8 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
         Assertions.assertEquals(BigInteger.valueOf(9L), info.getHeight());
         Assertions.assertEquals(metaDTO.getHash(), info.getHash());
         Assertions.assertEquals(metaDTO.getNumTransactions(), info.getNumTransactions());
+        Assertions.assertEquals(metaDTO.getNumStatements(), info.getNumStatements());
         Assertions.assertEquals(metaDTO.getGenerationHash(), info.getGenerationHash());
-        Assertions.assertEquals(metaDTO.getNumTransactions(), info.getNumTransactions());
         Assertions
             .assertEquals(metaDTO.getStateHashSubCacheMerkleRoots(), info.getSubCacheMerkleRoots());
         Assertions

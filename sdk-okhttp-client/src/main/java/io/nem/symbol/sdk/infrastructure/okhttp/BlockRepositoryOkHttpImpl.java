@@ -126,6 +126,7 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
             blockInfoDTO.getMeta().getGenerationHash(),
             blockInfoDTO.getMeta().getTotalFee(),
             blockInfoDTO.getMeta().getNumTransactions(),
+            blockInfoDTO.getMeta().getNumStatements(),
             blockInfoDTO.getMeta().getStateHashSubCacheMerkleRoots(),
             blockInfoDTO.getBlock().getSignature(),
             blockInfoDTO.getBlock().getSignerPublicKey(),

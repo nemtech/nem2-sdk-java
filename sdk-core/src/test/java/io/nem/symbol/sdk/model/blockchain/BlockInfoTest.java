@@ -64,6 +64,7 @@ class BlockInfoTest {
                 generationHash,
                 BigInteger.ZERO,
                 25,
+                35,
                 subCacheMerkleRoots,
                 signature,
                 signer,
@@ -86,7 +87,8 @@ class BlockInfoTest {
         assertEquals(hash, blockInfo.getHash());
         assertEquals(generationHash, blockInfo.getGenerationHash());
         assertEquals(BigInteger.valueOf(0), blockInfo.getTotalFee());
-        assertEquals(new Integer(25), blockInfo.getNumTransactions());
+        assertEquals(25, blockInfo.getNumTransactions());
+        assertEquals(35, blockInfo.getNumStatements());
         assertEquals(signature, blockInfo.getSignature());
         Assertions.assertEquals(
             new PublicAccount(signer, NetworkType.MIJIN_TEST), blockInfo.getSignerPublicAccount());
