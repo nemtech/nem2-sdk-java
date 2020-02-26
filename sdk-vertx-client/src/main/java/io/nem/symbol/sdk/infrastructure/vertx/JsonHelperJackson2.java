@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -63,6 +64,7 @@ public class JsonHelperJackson2 implements JsonHelper {
         objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
         objectMapper.setSerializationInclusion(Include.NON_EMPTY);
         objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+        objectMapper.registerModule(new Jdk8Module());
         return objectMapper;
     }
 

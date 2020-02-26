@@ -20,6 +20,7 @@ import com.google.gson.JsonObject;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import java.math.BigInteger;
 import java.util.Objects;
+import java.util.OptionalInt;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,25 +57,28 @@ public class JsonHelperGsonTest {
 
     @Test
     public void shouldParsePrintedObject() {
-        Car car = new Car("Renault", "Scenic", 2005);
+        Car car = new Car("Renault", "Scenic", 2005, OptionalInt.of(100));
         String json = jsonHelper.print(car);
 
         Assertions.assertNotNull(json);
         Assertions.assertTrue(json.contains("Renault"));
+        Assertions.assertTrue(json.contains("\"millage\":100"));
 
         Car parsedCar = jsonHelper.parse(json, Car.class);
         Assertions.assertEquals(car, parsedCar);
         Assertions.assertEquals(BigInteger.valueOf(2005), parsedCar.getYear());
+        Assertions.assertEquals(100, parsedCar.getMillage().getAsInt());
 
     }
 
     @Test
     public void shouldParsePrettyPrintedObject() {
-        Car car = new Car("Renault", "Scenic", 2005);
+        Car car = new Car("Renault", "Scenic", 2005, OptionalInt.empty());
         String json = jsonHelper.prettyPrint(car);
 
         Assertions.assertNotNull(json);
         Assertions.assertTrue(json.contains("Renault"));
+        Assertions.assertFalse(json.contains("millage"));
 
         Car parsedCar = jsonHelper.parse(json, Car.class);
         Assertions.assertEquals(car, parsedCar);
@@ -84,11 +88,12 @@ public class JsonHelperGsonTest {
 
     @Test
     public void shouldParsePrintedConvertObject() {
-        Car car = new Car("Renault", "Scenic", 2005);
+        Car car = new Car("Renault", "Scenic", 2005, OptionalInt.empty());
         String json = jsonHelper.print(car);
 
         Assertions.assertNotNull(json);
         Assertions.assertTrue(json.contains("Renault"));
+        Assertions.assertFalse(json.contains("millage"));
 
         Object genericType = jsonHelper.parse(json);
 
@@ -102,11 +107,12 @@ public class JsonHelperGsonTest {
 
     @Test
     public void shouldParseGenericNode() {
-        Car car = new Car("Renault", "11", 1989);
+        Car car = new Car("Renault", "11", 1989, OptionalInt.empty());
         String json = jsonHelper.print(car);
 
         Assertions.assertNotNull(json);
         Assertions.assertTrue(json.contains("Renault"));
+        Assertions.assertFalse(json.contains("millage"));
 
         Object parsedCar = jsonHelper.parse(json);
         Assertions.assertEquals(JsonObject.class, parsedCar.getClass());
@@ -117,7 +123,7 @@ public class JsonHelperGsonTest {
 
     @Test
     public void shouldReturnValues() {
-        Car car = new Car("Renault", "11", 1989);
+        Car car = new Car("Renault", "11", 1989, OptionalInt.of(200));
         Assertions.assertEquals(car.getBrand(), jsonHelper.getString(car, "brand"));
         Assertions.assertEquals(car.getModel(), jsonHelper.getString(car, "model"));
         Assertions
@@ -125,6 +131,9 @@ public class JsonHelperGsonTest {
 
         Assertions.assertEquals(car.getYear().longValue(),
             jsonHelper.getLong(car, "year").longValue());
+
+        Assertions.assertEquals(car.getMillage().getAsInt(),
+            jsonHelper.getLong(car, "millage").intValue());
 
         Assertions.assertFalse(jsonHelper.getBoolean(car, "year").booleanValue());
 
@@ -146,7 +155,7 @@ public class JsonHelperGsonTest {
 
     @Test
     public void shouldRaiseErrorOnInvalidPath() {
-        Car car = new Car("Renault", "11", 1989);
+        Car car = new Car("Renault", "11", 1989, OptionalInt.empty());
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> jsonHelper.getInteger(car));
         Assertions.assertThrows(IllegalArgumentException.class, () -> jsonHelper.getString(car));
@@ -164,11 +173,14 @@ public class JsonHelperGsonTest {
 
         private BigInteger year;
 
+        private OptionalInt millage = OptionalInt.empty();
 
-        public Car(String brand, String model, int year) {
+
+        public Car(String brand, String model, int year, OptionalInt millage) {
             this.brand = brand;
             this.model = model;
             this.year = BigInteger.valueOf(year);
+            this.millage = millage;
         }
 
         public Car() {
@@ -198,6 +210,13 @@ public class JsonHelperGsonTest {
             this.year = year;
         }
 
+        public OptionalInt getMillage() {
+            return millage;
+        }
+
+        public void setMillage(OptionalInt millage) {
+            this.millage = millage;
+        }
 
         @Override
         public boolean equals(Object o) {
@@ -210,12 +229,13 @@ public class JsonHelperGsonTest {
             Car car = (Car) o;
             return Objects.equals(brand, car.brand) &&
                 Objects.equals(model, car.model) &&
-                Objects.equals(year, car.year);
+                Objects.equals(year, car.year) &&
+                Objects.equals(millage, car.millage);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(brand, model, year);
+            return Objects.hash(brand, model, year, millage);
         }
     }
 

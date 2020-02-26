@@ -34,6 +34,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Date;
 import java.util.TreeSet;
+import net.dongliu.gson.GsonJava8TypeAdapterFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -73,7 +74,8 @@ public class JsonHelperGson implements JsonHelper {
             .registerTypeAdapter(Double.class, new DoubleJsonSerializer())
             .registerTypeAdapter(Date.class, dateTypeAdapter)
             .registerTypeAdapter(java.sql.Date.class, sqlDateTypeAdapter)
-            .registerTypeAdapter(byte[].class, byteArrayAdapter);
+            .registerTypeAdapter(byte[].class, byteArrayAdapter)
+            .registerTypeAdapterFactory(new GsonJava8TypeAdapterFactory());
         if (pretty) {
             builder.setPrettyPrinting();
         }
