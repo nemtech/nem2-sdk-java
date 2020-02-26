@@ -27,7 +27,7 @@ public class CryptoException extends RuntimeException {
      * @param message The exception message.
      */
     public CryptoException(final String message) {
-        super(message);
+        this(message, null);
     }
 
     /**
@@ -36,7 +36,7 @@ public class CryptoException extends RuntimeException {
      * @param cause The exception cause.
      */
     public CryptoException(final Throwable cause) {
-        super(cause);
+        this(null, cause);
     }
 
     /**
