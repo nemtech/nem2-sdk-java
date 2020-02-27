@@ -1,6 +1,6 @@
 dependencies {
     compile project(':symbol-sdk-core')
     compile "io.nem:symbol-openapi-okhttp-gson-client:${restApiVersion}"
-    
+    compile "net.dongliu:gson-java8-datatype:1.1.0"
 }
 

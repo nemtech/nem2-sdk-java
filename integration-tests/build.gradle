@@ -2,6 +2,6 @@ dependencies {
     compile project(':symbol-sdk-core')
     compile project(':symbol-sdk-vertx-client')
     compile project(':symbol-sdk-okhttp-client')
-    testCompile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.8'
+    testCompile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jackson_version"
 }
 
