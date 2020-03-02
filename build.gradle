@@ -164,19 +164,8 @@ subprojects {
         }
     }
 
-    task setupIntegrationTest(type: Test) {
-        include '**/**SetupIntegrationTest.class'
-        useJUnitPlatform {
-            includeEngines 'junit-jupiter'
-        }
-        testLogging {
-            events "skipped", "failed"
-        }
-    }
-
     task integrationTest(type: Test) {
         include '**/**IntegrationTest.class'
-        exclude '**/**SetupIntegrationTest.class'
         useJUnitPlatform {
             includeEngines 'junit-jupiter'
         }
