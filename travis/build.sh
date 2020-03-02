@@ -2,4 +2,4 @@
 set -e
 
 echo "Building branch '$TRAVIS_BRANCH'"
-./gradlew install jacocoTestReport coveralls -x javadoc -x integrationTest
+./gradlew install jacocoTestReport coveralls -x javadoc -x integrationTest -x setupIntegrationTest
