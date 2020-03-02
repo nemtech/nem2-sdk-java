@@ -99,7 +99,7 @@ class HashLockTransactionTest extends AbstractTransactionTester {
             payload.substring(240)
         );
         assertEquals(
-            "91BBB1F8452BAD9ECAC1D85E8D21A2EB855CA1552BC76DDEDA4083C1700C845B",
+            "C29536DFA2B6FFBE112965F7695ADCB9D67F9984139709ED5A6A51BF8700BBDB",
             lockFundsTransactionSigned.getHash());
     }
 

@@ -299,6 +299,8 @@ public abstract class BaseIntegrationTest {
         TransactionService transactionService = getTransactionService(type);
         Transaction announceCorrectly = getTransactionOrFail(
             transactionService.announce(getListener(type), signedTransaction), transaction);
+        Assertions.assertEquals(signedTransaction.getHash(),
+            announceCorrectly.getTransactionInfo().get().getHash().get());
         Assertions.assertEquals(announceCorrectly.getType(), transaction.getType());
         if (transaction.getType() != TransactionType.AGGREGATE_COMPLETE) {
             System.out

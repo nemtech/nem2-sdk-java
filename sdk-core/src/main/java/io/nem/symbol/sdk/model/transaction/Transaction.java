@@ -172,10 +172,10 @@ public abstract class Transaction {
         String transactionPayload, final byte[] generationHashBytes) {
         byte[] bytes = ConvertUtils.fromHexToBytes(transactionPayload);
         final byte[] dataBytes = getSignBytes(bytes, generationHashBytes);
-        byte[] signingBytes = new byte[dataBytes.length + 64];
-        System.arraycopy(bytes, 8, signingBytes, 0, 32);
-        System.arraycopy(bytes, 72, signingBytes, 32, 32);
-        System.arraycopy(dataBytes, 0, signingBytes, 64, dataBytes.length);
+        final int sizeOfSignatureAndSignerPublicKey = 96;
+        byte[] signingBytes = new byte[dataBytes.length + sizeOfSignatureAndSignerPublicKey];
+        System.arraycopy(bytes, 8, signingBytes, 0, sizeOfSignatureAndSignerPublicKey);
+        System.arraycopy(dataBytes, 0, signingBytes, sizeOfSignatureAndSignerPublicKey, dataBytes.length);
         byte[] result = Hashes.sha3_256(signingBytes);
         return ConvertUtils.toHex(result);
     }
