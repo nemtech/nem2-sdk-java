@@ -88,7 +88,7 @@ public abstract class AbstractVertxRespositoryTest {
             .invokeAPI(Mockito.anyString(), Mockito.anyString(), Mockito.anyListOf(Pair.class),
                 argument.capture(),
                 Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
-                Mockito.any(), Mockito.any());
+                Mockito.any(), Mockito.any(), Mockito.any());
         return argument;
 
     }
@@ -135,7 +135,7 @@ public abstract class AbstractVertxRespositoryTest {
         }).when(apiClientMock)
             .invokeAPI(Mockito.anyString(), Mockito.anyString(), Mockito.anyList(), Mockito.any(),
                 Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
-                Mockito.any(), Mockito.any());
+                Mockito.any(), Mockito.any(), Mockito.any());
     }
 
     protected Mosaic createAbsolute(BigInteger amount) {
