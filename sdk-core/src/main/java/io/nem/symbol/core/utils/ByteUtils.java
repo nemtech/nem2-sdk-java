@@ -38,10 +38,8 @@ public class ByteUtils {
     public static byte[] bigIntToBytesOfSize(final BigInteger x, final int size) {
         byte[] bytes = x.toByteArray();
         int maxSize = bytes.length;
-        bytes =
-            Arrays.copyOfRange(
-                bytes, (maxSize <= size) ? 0 : maxSize - size, (maxSize <= size) ? size : maxSize);
-        return bytes;
+        return Arrays
+            .copyOfRange(bytes, (maxSize <= size) ? 0 : maxSize - size, Math.max(maxSize, size));
     }
 
     /**

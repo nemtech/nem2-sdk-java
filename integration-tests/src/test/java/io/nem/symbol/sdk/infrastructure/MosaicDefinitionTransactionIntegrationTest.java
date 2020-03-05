@@ -40,7 +40,7 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void standaloneMosaicDefinitionTransaction(RepositoryType type) throws InterruptedException {
+    void standaloneMosaicDefinitionTransaction(RepositoryType type) {
         MosaicId mosaicId = createMosaic(type);
         sleep(1000);
         MosaicInfo mosaicInfo = get(
@@ -69,6 +69,8 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
         MosaicDefinitionTransaction processed = announceAndValidate(type,
             this.account, mosaicDefinitionTransaction);
         Assertions.assertEquals(mosaicId, processed.getMosaicId());
+        Assertions
+            .assertEquals(mosaicDefinitionTransaction.getMosaicNonce(), processed.getMosaicNonce());
         return mosaicId;
     }
 
@@ -89,6 +91,8 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
 
         MosaicDefinitionTransaction processed = announceAggregateAndValidate(
             type, mosaicDefinitionTransaction, this.account).getLeft();
+        Assertions
+            .assertEquals(mosaicDefinitionTransaction.getMosaicNonce(), processed.getMosaicNonce());
         Assertions.assertEquals(mosaicId, processed.getMosaicId());
     }
 

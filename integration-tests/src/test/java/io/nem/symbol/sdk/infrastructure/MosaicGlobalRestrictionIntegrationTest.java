@@ -42,8 +42,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void createMosaicGlobalRestrictionAndValidateEndpoints(RepositoryType type)
-        throws InterruptedException {
+    void createMosaicGlobalRestrictionAndValidateEndpoints(RepositoryType type) {
 
         //1) Create a new mosaic
 

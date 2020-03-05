@@ -68,7 +68,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Abstract class for all the repository integration tests.
@@ -114,12 +113,6 @@ public abstract class BaseIntegrationTest {
 
         System.out.println("Network Type: " + networkType);
         System.out.println("Generation Hash: " + generationHash);
-    }
-
-    @BeforeEach
-    void coolDown() throws InterruptedException {
-        //To avoid rate-limiting errors from server. (5 per seconds)
-        sleep(500);
     }
 
     private NetworkCurrency resolveNetworkCurrency() {
@@ -343,9 +336,14 @@ public abstract class BaseIntegrationTest {
     }
 
     @SuppressWarnings("squid:S2925")
-    protected void sleep(long time) throws InterruptedException {
-        System.out.println("Sleeping for " + time);
-        Thread.sleep(time);
+    protected void sleep(long time) {
+        try {
+            System.out.println("Sleeping for " + time);
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
+
     }
 
     public NetworkCurrency getNetworkCurrency() {
@@ -357,7 +355,7 @@ public abstract class BaseIntegrationTest {
 
         NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
 
-        Account nemesisAccount = config().getNemesisAccount();
+        Account nemesisAccount = config().getNemesisAccount1();
 
         List<AccountNames> accountNames = get(
             getRepositoryFactory(type).createNamespaceRepository().getAccountsNames(
@@ -402,7 +400,7 @@ public abstract class BaseIntegrationTest {
     protected NamespaceId setMosaicAlias(
         RepositoryType type, MosaicId mosaicId,
         String namespaceName) {
-        Account nemesisAccount = config().getNemesisAccount();
+        Account nemesisAccount = config().getNemesisAccount1();
         NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
         List<MosaicNames> mosaicNames = get(
             getRepositoryFactory(type).createNamespaceRepository().getMosaicsNames(
@@ -445,7 +443,7 @@ public abstract class BaseIntegrationTest {
     }
 
     protected MosaicId createMosaic(Account account, RepositoryType type,
-        BigInteger initialSupply, String alias) throws InterruptedException {
+        BigInteger initialSupply, String alias) {
         MosaicNonce nonce = MosaicNonce.createRandom();
         MosaicId mosaicId = MosaicId.createFromNonce(nonce, account.getPublicAccount());
 

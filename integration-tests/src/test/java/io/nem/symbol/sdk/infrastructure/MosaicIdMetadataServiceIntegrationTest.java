@@ -42,7 +42,7 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void setAndUpdateMosaicMetadata(RepositoryType type) throws InterruptedException {
+    void setAndUpdateMosaicMetadata(RepositoryType type) {
 
         MosaicId targetMosaicId = super.createMosaic(signerAccount, type, BigInteger.ZERO, null);
 

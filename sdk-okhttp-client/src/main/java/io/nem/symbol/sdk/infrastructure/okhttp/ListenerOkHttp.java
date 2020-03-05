@@ -23,9 +23,11 @@ import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.symbol.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.infrastructure.okhttp.mappers.TransactionMapper;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
+import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.JSON;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.BlockInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.Cosignature;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -105,6 +107,14 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
     protected Transaction toTransaction(Object transactionInfo) {
         return transactionMapper
             .map(getJsonHelper().convert(transactionInfo, TransactionInfoDTO.class));
+    }
+
+    @Override
+    protected CosignatureSignedTransaction toCosignatureSignedTransaction(
+        Object cosignatureJson) {
+        Cosignature cosignature = getJsonHelper().convert(cosignatureJson, Cosignature.class);
+        return new CosignatureSignedTransaction(cosignature.getParentHash(),
+            cosignature.getSignature(), cosignature.getSignerPublicKey());
     }
 
 

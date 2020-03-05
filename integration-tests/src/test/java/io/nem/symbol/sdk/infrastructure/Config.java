@@ -150,13 +150,47 @@ public class Config {
 
     public Account getDefaultAccount() {
         //TODO - Replace with getTestAccount once it doesn't run out of currency.
-        return getNemesisAccount();
+        return getNemesisAccount1();
+    }
+
+
+    public Account getNemesisAccount(int index) {
+        return getOptionalAccount("nemesisAccount")
+            .orElseGet(() -> getNemesisAccounts().stream().skip(index).findFirst().orElseThrow(
+                () -> new IllegalArgumentException(
+                    "No nemesis account could not be found at index " + index)));
+    }
+
+    public List<Account> getNemesisAccounts() {
+        return nemesisAccounts;
     }
 
     public Account getNemesisAccount() {
-        return getOptionalAccount("nemesisAccount")
-            .orElseGet(() -> nemesisAccounts.stream().findFirst().orElseThrow(
-                () -> new IllegalArgumentException("No nemesis account could not be found")));
+        return getNemesisAccount(0);
+    }
+
+    public Account getNemesisAccount1() {
+        return getNemesisAccount(0);
+    }
+
+    public Account getNemesisAccount2() {
+        return getNemesisAccount(1);
+    }
+
+    public Account getNemesisAccount3() {
+        return getNemesisAccount(2);
+    }
+
+    public Account getNemesisAccount4() {
+        return getNemesisAccount(3);
+    }
+
+    public Account getNemesisAccount5() {
+        return getNemesisAccount(4);
+    }
+
+    public Account getNemesisAccount6() {
+        return getNemesisAccount(5);
     }
 
     public Account getTestAccount() {

@@ -23,8 +23,10 @@ import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.symbol.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.infrastructure.vertx.mappers.TransactionMapper;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
+import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.openapi.vertx.model.BlockInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.Cosignature;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.RequestOptions;
@@ -109,6 +111,13 @@ public class ListenerVertx extends ListenerBase implements Listener {
             .map(getJsonHelper().convert(transactionInfo, TransactionInfoDTO.class));
     }
 
+    @Override
+    protected CosignatureSignedTransaction toCosignatureSignedTransaction(
+        Object cosignatureJson) {
+        Cosignature cosignature = getJsonHelper().convert(cosignatureJson, Cosignature.class);
+        return new CosignatureSignedTransaction(cosignature.getParentHash(),
+            cosignature.getSignature(), cosignature.getSignerPublicKey());
+    }
 
     /**
      * Close webSocket connection

@@ -43,7 +43,7 @@ public class CreatingAnEscrowContractWithAggregateBondedTransactionIntegrationTe
 
     @Test
     @Disabled
-    void executeTransfer() throws InterruptedException {
+    void executeTransfer() {
 
         Account ticketDistributorAccount = this.config().getTestAccount();
         Account aliceAccount = this.config().getTestAccount2();

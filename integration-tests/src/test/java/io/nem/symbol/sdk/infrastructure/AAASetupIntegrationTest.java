@@ -180,8 +180,6 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
         factory.maxFee(this.maxFee);
         TransferTransaction transferTransaction = factory.build();
 
-
-
         TransferTransaction processedTransaction = announceAndValidate(type, nemesisAccount,
             transferTransaction);
         Assertions.assertEquals(amount, processedTransaction.getMosaics().get(0).getAmount());

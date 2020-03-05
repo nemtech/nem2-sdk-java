@@ -49,8 +49,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void createMosaicAddressRestrictionAndValidateEndpoints(RepositoryType type)
-        throws InterruptedException {
+    void createMosaicAddressRestrictionAndValidateEndpoints(RepositoryType type) {
 
         //1) Create a mosaic
         MosaicId mosaicId = createMosaic(type, testAccount);

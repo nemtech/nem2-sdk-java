@@ -46,8 +46,7 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    public void testTransferCatCurrencyFromNemesis(RepositoryType type)
-        throws InterruptedException {
+    public void testTransferCatCurrencyFromNemesis(RepositoryType type) {
         String hash = transferUsingAliases(config().getNemesisAccount(), type, "cat.currency",
             "testaccount2", BigInteger.TEN).getTransactionInfo().get().getHash().get();
 
@@ -72,8 +71,7 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    public void testTransferCustomCurrencyFromAccount1(RepositoryType type)
-        throws InterruptedException {
+    public void testTransferCustomCurrencyFromAccount1(RepositoryType type) {
 
         MosaicId mosaicId = createMosaicUsingAlias(type, mosaicAlias);
 
@@ -94,8 +92,7 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    public void testTransferCustomCurrencyFromAccount1UsingAggregate(RepositoryType type)
-        throws InterruptedException {
+    public void testTransferCustomCurrencyFromAccount1UsingAggregate(RepositoryType type) {
 
         MosaicId mosaicId = createMosaicUsingAlias(type, mosaicAlias);
 
@@ -115,8 +112,7 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
     }
 
-    private MosaicId createMosaicUsingAlias(RepositoryType type, String mosaicAlias)
-        throws InterruptedException {
+    private MosaicId createMosaicUsingAlias(RepositoryType type, String mosaicAlias) {
         NamespaceId mosaicNamespace = NamespaceId.createFromName(mosaicAlias);
         NamespaceInfo namespaceInfo = null;
         MosaicId mosaicId = null;

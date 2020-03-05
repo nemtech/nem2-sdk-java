@@ -20,6 +20,7 @@ import io.nem.symbol.core.utils.ByteUtils;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.infrastructure.RandomUtils;
 import java.math.BigInteger;
+import java.util.Arrays;
 
 /**
  * Mosaic nonce class
@@ -29,7 +30,7 @@ public class MosaicNonce {
     /**
      * The number of bytes of the nonce.
      */
-    private final static int NO_OF_RANDOM_BYTES = 4;
+    private static final int NO_OF_RANDOM_BYTES = 4;
     /**
      * Mosaic nonce
      */
@@ -100,5 +101,22 @@ public class MosaicNonce {
      */
     public int getNonceAsInt() {
         return ByteUtils.bytesToInt(this.nonce);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        MosaicNonce that = (MosaicNonce) o;
+        return Arrays.equals(nonce, that.nonce);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(nonce);
     }
 }

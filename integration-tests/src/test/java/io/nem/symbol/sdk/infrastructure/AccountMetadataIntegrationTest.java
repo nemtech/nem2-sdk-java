@@ -40,7 +40,7 @@ public class AccountMetadataIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    public void addMetadataToAccount(RepositoryType type) throws InterruptedException {
+    public void addMetadataToAccount(RepositoryType type) {
         BigInteger key = BigInteger.valueOf(RandomUtils.generateRandomInt(100000));
 
         String message = "This is the message for this account! 汉字" + key;

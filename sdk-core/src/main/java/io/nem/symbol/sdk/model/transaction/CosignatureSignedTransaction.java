@@ -25,12 +25,12 @@ public class CosignatureSignedTransaction {
 
     private final String parentHash;
     private final String signature;
-    private final String signer;
+    private final String signerPublicKey;
 
-    public CosignatureSignedTransaction(String parentHash, String signature, String signer) {
+    public CosignatureSignedTransaction(String parentHash, String signature, String signerPublicKey) {
         this.parentHash = parentHash;
         this.signature = signature;
-        this.signer = signer;
+        this.signerPublicKey = signerPublicKey;
     }
 
     /**
@@ -57,7 +57,7 @@ public class CosignatureSignedTransaction {
      *
      * @return String
      */
-    public String getSigner() {
-        return signer;
+    public String getSignerPublicKey() {
+        return signerPublicKey;
     }
 }

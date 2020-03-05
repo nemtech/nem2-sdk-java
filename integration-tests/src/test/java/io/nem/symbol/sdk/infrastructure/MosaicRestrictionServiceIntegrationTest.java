@@ -42,8 +42,7 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void createUpdateMosaicGlobalRestrictionTransactionFactory(RepositoryType type)
-        throws InterruptedException {
+    void createUpdateMosaicGlobalRestrictionTransactionFactory(RepositoryType type) {
 
         //1) Create a new mosaic
         MosaicId mosaicId = createMosaic(testAccount, type, null, null);
@@ -164,8 +163,7 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void createUpdateMosaicAddressRestrictionTransactionFactory(RepositoryType type)
-        throws InterruptedException {
+    void createUpdateMosaicAddressRestrictionTransactionFactory(RepositoryType type) {
 
         //1) Create a new mosaic
         MosaicId mosaicId = createMosaic(testAccount, type, null, null);
@@ -236,8 +234,7 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void createUpdateMosaicAddressRestrictionTransactionFactoryUsingAlias(RepositoryType type)
-        throws InterruptedException {
+    void createUpdateMosaicAddressRestrictionTransactionFactoryUsingAlias(RepositoryType type) {
 
         //1) Create mosaic and alias
         String mosaicAliasName = "createUpdateMosaicAddressRestrictionTransactionFactoryUsingAlias"

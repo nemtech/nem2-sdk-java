@@ -253,7 +253,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
 
         Assertions.assertEquals(signedTransaction.getParentHash(), cosignature.getParentHash());
         Assertions.assertEquals(signedTransaction.getSignature(), cosignature.getSignature());
-        Assertions.assertEquals(signedTransaction.getSigner(), cosignature.getSignerPublicKey());
+        Assertions.assertEquals(signedTransaction.getSignerPublicKey(), cosignature.getSignerPublicKey());
     }
 
 

@@ -44,7 +44,7 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    public void addMetadataToMosaic(RepositoryType type) throws InterruptedException {
+    public void addMetadataToMosaic(RepositoryType type) {
 
         MosaicId targetMosaicId = createMosaic(type);
         NamespaceId alias = setMosaicAlias(type, targetMosaicId,
@@ -128,7 +128,7 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
     }
 
 
-    private MosaicId createMosaic(RepositoryType type) throws InterruptedException {
+    private MosaicId createMosaic(RepositoryType type) {
         return super.createMosaic(testAccount, type, BigInteger.ZERO, null);
     }
 }

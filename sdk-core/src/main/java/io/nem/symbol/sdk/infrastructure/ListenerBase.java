@@ -83,10 +83,7 @@ public abstract class ListenerBase implements Listener {
                     new BigInteger(jsonHelper.getString(message, "deadline"))));
             onNext(ListenerChannel.STATUS, messageObject);
         } else if (jsonHelper.contains(message, "parentHash")) {
-            CosignatureSignedTransaction messageObject = new CosignatureSignedTransaction(
-                jsonHelper.getString(message, "parenthash"),
-                jsonHelper.getString(message, "signature"),
-                jsonHelper.getString(message, "signer"));
+            CosignatureSignedTransaction messageObject = toCosignatureSignedTransaction(message);
             onNext(ListenerChannel.COSIGNATURE, messageObject);
         } else if (jsonHelper.contains(message, "meta")) {
             onNext(ListenerChannel.rawValueOf(
@@ -235,7 +232,7 @@ public abstract class ListenerBase implements Listener {
     public Observable<CosignatureSignedTransaction> cosignatureAdded(Address address) {
         Validate.notNull(address, "Address is required");
         validateOpen();
-        this.subscribeTo(ListenerChannel.CONFIRMED_ADDED + "/" + address.plain());
+        this.subscribeTo(ListenerChannel.COSIGNATURE + "/" + address.plain());
         return getMessageSubject()
             .filter(rawMessage -> rawMessage.getChannel().equals(ListenerChannel.COSIGNATURE))
             .map(rawMessage -> (CosignatureSignedTransaction) rawMessage.getMessage());
@@ -289,7 +286,7 @@ public abstract class ListenerBase implements Listener {
         Observable<TransactionStatusError> errorListener = status(address)
             .filter(m -> transactionHash.equalsIgnoreCase(m.getHash()));
         Observable<Object> errorOrTransactionObservable = Observable
-            .merge(transactionListener, errorListener);
+            .merge(transactionListener, errorListener).take(1);
         return errorOrTransactionObservable.map(errorOrTransaction -> {
             if (errorOrTransaction instanceof TransactionStatusError) {
                 throw new TransactionStatusException(caller,
@@ -355,6 +352,16 @@ public abstract class ListenerBase implements Listener {
      * @return the model {@link Transaction}
      */
     protected abstract Transaction toTransaction(Object transactionInfo);
+
+    /**
+     * Subclasses know how to map a generic Consignature DTO json to a CosignatureSignedTransaction
+     * using the generated DTOs of the implementation.
+     *
+     * @param cosignature the generic json
+     * @return the model {@link CosignatureSignedTransaction}
+     */
+    protected abstract CosignatureSignedTransaction toCosignatureSignedTransaction(
+        Object cosignature);
 
     protected abstract void subscribeTo(String channel);
 

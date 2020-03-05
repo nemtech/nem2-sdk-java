@@ -43,7 +43,7 @@ public class NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    public void addMetadataToNamespace(RepositoryType type) throws InterruptedException {
+    public void addMetadataToNamespace(RepositoryType type) {
         String namespaceName =
             "namespace-for-metadata-integration-test-" + new Double(
                 Math.floor(Math.random() * 10000))

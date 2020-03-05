@@ -45,7 +45,7 @@ public class AddressAliasTransactionIntegrationTest extends BaseIntegrationTest 
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void sendAddressAliasTransaction(RepositoryType type) throws InterruptedException {
+    void sendAddressAliasTransaction(RepositoryType type) {
         Account account = config().getDefaultAccount();
         String namespaceName =
             "test-root-namespace-for-address-alias-" + new Double(Math.floor(Math.random() * 10000))

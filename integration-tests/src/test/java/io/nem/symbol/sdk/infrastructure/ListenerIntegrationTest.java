@@ -199,7 +199,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         CosignatureSignedTransaction cosignatureSignedTransaction = get(
             listener.cosignatureAdded(this.cosignatoryAccount.getAddress()));
 
-        assertEquals(cosignatureSignedTransaction.getSigner(),
+        assertEquals(cosignatureSignedTransaction.getSignerPublicKey(),
             this.cosignatoryAccount2.getPublicKey());
     }
 

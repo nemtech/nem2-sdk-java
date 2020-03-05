@@ -38,27 +38,38 @@ public class ListenerForTests extends BaseIntegrationTest {
         listenToAccount("Cosignatory Account", config().getCosignatoryAccount(), listener);
         listenToAccount("Cosignatory Account 2", config().getCosignatory2Account(), listener);
         listenToAccount("Multisign Account 2", config().getMultisigAccount(), listener);
-        listenToAccount("Nemesis Account", config().getNemesisAccount(), listener);
+
+        config().getNemesisAccounts().stream()
+            .forEach(account -> listenToAccount("Nemesis Account", account, listener));
     }
 
     private void listenToAccount(String accountDescription, Account account, Listener listener) {
         System.out.println("Listening for transaction of account " + account.getAddress().plain()
             + ". " + accountDescription);
 
-        listener.unconfirmedAdded(account.getAddress())
-            .subscribe(c -> System.out
-                .println(accountDescription + " received unconfirmedAdded transaction " + c));
-
         listener.confirmed(account.getAddress())
             .subscribe(c -> System.out
-                .println(accountDescription + " received confirmed transaction " + c));
+                .println(accountDescription + " received confirmed transaction " + toJson(c)));
 
         listener.cosignatureAdded(account.getAddress())
             .subscribe(c -> System.out
-                .println(accountDescription + " Received cosignatureAdded transaction " + c));
+                .println(
+                    accountDescription + " Received cosignatureAdded transaction " + toJson(c)));
+
+        listener.aggregateBondedAdded(account.getAddress())
+            .subscribe(c -> System.out
+                .println(
+                    accountDescription + " Received aggregateBondedAdded transaction " + toJson(
+                        c)));
+
+        listener.aggregateBondedRemoved(account.getAddress())
+            .subscribe(c -> System.out
+                .println(
+                    accountDescription + " Received aggregateBondedRemoved transaction " + toJson(
+                        c)));
 
         listener.status(account.getAddress())
-            .subscribe(c -> System.out.println(accountDescription + " Error: " + c.getStatus()));
+            .subscribe(c -> System.out.println(accountDescription + " Error: " + toJson(c)));
     }
 
 }

@@ -40,7 +40,7 @@ class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void setAndUpdateAccountMetadata(RepositoryType type) throws InterruptedException {
+    void setAndUpdateAccountMetadata(RepositoryType type) {
         BigInteger key = BigInteger.valueOf(RandomUtils.generateRandomInt(100000));
 
         String originalMessage = "The original message";

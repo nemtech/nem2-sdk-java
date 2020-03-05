@@ -29,6 +29,6 @@ public class CosignatureSignedTransactionTest {
 
         assertEquals("parentHash", cosignatureSignedTransaction.getParentHash());
         assertEquals("signature", cosignatureSignedTransaction.getSignature());
-        assertEquals("signer", cosignatureSignedTransaction.getSigner());
+        assertEquals("signer", cosignatureSignedTransaction.getSignerPublicKey());
     }
 }

@@ -33,6 +33,7 @@ import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionCosignature;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
@@ -45,6 +46,7 @@ import io.nem.symbol.sdk.model.transaction.TransactionStatusException;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
+import io.nem.symbol.sdk.openapi.vertx.model.Cosignature;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -216,6 +218,42 @@ public class ListenerVertxTest {
         Mockito.verify(webSocketMock).writeTextMessage(jsonHelper
             .print(new ListenerSubscribeMessage(this.wsId, "status" + "/" + address.plain())));
 
+    }
+
+
+    @Test
+    public void cosignatureAdded()
+        throws InterruptedException, ExecutionException, TimeoutException {
+        simulateWebSocketStartup();
+
+        NetworkType networkType = NetworkType.MIJIN_TEST;
+        Cosignature cosignature = new Cosignature().parentHash("aParentHash")
+            .signature("aSignature")
+            .signerPublicKey(Account.generateNewAccount(networkType).getPublicKey());
+
+        ObjectNode transactionInfoDtoJsonObject = jsonHelper
+            .convert(cosignature, ObjectNode.class);
+
+        Address address = Address.createFromPublicKey(cosignature.getSignerPublicKey(),
+            networkType);
+
+        String channelName = ListenerChannel.COSIGNATURE.toString();
+
+        List<CosignatureSignedTransaction> transactions = new ArrayList<>();
+        listener.cosignatureAdded(address).forEach(transactions::add);
+
+        listener.handle(transactionInfoDtoJsonObject, null);
+
+        Assertions.assertEquals(1, transactions.size());
+
+        Assertions.assertEquals(cosignature.getSignerPublicKey(),
+            transactions.get(0).getSignerPublicKey());
+        Assertions.assertEquals(cosignature.getParentHash(), transactions.get(0).getParentHash());
+        Assertions.assertEquals(cosignature.getSignature(), transactions.get(0).getSignature());
+        Mockito.verify(webSocketMock).handler(Mockito.any());
+        Mockito.verify(webSocketMock)
+            .writeTextMessage(jsonHelper.print(new ListenerSubscribeMessage(this.wsId,
+                channelName + "/" + address.plain())));
     }
 
     @Test

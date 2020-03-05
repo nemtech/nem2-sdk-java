@@ -43,7 +43,7 @@ public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void sendMosaicAliasTransaction(RepositoryType type) throws InterruptedException {
+    void sendMosaicAliasTransaction(RepositoryType type) {
         String namespaceName =
             "test-root-namespace-for-mosaic-alias-" + new Double(Math.floor(Math.random() * 10000))
                 .intValue();
@@ -75,7 +75,6 @@ public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
                 mosaicId).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, addressAliasTransaction, account);
-
 
         List<MosaicNames> accountNames = get(getRepositoryFactory(type).createNamespaceRepository()
             .getMosaicsNames(Collections.singletonList(mosaicId)));
