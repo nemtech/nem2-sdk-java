@@ -31,6 +31,7 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -107,16 +108,18 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void getTransferTransactions(RepositoryType type) {
+    void getMultipleTransactions(RepositoryType type) {
         AccountRepository accountHttp = getRepositoryFactory(type).createAccountRepository();
         Account account = config().getDefaultAccount();
-        TransactionType transactionType = TransactionType.TRANSFER;
+        List<TransactionType> transactionTypes = Arrays
+            .asList(TransactionType.TRANSFER, TransactionType.AGGREGATE_COMPLETE,
+                TransactionType.NAMESPACE_METADATA);
         List<Transaction> transactions = get(accountHttp.transactions(account.getPublicAccount(),
             new TransactionSearchCriteria().transactionTypes(
-                Collections.singletonList(transactionType))));
+                transactionTypes)));
         Assertions.assertFalse(transactions.isEmpty());
 
-        transactions.forEach(t -> Assertions.assertEquals(transactionType, t.getType()));
+        transactions.forEach(t -> Assertions.assertTrue(transactionTypes.contains(t.getType())));
     }
 
     @ParameterizedTest

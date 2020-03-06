@@ -254,9 +254,4 @@ public class Address implements UnresolvedAddress {
         return Objects.hash(plainAddress, networkType);
     }
 
-    @Override
-    public boolean isAlias() {
-        return false;
-    }
-
 }

@@ -86,7 +86,7 @@ public class Statement {
     public Optional<MosaicId> getResolvedMosaicId(BigInteger height,
         UnresolvedMosaicId mosaicAlias, int primaryId,
         int secondaryId) {
-        if (!mosaicAlias.isAlias()) {
+        if (mosaicAlias instanceof MosaicId) {
             return Optional.of((MosaicId) mosaicAlias);
         }
         return this.getMosaicResolutionStatement().stream()
@@ -108,7 +108,7 @@ public class Statement {
     public Optional<Address> getResolvedAddress(BigInteger height,
         UnresolvedAddress unresolvedAddress, int primaryId,
         int secondaryId) {
-        if (!unresolvedAddress.isAlias()) {
+        if (unresolvedAddress instanceof Address) {
             return Optional.of((Address) unresolvedAddress);
         }
         return this.getAddressResolutionStatements().stream()

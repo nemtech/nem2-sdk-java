@@ -64,7 +64,7 @@ public final class NetworkCurrencyBuilder {
         Validate.isTrue(divisibility > 0, "divisibility must be greater than 0");
         this.unresolvedMosaicId = unresolvedMosaicId;
         this.divisibility = divisibility;
-        if (unresolvedMosaicId.isAlias()) {
+        if (unresolvedMosaicId instanceof NamespaceId) {
             withNamespaceId((NamespaceId) unresolvedMosaicId);
         } else {
             withMosaicId((MosaicId) unresolvedMosaicId);

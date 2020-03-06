@@ -127,10 +127,6 @@ public class MosaicId implements UnresolvedMosaicId {
         return ConvertUtils.toHex(bytes);
     }
 
-    @Override
-    public boolean isAlias() {
-        return false;
-    }
 }
 
 

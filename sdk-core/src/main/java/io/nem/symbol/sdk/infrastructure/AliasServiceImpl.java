@@ -46,7 +46,7 @@ public class AliasServiceImpl implements AliasService {
 
     @Override
     public Observable<MosaicId> resolveMosaicId(UnresolvedMosaicId unresolvedMosaicId) {
-        if (unresolvedMosaicId.isAlias()) {
+        if (unresolvedMosaicId instanceof NamespaceId) {
             NamespaceId alias = (NamespaceId) unresolvedMosaicId;
             return namespaceRepository.getNamespace(alias)
                 .map(namespaceInfo -> {
@@ -66,7 +66,7 @@ public class AliasServiceImpl implements AliasService {
 
     @Override
     public Observable<Address> resolveAddress(UnresolvedAddress unresolvedAddress) {
-        if (unresolvedAddress.isAlias()) {
+        if (unresolvedAddress instanceof NamespaceId) {
             NamespaceId alias = (NamespaceId) unresolvedAddress;
             return namespaceRepository.getNamespace(alias)
                 .map(namespaceInfo -> {
