@@ -80,7 +80,7 @@ public abstract class AbstractOkHttpRespositoryTest {
         Mockito.doCallRealMethod().when(apiClientMock)
             .buildCall(Mockito.anyString(), Mockito.anyString(), Mockito.anyList(),
                 Mockito.anyList(), captor.capture(), Mockito.anyMap(), Mockito.anyMap(),
-                Mockito.any(), Mockito.any());
+                Mockito.any(), Mockito.any(), Mockito.any());
 
         Mockito.doReturn(apiResponse).when(apiClientMock).execute(Mockito.any(),
             Mockito.any(Type.class));

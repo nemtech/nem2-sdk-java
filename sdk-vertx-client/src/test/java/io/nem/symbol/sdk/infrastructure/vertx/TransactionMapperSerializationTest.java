@@ -78,16 +78,31 @@ public class TransactionMapperSerializationTest {
 
         //Patching the sort
         mappedTransactionInfo
-            .setTransaction(jsonHelper.convert(mappedTransactionInfo.getTransaction(),
-                Map.class));
+            .setTransaction(jsonHelper.convert(mappedTransactionInfo.getTransaction(), Map.class));
 
         Assertions.assertEquals(jsonHelper.prettyPrint(originalTransactionInfo),
             jsonHelper.prettyPrint(mappedTransactionInfo));
 
         BinarySerialization serialization = new BinarySerializationImpl();
         Assertions.assertEquals(ConvertUtils.toHex(serialization.serialize(transactionModel)),
-            ConvertUtils.toHex(serialization.serialize(transactionMapper.map(mappedTransactionInfo))));
+            ConvertUtils
+                .toHex(serialization.serialize(transactionMapper.map(mappedTransactionInfo))));
 
+        removeMeta(originalTransactionInfo);
+
+        TransactionInfoDTO deserializedTransaction = transactionMapper
+            .map(serialization.deserialize(serialization.serialize(transactionModel)));
+
+        deserializedTransaction.setTransaction(
+            jsonHelper.convert(deserializedTransaction.getTransaction(), Map.class));
+
+        removeMeta(deserializedTransaction);
+        Assertions.assertEquals(jsonHelper.prettyPrint(originalTransactionInfo),
+            jsonHelper.prettyPrint(deserializedTransaction));
+
+    }
+
+    private void removeMeta(TransactionInfoDTO originalTransactionInfo) {
         originalTransactionInfo.setMeta(null);
         Map<String, Object> transactionJson = (Map<String, Object>) originalTransactionInfo
             .getTransaction();
@@ -96,11 +111,6 @@ public class TransactionMapperSerializationTest {
                 .get("transactions");
             transactionsJson.forEach(t -> t.remove("meta"));
         }
-
-        Assertions.assertEquals(jsonHelper.prettyPrint(originalTransactionInfo),
-            jsonHelper.prettyPrint(transactionMapper
-                .map(serialization.deserialize(serialization.serialize(transactionModel)))));
-
     }
 
 

@@ -43,7 +43,7 @@ public class JsonHelperJackson2Test {
     public void shouldFailWhenParsingInvalid() {
         Assertions.assertEquals(
             "JsonEOFException: Unexpected end-of-input: expected close marker for Object (start marker at [Source: (String)\"{\"; line: 1, column: 1])\n"
-                + " at [Source: (String)\"{\"; line: 1, column: 3]. Json payload: {",
+                + " at [Source: (String)\"{\"; line: 1, column: 2]. Json payload: {",
             Assertions.assertThrows(IllegalArgumentException.class,
                 () -> jsonHelper.parse("{", Car.class)).getMessage());
     }

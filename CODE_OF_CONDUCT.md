@@ -1,4 +1,4 @@
-# Contributor Covenant Code of Conduct
+git g   # Contributor Covenant Code of Conduct
 
 ## Our Pledge
 

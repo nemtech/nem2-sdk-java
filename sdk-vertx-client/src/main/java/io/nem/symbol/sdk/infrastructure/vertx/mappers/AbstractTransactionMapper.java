@@ -74,7 +74,9 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
         NetworkType networkType = NetworkType.rawValueOf(transactionDTO.getNetwork().getValue());
         TransactionFactory<T> factory = createFactory(networkType, transaction);
         factory.version(transactionDTO.getVersion());
-        factory.deadline(new Deadline(transactionDTO.getDeadline()));
+        if (transactionDTO.getDeadline() != null) {
+            factory.deadline(new Deadline(transactionDTO.getDeadline()));
+        }
         if (transactionDTO.getSignerPublicKey() != null) {
             factory.signer(
                 PublicAccount
