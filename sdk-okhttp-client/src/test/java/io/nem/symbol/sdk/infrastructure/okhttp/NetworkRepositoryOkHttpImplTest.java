@@ -16,9 +16,12 @@
 
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
+import com.google.gson.JsonObject;
 import io.nem.symbol.sdk.model.blockchain.NetworkFees;
 import io.nem.symbol.sdk.model.blockchain.NetworkInfo;
 import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkConfiguration;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.NetworkConfigurationDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NetworkFeesDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NetworkTypeDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NodeInfoDTO;
@@ -42,7 +45,7 @@ public class NetworkRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     }
 
     @Test
-    public void shouldGetNetworkType() throws Exception {
+    void shouldGetNetworkType() throws Exception {
 
         NodeInfoDTO dto = new NodeInfoDTO();
         dto.setNetworkIdentifier(NetworkType.MIJIN_TEST.getValue());
@@ -58,7 +61,7 @@ public class NetworkRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     }
 
     @Test
-    public void shouldGetNetworkInfo() throws Exception {
+    void shouldGetNetworkInfo() throws Exception {
 
         NetworkTypeDTO networkTypeDTO = new NetworkTypeDTO();
         networkTypeDTO.setName("mijinTest");
@@ -76,12 +79,13 @@ public class NetworkRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     }
 
     @Test
-    public void getNetworkFees() throws Exception {
+    void getNetworkFees() throws Exception {
 
         NetworkFeesDTO dto = new NetworkFeesDTO();
         dto.setAverageFeeMultiplier(0.1);
         dto.setMedianFeeMultiplier(0.2);
-        dto.setLowestFeeMultiplier(3);;
+        dto.setLowestFeeMultiplier(3);
+        ;
         dto.setHighestFeeMultiplier(4);
 
         mockRemoteCall(dto);
@@ -94,6 +98,32 @@ public class NetworkRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         Assertions.assertEquals(dto.getMedianFeeMultiplier(), info.getMedianFeeMultiplier());
         Assertions.assertEquals(dto.getLowestFeeMultiplier(), info.getLowestFeeMultiplier());
         Assertions.assertEquals(dto.getHighestFeeMultiplier(), info.getHighestFeeMultiplier());
+
+    }
+
+    @Test
+    void getNetworkProperties() throws Exception {
+
+        NetworkConfigurationDTO dto = TestHelperOkHttp
+            .loadResource("network-configuration.json", NetworkConfigurationDTO.class);
+        Assertions.assertNotNull(dto);
+
+        JsonObject plain = TestHelperOkHttp
+            .loadResource("network-configuration.json", JsonObject.class);
+        Assertions.assertNotNull(plain);
+
+        Assertions.assertEquals(jsonHelper.prettyPrint(dto), jsonHelper.prettyPrint(plain));
+
+        mockRemoteCall(dto);
+
+        NetworkConfiguration configuration = repository.getNetworkProperties().toFuture().get();
+
+        Assertions.assertNotNull(configuration);
+
+        plain.get("network").getAsJsonObject().addProperty("nodeEqualityStrategy", "PUBLIC_KEY");
+        Assertions
+            .assertEquals(jsonHelper.prettyPrint(plain), jsonHelper.prettyPrint(configuration));
+
 
     }
 

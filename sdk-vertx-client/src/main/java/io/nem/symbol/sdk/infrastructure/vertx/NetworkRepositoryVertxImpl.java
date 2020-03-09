@@ -20,14 +20,44 @@ import io.nem.symbol.sdk.api.NetworkRepository;
 import io.nem.symbol.sdk.model.blockchain.NetworkFees;
 import io.nem.symbol.sdk.model.blockchain.NetworkInfo;
 import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.AccountLinkNetworkProperties;
+import io.nem.symbol.sdk.model.network.AccountRestrictionNetworkProperties;
+import io.nem.symbol.sdk.model.network.AggregateNetworkProperties;
+import io.nem.symbol.sdk.model.network.ChainProperties;
+import io.nem.symbol.sdk.model.network.HashLockNetworkProperties;
+import io.nem.symbol.sdk.model.network.MetadataNetworkProperties;
+import io.nem.symbol.sdk.model.network.MosaicNetworkProperties;
+import io.nem.symbol.sdk.model.network.MosaicRestrictionNetworkProperties;
+import io.nem.symbol.sdk.model.network.MultisigNetworkProperties;
+import io.nem.symbol.sdk.model.network.NamespaceNetworkProperties;
+import io.nem.symbol.sdk.model.network.NetworkConfiguration;
+import io.nem.symbol.sdk.model.network.NetworkProperties;
+import io.nem.symbol.sdk.model.network.NodeIdentityEqualityStrategy;
+import io.nem.symbol.sdk.model.network.PluginsProperties;
+import io.nem.symbol.sdk.model.network.SecretLockNetworkProperties;
+import io.nem.symbol.sdk.model.network.TransferNetworkProperties;
 import io.nem.symbol.sdk.openapi.vertx.api.NetworkRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.NetworkRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.api.NodeRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.NodeRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
+import io.nem.symbol.sdk.openapi.vertx.model.AccountLinkNetworkPropertiesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.AccountRestrictionNetworkPropertiesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.AggregateNetworkPropertiesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.ChainPropertiesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.HashLockNetworkPropertiesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.MetadataNetworkPropertiesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.MosaicNetworkPropertiesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.MosaicRestrictionNetworkPropertiesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.MultisigNetworkPropertiesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.NamespaceNetworkPropertiesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NetworkFeesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.NetworkPropertiesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NetworkTypeDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NodeInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.PluginsPropertiesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.SecretLockNetworkPropertiesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransferNetworkPropertiesDTO;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -64,7 +94,8 @@ public class NetworkRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
             .getNetworkFees(handler);
         return exceptionHandling(
             call(callback).map(info -> new NetworkFees(info.getAverageFeeMultiplier(),
-                info.getMedianFeeMultiplier(), info.getLowestFeeMultiplier(), info.getHighestFeeMultiplier()
+                info.getMedianFeeMultiplier(), info.getLowestFeeMultiplier(),
+                info.getHighestFeeMultiplier()
             )));
     }
 
@@ -76,6 +107,106 @@ public class NetworkRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         return exceptionHandling(
             call(callback)
                 .map(info -> new NetworkInfo(info.getName(), info.getDescription())));
+    }
+
+
+    @Override
+    public Observable<NetworkConfiguration> getNetworkProperties() {
+        return call(getNetworkRoutesApi()::getNetworkProperties)
+            .map(info -> new NetworkConfiguration(toNetworkProperties(info.getNetwork()),
+                toChainProperties(info.getChain()), toPluginsProperties(info.getPlugins())));
+    }
+
+    private NetworkProperties toNetworkProperties(NetworkPropertiesDTO dto) {
+        return new NetworkProperties(dto.getIdentifier(),
+            NodeIdentityEqualityStrategy.fromValue(dto.getNodeEqualityStrategy().getValue()),
+            dto.getPublicKey(), dto.getGenerationHash(), dto.getEpochAdjustment());
+    }
+
+    private ChainProperties toChainProperties(ChainPropertiesDTO dto) {
+        return new ChainProperties(dto.getEnableVerifiableState(),
+            dto.getEnableVerifiableReceipts(), dto.getCurrencyMosaicId(),
+            dto.getHarvestingMosaicId(), dto.getBlockGenerationTargetTime(),
+            dto.getBlockTimeSmoothingFactor(), dto.getImportanceGrouping(),
+            dto.getImportanceActivityPercentage(), dto.getMaxRollbackBlocks(),
+            dto.getMaxDifficultyBlocks(), dto.getDefaultDynamicFeeMultiplier(),
+            dto.getMaxTransactionLifetime(), dto.getMaxBlockFutureTime(),
+            dto.getInitialCurrencyAtomicUnits(), dto.getMaxMosaicAtomicUnits(),
+            dto.getTotalChainImportance(), dto.getMinHarvesterBalance(),
+            dto.getMaxHarvesterBalance(), dto.getHarvestBeneficiaryPercentage(),
+            dto.getBlockPruneInterval(), dto.getMaxTransactionsPerBlock());
+    }
+
+    private PluginsProperties toPluginsProperties(PluginsPropertiesDTO dto) {
+        return new PluginsProperties(
+            toAccountlink(dto.getAccountlink()),
+            toAggregate(dto.getAggregate()),
+            toLockhash(dto.getLockhash()),
+            toLocksecret(dto.getLocksecret()),
+            toMetadata(dto.getMetadata()),
+            toMosaic(dto.getMosaic()),
+            toMultisig(dto.getMultisig()),
+            toNamespace(dto.getNamespace()),
+            toRestrictionaccount(dto.getRestrictionaccount()),
+            toRestrictionmosaic(dto.getRestrictionmosaic()),
+            toTransfer(dto.getTransfer()));
+    }
+
+    private AccountLinkNetworkProperties toAccountlink(AccountLinkNetworkPropertiesDTO dto) {
+        return new AccountLinkNetworkProperties(dto.getDummy());
+    }
+
+    private AggregateNetworkProperties toAggregate(AggregateNetworkPropertiesDTO dto) {
+        return new AggregateNetworkProperties(dto.getMaxTransactionsPerAggregate(),
+            dto.getMaxCosignaturesPerAggregate(), dto.getEnableStrictCosignatureCheck(),
+            dto.getEnableBondedAggregateSupport(), dto.getMaxBondedTransactionLifetime());
+    }
+
+    private HashLockNetworkProperties toLockhash(HashLockNetworkPropertiesDTO dto) {
+        return new HashLockNetworkProperties(dto.getLockedFundsPerAggregate(),
+            dto.getMaxHashLockDuration());
+    }
+
+    private SecretLockNetworkProperties toLocksecret(SecretLockNetworkPropertiesDTO dto) {
+        return new SecretLockNetworkProperties(dto.getMaxSecretLockDuration(),
+            dto.getMinProofSize(), dto.getMaxProofSize());
+    }
+
+    private MetadataNetworkProperties toMetadata(MetadataNetworkPropertiesDTO dto) {
+        return new MetadataNetworkProperties(dto.getMaxValueSize());
+    }
+
+    private MosaicNetworkProperties toMosaic(MosaicNetworkPropertiesDTO dto) {
+        return new MosaicNetworkProperties(dto.getMaxMosaicsPerAccount(),
+            dto.getMaxMosaicDuration(), dto.getMaxMosaicDivisibility(),
+            dto.getMosaicRentalFeeSinkPublicKey(), dto.getMosaicRentalFee());
+    }
+
+    private MultisigNetworkProperties toMultisig(MultisigNetworkPropertiesDTO dto) {
+        return new MultisigNetworkProperties(dto.getMaxMultisigDepth(),
+            dto.getMaxCosignatoriesPerAccount(), dto.getMaxCosignedAccountsPerAccount());
+    }
+
+    private NamespaceNetworkProperties toNamespace(NamespaceNetworkPropertiesDTO dto) {
+        return new NamespaceNetworkProperties(dto.getMaxNameSize(), dto.getMaxChildNamespaces(),
+            dto.getMaxNamespaceDepth(), dto.getMinNamespaceDuration(),
+            dto.getMaxNamespaceDuration(), dto.getNamespaceGracePeriodDuration(),
+            dto.getReservedRootNamespaceNames(), dto.getNamespaceRentalFeeSinkPublicKey(),
+            dto.getRootNamespaceRentalFeePerBlock(), dto.getChildNamespaceRentalFee());
+    }
+
+    private AccountRestrictionNetworkProperties toRestrictionaccount(
+        AccountRestrictionNetworkPropertiesDTO dto) {
+        return new AccountRestrictionNetworkProperties(dto.getMaxAccountRestrictionValues());
+    }
+
+    private MosaicRestrictionNetworkProperties toRestrictionmosaic(
+        MosaicRestrictionNetworkPropertiesDTO dto) {
+        return new MosaicRestrictionNetworkProperties(dto.getMaxMosaicRestrictionValues());
+    }
+
+    private TransferNetworkProperties toTransfer(TransferNetworkPropertiesDTO dto) {
+        return new TransferNetworkProperties(dto.getMaxMessageSize());
     }
 
 

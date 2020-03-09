@@ -19,6 +19,7 @@ package io.nem.symbol.sdk.api;
 import io.nem.symbol.sdk.model.blockchain.NetworkFees;
 import io.nem.symbol.sdk.model.blockchain.NetworkInfo;
 import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkConfiguration;
 import io.reactivex.Observable;
 
 /**
@@ -36,7 +37,9 @@ public interface NetworkRepository {
     Observable<NetworkType> getNetworkType();
 
     /**
-     * Returns information about the average, median, highest and lower fee multiplier over the last "numBlocksTransactionFeeStats".
+     * Returns information about the average, median, highest and lower fee multiplier over the last
+     * "numBlocksTransactionFeeStats".
+     *
      * @return the NetworkFees
      */
     Observable<NetworkFees> getNetworkFees();
@@ -45,4 +48,12 @@ public interface NetworkRepository {
      * @return the network information with like the network's name and description.
      */
     Observable<NetworkInfo> getNetworkInfo();
+
+    /**
+     * @return the content from a catapult-server network configuration file
+     * (resources/config-network.properties). To enable this feature, the REST setting
+     * \&quot;network.propertiesFilePath\&quot; must define where the file is located. This is
+     * adjustable via the configuration file (rest/resources/rest.json) per REST instance.
+     */
+    Observable<NetworkConfiguration> getNetworkProperties();
 }
