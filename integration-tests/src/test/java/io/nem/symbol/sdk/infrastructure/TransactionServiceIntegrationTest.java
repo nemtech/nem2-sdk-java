@@ -19,6 +19,7 @@ package io.nem.symbol.sdk.infrastructure;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.AccountInfo;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -63,8 +64,8 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
         System.out.println(resolvedTransaction.getMosaics().get(0).getId());
 
-        Assertions.assertFalse(resolvedTransaction.getMosaics().get(0).getId().isAlias());
-        Assertions.assertFalse(resolvedTransaction.getRecipient().isAlias());
+        Assertions.assertTrue(resolvedTransaction.getMosaics().get(0).getId() instanceof MosaicId);
+        Assertions.assertTrue(resolvedTransaction.getRecipient() instanceof Address);
 
     }
 
@@ -159,8 +160,8 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
         Assertions.assertEquals(config().getTestAccount2().getAddress(),
             resolvedTransaction.getRecipient());
         System.out.println(resolvedTransaction.getMosaics().get(0).getId());
-        Assertions.assertFalse(resolvedTransaction.getMosaics().get(0).getId().isAlias());
-        Assertions.assertFalse(resolvedTransaction.getRecipient().isAlias());
+        Assertions.assertTrue(resolvedTransaction.getMosaics().get(0).getId() instanceof MosaicId);
+        Assertions.assertTrue(resolvedTransaction.getRecipient() instanceof Address);
         Assertions.assertEquals(mosaicId, resolvedTransaction.getMosaics().get(0).getId());
         Assertions.assertEquals(config().getTestAccount2().getAddress(),
             resolvedTransaction.getRecipient());
@@ -187,8 +188,9 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
         factory.maxFee(this.maxFee);
         TransferTransaction transferTransaction = factory.build();
 
-        Assertions.assertTrue(transferTransaction.getMosaics().get(0).getId().isAlias());
-        Assertions.assertTrue(transferTransaction.getRecipient().isAlias());
+        Assertions
+            .assertTrue(transferTransaction.getMosaics().get(0).getId() instanceof NamespaceId);
+        Assertions.assertTrue(transferTransaction.getRecipient() instanceof Address);
 
         TransferTransaction processedTransferTransaction = announceAndValidate(type, sender,
             transferTransaction);
@@ -198,8 +200,9 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
         System.out.println(toJson(processedTransferTransaction));
 
-        Assertions.assertTrue(processedTransferTransaction.getMosaics().get(0).getId().isAlias());
-        Assertions.assertTrue(processedTransferTransaction.getRecipient().isAlias());
+        Assertions.assertTrue(
+            processedTransferTransaction.getMosaics().get(0).getId() instanceof NamespaceId);
+        Assertions.assertTrue(processedTransferTransaction.getRecipient() instanceof NamespaceId);
 
         return processedTransferTransaction;
 
@@ -225,8 +228,9 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
         factory.maxFee(this.maxFee);
         TransferTransaction transferTransaction = factory.build();
 
-        Assertions.assertTrue(transferTransaction.getMosaics().get(0).getId().isAlias());
-        Assertions.assertTrue(transferTransaction.getRecipient().isAlias());
+        Assertions
+            .assertTrue(transferTransaction.getMosaics().get(0).getId() instanceof NamespaceId);
+        Assertions.assertTrue(transferTransaction.getRecipient() instanceof NamespaceId);
 
         Pair<TransferTransaction, AggregateTransaction> pair = announceAggregateAndValidate(type,
             transferTransaction, sender);
@@ -237,8 +241,9 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
         System.out.println(toJson(processedTransferTransaction));
 
-        Assertions.assertTrue(processedTransferTransaction.getMosaics().get(0).getId().isAlias());
-        Assertions.assertTrue(processedTransferTransaction.getRecipient().isAlias());
+        Assertions.assertTrue(
+            processedTransferTransaction.getMosaics().get(0).getId() instanceof NamespaceId);
+        Assertions.assertTrue(processedTransferTransaction.getRecipient() instanceof NamespaceId);
 
         return pair.getRight();
 

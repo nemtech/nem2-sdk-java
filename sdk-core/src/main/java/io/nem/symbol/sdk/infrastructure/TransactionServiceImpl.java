@@ -435,7 +435,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction,
         UnresolvedMosaicId unresolvedMosaicId,
         Observable<Statement> statementObservable, ReceiptSource expectedReceiptSource) {
-        if (!unresolvedMosaicId.isAlias()) {
+        if (unresolvedMosaicId instanceof MosaicId) {
             return Observable.just((MosaicId) unresolvedMosaicId);
         }
         return statementObservable.map(statement -> statement
@@ -451,7 +451,7 @@ public class TransactionServiceImpl implements TransactionService {
     private Observable<Address> getResolvedAddress(Transaction transaction,
         UnresolvedAddress unresolvedAddress,
         Observable<Statement> statementObservable, ReceiptSource expectedReceiptSource) {
-        if (!unresolvedAddress.isAlias()) {
+        if (unresolvedAddress instanceof Address) {
             return Observable.just((Address) unresolvedAddress);
         }
         return statementObservable.map(statement -> statement

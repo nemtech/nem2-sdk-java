@@ -190,8 +190,4 @@ public class NamespaceId implements UnresolvedMosaicId, UnresolvedAddress {
         return ConvertUtils.toHex(bytes);
     }
 
-    @Override
-    public boolean isAlias() {
-        return true;
-    }
 }
