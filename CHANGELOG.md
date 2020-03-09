@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [0.17.0] - 24-Feb-2020
+## [0.17.0] - 9-Mar-2020    
 
 **Milestone**: Fushicho.4(RC3 0.9.3.1)
 
