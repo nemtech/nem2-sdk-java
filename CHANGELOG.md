@@ -18,6 +18,8 @@ Client Vertx | v0.8.5  | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk
 - **[BREAKING CHANGE]** Changed hashing algorithm to cope with catapult-server changes. All Key derivation and signing are now using `SHA512`. Removed `SignSchema` so `NetworkType` is no longer bonded to the schema anymore (sha3 / keccak). This change will affect all existing keypairs / address (derived from public key) and transaction signatures.
 - **[BREAKING CHANGE]** `NetworkCurrencyMosaic` and `NetworkHarvestMosaic` subclasses have been replaced with `NetworkCurrency.CAT_CURRENCY` and `NetworkCurrency.CAT_HARVEST` static values. `NetworkCurrency.SYMBOL_XYM` has been added describing the new currency.
 - **[BREAKING CHANGE]** Symbol rebranding. Maven artifact names have been changed. Packages have been moved from `io.nem` to `io.nem.symbol`
+- **[BREAKING CHANGE]** Added `s-part` of transaction signature to transaction hash.
+- Added `numStatements` to `blockInfo` model.
 - Added `NetworkGenerationHash` to the payload in `node/info` endpoint.
 - Added enum for block merkle path item positions (`left / right`) to replace previous number type value (`1 / 2`).
 - Added new `BlockService` for `Transaction` and `Receipt` block merkle proof auditing.
@@ -27,6 +29,8 @@ Client Vertx | v0.8.5  | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk
 - Generated hashes are uppercase.
 - Fixed ResolutionStatement hash generation.
 - Fixed Jackson version compatibility issue.
+- Fixed Cosignature listener channel and model object.
+- Added Jackson 2 and GSon adapters for JDK 8 compatibility.
 - Added `getNodePeers` method to `NodeRepository`
 - General legacy code refactoring and cleanup.
 
