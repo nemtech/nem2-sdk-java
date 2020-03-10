@@ -15,6 +15,7 @@ io.nem.symbol.sdk.model.message
 io.nem.symbol.sdk.model.metadata
 io.nem.symbol.sdk.model.mosaic
 io.nem.symbol.sdk.model.namespace
+io.nem.symbol.sdk.model.network
 io.nem.symbol.sdk.model.node
 io.nem.symbol.sdk.model.receipt
 io.nem.symbol.sdk.model.restriction
