@@ -17,6 +17,46 @@
           }
         ]
       }
+    },
+    {
+      "statement": {
+        "height": "53",
+        "source": {
+          "primaryId": 0,
+          "secondaryId": 0
+        },
+        "receipts": [
+          {
+            "version": 1,
+            "type": 4942,
+            "senderPublicKey": "2FC3872A792933617D70E02AFF8FBDE152821A0DF0CA5FB04CB56FC3D21C8863",
+            "mosaicId": "85BBEA6CC462B244",
+            "recipientAddress": "90CCB2D8723A173450E6404FDA1AFAAE0BDAB524508430C75E",
+            "amount": "1000"
+          },
+          {
+            "version": 1,
+            "type": 16717,
+            "artifactId": "2FC3872A792933617D70E02AFF8FBDE152821A0DF0CA5FB04CB56FC3D21C8863"
+          },
+          {
+            "version": 1,
+            "type": 16718,
+            "artifactId": "2FC3872A792933617D70E02AFF8FBDE152821A0DF0CA5FB04CB56FC3D21C8863"
+          },
+          {
+            "version": 1,
+            "type": 16974,
+            "artifactId": "2FC3872A792933617D70E02AFF8FBDE152821A0DF0CA5FB04CB56FC3D21C8863"
+          },
+          {
+            "version": 1,
+            "type": 20803,
+            "mosaicId": "85BBEA6CC462B244",
+            "amount": "333"
+          }
+        ]
+      }
     }
   ],
   "addressResolutionStatements": [
