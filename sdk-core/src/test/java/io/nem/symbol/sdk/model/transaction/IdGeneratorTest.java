@@ -231,22 +231,6 @@ class IdGeneratorTest {
     }
 
     @Test
-    void namespacePathRejectsNamesWithTooManyParts() {
-        assertThrows(
-            IllegalIdentifierException.class,
-            () -> {
-                IdGenerator.generateNamespacePath("a.b.c.d");
-            },
-            "too many parts");
-        assertThrows(
-            IllegalIdentifierException.class,
-            () -> {
-                IdGenerator.generateNamespacePath("a.b.c.d.e");
-            },
-            "too many parts");
-    }
-
-    @Test
     void namespacePathInvalid() {
         assertThrows(
             IllegalIdentifierException.class,

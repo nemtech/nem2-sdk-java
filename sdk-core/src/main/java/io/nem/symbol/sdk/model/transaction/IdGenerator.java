@@ -112,14 +112,12 @@ public class IdGenerator {
 
         if (parts.length == 0) {
             throw new IllegalIdentifierException("invalid namespace path");
-        } else if (parts.length > 3) {
-            throw new IllegalIdentifierException("too many parts");
         }
 
         BigInteger namespaceId = BigInteger.valueOf(0);
 
-        for (int i = 0; i < parts.length; i++) {
-            namespaceId = generateNamespaceId(parts[i], namespaceId);
+        for (String part : parts) {
+            namespaceId = generateNamespaceId(part, namespaceId);
             path.add(namespaceId);
         }
         return path;
