@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.symbol.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.model.account.Account;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;

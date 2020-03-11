@@ -20,11 +20,11 @@ import static io.nem.symbol.core.utils.MapperUtils.toUnresolvedMosaicId;
 
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.message.Message;
 import io.nem.symbol.sdk.model.message.MessageType;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;

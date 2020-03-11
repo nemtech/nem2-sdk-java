@@ -16,9 +16,9 @@
 
 package io.nem.symbol.sdk.model.transaction;
 
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import org.apache.commons.lang3.Validate;
 

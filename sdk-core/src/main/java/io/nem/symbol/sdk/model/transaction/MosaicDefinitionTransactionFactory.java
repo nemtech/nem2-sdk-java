@@ -17,10 +17,10 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.blockchain.BlockDuration;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNonce;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import org.apache.commons.lang3.Validate;
 
 /**

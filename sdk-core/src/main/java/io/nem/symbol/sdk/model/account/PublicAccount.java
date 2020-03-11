@@ -17,7 +17,7 @@
 package io.nem.symbol.sdk.model.account;
 
 import io.nem.symbol.core.crypto.PublicKey;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.util.Objects;
 
 /**

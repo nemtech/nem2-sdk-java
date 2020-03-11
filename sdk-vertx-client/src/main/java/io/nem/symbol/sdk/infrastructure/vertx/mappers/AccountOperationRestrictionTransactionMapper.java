@@ -16,7 +16,7 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;

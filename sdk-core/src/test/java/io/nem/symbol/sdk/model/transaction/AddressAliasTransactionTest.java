@@ -17,9 +17,9 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 

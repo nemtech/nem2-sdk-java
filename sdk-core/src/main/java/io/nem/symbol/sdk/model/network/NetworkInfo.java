@@ -14,21 +14,33 @@
  * limitations under the License.
  */
 
-package io.nem.symbol.sdk.model.transaction;
+package io.nem.symbol.sdk.model.network;
 
-import io.nem.symbol.sdk.model.network.NetworkType;
+/**
+ * It holds information about the catapult network.
+ */
+public class NetworkInfo {
 
-public class FakeTransferTransactionFactory extends TransactionFactory<FakeTransferTransaction> {
+    /**
+     * The name of the network.
+     */
+    private final String name;
 
-    public FakeTransferTransactionFactory(
-        NetworkType networkType) {
-        super(
-            TransactionType.TRANSFER,
-            networkType);
+    /**
+     * The description of the network.
+     */
+    private final String description;
+
+    public NetworkInfo(String name, String description) {
+        this.name = name;
+        this.description = description;
     }
 
-    @Override
-    public FakeTransferTransaction build() {
-        return new FakeTransferTransaction(this);
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

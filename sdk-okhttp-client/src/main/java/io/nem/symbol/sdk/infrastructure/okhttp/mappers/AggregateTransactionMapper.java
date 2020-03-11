@@ -17,7 +17,7 @@
 package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionCosignature;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;

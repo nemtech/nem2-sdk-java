@@ -71,7 +71,6 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.blockchain.BlockDuration;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.message.Message;
 import io.nem.symbol.sdk.model.message.MessageType;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
@@ -83,6 +82,7 @@ import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AccountLinkAction;
@@ -621,7 +621,7 @@ public class BinarySerializationImpl implements BinarySerialization {
             Serializer transactionBuilder) {
             MosaicDefinitionTransactionBodyBuilder builder = (MosaicDefinitionTransactionBodyBuilder) transactionBuilder;
             MosaicNonce mosaicNonce = MosaicNonce
-                .createFromBigInteger((long) builder.getNonce().getMosaicNonce());
+                .createFromInteger(builder.getNonce().getMosaicNonce());
             MosaicId mosaicId = SerializationUtils.toMosaicId(builder.getId());
             MosaicFlags mosaicFlags = MosaicFlags
                 .create(builder.getFlags().contains(MosaicFlagsDto.SUPPLY_MUTABLE),

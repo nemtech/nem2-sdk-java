@@ -21,10 +21,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.nem.symbol.core.crypto.KeyPair;
 import io.nem.symbol.core.crypto.ed25519.Ed25519CryptoEngine;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.FakeDeadline;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;

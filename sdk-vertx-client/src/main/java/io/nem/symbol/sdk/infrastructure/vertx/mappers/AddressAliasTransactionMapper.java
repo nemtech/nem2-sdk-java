@@ -20,9 +20,9 @@ import static io.nem.symbol.core.utils.MapperUtils.getIdAsHex;
 import static io.nem.symbol.core.utils.MapperUtils.toAddressFromEncoded;
 
 import io.nem.symbol.core.utils.MapperUtils;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AddressAliasTransaction;
 import io.nem.symbol.sdk.model.transaction.AddressAliasTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;

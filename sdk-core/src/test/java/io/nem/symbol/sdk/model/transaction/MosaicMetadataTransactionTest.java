@@ -19,8 +19,8 @@ package io.nem.symbol.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.symbol.sdk.model.account.Account;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

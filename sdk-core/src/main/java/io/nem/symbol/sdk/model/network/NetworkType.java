@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.nem.symbol.sdk.model.blockchain;
+package io.nem.symbol.sdk.model.network;
 
 import java.util.Arrays;
 

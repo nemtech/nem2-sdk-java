@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.model.blockchain;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;

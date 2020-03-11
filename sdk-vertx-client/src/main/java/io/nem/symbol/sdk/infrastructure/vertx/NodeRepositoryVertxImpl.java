@@ -17,14 +17,14 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.sdk.api.NodeRepository;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
-import io.nem.symbol.sdk.model.blockchain.ServerInfo;
-import io.nem.symbol.sdk.model.blockchain.StorageInfo;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.node.NodeHealth;
 import io.nem.symbol.sdk.model.node.NodeInfo;
 import io.nem.symbol.sdk.model.node.NodeStatus;
 import io.nem.symbol.sdk.model.node.NodeTime;
 import io.nem.symbol.sdk.model.node.RoleType;
+import io.nem.symbol.sdk.model.node.ServerInfo;
+import io.nem.symbol.sdk.model.node.StorageInfo;
 import io.nem.symbol.sdk.openapi.vertx.api.NodeRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.NodeRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;

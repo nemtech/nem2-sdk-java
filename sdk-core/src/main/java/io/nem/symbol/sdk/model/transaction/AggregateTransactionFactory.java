@@ -21,7 +21,7 @@ import io.nem.symbol.core.crypto.Hashes;
 import io.nem.symbol.core.crypto.MerkleHashBuilder;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.infrastructure.BinarySerializationImpl;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;

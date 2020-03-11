@@ -21,7 +21,7 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountGraphInfo;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.account.PublicAccount;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.MultisigRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MultisigAccountGraphInfoDTO;

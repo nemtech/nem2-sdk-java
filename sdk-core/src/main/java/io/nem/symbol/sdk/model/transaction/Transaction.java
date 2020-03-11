@@ -26,7 +26,7 @@ import io.nem.symbol.sdk.api.BinarySerialization;
 import io.nem.symbol.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.PublicAccount;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import java.util.Optional;
 

@@ -18,7 +18,7 @@ package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;

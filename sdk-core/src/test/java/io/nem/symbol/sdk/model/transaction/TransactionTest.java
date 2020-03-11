@@ -22,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.message.PlainMessage;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;

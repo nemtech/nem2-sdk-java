@@ -17,8 +17,8 @@
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
 import io.nem.symbol.core.utils.MapperUtils;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;

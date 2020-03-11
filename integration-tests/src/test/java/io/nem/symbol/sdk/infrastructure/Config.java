@@ -19,7 +19,7 @@ package io.nem.symbol.sdk.infrastructure;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.nem.symbol.sdk.model.account.Account;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.vertx.core.json.JsonObject;
 import java.io.File;
 import java.io.FileInputStream;

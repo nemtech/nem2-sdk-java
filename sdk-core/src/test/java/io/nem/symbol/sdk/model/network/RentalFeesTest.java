@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package io.nem.symbol.sdk.model.blockchain;
+package io.nem.symbol.sdk.model.network;
 
+import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test of {@link NetworkFees}
+ * Test of {@link RentalFees}
  */
-class NetworkFeesTest {
+class RentalFeesTest {
 
 
     @Test
-    void createNetworkFees() {
+    void createRentalFees() {
 
-        NetworkFees info = new NetworkFees(0.1, 0.2, 3, 4);
+        RentalFees info = new RentalFees(BigInteger.valueOf(1), BigInteger.valueOf(2), BigInteger.valueOf(3));
 
         Assertions.assertNotNull(info);
 
-        Assertions.assertEquals(0.1, info.getAverageFeeMultiplier());
-        Assertions.assertEquals(0.2, info.getMedianFeeMultiplier());
-        Assertions.assertEquals(3, info.getLowestFeeMultiplier());
-        Assertions.assertEquals(4, info.getHighestFeeMultiplier());
+        Assertions.assertEquals(1, info.getEffectiveRootNamespaceRentalFeePerBlock().intValue());
+        Assertions.assertEquals(2, info.getEffectiveChildNamespaceRentalFee().intValue());
+        Assertions.assertEquals(3, info.getEffectiveMosaicRentalFee().intValue());
 
     }
 }

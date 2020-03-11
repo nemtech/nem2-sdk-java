@@ -21,8 +21,8 @@ import static io.nem.symbol.sdk.infrastructure.okhttp.TestHelperOkHttp.loadTrans
 import io.nem.symbol.sdk.api.QueryParams;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.blockchain.Position;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.BlockDTO;

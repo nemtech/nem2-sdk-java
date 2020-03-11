@@ -18,7 +18,7 @@ package io.nem.symbol.sdk.model.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;

@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

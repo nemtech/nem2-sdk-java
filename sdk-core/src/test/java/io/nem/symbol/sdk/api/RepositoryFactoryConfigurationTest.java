@@ -16,10 +16,10 @@
 
 package io.nem.symbol.sdk.api;
 
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrencyBuilder;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

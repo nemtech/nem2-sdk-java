@@ -23,7 +23,7 @@ import io.nem.symbol.sdk.infrastructure.ListenerChannel;
 import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.Transaction;

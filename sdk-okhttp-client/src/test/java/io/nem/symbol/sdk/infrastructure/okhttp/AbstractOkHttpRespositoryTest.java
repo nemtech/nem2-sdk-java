@@ -19,7 +19,7 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 import com.google.gson.Gson;
 import io.nem.symbol.core.utils.HttpStatus;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiException;

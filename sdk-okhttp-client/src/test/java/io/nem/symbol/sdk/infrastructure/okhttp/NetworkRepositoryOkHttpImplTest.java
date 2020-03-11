@@ -17,14 +17,17 @@
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import com.google.gson.JsonObject;
-import io.nem.symbol.sdk.model.blockchain.NetworkFees;
-import io.nem.symbol.sdk.model.blockchain.NetworkInfo;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.network.NetworkConfiguration;
+import io.nem.symbol.sdk.model.network.NetworkInfo;
+import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.network.RentalFees;
+import io.nem.symbol.sdk.model.network.TransactionFees;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NetworkConfigurationDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.NetworkFeesDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NetworkTypeDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NodeInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.RentalFeesDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionFeesDTO;
+import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,18 +82,17 @@ public class NetworkRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     }
 
     @Test
-    void getNetworkFees() throws Exception {
+    void getTransactionFees() throws Exception {
 
-        NetworkFeesDTO dto = new NetworkFeesDTO();
-        dto.setAverageFeeMultiplier(0.1);
-        dto.setMedianFeeMultiplier(0.2);
+        TransactionFeesDTO dto = new TransactionFeesDTO();
+        dto.setAverageFeeMultiplier(1);
+        dto.setMedianFeeMultiplier(2);
         dto.setLowestFeeMultiplier(3);
-        ;
         dto.setHighestFeeMultiplier(4);
 
         mockRemoteCall(dto);
 
-        NetworkFees info = repository.getNetworkFees().toFuture().get();
+        TransactionFees info = repository.getTransactionFees().toFuture().get();
 
         Assertions.assertNotNull(info);
 
@@ -98,6 +100,29 @@ public class NetworkRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         Assertions.assertEquals(dto.getMedianFeeMultiplier(), info.getMedianFeeMultiplier());
         Assertions.assertEquals(dto.getLowestFeeMultiplier(), info.getLowestFeeMultiplier());
         Assertions.assertEquals(dto.getHighestFeeMultiplier(), info.getHighestFeeMultiplier());
+
+    }
+
+    @Test
+    void getRentalFees() throws Exception {
+
+        RentalFeesDTO dto = new RentalFeesDTO();
+        dto.setEffectiveChildNamespaceRentalFee(BigInteger.valueOf(1));
+        dto.setEffectiveMosaicRentalFee(BigInteger.valueOf(2));
+        dto.setEffectiveRootNamespaceRentalFeePerBlock(BigInteger.valueOf(3));
+
+        mockRemoteCall(dto);
+
+        RentalFees info = repository.getRentalFees().toFuture().get();
+
+        Assertions.assertNotNull(info);
+
+        Assertions.assertEquals(dto.getEffectiveChildNamespaceRentalFee(),
+            info.getEffectiveChildNamespaceRentalFee());
+        Assertions
+            .assertEquals(dto.getEffectiveMosaicRentalFee(), info.getEffectiveMosaicRentalFee());
+        Assertions.assertEquals(dto.getEffectiveRootNamespaceRentalFeePerBlock(),
+            info.getEffectiveRootNamespaceRentalFeePerBlock());
 
     }
 

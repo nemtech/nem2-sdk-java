@@ -22,12 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.symbol.sdk.api.NodeRepository;
-import io.nem.symbol.sdk.model.blockchain.ServerInfo;
-import io.nem.symbol.sdk.model.blockchain.StorageInfo;
 import io.nem.symbol.sdk.model.node.NodeHealth;
 import io.nem.symbol.sdk.model.node.NodeInfo;
 import io.nem.symbol.sdk.model.node.NodeStatus;
 import io.nem.symbol.sdk.model.node.NodeTime;
+import io.nem.symbol.sdk.model.node.ServerInfo;
+import io.nem.symbol.sdk.model.node.StorageInfo;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;

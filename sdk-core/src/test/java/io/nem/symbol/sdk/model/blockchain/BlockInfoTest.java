@@ -19,6 +19,7 @@ package io.nem.symbol.sdk.model.blockchain;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;

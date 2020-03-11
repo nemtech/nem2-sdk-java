@@ -16,23 +16,23 @@
  * limitations under the License.
  */
 
-package io.nem.symbol.sdk.model.blockchain;
+package io.nem.symbol.sdk.model.network;
 
 /**
  * Information about the average, median, highest and lower fee multiplier over the last
  * "numBlocksTransactionFeeStats".
  */
-public class NetworkFees {
+public class TransactionFees {
 
     /**
      * Average fee multiplier over the last "numBlocksTransactionFeeStats".
      */
-    private final Double averageFeeMultiplier;
+    private final Integer averageFeeMultiplier;
 
     /**
      * Median fee multiplier over the last "numBlocksTransactionFeeStats".
      **/
-    private final Double medianFeeMultiplier;
+    private final Integer medianFeeMultiplier;
 
 
     /**
@@ -45,7 +45,7 @@ public class NetworkFees {
      **/
     private final Integer highestFeeMultiplier;
 
-    public NetworkFees(Double averageFeeMultiplier, Double medianFeeMultiplier,
+    public TransactionFees(Integer averageFeeMultiplier, Integer medianFeeMultiplier,
         Integer lowestFeeMultiplier, Integer highestFeeMultiplier) {
         this.averageFeeMultiplier = averageFeeMultiplier;
         this.medianFeeMultiplier = medianFeeMultiplier;
@@ -53,11 +53,11 @@ public class NetworkFees {
         this.highestFeeMultiplier = highestFeeMultiplier;
     }
 
-    public Double getAverageFeeMultiplier() {
+    public Integer getAverageFeeMultiplier() {
         return averageFeeMultiplier;
     }
 
-    public Double getMedianFeeMultiplier() {
+    public Integer getMedianFeeMultiplier() {
         return medianFeeMultiplier;
     }
 

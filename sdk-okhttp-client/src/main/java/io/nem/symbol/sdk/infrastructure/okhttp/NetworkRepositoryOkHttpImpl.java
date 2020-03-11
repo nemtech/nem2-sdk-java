@@ -17,9 +17,6 @@
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.sdk.api.NetworkRepository;
-import io.nem.symbol.sdk.model.blockchain.NetworkFees;
-import io.nem.symbol.sdk.model.blockchain.NetworkInfo;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.network.AccountLinkNetworkProperties;
 import io.nem.symbol.sdk.model.network.AccountRestrictionNetworkProperties;
 import io.nem.symbol.sdk.model.network.AggregateNetworkProperties;
@@ -31,10 +28,14 @@ import io.nem.symbol.sdk.model.network.MosaicRestrictionNetworkProperties;
 import io.nem.symbol.sdk.model.network.MultisigNetworkProperties;
 import io.nem.symbol.sdk.model.network.NamespaceNetworkProperties;
 import io.nem.symbol.sdk.model.network.NetworkConfiguration;
+import io.nem.symbol.sdk.model.network.NetworkInfo;
 import io.nem.symbol.sdk.model.network.NetworkProperties;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.network.NodeIdentityEqualityStrategy;
 import io.nem.symbol.sdk.model.network.PluginsProperties;
+import io.nem.symbol.sdk.model.network.RentalFees;
 import io.nem.symbol.sdk.model.network.SecretLockNetworkProperties;
+import io.nem.symbol.sdk.model.network.TransactionFees;
 import io.nem.symbol.sdk.model.network.TransferNetworkProperties;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.NetworkRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.NodeRoutesApi;
@@ -88,14 +89,24 @@ public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
     }
 
     @Override
-    public Observable<NetworkFees> getNetworkFees() {
+    public Observable<TransactionFees> getTransactionFees() {
         return exceptionHandling(
-            call(getNetworkRoutesApi()::getNetworkFees)
-                .map(info -> new NetworkFees(info.getAverageFeeMultiplier(),
+            call(getNetworkRoutesApi()::getTransactionFees)
+                .map(info -> new TransactionFees(info.getAverageFeeMultiplier(),
                     info.getMedianFeeMultiplier(), info.getLowestFeeMultiplier(),
                     info.getHighestFeeMultiplier()
                 )));
     }
+
+    @Override
+    public Observable<RentalFees> getRentalFees() {
+        return exceptionHandling(
+            call(getNetworkRoutesApi()::getRentalFees)
+                .map(info -> new RentalFees(info.getEffectiveRootNamespaceRentalFeePerBlock(),
+                    info.getEffectiveChildNamespaceRentalFee(), info.getEffectiveMosaicRentalFee()
+                )));
+    }
+
 
     @Override
     public Observable<NetworkConfiguration> getNetworkProperties() {

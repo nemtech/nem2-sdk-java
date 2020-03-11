@@ -17,7 +17,7 @@
 package io.nem.symbol.sdk.model.account;
 
 import io.nem.symbol.core.utils.AbstractVectorTester;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

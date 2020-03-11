@@ -18,7 +18,7 @@ package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.account.PublicAccount;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;

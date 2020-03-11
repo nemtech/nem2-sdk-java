@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package io.nem.symbol.sdk.model.blockchain;
+package io.nem.symbol.sdk.model.network;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class NetworkTypeTest {
 
     @Test
     void MAIN_NETIs0x68() {
-        assertEquals(0x68, NetworkType.MAIN_NET.getValue());
+        Assertions.assertEquals(0x68, NetworkType.MAIN_NET.getValue());
         assertEquals(104, NetworkType.MAIN_NET.getValue());
     }
 

@@ -21,8 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.PublicAccount;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
