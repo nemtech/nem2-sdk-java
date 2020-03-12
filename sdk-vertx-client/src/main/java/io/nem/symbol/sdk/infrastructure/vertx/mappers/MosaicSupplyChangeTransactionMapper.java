@@ -19,8 +19,8 @@ package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 import static io.nem.symbol.core.utils.MapperUtils.getIdAsHex;
 import static io.nem.symbol.core.utils.MapperUtils.toUnresolvedMosaicId;
 
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.mosaic.MosaicSupplyChangeActionType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.MosaicSupplyChangeTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicSupplyChangeTransactionFactory;

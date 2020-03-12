@@ -19,7 +19,7 @@ package io.nem.symbol.core.crypto;
 import io.nem.symbol.core.utils.ArrayUtils;
 import io.nem.symbol.core.utils.Base32Encoder;
 import io.nem.symbol.core.utils.ConvertUtils;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.util.Arrays;
 
 /**

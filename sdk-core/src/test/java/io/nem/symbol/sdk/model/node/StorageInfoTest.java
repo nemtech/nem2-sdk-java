@@ -14,33 +14,19 @@
  * limitations under the License.
  */
 
-package io.nem.symbol.sdk.model.blockchain;
+package io.nem.symbol.sdk.model.node;
 
-/**
- * It holds information about the catapult network.
- */
-public class NetworkInfo {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    /**
-     * The name of the network.
-     */
-    private final String name;
+import org.junit.jupiter.api.Test;
 
-    /**
-     * The description of the network.
-     */
-    private final String description;
+class StorageInfoTest {
 
-    public NetworkInfo(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
+    @Test
+    void createStorageInfo() {
+        StorageInfo storageInfo = new StorageInfo(1, 2, 3);
+        assertEquals(1, storageInfo.getNumAccounts());
+        assertEquals(2, storageInfo.getNumBlocks());
+        assertEquals(3, storageInfo.getNumTransactions());
     }
 }

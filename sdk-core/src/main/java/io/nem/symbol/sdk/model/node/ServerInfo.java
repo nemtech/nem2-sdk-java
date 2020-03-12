@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.nem.symbol.sdk.model.blockchain;
+package io.nem.symbol.sdk.model.node;
 
 /**
  * Server info class

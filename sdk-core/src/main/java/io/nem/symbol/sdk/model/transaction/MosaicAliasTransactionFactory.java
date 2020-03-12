@@ -16,10 +16,10 @@
 
 package io.nem.symbol.sdk.model.transaction;
 
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import org.apache.commons.lang3.Validate;
 
 /**

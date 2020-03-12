@@ -17,9 +17,6 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.sdk.api.NetworkRepository;
-import io.nem.symbol.sdk.model.blockchain.NetworkFees;
-import io.nem.symbol.sdk.model.blockchain.NetworkInfo;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.network.AccountLinkNetworkProperties;
 import io.nem.symbol.sdk.model.network.AccountRestrictionNetworkProperties;
 import io.nem.symbol.sdk.model.network.AggregateNetworkProperties;
@@ -31,10 +28,14 @@ import io.nem.symbol.sdk.model.network.MosaicRestrictionNetworkProperties;
 import io.nem.symbol.sdk.model.network.MultisigNetworkProperties;
 import io.nem.symbol.sdk.model.network.NamespaceNetworkProperties;
 import io.nem.symbol.sdk.model.network.NetworkConfiguration;
+import io.nem.symbol.sdk.model.network.NetworkInfo;
 import io.nem.symbol.sdk.model.network.NetworkProperties;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.network.NodeIdentityEqualityStrategy;
 import io.nem.symbol.sdk.model.network.PluginsProperties;
+import io.nem.symbol.sdk.model.network.RentalFees;
 import io.nem.symbol.sdk.model.network.SecretLockNetworkProperties;
+import io.nem.symbol.sdk.model.network.TransactionFees;
 import io.nem.symbol.sdk.model.network.TransferNetworkProperties;
 import io.nem.symbol.sdk.openapi.vertx.api.NetworkRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.NetworkRoutesApiImpl;
@@ -51,12 +52,13 @@ import io.nem.symbol.sdk.openapi.vertx.model.MosaicNetworkPropertiesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicRestrictionNetworkPropertiesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MultisigNetworkPropertiesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NamespaceNetworkPropertiesDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.NetworkFeesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NetworkPropertiesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NetworkTypeDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NodeInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.PluginsPropertiesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.RentalFeesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.SecretLockNetworkPropertiesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionFeesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransferNetworkPropertiesDTO;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
@@ -89,16 +91,26 @@ public class NetworkRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
     }
 
     @Override
-    public Observable<NetworkFees> getNetworkFees() {
-        Consumer<Handler<AsyncResult<NetworkFeesDTO>>> callback = handler -> getNetworkRoutesApi()
-            .getNetworkFees(handler);
+    public Observable<TransactionFees> getTransactionFees() {
+        Consumer<Handler<AsyncResult<TransactionFeesDTO>>> callback = handler -> getNetworkRoutesApi()
+            .getTransactionFees(handler);
         return exceptionHandling(
-            call(callback).map(info -> new NetworkFees(info.getAverageFeeMultiplier(),
+            call(callback).map(info -> new TransactionFees(info.getAverageFeeMultiplier(),
                 info.getMedianFeeMultiplier(), info.getLowestFeeMultiplier(),
                 info.getHighestFeeMultiplier()
             )));
     }
 
+    @Override
+    public Observable<RentalFees> getRentalFees() {
+        Consumer<Handler<AsyncResult<RentalFeesDTO>>> callback = handler -> getNetworkRoutesApi()
+            .getRentalFees(handler);
+        return exceptionHandling(
+            call(callback)
+                .map(info -> new RentalFees(info.getEffectiveRootNamespaceRentalFeePerBlock(),
+                    info.getEffectiveChildNamespaceRentalFee(), info.getEffectiveMosaicRentalFee()
+                )));
+    }
 
     @Override
     public Observable<NetworkInfo> getNetworkInfo() {

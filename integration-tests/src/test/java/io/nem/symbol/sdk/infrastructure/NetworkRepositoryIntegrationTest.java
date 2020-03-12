@@ -19,9 +19,10 @@ package io.nem.symbol.sdk.infrastructure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.symbol.sdk.api.NetworkRepository;
-import io.nem.symbol.sdk.model.blockchain.NetworkFees;
-import io.nem.symbol.sdk.model.blockchain.NetworkInfo;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkInfo;
+import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.network.RentalFees;
+import io.nem.symbol.sdk.model.network.TransactionFees;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -48,13 +49,23 @@ class NetworkRepositoryIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void getNetworkFees(RepositoryType type) {
-        NetworkFees networkInfo = get(getNetworkRepository(type).getNetworkFees());
-        Assertions.assertNotNull(networkInfo.getAverageFeeMultiplier());
-        Assertions.assertNotNull(networkInfo.getHighestFeeMultiplier());
-        Assertions.assertNotNull(networkInfo.getLowestFeeMultiplier());
-        Assertions.assertNotNull(networkInfo.getMedianFeeMultiplier());
-        System.out.println(jsonHelper().prettyPrint(networkInfo));
+    void getTransactionFees(RepositoryType type) {
+        TransactionFees transactionFees = get(getNetworkRepository(type).getTransactionFees());
+        Assertions.assertNotNull(transactionFees.getAverageFeeMultiplier());
+        Assertions.assertNotNull(transactionFees.getHighestFeeMultiplier());
+        Assertions.assertNotNull(transactionFees.getLowestFeeMultiplier());
+        Assertions.assertNotNull(transactionFees.getMedianFeeMultiplier());
+        System.out.println(jsonHelper().prettyPrint(transactionFees));
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void getRentalFees(RepositoryType type) {
+        RentalFees rentalFees = get(getNetworkRepository(type).getRentalFees());
+        Assertions.assertNotNull(rentalFees.getEffectiveChildNamespaceRentalFee());
+        Assertions.assertNotNull(rentalFees.getEffectiveMosaicRentalFee());
+        Assertions.assertNotNull(rentalFees.getEffectiveRootNamespaceRentalFeePerBlock());
+        System.out.println(jsonHelper().prettyPrint(rentalFees));
     }
 
     private NetworkRepository getNetworkRepository(RepositoryType type) {

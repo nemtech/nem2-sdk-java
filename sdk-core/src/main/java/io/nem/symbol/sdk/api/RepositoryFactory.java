@@ -16,8 +16,8 @@
 
 package io.nem.symbol.sdk.api;
 
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.reactivex.Observable;
 import java.io.Closeable;
 

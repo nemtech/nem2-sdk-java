@@ -15,7 +15,7 @@
  */
 package io.nem.symbol.sdk.model.node;
 
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 
 public class NodeInfo {
 

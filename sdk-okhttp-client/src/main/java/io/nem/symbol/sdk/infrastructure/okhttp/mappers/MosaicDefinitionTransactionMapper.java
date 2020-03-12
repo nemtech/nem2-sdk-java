@@ -20,9 +20,9 @@ import static io.nem.symbol.core.utils.MapperUtils.getIdAsHex;
 
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.blockchain.BlockDuration;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicNonce;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransactionFactory;
@@ -45,9 +45,9 @@ class MosaicDefinitionTransactionMapper extends
     protected TransactionFactory<MosaicDefinitionTransaction> createFactory(NetworkType networkType,
         MosaicDefinitionTransactionDTO transaction) {
         MosaicFlags mosaicFlags =
-            MosaicFlags.create(transaction.getFlags().intValue());
+            MosaicFlags.create(transaction.getFlags());
         return MosaicDefinitionTransactionFactory.create(networkType,
-            MosaicNonce.createFromBigInteger(transaction.getNonce()),
+            MosaicNonce.createFromInteger(transaction.getNonce()),
             MapperUtils.toMosaicId(transaction.getId()),
             mosaicFlags, transaction.getDivisibility(),
             new BlockDuration(transaction.getDuration()));
@@ -59,7 +59,7 @@ class MosaicDefinitionTransactionMapper extends
         dto.setFlags(transaction.getMosaicFlags().getValue());
         dto.setId(getIdAsHex(transaction.getMosaicId()));
         dto.setDivisibility(transaction.getDivisibility());
-        dto.setNonce((long) transaction.getMosaicNonce().getNonceAsInt());
+        dto.setNonce(transaction.getMosaicNonce().getNonceAsInt());
         dto.setDuration(BigInteger.valueOf(transaction.getBlockDuration().getDuration()));
     }
 

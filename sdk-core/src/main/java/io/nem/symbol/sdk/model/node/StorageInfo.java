@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.nem.symbol.sdk.model.blockchain;
+package io.nem.symbol.sdk.model.node;
 
 /**
  * The blockchain storage info structure describes stored data.
@@ -23,11 +23,11 @@ package io.nem.symbol.sdk.model.blockchain;
  */
 public class StorageInfo {
 
-    private final Long numAccounts;
-    private final Long numBlocks;
-    private final Long numTransactions;
+    private final Integer numAccounts;
+    private final Integer numBlocks;
+    private final Integer numTransactions;
 
-    public StorageInfo(Long numAccounts, Long numBlocks, Long numTransactions) {
+    public StorageInfo(Integer numAccounts, Integer numBlocks, Integer numTransactions) {
         this.numAccounts = numAccounts;
         this.numBlocks = numBlocks;
         this.numTransactions = numTransactions;
@@ -38,7 +38,7 @@ public class StorageInfo {
      *
      * @return Long
      */
-    public Long getNumAccounts() {
+    public Integer getNumAccounts() {
         return numAccounts;
     }
 
@@ -47,7 +47,7 @@ public class StorageInfo {
      *
      * @return Long
      */
-    public Long getNumBlocks() {
+    public Integer getNumBlocks() {
         return numBlocks;
     }
 
@@ -56,7 +56,7 @@ public class StorageInfo {
      *
      * @return Long
      */
-    public Long getNumTransactions() {
+    public Integer getNumTransactions() {
         return numTransactions;
     }
 }

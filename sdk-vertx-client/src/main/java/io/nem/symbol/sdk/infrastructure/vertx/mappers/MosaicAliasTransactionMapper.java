@@ -19,9 +19,9 @@ package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 import static io.nem.symbol.core.utils.MapperUtils.getIdAsHex;
 
 import io.nem.symbol.core.utils.MapperUtils;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.MosaicAliasTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicAliasTransactionFactory;

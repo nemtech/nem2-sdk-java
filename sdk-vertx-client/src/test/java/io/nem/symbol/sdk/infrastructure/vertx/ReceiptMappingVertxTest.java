@@ -16,8 +16,8 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx;
 
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.receipt.ReceiptType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.receipt.Statement;
 import io.nem.symbol.sdk.model.receipt.TransactionStatement;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;

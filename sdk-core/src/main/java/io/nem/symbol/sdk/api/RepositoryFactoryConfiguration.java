@@ -17,8 +17,8 @@
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.infrastructure.RepositoryFactoryBase;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
+import io.nem.symbol.sdk.model.network.NetworkType;
 
 /**
  * This bean helps the user to create {@link RepositoryFactory}.

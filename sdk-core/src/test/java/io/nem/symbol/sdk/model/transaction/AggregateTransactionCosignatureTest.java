@@ -19,7 +19,7 @@ package io.nem.symbol.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import org.junit.jupiter.api.Test;
 
 public class AggregateTransactionCosignatureTest {

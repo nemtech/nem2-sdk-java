@@ -20,7 +20,7 @@ import io.nem.symbol.core.crypto.Hashes;
 import io.nem.symbol.core.crypto.RawAddress;
 import io.nem.symbol.core.utils.Base32Encoder;
 import io.nem.symbol.core.utils.ConvertUtils;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.util.Arrays;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;

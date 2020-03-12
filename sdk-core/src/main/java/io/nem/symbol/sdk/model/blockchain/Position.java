@@ -16,6 +16,7 @@
 
 package io.nem.symbol.sdk.model.blockchain;
 
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.util.Arrays;
 
 /**

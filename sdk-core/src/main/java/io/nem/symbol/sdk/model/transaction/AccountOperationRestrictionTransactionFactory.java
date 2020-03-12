@@ -15,7 +15,7 @@
  */
 package io.nem.symbol.sdk.model.transaction;
 
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 

@@ -17,8 +17,8 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.core.utils.ConvertUtils;
-import io.nem.symbol.sdk.model.blockchain.NetworkType;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
