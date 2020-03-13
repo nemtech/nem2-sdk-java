@@ -18,8 +18,13 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import static io.nem.symbol.sdk.infrastructure.okhttp.TestHelperOkHttp.loadResource;
 
-import io.nem.symbol.sdk.model.receipt.ReceiptType;
+import io.nem.symbol.sdk.model.mosaic.MosaicId;
+import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.receipt.ArtifactExpiryReceipt;
+import io.nem.symbol.sdk.model.receipt.BalanceTransferReceipt;
+import io.nem.symbol.sdk.model.receipt.InflationReceipt;
+import io.nem.symbol.sdk.model.receipt.ReceiptType;
 import io.nem.symbol.sdk.model.receipt.Statement;
 import io.nem.symbol.sdk.model.receipt.TransactionStatement;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
@@ -60,14 +65,33 @@ public class ReceiptMappingOkHttpTest {
         Assertions.assertEquals(5, transactionStatement.getReceipts().size());
         Assertions.assertEquals(
             ReceiptType.NAMESPACE_RENTAL_FEE, transactionStatement.getReceipts().get(0).getType());
+
+        Assertions.assertEquals("85BBEA6CC462B244",
+            ((BalanceTransferReceipt) transactionStatement.getReceipts().get(0)).getMosaicId()
+                .getIdAsHex());
+
         Assertions.assertEquals(ReceiptType.MOSAIC_EXPIRED,
             transactionStatement.getReceipts().get(1).getType());
+        Assertions.assertEquals(MosaicId.class,
+            ((ArtifactExpiryReceipt) transactionStatement.getReceipts().get(1)).getArtifactId()
+                .getClass());
+
         Assertions.assertEquals(ReceiptType.NAMESPACE_EXPIRED,
             transactionStatement.getReceipts().get(2).getType());
+        Assertions.assertEquals(NamespaceId.class,
+            ((ArtifactExpiryReceipt) transactionStatement.getReceipts().get(2)).getArtifactId()
+                .getClass());
+
         Assertions.assertEquals(ReceiptType.NAMESPACE_DELETED,
             transactionStatement.getReceipts().get(3).getType());
+        Assertions.assertEquals(NamespaceId.class,
+            ((ArtifactExpiryReceipt) transactionStatement.getReceipts().get(3)).getArtifactId()
+                .getClass());
+
         Assertions.assertEquals(ReceiptType.INFLATION,
             transactionStatement.getReceipts().get(4).getType());
+        Assertions.assertEquals(333,
+            ((InflationReceipt) transactionStatement.getReceipts().get(4)).getAmount().longValue());
     }
 
     @Test
