@@ -65,14 +65,16 @@ public enum LockHashAlgorithmType {
      * @return boolean when format is correct
      */
     public static boolean validator(LockHashAlgorithmType hashType, String input) {
-        if (hashType == LockHashAlgorithmType.SHA3_256 && input.matches(VALIDATOR_REGEX)) {
-            return input.length() == 64;
-        } else if (hashType == LockHashAlgorithmType.KECCAK_256 && input.matches(VALIDATOR_REGEX)) {
-            return input.length() == 64;
-        } else if (hashType == LockHashAlgorithmType.HASH_160 && input.matches(VALIDATOR_REGEX)) {
-            return input.length() == 40;
-        } else if (hashType == LockHashAlgorithmType.HASH_256 && input.matches(VALIDATOR_REGEX)) {
-            return input.length() == 64;
+        if (!input.matches(VALIDATOR_REGEX)) {
+            return false;
+        }
+        switch (hashType) {
+            case SHA3_256:
+            case KECCAK_256:
+            case HASH_256:
+                return input.length() == 64;
+            case HASH_160:
+                return input.length() == 64 || input.length() == 40;
         }
         return false;
     }

@@ -75,16 +75,22 @@ class LockHashAlgorithmTypeTest {
     }
 
     @Test
-    void HASH_160ShouldReturnFalseIfItIsNot40CharsLength() {
+    void HASH_160ShouldReturnTrueIfItIs64CharsLength() {
 
         System.out.println(ConvertUtils.toHex(Hashes.hash256(ConvertUtils.fromHexToBytes("ABCD"))));
 
         byte[] secretBytes = RandomUtils.generateRandomBytes(20);
         byte[] result = Hashes.sha3_256(secretBytes);
         String secret = ConvertUtils.toHex(result);
-
-        assertFalse(LockHashAlgorithmType.validator(LockHashAlgorithmType.HASH_160, secret));
+        assertTrue(LockHashAlgorithmType.validator(LockHashAlgorithmType.HASH_160, secret));
     }
+
+    @Test
+    void HASH_160ShouldReturnTrueIfItIsNot64Or40CharsLength() {
+        assertFalse(LockHashAlgorithmType.validator(LockHashAlgorithmType.HASH_160,
+            "400C2CDA984F04D00C78417D2AED8443AF451E40D77721AC1F5E5334555F0"));
+    }
+
 
     @Test
     void HASH_160ShouldReturnFalseIfItIsNotAValidHash() {

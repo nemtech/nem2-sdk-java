@@ -42,7 +42,8 @@ public class SecretProofTransactionFactory extends TransactionFactory<SecretProo
         Validate.notNull(recipient, "Recipient must not be null.");
         if (!LockHashAlgorithmType.validator(hashType, secret)) {
             throw new IllegalArgumentException(
-                "HashType and Secret have incompatible length or not hexadecimal string");
+                "HashType  " + hashType
+                    + " and Secret have incompatible length or not hexadecimal string");
         }
         this.hashType = hashType;
         this.secret = secret;
