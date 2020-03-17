@@ -32,7 +32,10 @@ import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountTypeEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.Mosaic;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -174,6 +177,9 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
         accountDTO.setAddress(encodeAddress(address));
+        List<Mosaic> mosaicDtos = new ArrayList<>();
+        mosaicDtos.add(new Mosaic().id("0000000000000ABC").amount(BigInteger.TEN));
+        accountDTO.setMosaics(mosaicDtos);
 
         AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
         accountInfoDTO.setAccount(accountDTO);
@@ -183,6 +189,11 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         AccountInfo resolvedAccountInfo = repository.getAccountInfo(address).toFuture().get();
         Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
         Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
+        Assertions.assertEquals(1, resolvedAccountInfo.getMosaics().size());
+        Assertions
+            .assertEquals("0000000000000ABC", resolvedAccountInfo.getMosaics().get(0).getId().getIdAsHex());
+        Assertions
+            .assertEquals(BigInteger.TEN, resolvedAccountInfo.getMosaics().get(0).getAmount());
     }
 
     @Test

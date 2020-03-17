@@ -16,6 +16,9 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import io.nem.symbol.catapult.builders.AliasActionDto;
 import io.nem.symbol.catapult.builders.LockHashAlgorithmDto;
 import io.nem.symbol.catapult.builders.MosaicRestrictionTypeDto;
@@ -26,6 +29,7 @@ import io.nem.symbol.sdk.model.blockchain.Position;
 import io.nem.symbol.sdk.model.message.MessageType;
 import io.nem.symbol.sdk.model.mosaic.MosaicSupplyChangeActionType;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
+import io.nem.symbol.sdk.model.namespace.AliasType;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.symbol.sdk.model.node.NodeStatus;
 import io.nem.symbol.sdk.model.node.RoleType;
@@ -41,6 +45,7 @@ import io.nem.symbol.sdk.openapi.vertx.model.AccountLinkActionEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountRestrictionFlagsEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.AliasActionEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.AliasTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.LockHashAlgorithmEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.MessageTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicRestrictionEntryTypeEnum;
@@ -511,4 +516,20 @@ public class EnumMapperTest {
                 rolesType.getValue());
     }
 
+
+    @ParameterizedTest
+    @EnumSource(AliasType.class)
+    void validFromAliasType(AliasType enumValue) {
+        assertNotNull(AliasTypeEnum.fromValue(enumValue.getValue()));
+        assertEquals(AliasTypeEnum.fromValue(enumValue.getValue()).getValue(),
+            enumValue.getValue());
+    }
+
+    @ParameterizedTest
+    @EnumSource(AliasTypeEnum.class)
+    void validAliasTypeEnum(AliasTypeEnum enumValue) {
+        assertNotNull(AliasType.rawValueOf(enumValue.getValue()));
+        Assertions.assertEquals(AliasTypeEnum.fromValue(enumValue.getValue()).getValue(),
+            enumValue.getValue());
+    }
 }

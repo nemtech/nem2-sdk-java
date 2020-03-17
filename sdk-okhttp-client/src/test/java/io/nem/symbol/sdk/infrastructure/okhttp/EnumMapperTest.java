@@ -16,6 +16,9 @@
 
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import io.nem.symbol.catapult.builders.AliasActionDto;
 import io.nem.symbol.catapult.builders.LockHashAlgorithmDto;
 import io.nem.symbol.catapult.builders.MosaicRestrictionTypeDto;
@@ -26,6 +29,7 @@ import io.nem.symbol.sdk.model.blockchain.Position;
 import io.nem.symbol.sdk.model.message.MessageType;
 import io.nem.symbol.sdk.model.mosaic.MosaicSupplyChangeActionType;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
+import io.nem.symbol.sdk.model.namespace.AliasType;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.symbol.sdk.model.node.NodeStatus;
 import io.nem.symbol.sdk.model.node.RoleType;
@@ -41,6 +45,7 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountLinkActionEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionFlagsEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AliasActionEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.AliasTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.LockHashAlgorithmEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MessageTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicRestrictionEntryTypeEnum;
@@ -70,7 +75,7 @@ public class EnumMapperTest {
     void testReceiptTypeModel() {
         Set<Integer> existingValues = new HashSet<>();
         Arrays.stream(ReceiptTypeEnum.values()).forEach(v -> {
-            Assertions.assertNotNull(ReceiptType.rawValueOf(v.getValue()), v.name());
+            assertNotNull(ReceiptType.rawValueOf(v.getValue()), v.name());
             Assertions
                 .assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
         });
@@ -80,7 +85,7 @@ public class EnumMapperTest {
     void testReceiptTypeEnumDTO() {
         Set<Integer> existingValues = new HashSet<>();
         Arrays.stream(ReceiptType.values()).forEach(v -> {
-            Assertions.assertNotNull(ReceiptTypeEnum.fromValue(v.getValue()), v.name());
+            assertNotNull(ReceiptTypeEnum.fromValue(v.getValue()), v.name());
             Assertions
                 .assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
         });
@@ -90,7 +95,7 @@ public class EnumMapperTest {
     void testAccountLinkActionEnumDTO() {
         Set<Byte> existingValues = new HashSet<>();
         Arrays.stream(AccountLinkAction.values()).forEach(v -> {
-            Assertions.assertNotNull(AccountLinkActionEnum.fromValue((int) v.getValue()), v.name());
+            assertNotNull(AccountLinkActionEnum.fromValue((int) v.getValue()), v.name());
             Assertions
                 .assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
         });
@@ -99,7 +104,7 @@ public class EnumMapperTest {
     @Test
     public void shouldAccountRestrictionTypeEnumMapToAccountRestrictionType() {
         Arrays.stream(AccountRestrictionFlagsEnum.values()).forEach(
-            v -> Assertions.assertNotNull(AccountRestrictionFlags.rawValueOf(v.getValue())));
+            v -> assertNotNull(AccountRestrictionFlags.rawValueOf(v.getValue())));
     }
 
     @Test
@@ -114,7 +119,7 @@ public class EnumMapperTest {
     void testFromAccountLinkActionEnumToAccountLinkAction() {
         Set<Integer> existingValues = new HashSet<>();
         Arrays.stream(AccountLinkActionEnum.values()).forEach(v -> {
-            Assertions.assertNotNull(AccountLinkAction.rawValueOf(v.getValue()), v.name());
+            assertNotNull(AccountLinkAction.rawValueOf(v.getValue()), v.name());
             Assertions
                 .assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
         });
@@ -124,7 +129,7 @@ public class EnumMapperTest {
     void testAliasActionModel() {
         Set<Integer> existingValues = new HashSet<>();
         Arrays.stream(AliasActionEnum.values()).forEach(v -> {
-            Assertions.assertNotNull(AliasAction.rawValueOf(v.getValue().byteValue()), v.name());
+            assertNotNull(AliasAction.rawValueOf(v.getValue().byteValue()), v.name());
             Assertions
                 .assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
         });
@@ -134,7 +139,7 @@ public class EnumMapperTest {
     void testAliasActionCatbuffer() {
         Set<Byte> existingValues = new HashSet<>();
         Arrays.stream(AliasAction.values()).forEach(v -> {
-            Assertions.assertNotNull(AliasActionDto.rawValueOf(v.getValue()), v.name());
+            assertNotNull(AliasActionDto.rawValueOf(v.getValue()), v.name());
             Assertions
                 .assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
         });
@@ -144,7 +149,7 @@ public class EnumMapperTest {
     void testAliasActionDTO() {
         Set<Byte> existingValues = new HashSet<>();
         Arrays.stream(AliasAction.values()).forEach(v -> {
-            Assertions.assertNotNull(AliasActionEnum.fromValue((int) v.getValue()), v.name());
+            assertNotNull(AliasActionEnum.fromValue((int) v.getValue()), v.name());
             Assertions
                 .assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
         });
@@ -331,7 +336,7 @@ public class EnumMapperTest {
     void testMosaicSupplyChangeActionEnumCatbuffer() {
         Set<Integer> existingValues = new HashSet<>();
         Arrays.stream(MosaicSupplyChangeActionType.values()).forEach(v -> {
-            Assertions.assertNotNull(MosaicSupplyChangeActionDto.rawValueOf((byte) v.getValue()),
+            assertNotNull(MosaicSupplyChangeActionDto.rawValueOf((byte) v.getValue()),
                 v.name());
             Assertions
                 .assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
@@ -440,7 +445,7 @@ public class EnumMapperTest {
     @ParameterizedTest
     @EnumSource(TransactionState.class)
     void validFromTransactionState(TransactionState transactionState) {
-        Assertions.assertNotNull(TransactionStateTypeEnum.valueOf(transactionState.name()));
+        assertNotNull(TransactionStateTypeEnum.valueOf(transactionState.name()));
         Assertions
             .assertEquals(TransactionStateTypeEnum.valueOf(transactionState.name()).getValue(),
                 transactionState.getValue());
@@ -449,7 +454,7 @@ public class EnumMapperTest {
     @ParameterizedTest
     @EnumSource(TransactionStateTypeEnum.class)
     void validFromTransactionStateTypeEnum(TransactionStateTypeEnum transactionState) {
-        Assertions.assertNotNull(TransactionState.valueOf(transactionState.name()));
+        assertNotNull(TransactionState.valueOf(transactionState.name()));
         Assertions
             .assertEquals(TransactionStateTypeEnum.valueOf(transactionState.name()).getValue(),
                 transactionState.getValue());
@@ -459,7 +464,7 @@ public class EnumMapperTest {
     @ParameterizedTest
     @EnumSource(RoleType.class)
     void validFromRoleType(RoleType roleType) {
-        Assertions.assertNotNull(RolesTypeEnum.fromValue(roleType.getValue()));
+        assertNotNull(RolesTypeEnum.fromValue(roleType.getValue()));
         Assertions
             .assertEquals(RolesTypeEnum.fromValue(roleType.getValue()).getValue(),
                 roleType.getValue());
@@ -468,7 +473,7 @@ public class EnumMapperTest {
     @ParameterizedTest
     @EnumSource(RolesTypeEnum.class)
     void validRoleTypeEnum(RolesTypeEnum rolesType) {
-        Assertions.assertNotNull(RoleType.rawValueOf(rolesType.getValue()));
+        assertNotNull(RoleType.rawValueOf(rolesType.getValue()));
         Assertions
             .assertEquals(RolesTypeEnum.fromValue(rolesType.getValue()).getValue(),
                 rolesType.getValue());
@@ -477,7 +482,7 @@ public class EnumMapperTest {
     @ParameterizedTest
     @EnumSource(NodeStatus.class)
     void validFromNodeStatus(NodeStatus nodeStatus) {
-        Assertions.assertNotNull(NodeStatusEnum.fromValue(nodeStatus.getValue()));
+        assertNotNull(NodeStatusEnum.fromValue(nodeStatus.getValue()));
         Assertions
             .assertEquals(NodeStatusEnum.fromValue(nodeStatus.getValue()).getValue(),
                 nodeStatus.getValue());
@@ -486,7 +491,7 @@ public class EnumMapperTest {
     @ParameterizedTest
     @EnumSource(NodeStatusEnum.class)
     void validNodeStatusEnum(NodeStatusEnum rolesType) {
-        Assertions.assertNotNull(NodeStatus.rawValueOf(rolesType.getValue()));
+        assertNotNull(NodeStatus.rawValueOf(rolesType.getValue()));
         Assertions
             .assertEquals(NodeStatusEnum.fromValue(rolesType.getValue()).getValue(),
                 rolesType.getValue());
@@ -494,20 +499,35 @@ public class EnumMapperTest {
 
     @ParameterizedTest
     @EnumSource(Position.class)
-    void validFromNodeStatus(Position position) {
-        Assertions.assertNotNull(PositionEnum.fromValue(position.getValue()));
-        Assertions
-            .assertEquals(PositionEnum.fromValue(position.getValue()).getValue(),
-                position.getValue());
+    void validFromPosition(Position enumValue) {
+        assertNotNull(PositionEnum.fromValue(enumValue.getValue()));
+        assertEquals(PositionEnum.fromValue(enumValue.getValue()).getValue(),
+            enumValue.getValue());
     }
 
     @ParameterizedTest
     @EnumSource(PositionEnum.class)
-    void validPositionEnum(PositionEnum rolesType) {
-        Assertions.assertNotNull(Position.rawValueOf(rolesType.getValue()));
-        Assertions
-            .assertEquals(PositionEnum.fromValue(rolesType.getValue()).getValue(),
-                rolesType.getValue());
+    void validPosition(PositionEnum enumValue) {
+        assertNotNull(Position.rawValueOf(enumValue.getValue()));
+        assertEquals(PositionEnum.fromValue(enumValue.getValue()).getValue(),
+            enumValue.getValue());
     }
+
+    @ParameterizedTest
+    @EnumSource(AliasType.class)
+    void validFromAliasType(AliasType enumValue) {
+        assertNotNull(AliasTypeEnum.fromValue(enumValue.getValue()));
+        assertEquals(AliasTypeEnum.fromValue(enumValue.getValue()).getValue(),
+            enumValue.getValue());
+    }
+
+    @ParameterizedTest
+    @EnumSource(AliasTypeEnum.class)
+    void validAliasTypeEnum(AliasTypeEnum enumValue) {
+        assertNotNull(AliasType.rawValueOf(enumValue.getValue()));
+        Assertions.assertEquals(AliasTypeEnum.fromValue(enumValue.getValue()).getValue(),
+            enumValue.getValue());
+    }
+
 
 }
