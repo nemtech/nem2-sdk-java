@@ -13,7 +13,7 @@ The Symbol SDK for Java, Kotlin and Scala.
 - Java 8
 - Java 9
 
-## Usage
+## Installation
 
 Each SDK user can depend on the best library for its need (example, ``symbol-sdk-vertx-client`` for server developers or ``symbol-sdk-okhttp-client`` for android developers).
 
@@ -53,11 +53,23 @@ OR
 
 ```libraryDependencies += "io.nem" % "symbol-sdk-okhttp-client" % "0.17.0"```
 
-## Documentation and Getting Started
+## Usage
 
-Get started and learn more about symbol-sdk-java, check the [official documentation][docs].
+Surf the [documentation][docs] to get started into Symbol development.
+You will find self-paced guides and useful code snippets using the Java SDK.
 
-Check SDK reference [here][sdk-ref]
+To get the full description of the available classes and their functions, check the [SDK reference][sdk-ref].
+
+## Pacakge Organization
+
+The SDK is composed of multiple sub-modules/folders:
+
+| Module  | Description |
+|---------|-------------|
+|sdk-core | This module includes the model objects, interfaces and common utility classes. It is Vertx, ok-http, gson, etc agnostic. Clients won't depend on this jar directly, they will depend on one of the implementations below. |
+|sdk-vertx-client| The symbol-sdk-java Implementation that uses Vertx and generated `symbol-openapi-vertx-client` lib and dtos. A client may depend on this SDK implementation if Vertx is the selected implementation (e.g. server users).|
+|sdk-okhttp-client| The symbol-sdk-java Implementation that uses OkHttp and the generated `symbol-openapi-okhttp-gson-client`. A client may depend on this SDK implementation if OkHttp is the selected implementation (e.g. android users). |
+|integration-tests|This module is in charge of running integration tests against all implementations. The integration tests exercise how the implementation work against a given catapult server.|
 
 ### Open API Generated Clients
 
@@ -65,40 +77,34 @@ The SDK libs depend on Open API 3 generated clients. The clients Jars are automa
 
 If you want to change or tune the generated libraries, you would need to clone/fork [symbol-openapi-generator][symbol-openapi-generator] repository.
 
-## Modules
+## Getting help
 
-The SDK is composed of multiple sub-modules/folders:
+Use the following available resources to get help:
 
-- **sdk-core:** This module includes the model objects, interfaces and common utility classes. It is Vertx, ok-http, gson, etc agnostic. Clients won't depend on this jar directly, they will depend on one of the implementations below.
-- **sdk-vertx-client:** The symbol-sdk-java Implementation that uses Vertx and generated `symbol-openapi-vertx-client` lib and dtos. A client may depend on this SDK implementation if Vertx is the selected implementation (e.g. server users).
-- **sdk-okhttp-client:** The symbol-sdk-java Implementation that uses OkHttp and the generated `symbol-openapi-okhttp-gson-client`. A client may depend on this SDK implementation if OkHttp is the selected implementation (e.g. android users).
-- **integration-tests:** This module is in charge of running integration tests against all implementations. The integration tests exercise how the implementation work against a given catapult server.
-
-
-## Releases
-
-The release notes for the symbol-sdk can be found [here](CHANGELOG.md).
+- [Symbol Documentation][docs]
+- [Symbol SDK Java Reference][sdk-ref]
+- Join the community [slack group (#sig-api)][slack] 
+- If you found a bug, [open a new issue][issues]
 
 ## Contributing
 
-This project is developed and maintained by NEM Foundation. Contributions are welcome and appreciated. You can find [symbol-sdk on GitHub][self];
-Feel free to start an issue or create a pull request. Check [CONTRIBUTING](CONTRIBUTING.md) before start.
+This project is developed and maintained by NEM Foundation.
 
-## Getting help
+Contributions are welcome and appreciated. 
+Check [CONTRIBUTING](CONTRIBUTING.md) for information on how to contribute.
 
-We use GitHub issues for tracking bugs and have limited bandwidth to address them.
-Please, use the following available resources to get help:
+You can also find useful notes for developers under our documentation [guidelines][guidelines] section.
 
-- [Symbol SDK Java Reference][sdk-ref]
-- If you found a bug, [open a new issue][issues]
 
 ## License
 
-Copyright (c) 2018 NEM
+Copyright (c) 2018-present NEM
 Licensed under the [Apache License 2.0](LICENSE)
 
 [self]: https://github.com/nemtech/symbol-sdk-java
 [docs]: http://nemtech.github.io/getting-started/setup-workstation.html
 [issues]: https://github.com/nemtech/symbol-sdk-java/issues
-[sdk-ref]: http://nemtech.github.io/symbol-sdk-java/javadoc/0.17.0/
+[sdk-ref]: https://nemtech.github.io/references/java-sdk.html
 [symbol-openapi-generator]: https://github.com/nemtech/symbol-openapi-generator
+[guidelines]: https://nemtech.github.io/contribute/contributing.html#sdk
+[slack]: https://join.slack.com/t/nem2/shared_invite/enQtMzY4MDc2NTg0ODgyLWZmZWRiMjViYTVhZjEzOTA0MzUyMTA1NTA5OWQ0MWUzNTA4NjM5OTJhOGViOTBhNjkxYWVhMWRiZDRkOTE0YmU
