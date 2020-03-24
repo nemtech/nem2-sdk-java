@@ -34,19 +34,11 @@ class Ed25519BlockCipherVectorTester extends AbstractVectorTester {
 
 
     private static Stream<Arguments> testResolveSharedKey() {
-        //NOTE!! first example of each file is broken?????
         return createArguments("4.test-cipher.json",
-            entry -> extractArguments(entry), 1, 20
+            entry -> extractArguments(entry), 20
         );
     }
 
-//    {
-//        "privateKey": "3140f94c79f249787d1ec75a97a885980eb8f0a7d9b7aa03e7200296e422b2b6",
-//        "otherPublicKey": "06CA6C64EC727E020022B780FA5677915DD33B14955463548221687771937088",
-//        "iv": "a73ff5c32f8fd055b09775817a6a3f95",
-//        "cipherText": "1C5ECCCDE6F563886919DC1C4AFFD1334381C601B1BBB5CBA437AF3E4C2221F8",
-//        "clearText": "86ddb9e713a8ebf67a51830eff03b837e147c20d75e67b2a54aa29e98c"
-//    },
 
     private static List<Arguments> extractArguments(
         Map<String, String> entry) {

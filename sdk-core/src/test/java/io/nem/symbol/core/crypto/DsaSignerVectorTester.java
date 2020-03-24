@@ -34,7 +34,7 @@ class DsaSignerVectorTester extends AbstractVectorTester {
 
     private static Stream<Arguments> testSignAll() {
         return createArguments("2.test-sign.json",
-            DsaSignerVectorTester::extractArguments, 0, 10
+            DsaSignerVectorTester::extractArguments, 10
         );
     }
 

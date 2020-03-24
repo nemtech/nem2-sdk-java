@@ -33,7 +33,6 @@ public class KeyPairVectorTester extends AbstractVectorTester {
 
     private static Stream<Arguments> testKeys() {
         return createArguments("1.test-keys.json", KeyPairVectorTester::extractArguments,
-            0,
             10
         );
     }

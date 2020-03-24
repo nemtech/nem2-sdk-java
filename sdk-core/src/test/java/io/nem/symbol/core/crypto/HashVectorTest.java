@@ -34,13 +34,13 @@ class HashVectorTest extends AbstractVectorTester {
 
 
     private static Stream<Arguments> testSha256() throws Exception {
-        return createArguments("0.test-sha3-256.json", HashVectorTest::extractArguments, 0,
+        return createArguments("0.test-sha3-256.json", HashVectorTest::extractArguments,
             10
         );
     }
 
     private static Stream<Arguments> testKeccak256() throws Exception {
-        return createArguments("0.test-keccak-256.json", HashVectorTest::extractArguments, 0,
+        return createArguments("0.test-keccak-256.json", HashVectorTest::extractArguments,
             10
         );
     }

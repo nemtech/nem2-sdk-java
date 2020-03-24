@@ -34,7 +34,7 @@ class AddressVectorTester extends AbstractVectorTester {
 
     private static Stream<Arguments> testAddress() {
         return createArguments("1.test-address.json", AddressVectorTester::extractArgumentsSha,
-            0, 5
+            5
         );
     }
 

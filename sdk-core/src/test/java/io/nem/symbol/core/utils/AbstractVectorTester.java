@@ -35,7 +35,7 @@ import org.junit.jupiter.params.provider.Arguments;
 public class AbstractVectorTester {
 
     protected static Stream<Arguments> createArguments(String fileName,
-        Function<Map<String, String>, List<Arguments>> extractArguments, long skip, int limit) {
+        Function<Map<String, String>, List<Arguments>> extractArguments, int limit) {
         try {
             //The files loaded here are a trimmed down version of the vectors tests https://github.com/nemtech/test-vectors
             URL url = AbstractVectorTester.class.getClassLoader()
@@ -47,7 +47,7 @@ public class AbstractVectorTester {
                 });
             //Not all the tests can be run every time as it would be slow.
             //It may be good to shuffle the list so different vectors are tested each run.
-            return list.stream().skip(skip).limit(limit).map(extractArguments::apply)
+            return list.stream().limit(limit).map(extractArguments::apply)
                 .flatMap(List::stream)
                 .filter(Objects::nonNull);
 

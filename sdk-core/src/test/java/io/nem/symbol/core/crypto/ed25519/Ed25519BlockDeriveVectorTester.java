@@ -32,9 +32,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 class Ed25519BlockDeriveVectorTester extends AbstractVectorTester {
 
     private static Stream<Arguments> testResolveSharedKey() {
-        //NOTE!! first example of each file is broken?????
         return createArguments("3.test-derive.json",
-            Ed25519BlockDeriveVectorTester::extractArguments, 0, 30
+            Ed25519BlockDeriveVectorTester::extractArguments, 30
         );
     }
 
