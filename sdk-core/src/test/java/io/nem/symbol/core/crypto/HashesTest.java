@@ -16,6 +16,7 @@
 
 package io.nem.symbol.core.crypto;
 
+import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.infrastructure.RandomUtils;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -34,6 +35,42 @@ public class HashesTest {
     private static final HashTester SHA_512_TESTER = new HashTester(Hashes::sha512, 64);
     private static final HashTester HASH_160_TESTER = new HashTester(Hashes::hash160, 20);
     private static final HashTester KECCAK_256_TESTER = new HashTester(Hashes::keccak256, 32);
+
+    @Test
+    public void testLeading00Hashes() {
+        final String hex = "00137c7c32881d1fff2e905f5b7034bcbcdb806d232f351db48a7816285c548f";
+        final PrivateKey privateKey = PrivateKey.fromHexString(hex);
+        MatcherAssert.assertThat(ConvertUtils.toHex(privateKey.getBytes()),
+            IsEqual.equalTo("00137C7C32881D1FFF2E905F5B7034BCBCDB806D232F351DB48A7816285C548F"));
+        final byte[] hash = Hashes.sha512(privateKey.getBytes());
+
+        MatcherAssert.assertThat(ConvertUtils.toHex(hash),
+            IsEqual.equalTo("47C755C29EC3494D59A4A7ECC497302271D46F2F69E1697AC15FA8C2B480CBC2FF6517F780C51B59E7E79AAF74C9CE04E65FCFDC62A157956AE0DC23C105E6B7"));
+
+        final byte[] d = Arrays.copyOfRange(hash, 0, 32);
+        String actual = ConvertUtils.toHex(d);
+        String expected = "47C755C29EC3494D59A4A7ECC497302271D46F2F69E1697AC15FA8C2B480CBC2";
+        MatcherAssert.assertThat(actual, IsEqual.equalTo(expected));
+    }
+
+    @Test
+    public void testNoLoadingZeros() {
+        final String hex = "e8857f8e488d4e6d4b71bcd44bb4cff49208c32651e1f6500c3b58cafeb8def6";
+        final PrivateKey privateKey = PrivateKey.fromHexString(hex);
+
+        MatcherAssert.assertThat(ConvertUtils.toHex(privateKey.getBytes()),
+            IsEqual.equalTo("E8857F8E488D4E6D4B71BCD44BB4CFF49208C32651E1F6500C3B58CAFEB8DEF6"));
+
+        final byte[] hash = Hashes.sha512(privateKey.getBytes());
+
+        MatcherAssert.assertThat(ConvertUtils.toHex(hash),
+            IsEqual.equalTo("CE46355C204ECF9CD7FF922B59934C40926759C4651D4BC34CA7B89BF5DF6A22EEE0B5ED6759085057D8AA6E032C76944370E77A81B318B0215EEEFD45DD9C46"));
+
+        final byte[] d = Arrays.copyOfRange(hash, 0, 32);
+        String actual = ConvertUtils.toHex(d);
+        String expected = "CE46355C204ECF9CD7FF922B59934C40926759C4651D4BC34CA7B89BF5DF6A22";
+        MatcherAssert.assertThat(actual, IsEqual.equalTo(expected));
+    }
 
     // region sha3_256
 

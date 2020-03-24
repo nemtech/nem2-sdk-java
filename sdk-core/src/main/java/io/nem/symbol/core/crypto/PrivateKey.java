@@ -16,6 +16,7 @@
 
 package io.nem.symbol.core.crypto;
 
+import io.nem.symbol.core.utils.ByteUtils;
 import io.nem.symbol.core.utils.ConvertUtils;
 import java.math.BigInteger;
 
@@ -73,7 +74,7 @@ public class PrivateKey {
     }
 
     public byte[] getBytes() {
-        return this.value.toByteArray();
+        return ByteUtils.bigIntToByteArrayLeadingZeros(this.value, 32);
     }
 
     @Override
@@ -95,7 +96,7 @@ public class PrivateKey {
      * @return the hex representation of the private key.
      */
     public String toHex() {
-        return ConvertUtils.toHex(this.value.toByteArray());
+        return ConvertUtils.toHex(getBytes());
     }
 
 }

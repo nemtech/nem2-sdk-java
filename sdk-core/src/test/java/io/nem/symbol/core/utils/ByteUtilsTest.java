@@ -360,5 +360,42 @@ public class ByteUtilsTest {
         MatcherAssert.assertThat(result, IsEqual.equalTo("{ 12 8A 00 07 }"));
     }
 
+    @Test
+    public void bigIntToByteArrayLeadingZeros() {
+        assertBigIntToByteArrayLeadingZeros("00137c7c32", 6, "0000137C7C32");
+        assertBigIntToByteArrayLeadingZeros("00137c7c32", 5, "00137C7C32");
+        assertBigIntToByteArrayLeadingZeros("00137c7c32", 4, "137C7C32");
+
+        assertBigIntToByteArrayLeadingZeros("00137c7c32", 3, null);
+        assertBigIntToByteArrayLeadingZeros("0137c7c32", 6, "0000137C7C32");
+        assertBigIntToByteArrayLeadingZeros("0137c7c32", 5, "00137C7C32");
+        assertBigIntToByteArrayLeadingZeros("0137c7c32", 4, "137C7C32");
+        assertBigIntToByteArrayLeadingZeros("0137c7c32", 3, null);
+
+        assertBigIntToByteArrayLeadingZeros("137c7c32", 6, "0000137C7C32");
+        assertBigIntToByteArrayLeadingZeros("137c7c32", 5, "00137C7C32");
+        assertBigIntToByteArrayLeadingZeros("137c7c32", 4, "137C7C32");
+        assertBigIntToByteArrayLeadingZeros("137c7c32", 3, null);
+    }
+
+    private void assertBigIntToByteArrayLeadingZeros(String originalHex, int size,
+        String finalHex) {
+        BigInteger originalBigInteger = new BigInteger(ConvertUtils.getBytes(originalHex));
+        if (finalHex == null) {
+            IllegalArgumentException exception = Assertions
+                .assertThrows(IllegalArgumentException.class, () -> {
+                    ByteUtils.bigIntToByteArrayLeadingZeros(originalBigInteger, size);
+                });
+            Assertions.assertEquals("value size " + originalBigInteger.toByteArray().length
+                + " is bigger than expected " + size, exception.getMessage());
+        } else {
+            Assertions.assertEquals(finalHex, ConvertUtils.toHex(
+                ByteUtils.bigIntToByteArrayLeadingZeros(originalBigInteger, size)));
+        }
+
+    }
+
+    //
+
     // endregion
 }

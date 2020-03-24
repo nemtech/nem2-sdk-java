@@ -43,6 +43,29 @@ public class ByteUtils {
     }
 
     /**
+     * Converts a BigInteger to a byte array of the given size leading with zeros.
+     *
+     * @param value The value to convert.
+     * @param numBytes The number of bytes in the destination array.
+     * @return a byte array of size numBytes
+     */
+    public static byte[] bigIntToByteArrayLeadingZeros(final BigInteger value, final int numBytes) {
+        byte[] valueByteArray = value.toByteArray();
+        if (valueByteArray.length > numBytes) {
+            throw new IllegalArgumentException(
+                "value size " + valueByteArray.length + " is bigger than expected "
+                    + numBytes);
+        }
+        if (valueByteArray.length == numBytes) {
+            return valueByteArray;
+        }
+        final byte[] outputBytes = new byte[numBytes];
+        System.arraycopy(valueByteArray, 0, outputBytes, outputBytes.length - valueByteArray.length,
+            valueByteArray.length);
+        return outputBytes;
+    }
+
+    /**
      * Converts a BigInteger value into an array of 8 bytes.
      *
      * @param x The BigInteger.
