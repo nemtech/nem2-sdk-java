@@ -74,7 +74,7 @@ def signingSecretKeyRingFile = getPropertyValue('signingSecretKeyRingFile')
 def signingKeyId = getPropertyValue('signingKeyId')
 def signingPassword = getPropertyValue('signingPassword')
 
-def githubToken = getPropertyValue('GRGIT_USER')
+def githubToken = getPropertyValue('GITHUB_TOKEN')
 def repoPath = getPropertyValue('TRAVIS_REPO_SLUG', "nemtech/symbol-sdk-java")
 
 allprojects {
