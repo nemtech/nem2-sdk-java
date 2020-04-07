@@ -113,7 +113,6 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
             client.getBlockTransactions(height,
                 getPageSize(queryParams),
                 getId(queryParams),
-                null,
                 handler);
 
         return exceptionHandling(

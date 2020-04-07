@@ -97,8 +97,7 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
         Callable<List<TransactionInfoDTO>> callback = () ->
             getClient().getBlockTransactions(height,
                 getPageSize(queryParams),
-                getId(queryParams),
-                null
+                getId(queryParams)
             );
 
         return exceptionHandling(
