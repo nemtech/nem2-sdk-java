@@ -2,7 +2,7 @@
 
 [![symbol-sdk-vertx-client](https://maven-badges.herokuapp.com/maven-central/io.nem/symbol-sdk-vertx-client/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.nem/symbol-sdk-vertx-client)
 [![symbol-sdk-okhttp-client](https://maven-badges.herokuapp.com/maven-central/io.nem/symbol-sdk-okhttp-client/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.nem/symbol-sdk-okhttp-client)
-[![Build Status](https://api.travis-ci.org/nemtech/symbol-sdk-java.svg?branch=master)](https://travis-ci.org/nemtech/symbol-sdk-java)
+[![Build Status](https://api.travis-ci.com/nemtech/symbol-sdk-java.svg?branch=master)](https://travis-ci.com/nemtech/symbol-sdk-java)
 [![Coverage Status](https://coveralls.io/repos/github/nemtech/symbol-sdk-java/badge.svg?branch=master)](https://coveralls.io/github/nemtech/symbol-sdk-java?branch=master)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
