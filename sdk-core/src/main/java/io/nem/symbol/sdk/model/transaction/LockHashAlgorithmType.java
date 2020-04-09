@@ -15,6 +15,8 @@
  */
 package io.nem.symbol.sdk.model.transaction;
 
+import io.nem.symbol.core.crypto.Hasher;
+import io.nem.symbol.core.crypto.Hashes;
 import java.util.Arrays;
 
 /**
@@ -22,24 +24,20 @@ import java.util.Arrays;
  *
  * @since 1.0
  */
-public enum LockHashAlgorithmType {
+public enum LockHashAlgorithmType implements Hasher {
 
     /**
      * hashed using SHA3-256 (Catapult Native)
      */
-    SHA3_256(0),
-    /**
-     * hashed using Keccak-256 (ETH Compat)
-     */
-    KECCAK_256(1),
+    SHA3_256(0, Hashes::sha3_256),
     /**
      * hashed twice: first with SHA-256 and then with RIPEMD-160 (BTC Compat)
      */
-    HASH_160(2),
+    HASH_160(1, Hashes::hash160),
     /**
      * Hashed twice with SHA-256 (BTC Compat)
      */
-    HASH_256(3);
+    HASH_256(2, Hashes::hash256);
 
     /**
      * The regex used to validate a hashed value.
@@ -48,8 +46,11 @@ public enum LockHashAlgorithmType {
 
     private final int value;
 
-    LockHashAlgorithmType(int value) {
+    private final Hasher delegate;
+
+    LockHashAlgorithmType(int value, Hasher delegate) {
         this.value = value;
+        this.delegate = delegate;
     }
 
     public static LockHashAlgorithmType rawValueOf(int value) {
@@ -70,7 +71,6 @@ public enum LockHashAlgorithmType {
         }
         switch (hashType) {
             case SHA3_256:
-            case KECCAK_256:
             case HASH_256:
                 return input.length() == 64;
             case HASH_160:
@@ -79,7 +79,13 @@ public enum LockHashAlgorithmType {
         return false;
     }
 
+    @Override
+    public byte[] hash(byte[]... values) {
+        return this.delegate.hash(values);
+    }
+
     public int getValue() {
         return value;
     }
+
 }

@@ -16,7 +16,6 @@
 
 package io.nem.symbol.core.crypto;
 
-import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.ExceptionUtils;
 import java.security.MessageDigest;
 import java.security.Security;
@@ -25,7 +24,6 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
 import org.bouncycastle.crypto.params.HKDFParameters;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Static class that exposes hash functions.
@@ -157,7 +155,7 @@ public class Hashes {
      */
     public static byte[] hash256(final byte[]... inputs) {
         byte[] hashedSha256 = hash(SHA_256, inputs);
-        return hash(SHA_256, ConvertUtils.toHex(hashedSha256).getBytes());
+        return hash(SHA_256, hashedSha256);
     }
 
     /**
@@ -169,7 +167,7 @@ public class Hashes {
      */
     public static byte[] hash160(final byte[]... inputs) {
         byte[] hashedSha256 = hash(SHA_256, inputs);
-        return hash(RIPEMD_160, Hex.toHexString(hashedSha256).getBytes());
+        return hash(RIPEMD_160, hashedSha256);
     }
 
     private static byte[] hash(final String algorithm, final byte[]... inputs) {
