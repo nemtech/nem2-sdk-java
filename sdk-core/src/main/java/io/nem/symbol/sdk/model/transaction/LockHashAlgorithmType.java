@@ -75,19 +75,15 @@ public enum LockHashAlgorithmType implements Hasher {
         if (!input.matches(VALIDATOR_REGEX)) {
             return false;
         }
-        switch (hashType) {
-            case SHA3_256:
-            case HASH_256:
-                return input.length() == 64;
-            case HASH_160:
-                return input.length() == 64 || input.length() == 40;
+        if (hashType == LockHashAlgorithmType.HASH_160) {
+            return input.length() == 64 || input.length() == 40;
         }
-        return false;
+        return input.length() == 64;
     }
 
     /**
-     * Use this method to just hash values when the LockHashAlgorithmType is known. Users don't
-     * need to if/switch per algorithm.
+     * Use this method to just hash values when the LockHashAlgorithmType is known. Users don't need
+     * to if/switch per algorithm.
      *
      * @param values the values to be hashed
      * @return the hashed value using the algorithm.
