@@ -44,8 +44,14 @@ public enum LockHashAlgorithmType implements Hasher {
      */
     public static final String VALIDATOR_REGEX = "-?[0-9a-fA-F]+";
 
+    /**
+     * The catbuffer and open api value of this type
+     */
     private final int value;
 
+    /**
+     * The {@link Hasher} that should be used when hashing values for this given Algorithm Type
+     */
     private final Hasher delegate;
 
     LockHashAlgorithmType(int value, Hasher delegate) {
@@ -79,6 +85,13 @@ public enum LockHashAlgorithmType implements Hasher {
         return false;
     }
 
+    /**
+     * Use this method to just hash values when the LockHashAlgorithmType is known. Users don't
+     * need to if/switch per algorithm.
+     *
+     * @param values the values to be hashed
+     * @return the hashed value using the algorithm.
+     */
     @Override
     public byte[] hash(byte[]... values) {
         return this.delegate.hash(values);
