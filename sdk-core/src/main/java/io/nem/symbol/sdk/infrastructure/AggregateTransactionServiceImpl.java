@@ -20,7 +20,9 @@ import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.api.AggregateTransactionService;
 import io.nem.symbol.sdk.api.MultisigRepository;
+import io.nem.symbol.sdk.api.NetworkRepository;
 import io.nem.symbol.sdk.api.RepositoryFactory;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountGraphInfo;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.account.PublicAccount;
@@ -37,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -46,9 +49,11 @@ public class AggregateTransactionServiceImpl implements AggregateTransactionServ
 
 
     private final MultisigRepository multisigRepository;
+    private final NetworkRepository networkRepository;
 
     public AggregateTransactionServiceImpl(RepositoryFactory repositoryFactory) {
         this.multisigRepository = repositoryFactory.createMultisigRepository();
+        this.networkRepository = repositoryFactory.createNetworkRepository();
     }
 
     @Override
@@ -83,6 +88,35 @@ public class AggregateTransactionServiceImpl implements AggregateTransactionServ
                             innerTransaction)) : Observable.just(signers.stream()
                         .anyMatch(s -> s.equals(multisigAccountInfo.getAccount().getPublicKey()))))
             ).all(v -> v).toObservable();
+    }
+
+    @Override
+    public Observable<Integer> getMaxCosignatures(Address address) {
+        return this.multisigRepository.getMultisigAccountGraphInfo(address)
+            .map(multisigAccountGraphInfo -> {
+                Stream<Address> publicAccountStream = multisigAccountGraphInfo
+                    .getMultisigAccounts().values().stream().flatMap(
+                        accounts -> accounts.stream()
+                            .flatMap(account -> account.getCosignatories().stream()
+                                .map(PublicAccount::getAddress)));
+                return (int) publicAccountStream.count();
+            });
+    }
+
+    @Override
+    public Observable<Integer> getNetworkMaxCosignaturesPerAggregate() {
+        return this.networkRepository.getNetworkProperties().map(properties -> {
+            if (properties.getPlugins() == null
+                || properties.getPlugins().getAggregate() == null
+                || properties.getPlugins().getAggregate().getMaxCosignaturesPerAggregate()
+                == null) {
+                throw new IllegalStateException(
+                    "Cannot get maxCosignaturesPerAggregate from network properties.");
+            }
+            return Integer.parseInt(
+                properties.getPlugins().getAggregate().getMaxCosignaturesPerAggregate()
+                    .replace("'", ""));
+        });
     }
 
     /**

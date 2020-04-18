@@ -4,3 +4,13 @@ dependencies {
     compile "net.dongliu:gson-java8-datatype:1.1.0"
 }
 
+sourceSets {
+    test {
+        resources {
+            srcDirs += [
+                    project(':symbol-sdk-core').sourceSets.test.resources
+            ]
+        }
+    }
+}
+

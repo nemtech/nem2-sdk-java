@@ -93,6 +93,36 @@ class TransferTransactionTest extends AbstractTransactionTester {
     }
 
     @Test
+    void createATransferTransactionViaStaticConstructorSetMaxFee() {
+
+        int feeMultiplier = 10;
+        TransactionFactory<TransferTransaction> factory = TransferTransactionFactory
+            .create(NetworkType.MIJIN_TEST,
+                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
+                    networkType),
+                Collections.emptyList(),
+                PlainMessage.Empty
+            ).calculateMaxFeeFromMultiplier(feeMultiplier);
+        TransferTransaction transaction =
+            factory.build();
+
+        assertEquals(NetworkType.MIJIN_TEST, transaction.getNetworkType());
+        assertEquals(1, (int) transaction.getVersion());
+        assertTrue(LocalDateTime.now().isBefore(transaction.getDeadline().getLocalDateTime()));
+        assertEquals(BigInteger.valueOf(1610), transaction.getMaxFee());
+        assertEquals(
+            new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", networkType),
+            transaction.getRecipient());
+        assertEquals(0, transaction.getMosaics().size());
+        assertNotNull(transaction.getMessage());
+
+        assertEquals(161, factory.getSize());
+        assertEquals(BigInteger.valueOf(transaction.getSize()).multiply(BigInteger.valueOf(feeMultiplier)), transaction.getMaxFee());
+        assertEquals(transaction.getSize(), factory.getSize());
+
+    }
+
+    @Test
     @DisplayName("Serialization")
     void shouldGenerateBytes() {
         String expected =

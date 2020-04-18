@@ -16,14 +16,19 @@
 
 package io.nem.symbol.sdk.infrastructure;
 
+import io.nem.symbol.core.utils.ExceptionUtils;
 import io.nem.symbol.sdk.api.MultisigRepository;
+import io.nem.symbol.sdk.api.NetworkRepository;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountGraphInfo;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.message.PlainMessage;
+import io.nem.symbol.sdk.model.network.AggregateNetworkProperties;
+import io.nem.symbol.sdk.model.network.NetworkConfiguration;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.network.PluginsProperties;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransaction;
@@ -51,37 +56,29 @@ public class AggregateTransactionServiceTest {
     private NetworkType networkType = NetworkType.MIJIN_TEST;
     private AggregateTransactionServiceImpl service;
 
-    private Account account1 = Account
-        .createFromPrivateKey("82DB2528834C9926F0FCCE042466B24A266F5B685CB66D2869AF6648C043E950",
-            networkType);
-    private Account multisig1 = Account
-        .createFromPrivateKey("8B0622C2CCFC5CCC5A74B500163E3C68F3AD3643DB12932FC931143EAC67280D",
-            networkType);
-    private Account multisig2 = Account
-        .createFromPrivateKey("22A1D67F8519D1A45BD7116600BB6E857786E816FE0B45E4C5B9FFF3D64BC177",
-            networkType);
+    private Account account1 = Account.generateNewAccount(networkType);
+    private Account account2 = Account.generateNewAccount(networkType);
+    private Account account3 = Account.generateNewAccount(networkType);
+    private Account account4 = Account.generateNewAccount(networkType);
 
-    private Account multisig3 = Account
-        .createFromPrivateKey("5E7812AB0E709ABC45466034E1A209099F6A12C4698748A63CDCAA9B0DDE1DBD",
-            networkType);
-    private Account account2 = Account
-        .createFromPrivateKey("A4D410270E01CECDCDEADCDE32EC79C8D9CDEA4DCD426CB1EB666EFEF148FBCE",
-            networkType);
-    private Account account3 = Account
-        .createFromPrivateKey("336AB45EE65A6AFFC0E7ADC5342F91E34BACA0B901A1D9C876FA25A1E590077E",
-            networkType);
+    private Account multisig1 = Account.generateNewAccount(networkType);
+    private Account multisig2 = Account.generateNewAccount(networkType);
+    private Account multisig3 = Account.generateNewAccount(networkType);
 
-    private Account account4 = Account
-        .createFromPrivateKey("4D8B3756592532753344E11E2B7541317BCCFBBCF4444274CDBF359D2C4AE0F1",
-            networkType);
     private String generationHash = "57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6";
+
+    private RepositoryFactory factory;
+    private MultisigRepository multisigRepository;
+    private NetworkRepository networkRepository;
 
     @BeforeEach
     void setup() {
+        factory = Mockito.mock(RepositoryFactory.class);
+        multisigRepository = Mockito.mock(MultisigRepository.class);
+        networkRepository = Mockito.mock(NetworkRepository.class);
 
-        RepositoryFactory factory = Mockito.mock(RepositoryFactory.class);
-        MultisigRepository multisigRepository = Mockito.mock(MultisigRepository.class);
         Mockito.when(factory.createMultisigRepository()).thenReturn(multisigRepository);
+        Mockito.when(factory.createNetworkRepository()).thenReturn(networkRepository);
 
         service = new AggregateTransactionServiceImpl(factory);
 
@@ -103,6 +100,7 @@ public class AggregateTransactionServiceTest {
             .thenReturn(Observable.just(givenAccount2Info()));
         Mockito.when(multisigRepository.getMultisigAccountInfo(Mockito.eq(account3.getAddress())))
             .thenReturn(Observable.just(givenAccount3Info()));
+
     }
 
     public MultisigAccountInfo givenMultisig2AccountInfo() {
@@ -187,6 +185,86 @@ public class AggregateTransactionServiceTest {
 
         return new MultisigAccountGraphInfo(map);
     }
+
+    @Test
+    void getMaxCosignatures() throws ExecutionException, InterruptedException {
+        Map<Integer, List<MultisigAccountInfo>> infoMap = new HashMap<>();
+        MultisigAccountInfo multisigAccountInfo1 =
+            new MultisigAccountInfo(
+                multisig1.getPublicAccount(),
+                1,
+                1,
+                Arrays.asList(account1.getPublicAccount(), account2.getPublicAccount(),
+                    account3.getPublicAccount()),
+                Collections.emptyList());
+        infoMap.put(-3, Collections.singletonList(multisigAccountInfo1));
+
+        MultisigAccountInfo multisigAccountInfo2 =
+            new MultisigAccountInfo(
+                multisig2.getPublicAccount(),
+                1,
+                1,
+                Arrays.asList(account4.getPublicAccount(), account2.getPublicAccount(),
+                    account3.getPublicAccount()),
+                Collections.emptyList());
+        infoMap.put(-2, Collections.singletonList(multisigAccountInfo2));
+
+        MultisigAccountGraphInfo multisigAccountGraphInfo = new MultisigAccountGraphInfo(infoMap);
+
+        Mockito
+            .when(multisigRepository.getMultisigAccountGraphInfo(Mockito.eq(account1.getAddress())))
+            .thenReturn(Observable.just(multisigAccountGraphInfo));
+
+        Integer maxConsignatures = service.getMaxCosignatures(account1.getAddress()).toFuture()
+            .get();
+        Assertions.assertEquals(6, maxConsignatures);
+    }
+
+    @Test
+    void getNetworkMaxCosignaturesPerAggregateWhenValid()
+        throws ExecutionException, InterruptedException {
+
+        NetworkConfiguration configuration = Mockito.mock(NetworkConfiguration.class);
+        PluginsProperties pluginsProperties = Mockito.mock(PluginsProperties.class);
+        AggregateNetworkProperties aggregateNetworkProperties = Mockito
+            .mock(AggregateNetworkProperties.class);
+
+        Mockito.when(aggregateNetworkProperties.getMaxCosignaturesPerAggregate()).thenReturn("25");
+        Mockito.when(pluginsProperties.getAggregate()).thenReturn(aggregateNetworkProperties);
+        Mockito.when(configuration.getPlugins()).thenReturn(pluginsProperties);
+
+        Mockito.when(networkRepository.getNetworkProperties())
+            .thenReturn(Observable.just(configuration));
+
+        Integer maxCosignaturesPerAggregate = service.getNetworkMaxCosignaturesPerAggregate()
+            .toFuture().get();
+
+        Assertions.assertEquals(25, maxCosignaturesPerAggregate);
+    }
+
+    @Test
+    void getNetworkMaxCosignaturesPerAggregateWhenValidInvalid() {
+
+        NetworkConfiguration configuration = Mockito.mock(NetworkConfiguration.class);
+        PluginsProperties pluginsProperties = Mockito.mock(PluginsProperties.class);
+        AggregateNetworkProperties aggregateNetworkProperties = Mockito
+            .mock(AggregateNetworkProperties.class);
+
+        Mockito.when(pluginsProperties.getAggregate()).thenReturn(aggregateNetworkProperties);
+        Mockito.when(configuration.getPlugins()).thenReturn(pluginsProperties);
+
+        Mockito.when(networkRepository.getNetworkProperties())
+            .thenReturn(Observable.just(configuration));
+
+        IllegalStateException exception = Assertions
+            .assertThrows(IllegalStateException.class, () -> ExceptionUtils.propagate(
+                () -> service.getNetworkMaxCosignaturesPerAggregate()
+                    .toFuture().get()));
+
+        Assertions.assertEquals("Cannot get maxCosignaturesPerAggregate from network properties.",
+            exception.getMessage());
+    }
+
 
     /*
      * MLMA

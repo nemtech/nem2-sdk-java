@@ -16,6 +16,7 @@
 
 package io.nem.symbol.sdk.api;
 
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.reactivex.Observable;
 
@@ -25,7 +26,7 @@ import io.reactivex.Observable;
 public interface AggregateTransactionService {
 
     /**
-     * Check if an aggregate complete transaction has all cosignatories attached.
+     * Checks if an aggregate complete transaction has all cosignatories attached.
      *
      * @param signedTransaction The signed aggregate transaction (complete) to be verified
      * @return true if the aggregate transaction has all the consignatories attached.
@@ -33,4 +34,21 @@ public interface AggregateTransactionService {
      * aggregate completed transaction.
      */
     Observable<Boolean> isComplete(SignedTransaction signedTransaction);
+
+
+    /**
+     * Gets total multisig account cosigner count.
+     *
+     * @param address address multisig account address
+     * @return Observable of the total amount of cosigner
+     */
+    Observable<Integer> getMaxCosignatures(Address address);
+
+
+    /**
+     * Gets max cosignatures allowed per aggregate according to the current network properties.
+     *
+     * @return Obervable of the total allowed aggregate
+     */
+    Observable<Integer>  getNetworkMaxCosignaturesPerAggregate();
 }

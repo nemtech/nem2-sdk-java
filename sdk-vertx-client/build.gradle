@@ -3,6 +3,16 @@ dependencies {
     compile "io.nem:symbol-openapi-vertx-client:${restApiVersion}"
     compile "io.vertx:vertx-rx-java2:${vertxVersion}"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jackson_version"
-
 }
+
+sourceSets {
+    test {
+        resources {
+            srcDirs += [
+                    project(':symbol-sdk-core').sourceSets.test.resources
+            ]
+        }
+    }
+}
+
 

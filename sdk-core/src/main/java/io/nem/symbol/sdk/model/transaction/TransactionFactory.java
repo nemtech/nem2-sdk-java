@@ -124,6 +124,17 @@ public abstract class TransactionFactory<T extends Transaction> {
         return this;
     }
 
+
+    /**
+     * Builder method used to to re-calculate the max fee based on the configured feeMultiplier
+     *
+     * @param feeMultiplier the fee multiplier greater than 1
+     * @return this factory to continue building the transaction.
+     */
+    public TransactionFactory<T> calculateMaxFeeFromMultiplier(int feeMultiplier) {
+        return maxFee(BigInteger.valueOf(getSize()).multiply(BigInteger.valueOf(feeMultiplier)));
+    }
+
     /**
      * Builder method used to set the signature. This method is generally called from the rest api
      * mappers.

@@ -150,6 +150,65 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
             transactionBuilder.serialize()));
     }
 
+    @Test
+    void maxFeeThreeCosignature() {
+        NetworkType networkType = NetworkType.MIJIN_TEST;
+        AggregateTransactionCosignature cosignature1 =
+            new AggregateTransactionCosignature(
+                "AAA9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456111AAA9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456111",
+                new PublicAccount(
+                    "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456111",
+                    networkType));
+
+        AggregateTransactionCosignature cosignature2 =
+            new AggregateTransactionCosignature(
+                "BBB9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222BBB9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222",
+                new PublicAccount(
+                    "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222",
+                    networkType));
+
+        AggregateTransactionCosignature cosignature3 =
+            new AggregateTransactionCosignature(
+                "CCC9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222BBB9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222",
+                new PublicAccount(
+                    "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456333",
+                    networkType));
+
+        AggregateTransactionFactory aggregateTransaction = AggregateTransactionFactory
+            .create(TransactionType.AGGREGATE_COMPLETE, networkType,
+                Collections.emptyList(),
+                Arrays.asList(cosignature1, cosignature2, cosignature3));
+
+        int multiplier = 10;
+        Assertions.assertThrows(IllegalArgumentException.class, () -> aggregateTransaction
+            .calculateMaxFeeFromMultiplier(multiplier));
+
+        aggregateTransaction.calculateMaxFeeForAggregate(multiplier, 1);
+        Assertions.assertEquals(BigInteger.valueOf(aggregateTransaction.getSize() * multiplier),
+            aggregateTransaction.getMaxFee());
+
+        aggregateTransaction.calculateMaxFeeForAggregate(multiplier, 2);
+        Assertions.assertEquals(BigInteger.valueOf(aggregateTransaction.getSize() * multiplier),
+            aggregateTransaction.getMaxFee());
+
+        aggregateTransaction.calculateMaxFeeForAggregate(multiplier, 3);
+        Assertions.assertEquals(BigInteger.valueOf(aggregateTransaction.getSize() * multiplier),
+            aggregateTransaction.getMaxFee());
+
+        aggregateTransaction.calculateMaxFeeForAggregate(multiplier, 4);
+        Assertions
+            .assertEquals(BigInteger.valueOf(multiplier * (aggregateTransaction.getSize() + 96)),
+                aggregateTransaction.getMaxFee());
+
+        aggregateTransaction.calculateMaxFeeForAggregate(multiplier, 5);
+        Assertions
+            .assertEquals(BigInteger.valueOf(
+                multiplier * (aggregateTransaction.getSize() + 96 * 2)),
+                aggregateTransaction.getMaxFee());
+
+
+    }
+
 
     @Test
     void serializeThreeCosignature() {
