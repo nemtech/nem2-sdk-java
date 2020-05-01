@@ -16,13 +16,10 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx;
 
-import io.nem.symbol.sdk.api.QueryParams;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.symbol.sdk.model.blockchain.Position;
 import io.nem.symbol.sdk.model.network.NetworkType;
-import io.nem.symbol.sdk.model.transaction.Transaction;
-import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.BlockDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.BlockInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.BlockMetaDTO;
@@ -30,11 +27,9 @@ import io.nem.symbol.sdk.openapi.vertx.model.MerklePathItemDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MerkleProofInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NetworkTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.PositionEnum;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,29 +47,6 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
     public void setUp() {
         super.setUp();
         repository = new BlockRepositoryVertxImpl(apiClientMock);
-    }
-
-    @Test
-    public void getBlockTransactions() throws Exception {
-
-        TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateTransferTransaction.json"
-        );
-
-        mockRemoteCall(Collections.singletonList(aggregateTransferTransactionDTO));
-
-        List<Transaction> transactions = repository
-            .getBlockTransactions(BigInteger.ONE).toFuture()
-            .get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.AGGREGATE_COMPLETE, transactions.get(0).getType());
-
-        transactions = repository
-            .getBlockTransactions(BigInteger.ONE, new QueryParams(1, "id")).toFuture()
-            .get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.AGGREGATE_COMPLETE, transactions.get(0).getType());
-
     }
 
     @Test
@@ -209,23 +181,5 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
         Assertions.assertEquals(blockDto.getHeight(), info.getHeight());
 
     }
-
-
-    @Test
-    public void shouldGetBlockTransactions() throws Exception {
-        TransactionInfoDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
-
-        mockRemoteCall(Collections.singletonList(transactionInfoDTO));
-
-        BigInteger height = BigInteger.valueOf(10L);
-        List<Transaction> transactions = repository.getBlockTransactions(height).toFuture().get();
-
-        Assertions.assertNotNull(transactions);
-
-        Assertions.assertEquals(1, transactions.size());
-
-    }
-
 
 }

@@ -55,8 +55,9 @@ public class MetadataRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl i
     public Observable<List<Metadata>> getAccountMetadata(Address targetAddress,
         Optional<QueryParams> queryParams) {
         Callable<MetadataEntriesDTO> callback = () -> getClient()
-            .getAccountMetadata(targetAddress.plain(), getPageSize(queryParams), getId(queryParams),
-                getOrder(queryParams)
+            .getAccountMetadata(targetAddress.plain(), getPageSize(queryParams),
+                getOrder(queryParams),
+                getId(queryParams)
             );
         return handleList(callback);
     }

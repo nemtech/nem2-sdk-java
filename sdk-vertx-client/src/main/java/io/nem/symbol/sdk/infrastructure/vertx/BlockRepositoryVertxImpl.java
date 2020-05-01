@@ -17,21 +17,16 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.sdk.api.BlockRepository;
-import io.nem.symbol.sdk.api.QueryParams;
-import io.nem.symbol.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
-import io.nem.symbol.sdk.infrastructure.vertx.mappers.TransactionMapper;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerklePathItem;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.symbol.sdk.model.blockchain.Position;
 import io.nem.symbol.sdk.model.network.NetworkType;
-import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.openapi.vertx.api.BlockRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.BlockRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.vertx.model.BlockInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MerkleProofInfoDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -51,12 +46,9 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
 
     private final BlockRoutesApi client;
 
-    private final TransactionMapper transactionMapper;
-
     public BlockRepositoryVertxImpl(ApiClient apiClient) {
         super(apiClient);
         client = new BlockRoutesApiImpl(apiClient);
-        transactionMapper = new GeneralTransactionMapper(getJsonHelper());
     }
 
     @Override
@@ -64,17 +56,6 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
         Consumer<Handler<AsyncResult<BlockInfoDTO>>> callback = handler -> getClient()
             .getBlockByHeight(height, handler);
         return exceptionHandling(call(callback).map(BlockRepositoryVertxImpl::toBlockInfo));
-    }
-
-    @Override
-    public Observable<List<Transaction>> getBlockTransactions(
-        BigInteger height, QueryParams queryParams) {
-        return this.getBlockTransactions(height, Optional.of(queryParams));
-    }
-
-    @Override
-    public Observable<List<Transaction>> getBlockTransactions(BigInteger height) {
-        return this.getBlockTransactions(height, Optional.empty());
     }
 
     @Override
@@ -107,22 +88,6 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
         return new MerkleProofInfo(pathItems);
     }
 
-    private Observable<List<Transaction>> getBlockTransactions(
-        BigInteger height, Optional<QueryParams> queryParams) {
-        Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.getBlockTransactions(height,
-                getPageSize(queryParams),
-                getId(queryParams),
-                handler);
-
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
-                .toObservable());
-    }
-
-    private Transaction toTransaction(TransactionInfoDTO input) {
-        return transactionMapper.map(input);
-    }
 
     public static BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO) {
         return BlockInfo.create(

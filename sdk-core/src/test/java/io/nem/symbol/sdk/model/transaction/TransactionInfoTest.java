@@ -55,19 +55,17 @@ public class TransactionInfoTest {
             TransactionInfo.create(
                 new BigInteger("121855"),
                 1,
-                "5A3D23889CD1E800015929A9",
                 "B6C7648A3DDF71415650805E9E7801424FE03BBEE7D21F9C57B60220D3E95B2F",
                 "B6C7648A3DDF71415650805E9E7801424FE03BBEE7D21F9C57B60220D3E95B2F");
 
         assertEquals(new BigInteger("121855"), transactionInfo.getHeight());
         assertTrue(transactionInfo.getIndex().isPresent());
-        assertTrue(transactionInfo.getId().isPresent());
+        assertFalse(transactionInfo.getId().isPresent());
         assertFalse(transactionInfo.getAggregateHash().isPresent());
         assertFalse(transactionInfo.getAggregateId().isPresent());
         assertTrue(transactionInfo.getHash().isPresent());
         assertTrue(transactionInfo.getMerkleComponentHash().isPresent());
-        assertTrue(1 == transactionInfo.getIndex().get());
-        assertEquals("5A3D23889CD1E800015929A9", transactionInfo.getId().get());
+        assertEquals(1, (int) transactionInfo.getIndex().get());
         assertEquals(
             "B6C7648A3DDF71415650805E9E7801424FE03BBEE7D21F9C57B60220D3E95B2F",
             transactionInfo.getHash().get());
@@ -93,7 +91,7 @@ public class TransactionInfoTest {
         assertFalse(transactionInfo.getMerkleComponentHash().isPresent());
         assertTrue(transactionInfo.getAggregateHash().isPresent());
         assertTrue(transactionInfo.getAggregateId().isPresent());
-        assertTrue(1 == transactionInfo.getIndex().get());
+        assertEquals(1, (int) transactionInfo.getIndex().get());
         assertEquals("5A3D23889CD1E800015929A9", transactionInfo.getId().get());
         assertEquals(
             "3D28C804EDD07D5A728E5C5FFEC01AB07AFA5766AE6997B38526D36015A4D006",

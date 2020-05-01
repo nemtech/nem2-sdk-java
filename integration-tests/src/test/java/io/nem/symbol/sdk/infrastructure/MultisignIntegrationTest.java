@@ -19,6 +19,8 @@ package io.nem.symbol.sdk.infrastructure;
 import io.nem.symbol.sdk.api.Listener;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.TransactionRepository;
+import io.nem.symbol.sdk.api.TransactionSearchCriteria;
+import io.nem.symbol.sdk.api.TransactionSearchGroup;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.message.PlainMessage;
@@ -38,6 +40,7 @@ import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.TestInstance;
@@ -125,9 +128,11 @@ class MultisignIntegrationTest extends BaseIntegrationTest {
                         .announceAggregateBonded(listener, signedAggregatedTx)
                         .flatMap(a -> {
                             System.out.println("Aggregate bonded finished");
-                            return repositoryFactory.createAccountRepository()
-                                .partialTransactions(cosignAccount1.getPublicAccount())
-                                .flatMap((transactions) -> {
+                            return repositoryFactory.createTransactionRepository()
+                                .searchTransactions(new TransactionSearchCriteria().signerPublicKey(cosignAccount1.getPublicAccount().getPublicKey()).group(
+                                    TransactionSearchGroup.PARTIAL))
+                                .flatMap((page) -> {
+                                    List<Transaction> transactions = page.getData();
                                     System.out
                                         .println(
                                             "partialTransactions " + transactions.size());

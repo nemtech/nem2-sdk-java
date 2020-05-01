@@ -20,25 +20,16 @@ import static io.nem.symbol.core.utils.MapperUtils.toAddressFromEncoded;
 import static io.nem.symbol.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.symbol.sdk.api.AccountRepository;
-import io.nem.symbol.sdk.api.TransactionSearchCriteria;
-import io.nem.symbol.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
-import io.nem.symbol.sdk.infrastructure.vertx.mappers.TransactionMapper;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
-import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
-import io.nem.symbol.sdk.model.transaction.Transaction;
-import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.api.AccountRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.AccountRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountIds;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountInfoDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionTypeEnum;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -57,12 +48,10 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
 
     private final AccountRoutesApi client;
 
-    private final TransactionMapper transactionMapper;
 
     public AccountRepositoryVertxImpl(ApiClient apiClient) {
         super(apiClient);
         this.client = new AccountRoutesApiImpl(apiClient);
-        this.transactionMapper = new GeneralTransactionMapper(getJsonHelper());
     }
 
     @Override
@@ -84,127 +73,6 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
             call(callback).flatMapIterable(item -> item)
                 .map(AccountInfoDTO::getAccount)
                 .map(this::toAccountInfo).toList().toObservable());
-    }
-
-
-    @Override
-    public Observable<List<Transaction>> transactions(PublicAccount publicAccount) {
-        return this.transactions(publicAccount, new TransactionSearchCriteria());
-    }
-
-    @Override
-    public Observable<List<Transaction>> transactions(
-        PublicAccount publicAccount, TransactionSearchCriteria criteria) {
-
-        Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.getAccountConfirmedTransactions(publicAccount.getPublicKey().toHex(),
-                criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionTypes(criteria.getTransactionTypes()), handler);
-
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
-                .toObservable());
-    }
-
-    @Override
-    public Observable<List<Transaction>> incomingTransactions(PublicAccount publicAccount) {
-        return this.incomingTransactions(publicAccount, new TransactionSearchCriteria());
-    }
-
-    @Override
-    public Observable<List<Transaction>> incomingTransactions(
-        PublicAccount publicAccount, TransactionSearchCriteria criteria) {
-
-        Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.getAccountIncomingTransactions(publicAccount.getPublicKey().toHex(),
-                criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionTypes(criteria.getTransactionTypes()), handler);
-
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
-                .toObservable());
-    }
-
-    @Override
-    public Observable<List<Transaction>> outgoingTransactions(PublicAccount publicAccount) {
-        return this.outgoingTransactions(publicAccount, new TransactionSearchCriteria());
-    }
-
-    @Override
-    public Observable<List<Transaction>> outgoingTransactions(
-        PublicAccount publicAccount, TransactionSearchCriteria criteria) {
-
-        Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.getAccountOutgoingTransactions(publicAccount.getPublicKey().toHex(),
-                criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionTypes(criteria.getTransactionTypes()), handler);
-
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
-                .toObservable());
-    }
-
-    @Override
-    public Observable<List<Transaction>> partialTransactions(PublicAccount publicAccount) {
-        return this.partialTransactions(publicAccount, new TransactionSearchCriteria());
-    }
-
-    @Override
-    public Observable<List<Transaction>> partialTransactions(
-        PublicAccount publicAccount, TransactionSearchCriteria criteria) {
-
-        Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.getAccountPartialTransactions(publicAccount.getPublicKey().toHex(),
-                criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionTypes(criteria.getTransactionTypes()), handler);
-
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
-                .toObservable());
-    }
-
-    private Transaction toTransaction(TransactionInfoDTO input) {
-        return transactionMapper.map(input);
-    }
-
-
-    @Override
-    public Observable<List<AggregateTransaction>> aggregateBondedTransactions(
-        PublicAccount publicAccount) {
-        return this.aggregateBondedTransactions(publicAccount, new TransactionSearchCriteria());
-    }
-
-    @Override
-    public Observable<List<AggregateTransaction>> aggregateBondedTransactions(
-        PublicAccount publicAccount, TransactionSearchCriteria criteria) {
-
-        Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.getAccountPartialTransactions(publicAccount.getPublicKey().toHex(),
-                criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionTypes(criteria.getTransactionTypes()), handler);
-
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toTransaction)
-                .map(o -> (AggregateTransaction) o).toList()
-                .toObservable());
-    }
-
-    @Override
-    public Observable<List<Transaction>> unconfirmedTransactions(PublicAccount publicAccount) {
-        return this.unconfirmedTransactions(publicAccount, new TransactionSearchCriteria());
-    }
-
-    @Override
-    public Observable<List<Transaction>> unconfirmedTransactions(
-        PublicAccount publicAccount, TransactionSearchCriteria criteria) {
-
-        Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.getAccountUnconfirmedTransactions(publicAccount.getPublicKey().toHex(),
-                criteria.getPageSize(), criteria.getId(), criteria.getOrder(),
-                toTransactionTypes(criteria.getTransactionTypes()), handler);
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
-                .toObservable());
     }
 
 
@@ -231,11 +99,5 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         return client;
     }
 
-    private List<TransactionTypeEnum> toTransactionTypes(List<TransactionType> transactionTypes) {
-        return transactionTypes == null || transactionTypes.isEmpty() ? null
-            : transactionTypes.stream()
-                .map(transactionType -> TransactionTypeEnum.fromValue(transactionType.getValue()))
-                .collect(Collectors.toList());
-    }
 
 }

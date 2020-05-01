@@ -26,10 +26,10 @@ class QueryParamsTest {
 
     @Test
     void shouldCreateQueryParamsViaConstructor() {
-        QueryParams queryParams = new QueryParams(15, "5A2139FC71C1B9000147D624", "someId");
+        QueryParams queryParams = new QueryParams(15, "5A2139FC71C1B9000147D624", OrderBy.ASC);
         assertEquals(15, (int) queryParams.getPageSize());
         assertEquals("5A2139FC71C1B9000147D624", queryParams.getId());
-        assertEquals("someId", queryParams.getOrder());
+        assertEquals(OrderBy.ASC, queryParams.getOrderBy());
     }
 
     @Test
@@ -37,15 +37,15 @@ class QueryParamsTest {
         QueryParams queryParams = new QueryParams(-1, "5A2139FC71C1B9000147D624");
         assertEquals(10, (int) queryParams.getPageSize());
         assertEquals("5A2139FC71C1B9000147D624", queryParams.getId());
-        assertNull(queryParams.getOrder());
+        assertNull(queryParams.getOrderBy());
     }
 
     @Test
     void shouldChangePageSizeTo10WhenSettingValue1000() {
-        QueryParams queryParams = new QueryParams(1000, "5A2139FC71C1B9000147D624", "AnotherId");
+        QueryParams queryParams = new QueryParams(1000, "5A2139FC71C1B9000147D624", OrderBy.DESC);
         assertEquals(10, (int) queryParams.getPageSize());
         assertEquals("5A2139FC71C1B9000147D624", queryParams.getId());
-        assertEquals("AnotherId", queryParams.getOrder());
+        assertEquals(OrderBy.DESC, queryParams.getOrderBy());
     }
 
 }

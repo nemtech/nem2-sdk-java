@@ -16,12 +16,12 @@
 
 package io.nem.symbol.sdk.infrastructure;
 
-import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.MosaicRepository;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.api.NetworkCurrencyService;
-import io.nem.symbol.sdk.api.QueryParams;
 import io.nem.symbol.sdk.api.RepositoryFactory;
+import io.nem.symbol.sdk.api.TransactionRepository;
+import io.nem.symbol.sdk.api.TransactionSearchCriteria;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrencyBuilder;
@@ -49,9 +49,9 @@ import org.apache.commons.lang3.Validate;
 public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
 
     /**
-     * The {@link BlockRepository} used to load the block 1 transactions.
+     * The {@link TransactionRepository} used to load the block 1 transactions.
      */
-    private final BlockRepository blockRepository;
+    private final TransactionRepository transactionRepository;
 
     /**
      * The {@link MosaicRepository}.
@@ -69,7 +69,7 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
      * @param repositoryFactory the repository factory.
      */
     public NetworkCurrencyServiceImpl(RepositoryFactory repositoryFactory) {
-        this.blockRepository = repositoryFactory.createBlockRepository();
+        this.transactionRepository = repositoryFactory.createTransactionRepository();
         this.mosaicRepository = repositoryFactory.createMosaicRepository();
         this.namespaceRepository = repositoryFactory.createNamespaceRepository();
     }
@@ -87,7 +87,7 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
      */
     @Override
     public Observable<List<NetworkCurrency>> getNetworkCurrenciesFromNemesis() {
-        return getBlockTransactions(BigInteger.ONE, null).map(transactions -> {
+        return getBlockTransactions(BigInteger.ONE, 1).map(transactions -> {
 
             List<MosaicDefinitionTransaction> mosaicTransactions = transactions.stream()
                 .filter(t -> t.getType() == TransactionType.MOSAIC_DEFINITION)
@@ -231,24 +231,18 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
      * This method is recursive, moving thorough all the pages.
      *
      * @param height the transaction of the given height
-     * @param fromId the start of the transactions to be retrieved.
+     * @param pageNumber the page to be loaded
      * @return the list of all the transaction of the given height starting from from id
      */
-    private Observable<List<Transaction>> getBlockTransactions(BigInteger height, String fromId) {
-        int pageSize = 30;
-        QueryParams query = new QueryParams(pageSize, fromId);
-        return this.blockRepository.getBlockTransactions(height, query)
-            .flatMap(transactions -> {
-                if (transactions.size() < query.getPageSize()) {
-                    return Observable.just(transactions);
+    private Observable<List<Transaction>> getBlockTransactions(BigInteger height, int pageNumber) {
+        return this.transactionRepository.searchTransactions(
+            new TransactionSearchCriteria().height(height).pageNumber(pageNumber))
+            .flatMap(page -> {
+                if (page.getPageNumber() <= pageNumber) {
+                    return Observable.just(page.getData());
                 } else {
-                    return getBlockTransactions(height,
-                        transactions.get(transactions.size() - 1)
-                            .getTransactionInfo()
-                            .orElseThrow(IllegalStateException::new)
-                            .getId()
-                            .orElseThrow(IllegalStateException::new))
-                        .map(tail -> Stream.concat(transactions.stream(), tail.stream())
+                    return getBlockTransactions(height, pageNumber + 1)
+                        .map(tail -> Stream.concat(page.getData().stream(), tail.stream())
                             .collect(Collectors.toList()));
                 }
             });

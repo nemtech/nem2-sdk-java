@@ -20,6 +20,7 @@ import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.EmbeddedTransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoExtendedDTO;
 
 /**
  * A transaction mapper knows how to map DTO for standard and embedded transactions into a {@link
@@ -34,6 +35,14 @@ public interface TransactionMapper {
      * @return the {@link Transaction}
      */
     Transaction map(EmbeddedTransactionInfoDTO transactionInfoDTO);
+
+    /**
+     * It maps an embedded transaction included in an aggregate transaction.
+     *
+     * @param transactionInfoExtendedDTO the embedded transaction
+     * @return the {@link Transaction}
+     */
+    Transaction map(TransactionInfoExtendedDTO transactionInfoExtendedDTO);
 
     /**
      * It maps a general transaction included in a top level json response.
@@ -65,4 +74,5 @@ public interface TransactionMapper {
      * @return the supported transaction type or null if supports all.
      */
     TransactionType getTransactionType();
+
 }

@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.nem.symbol.sdk.api.AccountRepository;
 import io.nem.symbol.sdk.api.Listener;
 import io.nem.symbol.sdk.api.TransactionRepository;
+import io.nem.symbol.sdk.api.TransactionSearchCriteria;
 import io.nem.symbol.sdk.api.TransactionService;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
@@ -35,6 +35,7 @@ import io.nem.symbol.sdk.model.transaction.CosignatureTransaction;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionStatusError;
+import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import io.reactivex.Observable;
@@ -189,10 +190,16 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         assertEquals(
             signedTransaction.getHash(), announcedTransaction.getTransactionInfo().get().getHash());
 
-        List<AggregateTransaction> transactions = get(getAccountRepository(type)
-            .aggregateBondedTransactions(this.cosignatoryAccount.getPublicAccount()));
+        TransactionRepository transactionRepository = getRepositoryFactory(type)
+            .createTransactionRepository();
 
-        AggregateTransaction transactionToCosign = transactions.get(0);
+        List<Transaction> transactions = get(transactionRepository.searchTransactions(
+            new TransactionSearchCriteria().transactionTypes(Collections.singletonList(
+                TransactionType.AGGREGATE_BONDED))
+                .signerPublicKey(this.cosignatoryAccount.getPublicAccount().getPublicKey())))
+            .getData();
+
+        AggregateTransaction transactionToCosign = (AggregateTransaction) transactions.get(0);
 
         this.announceCosignatureTransaction(transactionToCosign, type);
 
@@ -201,10 +208,6 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
 
         assertEquals(cosignatureSignedTransaction.getSignerPublicKey(),
             this.cosignatoryAccount2.getPublicKey());
-    }
-
-    private AccountRepository getAccountRepository(RepositoryType type) {
-        return getRepositoryFactory(type).createAccountRepository();
     }
 
     @ParameterizedTest

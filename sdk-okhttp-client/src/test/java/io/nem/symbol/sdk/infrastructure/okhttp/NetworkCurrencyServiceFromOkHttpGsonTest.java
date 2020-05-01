@@ -21,12 +21,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.gson.Gson;
-import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.JsonSerialization;
 import io.nem.symbol.sdk.api.MosaicRepository;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.api.NetworkCurrencyService;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RepositoryFactory;
+import io.nem.symbol.sdk.api.TransactionRepository;
+import io.nem.symbol.sdk.api.TransactionSearchCriteria;
 import io.nem.symbol.sdk.infrastructure.NetworkCurrencyServiceImpl;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.transaction.Transaction;
@@ -46,7 +48,7 @@ import org.mockito.Mockito;
 public class NetworkCurrencyServiceFromOkHttpGsonTest {
 
     private NamespaceRepository namespaceRepository;
-    private BlockRepository blockRepository;
+    private TransactionRepository transactionRepository;
     private MosaicRepository mosaicRepository;
     private NetworkCurrencyService service;
 
@@ -58,15 +60,13 @@ public class NetworkCurrencyServiceFromOkHttpGsonTest {
         namespaceRepository = mock(NamespaceRepository.class);
         when(factory.createNamespaceRepository()).thenReturn(namespaceRepository);
 
-        blockRepository = mock(BlockRepository.class);
-        when(factory.createBlockRepository()).thenReturn(blockRepository);
+        transactionRepository = mock(TransactionRepository.class);
+        when(factory.createTransactionRepository()).thenReturn(transactionRepository);
 
         mosaicRepository = mock(MosaicRepository.class);
         when(factory.createMosaicRepository()).thenReturn(mosaicRepository);
 
         service = new NetworkCurrencyServiceImpl(factory);
-
-
     }
 
     @Test
@@ -81,8 +81,11 @@ public class NetworkCurrencyServiceFromOkHttpGsonTest {
         List<Transaction> transactions = stream.map(serialization::jsonToTransaction)
             .collect(Collectors.toList());
 
-        when(blockRepository.getBlockTransactions(Mockito.eq(BigInteger.ONE), Mockito.any()))
-            .thenReturn(Observable.just(transactions));
+        TransactionSearchCriteria ctieria = new TransactionSearchCriteria().height(BigInteger.ONE)
+            .pageNumber(1);
+
+        when(transactionRepository.searchTransactions(Mockito.eq(ctieria)))
+            .thenReturn(Observable.just(new Page<>(transactions, 1, 1, 1, 1)));
 
         List<NetworkCurrency> networkCurrencies = service.getNetworkCurrenciesFromNemesis()
             .toFuture().get();

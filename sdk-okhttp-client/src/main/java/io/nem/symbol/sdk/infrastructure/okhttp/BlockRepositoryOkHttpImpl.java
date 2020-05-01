@@ -17,19 +17,15 @@
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.sdk.api.BlockRepository;
-import io.nem.symbol.sdk.api.QueryParams;
-import io.nem.symbol.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerklePathItem;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.symbol.sdk.model.blockchain.Position;
 import io.nem.symbol.sdk.model.network.NetworkType;
-import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.BlockRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.BlockInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MerkleProofInfoDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.List;
@@ -47,29 +43,16 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
 
     private final BlockRoutesApi client;
 
-    private final GeneralTransactionMapper transactionMapper;
 
     public BlockRepositoryOkHttpImpl(ApiClient apiClient) {
         super(apiClient);
         this.client = new BlockRoutesApi(apiClient);
-        this.transactionMapper = new GeneralTransactionMapper(getJsonHelper());
     }
 
     @Override
     public Observable<BlockInfo> getBlockByHeight(BigInteger height) {
         Callable<BlockInfoDTO> callback = () -> getClient().getBlockByHeight(height);
         return exceptionHandling(call(callback).map(BlockRepositoryOkHttpImpl::toBlockInfo));
-    }
-
-    @Override
-    public Observable<List<Transaction>> getBlockTransactions(
-        BigInteger height, QueryParams queryParams) {
-        return this.getBlockTransactions(height, Optional.of(queryParams));
-    }
-
-    @Override
-    public Observable<List<Transaction>> getBlockTransactions(BigInteger height) {
-        return this.getBlockTransactions(height, Optional.empty());
     }
 
     @Override
@@ -92,19 +75,6 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
 
     }
 
-    private Observable<List<Transaction>> getBlockTransactions(
-        BigInteger height, Optional<QueryParams> queryParams) {
-        Callable<List<TransactionInfoDTO>> callback = () ->
-            getClient().getBlockTransactions(height,
-                getPageSize(queryParams),
-                getId(queryParams)
-            );
-
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
-                .toObservable());
-    }
-
 
     private MerkleProofInfo toMerkleProofInfo(MerkleProofInfoDTO dto) {
         List<MerklePathItem> pathItems =
@@ -115,9 +85,6 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
         return new MerkleProofInfo(pathItems);
     }
 
-    private Transaction toTransaction(TransactionInfoDTO input) {
-        return transactionMapper.map(input);
-    }
 
     public static BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO) {
         return BlockInfo.create(

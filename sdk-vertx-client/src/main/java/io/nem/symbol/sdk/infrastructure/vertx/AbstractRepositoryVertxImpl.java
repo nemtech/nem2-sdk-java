@@ -21,6 +21,7 @@ import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiException;
+import io.nem.symbol.sdk.openapi.vertx.model.Order;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
@@ -111,8 +112,8 @@ public abstract class AbstractRepositoryVertxImpl {
         return queryParams.map(QueryParams::getId).orElse(null);
     }
 
-    protected String getOrder(Optional<QueryParams> queryParams) {
-        return queryParams.map(QueryParams::getOrder).orElse(null);
+    protected Order getOrder(Optional<QueryParams> queryParams) {
+        return queryParams.map(QueryParams::getOrderBy).map(o-> Order.fromValue(o.getValue())).orElse(null);
     }
 
     public JsonHelper getJsonHelper() {

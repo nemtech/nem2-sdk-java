@@ -19,6 +19,7 @@ package io.nem.symbol.sdk.infrastructure.vertx;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoExtendedDTO;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
@@ -37,6 +38,11 @@ public class TestHelperVertx {
     }
 
     private TestHelperVertx() {
+    }
+
+    public static TransactionInfoExtendedDTO loadTransactionInfoExtendedDTO(String name) {
+        String resourceName = "TransactionMapping-" + name;
+        return loadResource(resourceName, TransactionInfoExtendedDTO.class);
     }
 
     public static TransactionInfoDTO loadTransactionInfoDTO(String name) {

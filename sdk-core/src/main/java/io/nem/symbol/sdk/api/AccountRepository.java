@@ -18,9 +18,6 @@ package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.account.PublicAccount;
-import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
-import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.reactivex.Observable;
 import java.util.List;
 
@@ -47,132 +44,132 @@ public interface AccountRepository {
      */
     Observable<List<AccountInfo>> getAccountsInfo(List<Address> addresses);
 
-    /**
-     * Gets an list of confirmed transactions for which an account is signer or receiver.
-     *
-     * @param publicAccount PublicAccount
-     * @return Observable {@link List} of {@link Transaction}
-     */
-    Observable<List<Transaction>> transactions(PublicAccount publicAccount);
-
-    /**
-     * Gets an list of confirmed transactions for which an account is signer or receiver. With
-     * pagination.
-     *
-     * @param publicAccount PublicAccount
-     * @param criteria the criteria used to filter and order transactions
-     * @return Observable {@link List} of {@link Transaction}
-     */
-    Observable<List<Transaction>> transactions(PublicAccount publicAccount,
-        TransactionSearchCriteria criteria);
-
-    /**
-     * Gets an list of transactions for which an account is the recipient of a transaction. A
-     * transaction is said to be incoming with respect to an account if the account is the recipient
-     * of a transaction.
-     *
-     * @param publicAccount {@link PublicAccount}
-     * @return Observable {@link List} of {@link Transaction}
-     */
-    Observable<List<Transaction>> incomingTransactions(PublicAccount publicAccount);
-
-    /**
-     * Gets an list of transactions for which an account is the recipient of a transaction. A
-     * transaction is said to be incoming with respect to an account if the account is the recipient
-     * of a transaction. With pagination.
-     *
-     * @param publicAccount PublicAccount
-     * @param criteria the criteria used to filter and order transactions
-     * @return Observable {@link List} of {@link Transaction}
-     */
-    Observable<List<Transaction>> incomingTransactions(
-        PublicAccount publicAccount, TransactionSearchCriteria criteria);
-
-    /**
-     * Gets an list of transactions for which an account is the sender a transaction. A transaction
-     * is said to be outgoing with respect to an account if the account is the sender of a
-     * transaction.
-     *
-     * @param publicAccount PublicAccount
-     * @return Observable {@link List} of {@link Transaction}
-     */
-    Observable<List<Transaction>> outgoingTransactions(PublicAccount publicAccount);
-
-    /**
-     * Gets an list of transactions for which an account is the sender a transaction. A transaction
-     * is said to be outgoing with respect to an account if the account is the sender of a
-     * transaction. With pagination.
-     *
-     * @param publicAccount PublicAccount
-     * @param criteria the criteria used to filter and order transactions
-     * @return Observable {@link List} of {@link Transaction}
-     */
-    Observable<List<Transaction>> outgoingTransactions(
-        PublicAccount publicAccount, TransactionSearchCriteria criteria);
-
-    /**
-     * Gets an list of aggregate bonded transactions where the account is the sender or requires to
-     * cosign the transaction.
-     *
-     * @param publicAccount the sender account
-     * @return an observable list of Transaction
-     */
-    Observable<List<Transaction>> partialTransactions(PublicAccount publicAccount);
-
-    /**
-     * Gets an list of aggregate bonded transactions where the account is the sender or requires to
-     * cosign the transaction.
-     *
-     * @param publicAccount the sender account
-     * @param criteria the criteria with the pagination, ordering, filtering, etc
-     * @return an observable list of Transaction
-     */
-    Observable<List<Transaction>> partialTransactions(
-        PublicAccount publicAccount, TransactionSearchCriteria criteria);
-
-    /**
-     * Gets an list of transactions for which an account is the sender or has sign the transaction.
-     * A transaction is said to be aggregate bonded with respect to an account if there are missing
-     * signatures.
-     *
-     * @param publicAccount PublicAccount
-     * @return Observable {@link List} of {@link Transaction}
-     */
-    Observable<List<AggregateTransaction>> aggregateBondedTransactions(PublicAccount publicAccount);
-
-    /**
-     * Gets an list of transactions for which an account is the sender or has sign the transaction.
-     * A transaction is said to be aggregate bonded with respect to an account if there are missing
-     * signatures. With pagination.
-     *
-     * @param publicAccount PublicAccount
-     * @param criteria the criteria used to filter and order transactions
-     * @return Observable {@link List} of {@link Transaction}
-     */
-    Observable<List<AggregateTransaction>> aggregateBondedTransactions(
-        PublicAccount publicAccount, TransactionSearchCriteria criteria);
-
-    /**
-     * Gets the list of transactions for which an account is the sender or receiver and which have
-     * not yet been included in a block. Unconfirmed transactions are those transactions that have
-     * not yet been included in a block. Unconfirmed transactions are not guaranteed to be included
-     * in any block.
-     *
-     * @param publicAccount PublicAccount
-     * @return Observable {@link List} of {@link Transaction}
-     */
-    Observable<List<Transaction>> unconfirmedTransactions(PublicAccount publicAccount);
-
-    /**
-     * Gets the list of transactions for which an account is the sender or receiver and which have
-     * not yet been included in a block. Unconfirmed transactions are those transactions that have
-     * not yet been included in a block. Unconfirmed transactions are not guaranteed to be included
-     * in any block. With pagination.
-     *
-     * @param publicAccount PublicAccount
-     * @param criteria the criteria used to filter and order transactions
-     * @return Observable {@link List} of {@link Transaction}
-     */
-    Observable<List<Transaction>> unconfirmedTransactions(
-        PublicAccount publicAccount, TransactionSearchCriteria criteria);
+//    /**
+//     * Gets an list of confirmed transactions for which an account is signer or receiver.
+//     *
+//     * @param publicAccount PublicAccount
+//     * @return Observable {@link List} of {@link Transaction}
+//     */
+//    Observable<List<Transaction>> transactions(PublicAccount publicAccount);
+//
+//    /**
+//     * Gets an list of confirmed transactions for which an account is signer or receiver. With
+//     * pagination.
+//     *
+//     * @param publicAccount PublicAccount
+//     * @param criteria the criteria used to filter and order transactions
+//     * @return Observable {@link List} of {@link Transaction}
+//     */
+//    Observable<List<Transaction>> transactions(PublicAccount publicAccount,
+//        TransactionSearchCriteria criteria);
+//
+//    /**
+//     * Gets an list of transactions for which an account is the recipient of a transaction. A
+//     * transaction is said to be incoming with respect to an account if the account is the recipient
+//     * of a transaction.
+//     *
+//     * @param publicAccount {@link PublicAccount}
+//     * @return Observable {@link List} of {@link Transaction}
+//     */
+//    Observable<List<Transaction>> incomingTransactions(PublicAccount publicAccount);
+//
+//    /**
+//     * Gets an list of transactions for which an account is the recipient of a transaction. A
+//     * transaction is said to be incoming with respect to an account if the account is the recipient
+//     * of a transaction. With pagination.
+//     *
+//     * @param publicAccount PublicAccount
+//     * @param criteria the criteria used to filter and order transactions
+//     * @return Observable {@link List} of {@link Transaction}
+//     */
+//    Observable<List<Transaction>> incomingTransactions(
+//        PublicAccount publicAccount, TransactionSearchCriteria criteria);
+//
+//    /**
+//     * Gets an list of transactions for which an account is the sender a transaction. A transaction
+//     * is said to be outgoing with respect to an account if the account is the sender of a
+//     * transaction.
+//     *
+//     * @param publicAccount PublicAccount
+//     * @return Observable {@link List} of {@link Transaction}
+//     */
+//    Observable<List<Transaction>> outgoingTransactions(PublicAccount publicAccount);
+//
+//    /**
+//     * Gets an list of transactions for which an account is the sender a transaction. A transaction
+//     * is said to be outgoing with respect to an account if the account is the sender of a
+//     * transaction. With pagination.
+//     *
+//     * @param publicAccount PublicAccount
+//     * @param criteria the criteria used to filter and order transactions
+//     * @return Observable {@link List} of {@link Transaction}
+//     */
+//    Observable<List<Transaction>> outgoingTransactions(
+//        PublicAccount publicAccount, TransactionSearchCriteria criteria);
+//
+//    /**
+//     * Gets an list of aggregate bonded transactions where the account is the sender or requires to
+//     * cosign the transaction.
+//     *
+//     * @param publicAccount the sender account
+//     * @return an observable list of Transaction
+//     */
+//    Observable<List<Transaction>> partialTransactions(PublicAccount publicAccount);
+//
+//    /**
+//     * Gets an list of aggregate bonded transactions where the account is the sender or requires to
+//     * cosign the transaction.
+//     *
+//     * @param publicAccount the sender account
+//     * @param criteria the criteria with the pagination, ordering, filtering, etc
+//     * @return an observable list of Transaction
+//     */
+//    Observable<List<Transaction>> partialTransactions(
+//        PublicAccount publicAccount, TransactionSearchCriteria criteria);
+//
+//    /**
+//     * Gets an list of transactions for which an account is the sender or has sign the transaction.
+//     * A transaction is said to be aggregate bonded with respect to an account if there are missing
+//     * signatures.
+//     *
+//     * @param publicAccount PublicAccount
+//     * @return Observable {@link List} of {@link Transaction}
+//     */
+//    Observable<List<AggregateTransaction>> aggregateBondedTransactions(PublicAccount publicAccount);
+//
+//    /**
+//     * Gets an list of transactions for which an account is the sender or has sign the transaction.
+//     * A transaction is said to be aggregate bonded with respect to an account if there are missing
+//     * signatures. With pagination.
+//     *
+//     * @param publicAccount PublicAccount
+//     * @param criteria the criteria used to filter and order transactions
+//     * @return Observable {@link List} of {@link Transaction}
+//     */
+//    Observable<List<AggregateTransaction>> aggregateBondedTransactions(
+//        PublicAccount publicAccount, TransactionSearchCriteria criteria);
+//
+//    /**
+//     * Gets the list of transactions for which an account is the sender or receiver and which have
+//     * not yet been included in a block. Unconfirmed transactions are those transactions that have
+//     * not yet been included in a block. Unconfirmed transactions are not guaranteed to be included
+//     * in any block.
+//     *
+//     * @param publicAccount PublicAccount
+//     * @return Observable {@link List} of {@link Transaction}
+//     */
+//    Observable<List<Transaction>> unconfirmedTransactions(PublicAccount publicAccount);
+//
+//    /**
+//     * Gets the list of transactions for which an account is the sender or receiver and which have
+//     * not yet been included in a block. Unconfirmed transactions are those transactions that have
+//     * not yet been included in a block. Unconfirmed transactions are not guaranteed to be included
+//     * in any block. With pagination.
+//     *
+//     * @param publicAccount PublicAccount
+//     * @param criteria the criteria used to filter and order transactions
+//     * @return Observable {@link List} of {@link Transaction}
+//     */
+//    Observable<List<Transaction>> unconfirmedTransactions(
+//        PublicAccount publicAccount, TransactionSearchCriteria criteria);
 }

@@ -19,8 +19,9 @@ package io.nem.symbol.sdk.infrastructure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.symbol.sdk.api.BlockRepository;
-import io.nem.symbol.sdk.api.QueryParams;
 import io.nem.symbol.sdk.api.RepositoryCallException;
+import io.nem.symbol.sdk.api.TransactionRepository;
+import io.nem.symbol.sdk.api.TransactionSearchCriteria;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import java.math.BigInteger;
@@ -50,15 +51,18 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getBlockTransactions(RepositoryType type) {
-        List<Transaction> transactions = get(
-            getBlockRepository(type).getBlockTransactions(BigInteger.valueOf(1)));
+        TransactionRepository transactionRepository = getRepositoryFactory(type)
+            .createTransactionRepository();
+
+        List<Transaction> transactions = get(transactionRepository
+            .searchTransactions(
+                new TransactionSearchCriteria().height(BigInteger.ONE).pageNumber(1))).getData();
 
         assertEquals(10, transactions.size());
 
-        List<Transaction> nextTransactions = get(getBlockRepository(type).getBlockTransactions(
-            BigInteger.valueOf(1),
-            new QueryParams(10,
-                transactions.get(0).getTransactionInfo().get().getId().get())));
+        List<Transaction> nextTransactions = get(transactionRepository
+            .searchTransactions(
+                new TransactionSearchCriteria().height(BigInteger.ONE).pageNumber(2))).getData();
 
         assertEquals(10, nextTransactions.size());
         assertEquals(transactions.get(1).getTransactionInfo().get().getHash(),

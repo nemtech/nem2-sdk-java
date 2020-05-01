@@ -16,12 +16,17 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx;
 
+import static io.nem.symbol.sdk.infrastructure.vertx.TestHelperVertx.loadTransactionInfoDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.symbol.core.utils.ExceptionUtils;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RepositoryCallException;
+import io.nem.symbol.sdk.api.TransactionSearchCriteria;
+import io.nem.symbol.sdk.api.TransactionSearchGroup;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
@@ -31,16 +36,21 @@ import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionAnnounceResponse;
 import io.nem.symbol.sdk.model.transaction.TransactionStatus;
+import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import io.nem.symbol.sdk.openapi.vertx.model.AnnounceTransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.Cosignature;
+import io.nem.symbol.sdk.openapi.vertx.model.Pagination;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionGroupEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoExtendedDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionMetaDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionStateTypeEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionPage;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionStatusDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionStatusTypeEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionStatusEnum;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -127,8 +137,9 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     @Test
     public void shouldGetTransactions() throws Exception {
 
-        TransactionInfoDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
+        TransactionInfoExtendedDTO transactionInfoDTO = TestHelperVertx
+            .loadTransactionInfoExtendedDTO(
+                "shouldCreateAggregateMosaicCreationTransaction.json");
 
         mockRemoteCall(Collections.singletonList(transactionInfoDTO));
 
@@ -146,11 +157,11 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     public void shouldGetTransactionStatus() throws Exception {
 
         TransactionStatusDTO transactionStatusDTO = new TransactionStatusDTO();
-        transactionStatusDTO.setGroup(TransactionStateTypeEnum.FAILED);
+        transactionStatusDTO.setGroup(TransactionGroupEnum.FAILED);
         transactionStatusDTO.setDeadline(BigInteger.valueOf(5));
         transactionStatusDTO.setHeight(BigInteger.valueOf(6));
         transactionStatusDTO
-            .setCode(TransactionStatusTypeEnum.FAILURE_ACCOUNTLINK_LINK_ALREADY_EXISTS);
+            .setCode(TransactionStatusEnum.FAILURE_ACCOUNTLINK_LINK_ALREADY_EXISTS);
         transactionStatusDTO.setHash("someHash");
         mockRemoteCall(transactionStatusDTO);
 
@@ -172,11 +183,11 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
 
         TransactionStatusDTO transactionStatusDTO = new TransactionStatusDTO();
 
-        transactionStatusDTO.setGroup(TransactionStateTypeEnum.FAILED);
+        transactionStatusDTO.setGroup(TransactionGroupEnum.FAILED);
         transactionStatusDTO.setDeadline(BigInteger.valueOf(5));
         transactionStatusDTO.setHeight(BigInteger.valueOf(6));
         transactionStatusDTO
-            .setCode(TransactionStatusTypeEnum.FAILURE_ACCOUNTLINK_LINK_ALREADY_EXISTS);
+            .setCode(TransactionStatusEnum.FAILURE_ACCOUNTLINK_LINK_ALREADY_EXISTS);
         transactionStatusDTO.setHash("someHash");
         mockRemoteCall(Collections.singletonList(transactionStatusDTO));
 
@@ -253,7 +264,8 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
 
         Assertions.assertEquals(signedTransaction.getParentHash(), cosignature.getParentHash());
         Assertions.assertEquals(signedTransaction.getSignature(), cosignature.getSignature());
-        Assertions.assertEquals(signedTransaction.getSignerPublicKey(), cosignature.getSignerPublicKey());
+        Assertions
+            .assertEquals(signedTransaction.getSignerPublicKey(), cosignature.getSignerPublicKey());
     }
 
 
@@ -287,6 +299,63 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     protected Mosaic createAbsolute(BigInteger amount) {
         return new Mosaic(NamespaceId.createFromName("xem.currency"),
             amount);
+    }
+
+    @Test
+    public void searchTransactions() throws Exception {
+
+        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
+            "shouldCreateStandaloneTransferTransaction.json");
+
+        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
+
+        mockRemoteCall(toPage(transferTransactionDTO));
+
+        Page<Transaction> transactions = repository.searchTransactions(
+            new TransactionSearchCriteria().signerPublicKey(publicAccount.getPublicKey()).group(
+                TransactionSearchGroup.UNCONFIRMED))
+            .toFuture()
+            .get();
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
+        Assertions.assertEquals(1, transactions.getData().size());
+        Assertions.assertEquals(1, transactions.getPageNumber());
+        Assertions.assertEquals(2, transactions.getPageSize());
+        Assertions.assertEquals(3, transactions.getTotalEntries());
+        Assertions.assertEquals(4, transactions.getTotalPages());
+
+    }
+
+    @Test
+    public void searchTransactionsTransactionTypes() throws Exception {
+
+        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
+            "shouldCreateStandaloneTransferTransaction.json");
+
+        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
+
+        mockRemoteCall(toPage(transferTransactionDTO));
+
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria().transactionTypes(
+            Arrays.asList(TransactionType.NAMESPACE_METADATA, TransactionType.AGGREGATE_COMPLETE));
+
+        Page<Transaction> transactions = repository.searchTransactions(
+            criteria)
+            .toFuture()
+            .get();
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
+        Assertions.assertEquals(1, transactions.getData().size());
+        Assertions.assertEquals(1, transactions.getPageNumber());
+        Assertions.assertEquals(2, transactions.getPageSize());
+        Assertions.assertEquals(3, transactions.getTotalEntries());
+        Assertions.assertEquals(4, transactions.getTotalPages());
+
+    }
+
+    private TransactionPage toPage(TransactionInfoDTO dto) {
+        return new TransactionPage()
+            .data(Collections.singletonList(jsonHelper.parse(jsonHelper.print(dto),
+                TransactionInfoExtendedDTO.class)))
+            .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
     }
 
 }

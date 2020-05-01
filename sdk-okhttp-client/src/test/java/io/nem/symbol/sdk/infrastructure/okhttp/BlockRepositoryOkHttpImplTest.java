@@ -16,15 +16,10 @@
 
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
-import static io.nem.symbol.sdk.infrastructure.okhttp.TestHelperOkHttp.loadTransactionInfoDTO;
-
-import io.nem.symbol.sdk.api.QueryParams;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.symbol.sdk.model.blockchain.Position;
 import io.nem.symbol.sdk.model.network.NetworkType;
-import io.nem.symbol.sdk.model.transaction.Transaction;
-import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.BlockDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.BlockInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.BlockMetaDTO;
@@ -32,11 +27,9 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.MerklePathItemDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MerkleProofInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NetworkTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.PositionEnum;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,47 +49,25 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
         repository = new BlockRepositoryOkHttpImpl(apiClientMock);
     }
 
-    @Test
-    public void getBlockTransactions() throws Exception {
-
-        TransactionInfoDTO aggregateTransferTransactionDTO = loadTransactionInfoDTO(
-            "shouldCreateAggregateTransferTransaction.json"
-        );
-
-        mockRemoteCall(Collections.singletonList(aggregateTransferTransactionDTO));
-
-        List<Transaction> transactions = repository
-            .getBlockTransactions(BigInteger.ONE).toFuture()
-            .get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.AGGREGATE_COMPLETE, transactions.get(0).getType());
-
-        transactions = repository
-            .getBlockTransactions(BigInteger.ONE, new QueryParams(1, "id")).toFuture()
-            .get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.AGGREGATE_COMPLETE, transactions.get(0).getType());
-
-    }
 
     @Test
     public void getMerkleTransaction() throws Exception {
 
         MerkleProofInfoDTO merkleProofInfoDTO = new MerkleProofInfoDTO();
 
-        MerklePathItemDTO item = new MerklePathItemDTO().hash("someHash").position(PositionEnum.LEFT);
+        MerklePathItemDTO item = new MerklePathItemDTO().hash("someHash")
+            .position(PositionEnum.LEFT);
         mockRemoteCall(merkleProofInfoDTO.addMerklePathItem(item));
-
 
         MerkleProofInfo merkleProofInfo = repository
             .getMerkleTransaction(BigInteger.ONE, "HASH!").toFuture()
             .get();
         Assertions.assertEquals(1, merkleProofInfo.getMerklePath().size());
         Assertions.assertEquals("someHash", merkleProofInfo.getMerklePath().get(0).getHash());
-        Assertions.assertEquals(Position.LEFT, merkleProofInfo.getMerklePath().get(0).getPosition());
+        Assertions
+            .assertEquals(Position.LEFT, merkleProofInfo.getMerklePath().get(0).getPosition());
 
     }
-
 
 
     @Test
@@ -211,23 +182,6 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
         Assertions.assertEquals(blockDto.getHeight(), info.getHeight());
 
     }
-
-
-    @Test
-    public void shouldGetBlockTransactions() throws Exception {
-        TransactionInfoDTO transactionInfoDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
-
-        mockRemoteCall(Collections.singletonList(transactionInfoDTO));
-
-        BigInteger height = BigInteger.valueOf(10L);
-        List<Transaction> transactions = repository.getBlockTransactions(height).toFuture().get();
-
-        Assertions.assertNotNull(transactions);
-
-        Assertions.assertEquals(1, transactions.size());
-    }
-
 
     @Override
     public BlockRepositoryOkHttpImpl getRepository() {

@@ -16,9 +16,15 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx;
 
+import io.nem.symbol.core.crypto.PublicKey;
+import io.nem.symbol.sdk.api.OrderBy;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.TransactionRepository;
+import io.nem.symbol.sdk.api.TransactionSearchCriteria;
+import io.nem.symbol.sdk.api.TransactionSearchGroup;
 import io.nem.symbol.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.infrastructure.vertx.mappers.TransactionMapper;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
@@ -26,21 +32,29 @@ import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionAnnounceResponse;
 import io.nem.symbol.sdk.model.transaction.TransactionState;
 import io.nem.symbol.sdk.model.transaction.TransactionStatus;
+import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.api.TransactionRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.TransactionRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.vertx.model.AnnounceTransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.Cosignature;
+import io.nem.symbol.sdk.openapi.vertx.model.Order;
+import io.nem.symbol.sdk.openapi.vertx.model.Pagination;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionGroupSubsetEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionHashes;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionIds;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoExtendedDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionPage;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionPayload;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionStatusDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionTypeEnum;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Transaction http repository.
@@ -66,25 +80,68 @@ public class TransactionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
     }
 
     @Override
-    public Observable<Transaction> getTransaction(String transactionHash) {
-        Consumer<Handler<AsyncResult<TransactionInfoDTO>>> callback = handler -> getClient()
-            .getTransaction(transactionHash, handler);
-        return exceptionHandling(call(callback).map(this::toTransaction));
+    public Observable<Page<Transaction>> searchTransactions(TransactionSearchCriteria criteria) {
+        Consumer<Handler<AsyncResult<TransactionPage>>> callback = handler -> getClient()
+            .searchTransactions(toDto(criteria.getAddress()),
+                toDto(criteria.getRecipientAddress()),
+                toDto(criteria.getSignerPublicKey()), criteria.getHeight(),
+                criteria.getPageSize(),
+                criteria.getPageNumber(), criteria.getOffset(), toDto(criteria.getGroup()),
+                toDto(criteria.getOrder()), toDto(criteria.getTransactionTypes()),
+                criteria.getEmbedded(),
+                handler);
+
+        return exceptionHandling(call(callback)
+            .map(p -> {
+                List<Transaction> data = p.getData().stream().map(transactionMapper::map)
+                    .collect(Collectors.toList());
+                return toPage(p.getPagination(), data);
+            }));
     }
 
-    private Transaction toTransaction(TransactionInfoDTO input) {
-        return transactionMapper.map(input);
+    private Order toDto(OrderBy order) {
+        return order == null ? null : Order.fromValue(order.getValue());
+    }
+
+    private TransactionGroupSubsetEnum toDto(TransactionSearchGroup group) {
+        return group == null ? null : TransactionGroupSubsetEnum.fromValue(group.getValue());
+    }
+
+    private List<TransactionTypeEnum> toDto(List<TransactionType> transactionTypes) {
+        return transactionTypes == null ? null
+            : transactionTypes.stream().map(e -> TransactionTypeEnum.fromValue(e.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    private String toDto(PublicKey publicKey) {
+        return publicKey == null ? null : publicKey.toHex();
+    }
+
+    private String toDto(Address address) {
+        return address == null ? null : address.plain();
+    }
+
+    private <T> Page<T> toPage(Pagination pagination, List<T> data) {
+        return new Page<>(data, pagination.getPageNumber(), pagination.getPageSize(),
+            pagination.getTotalEntries(), pagination.getTotalPages());
     }
 
     @Override
+    public Observable<Transaction> getTransaction(String transactionHash) {
+        Consumer<Handler<AsyncResult<TransactionInfoDTO>>> callback = handler -> getClient()
+            .getTransaction(transactionHash, handler);
+        return exceptionHandling(call(callback).map(transactionMapper::map));
+    }
+
+
+    @Override
     public Observable<List<Transaction>> getTransactions(List<String> transactionHashes) {
-        Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
-            client.getTransactions(new TransactionIds().transactionIds(transactionHashes), handler);
+        Consumer<Handler<AsyncResult<List<TransactionInfoExtendedDTO>>>> callback = handler ->
+            client.getTransactionsById(new TransactionIds().transactionIds(transactionHashes),
+                handler);
         return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toTransaction).toList()
+            call(callback).flatMapIterable(item -> item).map(transactionMapper::map).toList()
                 .toObservable());
-
-
     }
 
     @Override

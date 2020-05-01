@@ -18,17 +18,17 @@ package io.nem.symbol.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.symbol.sdk.api.AccountRepository;
 import io.nem.symbol.sdk.api.RepositoryCallException;
+import io.nem.symbol.sdk.api.TransactionRepository;
 import io.nem.symbol.sdk.api.TransactionSearchCriteria;
+import io.nem.symbol.sdk.api.TransactionSearchGroup;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountNames;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import java.util.Arrays;
@@ -109,14 +109,16 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getMultipleTransactions(RepositoryType type) {
-        AccountRepository accountHttp = getRepositoryFactory(type).createAccountRepository();
+        TransactionRepository transactionRepository = getRepositoryFactory(type)
+            .createTransactionRepository();
         Account account = config().getDefaultAccount();
         List<TransactionType> transactionTypes = Arrays
             .asList(TransactionType.TRANSFER, TransactionType.AGGREGATE_COMPLETE,
                 TransactionType.NAMESPACE_METADATA);
-        List<Transaction> transactions = get(accountHttp.transactions(account.getPublicAccount(),
-            new TransactionSearchCriteria().transactionTypes(
-                transactionTypes)));
+        List<Transaction> transactions = get(transactionRepository.searchTransactions(
+            new TransactionSearchCriteria()
+                .signerPublicKey(account.getPublicAccount().getPublicKey()).transactionTypes(
+                transactionTypes))).getData();
         Assertions.assertFalse(transactions.isEmpty());
 
         transactions.forEach(t -> Assertions.assertTrue(transactionTypes.contains(t.getType())));
@@ -125,17 +127,19 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getTransactionById(RepositoryType type) {
-        AccountRepository accountHttp = getRepositoryFactory(type).createAccountRepository();
+        TransactionRepository transactionRepository = getRepositoryFactory(type)
+            .createTransactionRepository();
         Account account = config().getDefaultAccount();
-        List<Transaction> transactions = get(accountHttp.transactions(account.getPublicAccount(),
-            new TransactionSearchCriteria().pageSize(10).order("id")));
+        List<Transaction> transactions = get(transactionRepository.searchTransactions(
+            new TransactionSearchCriteria()
+                .signerPublicKey(account.getPublicAccount().getPublicKey()).pageSize(10)))
+            .getData();
         Assertions.assertTrue(transactions.size() > 0);
 
         String lastOne = transactions.get(0).getTransactionInfo().get().getId().get();
         String id = transactions.get(1).getTransactionInfo().get().getId().get();
-        List<Transaction> transactions2 = get(accountHttp.transactions(account.getPublicAccount(),
-            new TransactionSearchCriteria()
-                .id(id)));
+        List<Transaction> transactions2 = get(
+            transactionRepository.getTransactions(Arrays.asList(id)));
 
         Assertions.assertEquals(1, transactions2.size());
         transactions2
@@ -146,19 +150,21 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void outgoingTransactionsById(RepositoryType type) {
-        AccountRepository accountHttp = getRepositoryFactory(type).createAccountRepository();
+        TransactionRepository transactionRepository = getRepositoryFactory(type)
+            .createTransactionRepository();
         Account account = config().getDefaultAccount();
-        List<Transaction> transactions = get(
-            accountHttp.outgoingTransactions(account.getPublicAccount(),
-                new TransactionSearchCriteria().pageSize(10).order("id")));
+
+        List<Transaction> transactions = get(transactionRepository.searchTransactions(
+            new TransactionSearchCriteria()
+                .signerPublicKey(account.getPublicAccount().getPublicKey()).pageSize(10)))
+            .getData();
+
         Assertions.assertTrue(transactions.size() > 1);
 
         String lastOne = transactions.get(0).getTransactionInfo().get().getId().get();
         String id = transactions.get(1).getTransactionInfo().get().getId().get();
         List<Transaction> transactions2 = get(
-            accountHttp.outgoingTransactions(account.getPublicAccount(),
-                new TransactionSearchCriteria()
-                    .id(id)));
+            transactionRepository.getTransactions(Arrays.asList(id)));
 
         Assertions.assertEquals(1, transactions2.size());
         transactions2
@@ -169,55 +175,22 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getMosaicGlobalRegistration(RepositoryType type) {
-        AccountRepository accountHttp = getRepositoryFactory(type).createAccountRepository();
+        TransactionRepository transactionRepository = getRepositoryFactory(type)
+            .createTransactionRepository();
         Account account = config().getDefaultAccount();
         TransactionType transactionType = TransactionType.MOSAIC_GLOBAL_RESTRICTION;
-        List<Transaction> transactions = get(accountHttp.transactions(account.getPublicAccount(),
+        List<Transaction> transactions = get(transactionRepository.searchTransactions(
             new TransactionSearchCriteria()
-                .transactionTypes(Collections.singletonList(transactionType))));
+                .transactionTypes(Collections.singletonList(transactionType))
+                .signerPublicKey(account.getPublicAccount().getPublicKey()).pageSize(10)))
+            .getData();
+
         System.out.println(transactions.size());
         Assertions.assertFalse(transactions.isEmpty());
 
         transactions.forEach(t -> Assertions.assertEquals(transactionType, t.getType()));
     }
 
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void transactionsWithPagination(RepositoryType type) {
-        Account account = this.config().getDefaultAccount();
-        List<Transaction> transactions = get(
-            this.getAccountRepository(type).transactions(account.getPublicAccount()));
-
-        Assertions.assertTrue(transactions.size() > 0);
-
-        System.out.println(transactions.size());
-        List<Transaction> nextTransactions =
-            get(this.getAccountRepository(type)
-                .transactions(
-                    account.getPublicAccount(),
-                    new TransactionSearchCriteria()
-                        .id(transactions.get(0).getTransactionInfo().get().getId().get())));
-
-        System.out.println(nextTransactions.size());
-        assertEquals(
-            transactions.get(1).getTransactionInfo().get().getHash(),
-            nextTransactions.get(0).getTransactionInfo().get().getHash());
-
-    }
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void transactionsWithPaginationManyTransactions(RepositoryType type) {
-        //Testing that many transaction can be at at least parsed.
-        List<Transaction> transactions =
-            get(this.getAccountRepository(type)
-                .transactions(this.getTestPublicAccount(),
-                    new TransactionSearchCriteria().pageSize(100)));
-        assertTrue(transactions.size() <= 100);
-
-        transactions.forEach(transaction -> assertTransaction(transaction, false));
-    }
 
     private void assertTransaction(Transaction transaction, boolean outgoingTransactions) {
 
@@ -236,21 +209,15 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
 
     }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void incomingTransactions(RepositoryType type) {
-        List<Transaction> transactions = get(
-            this.getAccountRepository(type).incomingTransactions(this.getTestPublicAccount()));
-
-        transactions.forEach(transaction -> assertTransaction(transaction, false));
-    }
-
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void outgoingTransactions(RepositoryType type) {
+        TransactionRepository transactionRepository = getRepositoryFactory(type)
+            .createTransactionRepository();
         List<Transaction> transactions = get(
-            this.getAccountRepository(type).outgoingTransactions(this.getTestPublicAccount()));
+            transactionRepository.searchTransactions(new TransactionSearchCriteria()
+                .recipientAddress((this.getTestPublicAccount()).getAddress()))).getData();
         System.out.println(transactions.size());
         transactions.forEach(transaction -> assertTransaction(transaction, true));
     }
@@ -258,20 +225,16 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void aggregateBondedTransactions(RepositoryType type) {
-        List<AggregateTransaction> transactions = get(this.getAccountRepository(type)
-            .aggregateBondedTransactions(this.getTestPublicAccount())
-        );
-
-        assertEquals(0, transactions.size());
-    }
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
     void unconfirmedTransactions(RepositoryType type) {
-        List<Transaction> transactions = get(this.getAccountRepository(type)
-            .unconfirmedTransactions(this.getTestPublicAccount()));
-        assertEquals(0, transactions.size());
+        TransactionRepository transactionRepository = getRepositoryFactory(type)
+            .createTransactionRepository();
+        List<Transaction> transactions = get(
+            transactionRepository.searchTransactions(new TransactionSearchCriteria()
+                .signerPublicKey((this.getTestPublicAccount()).getPublicKey()).group(
+                    TransactionSearchGroup.UNCONFIRMED))).getData();
+        System.out.println(transactions.size());
+        transactions.forEach(transaction -> assertTransaction(transaction, true));
+
     }
 
     @ParameterizedTest
