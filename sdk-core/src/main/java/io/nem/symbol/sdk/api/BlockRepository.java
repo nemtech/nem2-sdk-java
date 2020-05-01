@@ -37,23 +37,6 @@ public interface BlockRepository {
      */
     Observable<BlockInfo> getBlockByHeight(BigInteger height);
 
-//    /**
-//     * Gets list of transactions included in a block for a block height
-//     *
-//     * @param height BigInteger
-//     * @return {@link Observable} of {@link Transaction} List
-//     */
-//    Observable<List<Transaction>> getBlockTransactions(BigInteger height);
-//
-//    /**
-//     * Gets list of transactions included in a block for a block height With pagination.
-//     *
-//     * @param height BigInteger
-//     * @param queryParams QueryParams
-//     * @return {@link Observable} of {@link Transaction} List
-//     */
-//    Observable<List<Transaction>> getBlockTransactions(BigInteger height, QueryParams queryParams);
-
     /**
      * Get the merkle path for a given a receipt statement hash and block Returns the merkle path
      * for a [receipt statement or resolution](https://nemtech.github.io/concepts/receipt.html)
