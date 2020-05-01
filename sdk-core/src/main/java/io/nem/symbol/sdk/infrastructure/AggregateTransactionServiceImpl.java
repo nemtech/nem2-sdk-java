@@ -99,7 +99,7 @@ public class AggregateTransactionServiceImpl implements AggregateTransactionServ
                         accounts -> accounts.stream()
                             .flatMap(account -> account.getCosignatories().stream()
                                 .map(PublicAccount::getAddress)));
-                return (int) publicAccountStream.count();
+                return publicAccountStream.collect(Collectors.toSet()).size();
             });
     }
 

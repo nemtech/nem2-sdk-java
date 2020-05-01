@@ -217,7 +217,7 @@ public class AggregateTransactionServiceTest {
 
         Integer maxConsignatures = service.getMaxCosignatures(account1.getAddress()).toFuture()
             .get();
-        Assertions.assertEquals(6, maxConsignatures);
+        Assertions.assertEquals(4, maxConsignatures);
     }
 
     @Test
