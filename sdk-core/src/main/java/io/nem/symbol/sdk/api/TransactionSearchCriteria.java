@@ -79,8 +79,8 @@ public class TransactionSearchCriteria extends SearchCriteria {
     private List<TransactionType> transactionTypes;
 
     /**
-     * embedded When true, the endpoint also returns all the embedded aggregate transactions. When
-     * false, only top-level transactions used to calcualate the block transactionsHash are
+     * When true, the endpoint also returns all the embedded aggregate transactions. When
+     * false, only top-level transactions used to calculate the block transactionsHash are
      * returned.  (optional, default to false)
      */
     private Boolean embedded;
