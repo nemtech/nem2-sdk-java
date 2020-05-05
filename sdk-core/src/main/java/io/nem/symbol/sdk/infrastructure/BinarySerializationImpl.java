@@ -17,7 +17,6 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.catapult.builders.AccountAddressRestrictionTransactionBodyBuilder;
-import io.nem.symbol.catapult.builders.AccountLinkActionDto;
 import io.nem.symbol.catapult.builders.AccountLinkTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.AccountMetadataTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.AccountMosaicRestrictionTransactionBodyBuilder;
@@ -35,6 +34,7 @@ import io.nem.symbol.catapult.builders.EntityTypeDto;
 import io.nem.symbol.catapult.builders.Hash256Dto;
 import io.nem.symbol.catapult.builders.HashLockTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.KeyDto;
+import io.nem.symbol.catapult.builders.LinkActionDto;
 import io.nem.symbol.catapult.builders.LockHashAlgorithmDto;
 import io.nem.symbol.catapult.builders.MosaicAddressRestrictionTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.MosaicAliasTransactionBodyBuilder;
@@ -149,8 +149,7 @@ import org.apache.commons.lang3.Validate;
 
 
 /**
- * Implementation of BinarySerialization. It uses the catbuffer generated builders to deserialize an
- * object.
+ * Implementation of BinarySerialization. It uses the catbuffer generated builders to deserialize an object.
  */
 public class BinarySerializationImpl implements BinarySerialization {
 
@@ -204,8 +203,7 @@ public class BinarySerializationImpl implements BinarySerialization {
     }
 
     /**
-     * It returns the registered {@link TransactionSerializer} for the given {@link
-     * TransactionType}.
+     * It returns the registered {@link TransactionSerializer} for the given {@link TransactionType}.
      *
      * @param transactionType the transaction type.
      * @param <T> the transaction type
@@ -334,9 +332,8 @@ public class BinarySerializationImpl implements BinarySerialization {
     }
 
     /**
-     * Deserialization of transactions. All the code related to the deserialization is handled in
-     * the class and its helpers. Transaction Model Objects are not polluted with deserialization
-     * functionality.
+     * Deserialization of transactions. All the code related to the deserialization is handled in the class and its
+     * helpers. Transaction Model Objects are not polluted with deserialization functionality.
      *
      * @param payload the byte array payload
      * @return the {@link Transaction}
@@ -437,8 +434,8 @@ public class BinarySerializationImpl implements BinarySerialization {
 
 
     /**
-     * Interface of the serializer helper classes that know how to serialize/deserialize one type of
-     * transaction from a payload.
+     * Interface of the serializer helper classes that know how to serialize/deserialize one type of transaction from a
+     * payload.
      */
     interface TransactionSerializer<T extends Transaction> {
 
@@ -453,23 +450,21 @@ public class BinarySerializationImpl implements BinarySerialization {
         Class<T> getTransactionClass();
 
         /**
-         * Subclasses would need to create the {@link TransactionFactory} for the handled {@link
-         * TransactionType} with just the specific transaction values. Common values like maxFee and
-         * deadline are handled at top level, subclasses won't need to duplicate the deserialization
-         * efforts.
+         * Subclasses would need to create the {@link TransactionFactory} for the handled {@link TransactionType} with
+         * just the specific transaction values. Common values like maxFee and deadline are handled at top level,
+         * subclasses won't need to duplicate the deserialization efforts.
          *
          * @param networkType the network type
-         * @param transactionBuilder the stream containing just the specific transaction values in
-         * the right order.
+         * @param transactionBuilder the stream containing just the specific transaction values in the right order.
          * @return the TransactionFactory of the transaction type this object handles.
          */
         TransactionFactory fromBodyBuilder(NetworkType networkType,
             Serializer transactionBuilder);
 
         /**
-         * Subclasses would need to know how to serialize the internal components of a transaction,
-         * the bytes that are serialized after the common attributes like max fee and duration.
-         * Subclasses would use catbuffer's transaction body builders.
+         * Subclasses would need to know how to serialize the internal components of a transaction, the bytes that are
+         * serialized after the common attributes like max fee and duration. Subclasses would use catbuffer's
+         * transaction body builders.
          *
          * @param transaction the transaction to be serialized
          * @return the catbuffer {@link Serializer}.
@@ -696,8 +691,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         public Serializer toBodyBuilder(AccountLinkTransaction transaction) {
             return AccountLinkTransactionBodyBuilder.create(
                 SerializationUtils.toKeyDto(transaction.getRemoteAccount().getPublicKey()),
-                AccountLinkActionDto.rawValueOf(transaction.getLinkAction().getValue()))
-                ;
+                LinkActionDto.rawValueOf(transaction.getLinkAction().getValue()));
 
         }
 
@@ -777,7 +771,7 @@ public class BinarySerializationImpl implements BinarySerialization {
             return MosaicMetadataTransactionBodyBuilder.create(
                 SerializationUtils.toKeyDto(transaction.getTargetAccount().getPublicKey()),
                 transaction.getScopedMetadataKey().longValue(),
-                new UnresolvedMosaicIdDto(transaction.getTargetMosaicId().getId().longValue()),
+                SerializationUtils.toUnresolvedMosaicIdDto(transaction.getTargetMosaicId()),
                 (short) transaction.getValueSizeDelta(),
                 ByteBuffer.wrap(MetadataTransaction.toByteArray(transaction.getValue()))
             );
@@ -884,7 +878,7 @@ public class BinarySerializationImpl implements BinarySerialization {
             if (transaction.getNamespaceRegistrationType()
                 == NamespaceRegistrationType.ROOT_NAMESPACE) {
                 txBuilder =
-                    NamespaceRegistrationTransactionBodyBuilder.create(
+                    NamespaceRegistrationTransactionBodyBuilder.createRoot(
                         new BlockDurationDto(transaction.getDuration()
                             .orElseThrow(() -> new IllegalStateException("Duration is required"))
                             .longValue()),
@@ -893,7 +887,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
             } else {
                 txBuilder =
-                    NamespaceRegistrationTransactionBodyBuilder.create(
+                    NamespaceRegistrationTransactionBodyBuilder.createChild(
                         new NamespaceIdDto(transaction.getParentId()
                             .orElseThrow(() -> new IllegalStateException("ParentId is required"))
                             .getId().longValue()),
@@ -1070,12 +1064,13 @@ public class BinarySerializationImpl implements BinarySerialization {
                 transaction.getNamespaceId().getIdAsLong());
             AliasActionDto aliasActionDto = AliasActionDto
                 .rawValueOf(transaction.getAliasAction().getValue());
-            AddressDto addressDto = new AddressDto(SerializationUtils
-                .fromUnresolvedAddressToByteBuffer(transaction.getAddress(),
-                    transaction.getNetworkType()));
+            Address address = transaction.getAddress();
+            AddressDto addressDto = SerializationUtils.toAddressDto(address, transaction.getNetworkType());
             return AddressAliasTransactionBodyBuilder
                 .create(namespaceIdDto, addressDto, aliasActionDto);
         }
+
+
 
     }
 

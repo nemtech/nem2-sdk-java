@@ -259,8 +259,8 @@ public class SerializationUtils {
     }
 
     /**
-     * It concats the 2 byte arrays patching the int size at the beginning of the first byte array
-     * setting up the sum of both lengths.
+     * It concats the 2 byte arrays patching the int size at the beginning of the first byte array setting up the sum of
+     * both lengths.
      *
      * @param commonBytes the common transaction byte array
      * @param transactionBytes the specific transaction byte array.
@@ -316,4 +316,36 @@ public class SerializationUtils {
         return new Hash256Dto(ByteBuffer.wrap(ConvertUtils.fromHexToBytes(hash)));
     }
 
+    /**
+     * Converts an a model {@link Address} into an {@link AddressDto} from catbuffer.
+     *
+     * @param address the model adddress
+     * @param networkType the network type
+     * @return the address dto.
+     */
+    public static AddressDto toAddressDto(Address address, NetworkType networkType) {
+        return new AddressDto(SerializationUtils
+            .fromUnresolvedAddressToByteBuffer(address,
+                networkType));
+    }
+
+    /**
+     * Converts an a model {@link UnresolvedMosaicId} into an {@link UnresolvedMosaicIdDto} from catbuffer.
+     *
+     * @param mosaicId the model
+     * @return the dto
+     */
+    public static UnresolvedMosaicIdDto toUnresolvedMosaicIdDto(UnresolvedMosaicId mosaicId) {
+        return new UnresolvedMosaicIdDto(mosaicId.getId().longValue());
+    }
+
+    /**
+     * Converts an a model {@link MosaicId} into an {@link MosaicIdDto} from catbuffer.
+     *
+     * @param mosaicId the model
+     * @return the dto
+     */
+    public static MosaicIdDto toMosaicIdDto(MosaicId mosaicId) {
+        return new MosaicIdDto(mosaicId.getId().longValue());
+    }
 }

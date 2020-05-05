@@ -20,6 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import io.nem.symbol.catapult.builders.MosaicExpiryReceiptBuilder;
+import io.nem.symbol.catapult.builders.MosaicIdDto;
+import io.nem.symbol.catapult.builders.ReceiptTypeDto;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
@@ -29,6 +32,17 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class ArtifactExpiryReceiptTest {
+
+    @Test
+    void shouldMosaicExpiryReceiptBuilderSerialize() {
+        MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
+        MosaicExpiryReceiptBuilder builder = MosaicExpiryReceiptBuilder
+            .create((short) 1, ReceiptTypeDto.INFLATION, new MosaicIdDto(mosaicId.getId().longValue()));
+        byte[] serialize = builder.serialize();
+        Assertions.assertEquals(builder.getSize(), serialize.length);
+        String hex = ConvertUtils.toHex(serialize);
+        Assertions.assertEquals("01004D4144B262C46CEABB85", hex);
+    }
 
     @Test
     void shouldCreateMosaicExpiryReceipt() {
