@@ -24,8 +24,6 @@ import io.nem.symbol.catapult.builders.ReceiptSourceBuilder;
 import io.nem.symbol.catapult.builders.ReceiptTypeDto;
 import io.nem.symbol.catapult.builders.Serializer;
 import io.nem.symbol.core.crypto.Hashes;
-import io.nem.symbol.core.utils.ArrayUtils;
-import io.nem.symbol.core.utils.ByteUtils;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.account.Address;
@@ -40,8 +38,7 @@ import java.util.stream.Collectors;
 
 /**
  * @param <U> the unresolved type {@link UnresolvedAddress} or  {@link UnresolvedMosaicId}
- * @param <R> the resolved type {@link Address} or {@link
- * MosaicId}
+ * @param <R> the resolved type {@link Address} or {@link MosaicId}
  */
 public abstract class ResolutionStatement<U, R> {
 
@@ -55,10 +52,9 @@ public abstract class ResolutionStatement<U, R> {
      *
      * @param resolutionType the ResolutionType
      * @param height Height
-     * @param unresolved An unresolved address or unresolved mosaicId ({@link UnresolvedAddress} |
-     * {@link UnresolvedMosaicId}).
-     * @param resolutionEntries Array of resolution entries ({@link Address},
-     * or {@link MosaicId}).
+     * @param unresolved An unresolved address or unresolved mosaicId ({@link UnresolvedAddress} | {@link
+     * UnresolvedMosaicId}).
+     * @param resolutionEntries Array of resolution entries ({@link Address}, or {@link MosaicId}).
      */
     public ResolutionStatement(
         ResolutionType resolutionType, BigInteger height, U unresolved,
@@ -272,8 +268,8 @@ public abstract class ResolutionStatement<U, R> {
     }
 
     /**
-     * Get most `recent` primary source id by a given id (transaction index) as PrimaryId might not
-     * be the same as block transaction index.
+     * Get most `recent` primary source id by a given id (transaction index) as PrimaryId might not be the same as block
+     * transaction index.
      *
      * @param primaryId Primary source id
      * @return the expected max available.
@@ -294,84 +290,48 @@ public abstract class ResolutionStatement<U, R> {
      * @return resolution statement hash
      */
     public String generateHash(NetworkType networkType) {
-
-        final byte[] versionByte = ByteUtils.shortToBytes(
-            Short.reverseBytes((short) ReceiptVersion.RESOLUTION_STATEMENT.getValue()));
-        final byte[] typeByte = getResolutionType() == ResolutionType.ADDRESS ?
-            ByteUtils.shortToBytes(
-                Short.reverseBytes((short) ReceiptType.ADDRESS_ALIAS_RESOLUTION.getValue())) :
-            ByteUtils.shortToBytes(
-                Short.reverseBytes((short) ReceiptType.MOSAIC_ALIAS_RESOLUTION.getValue()));
-        final byte[] unresolvedBytes = serializeUnresolved(networkType);
-
-        byte[] results = ArrayUtils.concat(versionByte, typeByte, unresolvedBytes);
-
-        for (final ResolutionEntry entry : resolutionEntries) {
-            results = ArrayUtils.concat(results, entry.serialize());
-        }
-
-        byte[] hash = Hashes.sha3_256(results);
-        return ConvertUtils.toHex(hash).toUpperCase();
+        byte[] serialized = serialize(networkType);
+        byte[] hash = Hashes.sha3_256(serialized);
+        return ConvertUtils.toHex(hash);
     }
 
     /**
-     * Generate unresolved bytes
+     * Serializes the statement using the catuffer builders
      *
      * @param networkType the network type.
-     * @return unresolved bytes
+     * @return the serialized content.
      */
-    private byte[] serializeUnresolved(NetworkType networkType) {
-        if (getResolutionType() == ResolutionType.ADDRESS) {
-            return SerializationUtils
-                .fromUnresolvedAddressToByteBuffer((UnresolvedAddress) getUnresolved(), networkType)
-                .array();
-        }
-        return ByteUtils
-            .reverseCopy(ByteUtils.bigIntToBytes(((UnresolvedMosaicId) getUnresolved()).getId()));
-    }
-
-    /**
-     * Serialize resolution statement and generate hash
-     *
-     * @param networkType networkType
-     * @return resolution statement hash
-     */
-    public String generateHash2(NetworkType networkType) {
-
-
+    private byte[] serialize(NetworkType networkType) {
         ReceiptType type =
             this.resolutionType == ResolutionType.ADDRESS ? ReceiptType.ADDRESS_ALIAS_RESOLUTION
                 : ReceiptType.MOSAIC_ALIAS_RESOLUTION;
         ReceiptTypeDto recipientTypeDto = ReceiptTypeDto.rawValueOf((short) type.getValue());
-        Serializer builder =
-            this.resolutionType == ResolutionType.ADDRESS
-                ? AddressResolutionStatementBuilder.create(
-                (short) ReceiptVersion.RESOLUTION_STATEMENT.getValue(),
-                recipientTypeDto,
-                SerializationUtils.toUnresolvedAddress((UnresolvedAddress) this.unresolved, networkType),
+        short version = (short) ReceiptVersion.RESOLUTION_STATEMENT.getValue();
+        Serializer serializer = this.resolutionType == ResolutionType.ADDRESS
+            ? AddressResolutionStatementBuilder.create(
+            version, recipientTypeDto,
+            SerializationUtils.toUnresolvedAddress((UnresolvedAddress) this.unresolved, networkType),
+            this.resolutionEntries.stream().map(
+                (entry) ->
+                    AddressResolutionEntryBuilder.create(
+                        ReceiptSourceBuilder.create(entry.getReceiptSource().getPrimaryId(),
+                            entry.getReceiptSource().getSecondaryId()),
+                        SerializationUtils.toAddressDto((Address) entry.getResolved(), networkType))
+            ).collect(Collectors.toList()))
+
+            : MosaicResolutionStatementBuilder.create(
+                version, recipientTypeDto,
+                SerializationUtils.toUnresolvedMosaicIdDto((UnresolvedMosaicId) this.unresolved),
                 this.resolutionEntries.stream().map(
                     (entry) ->
-                        AddressResolutionEntryBuilder.create(
+                        MosaicResolutionEntryBuilder.create(
                             ReceiptSourceBuilder.create(entry.getReceiptSource().getPrimaryId(),
                                 entry.getReceiptSource().getSecondaryId()),
-                            SerializationUtils.toAddressDto((Address) entry.getResolved(), networkType))
-                ).collect(Collectors.toList()))
-
-                : MosaicResolutionStatementBuilder.create(
-                    (short) ReceiptVersion.RESOLUTION_STATEMENT.getValue(),
-                    recipientTypeDto, SerializationUtils.toUnresolvedMosaicIdDto((UnresolvedMosaicId) this.unresolved),
-                    this.resolutionEntries.stream().map(
-                        (entry) ->
-                            MosaicResolutionEntryBuilder.create(
-                                ReceiptSourceBuilder.create(entry.getReceiptSource().getPrimaryId(),
-                                    entry.getReceiptSource().getSecondaryId()),
-                                SerializationUtils.toMosaicIdDto((MosaicId) entry.getResolved())
-                            )
-                    ).collect(Collectors.toList())
-                );
-
-        byte[] hash = Hashes.sha3_256(builder.serialize());
-        return ConvertUtils.toHex(hash).toUpperCase();
+                            SerializationUtils.toMosaicIdDto((MosaicId) entry.getResolved())
+                        )
+                ).collect(Collectors.toList())
+            );
+        return serializer.serialize();
     }
 
 }

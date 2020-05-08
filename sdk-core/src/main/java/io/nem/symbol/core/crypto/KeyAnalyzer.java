@@ -27,7 +27,7 @@ public interface KeyAnalyzer {
      * @param publicKey The public key.
      * @return true if the public key is compressed, false otherwise.
      */
-    boolean isKeyCompressed(final PublicKey publicKey);
+    boolean isKeyCompressed(final Key publicKey);
 
 
 }

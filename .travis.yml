@@ -28,12 +28,12 @@ deploy:
     on:
       branch: $RELEASE_BRANCH
       jdk: oraclejdk8
-  - provider: script
-    skip_cleanup: true
-    script: /bin/sh travis/sonarqube.sh
-    on:
-      branch: master
-      jdk: oraclejdk9
+#  - provider: script
+#    skip_cleanup: true
+#    script: /bin/sh travis/sonarqube.sh
+#    on:
+#      branch: master
+#      jdk: oraclejdk9
 before_install:
   - |
     if [ -z "${signingKeyId}" ]; then

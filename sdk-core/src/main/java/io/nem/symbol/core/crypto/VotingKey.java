@@ -21,47 +21,48 @@ import java.math.BigInteger;
 /**
  * Represents a public key.
  */
-public class PublicKey extends Key {
-    /**
-     * The size of Symbol's public keys.
-     */
-    public static final int SIZE = 32;
+public class VotingKey extends Key {
 
     /**
-     * Creates a new key from the byte array.
-     *
-     * @param bytes The raw public key value.
+     * The size of Symbol's voting keys.
      */
-    public PublicKey(byte[] bytes) {
+    public static final int SIZE = 48;
+
+    /**
+     * Creates a new voting key.
+     *
+     * @param bytes The raw voting key value.
+     */
+    public VotingKey(byte[] bytes) {
         super(bytes, SIZE);
     }
 
     /**
-     * Creates a new key from a big int value
+     * Creates a new voting key from a big int value
      *
      * @param value the value
      */
-    public PublicKey(BigInteger value) {
+    public VotingKey(BigInteger value) {
         super(value, SIZE);
     }
 
     /**
-     * Creates a new key from an hex.
+     * Creates a new voting key from an hex.
      *
      * @param hex the hex.
      */
-    public PublicKey(String hex) {
+    public VotingKey(String hex) {
         super(hex, SIZE);
     }
 
     /**
-     * Creates a public key from a hex string.
+     * Creates a voting key from a hex string.
      *
      * @param hex The hex string.
-     * @return The new public key.
+     * @return The new voting key.
      */
-    public static PublicKey fromHexString(final String hex) {
-        return new PublicKey(hex);
+    public static VotingKey fromHexString(final String hex) {
+        return new VotingKey(hex);
     }
 
 }

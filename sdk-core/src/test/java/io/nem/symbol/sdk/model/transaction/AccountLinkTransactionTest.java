@@ -41,8 +41,8 @@ public class AccountLinkTransactionTest extends AbstractTransactionTester {
             AccountLinkTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
-                AccountLinkAction.LINK).deadline(new FakeDeadline()).build();
-        assertEquals(AccountLinkAction.LINK, transaction.getLinkAction());
+                LinkAction.LINK).deadline(new FakeDeadline()).build();
+        assertEquals(LinkAction.LINK, transaction.getLinkAction());
         assertEquals(
             "F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E6",
             transaction.getRemoteAccount().getPublicKey().toHex());
@@ -55,7 +55,7 @@ public class AccountLinkTransactionTest extends AbstractTransactionTester {
             AccountLinkTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
-                AccountLinkAction.LINK).signer(account.getPublicAccount())
+                LinkAction.LINK).signer(account.getPublicAccount())
                 .deadline(new FakeDeadline()).build();
 
         String expected = "A10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E60000000001904C4100000000000000000100000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E601";

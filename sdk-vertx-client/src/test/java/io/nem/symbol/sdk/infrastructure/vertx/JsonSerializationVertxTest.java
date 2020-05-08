@@ -34,7 +34,7 @@ public class JsonSerializationVertxTest {
     @Test
     public void jsonToTransaction() {
         String json = TestHelperVertx.loadResource(
-            "TransactionMapping-shouldCreateAggregateTransferTransaction.json"
+            "transaction-aggregateTransferTransaction.json"
         );
         Transaction transaction = jsonSerialization.jsonToTransaction(json);
         Assertions.assertNotNull(transaction);

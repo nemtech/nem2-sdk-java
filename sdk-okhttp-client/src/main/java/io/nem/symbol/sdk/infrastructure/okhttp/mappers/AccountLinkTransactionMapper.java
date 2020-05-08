@@ -18,13 +18,13 @@ package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.network.NetworkType;
-import io.nem.symbol.sdk.model.transaction.AccountLinkAction;
 import io.nem.symbol.sdk.model.transaction.AccountLinkTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountLinkTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
+import io.nem.symbol.sdk.model.transaction.LinkAction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountLinkActionEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountLinkTransactionDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.LinkActionEnum;
 
 /**
  * Account link transaction mapper.
@@ -43,14 +43,14 @@ class AccountLinkTransactionMapper extends
             .createFromPublicKey(dto.getRemotePublicKey(), networkType);
         return AccountLinkTransactionFactory.create(networkType,
             remoteAccount,
-            AccountLinkAction.rawValueOf(dto.getLinkAction().getValue()));
+            LinkAction.rawValueOf(dto.getLinkAction().getValue()));
     }
 
     @Override
     protected void copyToDto(AccountLinkTransaction transaction, AccountLinkTransactionDTO dto) {
         dto.setRemotePublicKey(transaction.getRemoteAccount().getPublicKey().toHex());
         dto.setLinkAction(
-            AccountLinkActionEnum.fromValue((int) transaction.getLinkAction().getValue()));
+            LinkActionEnum.fromValue((int) transaction.getLinkAction().getValue()));
     }
 
 }

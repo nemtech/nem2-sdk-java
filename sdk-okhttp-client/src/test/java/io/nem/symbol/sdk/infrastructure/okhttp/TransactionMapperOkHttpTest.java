@@ -27,7 +27,6 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
-import io.nem.symbol.sdk.model.transaction.AccountLinkAction;
 import io.nem.symbol.sdk.model.transaction.AccountLinkTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransaction;
@@ -37,6 +36,7 @@ import io.nem.symbol.sdk.model.transaction.AddressAliasTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
+import io.nem.symbol.sdk.model.transaction.LinkAction;
 import io.nem.symbol.sdk.model.transaction.MosaicAliasTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicMetadataTransaction;
@@ -73,7 +73,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateStandaloneTransferTransaction() {
         TransactionInfoDTO transferTransactionDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateStandaloneTransferTransaction.json");
+            "standaloneTransferTransaction.json");
 
         Transaction transferTransaction = map(transferTransactionDTO);
 
@@ -83,7 +83,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateTransferTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAggregateTransferTransaction.json"
+            "aggregateTransferTransaction.json"
         );
 
         Transaction aggregateTransferTransaction = map(aggregateTransferTransactionDTO);
@@ -94,7 +94,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateTransferTransactionUsingAlias() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAggregateTransferTransactionUsingAlias.json"
+            "aggregateTransferTransactionUsingAlias.json"
         );
 
         Transaction aggregateTransferTransaction = map(aggregateTransferTransactionDTO);
@@ -105,7 +105,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateStandaloneRootNamespaceCreationTransaction() {
         TransactionInfoDTO namespaceCreationTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateStandaloneRootNamespaceCreationTransaction.json"
+            TestHelperOkHttp.loadTransactionInfoDTO("standaloneRootNamespaceCreationTransaction.json"
             );
 
         Transaction namespaceCreationTransaction = map(namespaceCreationTransactionDTO);
@@ -117,7 +117,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateRootNamespaceCreationTransaction() {
         TransactionInfoDTO aggregateNamespaceCreationTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateAggregateRootNamespaceCreationTransaction.json"
+            TestHelperOkHttp.loadTransactionInfoDTO("aggregateRootNamespaceCreationTransaction.json"
             );
 
         Transaction aggregateNamespaceCreationTransaction =
@@ -131,7 +131,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateStandaloneSubNamespaceCreationTransaction() {
         TransactionInfoDTO namespaceCreationTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateStandaloneSubNamespaceCreationTransaction.json"
+            TestHelperOkHttp.loadTransactionInfoDTO("standaloneSubNamespaceCreationTransaction.json"
             );
 
         Transaction namespaceCreationTransaction =
@@ -144,7 +144,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateSubNamespaceCreationTransaction() {
         TransactionInfoDTO aggregateNamespaceCreationTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateAggregateSubNamespaceCreationTransaction.json"
+            TestHelperOkHttp.loadTransactionInfoDTO("aggregateSubNamespaceCreationTransaction.json"
             );
 
         Transaction aggregateNamespaceCreationTransaction =
@@ -158,7 +158,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateStandaloneMosaicCreationTransaction() {
         TransactionInfoDTO mosaicCreationTransactionDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateStandaloneMosaicCreationTransaction.json");
+            "standaloneMosaicCreationTransaction.json");
 
         Transaction mosaicCreationTransaction = map(mosaicCreationTransactionDTO);
 
@@ -168,7 +168,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateMosaicCreationTransaction() {
         TransactionInfoDTO aggregateMosaicCreationTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateAggregateMosaicCreationTransaction.json"
+            TestHelperOkHttp.loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json"
             );
 
         Transaction aggregateMosaicCreationTransaction =
@@ -182,7 +182,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateStandaloneMosaicSupplyChangeTransaction() {
         TransactionInfoDTO mosaicSupplyChangeTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateStandaloneMosaicSupplyChangeTransaction.json"
+            TestHelperOkHttp.loadTransactionInfoDTO("standaloneMosaicSupplyChangeTransaction.json"
             );
 
         Transaction mosaicSupplyChangeTransaction =
@@ -195,7 +195,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateMosaicSupplyChangeTransaction() {
         TransactionInfoDTO aggregateMosaicSupplyChangeTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateAggregateMosaicSupplyChangeTransaction.json"
+            TestHelperOkHttp.loadTransactionInfoDTO("aggregateMosaicSupplyChangeTransaction.json"
             );
 
         Transaction aggregateMosaicSupplyChangeTransaction =
@@ -210,7 +210,7 @@ public class TransactionMapperOkHttpTest {
     void shouldCreateStandaloneMosaicAddressRestrictionTransaction() {
         TransactionInfoDTO mosaicAddressRestrictionTransactionDTO = TestHelperOkHttp
             .loadTransactionInfoDTO(
-            "shouldCreateStandaloneMosaicAddressRestrictionTransaction.json");
+            "standaloneMosaicAddressRestrictionTransaction.json");
 
         Transaction mosaicAddressRestrictionTransaction = map(
             mosaicAddressRestrictionTransactionDTO);
@@ -222,7 +222,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateMosaicAddressRestrictionTransaction() {
         TransactionInfoDTO aggregateMosaicAddressRestrictionTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateAggregateMosaicAddressRestrictionTransaction.json"
+            TestHelperOkHttp.loadTransactionInfoDTO("aggregateMosaicAddressRestrictionTransaction.json"
             );
 
         Transaction aggregateMosaicAddressRestrictionTransaction =
@@ -237,7 +237,7 @@ public class TransactionMapperOkHttpTest {
     void shouldCreateStandaloneMosaicGlobalRestrictionTransaction() {
         TransactionInfoDTO mosaicGlobalRestrictionTransactionDTO = TestHelperOkHttp
             .loadTransactionInfoDTO(
-            "shouldCreateStandaloneMosaicGlobalRestrictionTransaction.json");
+            "standaloneMosaicGlobalRestrictionTransaction.json");
 
         Transaction mosaicGlobalRestrictionTransaction = map(mosaicGlobalRestrictionTransactionDTO);
 
@@ -248,7 +248,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateMosaicGlobalRestrictionTransaction() {
         TransactionInfoDTO aggregateMosaicGlobalRestrictionTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateAggregateMosaicGlobalRestrictionTransaction.json"
+            TestHelperOkHttp.loadTransactionInfoDTO("aggregateMosaicGlobalRestrictionTransaction.json"
             );
 
         Transaction aggregateMosaicGlobalRestrictionTransaction =
@@ -262,7 +262,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateStandaloneMultisigModificationTransaction() {
         TransactionInfoDTO multisigModificationTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateStandaloneMultisigModificationTransaction.json"
+            TestHelperOkHttp.loadTransactionInfoDTO("standaloneMultisigModificationTransaction.json"
             );
 
         Transaction multisigModificationTransaction =
@@ -275,7 +275,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateMultisigModificationTransaction() {
         TransactionInfoDTO aggregateMultisigModificationTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateAggregateMultisigModificationTransaction.json"
+            TestHelperOkHttp.loadTransactionInfoDTO("aggregateMultisigModificationTransaction.json"
             );
 
         Transaction aggregateMultisigModificationTransaction =
@@ -289,7 +289,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateStandaloneLockFundsTransaction() {
         TransactionInfoDTO lockFundsTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateStandaloneLockFundsTransaction.json");
+            TestHelperOkHttp.loadTransactionInfoDTO("standaloneLockFundsTransaction.json");
 
         Transaction lockFundsTransaction = map(lockFundsTransactionDTO);
 
@@ -299,7 +299,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateLockFundsTransaction() {
         TransactionInfoDTO aggregateLockFundsTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateAggregateLockFundsTransaction.json"
+            TestHelperOkHttp.loadTransactionInfoDTO("aggregateLockFundsTransaction.json"
             );
 
         Transaction lockFundsTransaction =
@@ -312,7 +312,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateStandaloneSecretLockTransaction() {
         TransactionInfoDTO secretLockTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateStandaloneSecretLockTransaction.json"
+            TestHelperOkHttp.loadTransactionInfoDTO("standaloneSecretLockTransaction.json"
             );
 
         Transaction secretLockTransaction = map(secretLockTransactionDTO);
@@ -323,7 +323,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateSecretLockTransaction() {
         TransactionInfoDTO aggregateSecretLockTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateAggregateSecretLockTransaction.json");
+            TestHelperOkHttp.loadTransactionInfoDTO("aggregateSecretLockTransaction.json");
 
         Transaction aggregateSecretLockTransaction = map(aggregateSecretLockTransactionDTO);
 
@@ -334,7 +334,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateStandaloneSecretProofTransaction() {
         TransactionInfoDTO secretProofTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateStandaloneSecretProofTransaction.json");
+            TestHelperOkHttp.loadTransactionInfoDTO("standaloneSecretProofTransaction.json");
 
         Transaction secretProofTransaction = map(secretProofTransactionDTO);
         validateStandaloneTransaction(secretProofTransaction, secretProofTransactionDTO);
@@ -343,7 +343,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateSecretProofTransaction() {
         TransactionInfoDTO aggregateSecretProofTransactionDTO =
-            TestHelperOkHttp.loadTransactionInfoDTO("shouldCreateAggregateSecretProofTransaction.json");
+            TestHelperOkHttp.loadTransactionInfoDTO("aggregateSecretProofTransaction.json");
 
         Transaction aggregateSecretProofTransaction =
             map(aggregateSecretProofTransactionDTO);
@@ -440,7 +440,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateAddressAliasTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAggregateAddressAliasTransaction.json"
+            "aggregateAddressAliasTransaction.json"
         );
 
         Transaction aggregateTransferTransaction = map(aggregateTransferTransactionDTO);
@@ -461,7 +461,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateMosaicAliasTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicAliasTransaction.json"
+            "aggregateMosaicAliasTransaction.json"
         );
 
         Transaction aggregateTransferTransaction = map(aggregateTransferTransactionDTO);
@@ -482,7 +482,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateAccountLinkTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAggregateAccountLinkTransaction.json"
+            "aggregateAccountLinkTransaction.json"
         );
 
         Transaction aggregateTransferTransaction = map(aggregateTransferTransactionDTO);
@@ -493,7 +493,7 @@ public class TransactionMapperOkHttpTest {
         AccountLinkTransaction transaction = (AccountLinkTransaction) ((AggregateTransaction) aggregateTransferTransaction)
             .getInnerTransactions().get(0);
 
-        Assertions.assertEquals(AccountLinkAction.LINK, transaction.getLinkAction());
+        Assertions.assertEquals(LinkAction.LINK, transaction.getLinkAction());
         Assertions.assertEquals("SARNASAS2BIAB6LMFA3FPMGBPGIJGK6IJETM3ZSP",
             transaction.getRemoteAccount().getAddress().plain());
     }
@@ -501,7 +501,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateMosaicMetadataTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicMetadataTransaction.json"
+            "aggregateMosaicMetadataTransaction.json"
         );
 
         AggregateTransaction aggregateTransferTransaction = (AggregateTransaction) map(
@@ -525,7 +525,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateNamespaceMetadataTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAggregateNamespaceMetadataTransaction.json"
+            "aggregateNamespaceMetadataTransaction.json"
         );
 
         AggregateTransaction aggregateTransferTransaction = (AggregateTransaction) map(
@@ -550,7 +550,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateAggregateAccountMetadataTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAggregateAccountMetadataTransaction.json"
+            "aggregateAccountMetadataTransaction.json"
         );
 
         AggregateTransaction aggregateTransferTransaction = (AggregateTransaction) map(
@@ -574,7 +574,7 @@ public class TransactionMapperOkHttpTest {
     public void shouldCreateAccountAddressRestriction() throws Exception {
 
         TransactionInfoDTO transactionInfoDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAccountAddressRestrictionTransaction.json");
+            "accountAddressRestrictionTransaction.json");
 
         AccountAddressRestrictionTransaction transaction = (AccountAddressRestrictionTransaction) map(
             transactionInfoDTO);
@@ -598,7 +598,7 @@ public class TransactionMapperOkHttpTest {
     public void shouldCreateAccountMosaicRestriction() throws Exception {
 
         TransactionInfoDTO transactionInfoDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAccountMosaicRestrictionTransaction.json");
+            "accountMosaicRestrictionTransaction.json");
 
         AccountMosaicRestrictionTransaction transaction = (AccountMosaicRestrictionTransaction) map(
             transactionInfoDTO);
@@ -616,7 +616,7 @@ public class TransactionMapperOkHttpTest {
     public void shouldCreateAccountOperationRestriction() throws Exception {
 
         TransactionInfoDTO transactionInfoDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAccountOperationRestrictionTransaction.json");
+            "accountOperationRestrictionTransaction.json");
 
         AccountOperationRestrictionTransaction transaction = (AccountOperationRestrictionTransaction) map(
             transactionInfoDTO);
@@ -634,7 +634,7 @@ public class TransactionMapperOkHttpTest {
     @Test
     void shouldCreateTransferEmptyMessage() {
         TransactionInfoDTO transferTransactionDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateTransferEmptyMessage.json");
+            "transferEmptyMessage.json");
 
         TransferTransaction transferTransaction = (TransferTransaction) map(transferTransactionDTO);
 

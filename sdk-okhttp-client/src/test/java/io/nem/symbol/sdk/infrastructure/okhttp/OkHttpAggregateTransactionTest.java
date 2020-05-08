@@ -149,8 +149,8 @@ public class OkHttpAggregateTransactionTest {
     @Test
     void shouldFindAccountInAsASignerOfTheTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperOkHttp
-            .loadAggregateTransactionInfoDTO(
-                "shouldFindAccountInAsASignerOfTheTransaction.json");
+            .loadTransactionInfoDTO(
+                "accountInAsASignerOfTheTransaction.json");
 
         AggregateTransaction aggregateTransferTransaction =
             (AggregateTransaction) new GeneralTransactionMapper(jsonHelper)

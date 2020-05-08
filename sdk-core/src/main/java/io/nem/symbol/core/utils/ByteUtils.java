@@ -50,7 +50,17 @@ public class ByteUtils {
      * @return a byte array of size numBytes
      */
     public static byte[] bigIntToByteArrayLeadingZeros(final BigInteger value, final int numBytes) {
-        byte[] valueByteArray = value.toByteArray();
+        return byteArrayLeadingZeros(value.toByteArray(), numBytes);
+    }
+
+    /**
+     * It completes the byte array to a byte array of the given size leading with zeros.
+     *
+     * @param valueByteArray the source byte array.
+     * @param numBytes The number of bytes in the destination array.
+     * @return a byte array of size numBytes
+     */
+    public static byte[] byteArrayLeadingZeros(byte[] valueByteArray, int numBytes) {
         if (valueByteArray.length > numBytes) {
             throw new IllegalArgumentException(
                 "value size " + valueByteArray.length + " is bigger than expected "
@@ -138,8 +148,8 @@ public class ByteUtils {
     }
 
     /**
-     * Converts an int array into a byte array. Assumes each integer value fits in a byte. If
-     * integer value uses more than 1 byte then only the lowest byte
+     * Converts an int array into a byte array. Assumes each integer value fits in a byte. If integer value uses more
+     * than 1 byte then only the lowest byte
      *
      * @param intArray The int array.
      * @return The bytes.
@@ -170,8 +180,7 @@ public class ByteUtils {
     }
 
     /**
-     * Constant-time check if byte is negative. The constant time behavior eliminates side channel
-     * attacks.
+     * Constant-time check if byte is negative. The constant time behavior eliminates side channel attacks.
      *
      * @param b The byte to check.
      * @return 1 if the byte is negative, 0 otherwise.

@@ -62,7 +62,7 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     public void incomingTransactions() throws Exception {
 
         TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "shouldCreateStandaloneTransferTransaction.json");
+            "standaloneTransferTransaction.json");
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
@@ -84,7 +84,7 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     public void partialTransactions() throws Exception {
 
         TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "shouldCreateStandaloneTransferTransaction.json");
+            "standaloneTransferTransaction.json");
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
@@ -106,7 +106,7 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     public void transactions() throws Exception {
 
         TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "shouldCreateStandaloneTransferTransaction.json");
+            "standaloneTransferTransaction.json");
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
@@ -127,7 +127,7 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     public void outgoingTransactions() throws Exception {
 
         TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "shouldCreateStandaloneTransferTransaction.json");
+            "standaloneTransferTransaction.json");
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
@@ -148,7 +148,7 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     public void unconfirmedTransactions() throws Exception {
 
         TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "shouldCreateStandaloneTransferTransaction.json");
+            "standaloneTransferTransaction.json");
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
@@ -170,7 +170,7 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     public void aggregateBondedTransactions() throws Exception {
 
         TransactionInfoDTO aggregateTransferTransactionDTO = loadTransactionInfoDTO(
-            "shouldCreateAggregateTransferTransaction.json"
+            "aggregateTransferTransaction.json"
         );
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();

@@ -33,7 +33,7 @@ public class JsonSerializationOkHttpTest {
     @Test
     public void jsonToTransaction() {
         String json = TestHelperOkHttp.loadResource(
-            "TransactionMapping-shouldCreateAggregateTransferTransaction.json"
+            "transaction-aggregateTransferTransaction.json"
         );
         Transaction transaction = jsonSerialization.jsonToTransaction(json);
         Assertions.assertNotNull(transaction);

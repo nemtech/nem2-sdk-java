@@ -16,39 +16,39 @@
 
 package io.nem.symbol.sdk.model.transaction;
 
-import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.core.crypto.PublicKey;
 
 /**
- *
+ * Vrf key link transaction.
  */
-public class AccountLinkTransaction extends Transaction {
+public class VrfKeyLinkTransaction extends Transaction {
 
-    private final PublicAccount remoteAccount;
+    /**
+     * The linked public key.
+     */
+    private final PublicKey linkedPublicKey;
 
+    /**
+     * The link action.
+     */
     private final LinkAction linkAction;
 
-    public AccountLinkTransaction(AccountLinkTransactionFactory factory) {
+    /**
+     * Constructor
+     *
+     * @param factory the factory.
+     */
+    VrfKeyLinkTransaction(VrfKeyLinkTransactionFactory factory) {
         super(factory);
-        this.remoteAccount = factory.getRemoteAccount();
-        this.linkAction = factory.getLinkAction();
+        linkedPublicKey = factory.getLinkedPublicKey();
+        linkAction = factory.getLinkAction();
     }
 
-    /**
-     * Gets the public key.
-     *
-     * @return Public key.
-     */
-    public PublicAccount getRemoteAccount() {
-        return remoteAccount;
+    public PublicKey getLinkedPublicKey() {
+        return linkedPublicKey;
     }
 
-    /**
-     * Gets the link action.
-     *
-     * @return Link action.
-     */
     public LinkAction getLinkAction() {
         return linkAction;
     }
-
 }

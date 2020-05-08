@@ -16,24 +16,33 @@
 
 package io.nem.symbol.core.crypto;
 
-import io.nem.symbol.core.utils.ByteUtils;
-import io.nem.symbol.core.utils.ConvertUtils;
 import java.math.BigInteger;
 
 /**
  * Represents a private key.
  */
-public class PrivateKey {
-
-    private final BigInteger value;
+public class PrivateKey extends Key {
 
     /**
-     * Creates a new private key.
+     * The size of Symbol's private keys .
+     */
+    public static final int SIZE = 32;
+
+    /**
+     * Creates a new private key from a big int value.
      *
-     * @param value The raw private key value.
+     * @param value the big int.
      */
     public PrivateKey(final BigInteger value) {
-        this.value = value;
+        super(value, SIZE);
+    }
+
+    public PrivateKey(byte[] bytes) {
+        super(bytes, SIZE);
+    }
+
+    public PrivateKey(String hex) {
+        super(hex, SIZE);
     }
 
     /**
@@ -43,11 +52,7 @@ public class PrivateKey {
      * @return The new private key.
      */
     public static PrivateKey fromHexString(final String hex) {
-        try {
-            return new PrivateKey(new BigInteger(ConvertUtils.getBytes(hex)));
-        } catch (final IllegalArgumentException e) {
-            throw new CryptoException(e);
-        }
+        return new PrivateKey(hex);
     }
 
     /**
@@ -57,46 +62,7 @@ public class PrivateKey {
      * @return The new private key.
      */
     public static PrivateKey fromDecimalString(final String decimal) {
-        try {
-            return new PrivateKey(new BigInteger(decimal, 10));
-        } catch (final NumberFormatException e) {
-            throw new CryptoException(e);
-        }
-    }
-
-    /**
-     * Gets the raw private key value.
-     *
-     * @return The raw private key value.
-     */
-    public BigInteger getRaw() {
-        return this.value;
-    }
-
-    public byte[] getBytes() {
-        return ByteUtils.bigIntToByteArrayLeadingZeros(this.value, 32);
-    }
-
-    @Override
-    public int hashCode() {
-        return this.value.hashCode();
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (!(obj instanceof PrivateKey)) {
-            return false;
-        }
-
-        final PrivateKey rhs = (PrivateKey) obj;
-        return this.value.equals(rhs.value);
-    }
-
-    /**
-     * @return the hex representation of the private key.
-     */
-    public String toHex() {
-        return ConvertUtils.toHex(getBytes());
+        return new PrivateKey(new BigInteger(decimal, 10));
     }
 
 }
