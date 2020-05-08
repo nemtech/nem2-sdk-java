@@ -145,6 +145,9 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
             blockInfoDTO.getBlock().getTransactionsHash(),
             blockInfoDTO.getBlock().getReceiptsHash(),
             blockInfoDTO.getBlock().getStateHash(),
+            blockInfoDTO.getBlock().getProofGamma(),
+            blockInfoDTO.getBlock().getProofScalar(),
+            blockInfoDTO.getBlock().getProofVerificationHash(),
             blockInfoDTO.getBlock().getBeneficiaryPublicKey());
     }
 

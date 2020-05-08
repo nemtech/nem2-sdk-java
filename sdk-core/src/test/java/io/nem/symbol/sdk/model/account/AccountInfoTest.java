@@ -32,6 +32,13 @@ class AccountInfoTest {
     void shouldCreateAccountInfoViaConstructor() {
         List<Mosaic> mosaics =
             Collections.singletonList(NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)));
+        String linkedPublicKey = "linkedPublicKey";
+        BigInteger startHeight = BigInteger.ONE;
+        BigInteger totalFeesPaid = BigInteger.valueOf(2);
+        int beneficiaryCount = 3;
+        BigInteger rawScore = BigInteger.valueOf(4);
+        ActivityBucket bucket = new ActivityBucket(startHeight, totalFeesPaid, beneficiaryCount, rawScore);
+        List<ActivityBucket> activityBuckets = Collections.singletonList(bucket);
         AccountInfo accountInfo =
             new AccountInfo(
                 Address.createFromRawAddress("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR26"),
@@ -40,7 +47,7 @@ class AccountInfoTest {
                 new BigInteger("966"),
                 new BigInteger("777"),
                 new BigInteger("0"),
-                mosaics, AccountType.REMOTE_UNLINKED);
+                mosaics, AccountType.REMOTE_UNLINKED, linkedPublicKey, activityBuckets);
 
         assertEquals(
             Address.createFromRawAddress("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR26"),
@@ -61,5 +68,8 @@ class AccountInfoTest {
 
         assertEquals(AccountType.REMOTE_UNLINKED,
             accountInfo.getAccountType());
+
+        assertEquals(linkedPublicKey, accountInfo.getLinkedPublicKey());
+        assertEquals(activityBuckets, accountInfo.getActivityBuckets());
     }
 }

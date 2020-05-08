@@ -108,6 +108,7 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
         metaDTO.setStateHashSubCacheMerkleRoots(Arrays.asList("string1", "string2"));
         metaDTO.setTotalFee(BigInteger.valueOf(8));
 
+
         dto.setMeta(metaDTO);
 
         BlockDTO blockDto = new BlockDTO();
@@ -176,6 +177,10 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
             "B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
         blockDto.setHeight(BigInteger.valueOf(9));
 
+        blockDto.setProofGamma("proofGamma");
+        blockDto.setProofScalar("proofScalar");
+        blockDto.setProofVerificationHash("proofVerificationHash");
+
         dto.setBlock(blockDto);
 
         mockRemoteCall(Collections.singletonList(dto));
@@ -207,6 +212,11 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
             .assertEquals(metaDTO.getTotalFee(), info.getTotalFee());
 
         Assertions.assertEquals(blockDto.getHeight(), info.getHeight());
+
+
+        Assertions.assertEquals(blockDto.getProofGamma(), info.getProofGamma());
+        Assertions.assertEquals(blockDto.getProofScalar(), info.getProofScalar());
+        Assertions.assertEquals(blockDto.getProofVerificationHash(), info.getProofVerificationHash());
 
     }
 
