@@ -16,7 +16,6 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx;
 
-import static io.nem.symbol.sdk.infrastructure.vertx.TestHelperVertx.loadCosignatureTransactionInfoDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -52,8 +51,8 @@ public class VertxCosignatureTransactionTest {
 
     @Test
     void createACosignatureTransactionViaConstructor() {
-        TransactionInfoDTO transactionInfoDTO = loadCosignatureTransactionInfoDTO(
-            "createACosignatureTransactionViaConstructor.json");
+        TransactionInfoDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
+            "cosignatureTransactionViaConstructor.json");
         AggregateTransaction aggregateTransaction =
             (AggregateTransaction) new GeneralTransactionMapper(jsonHelper)
                 .map(transactionInfoDTO);

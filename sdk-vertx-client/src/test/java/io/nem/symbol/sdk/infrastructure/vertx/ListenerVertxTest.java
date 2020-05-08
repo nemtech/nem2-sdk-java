@@ -144,7 +144,7 @@ public class ListenerVertxTest {
         simulateWebSocketStartup();
 
         TransactionInfoDTO transactionInfo = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
+            "aggregateMosaicCreationTransaction.json");
 
         ObjectNode transactionInfoDtoJsonObject = jsonHelper
             .convert(transactionInfo, ObjectNode.class);
@@ -184,7 +184,7 @@ public class ListenerVertxTest {
         simulateWebSocketStartup();
 
         TransactionInfoDTO transactionInfo = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
+            "aggregateMosaicCreationTransaction.json");
 
         ObjectNode transactionInfoDtoJsonObject = jsonHelper
             .convert(transactionInfo, ObjectNode.class);
@@ -262,7 +262,7 @@ public class ListenerVertxTest {
         simulateWebSocketStartup();
 
         TransactionInfoDTO transactionInfo = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
+            "aggregateMosaicCreationTransaction.json");
 
         ObjectNode transactionInfoDtoJsonObject = jsonHelper
             .convert(transactionInfo, ObjectNode.class);
@@ -310,7 +310,7 @@ public class ListenerVertxTest {
         simulateWebSocketStartup();
 
         TransactionInfoDTO transactionInfo = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
+            "aggregateMosaicCreationTransaction.json");
 
         ObjectNode transactionInfoDtoJsonObject = jsonHelper
             .convert(transactionInfo, ObjectNode.class);
@@ -353,7 +353,7 @@ public class ListenerVertxTest {
         simulateWebSocketStartup();
 
         TransactionInfoDTO transactionInfo = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
+            "aggregateMosaicCreationTransaction.json");
 
         ObjectNode transactionInfoDtoJsonObject = jsonHelper
             .convert(transactionInfo, ObjectNode.class);

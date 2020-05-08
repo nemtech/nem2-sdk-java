@@ -60,7 +60,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
     public void getBlockTransactions() throws Exception {
 
         TransactionInfoDTO aggregateTransferTransactionDTO = loadTransactionInfoDTO(
-            "shouldCreateAggregateTransferTransaction.json"
+            "aggregateTransferTransaction.json"
         );
 
         mockRemoteCall(Collections.singletonList(aggregateTransferTransactionDTO));
@@ -216,7 +216,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
     @Test
     public void shouldGetBlockTransactions() throws Exception {
         TransactionInfoDTO transactionInfoDTO = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
+            "aggregateMosaicCreationTransaction.json");
 
         mockRemoteCall(Collections.singletonList(transactionInfoDTO));
 

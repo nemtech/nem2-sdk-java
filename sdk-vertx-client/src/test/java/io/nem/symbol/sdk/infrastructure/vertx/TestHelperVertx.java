@@ -40,17 +40,7 @@ public class TestHelperVertx {
     }
 
     public static TransactionInfoDTO loadTransactionInfoDTO(String name) {
-        String resourceName = "TransactionMapping-" + name;
-        return loadResource(resourceName, TransactionInfoDTO.class);
-    }
-
-    public static TransactionInfoDTO loadCosignatureTransactionInfoDTO(String name) {
-        String resourceName = "CosignatureTransaction-" + name;
-        return loadResource(resourceName, TransactionInfoDTO.class);
-    }
-
-    public static TransactionInfoDTO loadAggregateTransactionInfoDTO(String name) {
-        String resourceName = "AggregateTransaction-" + name;
+        String resourceName = "transaction-" + name;
         return loadResource(resourceName, TransactionInfoDTO.class);
     }
 

@@ -26,12 +26,12 @@ import org.apache.commons.lang3.Validate;
 public class AccountLinkTransactionFactory extends TransactionFactory<AccountLinkTransaction> {
 
     private final PublicAccount remoteAccount;
-    private final AccountLinkAction linkAction;
+    private final LinkAction linkAction;
 
     private AccountLinkTransactionFactory(
         final NetworkType networkType,
         final PublicAccount remoteAccount,
-        final AccountLinkAction linkAction) {
+        final LinkAction linkAction) {
         super(TransactionType.ACCOUNT_LINK, networkType);
         Validate.notNull(remoteAccount, "RemoteAccount must not be null");
         Validate.notNull(linkAction, "LinkAction must not be null");
@@ -48,7 +48,7 @@ public class AccountLinkTransactionFactory extends TransactionFactory<AccountLin
    * @return Account link transaction.
    */
   public static AccountLinkTransactionFactory create(
-      NetworkType networkType, PublicAccount remoteAccount, AccountLinkAction linkAction) {
+      NetworkType networkType, PublicAccount remoteAccount, LinkAction linkAction) {
         return new AccountLinkTransactionFactory(networkType, remoteAccount, linkAction);
     }
 
@@ -66,7 +66,7 @@ public class AccountLinkTransactionFactory extends TransactionFactory<AccountLin
      *
      * @return Link action.
      */
-    public AccountLinkAction getLinkAction() {
+    public LinkAction getLinkAction() {
         return linkAction;
     }
 

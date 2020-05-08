@@ -19,9 +19,9 @@ package io.nem.symbol.sdk.model.transaction;
 import java.util.Arrays;
 
 /**
- * Account link action.
+ * Link action.
  */
-public enum AccountLinkAction {
+public enum LinkAction {
     /**
      * Link account.
      */
@@ -38,7 +38,7 @@ public enum AccountLinkAction {
      *
      * @param value Link action value.
      */
-    AccountLinkAction(final byte value) {
+    LinkAction(final byte value) {
         this.value = value;
     }
 
@@ -48,7 +48,7 @@ public enum AccountLinkAction {
      * @param value Raw value.
      * @return Enum value.
      */
-    public static AccountLinkAction rawValueOf(final int value) {
+    public static LinkAction rawValueOf(final int value) {
         return Arrays.stream(values()).filter(e -> e.value == value).findFirst()
             .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
     }

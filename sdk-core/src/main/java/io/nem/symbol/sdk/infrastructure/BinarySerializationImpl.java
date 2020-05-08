@@ -52,6 +52,7 @@ import io.nem.symbol.catapult.builders.NamespaceIdDto;
 import io.nem.symbol.catapult.builders.NamespaceMetadataTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.NamespaceRegistrationTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.NetworkTypeDto;
+import io.nem.symbol.catapult.builders.NodeKeyLinkTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.SecretLockTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.SecretProofTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.Serializer;
@@ -63,6 +64,11 @@ import io.nem.symbol.catapult.builders.TransferTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.UnresolvedAddressDto;
 import io.nem.symbol.catapult.builders.UnresolvedMosaicBuilder;
 import io.nem.symbol.catapult.builders.UnresolvedMosaicIdDto;
+import io.nem.symbol.catapult.builders.VotingKeyDto;
+import io.nem.symbol.catapult.builders.VotingKeyLinkTransactionBodyBuilder;
+import io.nem.symbol.catapult.builders.VrfKeyLinkTransactionBodyBuilder;
+import io.nem.symbol.core.crypto.PublicKey;
+import io.nem.symbol.core.crypto.VotingKey;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.ExceptionUtils;
 import io.nem.symbol.core.utils.StringEncoder;
@@ -85,7 +91,6 @@ import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.AccountLinkAction;
 import io.nem.symbol.sdk.model.transaction.AccountLinkTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountLinkTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransaction;
@@ -103,6 +108,7 @@ import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.LinkAction;
 import io.nem.symbol.sdk.model.transaction.LockHashAlgorithmType;
 import io.nem.symbol.sdk.model.transaction.MetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransaction;
@@ -124,6 +130,8 @@ import io.nem.symbol.sdk.model.transaction.NamespaceMetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.NamespaceMetadataTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.symbol.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.NodeKeyLinkTransaction;
+import io.nem.symbol.sdk.model.transaction.NodeKeyLinkTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransaction;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.SecretProofTransaction;
@@ -133,6 +141,10 @@ import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.VotingKeyLinkTransaction;
+import io.nem.symbol.sdk.model.transaction.VotingKeyLinkTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.VrfKeyLinkTransaction;
+import io.nem.symbol.sdk.model.transaction.VrfKeyLinkTransactionFactory;
 import java.io.DataInputStream;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -187,6 +199,9 @@ public class BinarySerializationImpl implements BinarySerialization {
         register(new AccountMosaicRestrictionTransactionSerializer());
         register(new AccountOperationRestrictionTransactionSerializer());
         register(new AccountAddressRestrictionTransactionSerializer());
+        register(new NodeKeyLinkTransactionBuilderSerializer());
+        register(new VotingKeyLinkTransactionBuilderSerializer());
+        register(new VrfKeyLinkTransactionBuilderSerializer());
         register(new AggregateTransactionSerializer(TransactionType.AGGREGATE_COMPLETE, this));
         register(new AggregateTransactionSerializer(TransactionType.AGGREGATE_BONDED, this));
     }
@@ -681,7 +696,7 @@ public class BinarySerializationImpl implements BinarySerialization {
             AccountLinkTransactionBodyBuilder builder = (AccountLinkTransactionBodyBuilder) transactionBuilder;
             PublicAccount remoteAccount = SerializationUtils
                 .toPublicAccount(builder.getRemotePublicKey(), networkType);
-            AccountLinkAction linkAction = AccountLinkAction
+            LinkAction linkAction = LinkAction
                 .rawValueOf(builder.getLinkAction().getValue());
             return AccountLinkTransactionFactory
                 .create(networkType, remoteAccount, linkAction);
@@ -1069,7 +1084,6 @@ public class BinarySerializationImpl implements BinarySerialization {
             return AddressAliasTransactionBodyBuilder
                 .create(namespaceIdDto, addressDto, aliasActionDto);
         }
-
 
 
     }
@@ -1593,6 +1607,100 @@ public class BinarySerializationImpl implements BinarySerialization {
                 .create(SerializationUtils.toKeyDto(c.getSigner().getPublicKey()),
                     SerializationUtils.toSignatureDto(c.getSignature()));
         }
+    }
+
+
+    private static class NodeKeyLinkTransactionBuilderSerializer implements
+        TransactionSerializer<NodeKeyLinkTransaction> {
+
+        @Override
+        public TransactionType getTransactionType() {
+            return TransactionType.NODE_KEY_LINK;
+        }
+
+        @Override
+        public Class<NodeKeyLinkTransaction> getTransactionClass() {
+            return NodeKeyLinkTransaction.class;
+        }
+
+        @Override
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
+            NodeKeyLinkTransactionBodyBuilder builder = (NodeKeyLinkTransactionBodyBuilder) transactionBuilder;
+            PublicKey linkedPublicKey = SerializationUtils.toPublicKey(builder.getLinkedPublicKey());
+            LinkAction linkAction = LinkAction.rawValueOf(builder.getLinkAction().getValue());
+            return NodeKeyLinkTransactionFactory.create(networkType, linkedPublicKey, linkAction);
+        }
+
+        @Override
+        public Serializer toBodyBuilder(NodeKeyLinkTransaction transaction) {
+            KeyDto linkedPublicKey = SerializationUtils.toKeyDto(transaction.getLinkedPublicKey());
+            LinkActionDto linkAction = LinkActionDto.rawValueOf(transaction.getLinkAction().getValue());
+            return NodeKeyLinkTransactionBodyBuilder.create(linkedPublicKey, linkAction);
+        }
+
+    }
+
+    private static class VrfKeyLinkTransactionBuilderSerializer implements
+        TransactionSerializer<VrfKeyLinkTransaction> {
+
+        @Override
+        public TransactionType getTransactionType() {
+            return TransactionType.VRF_KEY_LINK;
+        }
+
+        @Override
+        public Class<VrfKeyLinkTransaction> getTransactionClass() {
+            return VrfKeyLinkTransaction.class;
+        }
+
+        @Override
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
+            VrfKeyLinkTransactionBodyBuilder builder = (VrfKeyLinkTransactionBodyBuilder) transactionBuilder;
+            PublicKey linkedPublicKey = SerializationUtils.toPublicKey(builder.getLinkedPublicKey());
+            LinkAction linkAction = LinkAction.rawValueOf(builder.getLinkAction().getValue());
+            return VrfKeyLinkTransactionFactory.create(networkType, linkedPublicKey, linkAction);
+        }
+
+        @Override
+        public Serializer toBodyBuilder(VrfKeyLinkTransaction transaction) {
+            KeyDto linkedPublicKey = SerializationUtils.toKeyDto(transaction.getLinkedPublicKey());
+            LinkActionDto linkAction = LinkActionDto.rawValueOf(transaction.getLinkAction().getValue());
+            return VrfKeyLinkTransactionBodyBuilder.create(linkedPublicKey, linkAction);
+        }
+
+    }
+
+    private static class VotingKeyLinkTransactionBuilderSerializer implements
+        TransactionSerializer<VotingKeyLinkTransaction> {
+
+        @Override
+        public TransactionType getTransactionType() {
+            return TransactionType.VOTING_KEY_LINK;
+        }
+
+        @Override
+        public Class<VotingKeyLinkTransaction> getTransactionClass() {
+            return VotingKeyLinkTransaction.class;
+        }
+
+        @Override
+        public TransactionFactory fromBodyBuilder(NetworkType networkType,
+            Serializer transactionBuilder) {
+            VotingKeyLinkTransactionBodyBuilder builder = (VotingKeyLinkTransactionBodyBuilder) transactionBuilder;
+            VotingKey linkedPublicKey = SerializationUtils.toVotingKey(builder.getLinkedPublicKey());
+            LinkAction linkAction = LinkAction.rawValueOf(builder.getLinkAction().getValue());
+            return VotingKeyLinkTransactionFactory.create(networkType, linkedPublicKey, linkAction);
+        }
+
+        @Override
+        public Serializer toBodyBuilder(VotingKeyLinkTransaction transaction) {
+            VotingKeyDto linkedPublicKey = SerializationUtils.toVotingKeyDto(transaction.getLinkedPublicKey());
+            LinkActionDto linkAction = LinkActionDto.rawValueOf(transaction.getLinkAction().getValue());
+            return VotingKeyLinkTransactionBodyBuilder.create(linkedPublicKey, linkAction);
+        }
+
     }
 
 }

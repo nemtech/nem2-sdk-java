@@ -62,7 +62,7 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     public void incomingTransactions() throws Exception {
 
         TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "shouldCreateStandaloneTransferTransaction.json");
+            "standaloneTransferTransaction.json");
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
@@ -83,7 +83,7 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     public void transactions() throws Exception {
 
         TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "shouldCreateStandaloneTransferTransaction.json");
+            "standaloneTransferTransaction.json");
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
@@ -104,7 +104,7 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     public void outgoingTransactions() throws Exception {
 
         TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "shouldCreateStandaloneTransferTransaction.json");
+            "standaloneTransferTransaction.json");
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
@@ -125,7 +125,7 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     public void unconfirmedTransactions() throws Exception {
 
         TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "shouldCreateStandaloneTransferTransaction.json");
+            "standaloneTransferTransaction.json");
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
@@ -147,7 +147,7 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     public void aggregateBondedTransactions() throws Exception {
 
         TransactionInfoDTO aggregateTransferTransactionDTO = loadTransactionInfoDTO(
-            "shouldCreateAggregateTransferTransaction.json"
+            "aggregateTransferTransaction.json"
         );
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
@@ -200,7 +200,7 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     public void partialTransactions() throws Exception {
 
         TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "shouldCreateStandaloneTransferTransaction.json");
+            "standaloneTransferTransaction.json");
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 

@@ -59,6 +59,9 @@ public class GeneralTransactionMapper implements TransactionMapper {
         register(new AccountAddressRestrictionTransactionMapper(jsonHelper));
         register(new AccountMosaicRestrictionTransactionMapper(jsonHelper));
         register(new AccountOperationRestrictionTransactionMapper(jsonHelper));
+        register(new VrfKeyLinkTransactionMapper(jsonHelper));
+        register(new NodeKeyLinkTransactionMapper(jsonHelper));
+        register(new VotingKeyLinkTransactionMapper(jsonHelper));
 
         register(
             new AggregateTransactionMapper(jsonHelper, TransactionType.AGGREGATE_BONDED, this));

@@ -67,7 +67,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     public void shouldGetTransaction() throws Exception {
 
         TransactionInfoDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
+            "aggregateMosaicCreationTransaction.json");
 
         mockRemoteCall(transactionInfoDTO);
 
@@ -128,7 +128,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     public void shouldGetTransactions() throws Exception {
 
         TransactionInfoDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
+            "aggregateMosaicCreationTransaction.json");
 
         mockRemoteCall(Collections.singletonList(transactionInfoDTO));
 

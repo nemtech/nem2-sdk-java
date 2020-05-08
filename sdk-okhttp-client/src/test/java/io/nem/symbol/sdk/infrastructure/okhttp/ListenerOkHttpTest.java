@@ -122,7 +122,7 @@ public class ListenerOkHttpTest {
         simulateWebSocketStartup();
 
         TransactionInfoDTO transactionInfo = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
+            "aggregateMosaicCreationTransaction.json");
 
         JsonObject transactionInfoDtoJsonObject = jsonHelper
             .convert(transactionInfo, JsonObject.class);
@@ -192,7 +192,7 @@ public class ListenerOkHttpTest {
         simulateWebSocketStartup();
 
         TransactionInfoDTO transactionInfo = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
+            "aggregateMosaicCreationTransaction.json");
 
         JsonObject transactionInfoDtoJsonObject = jsonHelper
             .convert(transactionInfo, JsonObject.class);
@@ -233,7 +233,7 @@ public class ListenerOkHttpTest {
         simulateWebSocketStartup();
 
         TransactionInfoDTO transactionInfo = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
+            "aggregateMosaicCreationTransaction.json");
 
         JsonObject transactionInfoDtoJsonObject = jsonHelper
             .convert(transactionInfo, JsonObject.class);
@@ -279,7 +279,7 @@ public class ListenerOkHttpTest {
         simulateWebSocketStartup();
 
         TransactionInfoDTO transactionInfo = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
+            "aggregateMosaicCreationTransaction.json");
 
         JsonObject transactionInfoDtoJsonObject = jsonHelper
             .convert(transactionInfo, JsonObject.class);
@@ -321,7 +321,7 @@ public class ListenerOkHttpTest {
         simulateWebSocketStartup();
 
         TransactionInfoDTO transactionInfo = TestHelperOkHttp.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicCreationTransaction.json");
+            "aggregateMosaicCreationTransaction.json");
 
         JsonObject transactionInfoDtoJsonObject = jsonHelper
             .convert(transactionInfo, JsonObject.class);

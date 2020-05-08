@@ -19,7 +19,6 @@ package io.nem.symbol.core.crypto.ed25519;
 import io.nem.symbol.core.crypto.PrivateKey;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.infrastructure.RandomUtils;
-import java.math.BigInteger;
 import java.util.stream.Stream;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -50,8 +49,7 @@ public class Ed25519UtilsTest {
     @Test
     public void prepareForScalarMultiplyReturnsClampedValue() {
         // Arrange:
-        final PrivateKey privateKey = new PrivateKey(
-            new BigInteger(RandomUtils.generateRandomBytes(32)));
+        final PrivateKey privateKey = new PrivateKey(RandomUtils.generateRandomBytes(32));
 
         // Act:
         final byte[] a = Ed25519Utils.prepareForScalarMultiply(privateKey).getRaw();

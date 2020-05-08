@@ -29,6 +29,11 @@ public enum TransactionType {
     MOSAIC_DEFINITION(16717, 1),
 
     /**
+     * Node key link transaction type.
+     */
+    NODE_KEY_LINK(16972, 1),
+
+    /**
      * Mosaic supply change transaction.
      */
     MOSAIC_SUPPLY_CHANGE(16973, 1),
@@ -67,6 +72,16 @@ public enum TransactionType {
      * Aggregate bonded transaction type
      */
     AGGREGATE_BONDED(16961, 1),
+
+    /**
+     * Voting key link transaction builder.
+     */
+    VOTING_KEY_LINK(16707, 1),
+
+    /**
+     * Vrf key link transaction builder.
+     */
+    VRF_KEY_LINK(16963, 1),
 
     /**
      * Hash Lock transaction type
@@ -134,12 +149,10 @@ public enum TransactionType {
     private final int value;
 
     /**
-     * Transaction format versions are defined in catapult-server in each transaction's plugin
-     * source code.
+     * Transaction format versions are defined in catapult-server in each transaction's plugin source code.
      *
      * <p>In [catapult-server](https://github.com/nemtech/catapult-server), the
-     * `DEFINE_TRANSACTION_CONSTANTS` macro is used to define the `TYPE` and `VERSION` of the
-     * transaction format.
+     * `DEFINE_TRANSACTION_CONSTANTS` macro is used to define the `TYPE` and `VERSION` of the transaction format.
      *
      * @see <a href="https://github.com/nemtech/catapult-server/blob/master/plugins/txes/transfer/src/model/TransferTransaction.h#L37"/>
      */

@@ -27,7 +27,6 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
-import io.nem.symbol.sdk.model.transaction.AccountLinkAction;
 import io.nem.symbol.sdk.model.transaction.AccountLinkTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransaction;
@@ -37,6 +36,7 @@ import io.nem.symbol.sdk.model.transaction.AddressAliasTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
+import io.nem.symbol.sdk.model.transaction.LinkAction;
 import io.nem.symbol.sdk.model.transaction.MosaicAliasTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicMetadataTransaction;
@@ -88,7 +88,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateStandaloneTransferTransaction() {
         TransactionInfoDTO transferTransactionDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateStandaloneTransferTransaction.json");
+            "standaloneTransferTransaction.json");
 
         Transaction transferTransaction = map(transferTransactionDTO);
 
@@ -99,7 +99,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateTransferEmptyMessage() {
         TransactionInfoDTO transferTransactionDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateTransferEmptyMessage.json");
+            "transferEmptyMessage.json");
 
         TransferTransaction transferTransaction = (TransferTransaction) map(transferTransactionDTO);
 
@@ -110,7 +110,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateTransferTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateTransferTransaction.json"
+            "aggregateTransferTransaction.json"
         );
 
         Transaction aggregateTransferTransaction = map(aggregateTransferTransactionDTO);
@@ -121,7 +121,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateTransferTransactionUsingAlias() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateTransferTransactionUsingAlias.json"
+            "aggregateTransferTransactionUsingAlias.json"
         );
 
         Transaction aggregateTransferTransaction = map(aggregateTransferTransactionDTO);
@@ -132,7 +132,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateStandaloneRootNamespaceCreationTransaction() {
         TransactionInfoDTO namespaceCreationTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateStandaloneRootNamespaceCreationTransaction.json"
+            TestHelperVertx.loadTransactionInfoDTO("standaloneRootNamespaceCreationTransaction.json"
             );
 
         Transaction namespaceCreationTransaction = map(namespaceCreationTransactionDTO);
@@ -144,7 +144,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateRootNamespaceCreationTransaction() {
         TransactionInfoDTO aggregateNamespaceCreationTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateAggregateRootNamespaceCreationTransaction.json"
+            TestHelperVertx.loadTransactionInfoDTO("aggregateRootNamespaceCreationTransaction.json"
             );
 
         Transaction aggregateNamespaceCreationTransaction =
@@ -158,7 +158,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateStandaloneSubNamespaceCreationTransaction() {
         TransactionInfoDTO namespaceCreationTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateStandaloneSubNamespaceCreationTransaction.json"
+            TestHelperVertx.loadTransactionInfoDTO("standaloneSubNamespaceCreationTransaction.json"
             );
 
         Transaction namespaceCreationTransaction =
@@ -171,7 +171,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateSubNamespaceCreationTransaction() {
         TransactionInfoDTO aggregateNamespaceCreationTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateAggregateSubNamespaceCreationTransaction.json"
+            TestHelperVertx.loadTransactionInfoDTO("aggregateSubNamespaceCreationTransaction.json"
             );
 
         Transaction aggregateNamespaceCreationTransaction =
@@ -185,7 +185,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateStandaloneMosaicCreationTransaction() {
         TransactionInfoDTO mosaicCreationTransactionDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateStandaloneMosaicCreationTransaction.json");
+            "standaloneMosaicCreationTransaction.json");
 
         Transaction mosaicCreationTransaction = map(mosaicCreationTransactionDTO);
 
@@ -195,7 +195,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateMosaicCreationTransaction() {
         TransactionInfoDTO aggregateMosaicCreationTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateAggregateMosaicCreationTransaction.json"
+            TestHelperVertx.loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json"
             );
 
         Transaction aggregateMosaicCreationTransaction =
@@ -209,7 +209,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateStandaloneMosaicSupplyChangeTransaction() {
         TransactionInfoDTO mosaicSupplyChangeTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateStandaloneMosaicSupplyChangeTransaction.json"
+            TestHelperVertx.loadTransactionInfoDTO("standaloneMosaicSupplyChangeTransaction.json"
             );
 
         Transaction mosaicSupplyChangeTransaction =
@@ -222,7 +222,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateMosaicSupplyChangeTransaction() {
         TransactionInfoDTO aggregateMosaicSupplyChangeTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateAggregateMosaicSupplyChangeTransaction.json"
+            TestHelperVertx.loadTransactionInfoDTO("aggregateMosaicSupplyChangeTransaction.json"
             );
 
         Transaction aggregateMosaicSupplyChangeTransaction =
@@ -237,7 +237,7 @@ public class TransactionMapperVertxTest {
     void shouldCreateStandaloneMosaicAddressRestrictionTransaction() {
         TransactionInfoDTO mosaicAddressRestrictionTransactionDTO = TestHelperVertx
             .loadTransactionInfoDTO(
-            "shouldCreateStandaloneMosaicAddressRestrictionTransaction.json");
+            "standaloneMosaicAddressRestrictionTransaction.json");
 
         Transaction mosaicAddressRestrictionTransaction = map(
             mosaicAddressRestrictionTransactionDTO);
@@ -249,7 +249,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateMosaicAddressRestrictionTransaction() {
         TransactionInfoDTO aggregateMosaicAddressRestrictionTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateAggregateMosaicAddressRestrictionTransaction.json"
+            TestHelperVertx.loadTransactionInfoDTO("aggregateMosaicAddressRestrictionTransaction.json"
             );
 
         Transaction aggregateMosaicAddressRestrictionTransaction =
@@ -264,7 +264,7 @@ public class TransactionMapperVertxTest {
     void shouldCreateStandaloneMosaicGlobalRestrictionTransaction() {
         TransactionInfoDTO mosaicGlobalRestrictionTransactionDTO = TestHelperVertx
             .loadTransactionInfoDTO(
-            "shouldCreateStandaloneMosaicGlobalRestrictionTransaction.json");
+            "standaloneMosaicGlobalRestrictionTransaction.json");
 
         Transaction mosaicGlobalRestrictionTransaction = map(mosaicGlobalRestrictionTransactionDTO);
 
@@ -275,7 +275,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateMosaicGlobalRestrictionTransaction() {
         TransactionInfoDTO aggregateMosaicGlobalRestrictionTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateAggregateMosaicGlobalRestrictionTransaction.json"
+            TestHelperVertx.loadTransactionInfoDTO("aggregateMosaicGlobalRestrictionTransaction.json"
             );
 
         Transaction aggregateMosaicGlobalRestrictionTransaction =
@@ -289,7 +289,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateStandaloneMultisigModificationTransaction() {
         TransactionInfoDTO multisigModificationTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateStandaloneMultisigModificationTransaction.json"
+            TestHelperVertx.loadTransactionInfoDTO("standaloneMultisigModificationTransaction.json"
             );
 
         Transaction multisigModificationTransaction =
@@ -302,7 +302,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateMultisigModificationTransaction() {
         TransactionInfoDTO aggregateMultisigModificationTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateAggregateMultisigModificationTransaction.json"
+            TestHelperVertx.loadTransactionInfoDTO("aggregateMultisigModificationTransaction.json"
             );
 
         Transaction aggregateMultisigModificationTransaction =
@@ -316,7 +316,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateStandaloneLockFundsTransaction() {
         TransactionInfoDTO lockFundsTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateStandaloneLockFundsTransaction.json");
+            TestHelperVertx.loadTransactionInfoDTO("standaloneLockFundsTransaction.json");
 
         Transaction lockFundsTransaction = map(lockFundsTransactionDTO);
 
@@ -326,7 +326,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateLockFundsTransaction() {
         TransactionInfoDTO aggregateLockFundsTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateAggregateLockFundsTransaction.json"
+            TestHelperVertx.loadTransactionInfoDTO("aggregateLockFundsTransaction.json"
             );
 
         Transaction lockFundsTransaction =
@@ -339,7 +339,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateStandaloneSecretLockTransaction() {
         TransactionInfoDTO secretLockTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateStandaloneSecretLockTransaction.json"
+            TestHelperVertx.loadTransactionInfoDTO("standaloneSecretLockTransaction.json"
             );
 
         Transaction secretLockTransaction = map(secretLockTransactionDTO);
@@ -350,7 +350,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateSecretLockTransaction() {
         TransactionInfoDTO aggregateSecretLockTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateAggregateSecretLockTransaction.json");
+            TestHelperVertx.loadTransactionInfoDTO("aggregateSecretLockTransaction.json");
 
         Transaction aggregateSecretLockTransaction = map(aggregateSecretLockTransactionDTO);
 
@@ -361,7 +361,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateStandaloneSecretProofTransaction() {
         TransactionInfoDTO secretProofTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateStandaloneSecretProofTransaction.json");
+            TestHelperVertx.loadTransactionInfoDTO("standaloneSecretProofTransaction.json");
 
         Transaction secretProofTransaction = map(secretProofTransactionDTO);
         validateStandaloneTransaction(secretProofTransaction, secretProofTransactionDTO);
@@ -370,7 +370,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateSecretProofTransaction() {
         TransactionInfoDTO aggregateSecretProofTransactionDTO =
-            TestHelperVertx.loadTransactionInfoDTO("shouldCreateAggregateSecretProofTransaction.json");
+            TestHelperVertx.loadTransactionInfoDTO("aggregateSecretProofTransaction.json");
 
         Transaction aggregateSecretProofTransaction =
             map(aggregateSecretProofTransactionDTO);
@@ -467,7 +467,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateAddressAliasTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateAddressAliasTransaction.json"
+            "aggregateAddressAliasTransaction.json"
         );
 
         Transaction aggregateTransferTransaction = map(aggregateTransferTransactionDTO);
@@ -489,7 +489,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateMosaicAliasTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicAliasTransaction.json"
+            "aggregateMosaicAliasTransaction.json"
         );
 
         Transaction aggregateTransferTransaction = map(aggregateTransferTransactionDTO);
@@ -510,7 +510,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateMosaicMetadataTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateMosaicMetadataTransaction.json"
+            "aggregateMosaicMetadataTransaction.json"
         );
 
         AggregateTransaction aggregateTransferTransaction = (AggregateTransaction) map(
@@ -534,7 +534,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateNamespaceMetadataTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateNamespaceMetadataTransaction.json"
+            "aggregateNamespaceMetadataTransaction.json"
         );
 
         AggregateTransaction aggregateTransferTransaction = (AggregateTransaction) map(
@@ -559,7 +559,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateAccountMetadataTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateAccountMetadataTransaction.json"
+            "aggregateAccountMetadataTransaction.json"
         );
 
         AggregateTransaction aggregateTransferTransaction = (AggregateTransaction) map(
@@ -584,7 +584,7 @@ public class TransactionMapperVertxTest {
     public void shouldCreateAccountAddressRestriction() throws Exception {
 
         TransactionInfoDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAccountAddressRestrictionTransaction.json");
+            "accountAddressRestrictionTransaction.json");
 
         AccountAddressRestrictionTransaction transaction = (AccountAddressRestrictionTransaction) map(
             transactionInfoDTO);
@@ -608,7 +608,7 @@ public class TransactionMapperVertxTest {
     public void shouldCreateAccountMosaicRestriction() throws Exception {
 
         TransactionInfoDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAccountMosaicRestrictionTransaction.json");
+            "accountMosaicRestrictionTransaction.json");
 
         AccountMosaicRestrictionTransaction transaction = (AccountMosaicRestrictionTransaction) map(
             transactionInfoDTO);
@@ -626,7 +626,7 @@ public class TransactionMapperVertxTest {
     public void shouldCreateAccountOperationRestriction() throws Exception {
 
         TransactionInfoDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAccountOperationRestrictionTransaction.json");
+            "accountOperationRestrictionTransaction.json");
 
         AccountOperationRestrictionTransaction transaction = (AccountOperationRestrictionTransaction) map(
             transactionInfoDTO);
@@ -644,7 +644,7 @@ public class TransactionMapperVertxTest {
     @Test
     void shouldCreateAggregateAccountLinkTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "shouldCreateAggregateAccountLinkTransaction.json"
+            "aggregateAccountLinkTransaction.json"
         );
 
         Transaction aggregateTransferTransaction = map(aggregateTransferTransactionDTO);
@@ -655,7 +655,7 @@ public class TransactionMapperVertxTest {
         AccountLinkTransaction transaction = (AccountLinkTransaction) ((AggregateTransaction) aggregateTransferTransaction)
             .getInnerTransactions().get(0);
 
-        Assertions.assertEquals(AccountLinkAction.LINK, transaction.getLinkAction());
+        Assertions.assertEquals(LinkAction.LINK, transaction.getLinkAction());
         Assertions.assertEquals("SARNASAS2BIAB6LMFA3FPMGBPGIJGK6IJETM3ZSP",
             transaction.getRemoteAccount().getAddress().plain());
     }

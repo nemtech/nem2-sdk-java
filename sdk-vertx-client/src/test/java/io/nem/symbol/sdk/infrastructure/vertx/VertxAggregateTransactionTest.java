@@ -152,8 +152,8 @@ public class VertxAggregateTransactionTest {
     @Test
     void shouldFindAccountInAsASignerOfTheTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperVertx
-            .loadAggregateTransactionInfoDTO(
-            "shouldFindAccountInAsASignerOfTheTransaction.json");
+            .loadTransactionInfoDTO(
+            "accountInAsASignerOfTheTransaction.json");
 
         AggregateTransaction aggregateTransferTransaction =
             (AggregateTransaction) new GeneralTransactionMapper(jsonHelper)

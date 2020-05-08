@@ -25,17 +25,17 @@ import org.hamcrest.core.IsNot;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class PublicKeyTest {
+public class VotingKeyTest {
 
-    private static final byte[] TEST_BYTES = RandomUtils.generateRandomBytes(PublicKey.SIZE);
-    private static final byte[] MODIFIED_TEST_BYTES = RandomUtils.generateRandomBytes(PublicKey.SIZE);
+    private static final byte[] TEST_BYTES = RandomUtils.generateRandomBytes(VotingKey.SIZE);
+    private static final byte[] MODIFIED_TEST_BYTES = RandomUtils.generateRandomBytes(VotingKey.SIZE);
 
     // region constructors / factories
 
     @Test
     public void canCreateFromBytes() {
         // Arrange:
-        final PublicKey key = new PublicKey(TEST_BYTES);
+        final VotingKey key = new VotingKey(TEST_BYTES);
 
         // Assert:
         MatcherAssert.assertThat(key.getBytes(), IsEqual.equalTo(TEST_BYTES));
@@ -44,19 +44,19 @@ public class PublicKeyTest {
     @Test
     public void canCreateFromHexString() {
         // Arrange:
-        final PublicKey key = PublicKey.fromHexString("227F");
-        Assertions.assertEquals(PublicKey.SIZE, key.getSize());
+        final VotingKey key = VotingKey.fromHexString("227F");
+        Assertions.assertEquals(VotingKey.SIZE, key.getSize());
 
         // Assert:
-        MatcherAssert.assertThat(key.getBytes(), IsEqual.equalTo(ByteUtils.byteArrayLeadingZeros(new byte[]{0x22, 0x7F},PublicKey.SIZE)));
+        MatcherAssert.assertThat(key.getBytes(), IsEqual.equalTo(ByteUtils.byteArrayLeadingZeros(new byte[]{0x22, 0x7F},VotingKey.SIZE)));
     }
 
     @Test
     public void shouldBeEquals() {
         // Arrange:
-        final PublicKey key1 = PublicKey.fromHexString("227F");
-        final PublicKey key2 = PublicKey.fromHexString("227F");
-        final PublicKey key3 = PublicKey.fromHexString("327F");
+        final VotingKey key1 = VotingKey.fromHexString("227F");
+        final VotingKey key2 = VotingKey.fromHexString("227F");
+        final VotingKey key3 = VotingKey.fromHexString("327F");
 
         // Assert:
         MatcherAssert.assertThat(key1, IsEqual.equalTo(key2));
@@ -66,7 +66,7 @@ public class PublicKeyTest {
     @Test
     public void cannotCreateAroundMalformedHexString() {
         // Act:
-        Assertions.assertThrows(IllegalArgumentException.class, () -> PublicKey.fromHexString("22G75"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> VotingKey.fromHexString("22G75"));
     }
 
     // endregion
@@ -80,21 +80,21 @@ public class PublicKeyTest {
     @Test
     public void equalsOnlyReturnsTrueForEquivalentObjects() {
         // Arrange:
-        final PublicKey key = new PublicKey(TEST_BYTES);
+        final VotingKey key = new VotingKey(TEST_BYTES);
 
         // Assert:
-        MatcherAssert.assertThat(new PublicKey(TEST_BYTES), IsEqual.equalTo(key));
+        MatcherAssert.assertThat(new VotingKey(TEST_BYTES), IsEqual.equalTo(key));
         MatcherAssert
-            .assertThat(new PublicKey(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(key)));
+            .assertThat(new VotingKey(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(key)));
         MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
         MatcherAssert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo(key)));
-        MatcherAssert.assertThat(key, IsNot.not(IsEqual.equalTo("ImNotAPublicKey")));
+        MatcherAssert.assertThat(key, IsNot.not(IsEqual.equalTo("ImNotAVotingKey")));
     }
 
     @Test
     public void canGetByteBuffers() {
         // Arrange:
-        final PublicKey key = new PublicKey(TEST_BYTES);
+        final VotingKey key = new VotingKey(TEST_BYTES);
         Assertions.assertEquals(TEST_BYTES, key.getByteBuffer().array());
     }
 
@@ -106,7 +106,7 @@ public class PublicKeyTest {
     public void toStringReturnsHexRepresentation() {
         // Assert:
         MatcherAssert.assertThat(
-            new PublicKey(TEST_BYTES).toHex().toUpperCase(),
+            new VotingKey(TEST_BYTES).toHex().toUpperCase(),
             IsEqual.equalTo(ConvertUtils.toHex(TEST_BYTES).toUpperCase()));
     }
 

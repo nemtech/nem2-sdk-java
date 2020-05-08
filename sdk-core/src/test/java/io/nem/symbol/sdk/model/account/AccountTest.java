@@ -105,6 +105,7 @@ class AccountTest {
         assertNotEquals(null, account.getPrivateKey());
         assertNotEquals(null, account.getPublicKey());
         assertEquals(64, account.getPrivateKey().length());
+        assertEquals(64, account.getPublicKey().length());
     }
 
     @Test

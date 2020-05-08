@@ -25,7 +25,6 @@ import io.nem.symbol.core.crypto.ed25519.arithmetic.Ed25519EncodedFieldElement;
 import io.nem.symbol.core.crypto.ed25519.arithmetic.Ed25519Group;
 import io.nem.symbol.core.crypto.ed25519.arithmetic.Ed25519GroupElement;
 import io.nem.symbol.sdk.infrastructure.RandomUtils;
-import java.math.BigInteger;
 
 /**
  * Implementation of the key generator for Ed25519.
@@ -38,7 +37,7 @@ public class Ed25519KeyGenerator implements KeyGenerator {
         final byte[] seed = RandomUtils.generateRandomBytes(32);
 
         // seed is the private key.
-        final PrivateKey privateKey = new PrivateKey(new BigInteger(seed));
+        final PrivateKey privateKey = new PrivateKey(seed);
         return KeyPair.fromPrivate(privateKey, CryptoEngines.ed25519Engine());
     }
 
