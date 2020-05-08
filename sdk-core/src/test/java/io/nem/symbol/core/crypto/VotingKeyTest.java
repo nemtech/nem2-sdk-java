@@ -19,6 +19,7 @@ package io.nem.symbol.core.crypto;
 import io.nem.symbol.core.utils.ByteUtils;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.infrastructure.RandomUtils;
+import java.math.BigInteger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
@@ -67,6 +68,16 @@ public class VotingKeyTest {
     public void cannotCreateAroundMalformedHexString() {
         // Act:
         Assertions.assertThrows(IllegalArgumentException.class, () -> VotingKey.fromHexString("22G75"));
+    }
+
+    @Test
+    public void crateFromBigInt() {
+        // Arrange:
+        final VotingKey key = new VotingKey(new BigInteger("2275"));
+
+        // Assert:
+        MatcherAssert.assertThat(new VotingKey(new BigInteger("2276")), IsNot.not(IsEqual.equalTo(key)));
+        Assertions.assertEquals("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008E3", key.toHex());
     }
 
     // endregion

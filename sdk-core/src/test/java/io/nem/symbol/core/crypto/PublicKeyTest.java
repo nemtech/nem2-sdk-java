@@ -19,6 +19,7 @@ package io.nem.symbol.core.crypto;
 import io.nem.symbol.core.utils.ByteUtils;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.infrastructure.RandomUtils;
+import java.math.BigInteger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
@@ -69,13 +70,15 @@ public class PublicKeyTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> PublicKey.fromHexString("22G75"));
     }
 
-    // endregion
+    @Test
+    public void crateFromBigInt() {
+        // Arrange:
+        final PublicKey key = new PublicKey(new BigInteger("2275"));
 
-    // region serializer
-
-    // endregion
-
-    // region equals / hashCode
+        // Assert:
+        MatcherAssert.assertThat(new PublicKey(new BigInteger("2276")), IsNot.not(IsEqual.equalTo(key)));
+        Assertions.assertEquals("00000000000000000000000000000000000000000000000000000000000008E3", key.toHex());
+    }
 
     @Test
     public void equalsOnlyReturnsTrueForEquivalentObjects() {
