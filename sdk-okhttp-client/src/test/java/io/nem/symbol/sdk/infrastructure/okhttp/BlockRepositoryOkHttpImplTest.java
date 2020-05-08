@@ -87,7 +87,6 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
         MerklePathItemDTO item = new MerklePathItemDTO().hash("someHash").position(PositionEnum.LEFT);
         mockRemoteCall(merkleProofInfoDTO.addMerklePathItem(item));
 
-
         MerkleProofInfo merkleProofInfo = repository
             .getMerkleTransaction(BigInteger.ONE, "HASH!").toFuture()
             .get();
@@ -96,7 +95,6 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
         Assertions.assertEquals(Position.LEFT, merkleProofInfo.getMerklePath().get(0).getPosition());
 
     }
-
 
 
     @Test
@@ -179,6 +177,10 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
         blockDto.setHeight(BigInteger.valueOf(9L));
         blockDto.setNetwork(NetworkTypeEnum.NUMBER_144);
 
+        blockDto.setProofGamma("proofGamma");
+        blockDto.setProofScalar("proofScalar");
+        blockDto.setProofVerificationHash("proofVerificationHash");
+
         dto.setBlock(blockDto);
 
         mockRemoteCall(Collections.singletonList(dto));
@@ -209,7 +211,9 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
             .assertEquals(metaDTO.getTotalFee(), info.getTotalFee());
 
         Assertions.assertEquals(blockDto.getHeight(), info.getHeight());
-
+        Assertions.assertEquals(blockDto.getProofGamma(), info.getProofGamma());
+        Assertions.assertEquals(blockDto.getProofScalar(), info.getProofScalar());
+        Assertions.assertEquals(blockDto.getProofVerificationHash(), info.getProofVerificationHash());
     }
 
 

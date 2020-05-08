@@ -32,6 +32,7 @@ import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountTypeEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.ActivityBucketDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.Mosaic;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import java.math.BigInteger;
@@ -226,9 +227,17 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
         accountDTO.setAddress(encodeAddress(address));
+        accountDTO.setLinkedPublicKey("linkedPublicKey");
 
         AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
         accountInfoDTO.setAccount(accountDTO);
+
+        BigInteger startHeight = BigInteger.ONE;
+        BigInteger totalFeesPaid = BigInteger.valueOf(2);
+        int beneficiaryCount = 3;
+        BigInteger rawScore = BigInteger.valueOf(4);
+        accountDTO.addActivityBucketsItem(new ActivityBucketDTO().startHeight(startHeight).totalFeesPaid(totalFeesPaid)
+            .beneficiaryCount(beneficiaryCount).rawScore(rawScore));
 
         mockRemoteCall(Collections.singletonList(accountInfoDTO));
 
@@ -241,6 +250,14 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
 
         Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
         Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
+        Assertions.assertEquals(accountDTO.getLinkedPublicKey(), resolvedAccountInfo.getLinkedPublicKey());
+
+        Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
+        Assertions.assertEquals(startHeight, resolvedAccountInfo.getActivityBuckets().get(0).getStartHeight());
+        Assertions.assertEquals(totalFeesPaid, resolvedAccountInfo.getActivityBuckets().get(0).getTotalFeesPaid());
+        Assertions.assertEquals(beneficiaryCount, resolvedAccountInfo.getActivityBuckets().get(0).getBeneficiaryCount());
+        Assertions.assertEquals(rawScore, resolvedAccountInfo.getActivityBuckets().get(0).getRawScore());
+
     }
 
 

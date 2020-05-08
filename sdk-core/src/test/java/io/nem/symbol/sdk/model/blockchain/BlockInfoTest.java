@@ -45,6 +45,9 @@ class BlockInfoTest {
     private String stateHash;
     private String beneficiaryPublicKey;
     private List<String> subCacheMerkleRoots;
+    private String proofGamma = "proofGamma";
+    private String proofScalar = "proofScalar";
+    private String proofVerificationHash = "proofVerificationHash";
 
     @BeforeAll
     void setup() {
@@ -81,6 +84,9 @@ class BlockInfoTest {
                 blockTransactionsHash,
                 blockReceiptsHash,
                 stateHash,
+                proofGamma,
+                proofScalar,
+                proofVerificationHash,
                 beneficiaryPublicKey);
     }
 
@@ -108,5 +114,8 @@ class BlockInfoTest {
         assertEquals(
             new PublicAccount(beneficiaryPublicKey, NetworkType.MIJIN_TEST),
             blockInfo.getBeneficiaryPublicAccount());
+        assertEquals(proofGamma, blockInfo.getProofGamma());
+        assertEquals(proofScalar, blockInfo.getProofScalar());
+        assertEquals(proofVerificationHash, blockInfo.getProofVerificationHash());
     }
 }

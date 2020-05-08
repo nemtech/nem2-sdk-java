@@ -25,6 +25,7 @@ import io.nem.symbol.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.infrastructure.okhttp.mappers.TransactionMapper;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountType;
+import io.nem.symbol.sdk.model.account.ActivityBucket;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
@@ -213,7 +214,9 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
             accountDTO.getMosaics().stream()
                 .map(mosaicDTO -> new Mosaic(toMosaicId(mosaicDTO.getId()), mosaicDTO.getAmount()))
                 .collect(Collectors.toList()),
-            AccountType.rawValueOf(accountDTO.getAccountType().getValue()));
+            AccountType.rawValueOf(accountDTO.getAccountType().getValue()), accountDTO.getLinkedPublicKey(),
+            accountDTO.getActivityBuckets().stream().map(dto -> new ActivityBucket(dto.getStartHeight(),
+                dto.getTotalFeesPaid(), dto.getBeneficiaryCount(), dto.getRawScore())).collect(Collectors.toList()));
     }
 
 

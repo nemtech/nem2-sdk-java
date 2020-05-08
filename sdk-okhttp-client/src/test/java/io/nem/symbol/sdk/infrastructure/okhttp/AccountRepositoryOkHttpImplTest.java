@@ -32,6 +32,7 @@ import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountTypeEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.ActivityBucketDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Mosaic;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.math.BigInteger;
@@ -180,6 +181,7 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         List<Mosaic> mosaicDtos = new ArrayList<>();
         mosaicDtos.add(new Mosaic().id("0000000000000ABC").amount(BigInteger.TEN));
         accountDTO.setMosaics(mosaicDtos);
+        accountDTO.setLinkedPublicKey("linkedPublicKey");
 
         AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
         accountInfoDTO.setAccount(accountDTO);
@@ -194,7 +196,9 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
             .assertEquals("0000000000000ABC", resolvedAccountInfo.getMosaics().get(0).getId().getIdAsHex());
         Assertions
             .assertEquals(BigInteger.TEN, resolvedAccountInfo.getMosaics().get(0).getAmount());
+        Assertions.assertEquals(accountDTO.getLinkedPublicKey(), resolvedAccountInfo.getLinkedPublicKey());
     }
+
 
     @Test
     public void partialTransactions() throws Exception {
@@ -227,9 +231,17 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
         accountDTO.setAddress(encodeAddress(address));
+        accountDTO.setLinkedPublicKey("linkedPublicKey");
 
         AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
         accountInfoDTO.setAccount(accountDTO);
+
+        BigInteger startHeight = BigInteger.ONE;
+        BigInteger totalFeesPaid = BigInteger.valueOf(2);
+        int beneficiaryCount = 3;
+        BigInteger rawScore = BigInteger.valueOf(4);
+        accountDTO.addActivityBucketsItem(new ActivityBucketDTO().startHeight(startHeight).totalFeesPaid(totalFeesPaid)
+            .beneficiaryCount(beneficiaryCount).rawScore(rawScore));
 
         mockRemoteCall(Collections.singletonList(accountInfoDTO));
 
@@ -242,8 +254,16 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
 
         Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
         Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
-    }
+        Assertions.assertEquals(accountDTO.getLinkedPublicKey(), resolvedAccountInfo.getLinkedPublicKey());
 
+        Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
+        Assertions.assertEquals(startHeight, resolvedAccountInfo.getActivityBuckets().get(0).getStartHeight());
+        Assertions.assertEquals(totalFeesPaid, resolvedAccountInfo.getActivityBuckets().get(0).getTotalFeesPaid());
+        Assertions
+            .assertEquals(beneficiaryCount, resolvedAccountInfo.getActivityBuckets().get(0).getBeneficiaryCount());
+        Assertions.assertEquals(rawScore, resolvedAccountInfo.getActivityBuckets().get(0).getRawScore());
+
+    }
 
     @Test
     public void shouldProcessExceptionWhenNotFound() throws Exception {
