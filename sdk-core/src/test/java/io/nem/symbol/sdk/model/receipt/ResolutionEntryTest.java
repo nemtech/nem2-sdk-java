@@ -19,9 +19,9 @@ package io.nem.symbol.sdk.model.receipt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
-import io.nem.symbol.sdk.model.namespace.MosaicAlias;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -43,30 +43,29 @@ public class ResolutionEntryTest {
     @Test
     void shouldCreateAddressResolutionEntry() {
 
-        ResolutionEntry<Address> resolutionEntry =
-            new ResolutionEntry(address, receiptSource, ReceiptType.ADDRESS_ALIAS_RESOLUTION);
+        ResolutionEntry<Address> resolutionEntry = ResolutionEntry.forAddress(address, receiptSource);
         assertEquals(ReceiptType.ADDRESS_ALIAS_RESOLUTION, resolutionEntry.getType());
         assertEquals(resolutionEntry.getReceiptSource(), receiptSource);
         assertEquals(resolutionEntry.getResolved(), address);
+        assertEquals("010000000100000090CCB2D8723A173450E6404FDA1AFAAE0BDAB524508430C75E",
+            ConvertUtils.toHex(resolutionEntry.serialize()));
     }
 
     @Test
     void shouldCreateMosaicResolutionEntry() {
 
-        ResolutionEntry<MosaicAlias> resolutionEntry =
-            new ResolutionEntry(mosaicId, receiptSource, ReceiptType.MOSAIC_ALIAS_RESOLUTION);
+        ResolutionEntry<MosaicId> resolutionEntry = ResolutionEntry.forMosaicId(mosaicId, receiptSource);
         assertEquals(ReceiptType.MOSAIC_ALIAS_RESOLUTION, resolutionEntry.getType());
         assertEquals(resolutionEntry.getReceiptSource(), receiptSource);
         assertEquals(resolutionEntry.getResolved(), mosaicId);
+        assertEquals("010000000100000044B262C46CEABB85", ConvertUtils.toHex(resolutionEntry.serialize()));
     }
 
     @Test
     void shouldThrowIllegalArgumentExceptionWithWrongReceiptType() {
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> {
-                new ResolutionEntry<>(address, receiptSource, ReceiptType.NAMESPACE_RENTAL_FEE);
-            });
+            () -> new ResolutionEntry<>(address, receiptSource, ReceiptType.NAMESPACE_RENTAL_FEE));
 
         assertEquals("Receipt type: [NAMESPACE_RENTAL_FEE] is not valid.", exception.getMessage());
     }

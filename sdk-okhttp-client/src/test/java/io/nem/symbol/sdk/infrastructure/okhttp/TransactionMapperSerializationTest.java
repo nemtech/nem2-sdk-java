@@ -47,7 +47,7 @@ public class TransactionMapperSerializationTest {
 
     private static List<String> transactionJsonFiles() {
         return Arrays.stream(getResourceFolderFiles("json"))
-            .filter(f -> f.getName().contains("Transaction")).map(File::getName)
+            .filter(f -> f.getName().startsWith("transaction-")).map(File::getName)
             .collect(Collectors.toList());
     }
 
