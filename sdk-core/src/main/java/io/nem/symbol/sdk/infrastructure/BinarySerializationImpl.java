@@ -339,17 +339,30 @@ public class BinarySerializationImpl implements BinarySerialization {
      * functionality.
      *
      * @param payload the byte array payload
-     * @return the {@link Transaction}
+     * @return the {@link TransactionFactory}.
      */
     @Override
-    @SuppressWarnings("squid:S1192")
-    public Transaction deserialize(byte[] payload) {
+    public TransactionFactory<? > deserializeToFactory(byte[] payload){
         Validate.notNull(payload, "Payload must not be null");
         DataInputStream stream = SerializationUtils.toDataInput(payload);
         TransactionBuilder builder = TransactionBuilderFactory
             .createTransactionBuilder(stream);
 
-        return toTransaction(builder);
+        return toTransactionFactory(builder);
+    }
+
+    /**
+     * Deserialization of transactions. All the code related to the deserialization is handled in
+     * the class and its helpers. Transaction Model Objects are not polluted with deserialization
+     * functionality.
+     *
+     * @param payload the byte array payload
+     * @return the {@link Transaction}
+     */
+    @Override
+    @SuppressWarnings("squid:S1192")
+    public Transaction deserialize(byte[] payload) {
+        return deserializeToFactory(payload).build();
     }
 
     /**
@@ -358,7 +371,7 @@ public class BinarySerializationImpl implements BinarySerialization {
      * @param builder the builder
      * @return the {@link Transaction} model.
      */
-    private Transaction toTransaction(TransactionBuilder builder) {
+    private TransactionFactory<?> toTransactionFactory(TransactionBuilder builder) {
         TransactionType transactionType = TransactionType
             .rawValueOf(SerializationUtils.shortToUnsignedInt(builder.getType().getValue()));
         NetworkType networkType = NetworkType
@@ -381,8 +394,7 @@ public class BinarySerializationImpl implements BinarySerialization {
             factory.signer(
                 SerializationUtils.toPublicAccount(builder.getSignerPublicKey(), networkType));
         }
-
-        return factory.build();
+        return factory;
     }
 
 

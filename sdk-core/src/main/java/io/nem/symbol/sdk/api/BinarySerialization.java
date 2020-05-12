@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.transaction.Transaction;
+import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 
 
 /**
@@ -34,6 +35,14 @@ public interface BinarySerialization {
      */
     <T extends Transaction> byte[] serialize(T transaction);
 
+
+    /**
+     * It deserializes the symbol buffer payload into a transaction factory.
+     *
+     * @param payload the byte array payload
+     * @return the {@link TransactionFactory}.
+     */
+    TransactionFactory<?> deserializeToFactory(byte[] payload);
 
     /**
      * It deserializes the symbol buffer payload into a transaction.
