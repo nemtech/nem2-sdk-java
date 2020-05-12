@@ -153,6 +153,15 @@ public class ConvertUtilsTest {
             ConvertUtils.toSize16Hex(BigInteger.valueOf(100000)));
     }
 
+    @Test
+    void reverseHexString() {
+        Assertions.assertEquals("FF75",
+            ConvertUtils.reverseHexString("75FF"));
+
+        Assertions.assertEquals("FF66FF66FF66FF66FF66FF66FF66FF75FF75FF75FF75FF75FF75",
+            ConvertUtils.reverseHexString("75FF75FF75FF75FF75FF75FF66FF66FF66FF66FF66FF66FF66FF"));
+    }
+
 
     @Test
     void testToBigIntegerFromLong() {
