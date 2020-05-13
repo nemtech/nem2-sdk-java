@@ -102,6 +102,7 @@ public class MapperUtilsTest {
         UnresolvedAddress actual = MapperUtils
             .toUnresolvedAddress("01E7CA7E22727DDD8800000000000000000000000000000000");
         Assertions.assertTrue(actual instanceof NamespaceId);
+        Assertions.assertEquals("88DD7D72227ECAE7", ((NamespaceId) actual).getIdAsHex());
     }
 
     @Test
