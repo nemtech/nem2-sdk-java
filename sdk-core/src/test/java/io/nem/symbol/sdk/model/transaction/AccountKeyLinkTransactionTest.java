@@ -23,7 +23,7 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class AccountLinkTransactionTest extends AbstractTransactionTester {
+public class AccountKeyLinkTransactionTest extends AbstractTransactionTester {
 
     static Account account;
 
@@ -37,8 +37,8 @@ public class AccountLinkTransactionTest extends AbstractTransactionTester {
 
     @Test
     void create() {
-        AccountLinkTransaction transaction =
-            AccountLinkTransactionFactory.create(
+        AccountKeyLinkTransaction transaction =
+            AccountKeyLinkTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
                 LinkAction.LINK).deadline(new FakeDeadline()).build();
@@ -51,8 +51,8 @@ public class AccountLinkTransactionTest extends AbstractTransactionTester {
     @Test
     void shouldGenerateBytes() {
 
-        AccountLinkTransaction transaction =
-            AccountLinkTransactionFactory.create(
+        AccountKeyLinkTransaction transaction =
+            AccountKeyLinkTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 account.getPublicAccount(),
                 LinkAction.LINK).signer(account.getPublicAccount())

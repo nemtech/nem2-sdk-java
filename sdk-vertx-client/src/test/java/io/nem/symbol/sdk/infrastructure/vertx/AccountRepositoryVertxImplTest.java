@@ -25,14 +25,17 @@ import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.KeyType;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.AccountKeyDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.ActivityBucketDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.KeyTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.Mosaic;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import java.math.BigInteger;
@@ -227,7 +230,7 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
         accountDTO.setAddress(encodeAddress(address));
-        accountDTO.setLinkedPublicKey("linkedPublicKey");
+        accountDTO.setSupplementalAccountKeys(Collections.singletonList(new AccountKeyDTO().key("abc").keyType(KeyTypeEnum.NUMBER_2)));
 
         AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
         accountInfoDTO.setAccount(accountDTO);
@@ -250,7 +253,9 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
 
         Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
         Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
-        Assertions.assertEquals(accountDTO.getLinkedPublicKey(), resolvedAccountInfo.getLinkedPublicKey());
+        Assertions.assertEquals("abc", resolvedAccountInfo.getSupplementalAccountKeys().get(0).getKey());
+        Assertions.assertEquals(
+            KeyType.VRF, resolvedAccountInfo.getSupplementalAccountKeys().get(0).getKeyType());
 
         Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
         Assertions.assertEquals(startHeight, resolvedAccountInfo.getActivityBuckets().get(0).getStartHeight());

@@ -24,9 +24,11 @@ import io.nem.symbol.sdk.api.TransactionSearchCriteria;
 import io.nem.symbol.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.infrastructure.vertx.mappers.TransactionMapper;
 import io.nem.symbol.sdk.model.account.AccountInfo;
+import io.nem.symbol.sdk.model.account.AccountKey;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.ActivityBucket;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.KeyType;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
@@ -224,9 +226,14 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
                             toMosaicId(mosaicDTO.getId()),
                             mosaicDTO.getAmount()))
                 .collect(Collectors.toList()),
-            AccountType.rawValueOf(accountDTO.getAccountType().getValue()), accountDTO.getLinkedPublicKey(),
-            accountDTO.getActivityBuckets().stream().map(dto -> new ActivityBucket(dto.getStartHeight(),
-                dto.getTotalFeesPaid(), dto.getBeneficiaryCount(), dto.getRawScore())).collect(Collectors.toList()));
+            AccountType.rawValueOf(accountDTO.getAccountType().getValue()),
+            accountDTO.getSupplementalAccountKeys().stream().map(dto -> new AccountKey(
+                KeyType.rawValueOf(dto.getKeyType().getValue()), dto.getKey()))
+                .collect(Collectors.toList()),
+            accountDTO.getActivityBuckets().stream()
+                .map(dto -> new ActivityBucket(dto.getStartHeight(),
+                    dto.getTotalFeesPaid(), dto.getBeneficiaryCount(), dto.getRawScore()))
+                .collect(Collectors.toList()));
     }
 
 

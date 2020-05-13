@@ -149,10 +149,10 @@ class TransactionTypeTest {
 
     @Test
     void accountLinkType() {
-        TransactionType transactionType = TransactionType.ACCOUNT_LINK;
+        TransactionType transactionType = TransactionType.ACCOUNT_KEY_LINK;
         assertEquals(0x414C, transactionType.getValue());
         assertEquals(16716, transactionType.getValue());
-        assertEquals(TransactionType.ACCOUNT_LINK, TransactionType.rawValueOf(16716));
+        assertEquals(TransactionType.ACCOUNT_KEY_LINK, TransactionType.rawValueOf(16716));
     }
 
     @ParameterizedTest
