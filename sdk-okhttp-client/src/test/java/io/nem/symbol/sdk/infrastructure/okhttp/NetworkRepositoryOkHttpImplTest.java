@@ -149,7 +149,6 @@ public class NetworkRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         Assertions
             .assertEquals(jsonHelper.prettyPrint(plain), jsonHelper.prettyPrint(configuration));
 
-
     }
 
     @Override

@@ -35,7 +35,7 @@ public class AccountInfo {
     private final List<Importances> importances;
     private final List<Mosaic> mosaics;
     private final AccountType accountType;
-    private final String linkedPublicKey;
+    private final List<AccountKey> supplementalAccountKeys;
     private final List<ActivityBucket> activityBuckets;
 
     @SuppressWarnings("squid:S00107")
@@ -47,14 +47,15 @@ public class AccountInfo {
         BigInteger importance,
         BigInteger importanceHeight,
         List<Mosaic> mosaics,
-        AccountType accountType, String linkedPublicKey,
+        AccountType accountType,
+        List<AccountKey> supplementalAccountKeys,
         List<ActivityBucket> activityBuckets) {
         this.address = address;
         this.addressHeight = addressHeight;
         this.publicKey = publicKey;
         this.publicKeyHeight = publicKeyHeight;
         this.accountType = accountType;
-        this.linkedPublicKey = linkedPublicKey;
+        this.supplementalAccountKeys = supplementalAccountKeys;
         this.activityBuckets = activityBuckets;
         this.importances = new ArrayList<>();
         this.importances.add(new Importances(importance, importanceHeight));
@@ -132,10 +133,10 @@ public class AccountInfo {
     }
 
     /**
-     * @return the linked public key.
+     * @return the supplemental account keys.
      */
-    public String getLinkedPublicKey() {
-        return linkedPublicKey;
+    public List<AccountKey> getSupplementalAccountKeys() {
+        return supplementalAccountKeys;
     }
 
     /**

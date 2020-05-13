@@ -57,6 +57,11 @@ public class ChainProperties {
     private final String blockTimeSmoothingFactor;
 
     /**
+     * Number of blocks between successive finalization attempts.
+     */
+    private final String blockFinalizationInterval;
+
+    /**
      * Number of blocks that should be treated as a group for importance purposes.
      */
     private final String importanceGrouping;
@@ -119,10 +124,23 @@ public class ChainProperties {
     private final String maxHarvesterBalance;
 
     /**
+     * Minimum number of harvesting mosaic atomic units needed for an account to be eligible for voting.
+     */
+    private final String minVoterBalance;
+    /**
      * Percentage of the harvested fee that is collected by the beneficiary account.
      */
     private final String harvestBeneficiaryPercentage;
 
+    /**
+     * Percentage of the harvested fee that is collected by network.
+     */
+    private final String harvestNetworkPercentage;
+
+    /**
+     * The harvest network fee sink public key.
+     */
+    private final String harvestNetworkFeeSinkPublicKey;
     /**
      * Number of blocks between cache pruning.
      */
@@ -136,13 +154,15 @@ public class ChainProperties {
 
     public ChainProperties(Boolean enableVerifiableState, Boolean enableVerifiableReceipts,
         String currencyMosaicId, String harvestingMosaicId, String blockGenerationTargetTime,
-        String blockTimeSmoothingFactor, String importanceGrouping,
-        String importanceActivityPercentage, String maxRollbackBlocks,
-        String maxDifficultyBlocks, String defaultDynamicFeeMultiplier,
-        String maxTransactionLifetime, String maxBlockFutureTime,
-        String initialCurrencyAtomicUnits, String maxMosaicAtomicUnits,
-        String totalChainImportance, String minHarvesterBalance, String maxHarvesterBalance,
-        String harvestBeneficiaryPercentage, String blockPruneInterval,
+        String blockTimeSmoothingFactor, String blockFinalizationInterval,
+        String importanceGrouping, String importanceActivityPercentage,
+        String maxRollbackBlocks, String maxDifficultyBlocks,
+        String defaultDynamicFeeMultiplier, String maxTransactionLifetime,
+        String maxBlockFutureTime, String initialCurrencyAtomicUnits,
+        String maxMosaicAtomicUnits, String totalChainImportance, String minHarvesterBalance,
+        String maxHarvesterBalance, String minVoterBalance,
+        String harvestBeneficiaryPercentage, String harvestNetworkPercentage,
+        String harvestNetworkFeeSinkPublicKey, String blockPruneInterval,
         String maxTransactionsPerBlock) {
         this.enableVerifiableState = enableVerifiableState;
         this.enableVerifiableReceipts = enableVerifiableReceipts;
@@ -150,6 +170,7 @@ public class ChainProperties {
         this.harvestingMosaicId = harvestingMosaicId;
         this.blockGenerationTargetTime = blockGenerationTargetTime;
         this.blockTimeSmoothingFactor = blockTimeSmoothingFactor;
+        this.blockFinalizationInterval = blockFinalizationInterval;
         this.importanceGrouping = importanceGrouping;
         this.importanceActivityPercentage = importanceActivityPercentage;
         this.maxRollbackBlocks = maxRollbackBlocks;
@@ -162,7 +183,10 @@ public class ChainProperties {
         this.totalChainImportance = totalChainImportance;
         this.minHarvesterBalance = minHarvesterBalance;
         this.maxHarvesterBalance = maxHarvesterBalance;
+        this.minVoterBalance = minVoterBalance;
         this.harvestBeneficiaryPercentage = harvestBeneficiaryPercentage;
+        this.harvestNetworkPercentage = harvestNetworkPercentage;
+        this.harvestNetworkFeeSinkPublicKey = harvestNetworkFeeSinkPublicKey;
         this.blockPruneInterval = blockPruneInterval;
         this.maxTransactionsPerBlock = maxTransactionsPerBlock;
     }
@@ -189,6 +213,10 @@ public class ChainProperties {
 
     public String getBlockTimeSmoothingFactor() {
         return blockTimeSmoothingFactor;
+    }
+
+    public String getBlockFinalizationInterval() {
+        return blockFinalizationInterval;
     }
 
     public String getImportanceGrouping() {
@@ -239,8 +267,20 @@ public class ChainProperties {
         return maxHarvesterBalance;
     }
 
+    public String getMinVoterBalance() {
+        return minVoterBalance;
+    }
+
     public String getHarvestBeneficiaryPercentage() {
         return harvestBeneficiaryPercentage;
+    }
+
+    public String getHarvestNetworkPercentage() {
+        return harvestNetworkPercentage;
+    }
+
+    public String getHarvestNetworkFeeSinkPublicKey() {
+        return harvestNetworkFeeSinkPublicKey;
     }
 
     public String getBlockPruneInterval() {

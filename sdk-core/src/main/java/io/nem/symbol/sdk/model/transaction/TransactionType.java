@@ -129,9 +129,9 @@ public enum TransactionType {
     NAMESPACE_METADATA(17220, 1),
 
     /**
-     * Account link transaction type
+     * Account key link transaction type
      */
-    ACCOUNT_LINK(16716, 1),
+    ACCOUNT_KEY_LINK(16716, 1),
 
     /**
      * Mosaic address restriction type

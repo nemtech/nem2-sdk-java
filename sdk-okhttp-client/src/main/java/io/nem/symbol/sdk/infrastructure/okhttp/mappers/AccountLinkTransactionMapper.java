@@ -18,36 +18,36 @@ package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.network.NetworkType;
-import io.nem.symbol.sdk.model.transaction.AccountLinkTransaction;
-import io.nem.symbol.sdk.model.transaction.AccountLinkTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.AccountKeyLinkTransaction;
+import io.nem.symbol.sdk.model.transaction.AccountKeyLinkTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.LinkAction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountLinkTransactionDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountKeyLinkTransactionDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.LinkActionEnum;
 
 /**
  * Account link transaction mapper.
  */
-class AccountLinkTransactionMapper extends
-    AbstractTransactionMapper<AccountLinkTransactionDTO, AccountLinkTransaction> {
+class AccountKeyLinkTransactionMapper extends
+    AbstractTransactionMapper<AccountKeyLinkTransactionDTO, AccountKeyLinkTransaction> {
 
-    public AccountLinkTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.ACCOUNT_LINK, AccountLinkTransactionDTO.class);
+    public AccountKeyLinkTransactionMapper(JsonHelper jsonHelper) {
+        super(jsonHelper, TransactionType.ACCOUNT_KEY_LINK, AccountKeyLinkTransactionDTO.class);
     }
 
     @Override
-    protected AccountLinkTransactionFactory createFactory(NetworkType networkType,
-        AccountLinkTransactionDTO dto) {
+    protected AccountKeyLinkTransactionFactory createFactory(NetworkType networkType,
+        AccountKeyLinkTransactionDTO dto) {
         PublicAccount remoteAccount = PublicAccount
             .createFromPublicKey(dto.getRemotePublicKey(), networkType);
-        return AccountLinkTransactionFactory.create(networkType,
+        return AccountKeyLinkTransactionFactory.create(networkType,
             remoteAccount,
             LinkAction.rawValueOf(dto.getLinkAction().getValue()));
     }
 
     @Override
-    protected void copyToDto(AccountLinkTransaction transaction, AccountLinkTransactionDTO dto) {
+    protected void copyToDto(AccountKeyLinkTransaction transaction, AccountKeyLinkTransactionDTO dto) {
         dto.setRemotePublicKey(transaction.getRemoteAccount().getPublicKey().toHex());
         dto.setLinkAction(
             LinkActionEnum.fromValue((int) transaction.getLinkAction().getValue()));

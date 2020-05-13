@@ -25,6 +25,7 @@ import io.nem.symbol.catapult.builders.MosaicRestrictionTypeDto;
 import io.nem.symbol.catapult.builders.MosaicSupplyChangeActionDto;
 import io.nem.symbol.catapult.builders.NamespaceRegistrationTypeDto;
 import io.nem.symbol.sdk.model.account.AccountType;
+import io.nem.symbol.sdk.model.account.KeyType;
 import io.nem.symbol.sdk.model.blockchain.Position;
 import io.nem.symbol.sdk.model.message.MessageType;
 import io.nem.symbol.sdk.model.mosaic.MosaicSupplyChangeActionType;
@@ -45,6 +46,7 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionFlagsEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AliasActionEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AliasTypeEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.KeyTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.LinkActionEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.LockHashAlgorithmEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MessageTypeEnum;
@@ -62,7 +64,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -284,8 +285,6 @@ public class EnumMapperTest {
     }
 
     @Test
-    @Disabled
-        //Fix open api first
     void testLockHashAlgorithmTypeModel() {
         Set<Integer> existingValues = new HashSet<>();
         Arrays.stream(LockHashAlgorithmEnum.values()).forEach(v -> {
@@ -531,6 +530,24 @@ public class EnumMapperTest {
         Assertions.assertEquals(AliasTypeEnum.fromValue(enumValue.getValue()).getValue(),
             enumValue.getValue());
     }
+
+
+    @ParameterizedTest
+    @EnumSource(KeyType.class)
+    void validFromKeyType(KeyType enumValue) {
+        assertNotNull(KeyTypeEnum.fromValue(enumValue.getValue()));
+        assertEquals(KeyTypeEnum.fromValue(enumValue.getValue()).getValue(),
+            enumValue.getValue());
+    }
+
+    @ParameterizedTest
+    @EnumSource(KeyTypeEnum.class)
+    void validKeyTypeEnum(KeyTypeEnum enumValue) {
+        assertNotNull(KeyType.rawValueOf(enumValue.getValue()));
+        Assertions.assertEquals(KeyTypeEnum.fromValue(enumValue.getValue()).getValue(),
+            enumValue.getValue());
+    }
+
 
 
 }

@@ -21,13 +21,13 @@ import io.nem.symbol.sdk.model.account.PublicAccount;
 /**
  *
  */
-public class AccountLinkTransaction extends Transaction {
+public class AccountKeyLinkTransaction extends Transaction {
 
     private final PublicAccount remoteAccount;
 
     private final LinkAction linkAction;
 
-    public AccountLinkTransaction(AccountLinkTransactionFactory factory) {
+    public AccountKeyLinkTransaction(AccountKeyLinkTransactionFactory factory) {
         super(factory);
         this.remoteAccount = factory.getRemoteAccount();
         this.linkAction = factory.getLinkAction();

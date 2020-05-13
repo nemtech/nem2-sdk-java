@@ -27,7 +27,7 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
-import io.nem.symbol.sdk.model.transaction.AccountLinkTransaction;
+import io.nem.symbol.sdk.model.transaction.AccountKeyLinkTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransaction;
@@ -642,9 +642,9 @@ public class TransactionMapperVertxTest {
 
 
     @Test
-    void shouldCreateAggregateAccountLinkTransaction() {
+    void shouldCreateAggregateAccountKeyLinkTransaction() {
         TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "aggregateAccountLinkTransaction.json"
+            "aggregateAccountKeyLinkTransaction.json"
         );
 
         Transaction aggregateTransferTransaction = map(aggregateTransferTransactionDTO);
@@ -652,7 +652,7 @@ public class TransactionMapperVertxTest {
         validateAggregateTransaction(
             (AggregateTransaction) aggregateTransferTransaction, aggregateTransferTransactionDTO);
 
-        AccountLinkTransaction transaction = (AccountLinkTransaction) ((AggregateTransaction) aggregateTransferTransaction)
+        AccountKeyLinkTransaction transaction = (AccountKeyLinkTransaction) ((AggregateTransaction) aggregateTransferTransaction)
             .getInnerTransactions().get(0);
 
         Assertions.assertEquals(LinkAction.LINK, transaction.getLinkAction());

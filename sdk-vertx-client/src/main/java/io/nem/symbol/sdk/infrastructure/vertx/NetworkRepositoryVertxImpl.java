@@ -42,7 +42,7 @@ import io.nem.symbol.sdk.openapi.vertx.api.NetworkRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.api.NodeRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.NodeRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
-import io.nem.symbol.sdk.openapi.vertx.model.AccountLinkNetworkPropertiesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.AccountKeyLinkNetworkPropertiesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountRestrictionNetworkPropertiesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AggregateNetworkPropertiesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.ChainPropertiesDTO;
@@ -131,21 +131,24 @@ public class NetworkRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
 
     private NetworkProperties toNetworkProperties(NetworkPropertiesDTO dto) {
         return new NetworkProperties(dto.getIdentifier(),
-            NodeIdentityEqualityStrategy.fromValue(dto.getNodeEqualityStrategy().getValue()),
-            dto.getPublicKey(), dto.getGenerationHash(), dto.getEpochAdjustment());
+            NodeIdentityEqualityStrategy.fromValue(dto.getNodeEqualityStrategy().getValue()), dto.getPublicKey(),
+            dto.getGenerationHashSeed(), dto.getEpochAdjustment());
     }
 
     private ChainProperties toChainProperties(ChainPropertiesDTO dto) {
         return new ChainProperties(dto.getEnableVerifiableState(),
             dto.getEnableVerifiableReceipts(), dto.getCurrencyMosaicId(),
             dto.getHarvestingMosaicId(), dto.getBlockGenerationTargetTime(),
-            dto.getBlockTimeSmoothingFactor(), dto.getImportanceGrouping(),
+            dto.getBlockTimeSmoothingFactor(), dto.getBlockFinalizationInterval(),
+            dto.getImportanceGrouping(),
             dto.getImportanceActivityPercentage(), dto.getMaxRollbackBlocks(),
             dto.getMaxDifficultyBlocks(), dto.getDefaultDynamicFeeMultiplier(),
             dto.getMaxTransactionLifetime(), dto.getMaxBlockFutureTime(),
             dto.getInitialCurrencyAtomicUnits(), dto.getMaxMosaicAtomicUnits(),
             dto.getTotalChainImportance(), dto.getMinHarvesterBalance(),
-            dto.getMaxHarvesterBalance(), dto.getHarvestBeneficiaryPercentage(),
+            dto.getMaxHarvesterBalance(), dto.getMinVoterBalance(),
+            dto.getHarvestBeneficiaryPercentage(),
+            dto.getHarvestNetworkPercentage(), dto.getHarvestNetworkFeeSinkPublicKey(),
             dto.getBlockPruneInterval(), dto.getMaxTransactionsPerBlock());
     }
 
@@ -164,7 +167,7 @@ public class NetworkRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
             toTransfer(dto.getTransfer()));
     }
 
-    private AccountLinkNetworkProperties toAccountlink(AccountLinkNetworkPropertiesDTO dto) {
+    private AccountLinkNetworkProperties toAccountlink(AccountKeyLinkNetworkPropertiesDTO dto) {
         return new AccountLinkNetworkProperties(dto.getDummy());
     }
 

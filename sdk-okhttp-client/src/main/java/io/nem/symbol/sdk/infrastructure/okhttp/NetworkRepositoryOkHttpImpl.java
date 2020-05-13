@@ -40,7 +40,7 @@ import io.nem.symbol.sdk.model.network.TransferNetworkProperties;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.NetworkRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.NodeRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountLinkNetworkPropertiesDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountKeyLinkNetworkPropertiesDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionNetworkPropertiesDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AggregateNetworkPropertiesDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.ChainPropertiesDTO;
@@ -117,21 +117,24 @@ public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
 
     private NetworkProperties toNetworkProperties(NetworkPropertiesDTO dto) {
         return new NetworkProperties(dto.getIdentifier(),
-            NodeIdentityEqualityStrategy.fromValue(dto.getNodeEqualityStrategy().getValue()),
-            dto.getPublicKey(), dto.getGenerationHash(), dto.getEpochAdjustment());
+            NodeIdentityEqualityStrategy.fromValue(dto.getNodeEqualityStrategy().getValue()), dto.getPublicKey(),
+            dto.getGenerationHashSeed(), dto.getEpochAdjustment());
     }
 
     private ChainProperties toChainProperties(ChainPropertiesDTO dto) {
         return new ChainProperties(dto.getEnableVerifiableState(),
             dto.getEnableVerifiableReceipts(), dto.getCurrencyMosaicId(),
             dto.getHarvestingMosaicId(), dto.getBlockGenerationTargetTime(),
-            dto.getBlockTimeSmoothingFactor(), dto.getImportanceGrouping(),
+            dto.getBlockTimeSmoothingFactor(), dto.getBlockFinalizationInterval(),
+            dto.getImportanceGrouping(),
             dto.getImportanceActivityPercentage(), dto.getMaxRollbackBlocks(),
             dto.getMaxDifficultyBlocks(), dto.getDefaultDynamicFeeMultiplier(),
             dto.getMaxTransactionLifetime(), dto.getMaxBlockFutureTime(),
             dto.getInitialCurrencyAtomicUnits(), dto.getMaxMosaicAtomicUnits(),
             dto.getTotalChainImportance(), dto.getMinHarvesterBalance(),
-            dto.getMaxHarvesterBalance(), dto.getHarvestBeneficiaryPercentage(),
+            dto.getMaxHarvesterBalance(), dto.getMinVoterBalance(),
+            dto.getHarvestBeneficiaryPercentage(),
+            dto.getHarvestNetworkPercentage(), dto.getHarvestNetworkFeeSinkPublicKey(),
             dto.getBlockPruneInterval(), dto.getMaxTransactionsPerBlock());
     }
 
@@ -150,7 +153,7 @@ public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
             toTransfer(dto.getTransfer()));
     }
 
-    private AccountLinkNetworkProperties toAccountlink(AccountLinkNetworkPropertiesDTO dto) {
+    private AccountLinkNetworkProperties toAccountlink(AccountKeyLinkNetworkPropertiesDTO dto) {
         return new AccountLinkNetworkProperties(dto.getDummy());
     }
 

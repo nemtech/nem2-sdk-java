@@ -17,7 +17,7 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.catapult.builders.AccountAddressRestrictionTransactionBodyBuilder;
-import io.nem.symbol.catapult.builders.AccountLinkTransactionBodyBuilder;
+import io.nem.symbol.catapult.builders.AccountKeyLinkTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.AccountMetadataTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.AccountMosaicRestrictionTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.AccountOperationRestrictionTransactionBodyBuilder;
@@ -91,8 +91,8 @@ import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.AccountLinkTransaction;
-import io.nem.symbol.sdk.model.transaction.AccountLinkTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.AccountKeyLinkTransaction;
+import io.nem.symbol.sdk.model.transaction.AccountKeyLinkTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransaction;
@@ -183,7 +183,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         register(new TransferTransactionSerializer());
         register(new MosaicSupplyChangeTransactionSerializer());
         register(new MosaicDefinitionTransactionSerializer());
-        register(new AccountLinkTransactionSerializer());
+        register(new AccountKeyLinkTransactionSerializer());
         register(new AccountMetadataTransactionSerializer());
         register(new MosaicMetadataTransactionSerializer());
         register(new NamespaceMetadataTransactionSerializer());
@@ -689,34 +689,34 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
     }
 
-    private static class AccountLinkTransactionSerializer implements
-        TransactionSerializer<AccountLinkTransaction> {
+    private static class AccountKeyLinkTransactionSerializer implements
+        TransactionSerializer<AccountKeyLinkTransaction> {
 
         @Override
         public TransactionType getTransactionType() {
-            return TransactionType.ACCOUNT_LINK;
+            return TransactionType.ACCOUNT_KEY_LINK;
         }
 
         @Override
-        public Class<AccountLinkTransaction> getTransactionClass() {
-            return AccountLinkTransaction.class;
+        public Class<AccountKeyLinkTransaction> getTransactionClass() {
+            return AccountKeyLinkTransaction.class;
         }
 
         @Override
         public TransactionFactory fromBodyBuilder(NetworkType networkType,
             Serializer transactionBuilder) {
-            AccountLinkTransactionBodyBuilder builder = (AccountLinkTransactionBodyBuilder) transactionBuilder;
+            AccountKeyLinkTransactionBodyBuilder builder = (AccountKeyLinkTransactionBodyBuilder) transactionBuilder;
             PublicAccount remoteAccount = SerializationUtils
                 .toPublicAccount(builder.getRemotePublicKey(), networkType);
             LinkAction linkAction = LinkAction
                 .rawValueOf(builder.getLinkAction().getValue());
-            return AccountLinkTransactionFactory
+            return AccountKeyLinkTransactionFactory
                 .create(networkType, remoteAccount, linkAction);
         }
 
         @Override
-        public Serializer toBodyBuilder(AccountLinkTransaction transaction) {
-            return AccountLinkTransactionBodyBuilder.create(
+        public Serializer toBodyBuilder(AccountKeyLinkTransaction transaction) {
+            return AccountKeyLinkTransactionBodyBuilder.create(
                 SerializationUtils.toKeyDto(transaction.getRemoteAccount().getPublicKey()),
                 LinkActionDto.rawValueOf(transaction.getLinkAction().getValue()));
 

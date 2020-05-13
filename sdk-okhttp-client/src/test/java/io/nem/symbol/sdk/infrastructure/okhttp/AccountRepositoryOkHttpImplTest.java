@@ -25,18 +25,19 @@ import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.KeyType;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountKeyDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.ActivityBucketDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.Mosaic;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.KeyTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -178,25 +179,39 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
         accountDTO.setAddress(encodeAddress(address));
-        List<Mosaic> mosaicDtos = new ArrayList<>();
-        mosaicDtos.add(new Mosaic().id("0000000000000ABC").amount(BigInteger.TEN));
-        accountDTO.setMosaics(mosaicDtos);
-        accountDTO.setLinkedPublicKey("linkedPublicKey");
+        accountDTO.setSupplementalAccountKeys(Collections.singletonList(new AccountKeyDTO().key("abc").keyType(
+            KeyTypeEnum.NUMBER_2)));
 
         AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
         accountInfoDTO.setAccount(accountDTO);
 
-        mockRemoteCall(accountInfoDTO);
+        BigInteger startHeight = BigInteger.ONE;
+        BigInteger totalFeesPaid = BigInteger.valueOf(2);
+        int beneficiaryCount = 3;
+        BigInteger rawScore = BigInteger.valueOf(4);
+        accountDTO.addActivityBucketsItem(new ActivityBucketDTO().startHeight(startHeight).totalFeesPaid(totalFeesPaid)
+            .beneficiaryCount(beneficiaryCount).rawScore(rawScore));
 
-        AccountInfo resolvedAccountInfo = repository.getAccountInfo(address).toFuture().get();
+        mockRemoteCall(Collections.singletonList(accountInfoDTO));
+
+        List<AccountInfo> resolvedAccountInfos = repository
+            .getAccountsInfo(Collections.singletonList(address)).toFuture().get();
+
+        Assertions.assertEquals(1, resolvedAccountInfos.size());
+
+        AccountInfo resolvedAccountInfo = resolvedAccountInfos.get(0);
+
         Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
         Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
-        Assertions.assertEquals(1, resolvedAccountInfo.getMosaics().size());
-        Assertions
-            .assertEquals("0000000000000ABC", resolvedAccountInfo.getMosaics().get(0).getId().getIdAsHex());
-        Assertions
-            .assertEquals(BigInteger.TEN, resolvedAccountInfo.getMosaics().get(0).getAmount());
-        Assertions.assertEquals(accountDTO.getLinkedPublicKey(), resolvedAccountInfo.getLinkedPublicKey());
+        Assertions.assertEquals("abc", resolvedAccountInfo.getSupplementalAccountKeys().get(0).getKey());
+        Assertions.assertEquals(
+            KeyType.VRF, resolvedAccountInfo.getSupplementalAccountKeys().get(0).getKeyType());
+
+        Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
+        Assertions.assertEquals(startHeight, resolvedAccountInfo.getActivityBuckets().get(0).getStartHeight());
+        Assertions.assertEquals(totalFeesPaid, resolvedAccountInfo.getActivityBuckets().get(0).getTotalFeesPaid());
+        Assertions.assertEquals(beneficiaryCount, resolvedAccountInfo.getActivityBuckets().get(0).getBeneficiaryCount());
+        Assertions.assertEquals(rawScore, resolvedAccountInfo.getActivityBuckets().get(0).getRawScore());
     }
 
 
@@ -231,7 +246,7 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
         accountDTO.setAddress(encodeAddress(address));
-        accountDTO.setLinkedPublicKey("linkedPublicKey");
+        accountDTO.setSupplementalAccountKeys(Collections.singletonList(new AccountKeyDTO().key("abc").keyType(KeyTypeEnum.NUMBER_2)));
 
         AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
         accountInfoDTO.setAccount(accountDTO);
@@ -254,13 +269,14 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
 
         Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
         Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
-        Assertions.assertEquals(accountDTO.getLinkedPublicKey(), resolvedAccountInfo.getLinkedPublicKey());
+        Assertions.assertEquals("abc", resolvedAccountInfo.getSupplementalAccountKeys().get(0).getKey());
+        Assertions.assertEquals(
+            KeyType.VRF, resolvedAccountInfo.getSupplementalAccountKeys().get(0).getKeyType());
 
         Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
         Assertions.assertEquals(startHeight, resolvedAccountInfo.getActivityBuckets().get(0).getStartHeight());
         Assertions.assertEquals(totalFeesPaid, resolvedAccountInfo.getActivityBuckets().get(0).getTotalFeesPaid());
-        Assertions
-            .assertEquals(beneficiaryCount, resolvedAccountInfo.getActivityBuckets().get(0).getBeneficiaryCount());
+        Assertions.assertEquals(beneficiaryCount, resolvedAccountInfo.getActivityBuckets().get(0).getBeneficiaryCount());
         Assertions.assertEquals(rawScore, resolvedAccountInfo.getActivityBuckets().get(0).getRawScore());
 
     }
