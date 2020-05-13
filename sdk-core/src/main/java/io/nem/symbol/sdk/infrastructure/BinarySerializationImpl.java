@@ -347,9 +347,8 @@ public class BinarySerializationImpl implements BinarySerialization {
     }
 
     /**
-     * Deserialization of transactions. All the code related to the deserialization is handled in
-     * the class and its helpers. Transaction Model Objects are not polluted with deserialization
-     * functionality.
+     * Deserialization of transactions. All the code related to the deserialization is handled in the class and its
+     * helpers. Transaction Model Objects are not polluted with deserialization functionality.
      *
      * @param payload the byte array payload
      * @return the {@link TransactionFactory}.
