@@ -44,7 +44,7 @@ class NodeRepositoryIntegrationTest extends BaseIntegrationTest {
         assertNotNull(nodeInfo.getHost());
         assertTrue(nodeInfo.getPort() > 0);
         assertTrue(nodeInfo.getNetworkIdentifier().getValue() > 0);
-        assertEquals(getGenerationHash(), nodeInfo.getNetworkGenerationHash());
+        assertEquals(getGenerationHash(), nodeInfo.getNetworkGenerationHashSeed());
     }
 
     private NodeRepository getNodeRepository(RepositoryType type) {

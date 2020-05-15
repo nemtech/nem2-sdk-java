@@ -17,17 +17,14 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.catapult.builders.GeneratorUtils;
-import io.nem.symbol.sdk.api.NetworkCurrencyService;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.RepositoryFactoryConfiguration;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.reactivex.Observable;
-import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 /**
  * Tests for {@link RepositoryFactoryVertxImpl}.
@@ -106,12 +103,15 @@ public class RepositoryFactoryVertxImplTest {
         configuration.withNetworkType(NetworkType.MAIN_NET);
 
         RepositoryFactory factory = new RepositoryFactoryVertxImpl(configuration) {
+
             @Override
-            protected NetworkCurrencyService createNetworkCurrencyService() {
-                NetworkCurrencyService mock = Mockito.mock(NetworkCurrencyService.class);
-                Mockito.when(mock.getNetworkCurrenciesFromNemesis()).thenReturn(Observable.just(
-                    Arrays.asList(NetworkCurrency.CAT_CURRENCY, NetworkCurrency.CAT_HARVEST)));
-                return mock;
+            protected Observable<NetworkCurrency> loadNetworkCurrency() {
+                return Observable.just(NetworkCurrency.CAT_CURRENCY);
+            }
+
+            @Override
+            protected Observable<NetworkCurrency> loadHarvestCurrency() {
+                return Observable.just(NetworkCurrency.CAT_HARVEST);
             }
         };
 

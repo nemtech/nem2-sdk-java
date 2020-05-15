@@ -122,7 +122,7 @@ public interface RepositoryFactory extends Closeable {
     /**
      * @return the generation hash used to sign transactions.  It uses the user configured
      * generation hash if provided, if not, the value will be resolved from the server. Value
-     * retrieved from the block/1 endpoint. This method is cached, the server is only called the
+     * retrieved from the node/info endpoint. This method is cached, the server is only called the
      * first time.
      * @see RepositoryFactoryConfiguration
      */

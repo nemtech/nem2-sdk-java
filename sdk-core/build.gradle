@@ -2,7 +2,7 @@ dependencies {
 
     compile "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
 
-    compile 'io.nem:catbuffer-java:2.0.3-SNAPSHOT'
+    compile 'io.nem:catbuffer-java:0.0.14'
     compile 'org.bouncycastle:bcprov-jdk15on:1.58'
     compile 'commons-codec:commons-codec:1.11'
     compile 'org.apache.commons:commons-lang3:3.9'

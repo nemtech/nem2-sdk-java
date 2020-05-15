@@ -26,7 +26,7 @@ public class NodeInfo {
     private final RoleType roles;
     private final String host;
     private final String friendlyName;
-    private final String networkGenerationHash;
+    private final String networkGenerationHashSeed;
 
     public NodeInfo(
         String publicKey,
@@ -35,7 +35,7 @@ public class NodeInfo {
         int version,
         RoleType roles,
         String host,
-        String friendlyName, String networkGenerationHash) {
+        String friendlyName, String networkGenerationHashSeed) {
         this.friendlyName = friendlyName;
         this.host = host;
         this.networkIdentifier = networkIdentifier;
@@ -43,7 +43,7 @@ public class NodeInfo {
         this.port = port;
         this.version = version;
         this.roles = roles;
-        this.networkGenerationHash = networkGenerationHash;
+        this.networkGenerationHashSeed = networkGenerationHashSeed;
     }
 
     /**
@@ -115,7 +115,7 @@ public class NodeInfo {
      *
      * @return The network generation hash (block/1 generation hash)
      */
-    public String getNetworkGenerationHash() {
-        return networkGenerationHash;
+    public String getNetworkGenerationHashSeed() {
+        return networkGenerationHashSeed;
     }
 }

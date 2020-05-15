@@ -66,7 +66,7 @@ public class NodeRepositoryOkVertxImplTest extends AbstractVertxRespositoryTest 
         dto.setRoles(RolesTypeEnum.NUMBER_2);
         dto.setVersion(1234);
         dto.setPublicKey("somePublicKey");
-        dto.setNetworkGenerationHash("abc");
+        dto.setNetworkGenerationHashSeed("abc");
 
         mockRemoteCall(dto);
 
@@ -81,7 +81,7 @@ public class NodeRepositoryOkVertxImplTest extends AbstractVertxRespositoryTest 
         Assertions.assertEquals(NetworkType.MAIN_NET, info.getNetworkIdentifier());
         Assertions.assertEquals(RoleType.API_NODE, info.getRoles());
         Assertions.assertEquals(dto.getVersion().intValue(), info.getVersion());
-        Assertions.assertEquals(dto.getNetworkGenerationHash(), info.getNetworkGenerationHash());
+        Assertions.assertEquals(dto.getNetworkGenerationHashSeed(), info.getNetworkGenerationHashSeed());
 
     }
 
@@ -96,7 +96,7 @@ public class NodeRepositoryOkVertxImplTest extends AbstractVertxRespositoryTest 
         dto.setRoles(RolesTypeEnum.NUMBER_2);
         dto.setVersion(1234);
         dto.setPublicKey("somePublicKey");
-        dto.setNetworkGenerationHash("abc");
+        dto.setNetworkGenerationHashSeed("abc");
 
         mockRemoteCall(Arrays.asList(dto));
 
@@ -111,7 +111,7 @@ public class NodeRepositoryOkVertxImplTest extends AbstractVertxRespositoryTest 
         Assertions.assertEquals(NetworkType.MAIN_NET, info.getNetworkIdentifier());
         Assertions.assertEquals(RoleType.API_NODE, info.getRoles());
         Assertions.assertEquals(dto.getVersion().intValue(), info.getVersion());
-        Assertions.assertEquals(dto.getNetworkGenerationHash(), info.getNetworkGenerationHash());
+        Assertions.assertEquals(dto.getNetworkGenerationHashSeed(), info.getNetworkGenerationHashSeed());
 
     }
 

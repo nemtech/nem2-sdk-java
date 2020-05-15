@@ -103,6 +103,13 @@ public class MosaicNonce {
         return ByteUtils.bytesToInt(this.nonce);
     }
 
+    /**
+     * @return nonce long
+     */
+    public long getNonceAsLong() {
+        return Integer.toUnsignedLong(getNonceAsInt());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

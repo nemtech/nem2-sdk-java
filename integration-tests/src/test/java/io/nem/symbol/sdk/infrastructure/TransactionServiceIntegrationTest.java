@@ -48,7 +48,8 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     public void testTransferCatCurrencyFromNemesis(RepositoryType type) {
-        String hash = transferUsingAliases(config().getNemesisAccount(), type, "cat.currency",
+        String mosaicAlias = getNetworkCurrency().getNamespaceId().get().getFullName().get();
+        String hash = transferUsingAliases(config().getNemesisAccount(), type, mosaicAlias,
             "testaccount2", BigInteger.TEN).getTransactionInfo().get().getHash().get();
 
         List<Transaction> transactions = get(
@@ -190,7 +191,7 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
         Assertions
             .assertTrue(transferTransaction.getMosaics().get(0).getId() instanceof NamespaceId);
-        Assertions.assertTrue(transferTransaction.getRecipient() instanceof Address);
+        Assertions.assertTrue(transferTransaction.getRecipient() instanceof NamespaceId);
 
         TransferTransaction processedTransferTransaction = announceAndValidate(type, sender,
             transferTransaction);

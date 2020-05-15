@@ -53,6 +53,6 @@ public class NodeInfoTest {
         assertEquals(NetworkType.MIJIN_TEST, nodeInfo.getNetworkIdentifier());
         assertEquals(2, nodeInfo.getRoles().getValue());
         assertEquals(nodeInfo.getPublicKey(), account.getPublicKey());
-        assertEquals("abc", nodeInfo.getNetworkGenerationHash());
+        assertEquals("abc", nodeInfo.getNetworkGenerationHashSeed());
     }
 }
