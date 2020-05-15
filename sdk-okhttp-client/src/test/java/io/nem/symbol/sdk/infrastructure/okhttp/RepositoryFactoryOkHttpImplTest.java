@@ -17,14 +17,32 @@
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.catapult.builders.GeneratorUtils;
+import io.nem.symbol.sdk.api.MosaicRepository;
+import io.nem.symbol.sdk.api.NamespaceRepository;
+import io.nem.symbol.sdk.api.NetworkRepository;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.RepositoryFactoryConfiguration;
+import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
+import io.nem.symbol.sdk.model.mosaic.MosaicId;
+import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
+import io.nem.symbol.sdk.model.mosaic.MosaicNames;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
+import io.nem.symbol.sdk.model.mosaic.NetworkCurrencyBuilder;
+import io.nem.symbol.sdk.model.namespace.NamespaceName;
+import io.nem.symbol.sdk.model.network.ChainProperties;
+import io.nem.symbol.sdk.model.network.NetworkConfiguration;
+import io.nem.symbol.sdk.model.network.NetworkProperties;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.NetworkConfigurationDTO;
 import io.reactivex.Observable;
+import java.math.BigInteger;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 /**
  * Tests for {@link RepositoryFactoryOkHttpImpl}.
@@ -126,6 +144,170 @@ public class RepositoryFactoryOkHttpImplTest {
 
         Assertions.assertEquals(NetworkCurrency.CAT_CURRENCY,
             factory.getNetworkCurrency().toFuture().get());
+    }
+
+    @Test
+    public void getRestProvidedNetworkCurrenciesUsingNetworkProperties() throws Exception {
+        String baseUrl = "https://localhost:1934/path";
+        RepositoryFactoryConfiguration configuration = new RepositoryFactoryConfiguration(baseUrl);
+        configuration.withGenerationHash("abc");
+        configuration.withNetworkType(NetworkType.MAIN_NET);
+        NetworkRepository networkRepositoryMock = Mockito.mock(NetworkRepository.class);
+
+        NetworkConfiguration networkConfiguration = Mockito.mock(NetworkConfiguration.class);
+        ChainProperties chainProperties = Mockito.mock(ChainProperties.class);
+        Mockito.when(chainProperties.getCurrencyMosaicId()).thenReturn("0x62EF'46FD'6555'AAAA");
+        Mockito.when(chainProperties.getHarvestingMosaicId()).thenReturn("0x62EF'46FD'6555'BBBB");
+        Mockito.when(networkConfiguration.getChain()).thenReturn(chainProperties);
+
+        Mockito.when(networkRepositoryMock.getNetworkProperties())
+            .thenReturn(Observable.just(networkConfiguration));
+
+        MosaicRepository mosaicRepositoryMock = Mockito.mock(MosaicRepository.class);
+
+        MosaicId networkMosaicId = new MosaicId("62EF46FD6555AAAA");
+        MosaicInfo networkMosaic = MosaicInfo.create(networkMosaicId, BigInteger.valueOf(1),
+            BigInteger.valueOf(2),
+            Account.generateNewAccount(NetworkType.MIJIN_TEST).getPublicAccount(), 4,
+            MosaicFlags.create(true, false, true), 5, BigInteger.valueOf(10));
+        Mockito.when(mosaicRepositoryMock.getMosaic(networkMosaicId))
+            .thenReturn(Observable.just(networkMosaic));
+
+        MosaicId harvestMosaicId = new MosaicId("62EF46FD6555BBBB");
+        MosaicInfo harvestMosaic = MosaicInfo.create(harvestMosaicId, BigInteger.valueOf(1),
+            BigInteger.valueOf(2),
+            Account.generateNewAccount(NetworkType.MIJIN_TEST).getPublicAccount(), 10,
+            MosaicFlags.create(false, true, false), 4, BigInteger.valueOf(20));
+        Mockito.when(mosaicRepositoryMock.getMosaic(harvestMosaicId))
+            .thenReturn(Observable.just(harvestMosaic));
+
+        NamespaceRepository namespaceRepository = Mockito.mock(NamespaceRepository.class);
+        NamespaceName networkNamespaceName = new NamespaceName("network.xym");
+        List<MosaicNames> networkNames = Collections
+            .singletonList(new MosaicNames(networkMosaicId, Collections.singletonList(
+                networkNamespaceName)));
+        Mockito
+            .when(namespaceRepository.getMosaicsNames(Collections.singletonList(networkMosaicId)))
+            .thenReturn(Observable.just(networkNames));
+
+        NamespaceName harvestNamespaceNetwork = new NamespaceName("harvest.xym");
+        List<MosaicNames> harvestNames = Collections
+            .singletonList(new MosaicNames(harvestMosaicId, Collections.singletonList(
+                harvestNamespaceNetwork)));
+        Mockito
+            .when(namespaceRepository.getMosaicsNames(Collections.singletonList(harvestMosaicId)))
+            .thenReturn(Observable.just(harvestNames));
+
+        RepositoryFactory factory = new RepositoryFactoryOkHttpImpl(configuration) {
+
+            @Override
+            public NetworkRepository createNetworkRepository() {
+                return networkRepositoryMock;
+            }
+
+            @Override
+            public MosaicRepository createMosaicRepository() {
+                return mosaicRepositoryMock;
+            }
+
+            @Override
+            public NamespaceRepository createNamespaceRepository() {
+                return namespaceRepository;
+            }
+        };
+
+        Assertions.assertEquals(configuration.getNetworkType(),
+            factory.getNetworkType().toFuture().get());
+
+        Assertions.assertEquals(configuration.getGenerationHash(),
+            factory.getGenerationHash().toFuture().get());
+
+        Assertions.assertEquals(new NetworkCurrencyBuilder(networkMosaicId, 5)
+                .withNamespaceId(networkNamespaceName.getNamespaceId()).withSupplyMutable(true)
+                .withTransferable(false).build(),
+            factory.getNetworkCurrency().toFuture().get());
+
+        Assertions.assertEquals(new NetworkCurrencyBuilder(harvestMosaicId, 4)
+                .withNamespaceId(harvestNamespaceNetwork.getNamespaceId()).withSupplyMutable(false)
+                .withTransferable(true).build(),
+            factory.getHarvestCurrency().toFuture().get());
+
+    }
+
+    @Test
+    public void getRestProvidedNetworkCurrenciesUsingNetworkPropertiesSameCurrency()
+        throws Exception {
+        String baseUrl = "https://localhost:1934/path";
+        RepositoryFactoryConfiguration configuration = new RepositoryFactoryConfiguration(baseUrl);
+        configuration.withGenerationHash("abc");
+        configuration.withNetworkType(NetworkType.MAIN_NET);
+        NetworkRepository networkRepositoryMock = Mockito.mock(NetworkRepository.class);
+
+        NetworkConfiguration networkConfiguration = Mockito.mock(NetworkConfiguration.class);
+        ChainProperties chainProperties = Mockito.mock(ChainProperties.class);
+        Mockito.when(chainProperties.getCurrencyMosaicId()).thenReturn("0x62EF'46FD'6555'AAAA");
+        Mockito.when(chainProperties.getHarvestingMosaicId()).thenReturn("0x62EF'46FD'6555'AAAA");
+        Mockito.when(networkConfiguration.getChain()).thenReturn(chainProperties);
+
+        Mockito.when(networkRepositoryMock.getNetworkProperties())
+            .thenReturn(Observable.just(networkConfiguration));
+
+        MosaicRepository mosaicRepositoryMock = Mockito.mock(MosaicRepository.class);
+
+        MosaicId networkMosaicId = new MosaicId("62EF46FD6555AAAA");
+        MosaicInfo networkMosaic = MosaicInfo.create(networkMosaicId, BigInteger.valueOf(1),
+            BigInteger.valueOf(2),
+            Account.generateNewAccount(NetworkType.MIJIN_TEST).getPublicAccount(), 4,
+            MosaicFlags.create(true, false, true), 5, BigInteger.valueOf(10));
+        Mockito.when(mosaicRepositoryMock.getMosaic(networkMosaicId))
+            .thenReturn(Observable.just(networkMosaic));
+
+        NamespaceRepository namespaceRepository = Mockito.mock(NamespaceRepository.class);
+        NamespaceName networkNamespaceName = new NamespaceName("network.xym");
+        List<MosaicNames> networkNames = Collections
+            .singletonList(new MosaicNames(networkMosaicId, Collections.singletonList(
+                networkNamespaceName)));
+        Mockito
+            .when(namespaceRepository.getMosaicsNames(Collections.singletonList(networkMosaicId)))
+            .thenReturn(Observable.just(networkNames));
+
+        RepositoryFactory factory = new RepositoryFactoryOkHttpImpl(configuration) {
+
+            @Override
+            public NetworkRepository createNetworkRepository() {
+                return networkRepositoryMock;
+            }
+
+            @Override
+            public MosaicRepository createMosaicRepository() {
+                return mosaicRepositoryMock;
+            }
+
+            @Override
+            public NamespaceRepository createNamespaceRepository() {
+                return namespaceRepository;
+            }
+        };
+
+        Assertions.assertEquals(configuration.getNetworkType(),
+            factory.getNetworkType().toFuture().get());
+
+        Assertions.assertEquals(configuration.getGenerationHash(),
+            factory.getGenerationHash().toFuture().get());
+
+        Assertions.assertEquals(new NetworkCurrencyBuilder(networkMosaicId, 5)
+                .withNamespaceId(networkNamespaceName.getNamespaceId()).withSupplyMutable(true)
+                .withTransferable(false).build(),
+            factory.getNetworkCurrency().toFuture().get());
+
+        Assertions.assertEquals(new NetworkCurrencyBuilder(networkMosaicId, 5)
+                .withNamespaceId(networkNamespaceName.getNamespaceId()).withSupplyMutable(true)
+                .withTransferable(false).build(),
+            factory.getHarvestCurrency().toFuture().get());
+
+        Assertions.assertEquals(factory.getNetworkCurrency().toFuture().get(),
+            factory.getHarvestCurrency().toFuture().get());
+
     }
 
     @Test

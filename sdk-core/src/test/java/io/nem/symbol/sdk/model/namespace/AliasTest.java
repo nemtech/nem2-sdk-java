@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
+import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 
 public class AliasTest {
@@ -62,6 +63,12 @@ public class AliasTest {
         AddressAlias addressAlias2 = new AddressAlias(address2);
         assertEquals(addressAlias.getAliasValue(), addressAlias1.getAliasValue());
         assertNotEquals(addressAlias.getAliasValue(), addressAlias2.getAliasValue());
+        assertEquals(addressAlias, addressAlias);
+        assertEquals(addressAlias, addressAlias1);
+        assertEquals(addressAlias.hashCode(), addressAlias1.hashCode());
+        assertNotEquals(addressAlias, addressAlias2);
+        assertNotEquals( addressAlias2, BigInteger.valueOf(-1));
+        assertNotEquals(addressAlias.hashCode(), addressAlias2.hashCode());
     }
 
     @Test

@@ -131,7 +131,7 @@ public class NetworkRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
 
     private NetworkProperties toNetworkProperties(NetworkPropertiesDTO dto) {
         return new NetworkProperties(dto.getIdentifier(),
-            NodeIdentityEqualityStrategy.fromValue(dto.getNodeEqualityStrategy().getValue()), dto.getPublicKey(),
+            NodeIdentityEqualityStrategy.rawValueOf(dto.getNodeEqualityStrategy().getValue()), dto.getPublicKey(),
             dto.getGenerationHashSeed(), dto.getEpochAdjustment());
     }
 

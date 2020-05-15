@@ -19,6 +19,7 @@ package io.nem.symbol.sdk.infrastructure;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.RepositoryFactoryConfiguration;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
+import io.nem.symbol.sdk.model.mosaic.MosaicNames;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrencyBuilder;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
@@ -29,7 +30,9 @@ import io.nem.symbol.sdk.model.node.NodeInfo;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Callable;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Base class of all the {@link RepositoryFactory}. It handles common functions like resolving
@@ -84,10 +87,10 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
             .defer(() -> createNetworkRepository().getNetworkProperties()).cache();
 
         this.networkCurrency = createLazyObservable(configuration.getNetworkCurrency(),
-            () -> loadNetworkCurrency());
+            this::loadNetworkCurrency);
 
         this.harvestCurrency = createLazyObservable(configuration.getHarvestCurrency(),
-            () -> loadHarvestCurrency());
+            this::loadHarvestCurrency);
     }
 
     protected Observable<NetworkCurrency> loadHarvestCurrency() {
@@ -117,23 +120,25 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
     }
 
     protected ObservableSource<NetworkCurrency> getNetworkCurrency(String mosaicIdHex) {
-        MosaicId mosaicId = new MosaicId(mosaicIdHex.replace("'","").substring(2));
+        MosaicId mosaicId = new MosaicId(
+            StringUtils.removeStart(mosaicIdHex.replace("'", "").substring(2), "0x"));
         return createMosaicRepository().getMosaic(mosaicId)
             .map(mosaicInfo -> new NetworkCurrencyBuilder(mosaicInfo.getMosaicId(),
                 mosaicInfo.getDivisibility()).withTransferable(mosaicInfo.isTransferable())
                 .withSupplyMutable(mosaicInfo.isSupplyMutable()))
             .flatMap(builder -> createNamespaceRepository()
-                .getMosaicsNames(Collections.singletonList(mosaicId)).map(names -> {
-                    if (names.isEmpty() || names.get(0).getNames().isEmpty()) {
-                        return builder.build();
-                    } else {
-                        NamespaceName namespaceName = names.get(0).getNames().get(0);
-                        NamespaceId namespaceId = namespaceName.getNamespaceId();
-                        return builder.withNamespaceId(NamespaceId
-                            .createFromIdAndFullName(namespaceId.getId(), namespaceName.getName()))
-                            .build();
-                    }
-                }));
+                .getMosaicsNames(Collections.singletonList(mosaicId)).map(
+                    names -> names.stream().filter(n -> n.getMosaicId().equals(mosaicId))
+                        .findFirst()
+                        .map(name -> builder.withNamespaceId(getNamespaceId(names)).build())
+                        .orElse(builder.build())));
+    }
+
+    private NamespaceId getNamespaceId(List<MosaicNames> names) {
+        NamespaceName namespaceName = names.get(0).getNames().get(0);
+        NamespaceId namespaceId = namespaceName.getNamespaceId();
+        return NamespaceId
+            .createFromIdAndFullName(namespaceId.getId(), namespaceName.getName());
     }
 
     private static <T> Observable<T> createLazyObservable(T providedValue,

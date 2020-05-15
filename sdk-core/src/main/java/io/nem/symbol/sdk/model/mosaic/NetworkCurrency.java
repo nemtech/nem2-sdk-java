@@ -197,4 +197,16 @@ public class NetworkCurrency {
                 transferable,
                 supplyMutable);
     }
+
+    @Override
+    public String toString() {
+        return "NetworkCurrency{" +
+            "unresolvedMosaicId=" + unresolvedMosaicId +
+            ", mosaicId=" + mosaicId +
+            ", namespaceId=" + namespaceId +
+            ", divisibility=" + divisibility +
+            ", transferable=" + transferable +
+            ", supplyMutable=" + supplyMutable +
+            '}';
+    }
 }

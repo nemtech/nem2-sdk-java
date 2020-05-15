@@ -19,6 +19,7 @@ package io.nem.symbol.core.crypto;
 import io.nem.symbol.core.utils.ByteUtils;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.infrastructure.RandomUtils;
+import io.nem.symbol.sdk.model.mosaic.IllegalIdentifierException;
 import java.math.BigInteger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -29,9 +30,16 @@ import org.junit.jupiter.api.Test;
 public class PublicKeyTest {
 
     private static final byte[] TEST_BYTES = RandomUtils.generateRandomBytes(PublicKey.SIZE);
-    private static final byte[] MODIFIED_TEST_BYTES = RandomUtils.generateRandomBytes(PublicKey.SIZE);
+    private static final byte[] MODIFIED_TEST_BYTES = RandomUtils
+        .generateRandomBytes(PublicKey.SIZE);
 
     // region constructors / factories
+
+    @Test
+    public void randomUtilsFail() {
+        Assertions.assertThrows(IllegalIdentifierException.class,
+            () -> RandomUtils.generateRandomBytes(-1));
+    }
 
     @Test
     public void canCreateFromBytes() {
@@ -49,7 +57,8 @@ public class PublicKeyTest {
         Assertions.assertEquals(PublicKey.SIZE, key.getSize());
 
         // Assert:
-        MatcherAssert.assertThat(key.getBytes(), IsEqual.equalTo(ByteUtils.byteArrayLeadingZeros(new byte[]{0x22, 0x7F},PublicKey.SIZE)));
+        MatcherAssert.assertThat(key.getBytes(), IsEqual
+            .equalTo(ByteUtils.byteArrayLeadingZeros(new byte[]{0x22, 0x7F}, PublicKey.SIZE)));
     }
 
     @Test
@@ -67,7 +76,8 @@ public class PublicKeyTest {
     @Test
     public void cannotCreateAroundMalformedHexString() {
         // Act:
-        Assertions.assertThrows(IllegalArgumentException.class, () -> PublicKey.fromHexString("22G75"));
+        Assertions
+            .assertThrows(IllegalArgumentException.class, () -> PublicKey.fromHexString("22G75"));
     }
 
     @Test
@@ -76,8 +86,10 @@ public class PublicKeyTest {
         final PublicKey key = new PublicKey(new BigInteger("2275"));
 
         // Assert:
-        MatcherAssert.assertThat(new PublicKey(new BigInteger("2276")), IsNot.not(IsEqual.equalTo(key)));
-        Assertions.assertEquals("00000000000000000000000000000000000000000000000000000000000008E3", key.toHex());
+        MatcherAssert
+            .assertThat(new PublicKey(new BigInteger("2276")), IsNot.not(IsEqual.equalTo(key)));
+        Assertions.assertEquals("00000000000000000000000000000000000000000000000000000000000008E3",
+            key.toHex());
     }
 
     @Test

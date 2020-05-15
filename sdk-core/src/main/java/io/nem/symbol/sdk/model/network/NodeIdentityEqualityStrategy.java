@@ -17,6 +17,9 @@
 
 package io.nem.symbol.sdk.model.network;
 
+import io.nem.symbol.sdk.model.account.KeyType;
+import java.util.Arrays;
+
 /**
  * Node equality strategy. Defines if the identifier for the node must be its public key or host.
  */
@@ -36,13 +39,9 @@ public enum NodeIdentityEqualityStrategy {
         return value;
     }
 
-    public static NodeIdentityEqualityStrategy fromValue(String value) {
-        for (NodeIdentityEqualityStrategy b : NodeIdentityEqualityStrategy.values()) {
-            if (b.value.equals(value)) {
-                return b;
-            }
-        }
-        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    public static NodeIdentityEqualityStrategy rawValueOf(String value) {
+        return Arrays.stream(values()).filter(e -> e.getValue().equals(value)).findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
     }
 
     @Override

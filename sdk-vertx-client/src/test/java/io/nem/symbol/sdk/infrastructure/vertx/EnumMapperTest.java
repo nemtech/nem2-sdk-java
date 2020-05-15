@@ -52,6 +52,7 @@ import io.nem.symbol.sdk.openapi.vertx.model.MosaicRestrictionEntryTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicRestrictionTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicSupplyChangeActionEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.NamespaceRegistrationTypeEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.NodeIdentityEqualityStrategy;
 import io.nem.symbol.sdk.openapi.vertx.model.NodeStatusEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.PositionEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.ReceiptTypeEnum;
@@ -530,6 +531,23 @@ public class EnumMapperTest {
     void validAliasTypeEnum(AliasTypeEnum enumValue) {
         assertNotNull(AliasType.rawValueOf(enumValue.getValue()));
         Assertions.assertEquals(AliasTypeEnum.fromValue(enumValue.getValue()).getValue(),
+            enumValue.getValue());
+    }
+
+    @ParameterizedTest
+    @EnumSource(io.nem.symbol.sdk.model.network.NodeIdentityEqualityStrategy.class)
+    void validFromNodeIdentityEqualityStrategy(
+        io.nem.symbol.sdk.model.network.NodeIdentityEqualityStrategy enumValue) {
+        assertNotNull(NodeIdentityEqualityStrategy.fromValue(enumValue.getValue()));
+        assertEquals(NodeIdentityEqualityStrategy.fromValue(enumValue.getValue()).getValue(),
+            enumValue.getValue());
+    }
+
+    @ParameterizedTest
+    @EnumSource(NodeIdentityEqualityStrategy.class)
+    void validNodeIdentityEqualityStrategyEnum(NodeIdentityEqualityStrategy enumValue) {
+        assertNotNull(io.nem.symbol.sdk.model.network.NodeIdentityEqualityStrategy.rawValueOf(enumValue.getValue()));
+        Assertions.assertEquals(NodeIdentityEqualityStrategy.fromValue(enumValue.getValue()).getValue(),
             enumValue.getValue());
     }
 }

@@ -54,6 +54,7 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicRestrictionEntryTypeEnu
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicRestrictionTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicSupplyChangeActionEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NamespaceRegistrationTypeEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.NodeIdentityEqualityStrategy;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NodeStatusEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.PositionEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.ReceiptTypeEnum;
@@ -548,6 +549,21 @@ public class EnumMapperTest {
             enumValue.getValue());
     }
 
+    @ParameterizedTest
+    @EnumSource(io.nem.symbol.sdk.model.network.NodeIdentityEqualityStrategy.class)
+    void validFromNodeIdentityEqualityStrategy(
+        io.nem.symbol.sdk.model.network.NodeIdentityEqualityStrategy enumValue) {
+        assertNotNull(NodeIdentityEqualityStrategy.fromValue(enumValue.getValue()));
+        assertEquals(NodeIdentityEqualityStrategy.fromValue(enumValue.getValue()).getValue(),
+            enumValue.getValue());
+    }
 
+    @ParameterizedTest
+    @EnumSource(NodeIdentityEqualityStrategy.class)
+    void validNodeIdentityEqualityStrategyEnum(NodeIdentityEqualityStrategy enumValue) {
+        assertNotNull(io.nem.symbol.sdk.model.network.NodeIdentityEqualityStrategy.rawValueOf(enumValue.getValue()));
+        Assertions.assertEquals(NodeIdentityEqualityStrategy.fromValue(enumValue.getValue()).getValue(),
+            enumValue.getValue());
+    }
 
 }

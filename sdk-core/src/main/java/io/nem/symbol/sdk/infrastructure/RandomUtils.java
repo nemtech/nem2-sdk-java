@@ -40,13 +40,14 @@ public class RandomUtils {
      * @return A byte array containing random data.
      */
     public static byte[] generateRandomBytes(int numBytes) {
-        byte[] bytes = new byte[numBytes]; // the array to be filled in with random bytes
+
         try {
+            byte[] bytes = new byte[numBytes]; // the array to be filled in with random bytes
             new SecureRandom().nextBytes(bytes);
+            return bytes;
         } catch (Exception e) {
             throw new IllegalIdentifierException(ExceptionUtils.getMessage(e), e);
         }
-        return bytes;
     }
 
     /**

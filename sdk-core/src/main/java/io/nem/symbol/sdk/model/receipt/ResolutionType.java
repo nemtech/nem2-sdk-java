@@ -16,39 +16,11 @@
 
 package io.nem.symbol.sdk.model.receipt;
 
-import java.util.Arrays;
-
 /**
  * Enum containing resolution type constants.
  */
 public enum ResolutionType {
 
-    ADDRESS(0),
-    MOSAIC(1);
-
-    private final int value;
-
-    ResolutionType(int value) {
-        this.value = value;
-    }
-
-    /**
-     * Static constructor converting resolution type raw value to enum instance.
-     *
-     * @param value the low level int value.
-     * @return {@link ReceiptType}
-     */
-    public static ResolutionType rawValueOf(int value) {
-        return Arrays.stream(values()).filter(e -> e.value == value).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
-
-    /**
-     * Returns enum value.
-     *
-     * @return enum value
-     */
-    public int getValue() {
-        return this.value;
-    }
+    ADDRESS,
+    MOSAIC
 }
