@@ -316,7 +316,7 @@ public abstract class ResolutionStatement<U, R> {
                     AddressResolutionEntryBuilder.create(
                         ReceiptSourceBuilder.create(entry.getReceiptSource().getPrimaryId(),
                             entry.getReceiptSource().getSecondaryId()),
-                        SerializationUtils.toAddressDto((Address) entry.getResolved(), networkType))
+                        SerializationUtils.toAddressDto((Address) entry.getResolved()))
             ).collect(Collectors.toList()))
 
             : MosaicResolutionStatementBuilder.create(

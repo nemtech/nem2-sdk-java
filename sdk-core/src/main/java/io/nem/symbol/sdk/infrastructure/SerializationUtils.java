@@ -116,7 +116,7 @@ public class SerializationUtils {
     }
 
     /**
-     * It serializes a UnresolvedAddress to an hex catbuffer understand.
+     * It serializes a {@link UnresolvedAddress} to an hex catbuffer understand.
      *
      * @param unresolvedAddress the {@link Address} or {@link NamespaceId} to be serialized.
      * @param networkType the network type to customize the {@link NamespaceId} serialization
@@ -137,10 +137,31 @@ public class SerializationUtils {
         }
 
         if (unresolvedAddress instanceof Address) {
-            return ByteBuffer.wrap(Base32Encoder.getBytes(((Address) unresolvedAddress).plain()));
+            return fromAddressToByteBuffer((Address) unresolvedAddress);
         }
         throw new IllegalArgumentException(
             "Unexpected UnresolvedAddress type " + unresolvedAddress.getClass());
+    }
+
+    /**
+     * It serializes an resolved {@link Address} into a {@link ByteBuffer}
+     *
+     * @param resolvedAddress the resolved address
+     * @return the serialized {@link ByteBuffer}
+     */
+    public static ByteBuffer fromAddressToByteBuffer(Address resolvedAddress) {
+        return ByteBuffer.wrap(Base32Encoder.getBytes(resolvedAddress.plain()));
+    }
+
+
+    /**
+     * It serializes an resolved {@link Address} into a {@link ByteBuffer}
+     *
+     * @param resolvedAddress the resolved address
+     * @return the serialized {@link ByteBuffer}
+     */
+    public static AddressDto toAddressDto(Address resolvedAddress) {
+        return new AddressDto(fromAddressToByteBuffer(resolvedAddress));
     }
 
 
@@ -261,8 +282,8 @@ public class SerializationUtils {
     }
 
     /**
-     * It concats the 2 byte arrays patching the int size at the beginning of the first byte array setting up the sum of
-     * both lengths.
+     * It concats the 2 byte arrays patching the int size at the beginning of the first byte array
+     * setting up the sum of both lengths.
      *
      * @param commonBytes the common transaction byte array
      * @param transactionBytes the specific transaction byte array.
@@ -349,20 +370,8 @@ public class SerializationUtils {
     }
 
     /**
-     * Converts an a model {@link Address} into an {@link AddressDto} from catbuffer.
-     *
-     * @param address the model adddress
-     * @param networkType the network type
-     * @return the address dto.
-     */
-    public static AddressDto toAddressDto(Address address, NetworkType networkType) {
-        return new AddressDto(SerializationUtils
-            .fromUnresolvedAddressToByteBuffer(address,
-                networkType));
-    }
-
-    /**
-     * Converts an a model {@link UnresolvedMosaicId} into an {@link UnresolvedMosaicIdDto} from catbuffer.
+     * Converts an a model {@link UnresolvedMosaicId} into an {@link UnresolvedMosaicIdDto} from
+     * catbuffer.
      *
      * @param mosaicId the model
      * @return the dto

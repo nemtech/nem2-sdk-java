@@ -16,6 +16,7 @@
 
 package io.nem.symbol.sdk.model.transaction;
 
+import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import org.apache.commons.lang3.Validate;
@@ -25,17 +26,17 @@ import org.apache.commons.lang3.Validate;
  */
 public class AccountKeyLinkTransactionFactory extends TransactionFactory<AccountKeyLinkTransaction> {
 
-    private final PublicAccount remoteAccount;
+    private final PublicKey linkedPublicKey;
     private final LinkAction linkAction;
 
     private AccountKeyLinkTransactionFactory(
         final NetworkType networkType,
-        final PublicAccount remoteAccount,
+        final PublicKey linkedPublicKey,
         final LinkAction linkAction) {
         super(TransactionType.ACCOUNT_KEY_LINK, networkType);
-        Validate.notNull(remoteAccount, "RemoteAccount must not be null");
+        Validate.notNull(linkedPublicKey, "RemoteAccount must not be null");
         Validate.notNull(linkAction, "LinkAction must not be null");
-        this.remoteAccount = remoteAccount;
+        this.linkedPublicKey = linkedPublicKey;
         this.linkAction = linkAction;
     }
 
@@ -43,13 +44,13 @@ public class AccountKeyLinkTransactionFactory extends TransactionFactory<Account
    * Static create method for factory.
    *
    * @param networkType Network type.
-   * @param remoteAccount Remote account.
+   * @param linkedPublicKey linked public key.
    * @param linkAction Link action.
    * @return Account link transaction.
    */
   public static AccountKeyLinkTransactionFactory create(
-      NetworkType networkType, PublicAccount remoteAccount, LinkAction linkAction) {
-        return new AccountKeyLinkTransactionFactory(networkType, remoteAccount, linkAction);
+      NetworkType networkType, PublicKey linkedPublicKey, LinkAction linkAction) {
+        return new AccountKeyLinkTransactionFactory(networkType, linkedPublicKey, linkAction);
     }
 
     /**
@@ -57,8 +58,8 @@ public class AccountKeyLinkTransactionFactory extends TransactionFactory<Account
      *
      * @return Public key.
      */
-    public PublicAccount getRemoteAccount() {
-        return remoteAccount;
+    public PublicKey getLinkedPublicKey() {
+        return linkedPublicKey;
     }
 
     /**

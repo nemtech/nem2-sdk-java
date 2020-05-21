@@ -24,6 +24,7 @@ import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
@@ -210,7 +211,7 @@ public class TransactionMapperOkHttpTest {
     void shouldCreateStandaloneMosaicAddressRestrictionTransaction() {
         TransactionInfoDTO mosaicAddressRestrictionTransactionDTO = TestHelperOkHttp
             .loadTransactionInfoDTO(
-            "standaloneMosaicAddressRestrictionTransaction.json");
+                "standaloneMosaicAddressRestrictionTransaction.json");
 
         Transaction mosaicAddressRestrictionTransaction = map(
             mosaicAddressRestrictionTransactionDTO);
@@ -237,7 +238,7 @@ public class TransactionMapperOkHttpTest {
     void shouldCreateStandaloneMosaicGlobalRestrictionTransaction() {
         TransactionInfoDTO mosaicGlobalRestrictionTransactionDTO = TestHelperOkHttp
             .loadTransactionInfoDTO(
-            "standaloneMosaicGlobalRestrictionTransaction.json");
+                "standaloneMosaicGlobalRestrictionTransaction.json");
 
         Transaction mosaicGlobalRestrictionTransaction = map(mosaicGlobalRestrictionTransactionDTO);
 
@@ -495,7 +496,8 @@ public class TransactionMapperOkHttpTest {
 
         Assertions.assertEquals(LinkAction.LINK, transaction.getLinkAction());
         Assertions.assertEquals("SARNASAS2BIAB6LMFA3FPMGBPGIJGK6IJETM3ZSP",
-            transaction.getRemoteAccount().getAddress().plain());
+            PublicAccount.createFromPublicKey(transaction.getLinkedPublicKey().toHex(), transaction.getNetworkType())
+                .getAddress().plain());
     }
 
     @Test

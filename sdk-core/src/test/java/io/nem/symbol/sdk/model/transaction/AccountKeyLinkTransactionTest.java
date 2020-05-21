@@ -40,12 +40,12 @@ public class AccountKeyLinkTransactionTest extends AbstractTransactionTester {
         AccountKeyLinkTransaction transaction =
             AccountKeyLinkTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                account.getPublicAccount(),
+                account.getPublicAccount().getPublicKey(),
                 LinkAction.LINK).deadline(new FakeDeadline()).build();
         assertEquals(LinkAction.LINK, transaction.getLinkAction());
         assertEquals(
             "F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E6",
-            transaction.getRemoteAccount().getPublicKey().toHex());
+            transaction.getLinkedPublicKey().toHex());
     }
 
     @Test
@@ -54,7 +54,7 @@ public class AccountKeyLinkTransactionTest extends AbstractTransactionTester {
         AccountKeyLinkTransaction transaction =
             AccountKeyLinkTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                account.getPublicAccount(),
+                account.getPublicAccount().getPublicKey(),
                 LinkAction.LINK).signer(account.getPublicAccount())
                 .deadline(new FakeDeadline()).build();
 

@@ -16,30 +16,30 @@
 
 package io.nem.symbol.sdk.model.transaction;
 
-import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.core.crypto.PublicKey;
 
 /**
  *
  */
 public class AccountKeyLinkTransaction extends Transaction {
 
-    private final PublicAccount remoteAccount;
+    private final PublicKey linkedPublicKey;
 
     private final LinkAction linkAction;
 
     public AccountKeyLinkTransaction(AccountKeyLinkTransactionFactory factory) {
         super(factory);
-        this.remoteAccount = factory.getRemoteAccount();
+        this.linkedPublicKey = factory.getLinkedPublicKey();
         this.linkAction = factory.getLinkAction();
     }
 
     /**
-     * Gets the public key.
+     * Gets the linked public key.
      *
      * @return Public key.
      */
-    public PublicAccount getRemoteAccount() {
-        return remoteAccount;
+    public PublicKey getLinkedPublicKey() {
+        return linkedPublicKey;
     }
 
     /**

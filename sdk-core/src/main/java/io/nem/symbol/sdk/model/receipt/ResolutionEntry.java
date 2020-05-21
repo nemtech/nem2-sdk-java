@@ -16,11 +16,14 @@
 
 package io.nem.symbol.sdk.model.receipt;
 
-import io.nem.symbol.core.utils.ByteUtils;
-import io.nem.symbol.core.utils.ConvertUtils;
+import io.nem.symbol.catapult.builders.AddressDto;
+import io.nem.symbol.catapult.builders.AddressResolutionEntryBuilder;
+import io.nem.symbol.catapult.builders.MosaicIdDto;
+import io.nem.symbol.catapult.builders.MosaicResolutionEntryBuilder;
+import io.nem.symbol.catapult.builders.ReceiptSourceBuilder;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
-import java.nio.ByteBuffer;
 
 public class ResolutionEntry<T> {
 
@@ -108,25 +111,23 @@ public class ResolutionEntry<T> {
      * @return receipt bytes
      */
     public byte[] serialize() {
-        final byte[] resolvedBytes = getResolvedBytes();
-        final ByteBuffer buffer = ByteBuffer.allocate(8 + resolvedBytes.length);
-        buffer.put(getReceiptSource().serialize());
-        buffer.put(resolvedBytes);
-        return buffer.array();
+        ReceiptSourceBuilder receiptSourceBuilder = ReceiptSourceBuilder
+            .create(getReceiptSource().getPrimaryId(), getReceiptSource().getSecondaryId());
+        Class<?> resolutionClass = this.resolved.getClass();
+        if (Address.class.isAssignableFrom(resolutionClass)) {
+            AddressDto addressBuilder = new AddressDto(
+                SerializationUtils.fromAddressToByteBuffer((Address) getResolved()));
+            AddressResolutionEntryBuilder builder = AddressResolutionEntryBuilder
+                .create(receiptSourceBuilder, addressBuilder);
+            return builder.serialize();
+        } else {
+            MosaicIdDto mosaicIdDto = SerializationUtils.toMosaicIdDto((MosaicId) getResolved());
+            MosaicResolutionEntryBuilder builder = MosaicResolutionEntryBuilder
+                .create(receiptSourceBuilder, mosaicIdDto);
+            return builder.serialize();
+        }
     }
 
-    /**
-     * Serialize resolved value depends on type
-     *
-     * @return resolved bytes
-     */
-    private byte[] getResolvedBytes() {
-        Class resolutionClass = this.resolved.getClass();
-        if (Address.class.isAssignableFrom(resolutionClass)) {
-            return ConvertUtils.getBytes(((Address) getResolved()).encoded());
-        }
-        return ByteUtils.reverseCopy(ByteUtils.bigIntToBytes(((MosaicId) getResolved()).getId()));
-    }
 
     /**
      * Validate resolved type (MosaicId | Address)

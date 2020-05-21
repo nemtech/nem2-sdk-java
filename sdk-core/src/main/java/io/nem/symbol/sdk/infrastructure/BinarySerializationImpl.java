@@ -354,7 +354,7 @@ public class BinarySerializationImpl implements BinarySerialization {
      * @return the {@link TransactionFactory}.
      */
     @Override
-    public TransactionFactory<? > deserializeToFactory(byte[] payload){
+    public TransactionFactory<?> deserializeToFactory(byte[] payload) {
         Validate.notNull(payload, "Payload must not be null");
         DataInputStream stream = SerializationUtils.toDataInput(payload);
         TransactionBuilder builder = TransactionBuilderFactory
@@ -532,11 +532,8 @@ public class BinarySerializationImpl implements BinarySerialization {
 
         @Override
         public Serializer toBodyBuilder(TransferTransaction transaction) {
-            return TransferTransactionBodyBuilder.create(
-                new UnresolvedAddressDto(
-                    SerializationUtils
-                        .fromUnresolvedAddressToByteBuffer(transaction.getRecipient(),
-                            transaction.getNetworkType())),
+            return TransferTransactionBodyBuilder.create(SerializationUtils
+                    .toUnresolvedAddress(transaction.getRecipient(), transaction.getNetworkType()),
                 getUnresolvedMosaicArray(transaction),
                 getMessageBuffer(transaction));
 
@@ -705,22 +702,18 @@ public class BinarySerializationImpl implements BinarySerialization {
         public TransactionFactory fromBodyBuilder(NetworkType networkType,
             Serializer transactionBuilder) {
             AccountKeyLinkTransactionBodyBuilder builder = (AccountKeyLinkTransactionBodyBuilder) transactionBuilder;
-            PublicAccount remoteAccount = SerializationUtils
-                .toPublicAccount(builder.getRemotePublicKey(), networkType);
+            PublicKey linkedPublicKey = SerializationUtils.toPublicKey(builder.getLinkedPublicKey());
             LinkAction linkAction = LinkAction
                 .rawValueOf(builder.getLinkAction().getValue());
-            return AccountKeyLinkTransactionFactory
-                .create(networkType, remoteAccount, linkAction);
+            return AccountKeyLinkTransactionFactory.create(networkType, linkedPublicKey, linkAction);
         }
 
         @Override
         public Serializer toBodyBuilder(AccountKeyLinkTransaction transaction) {
             return AccountKeyLinkTransactionBodyBuilder.create(
-                SerializationUtils.toKeyDto(transaction.getRemoteAccount().getPublicKey()),
+                SerializationUtils.toKeyDto(transaction.getLinkedPublicKey()),
                 LinkActionDto.rawValueOf(transaction.getLinkAction().getValue()));
-
         }
-
     }
 
     private static class AccountMetadataTransactionSerializer implements
@@ -970,10 +963,9 @@ public class BinarySerializationImpl implements BinarySerialization {
                     new BlockDurationDto(transaction.getDuration().longValue()),
                     LockHashAlgorithmDto
                         .rawValueOf((byte) transaction.getHashAlgorithm().getValue()),
-                    new UnresolvedAddressDto(
-                        SerializationUtils
-                            .fromUnresolvedAddressToByteBuffer(transaction.getRecipient(),
-                                transaction.getNetworkType())))
+                    SerializationUtils
+                        .toUnresolvedAddress(transaction.getRecipient(),
+                            transaction.getNetworkType()))
                 ;
         }
 
@@ -1024,10 +1016,8 @@ public class BinarySerializationImpl implements BinarySerialization {
             return SecretProofTransactionBodyBuilder.create(
                 new Hash256Dto(getSecretBuffer(transaction)),
                 LockHashAlgorithmDto.rawValueOf((byte) transaction.getHashType().getValue()),
-                new UnresolvedAddressDto(
-                    SerializationUtils
-                        .fromUnresolvedAddressToByteBuffer(transaction.getRecipient(),
-                            transaction.getNetworkType())),
+                SerializationUtils.toUnresolvedAddress(transaction.getRecipient(),
+                    transaction.getNetworkType()),
                 getProofBuffer(transaction));
         }
 
@@ -1091,7 +1081,8 @@ public class BinarySerializationImpl implements BinarySerialization {
             AliasActionDto aliasActionDto = AliasActionDto
                 .rawValueOf(transaction.getAliasAction().getValue());
             Address address = transaction.getAddress();
-            AddressDto addressDto = SerializationUtils.toAddressDto(address, transaction.getNetworkType());
+            AddressDto addressDto = SerializationUtils
+                .toAddressDto(address);
             return AddressAliasTransactionBodyBuilder
                 .create(namespaceIdDto, addressDto, aliasActionDto);
         }

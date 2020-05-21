@@ -20,6 +20,7 @@ import static io.nem.symbol.core.utils.MapperUtils.toAddressFromEncoded;
 import static io.nem.symbol.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.symbol.core.utils.MapperUtils;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
@@ -82,12 +83,12 @@ public class ReceiptMappingOkHttp {
         ResolutionStatementBodyDTO statement = receiptDto.getStatement();
         return new AddressResolutionStatement(
             statement.getHeight(),
-            MapperUtils.toUnresolvedAddress(statement.getUnresolved().toString()),
+            MapperUtils.toUnresolvedAddress(statement.getUnresolved()),
             statement.getResolutionEntries().stream()
                 .map(
                     entry ->
                         ResolutionEntry.forAddress(
-                            toAddressFromEncoded(entry.getResolved().toString()),
+                            toAddressFromEncoded(entry.getResolved()),
                             new ReceiptSource(entry.getSource().getPrimaryId(),
                                 entry.getSource().getSecondaryId())))
                 .collect(Collectors.toList()));
@@ -98,12 +99,12 @@ public class ReceiptMappingOkHttp {
         ResolutionStatementBodyDTO statement = receiptDto.getStatement();
         return new MosaicResolutionStatement(
             statement.getHeight(),
-            MapperUtils.toUnresolvedMosaicId(statement.getUnresolved().toString()),
+            MapperUtils.toUnresolvedMosaicId(statement.getUnresolved()),
             statement.getResolutionEntries().stream()
                 .map(
                     entry ->
                         ResolutionEntry.forMosaicId(
-                            toMosaicId(entry.getResolved().toString()),
+                            toMosaicId(entry.getResolved()),
                             new ReceiptSource(
                                 entry.getSource().getPrimaryId(),
                                 entry.getSource().getSecondaryId())))
@@ -183,7 +184,7 @@ public class ReceiptMappingOkHttp {
         BalanceTransferReceiptDTO receipt, NetworkType networkType) {
         return new BalanceTransferReceipt(
             PublicAccount.createFromPublicKey(receipt.getSenderPublicKey(), networkType),
-            MapperUtils.toUnresolvedAddress(receipt.getRecipientAddress()),
+            Address.createFromEncoded(receipt.getRecipientAddress()),
             new MosaicId(receipt.getMosaicId()),
             receipt.getAmount(),
             ReceiptType.rawValueOf(receipt.getType().getValue()),

@@ -16,7 +16,7 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
-import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AccountKeyLinkTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountKeyLinkTransactionFactory;
@@ -39,18 +39,16 @@ class AccountKeyLinkTransactionMapper extends
     @Override
     protected AccountKeyLinkTransactionFactory createFactory(NetworkType networkType,
         AccountKeyLinkTransactionDTO dto) {
-        PublicAccount remoteAccount = PublicAccount
-            .createFromPublicKey(dto.getRemotePublicKey(), networkType);
+        PublicKey linkedPublicKey = PublicKey.fromHexString(dto.getLinkedPublicKey());
         return AccountKeyLinkTransactionFactory.create(networkType,
-            remoteAccount,
-            LinkAction.rawValueOf(dto.getLinkAction().getValue()));
+            linkedPublicKey, LinkAction.rawValueOf(dto.getLinkAction().getValue()));
     }
 
     @Override
-    protected void copyToDto(AccountKeyLinkTransaction transaction, AccountKeyLinkTransactionDTO dto) {
-        dto.setRemotePublicKey(transaction.getRemoteAccount().getPublicKey().toHex());
-        dto.setLinkAction(
-            LinkActionEnum.fromValue((int) transaction.getLinkAction().getValue()));
+    protected void copyToDto(AccountKeyLinkTransaction transaction,
+        AccountKeyLinkTransactionDTO dto) {
+        dto.setLinkedPublicKey(transaction.getLinkedPublicKey().toHex());
+        dto.setLinkAction(LinkActionEnum.fromValue((int) transaction.getLinkAction().getValue()));
     }
 
 }

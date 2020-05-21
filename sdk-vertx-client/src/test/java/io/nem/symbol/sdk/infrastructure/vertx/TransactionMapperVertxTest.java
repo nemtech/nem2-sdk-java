@@ -24,6 +24,7 @@ import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
@@ -657,7 +658,8 @@ public class TransactionMapperVertxTest {
 
         Assertions.assertEquals(LinkAction.LINK, transaction.getLinkAction());
         Assertions.assertEquals("SARNASAS2BIAB6LMFA3FPMGBPGIJGK6IJETM3ZSP",
-            transaction.getRemoteAccount().getAddress().plain());
+            PublicAccount.createFromPublicKey(transaction.getLinkedPublicKey().toHex(), transaction.getNetworkType())
+                .getAddress().plain());
     }
 
 

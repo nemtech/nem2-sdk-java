@@ -36,7 +36,7 @@ public class BalanceTransferReceiptTest {
 
     static Account account;
     static MosaicId mosaicId;
-    static UnresolvedAddress unresolvedAddress;
+    static Address unresolvedAddress;
     static Address address;
     static NetworkType networkType = NetworkType.MIJIN_TEST;
 
@@ -48,7 +48,7 @@ public class BalanceTransferReceiptTest {
         mosaicId = new MosaicId("85BBEA6CC462B244");
         address = new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
             NetworkType.MIJIN_TEST);
-        unresolvedAddress = MapperUtils.toUnresolvedAddress(address.encoded(networkType));
+        unresolvedAddress = address;
 
     }
 

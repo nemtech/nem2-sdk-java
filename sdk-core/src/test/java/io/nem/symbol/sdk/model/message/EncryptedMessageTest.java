@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.model.message;
 
 import io.nem.symbol.core.crypto.KeyPair;
 import io.nem.symbol.core.crypto.PrivateKey;
+import io.nem.symbol.core.utils.ConvertUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -62,6 +63,33 @@ public class EncryptedMessageTest {
         String typescriptEncryptedKey = "DA5E78D71024C49567855E83C0420855976FCF6CCDD68173A408FA31207DC92AB993348AC02411673E5602DAF994601A";
 
         EncryptedMessage encryptedMessage = new EncryptedMessage(typescriptEncryptedKey);
+        String plainMessage = encryptedMessage
+            .decryptPayload(sender.getPublicKey(), recipient.getPrivateKey());
+
+        Assertions.assertEquals("test transaction 漢字", plainMessage);
+
+
+    }
+
+    @Test
+    public void testTypeScriptCompatibilityFromPayload() {
+
+        // This unit test recreates a message encrypted in one of the typescript unit tests.
+        // Encryption should be the same between the 2 sdk. If one sdk is encrypting a message,
+        // the other sdk should be able to decrypted if it knows the right keys.
+        // Although using the same encryption algorithm, outcome may be different if the encoding
+        // process is different. Both TS and Java are using utf-8 and hex encodings,
+
+        KeyPair sender = KeyPair.fromPrivate(PrivateKey
+            .fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C108"));
+        KeyPair recipient = KeyPair.fromPrivate(PrivateKey
+            .fromHexString("B72F2950498111BADF276D6D9D5E345F04E0D5C9B8342DA983C3395B4CF18F08"));
+
+        String typescriptEncryptedKey = "DA5E78D71024C49567855E83C0420855976FCF6CCDD68173A408FA31207DC92AB993348AC02411673E5602DAF994601A";
+
+        EncryptedMessage encryptedMessage = (EncryptedMessage) Message
+            .createFromPayload(MessageType.ENCRYPTED_MESSAGE,
+                ConvertUtils.fromStringToHex(typescriptEncryptedKey));
         String plainMessage = encryptedMessage
             .decryptPayload(sender.getPublicKey(), recipient.getPrivateKey());
 

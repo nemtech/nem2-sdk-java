@@ -26,17 +26,15 @@ import io.nem.symbol.catapult.builders.ReceiptTypeDto;
 import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
-import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.AddressAlias;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.util.Optional;
 
 public class BalanceTransferReceipt extends Receipt {
 
     private final PublicAccount sender;
-    private final UnresolvedAddress recipient;
+    private final Address recipient;
     private final MosaicId mosaicId;
     private final BigInteger amount;
 
@@ -44,7 +42,7 @@ public class BalanceTransferReceipt extends Receipt {
      * Constructor
      *
      * @param sender Sender's Public Account
-     * @param recipient Recipient (Address | AddressAlias)
+     * @param recipient Recipient Address
      * @param mosaicId Mosaic Id
      * @param amount Amount
      * @param type Receipt Type
@@ -53,7 +51,7 @@ public class BalanceTransferReceipt extends Receipt {
      */
     public BalanceTransferReceipt(
         PublicAccount sender,
-        UnresolvedAddress recipient,
+        Address recipient,
         MosaicId mosaicId,
         BigInteger amount,
         ReceiptType type,
@@ -72,7 +70,7 @@ public class BalanceTransferReceipt extends Receipt {
      * Constructor BalanceTransferReceipt
      *
      * @param sender Sender's Public Account
-     * @param recipient Recipient (Address | AddressAlias)
+     * @param recipient Recipient Address
      * @param mosaicId Mosaic Id
      * @param amount Amount
      * @param type Receipt Type
@@ -80,7 +78,7 @@ public class BalanceTransferReceipt extends Receipt {
      */
     public BalanceTransferReceipt(
         PublicAccount sender,
-        UnresolvedAddress recipient,
+        Address recipient,
         MosaicId mosaicId,
         BigInteger amount,
         ReceiptType type,
@@ -107,7 +105,7 @@ public class BalanceTransferReceipt extends Receipt {
      *
      * @return recipient's address or addressAlias
      */
-    public UnresolvedAddress getRecipient() {
+    public Address getRecipient() {
         return this.recipient;
     }
 
@@ -136,24 +134,15 @@ public class BalanceTransferReceipt extends Receipt {
      */
     @Override
     public byte[] serialize() {
-        ByteBuffer recipientBytes = SerializationUtils
-            .fromUnresolvedAddressToByteBuffer(getRecipient(),
-                getSender().getAddress().getNetworkType());
-
         final short version = (short) getVersion().getValue();
         final ReceiptTypeDto type = ReceiptTypeDto.rawValueOf((short) getType().getValue());
         final MosaicBuilder mosaic = MosaicBuilder
             .create(new MosaicIdDto(getMosaicId().getIdAsLong()),
                 new AmountDto(getAmount().longValue()));
-
         final KeyDto senderPublicKey = SerializationUtils.toKeyDto(getSender().getPublicKey());
-
-        final AddressDto recipientAddress = new AddressDto(recipientBytes);
-
+        final AddressDto recipientAddress = SerializationUtils.toAddressDto(getRecipient());
         return BalanceTransferReceiptBuilder
             .create(version, type, mosaic, senderPublicKey, recipientAddress).serialize();
-
-
     }
 
     /**
