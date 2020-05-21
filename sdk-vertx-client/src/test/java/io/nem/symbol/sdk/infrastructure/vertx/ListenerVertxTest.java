@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.Listener;
+import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.infrastructure.ListenerChannel;
 import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.symbol.sdk.model.account.Account;
@@ -87,11 +88,14 @@ public class ListenerVertxTest {
 
     private String wsId = "TheWSid";
 
+    private NamespaceRepository namespaceRepository;
+
     @BeforeEach
     public void setUp() {
         httpClientMock = Mockito.mock(HttpClient.class);
         String url = "http://nem.com:3000/";
-        listener = new ListenerVertx(httpClientMock, url);
+        namespaceRepository = Mockito.mock(NamespaceRepository.class);
+        listener = new ListenerVertx(httpClientMock, url, namespaceRepository);
         jsonHelper = listener.getJsonHelper();
         webSocketMock = Mockito.mock(WebSocket.class);
     }

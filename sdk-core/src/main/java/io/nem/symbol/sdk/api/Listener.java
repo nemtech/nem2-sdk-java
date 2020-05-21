@@ -66,7 +66,18 @@ public interface Listener extends Closeable {
      * @param address address we listen when a transaction is in confirmed state
      * @return an observable stream of Transaction with state confirmed
      */
-    Observable<Transaction> confirmed(Address address);
+    default Observable<Transaction> confirmed(Address address) {
+        return this.confirmed(address, null);
+    }
+
+    /**
+     * Returns an observable stream of the transaction for the given address and transactionHash.
+     *
+     * @param address address we listen when a transaction is in confirmed state
+     * @param transactionHash the expected transaction hash
+     * @return an observable stream of Transaction with given transaction hash and state confirmed.
+     */
+    Observable<Transaction> confirmed(Address address, String transactionHash);
 
     /**
      * Returns an observable stream of the transaction of the given transactionHash. This stream is
@@ -80,7 +91,7 @@ public interface Listener extends Closeable {
      * @param transactionHash the expected transaction hash
      * @return an observable stream of Transaction with given transaction hash and state confirmed.
      */
-    Observable<Transaction> confirmed(Address address, String transactionHash);
+    Observable<Transaction> confirmedOrError(Address address, String transactionHash);
 
     /**
      * Returns an observable stream of Transaction for a specific address. Each time a transaction
@@ -90,7 +101,21 @@ public interface Listener extends Closeable {
      * @param address address we listen when a transaction is in unconfirmed state
      * @return an observable stream of Transaction with state unconfirmed
      */
-    Observable<Transaction> unconfirmedAdded(Address address);
+    default Observable<Transaction> unconfirmedAdded(Address address) {
+        return this.unconfirmedAdded(address, null);
+    }
+
+
+    /**
+     * Returns an observable stream of Transaction for a specific address. Each time a transaction
+     * is in unconfirmed state an it involves the address, it emits a new Transaction in the event
+     * stream.
+     *
+     * @param address address we listen when a transaction is in unconfirmed state
+     * @param transactionHash the expected transaction hash
+     * @return an observable stream of Transaction with state unconfirmed
+     */
+    Observable<Transaction> unconfirmedAdded(Address address, String transactionHash);
 
     /**
      * Returns an observable stream of Transaction Hashes for specific address. Each time a
@@ -100,7 +125,20 @@ public interface Listener extends Closeable {
      * @param address address we listen when a transaction is removed from unconfirmed state
      * @return an observable stream of Strings with the transaction hash
      */
-    Observable<String> unconfirmedRemoved(Address address);
+    default Observable<String> unconfirmedRemoved(Address address) {
+        return this.unconfirmedRemoved(address, null);
+    }
+
+    /**
+     * Returns an observable stream of Transaction Hashes for specific address. Each time a
+     * transaction with state unconfirmed changes its state, it emits a new message with the
+     * transaction hash in the event stream.
+     *
+     * @param address address we listen when a transaction is removed from unconfirmed state
+     * @param transactionHash the expected transaction hash
+     * @return an observable stream of Strings with the transaction hash
+     */
+    Observable<String> unconfirmedRemoved(Address address, String transactionHash);
 
     /**
      * Return an observable of {@link AggregateTransaction} for specific address. Each time an
@@ -110,7 +148,9 @@ public interface Listener extends Closeable {
      * @param address address we listen when a transaction with missing signatures state
      * @return an observable stream of AggregateTransaction with missing signatures state
      */
-    Observable<AggregateTransaction> aggregateBondedAdded(Address address);
+    default Observable<AggregateTransaction> aggregateBondedAdded(Address address) {
+        return this.aggregateBondedAdded(address, null);
+    }
 
     /**
      * Return an observable of {@link AggregateTransaction} for an specific address and transcation
@@ -125,6 +165,18 @@ public interface Listener extends Closeable {
      * @param transactionHash the expected transaction hash
      * @return an observable stream of AggregateTransaction with missing signatures state
      */
+    Observable<AggregateTransaction> aggregateBondedAddedOrError(Address address, String transactionHash);
+
+
+    /**
+     * Return an observable of {@link AggregateTransaction} for specific address and hash. Each time an
+     * aggregate bonded transaction is announced, it emits a new {@link AggregateTransaction} in the
+     * event stream.
+     *
+     * @param address address we listen when a transaction with missing signatures state
+     * @param transactionHash the expected transaction hash
+     * @return an observable stream of AggregateTransaction with missing signatures state
+     */
     Observable<AggregateTransaction> aggregateBondedAdded(Address address, String transactionHash);
 
     /**
@@ -135,7 +187,20 @@ public interface Listener extends Closeable {
      * @param address address we listen when a transaction is confirmed or rejected
      * @return an observable stream of Strings with the transaction hash
      */
-    Observable<String> aggregateBondedRemoved(Address address);
+    default Observable<String> aggregateBondedRemoved(Address address) {
+        return this.aggregateBondedRemoved(address, null);
+    }
+
+    /**
+     * Returns an observable stream of of the hash for specific address. Each time an
+     * aggregate bonded transaction is announced, it emits a new message with the transaction hash
+     * in the event stream.
+     *
+     * @param address address we listen when a transaction is confirmed or rejected
+     * @param transactionHash the expected transaction hash (optional)
+     * @return an observable stream of Strings with the transaction hash
+     */
+    Observable<String> aggregateBondedRemoved(Address address, String transactionHash);
 
     /**
      * Returns an observable stream of {@link TransactionStatusError} for specific address. Each
@@ -145,7 +210,19 @@ public interface Listener extends Closeable {
      * @param address address we listen to be notified when some error happened
      * @return an observable stream of {@link TransactionStatusError}
      */
-    Observable<TransactionStatusError> status(Address address);
+    default Observable<TransactionStatusError> status(Address address) {
+        return this.status(address, null);
+    }
+    /**
+     * Returns an observable stream of {@link TransactionStatusError} for specific address and hash. Each
+     * time a transaction contains an error, it emits a new message with the transaction status
+     * error in the event stream.
+     *
+     * @param address address we listen to be notified when some error happened
+     * @param transactionHash filter by transaction hash (optional)
+     * @return an observable stream of {@link TransactionStatusError}
+     */
+    Observable<TransactionStatusError> status(Address address, String transactionHash);
 
     /**
      * Returns an observable stream of {@link CosignatureSignedTransaction} for specific address.
@@ -156,5 +233,18 @@ public interface Listener extends Closeable {
      * sent
      * @return an observable stream of {@link CosignatureSignedTransaction}
      */
-    Observable<CosignatureSignedTransaction> cosignatureAdded(Address address);
+    default Observable<CosignatureSignedTransaction> cosignatureAdded(Address address){
+        return this.cosignatureAdded(address,null);
+    };
+    /**
+     * Returns an observable stream of {@link CosignatureSignedTransaction} for specific address.
+     * Each time a cosigner signs a transaction the address initialized, it emits a new message with
+     * the cosignatory signed transaction in the even stream.
+     *
+     * @param address address we listen when a cosignatory is added to some transaction address
+     * sent
+     * @param parentTransactionHash filter by parent transaction hash (optional)
+     * @return an observable stream of {@link CosignatureSignedTransaction}
+     */
+    Observable<CosignatureSignedTransaction> cosignatureAdded(Address address, String parentTransactionHash);
 }

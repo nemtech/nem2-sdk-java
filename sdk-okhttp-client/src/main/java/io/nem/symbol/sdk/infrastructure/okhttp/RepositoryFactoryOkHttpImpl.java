@@ -128,7 +128,7 @@ public class RepositoryFactoryOkHttpImpl extends RepositoryFactoryBase {
 
     @Override
     public Listener createListener() {
-        return new ListenerOkHttp(apiClient.getHttpClient(), getBaseUrl(), apiClient.getJSON());
+        return new ListenerOkHttp(apiClient.getHttpClient(), getBaseUrl(), apiClient.getJSON(), createNamespaceRepository());
     }
 
     @Override
