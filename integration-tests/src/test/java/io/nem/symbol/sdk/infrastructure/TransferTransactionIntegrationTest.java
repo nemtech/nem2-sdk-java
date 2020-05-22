@@ -85,7 +85,6 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
             recipient.encoded(getNetworkType()));
         String message = "E2ETest:standaloneTransferTransaction:message 漢字";
 
-        NetworkType networkType = getNetworkType();
         KeyPair senderKeyPair = KeyPair.random();
         KeyPair recipientKeyPair = KeyPair.random();
 
