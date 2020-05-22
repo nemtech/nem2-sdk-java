@@ -21,20 +21,29 @@ import io.nem.symbol.sdk.api.Listener;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
+import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.namespace.NamespaceName;
+import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
+import io.nem.symbol.sdk.model.transaction.MetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransaction;
+import io.nem.symbol.sdk.model.transaction.PublicKeyLinkTransaction;
+import io.nem.symbol.sdk.model.transaction.RecipientTransaction;
+import io.nem.symbol.sdk.model.transaction.TargetAddressTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionStatusError;
 import io.nem.symbol.sdk.model.transaction.TransactionStatusException;
-import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import java.math.BigInteger;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -160,9 +169,10 @@ public abstract class ListenerBase implements Listener {
         String parentTransactionHash) {
         Validate.notNull(address, "Address is required");
         validateOpen();
-        this.subscribeTo(ListenerChannel.COSIGNATURE + "/" + address.plain());
+        ListenerChannel channel = ListenerChannel.COSIGNATURE;
+        this.subscribeTo(channel + "/" + address.plain());
         return getMessageSubject()
-            .filter(rawMessage -> rawMessage.getChannel().equals(ListenerChannel.COSIGNATURE))
+            .filter(rawMessage -> rawMessage.getChannel().equals(channel))
             .map(rawMessage -> (CosignatureSignedTransaction) rawMessage.getMessage())
             .filter(status -> parentTransactionHash == null || parentTransactionHash
                 .equalsIgnoreCase(status.getParentHash()));
@@ -187,8 +197,7 @@ public abstract class ListenerBase implements Listener {
         String transactionHash, Observable<T> transactionListener) {
         // I may move this method to the Listener
         IllegalStateException caller = new IllegalStateException("The Caller");
-        Observable<TransactionStatusError> errorListener = status(address)
-            .filter(m -> transactionHash.equalsIgnoreCase(m.getHash()));
+        Observable<TransactionStatusError> errorListener = status(address, transactionHash);
         Observable<Object> errorOrTransactionObservable = Observable
             .merge(transactionListener, errorListener).take(1);
         return errorOrTransactionObservable.map(errorOrTransaction -> {
@@ -216,7 +225,9 @@ public abstract class ListenerBase implements Listener {
                     info -> transactionHash == null || info.getHash()
                         .filter(transactionHash::equalsIgnoreCase).isPresent())
                 .isPresent())
-            .filter(transaction -> this.transactionFromAddress(transaction, address));
+            .flatMap(transaction -> this.transactionFromAddress(transaction, address,
+                getNamespaceIds(address)).flatMap(
+                include -> include ? Observable.just(transaction) : Observable.empty()));
     }
 
     private Observable<String> subscribeTransactionHash(ListenerChannel channel, Address address,
@@ -230,30 +241,111 @@ public abstract class ListenerBase implements Listener {
             .filter(hash -> transactionHash == null || transactionHash.equalsIgnoreCase(hash));
     }
 
-    public boolean transactionFromAddress(final Transaction transaction, final Address address) {
+    public Observable<Boolean> transactionFromAddress(final Transaction transaction,
+        final Address address, final Observable<List<NamespaceId>> namespaceIdsObservable) {
         if (transaction.getSigner().filter(s -> s.getAddress().equals(address)).isPresent()) {
-            return true;
-        }
-
-        if (transaction instanceof TransferTransaction) {
-            return ((TransferTransaction) transaction).getRecipient().equals(address);
-        }
-
-        if (transaction instanceof MultisigAccountModificationTransaction) {
-            return ((MultisigAccountModificationTransaction) transaction).getPublicKeyAdditions()
-                .stream().anyMatch(m -> m.getAddress().equals(address));
+            return Observable.just(true);
         }
         if (transaction instanceof AggregateTransaction) {
             final AggregateTransaction aggregateTransaction = (AggregateTransaction) transaction;
             if (aggregateTransaction.getCosignatures()
                 .stream().anyMatch(c -> c.getSigner().getAddress().equals(address))) {
-                return true;
+                return Observable.just(true);
             }
             //Recursion...
-            return aggregateTransaction.getInnerTransactions()
-                .stream().anyMatch(t -> this.transactionFromAddress(t, address));
+            Observable<Transaction> innerTransactionObservable = Observable
+                .fromIterable(aggregateTransaction.getInnerTransactions());
+
+            return innerTransactionObservable
+                .flatMap(t -> this.transactionFromAddress(t, address, namespaceIdsObservable)
+                    .filter(a -> a))
+                .first(false).toObservable();
         }
-        return false;
+        if (transaction instanceof PublicKeyLinkTransaction) {
+            return Observable.just(Address.createFromPublicKey(
+                ((PublicKeyLinkTransaction) transaction).getLinkedPublicKey().toHex(),
+                transaction.getNetworkType()).equals(address));
+        }
+
+        if (transaction instanceof MetadataTransaction) {
+            MetadataTransaction metadataTransaction = (MetadataTransaction) transaction;
+            return Observable.just(
+                metadataTransaction.getTargetAccount().getAddress().equals(address));
+        }
+
+        if (transaction instanceof TargetAddressTransaction) {
+            TargetAddressTransaction targetAddressTransaction = (TargetAddressTransaction) transaction;
+            if (targetAddressTransaction.getTargetAddress() instanceof Address) {
+                return Observable.just(targetAddressTransaction.getTargetAddress().equals(address));
+            }
+            return namespaceIdsObservable
+                .map(namespaceIds -> namespaceIds
+                    .contains(targetAddressTransaction.getTargetAddress()));
+        }
+
+        if (transaction instanceof MultisigAccountModificationTransaction) {
+            MultisigAccountModificationTransaction multisigAccountModificationTransaction = (MultisigAccountModificationTransaction) transaction;
+            if (multisigAccountModificationTransaction.getPublicKeyAdditions().stream()
+                .anyMatch(a -> a.getAddress().equals(address))) {
+                return Observable.just(true);
+            }
+
+            return Observable
+                .just(multisigAccountModificationTransaction.getPublicKeyDeletions().stream()
+                    .anyMatch(a -> a.getAddress().equals(address)));
+
+        }
+
+        if (transaction instanceof AccountAddressRestrictionTransaction) {
+            AccountAddressRestrictionTransaction accountAddressRestrictionTransaction = (AccountAddressRestrictionTransaction) transaction;
+            if (accountAddressRestrictionTransaction.getRestrictionAdditions().contains(address)) {
+                return Observable.just(true);
+            }
+            if (accountAddressRestrictionTransaction.getRestrictionDeletions().contains(address)) {
+                return Observable.just(true);
+            }
+            return namespaceIdsObservable
+                .flatMap(namespaceIds -> {
+                    if (namespaceIds.stream().anyMatch(
+                        namespaceId -> accountAddressRestrictionTransaction
+                            .getRestrictionAdditions().contains(namespaceId))) {
+                        return Observable.just(true);
+                    }
+                    if (namespaceIds.stream().anyMatch(
+                        namespaceId -> accountAddressRestrictionTransaction
+                            .getRestrictionDeletions().contains(namespaceId))) {
+                        return Observable.just(true);
+                    }
+                    return Observable.just(false);
+                });
+        }
+
+        if (transaction instanceof RecipientTransaction) {
+            RecipientTransaction recipientTransaction = (RecipientTransaction) transaction;
+            if (recipientTransaction.getRecipient() instanceof NamespaceId) {
+                return namespaceIdsObservable
+                    .map(namespaceIds -> namespaceIds
+                        .contains(recipientTransaction.getRecipient()));
+            }
+            return Observable.just(recipientTransaction.getRecipient().equals(address));
+
+        }
+
+        return Observable.just(false);
+    }
+
+    /**
+     * Returns the namespaces ids for the given address.
+     *
+     * @param address the address
+     * @return observable of namespace ids.
+     */
+    private Observable<List<NamespaceId>> getNamespaceIds(Address address) {
+        return Observable.defer(() -> namespaceRepository
+            .getAccountsNames(Collections.singletonList(address)).map(
+                accountNames -> accountNames.stream()
+                    .flatMap(accountName -> accountName.getNames().stream().map(
+                        NamespaceName::getNamespaceId)).collect(Collectors.toList()))).cache();
     }
 
 

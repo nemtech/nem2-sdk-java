@@ -20,7 +20,7 @@ import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import java.math.BigInteger;
 
-public class SecretLockTransaction extends Transaction {
+public class SecretLockTransaction extends Transaction implements RecipientTransaction {
 
     private final Mosaic mosaic;
     private final BigInteger duration;
@@ -84,6 +84,7 @@ public class SecretLockTransaction extends Transaction {
      *
      * @return the recipient of the funds.
      */
+    @Override
     public UnresolvedAddress getRecipient() {
         return recipient;
     }

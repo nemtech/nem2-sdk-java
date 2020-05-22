@@ -21,7 +21,7 @@ import io.nem.symbol.core.crypto.PublicKey;
 /**
  * Voting key link transaction.
  */
-public class NodeKeyLinkTransaction extends Transaction {
+public class NodeKeyLinkTransaction extends Transaction implements PublicKeyLinkTransaction {
 
     /**
      * The linked public key.

@@ -34,7 +34,8 @@ import java.math.BigInteger;
  *
  * @since 1.0
  */
-public class MosaicAddressRestrictionTransaction extends Transaction {
+public class MosaicAddressRestrictionTransaction extends Transaction implements
+    TargetAddressTransaction{
 
     private final UnresolvedMosaicId mosaicId;
     private final BigInteger restrictionKey;
@@ -79,6 +80,7 @@ public class MosaicAddressRestrictionTransaction extends Transaction {
      *
      * @return {@link Address}
      */
+    @Override
     public UnresolvedAddress getTargetAddress() {
         return targetAddress;
     }

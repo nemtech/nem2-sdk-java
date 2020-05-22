@@ -25,7 +25,7 @@ import java.util.List;
  * The transfer transactions object contain data about transfers of mosaics and message to another
  * account.
  */
-public class TransferTransaction extends Transaction {
+public class TransferTransaction extends Transaction implements RecipientTransaction {
 
     private final UnresolvedAddress recipient;
     private final List<Mosaic> mosaics;
@@ -48,6 +48,7 @@ public class TransferTransaction extends Transaction {
      *
      * @return recipient address
      */
+    @Override
     public UnresolvedAddress getRecipient() {
         return recipient;
     }

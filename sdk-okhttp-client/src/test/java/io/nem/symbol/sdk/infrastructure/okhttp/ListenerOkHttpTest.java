@@ -62,6 +62,7 @@ public class ListenerOkHttpTest {
     private ListenerOkHttp listener;
 
     private OkHttpClient httpClientMock;
+
     private NamespaceRepository namespaceRepository;
 
     private WebSocket webSocketMock;
@@ -211,7 +212,7 @@ public class ListenerOkHttpTest {
 
         List<Transaction> transactions = new ArrayList<>();
         List<Throwable> exceptions = new ArrayList<>();
-        listener.confirmed(address, transactionInfo.getMeta().getHash()).doOnError(exceptions::add)
+        listener.confirmedOrError(address, transactionInfo.getMeta().getHash()).doOnError(exceptions::add)
             .forEach(transactions::add);
 
         listener.handle(transactionInfoDtoJsonObject, null);
@@ -255,7 +256,7 @@ public class ListenerOkHttpTest {
 
         List<Transaction> transactions = new ArrayList<>();
         List<Throwable> exceptions = new ArrayList<>();
-        listener.confirmed(address, transactionInfo.getMeta().getHash()).doOnError(exceptions::add)
+        listener.confirmedOrError(address, transactionInfo.getMeta().getHash()).doOnError(exceptions::add)
             .forEach(transactions::add);
 
         listener.handle(transactionStatusError, null);
@@ -298,7 +299,7 @@ public class ListenerOkHttpTest {
 
         List<Transaction> transactions = new ArrayList<>();
         List<Throwable> exceptions = new ArrayList<>();
-        listener.aggregateBondedAdded(address, transactionInfo.getMeta().getHash())
+        listener.aggregateBondedAddedOrError(address, transactionInfo.getMeta().getHash())
             .doOnError(exceptions::add)
             .forEach(transactions::add);
 
@@ -343,7 +344,7 @@ public class ListenerOkHttpTest {
 
         List<Transaction> transactions = new ArrayList<>();
         List<Throwable> exceptions = new ArrayList<>();
-        listener.aggregateBondedAdded(address, transactionInfo.getMeta().getHash())
+        listener.aggregateBondedAddedOrError(address, transactionInfo.getMeta().getHash())
             .doOnError(exceptions::add)
             .forEach(transactions::add);
 

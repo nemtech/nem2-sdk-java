@@ -95,7 +95,7 @@ public class TransactionServiceImpl implements TransactionService {
         Observable<TransactionAnnounceResponse> announce = transactionRepository
             .announce(signedTransaction);
         return announce.flatMap(
-            r -> listener.confirmed(signedTransaction.getSigner().getAddress(),
+            r -> listener.confirmedOrError(signedTransaction.getSigner().getAddress(),
                 signedTransaction.getHash()));
     }
 
@@ -108,7 +108,7 @@ public class TransactionServiceImpl implements TransactionService {
         Observable<TransactionAnnounceResponse> announce = transactionRepository
             .announceAggregateBonded(signedAggregateTransaction);
         return announce.flatMap(
-            r -> listener.aggregateBondedAdded(signedAggregateTransaction.getSigner().getAddress(),
+            r -> listener.aggregateBondedAddedOrError(signedAggregateTransaction.getSigner().getAddress(),
                 signedAggregateTransaction.getHash()));
     }
 

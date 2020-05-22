@@ -21,7 +21,7 @@ import io.nem.symbol.core.crypto.PublicKey;
 /**
  * Vrf key link transaction.
  */
-public class VrfKeyLinkTransaction extends Transaction {
+public class VrfKeyLinkTransaction extends Transaction implements PublicKeyLinkTransaction {
 
     /**
      * The linked public key.
