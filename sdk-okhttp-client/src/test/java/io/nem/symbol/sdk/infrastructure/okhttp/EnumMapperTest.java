@@ -24,6 +24,8 @@ import io.nem.symbol.catapult.builders.LockHashAlgorithmDto;
 import io.nem.symbol.catapult.builders.MosaicRestrictionTypeDto;
 import io.nem.symbol.catapult.builders.MosaicSupplyChangeActionDto;
 import io.nem.symbol.catapult.builders.NamespaceRegistrationTypeDto;
+import io.nem.symbol.sdk.api.BlockOrderBy;
+import io.nem.symbol.sdk.api.TransactionSearchGroup;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.KeyType;
 import io.nem.symbol.sdk.model.blockchain.Position;
@@ -46,6 +48,7 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionFlagsEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AliasActionEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AliasTypeEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.BlockOrderByEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.KeyTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.LinkActionEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.LockHashAlgorithmEnum;
@@ -59,7 +62,8 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.NodeStatusEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.PositionEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.ReceiptTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.RolesTypeEnum;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionStateTypeEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionGroupEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionGroupSubsetEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionTypeEnum;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -279,7 +283,7 @@ public class EnumMapperTest {
         Set<Integer> existingValues = new HashSet<>();
         Arrays.stream(LockHashAlgorithmType.values()).forEach(v -> {
             Assertions
-                .assertNotNull(LockHashAlgorithmEnum.fromValue((int) v.getValue()), v.name());
+                .assertNotNull(LockHashAlgorithmEnum.fromValue(v.getValue()), v.name());
             Assertions
                 .assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
         });
@@ -448,21 +452,41 @@ public class EnumMapperTest {
     @ParameterizedTest
     @EnumSource(TransactionState.class)
     void validFromTransactionState(TransactionState transactionState) {
-        assertNotNull(TransactionStateTypeEnum.valueOf(transactionState.name()));
+        assertNotNull(TransactionGroupEnum.valueOf(transactionState.name()));
         Assertions
-            .assertEquals(TransactionStateTypeEnum.valueOf(transactionState.name()).getValue(),
+            .assertEquals(TransactionGroupEnum.valueOf(transactionState.name()).getValue(),
                 transactionState.getValue());
     }
 
     @ParameterizedTest
-    @EnumSource(TransactionStateTypeEnum.class)
-    void validFromTransactionStateTypeEnum(TransactionStateTypeEnum transactionState) {
+    @EnumSource(TransactionGroupEnum.class)
+    void validFromTransactionStateTypeEnum(TransactionGroupEnum transactionState) {
         assertNotNull(TransactionState.valueOf(transactionState.name()));
         Assertions
-            .assertEquals(TransactionStateTypeEnum.valueOf(transactionState.name()).getValue(),
+            .assertEquals(TransactionGroupEnum.valueOf(transactionState.name()).getValue(),
                 transactionState.getValue());
 
     }
+
+    @ParameterizedTest
+    @EnumSource(TransactionGroupSubsetEnum.class)
+    void validFromTransactionState(TransactionGroupSubsetEnum transactionState) {
+        assertNotNull(TransactionGroupEnum.valueOf(transactionState.name()));
+        Assertions
+            .assertEquals(TransactionGroupEnum.valueOf(transactionState.name()).getValue(),
+                transactionState.getValue());
+    }
+
+    @ParameterizedTest
+    @EnumSource(TransactionGroupSubsetEnum.class)
+    void validFromTransactionStateTypeEnum(TransactionGroupSubsetEnum transactionState) {
+        assertNotNull(TransactionGroupSubsetEnum.valueOf(transactionState.name()));
+        Assertions
+            .assertEquals(TransactionGroupSubsetEnum.valueOf(transactionState.name()).getValue(),
+                transactionState.getValue());
+
+    }
+
 
     @ParameterizedTest
     @EnumSource(RoleType.class)
@@ -532,6 +556,24 @@ public class EnumMapperTest {
             enumValue.getValue());
     }
 
+    @ParameterizedTest
+    @EnumSource(TransactionSearchGroup.class)
+    void validTransactionSearchGroup(TransactionSearchGroup enumValue) {
+        assertNotNull(TransactionGroupSubsetEnum.fromValue(enumValue.getValue()));
+        assertEquals(TransactionGroupSubsetEnum.fromValue(enumValue.getValue()).getValue(),
+            enumValue.getValue());
+    }
+
+    @ParameterizedTest
+    @EnumSource(TransactionGroupSubsetEnum.class)
+    void validTransactionGroupSubsetEnum(TransactionGroupSubsetEnum enumValue) {
+        assertNotNull(TransactionSearchGroup.rawValueOf(enumValue.getValue()));
+        Assertions
+            .assertEquals(TransactionGroupSubsetEnum.fromValue(enumValue.getValue()).getValue(),
+                enumValue.getValue());
+
+    }
+
 
     @ParameterizedTest
     @EnumSource(KeyType.class)
@@ -564,6 +606,15 @@ public class EnumMapperTest {
         assertNotNull(io.nem.symbol.sdk.model.network.NodeIdentityEqualityStrategy.rawValueOf(enumValue.getValue()));
         Assertions.assertEquals(NodeIdentityEqualityStrategy.fromValue(enumValue.getValue()).getValue(),
             enumValue.getValue());
+    }
+
+
+    @ParameterizedTest
+    @EnumSource(BlockOrderBy.class)
+    void validFromNodeIdentityEqualityStrategy(
+        BlockOrderBy enumValue) {
+        assertNotNull(BlockOrderByEnum.fromValue(enumValue.getValue()));
+        assertEquals(BlockOrderByEnum.fromValue(enumValue.getValue()).getValue(), enumValue.getValue());
     }
 
 }

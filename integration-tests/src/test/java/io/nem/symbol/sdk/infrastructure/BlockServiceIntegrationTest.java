@@ -18,6 +18,8 @@ package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.BlockService;
 import io.nem.symbol.sdk.api.RepositoryFactory;
+import io.nem.symbol.sdk.api.TransactionRepository;
+import io.nem.symbol.sdk.api.TransactionSearchCriteria;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import java.math.BigInteger;
 import java.util.List;
@@ -36,11 +38,14 @@ class BlockServiceIntegrationTest extends BaseIntegrationTest {
         BigInteger height = BigInteger.ONE;
         RepositoryFactory repositoryFactory = getRepositoryFactory(type);
 
-        BlockService service = new BlockServiceImpl(repositoryFactory);
+        TransactionRepository transactionRepository = getRepositoryFactory(type)
+            .createTransactionRepository();
 
-        List<Transaction> transactions = get(
-            repositoryFactory.createBlockRepository().getBlockTransactions(
-                height));
+        List<Transaction> transactions = get(transactionRepository
+            .searchTransactions(
+                new TransactionSearchCriteria().height(height).pageNumber(1))).getData();
+
+        BlockService service = new BlockServiceImpl(repositoryFactory);
 
         transactions.forEach(t -> {
             String hash = t.getTransactionInfo().get().getHash().get();

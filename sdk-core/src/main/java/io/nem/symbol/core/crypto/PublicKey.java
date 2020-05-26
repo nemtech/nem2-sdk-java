@@ -16,6 +16,7 @@
 
 package io.nem.symbol.core.crypto;
 
+import io.nem.symbol.sdk.infrastructure.RandomUtils;
 import java.math.BigInteger;
 
 /**
@@ -62,6 +63,15 @@ public class PublicKey extends Key {
      */
     public static PublicKey fromHexString(final String hex) {
         return new PublicKey(hex);
+    }
+
+    /**
+     * Generates a random public key.
+     *
+     * @return The new public key.
+     */
+    public static PublicKey generateRandom() {
+        return new PublicKey(RandomUtils.generateRandomBytes(SIZE));
     }
 
 }

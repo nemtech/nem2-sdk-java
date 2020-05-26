@@ -16,6 +16,7 @@
 
 package io.nem.symbol.core.crypto;
 
+import io.nem.symbol.sdk.infrastructure.RandomUtils;
 import java.math.BigInteger;
 
 /**
@@ -63,6 +64,15 @@ public class VotingKey extends Key {
      */
     public static VotingKey fromHexString(final String hex) {
         return new VotingKey(hex);
+    }
+
+    /**
+     * Generates a random voting key.
+     *
+     * @return The new voting key.
+     */
+    public static VotingKey generateRandom() {
+        return new VotingKey(RandomUtils.generateRandomBytes(SIZE));
     }
 
 }

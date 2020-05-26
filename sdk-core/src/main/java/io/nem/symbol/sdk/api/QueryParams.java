@@ -27,12 +27,12 @@ public class QueryParams {
 
     private final String id;
 
-    private final String order;
+    private final OrderBy orderBy;
 
-    public QueryParams(Integer pageSize, String id, String order) {
+    public QueryParams(Integer pageSize, String id, OrderBy orderBy) {
         this.pageSize = pageSize != null && (pageSize >= 10 && pageSize <= 100) ? pageSize : 10;
         this.id = id;
-        this.order = order;
+        this.orderBy = orderBy;
     }
 
     public QueryParams(Integer pageSize, String id) {
@@ -58,13 +58,11 @@ public class QueryParams {
     }
 
     /**
-     * Return the field used to sort the results. Example 'id' . If prefixed with '-', the order
-     * will be reversed. Example '-id'.
      *
-     * @return the field used to sort the results
+     * @return the sort direction
      */
-    public String getOrder() {
-        return order;
+    public OrderBy getOrderBy() {
+        return orderBy;
     }
 
 }

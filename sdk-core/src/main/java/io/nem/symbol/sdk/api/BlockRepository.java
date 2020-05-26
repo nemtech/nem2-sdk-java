@@ -18,10 +18,8 @@ package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
-import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.reactivex.Observable;
 import java.math.BigInteger;
-import java.util.List;
 
 /**
  * Blockchain interface repository
@@ -38,45 +36,21 @@ public interface BlockRepository {
      */
     Observable<BlockInfo> getBlockByHeight(BigInteger height);
 
-    /**
-     * Gets list of transactions included in a block for a block height
-     *
-     * @param height BigInteger
-     * @return {@link Observable} of {@link Transaction} List
-     */
-    Observable<List<Transaction>> getBlockTransactions(BigInteger height);
 
     /**
-     * Gets list of transactions included in a block for a block height With pagination.
+     * It returns a page of {@link BlockInfo} according to the provided criteria.
      *
-     * @param height BigInteger
-     * @param queryParams QueryParams
-     * @return {@link Observable} of {@link Transaction} List
+     * @param criteria the criteria
+     * @return a page of block info objects.
      */
-    Observable<List<Transaction>> getBlockTransactions(BigInteger height, QueryParams queryParams);
-
-    /**
-     * Get the merkle path for a given a receipt statement hash and block Returns the merkle path
-     * for a [receipt statement or resolution](https://nemtech.github.io/concepts/receipt.html)
-     * linked to a block. The path is the complementary data needed to calculate the merkle root. A
-     * client can compare if the calculated root equals the one recorded in the block header,
-     * verifying that the receipt was linked with the block.
-     *
-     * @param height the height
-     * @param limit the limit.
-     * @return {@link Observable} of BlockInfo
-     */
-    Observable<List<BlockInfo>> getBlocksByHeightWithLimit(
-        BigInteger height, int limit);
-
+    Observable<Page<BlockInfo>> searchBlocks(BlockSearchCriteria criteria);
 
 
     /**
      * Get the merkle path for a given a transaction and block Returns the merkle path for a
-     * [transaction](https://nemtech.github.io/concepts/transaction.html) included in a block. The
-     * path is the complementary data needed to calculate the merkle root. A client can compare if
-     * the calculated root equals the one recorded in the block header, verifying that the
-     * transaction was included in the block.
+     * [transaction](https://nemtech.github.io/concepts/transaction.html) included in a block. The path is the
+     * complementary data needed to calculate the merkle root. A client can compare if the calculated root equals the
+     * one recorded in the block header, verifying that the transaction was included in the block.
      *
      * @param height the height.
      * @param hash the expected hash.

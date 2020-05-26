@@ -19,7 +19,8 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 import static io.nem.symbol.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.symbol.sdk.api.MosaicRepository;
-import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.api.MosaicSearchCriteria;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -27,11 +28,10 @@ import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.MosaicRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountIds;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicIds;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicInfoDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicsInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicPage;
 import io.reactivex.Observable;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -82,29 +82,20 @@ public class MosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imp
                 .toObservable()));
     }
 
-
     @Override
-    public Observable<List<MosaicInfo>> getMosaicsFromAccount(Address address) {
-        Callable<MosaicsInfoDTO> callback = () -> getClient()
-            .getMosaicsFromAccount(address.plain());
+    public Observable<Page<MosaicInfo>> searchMosaics(MosaicSearchCriteria criteria) {
+        Callable<MosaicPage> callback = () -> getClient()
+            .searchMosaics(toDto(criteria.getOwnerAddress()),
+                criteria.getPageSize(),
+                criteria.getPageNumber(), criteria.getOffset(),
+                toDto(criteria.getOrder()));
 
         return exceptionHandling(networkTypeObservable.flatMap(networkType ->
-            call(callback).map(MosaicsInfoDTO::getMosaics).flatMapIterable(item -> item).map(
-                mosaicInfoDTO -> createMosaicInfo(mosaicInfoDTO, networkType))
-                .toList().toObservable()));
+            call(callback).map(mosaicPage -> this.toPage(mosaicPage.getPagination(),
+                mosaicPage.getData().stream().map(dto -> this.createMosaicInfo(dto, networkType)).collect(
+                    Collectors.toList())))));
     }
 
-    @Override
-    public Observable<List<MosaicInfo>> getMosaicsFromAccounts(List<Address> addresses) {
-        AccountIds accountIds = new AccountIds()
-            .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-        Callable<MosaicsInfoDTO> callback = () -> getClient().getMosaicsFromAccounts(accountIds);
-
-        return exceptionHandling(networkTypeObservable.flatMap(networkType ->
-            call(callback).map(MosaicsInfoDTO::getMosaics).flatMapIterable(item -> item).map(
-                mosaicInfoDTO -> createMosaicInfo(mosaicInfoDTO, networkType))
-                .toList().toObservable()));
-    }
 
     private MosaicInfo createMosaicInfo(MosaicInfoDTO mosaicInfoDTO, NetworkType networkType) {
         return createMosaicInfo(mosaicInfoDTO.getMosaic(), networkType);

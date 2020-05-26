@@ -21,6 +21,7 @@ import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.EmbeddedTransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoExtendedDTO;
 import java.util.EnumMap;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -85,6 +86,12 @@ public class GeneralTransactionMapper implements TransactionMapper {
 
     @Override
     public Transaction map(TransactionInfoDTO transactionInfoDTO) {
+        Validate.notNull(transactionInfoDTO, "transactionInfoDTO must not be null");
+        return resolveMapper(transactionInfoDTO).map(transactionInfoDTO);
+    }
+
+    @Override
+    public Transaction map(TransactionInfoExtendedDTO transactionInfoDTO) {
         Validate.notNull(transactionInfoDTO, "transactionInfoDTO must not be null");
         return resolveMapper(transactionInfoDTO).map(transactionInfoDTO);
     }

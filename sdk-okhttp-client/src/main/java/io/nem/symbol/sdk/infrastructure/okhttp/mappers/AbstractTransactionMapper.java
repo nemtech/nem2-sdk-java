@@ -30,6 +30,7 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.EmbeddedTransactionMetaDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NetworkTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoExtendedDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionMetaDTO;
 
 /**
@@ -62,10 +63,18 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
     }
 
     @Override
+    public Transaction map(TransactionInfoExtendedDTO transactionInfoDTO) {
+        TransactionInfo transactionInfo = createTransactionInfo(transactionInfoDTO.getMeta());
+        return createModel(transactionInfo, transactionInfoDTO.getTransaction());
+    }
+
+    @Override
     public Transaction map(TransactionInfoDTO transactionInfoDTO) {
         TransactionInfo transactionInfo = createTransactionInfo(transactionInfoDTO.getMeta());
         return createModel(transactionInfo, transactionInfoDTO.getTransaction());
     }
+
+
 
     protected final T createModel(TransactionInfo transactionInfo, Object transactionDto) {
         D transaction = getJsonHelper().convert(transactionDto, transactionDtoClass);
@@ -103,7 +112,6 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
     protected TransactionInfo createTransactionInfo(TransactionMetaDTO meta) {
         return meta == null ? null : TransactionInfo.create(meta.getHeight(),
             meta.getIndex(),
-            meta.getId(),
             meta.getHash(),
             meta.getMerkleComponentHash());
     }
@@ -143,7 +151,6 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
             TransactionMetaDTO dto = new TransactionMetaDTO();
             dto.setHeight(i.getHeight());
             dto.setHash(i.getHash().orElse(null));
-            dto.setId(i.getId().orElse(null));
             dto.setIndex(i.getIndex().orElse(null));
             dto.setMerkleComponentHash(i.getMerkleComponentHash().orElse(null));
             return dto;

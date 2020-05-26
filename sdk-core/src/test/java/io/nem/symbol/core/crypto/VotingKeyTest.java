@@ -58,10 +58,12 @@ public class VotingKeyTest {
         final VotingKey key1 = VotingKey.fromHexString("227F");
         final VotingKey key2 = VotingKey.fromHexString("227F");
         final VotingKey key3 = VotingKey.fromHexString("327F");
+        final VotingKey key4 = VotingKey.generateRandom();
 
         // Assert:
         MatcherAssert.assertThat(key1, IsEqual.equalTo(key2));
         MatcherAssert.assertThat(key1, IsNot.not(IsEqual.equalTo(key3)));
+        MatcherAssert.assertThat(key1, IsNot.not(IsEqual.equalTo(key4)));
     }
 
     @Test

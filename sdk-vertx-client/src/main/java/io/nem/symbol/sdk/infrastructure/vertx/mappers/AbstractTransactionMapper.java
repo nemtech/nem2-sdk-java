@@ -30,6 +30,7 @@ import io.nem.symbol.sdk.openapi.vertx.model.EmbeddedTransactionMetaDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NetworkTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoExtendedDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionMetaDTO;
 
 /**
@@ -59,6 +60,12 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
     public Transaction map(EmbeddedTransactionInfoDTO transactionInfoDTO) {
         TransactionInfo transactionInfo = createTransactionInfo(transactionInfoDTO.getMeta());
         return createModel(transactionInfo, transactionInfoDTO.getTransaction());
+    }
+
+    @Override
+    public Transaction map(TransactionInfoExtendedDTO transactionInfoExtendedDTO) {
+        TransactionInfo transactionInfo = createTransactionInfo(transactionInfoExtendedDTO.getMeta());
+        return createModel(transactionInfo, transactionInfoExtendedDTO.getTransaction());
     }
 
     @Override
@@ -105,7 +112,6 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
     protected TransactionInfo createTransactionInfo(TransactionMetaDTO meta) {
         return meta == null ? null : TransactionInfo.create(meta.getHeight(),
             meta.getIndex(),
-            meta.getId(),
             meta.getHash(),
             meta.getMerkleComponentHash());
     }
@@ -145,7 +151,6 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
             TransactionMetaDTO dto = new TransactionMetaDTO();
             dto.setHeight(i.getHeight());
             dto.setHash(i.getHash().orElse(null));
-            dto.setId(i.getId().orElse(null));
             dto.setIndex(i.getIndex().orElse(null));
             dto.setMerkleComponentHash(i.getMerkleComponentHash().orElse(null));
             return dto;

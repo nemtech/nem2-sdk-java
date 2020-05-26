@@ -113,6 +113,7 @@ public class PrivateKeyTest {
         MatcherAssert.assertThat(PrivateKey.fromHexString("2276"), IsNot.not(IsEqual.equalTo(key)));
         MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
         MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo(key)));
+        MatcherAssert.assertThat(PrivateKey.generateRandom(), IsNot.not(IsEqual.equalTo(PrivateKey.fromDecimalString("2275"))));
     }
 
     @Test

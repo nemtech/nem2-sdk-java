@@ -50,7 +50,7 @@ import io.nem.symbol.sdk.model.transaction.SecretProofTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.AggregateTransactionBodyDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.AggregateTransactionBodyExtendedDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.HashLockTransactionDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicDefinitionTransactionDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicSupplyChangeTransactionDTO;
@@ -383,21 +383,6 @@ public class TransactionMapperOkHttpTest {
                 transaction.getTransactionInfo().get().getIndex().get(),
                 transactionDTO.getMeta().getIndex());
         }
-        if (transaction.getTransactionInfo().get().getId().isPresent()) {
-            assertEquals(
-                transactionDTO.getMeta().getId(),
-                transaction.getTransactionInfo().get().getId().get());
-        }
-//        if (transaction.getTransactionInfo().get().getAggregateHash().isPresent()) {
-//            assertEquals(
-//                transactionDTO.getMeta().getAggregateHash(),
-//                transaction.getTransactionInfo().get().getAggregateHash().get());
-//        }
-//        if (transaction.getTransactionInfo().get().getAggregateId().isPresent()) {
-//            assertEquals(
-//                transactionDTO.getMeta().getAggregateId(),
-//                transaction.getTransactionInfo().get().getAggregateId().get());
-//        }
 
         assertEquals(
             jsonHelper.getString(parentTransaction.getTransaction(), "signature"),
@@ -647,8 +632,8 @@ public class TransactionMapperOkHttpTest {
     void validateAggregateTransaction(
         AggregateTransaction aggregateTransaction, TransactionInfoDTO transactionDto) {
 
-        AggregateTransactionBodyDTO aggregateTransactionBodyDTO = jsonHelper
-            .convert(transactionDto.getTransaction(), AggregateTransactionBodyDTO.class);
+        AggregateTransactionBodyExtendedDTO aggregateTransactionBodyDTO = jsonHelper
+            .convert(transactionDto.getTransaction(), AggregateTransactionBodyExtendedDTO.class);
         assertEquals(
             transactionDto.getMeta().getHeight(),
             aggregateTransaction.getTransactionInfo().get().getHeight());
@@ -666,11 +651,6 @@ public class TransactionMapperOkHttpTest {
             assertEquals(
                 aggregateTransaction.getTransactionInfo().get().getIndex().get(),
                 transactionDto.getMeta().getIndex());
-        }
-        if (aggregateTransaction.getTransactionInfo().get().getId().isPresent()) {
-            assertEquals(
-                transactionDto.getMeta().getId(),
-                aggregateTransaction.getTransactionInfo().get().getId().get());
         }
 
         assertEquals(

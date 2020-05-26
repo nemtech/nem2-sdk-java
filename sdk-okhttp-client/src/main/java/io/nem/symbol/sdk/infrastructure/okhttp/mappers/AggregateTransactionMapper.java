@@ -24,7 +24,7 @@ import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.AggregateTransactionDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.AggregateTransactionExtendedDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.CosignatureDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.EmbeddedTransactionInfoDTO;
 import java.util.ArrayList;
@@ -36,20 +36,20 @@ import java.util.stream.Collectors;
  * Aggregate transaction mapper.
  */
 class AggregateTransactionMapper extends
-    AbstractTransactionMapper<AggregateTransactionDTO, AggregateTransaction> {
+    AbstractTransactionMapper<AggregateTransactionExtendedDTO, AggregateTransaction> {
 
     private TransactionMapper transactionMapper;
 
     public AggregateTransactionMapper(JsonHelper jsonHelper,
         TransactionType transactionType,
         TransactionMapper transactionMapper) {
-        super(jsonHelper, transactionType, AggregateTransactionDTO.class);
+        super(jsonHelper, transactionType, AggregateTransactionExtendedDTO.class);
         this.transactionMapper = transactionMapper;
     }
 
     @Override
     protected AggregateTransactionFactory createFactory(NetworkType networkType,
-        AggregateTransactionDTO transaction) {
+        AggregateTransactionExtendedDTO transaction) {
 
         List<Transaction> transactions = transaction.getTransactions().stream()
             .map(embeddedTransactionInfoDTO -> {
@@ -91,7 +91,7 @@ class AggregateTransactionMapper extends
     }
 
     @Override
-    protected void copyToDto(AggregateTransaction transaction, AggregateTransactionDTO dto) {
+    protected void copyToDto(AggregateTransaction transaction, AggregateTransactionExtendedDTO dto) {
         List<EmbeddedTransactionInfoDTO> transactions = transaction.getInnerTransactions().stream()
             .map(embeddedTransactionInfoDTO -> transactionMapper
                 .mapToEmbedded(embeddedTransactionInfoDTO)).collect(Collectors.toList());

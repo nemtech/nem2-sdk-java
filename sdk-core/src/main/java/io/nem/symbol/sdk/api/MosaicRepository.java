@@ -47,19 +47,12 @@ public interface MosaicRepository {
 
 
     /**
-     * Gets an array of mosaics created for a given account address.
+     * It searches mosaics based on a criteria.
      *
-     * @param address the address
-     * @return {@link Observable} of {@link MosaicInfo} List
+     * @param criteria the criteria
+     * @return a page of mosaic infos.
      */
-    Observable<List<MosaicInfo>> getMosaicsFromAccount(Address address);
+    Observable<Page<MosaicInfo>> searchMosaics(MosaicSearchCriteria criteria);
 
-    /**
-     * Gets an array of mosaics created for the given account addresses.
-     *
-     * @param addresses the account addresses.
-     * @return {@link Observable} of {@link MosaicInfo} List
-     */
-    Observable<List<MosaicInfo>> getMosaicsFromAccounts(List<Address> addresses);
 
 }

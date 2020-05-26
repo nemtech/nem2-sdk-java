@@ -19,6 +19,7 @@ package io.nem.symbol.sdk.infrastructure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.symbol.sdk.api.MosaicRepository;
+import io.nem.symbol.sdk.api.MosaicSearchCriteria;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.blockchain.BlockDuration;
@@ -55,18 +56,7 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
     @EnumSource(RepositoryType.class)
     void getMosaicsFromAccount(RepositoryType type) {
         List<MosaicInfo> mosaicInfos = get(getMosaicRepository(type)
-            .getMosaicsFromAccount(testAccount.getAddress()));
-        Assertions.assertTrue(mosaicInfos.size() > 0);
-        mosaicInfos.forEach(this::assertMosaic);
-        Assertions.assertTrue(
-            mosaicInfos.stream().anyMatch(mosaicInfo -> mosaicInfo.getMosaicId().equals(mosaicId)));
-    }
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getMosaicsFromAccounts(RepositoryType type) {
-        List<MosaicInfo> mosaicInfos = get(getMosaicRepository(type)
-            .getMosaicsFromAccounts(Collections.singletonList(testAccount.getAddress())));
+            .searchMosaics(new MosaicSearchCriteria().ownerAddress(testAccount.getAddress()))).getData();
         Assertions.assertTrue(mosaicInfos.size() > 0);
         mosaicInfos.forEach(this::assertMosaic);
         Assertions.assertTrue(

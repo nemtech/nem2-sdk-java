@@ -16,11 +16,17 @@
 
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
+import io.nem.symbol.core.crypto.PublicKey;
+import io.nem.symbol.sdk.api.OrderBy;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.QueryParams;
 import io.nem.symbol.sdk.api.RepositoryCallException;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiException;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.Order;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.Pagination;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
@@ -109,10 +115,27 @@ public abstract class AbstractRepositoryOkHttpImpl {
         return queryParams.map(QueryParams::getId).orElse(null);
     }
 
-    protected String getOrder(Optional<QueryParams> queryParams) {
-        return queryParams.map(QueryParams::getOrder).orElse(null);
+    protected Order getOrder(Optional<QueryParams> queryParams) {
+        return queryParams.map(QueryParams::getOrderBy).map(o -> Order.fromValue(o.getValue()))
+            .orElse(null);
     }
 
+    protected Order toDto(OrderBy order) {
+        return order == null ? null : Order.fromValue(order.getValue());
+    }
+
+    protected String toDto(PublicKey publicKey) {
+        return publicKey == null ? null : publicKey.toHex();
+    }
+
+    protected String toDto(Address address) {
+        return address == null ? null : address.plain();
+    }
+
+    protected <T> Page<T> toPage(Pagination pagination, List<T> data) {
+        return new Page<>(data, pagination.getPageNumber(), pagination.getPageSize(),
+            pagination.getTotalEntries(), pagination.getTotalPages());
+    }
 
     public JsonHelper getJsonHelper() {
         return jsonHelper;

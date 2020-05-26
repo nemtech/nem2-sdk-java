@@ -16,6 +16,7 @@
 
 package io.nem.symbol.core.crypto;
 
+import io.nem.symbol.sdk.infrastructure.RandomUtils;
 import java.math.BigInteger;
 
 /**
@@ -63,6 +64,15 @@ public class PrivateKey extends Key {
      */
     public static PrivateKey fromDecimalString(final String decimal) {
         return new PrivateKey(new BigInteger(decimal, 10));
+    }
+
+    /**
+     * Generates a random private key.
+     *
+     * @return The new private key.
+     */
+    public static PrivateKey generateRandom() {
+        return new PrivateKey(RandomUtils.generateRandomBytes(SIZE));
     }
 
 }

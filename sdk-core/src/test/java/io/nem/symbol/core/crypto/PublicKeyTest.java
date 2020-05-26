@@ -104,6 +104,7 @@ public class PublicKeyTest {
         MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
         MatcherAssert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo(key)));
         MatcherAssert.assertThat(key, IsNot.not(IsEqual.equalTo("ImNotAPublicKey")));
+        MatcherAssert.assertThat(PublicKey.generateRandom(), IsNot.not(IsEqual.equalTo(PublicKey.fromHexString("2275"))));
     }
 
     @Test
@@ -113,10 +114,6 @@ public class PublicKeyTest {
         Assertions.assertEquals(TEST_BYTES, key.getByteBuffer().array());
     }
 
-    // endregion
-
-    // region toString
-
     @Test
     public void toStringReturnsHexRepresentation() {
         // Assert:
@@ -125,5 +122,4 @@ public class PublicKeyTest {
             IsEqual.equalTo(ConvertUtils.toHex(TEST_BYTES).toUpperCase()));
     }
 
-    // endregion
 }

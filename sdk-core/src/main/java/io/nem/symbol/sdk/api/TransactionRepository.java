@@ -89,4 +89,12 @@ public interface TransactionRepository {
     Observable<TransactionAnnounceResponse> announceAggregateBondedCosignature(
         CosignatureSignedTransaction cosignatureSignedTransaction);
 
+    /**
+     * Search transactions based on the criteria's filtering and sorting returning a page.
+     *
+     * @param criteria the criteria
+     * @return a page of transactions.
+     */
+    Observable<Page<Transaction>> searchTransactions(TransactionSearchCriteria criteria);
+
 }

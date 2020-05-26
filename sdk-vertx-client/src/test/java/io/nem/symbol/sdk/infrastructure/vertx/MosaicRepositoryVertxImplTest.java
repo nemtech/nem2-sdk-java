@@ -17,12 +17,15 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.core.utils.MapperUtils;
-import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.api.MosaicSearchCriteria;
+import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicInfoDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.MosaicsInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.MosaicPage;
+import io.nem.symbol.sdk.openapi.vertx.model.Pagination;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
@@ -83,12 +86,10 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
         Assertions.assertEquals(BigInteger.valueOf(7), mosaicInfo.getDuration());
     }
 
-
     @Test
     public void shouldGetMosaicsFromAccount() throws Exception {
 
-        Address address = MapperUtils
-            .toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
         MosaicId mosaicId = MapperUtils.toMosaicId("481110499AAA");
 
@@ -103,11 +104,11 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
         mosaicDto.setDivisibility(6);
         mosaicDto.setDuration(BigInteger.valueOf(7));
 
-        mockRemoteCall(new MosaicsInfoDTO().mosaics(Collections.singletonList(mosaicDto)));
+        mockRemoteCall(toPage(new MosaicInfoDTO().mosaic(mosaicDto).id("ABC")));
 
         List<MosaicInfo> resolvedList = repository
-            .getMosaicsFromAccount(address)
-            .toFuture().get();
+            .searchMosaics(new MosaicSearchCriteria().ownerAddress(publicAccount.getAddress())).toFuture().get()
+            .getData();
 
         Assertions.assertEquals(1, resolvedList.size());
 
@@ -123,43 +124,10 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
         Assertions.assertEquals(BigInteger.valueOf(7), mosaicInfo.getDuration());
     }
 
-    @Test
-    public void shouldGetMosaicsFromAccounts() throws Exception {
-
-        Address address = MapperUtils
-            .toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
-
-        MosaicId mosaicId = MapperUtils.toMosaicId("481110499AAA");
-
-        MosaicDTO mosaicDto = new MosaicDTO();
-
-        mosaicDto
-            .setOwnerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
-        mosaicDto.setId("481110499AAA");
-        mosaicDto.setRevision(123);
-
-        mosaicDto.setFlags(5);
-        mosaicDto.setDivisibility(6);
-        mosaicDto.setDuration(BigInteger.valueOf(7));
-
-        mockRemoteCall(new MosaicsInfoDTO().mosaics(Collections.singletonList(mosaicDto)));
-
-        List<MosaicInfo> resolvedList = repository
-            .getMosaicsFromAccounts(Collections.singletonList(address))
-            .toFuture().get();
-
-        Assertions.assertEquals(1, resolvedList.size());
-
-        MosaicInfo mosaicInfo = resolvedList.get(0);
-        Assertions.assertEquals(mosaicId, mosaicInfo.getMosaicId());
-        Assertions.assertEquals(mosaicDto.getRevision(), mosaicInfo.getRevision());
-        Assertions
-            .assertEquals(mosaicDto.getOwnerPublicKey(),
-                mosaicInfo.getOwner().getPublicKey().toHex());
-
-        Assertions.assertFalse(mosaicInfo.isTransferable());
-        Assertions.assertEquals(6, mosaicInfo.getDivisibility());
-        Assertions.assertEquals(BigInteger.valueOf(7), mosaicInfo.getDuration());
+    private MosaicPage toPage(MosaicInfoDTO dto) {
+        return new MosaicPage()
+            .data(Collections.singletonList(dto))
+            .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
     }
 
     @Test

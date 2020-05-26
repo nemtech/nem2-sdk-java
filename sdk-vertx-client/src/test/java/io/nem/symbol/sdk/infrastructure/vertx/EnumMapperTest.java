@@ -24,6 +24,7 @@ import io.nem.symbol.catapult.builders.LockHashAlgorithmDto;
 import io.nem.symbol.catapult.builders.MosaicRestrictionTypeDto;
 import io.nem.symbol.catapult.builders.MosaicSupplyChangeActionDto;
 import io.nem.symbol.catapult.builders.NamespaceRegistrationTypeDto;
+import io.nem.symbol.sdk.api.TransactionSearchGroup;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.blockchain.Position;
 import io.nem.symbol.sdk.model.message.MessageType;
@@ -57,7 +58,8 @@ import io.nem.symbol.sdk.openapi.vertx.model.NodeStatusEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.PositionEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.ReceiptTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.RolesTypeEnum;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionStateTypeEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionGroupEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionGroupSubsetEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionTypeEnum;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -446,18 +448,18 @@ public class EnumMapperTest {
     @ParameterizedTest
     @EnumSource(TransactionState.class)
     void validFromTransactionState(TransactionState transactionState) {
-        Assertions.assertNotNull(TransactionStateTypeEnum.valueOf(transactionState.name()));
+        Assertions.assertNotNull(TransactionGroupEnum.valueOf(transactionState.name()));
         Assertions
-            .assertEquals(TransactionStateTypeEnum.valueOf(transactionState.name()).getValue(),
+            .assertEquals(TransactionGroupEnum.valueOf(transactionState.name()).getValue(),
                 transactionState.getValue());
     }
 
     @ParameterizedTest
-    @EnumSource(TransactionStateTypeEnum.class)
-    void validFromTransactionStateTypeEnum(TransactionStateTypeEnum transactionState) {
+    @EnumSource(TransactionGroupEnum.class)
+    void validFromTransactionStateTypeEnum(TransactionGroupEnum transactionState) {
         Assertions.assertNotNull(TransactionState.valueOf(transactionState.name()));
         Assertions
-            .assertEquals(TransactionStateTypeEnum.valueOf(transactionState.name()).getValue(),
+            .assertEquals(TransactionGroupEnum.valueOf(transactionState.name()).getValue(),
                 transactionState.getValue());
 
     }
@@ -532,6 +534,24 @@ public class EnumMapperTest {
         assertNotNull(AliasType.rawValueOf(enumValue.getValue()));
         Assertions.assertEquals(AliasTypeEnum.fromValue(enumValue.getValue()).getValue(),
             enumValue.getValue());
+    }
+
+    @ParameterizedTest
+    @EnumSource(TransactionSearchGroup.class)
+    void validTransactionSearchGroup(TransactionSearchGroup enumValue) {
+        assertNotNull(TransactionGroupSubsetEnum.fromValue(enumValue.getValue()));
+        assertEquals(TransactionGroupSubsetEnum.fromValue(enumValue.getValue()).getValue(),
+            enumValue.getValue());
+    }
+
+    @ParameterizedTest
+    @EnumSource(TransactionGroupSubsetEnum.class)
+    void validTransactionGroupSubsetEnum(TransactionGroupSubsetEnum enumValue) {
+        assertNotNull(TransactionSearchGroup.rawValueOf(enumValue.getValue()));
+        Assertions
+            .assertEquals(TransactionGroupSubsetEnum.fromValue(enumValue.getValue()).getValue(),
+                enumValue.getValue());
+
     }
 
     @ParameterizedTest

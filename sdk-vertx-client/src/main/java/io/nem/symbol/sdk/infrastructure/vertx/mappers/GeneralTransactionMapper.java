@@ -21,6 +21,7 @@ import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.EmbeddedTransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoExtendedDTO;
 import java.util.EnumMap;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -83,6 +84,7 @@ public class GeneralTransactionMapper implements TransactionMapper {
         return resolveMapper(transactionInfoDTO).map(transactionInfoDTO);
     }
 
+
     @Override
     public Transaction map(TransactionInfoDTO transactionInfoDTO) {
         Validate.notNull(transactionInfoDTO, "transactionInfoDTO must not be null");
@@ -99,6 +101,13 @@ public class GeneralTransactionMapper implements TransactionMapper {
     public TransactionInfoDTO map(Transaction transaction) {
         Validate.notNull(transaction, "transaction must not be null");
         return resolveMapper(transaction.getType()).map(transaction);
+    }
+
+
+    @Override
+    public Transaction map(TransactionInfoExtendedDTO transactionInfoDTO) {
+        Validate.notNull(transactionInfoDTO, "transactionInfoDTO must not be null");
+        return resolveMapper(transactionInfoDTO).map(transactionInfoDTO);
     }
 
     @Override

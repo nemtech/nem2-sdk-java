@@ -16,12 +16,8 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx;
 
-import static io.nem.symbol.sdk.infrastructure.vertx.TestHelperVertx.loadTransactionInfoDTO;
-
 import io.nem.symbol.core.utils.ExceptionUtils;
 import io.nem.symbol.sdk.api.RepositoryCallException;
-import io.nem.symbol.sdk.api.TransactionSearchCriteria;
-import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.Address;
@@ -37,7 +33,6 @@ import io.nem.symbol.sdk.openapi.vertx.model.AccountTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.ActivityBucketDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.KeyTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.Mosaic;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,138 +55,6 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     public void setUp() {
         super.setUp();
         repository = new AccountRepositoryVertxImpl(apiClientMock);
-    }
-
-    @Test
-    public void incomingTransactions() throws Exception {
-
-        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "standaloneTransferTransaction.json");
-
-        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
-
-        mockRemoteCall(Collections.singletonList(transferTransactionDTO));
-
-        List<Transaction> transactions = repository.incomingTransactions(publicAccount).toFuture()
-            .get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
-
-        transactions = repository
-            .incomingTransactions(publicAccount, new TransactionSearchCriteria())
-            .toFuture().get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
-    }
-
-    @Test
-    public void partialTransactions() throws Exception {
-
-        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "standaloneTransferTransaction.json");
-
-        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
-
-        mockRemoteCall(Collections.singletonList(transferTransactionDTO));
-
-        List<Transaction> transactions = repository.partialTransactions(publicAccount).toFuture()
-            .get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
-
-        transactions = repository
-            .incomingTransactions(publicAccount, new TransactionSearchCriteria())
-            .toFuture().get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
-    }
-
-    @Test
-    public void transactions() throws Exception {
-
-        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "standaloneTransferTransaction.json");
-
-        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
-
-        mockRemoteCall(Collections.singletonList(transferTransactionDTO));
-
-        List<Transaction> transactions = repository.transactions(publicAccount).toFuture()
-            .get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
-
-        transactions = repository.transactions(publicAccount)
-            .toFuture().get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
-    }
-
-    @Test
-    public void outgoingTransactions() throws Exception {
-
-        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "standaloneTransferTransaction.json");
-
-        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
-
-        mockRemoteCall(Collections.singletonList(transferTransactionDTO));
-
-        List<Transaction> transactions = repository.outgoingTransactions(publicAccount).toFuture()
-            .get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
-
-        transactions = repository.outgoingTransactions(publicAccount)
-            .toFuture().get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
-    }
-
-    @Test
-    public void unconfirmedTransactions() throws Exception {
-
-        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "standaloneTransferTransaction.json");
-
-        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
-
-        mockRemoteCall(Collections.singletonList(transferTransactionDTO));
-
-        List<Transaction> transactions = repository.unconfirmedTransactions(publicAccount)
-            .toFuture()
-            .get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
-
-        transactions = repository.unconfirmedTransactions(publicAccount)
-            .toFuture().get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.TRANSFER, transactions.get(0).getType());
-    }
-
-    @Test
-    public void aggregateBondedTransactions() throws Exception {
-
-        TransactionInfoDTO aggregateTransferTransactionDTO = loadTransactionInfoDTO(
-            "aggregateTransferTransaction.json"
-        );
-
-        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
-
-        mockRemoteCall(Collections.singletonList(aggregateTransferTransactionDTO));
-
-        List<AggregateTransaction> transactions = repository
-            .aggregateBondedTransactions(publicAccount).toFuture()
-            .get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.AGGREGATE_COMPLETE, transactions.get(0).getType());
-
-        transactions = repository
-            .aggregateBondedTransactions(publicAccount)
-            .toFuture().get();
-        Assertions.assertEquals(1, transactions.size());
-        Assertions.assertEquals(TransactionType.AGGREGATE_COMPLETE, transactions.get(0).getType());
     }
 
     @Test

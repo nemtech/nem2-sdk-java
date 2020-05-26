@@ -34,10 +34,8 @@ public class Ed25519KeyGenerator implements KeyGenerator {
 
     @Override
     public KeyPair generateKeyPair() {
-        final byte[] seed = RandomUtils.generateRandomBytes(32);
-
         // seed is the private key.
-        final PrivateKey privateKey = new PrivateKey(seed);
+        final PrivateKey privateKey = PrivateKey.generateRandom();
         return KeyPair.fromPrivate(privateKey, CryptoEngines.ed25519Engine());
     }
 

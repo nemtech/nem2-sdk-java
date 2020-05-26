@@ -58,15 +58,16 @@ public class MetadataRepositoryVertxImpl extends AbstractRepositoryVertxImpl imp
     public Observable<List<Metadata>> getAccountMetadata(Address targetAddress,
         Optional<QueryParams> queryParams) {
         Consumer<Handler<AsyncResult<MetadataEntriesDTO>>> callback = handler -> getClient()
-            .getAccountMetadata(targetAddress.plain(), getPageSize(queryParams), getId(queryParams),
-                getOrder(queryParams),
+            .getAccountMetadata(targetAddress.plain(), getPageSize(queryParams),
+                getOrder(queryParams), getId(queryParams),
                 handler);
         return handleList(callback);
     }
 
 
     @Override
-    public Observable<List<Metadata>> getAccountMetadataByKey(Address targetAddress, BigInteger key) {
+    public Observable<List<Metadata>> getAccountMetadataByKey(Address targetAddress,
+        BigInteger key) {
         Consumer<Handler<AsyncResult<MetadataEntriesDTO>>> callback = handler -> getClient()
             .getAccountMetadataByKey(targetAddress.plain(), toHex(key), handler);
         return handleList(callback);
@@ -77,21 +78,24 @@ public class MetadataRepositoryVertxImpl extends AbstractRepositoryVertxImpl imp
     public Observable<List<Metadata>> getMosaicMetadata(MosaicId targetMosaicId,
         Optional<QueryParams> queryParams) {
         Consumer<Handler<AsyncResult<MetadataEntriesDTO>>> callback = handler -> getClient()
-            .getMosaicMetadata(targetMosaicId.getIdAsHex(), getPageSize(queryParams), getId(queryParams),
+            .getMosaicMetadata(targetMosaicId.getIdAsHex(), getPageSize(queryParams),
+                getId(queryParams),
                 getOrder(queryParams),
                 handler);
         return handleList(callback);
     }
 
     @Override
-    public Observable<List<Metadata>> getMosaicMetadataByKey(MosaicId targetMosaicId, BigInteger key) {
+    public Observable<List<Metadata>> getMosaicMetadataByKey(MosaicId targetMosaicId,
+        BigInteger key) {
         Consumer<Handler<AsyncResult<MetadataEntriesDTO>>> callback = handler -> getClient()
             .getMosaicMetadataByKey(targetMosaicId.getIdAsHex(), toHex(key), handler);
         return handleList(callback);
     }
 
     @Override
-    public Observable<Metadata> getAccountMetadataByKeyAndSender(Address targetAddress, BigInteger key,
+    public Observable<Metadata> getAccountMetadataByKeyAndSender(Address targetAddress,
+        BigInteger key,
         String senderPublicKey) {
         Consumer<Handler<AsyncResult<MetadataDTO>>> callback = handler -> getClient()
             .getAccountMetadataByKeyAndSender(targetAddress.plain(), toHex(key), senderPublicKey,
@@ -101,7 +105,8 @@ public class MetadataRepositoryVertxImpl extends AbstractRepositoryVertxImpl imp
 
 
     @Override
-    public Observable<Metadata> getMosaicMetadataByKeyAndSender(MosaicId targetMosaicId, BigInteger key,
+    public Observable<Metadata> getMosaicMetadataByKeyAndSender(MosaicId targetMosaicId,
+        BigInteger key,
         String senderPublicKey) {
         Consumer<Handler<AsyncResult<MetadataDTO>>> callback = handler -> getClient()
             .getMosaicMetadataByKeyAndSender(targetMosaicId.getIdAsHex(), toHex(key),
