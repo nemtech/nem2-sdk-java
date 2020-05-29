@@ -17,15 +17,21 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import io.nem.symbol.core.crypto.PublicKey;
+import io.nem.symbol.sdk.api.BlockOrderBy;
+import io.nem.symbol.sdk.api.BlockPaginationStreamer;
 import io.nem.symbol.sdk.api.BlockRepository;
+import io.nem.symbol.sdk.api.BlockSearchCriteria;
+import io.nem.symbol.sdk.api.OrderBy;
 import io.nem.symbol.sdk.api.RepositoryCallException;
-import io.nem.symbol.sdk.api.TransactionRepository;
-import io.nem.symbol.sdk.api.TransactionSearchCriteria;
+import io.nem.symbol.sdk.model.Stored;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
-import io.nem.symbol.sdk.model.transaction.Transaction;
 import java.math.BigInteger;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,28 +51,150 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
         BlockInfo blockInfo = get(getBlockRepository(type).getBlockByHeight(BigInteger.valueOf(1)));
         assertEquals(1, blockInfo.getHeight().intValue());
         assertEquals(0, blockInfo.getTimestamp().intValue());
-        assertEquals(getGenerationHash(), blockInfo.getGenerationHash());
+        assertNotEquals(getGenerationHash(), blockInfo.getGenerationHash());
     }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void getBlockTransactions(RepositoryType type) {
-        TransactionRepository transactionRepository = getRepositoryFactory(type)
-            .createTransactionRepository();
+    void searchOrderByHeightAsc(RepositoryType type) {
+        BlockSearchCriteria criteria = new BlockSearchCriteria();
+        criteria.setOrderBy(BlockOrderBy.HEIGHT);
+        criteria.setOrder(OrderBy.ASC);
+        BlockPaginationStreamer streamer = new BlockPaginationStreamer(getBlockRepository(type));
 
-        List<Transaction> transactions = get(transactionRepository
-            .searchTransactions(
-                new TransactionSearchCriteria().height(BigInteger.ONE).pageNumber(1))).getData();
+        List<BlockInfo> blocks = get(streamer.search(criteria).toList().toObservable());
+        List<BlockInfo> sorted = blocks.stream().sorted(Comparator.comparing(BlockInfo::getHeight))
+            .collect(Collectors.toList());
+        Assertions.assertEquals(blocks, sorted);
+    }
 
-        assertEquals(10, transactions.size());
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void searchByBeneficiaryPublicKey(RepositoryType type) {
+        BlockRepository blockRepository = getBlockRepository(type);
+        BlockInfo block1 = get(blockRepository.getBlockByHeight(BigInteger.ONE));
+        BlockSearchCriteria criteria = new BlockSearchCriteria();
+        PublicKey expectedBeneficiaryPublicKey = block1.getBeneficiaryPublicAccount().getPublicKey();
+        criteria.setBeneficiaryPublicKey(expectedBeneficiaryPublicKey);
+        BlockPaginationStreamer streamer = new BlockPaginationStreamer(blockRepository);
+        List<BlockInfo> blocks = get(streamer.search(criteria).toList().toObservable());
+        blocks.forEach(
+            b -> Assertions.assertEquals(expectedBeneficiaryPublicKey, b.getBeneficiaryPublicAccount().getPublicKey()));
+        Assertions.assertFalse(blocks.isEmpty());
+    }
 
-        List<Transaction> nextTransactions = get(transactionRepository
-            .searchTransactions(
-                new TransactionSearchCriteria().height(BigInteger.ONE).pageNumber(2))).getData();
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void searchByBeneficiaryPublicKeyWhenInvalid(RepositoryType type) {
+        BlockRepository blockRepository = getBlockRepository(type);
+        BlockSearchCriteria criteria = new BlockSearchCriteria();
+        PublicKey expectedBeneficiaryPublicKey = PublicKey.generateRandom();
+        criteria.setBeneficiaryPublicKey(expectedBeneficiaryPublicKey);
+        BlockPaginationStreamer streamer = new BlockPaginationStreamer(blockRepository);
+        List<BlockInfo> blocks = get(streamer.search(criteria).toList().toObservable());
+        Assertions.assertTrue(blocks.isEmpty());
+    }
 
-        assertEquals(10, nextTransactions.size());
-        assertEquals(transactions.get(1).getTransactionInfo().get().getHash(),
-            nextTransactions.get(0).getTransactionInfo().get().getHash());
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void searchBySignerPublicKey(RepositoryType type) {
+        BlockRepository blockRepository = getBlockRepository(type);
+        BlockInfo block1 = get(blockRepository.getBlockByHeight(BigInteger.ONE));
+        BlockSearchCriteria criteria = new BlockSearchCriteria();
+        PublicKey expectedSignerPublicKey = block1.getSignerPublicAccount().getPublicKey();
+        criteria.setSignerPublicKey(expectedSignerPublicKey);
+        BlockPaginationStreamer streamer = new BlockPaginationStreamer(blockRepository);
+        List<BlockInfo> blocks = get(streamer.search(criteria).toList().toObservable());
+        blocks
+            .forEach(b -> Assertions.assertEquals(expectedSignerPublicKey, b.getSignerPublicAccount().getPublicKey()));
+        Assertions.assertFalse(blocks.isEmpty());
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void searchBySignerPublicKeyWhenInvalid(RepositoryType type) {
+        BlockRepository blockRepository = getBlockRepository(type);
+        BlockSearchCriteria criteria = new BlockSearchCriteria();
+        PublicKey expectedSignerPublicKey = PublicKey.generateRandom();
+        criteria.setSignerPublicKey(expectedSignerPublicKey);
+        BlockPaginationStreamer streamer = new BlockPaginationStreamer(blockRepository);
+        List<BlockInfo> blocks = get(streamer.search(criteria).toList().toObservable());
+        Assertions.assertTrue(blocks.isEmpty());
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void searchOrderByHeightDesc(RepositoryType type) {
+        BlockSearchCriteria criteria = new BlockSearchCriteria();
+        criteria.setOrderBy(BlockOrderBy.HEIGHT);
+        criteria.setOrder(OrderBy.DESC);
+        BlockPaginationStreamer streamer = new BlockPaginationStreamer(getBlockRepository(type));
+
+        List<BlockInfo> blocks = get(streamer.search(criteria).toList().toObservable());
+        List<BlockInfo> sorted = blocks.stream().sorted(Comparator.comparing(BlockInfo::getHeight).reversed())
+            .collect(Collectors.toList());
+        Assertions.assertEquals(blocks, sorted);
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void defaultSearch(RepositoryType type) {
+        getPaginationTester(type).basicTestSearch(null);
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void defaultSearchSize50(RepositoryType type) {
+        getPaginationTester(type).basicTestSearch(50);
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void defaultSearchBlock(RepositoryType type) {
+        getPaginationTester(type).basicTestSearch(null);
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void defaultSearchBlockPageSize50(RepositoryType type) {
+        getPaginationTester(type).basicTestSearch(50);
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void searchOrderByIdAsc(RepositoryType type) {
+        getPaginationTester(type).searchOrderByIdAsc();
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void usingBigPageSize(RepositoryType type) {
+        getPaginationTester(type).usingBigPageSize();
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void searchUsingOffset(RepositoryType type) {
+        BlockRepository blockRepository = getBlockRepository(type);
+        BlockPaginationStreamer streamer = new BlockPaginationStreamer(blockRepository);
+        BlockSearchCriteria criteria = new BlockSearchCriteria();
+        criteria.setPageSize(10);
+        int offsetIndex = 2;
+        List<BlockInfo> blocksWithoutOffset = get(streamer.search(criteria).toList().toObservable());
+        criteria.setOffset(blocksWithoutOffset.get(offsetIndex).getDatabaseId().get());
+        List<BlockInfo> blockFromOffsets = get(streamer.search(criteria).toList().toObservable());
+        PaginationTester.sameEntities(blocksWithoutOffset.stream().skip(offsetIndex + 1).collect(Collectors.toList()), blockFromOffsets);
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void searchOrderByIdDesc(RepositoryType type) {
+        getPaginationTester(type).searchOrderByIdDesc();
+    }
+
+    private PaginationTester<BlockInfo, BlockSearchCriteria> getPaginationTester(RepositoryType type) {
+        return new PaginationTester<>(
+            BlockSearchCriteria::new, getBlockRepository(type)::search);
     }
 
     @ParameterizedTest

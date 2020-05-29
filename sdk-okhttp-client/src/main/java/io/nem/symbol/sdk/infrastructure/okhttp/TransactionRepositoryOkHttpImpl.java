@@ -156,7 +156,7 @@ public class TransactionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImp
     }
 
     @Override
-    public Observable<Page<Transaction>> searchTransactions(TransactionSearchCriteria criteria) {
+    public Observable<Page<Transaction>> search(TransactionSearchCriteria criteria) {
         Callable<TransactionPage> callback = () -> getClient()
             .searchTransactions(toDto(criteria.getAddress()),
                 toDto(criteria.getRecipientAddress()),

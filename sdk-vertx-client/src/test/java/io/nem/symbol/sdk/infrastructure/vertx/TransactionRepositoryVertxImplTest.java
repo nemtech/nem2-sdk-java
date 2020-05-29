@@ -309,7 +309,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
 
         mockRemoteCall(toPage(transferTransactionDTO));
 
-        Page<Transaction> transactions = repository.searchTransactions(
+        Page<Transaction> transactions = repository.search(
             new TransactionSearchCriteria().signerPublicKey(publicAccount.getPublicKey()).group(
                 TransactionSearchGroup.UNCONFIRMED))
             .toFuture()
@@ -334,7 +334,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
         TransactionSearchCriteria criteria = new TransactionSearchCriteria().transactionTypes(
             Arrays.asList(TransactionType.NAMESPACE_METADATA, TransactionType.AGGREGATE_COMPLETE));
 
-        Page<Transaction> transactions = repository.searchTransactions(
+        Page<Transaction> transactions = repository.search(
             criteria)
             .toFuture()
             .get();

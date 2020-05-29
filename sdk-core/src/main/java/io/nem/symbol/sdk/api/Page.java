@@ -102,4 +102,11 @@ public class Page<E> {
     public Integer getTotalPages() {
         return totalPages;
     }
+
+    /**
+     * @return if this page is the last one.
+     */
+    public boolean isLast() {
+        return getPageNumber() >= getTotalPages();
+    }
 }

@@ -16,6 +16,7 @@
 
 package io.nem.symbol.sdk.model.blockchain;
 
+import io.nem.symbol.sdk.model.Stored;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
@@ -25,8 +26,9 @@ import java.util.Optional;
 /**
  * The block info structure describes basic information of a block.
  */
-public class BlockInfo {
+public class BlockInfo implements Stored {
 
+    private final String databaseId;
     private final String hash;
     private final String generationHash;
     private final BigInteger totalFee;
@@ -53,6 +55,7 @@ public class BlockInfo {
 
     @SuppressWarnings("squid:S00107")
     private BlockInfo(
+        String databaseId,
         String hash,
         String generationHash,
         BigInteger totalFee,
@@ -76,6 +79,7 @@ public class BlockInfo {
         String proofScalar,
         String proofVerificationHash,
         PublicAccount beneficiaryPublicAccount) {
+        this.databaseId = databaseId;
         this.hash = hash;
         this.generationHash = generationHash;
         this.totalFee = totalFee;
@@ -103,7 +107,7 @@ public class BlockInfo {
 
     @SuppressWarnings("squid:S00107")
     public static BlockInfo create(
-        String hash,
+        String databaseId, String hash,
         String generationHash,
         BigInteger totalFee,
         Integer numTransactions,
@@ -130,6 +134,7 @@ public class BlockInfo {
         PublicAccount beneficiaryPublicAccount = beneficiaryPublicKey == null ? null :
             BlockInfo.getPublicAccount(beneficiaryPublicKey, networkType);
         return new BlockInfo(
+            databaseId,
             hash,
             generationHash,
             totalFee,
@@ -389,5 +394,14 @@ public class BlockInfo {
      */
     public String getProofVerificationHash() {
         return proofVerificationHash;
+    }
+
+    /**
+     * Returns database id of the block
+     *
+     * @return The database id of the block.
+     */
+    public Optional<String> getDatabaseId() {
+        return Optional.ofNullable(databaseId);
     }
 }

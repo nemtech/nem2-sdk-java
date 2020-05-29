@@ -26,7 +26,7 @@ import java.math.BigInteger;
  *
  * @since 1.0
  */
-public interface BlockRepository {
+public interface BlockRepository extends Searcher<BlockInfo, BlockSearchCriteria> {
 
     /**
      * Gets a BlockInfo for a given block height.
@@ -35,16 +35,6 @@ public interface BlockRepository {
      * @return Observable of {@link BlockInfo}
      */
     Observable<BlockInfo> getBlockByHeight(BigInteger height);
-
-
-    /**
-     * It returns a page of {@link BlockInfo} according to the provided criteria.
-     *
-     * @param criteria the criteria
-     * @return a page of block info objects.
-     */
-    Observable<Page<BlockInfo>> searchBlocks(BlockSearchCriteria criteria);
-
 
     /**
      * Get the merkle path for a given a transaction and block Returns the merkle path for a

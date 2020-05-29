@@ -129,7 +129,7 @@ class MultisignIntegrationTest extends BaseIntegrationTest {
                         .flatMap(a -> {
                             System.out.println("Aggregate bonded finished");
                             return repositoryFactory.createTransactionRepository()
-                                .searchTransactions(new TransactionSearchCriteria().signerPublicKey(cosignAccount1.getPublicAccount().getPublicKey()).group(
+                                .search(new TransactionSearchCriteria().signerPublicKey(cosignAccount1.getPublicAccount().getPublicKey()).group(
                                     TransactionSearchGroup.PARTIAL))
                                 .flatMap((page) -> {
                                     List<Transaction> transactions = page.getData();

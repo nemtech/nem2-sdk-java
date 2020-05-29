@@ -16,6 +16,7 @@
 
 package io.nem.symbol.sdk.api;
 
+import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
@@ -29,7 +30,7 @@ import java.util.List;
  *
  * @since 1.0
  */
-public interface TransactionRepository {
+public interface TransactionRepository extends Searcher<Transaction, TransactionSearchCriteria> {
 
     /**
      * Gets a transaction for a given hash.
@@ -88,13 +89,5 @@ public interface TransactionRepository {
      */
     Observable<TransactionAnnounceResponse> announceAggregateBondedCosignature(
         CosignatureSignedTransaction cosignatureSignedTransaction);
-
-    /**
-     * Search transactions based on the criteria's filtering and sorting returning a page.
-     *
-     * @param criteria the criteria
-     * @return a page of transactions.
-     */
-    Observable<Page<Transaction>> searchTransactions(TransactionSearchCriteria criteria);
 
 }

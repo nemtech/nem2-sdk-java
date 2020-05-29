@@ -107,7 +107,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
         mockRemoteCall(toPage(new MosaicInfoDTO().mosaic(mosaicDto).id("ABC")));
 
         List<MosaicInfo> resolvedList = repository
-            .searchMosaics(new MosaicSearchCriteria().ownerAddress(publicAccount.getAddress())).toFuture().get()
+            .search(new MosaicSearchCriteria().ownerAddress(publicAccount.getAddress())).toFuture().get()
             .getData();
 
         Assertions.assertEquals(1, resolvedList.size());

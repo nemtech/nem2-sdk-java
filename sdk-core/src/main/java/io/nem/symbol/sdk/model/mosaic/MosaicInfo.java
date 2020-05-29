@@ -16,15 +16,21 @@
 
 package io.nem.symbol.sdk.model.mosaic;
 
+import io.nem.symbol.sdk.model.Stored;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import java.math.BigInteger;
+import java.util.Optional;
 
 /**
  * The mosaic info structure contains its properties, the owner and the namespace to which it
  * belongs to.
  */
-public class MosaicInfo {
+public class MosaicInfo implements Stored {
 
+    /**
+     * The database id.
+     */
+    private final String databaseId;
     private final MosaicId mosaicId;
     private final BigInteger supply;
     private final BigInteger startHeight;
@@ -35,9 +41,10 @@ public class MosaicInfo {
     private final BigInteger duration;
 
     @SuppressWarnings("squid:S00107")
-    private MosaicInfo(final MosaicId mosaicId, final BigInteger supply,
+    public MosaicInfo(final String databaseId, final MosaicId mosaicId, final BigInteger supply,
         final BigInteger startHeight, final PublicAccount owner, final Integer revision,
         final MosaicFlags mosaicFlags, final int divisibility, final BigInteger duration) {
+        this.databaseId = databaseId;
         this.mosaicId = mosaicId;
         this.supply = supply;
         this.startHeight = startHeight;
@@ -46,15 +53,6 @@ public class MosaicInfo {
         this.mosaicFlags = mosaicFlags;
         this.divisibility = divisibility;
         this.duration = duration;
-    }
-
-    @SuppressWarnings("squid:S00107")
-    public static MosaicInfo create(final MosaicId mosaicId,
-        final BigInteger supply, final BigInteger startHeight,
-        final PublicAccount owner, final Integer revision, final MosaicFlags mosaicFlags,
-        final int divisibility, final BigInteger duration) {
-        return new MosaicInfo(mosaicId, supply, startHeight, owner, revision, mosaicFlags,
-            divisibility, duration);
     }
 
     /**
@@ -145,5 +143,12 @@ public class MosaicInfo {
      */
     public BigInteger getDuration() {
         return duration;
+    }
+
+    /**
+     * @return the internal database id.
+     */
+    public Optional<String> getDatabaseId() {
+        return Optional.ofNullable(databaseId);
     }
 }

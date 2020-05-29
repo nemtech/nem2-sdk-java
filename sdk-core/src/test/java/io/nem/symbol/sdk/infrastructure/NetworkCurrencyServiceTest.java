@@ -71,7 +71,7 @@ class NetworkCurrencyServiceTest {
         Account account = Account.generateNewAccount(NetworkType.MAIN_NET);
         BigInteger supply = BigInteger.valueOf(12);
 
-        MosaicInfo mosaicInfo = MosaicInfo.create(mosaicId, supply, BigInteger.ONE,
+        MosaicInfo mosaicInfo = new MosaicInfo("abc",mosaicId, supply, BigInteger.ONE,
             account.getPublicAccount(), 4, MosaicFlags.create(true, true, true), 10,
             BigInteger.TEN);
 
@@ -99,7 +99,7 @@ class NetworkCurrencyServiceTest {
         Account account = Account.generateNewAccount(NetworkType.MAIN_NET);
         BigInteger supply = BigInteger.valueOf(12);
 
-        MosaicInfo mosaicInfo = MosaicInfo.create(mosaicId, supply, BigInteger.ONE,
+        MosaicInfo mosaicInfo = new MosaicInfo("abc",mosaicId, supply, BigInteger.ONE,
             account.getPublicAccount(), 4, MosaicFlags.create(true, true, true), 10,
             BigInteger.TEN);
 
@@ -127,7 +127,7 @@ class NetworkCurrencyServiceTest {
         Account account = Account.generateNewAccount(NetworkType.MAIN_NET);
         BigInteger supply = BigInteger.valueOf(12);
 
-        MosaicInfo mosaicInfo = MosaicInfo.create(mosaicId, supply, BigInteger.ONE,
+        MosaicInfo mosaicInfo = new MosaicInfo("abc",mosaicId, supply, BigInteger.ONE,
             account.getPublicAccount(), 4, MosaicFlags.create(true, true, true), 10,
             BigInteger.TEN);
 
@@ -156,7 +156,7 @@ class NetworkCurrencyServiceTest {
         Account account = Account.generateNewAccount(NetworkType.MAIN_NET);
         BigInteger supply = BigInteger.valueOf(12);
 
-        MosaicInfo mosaicInfo = MosaicInfo.create(mosaicId, supply, BigInteger.ONE,
+        MosaicInfo mosaicInfo = new MosaicInfo("abc",mosaicId, supply, BigInteger.ONE,
             account.getPublicAccount(), 4, MosaicFlags.create(true, true, true), 10,
             BigInteger.TEN);
 
@@ -194,7 +194,7 @@ class NetworkCurrencyServiceTest {
         Account account = Account.generateNewAccount(NetworkType.MAIN_NET);
         BigInteger supply = BigInteger.valueOf(12);
 
-        MosaicInfo mosaicInfo = MosaicInfo.create(mosaicId, supply, BigInteger.ONE,
+        MosaicInfo mosaicInfo = new MosaicInfo("abc",mosaicId, supply, BigInteger.ONE,
             account.getPublicAccount(), 4, MosaicFlags.create(true, true, true), 10,
             BigInteger.TEN);
 

@@ -42,7 +42,7 @@ class BlockServiceIntegrationTest extends BaseIntegrationTest {
             .createTransactionRepository();
 
         List<Transaction> transactions = get(transactionRepository
-            .searchTransactions(
+            .search(
                 new TransactionSearchCriteria().height(height).pageNumber(1))).getData();
 
         BlockService service = new BlockServiceImpl(repositoryFactory);

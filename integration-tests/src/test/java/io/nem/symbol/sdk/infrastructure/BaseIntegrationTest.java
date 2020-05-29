@@ -17,7 +17,6 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.nem.symbol.core.utils.ExceptionUtils;
 import io.nem.symbol.sdk.api.Listener;
 import io.nem.symbol.sdk.api.MosaicRestrictionTransactionService;
 import io.nem.symbol.sdk.api.RepositoryFactory;
@@ -63,7 +62,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
@@ -72,8 +70,7 @@ import org.junit.jupiter.api.Assertions;
 /**
  * Abstract class for all the repository integration tests.
  *
- * In general, the test ares parametrized so multiple implementations of a repository can be tested
- * at the same time.
+ * In general, the test ares parametrized so multiple implementations of a repository can be tested at the same time.
  */
 public abstract class BaseIntegrationTest {
 
@@ -82,18 +79,7 @@ public abstract class BaseIntegrationTest {
      */
     protected static final RepositoryType DEFAULT_REPOSITORY_TYPE = RepositoryType.VERTX;
 
-
-    protected BigInteger maxFee = BigInteger.valueOf(1000000);
-
-    /**
-     * Known implementations of repositories that the integration tests use.
-     */
-    public enum RepositoryType {
-        VERTX, OKHTTP
-    }
-
-    private final Config config;
-    private final Long timeoutSeconds;
+    private final TestHelper helper;
     private final Map<RepositoryType, RepositoryFactory> repositoryFactoryMap = new HashMap<>();
     private final Map<RepositoryType, Listener> listenerMap = new HashMap<>();
     private final JsonHelper jsonHelper = new JsonHelperJackson2(
@@ -101,14 +87,14 @@ public abstract class BaseIntegrationTest {
     private final String generationHash;
     private final NetworkType networkType;
     private final NetworkCurrency networkCurrency;
+    protected BigInteger maxFee = BigInteger.valueOf(1000000);
 
     public BaseIntegrationTest() {
-        this.config = new Config();
+        this.helper = new TestHelper();
         System.out.println("Running tests against server: " + config().getApiUrl());
-        this.timeoutSeconds = this.config().getTimeoutSeconds();
         this.generationHash = resolveGenerationHash();
         this.networkType = resolveNetworkType();
-        this.config.init(networkType);
+        this.helper.config().init(networkType);
         this.networkCurrency = resolveNetworkCurrency();
 
         System.out.println("Network Type: " + networkType);
@@ -118,7 +104,6 @@ public abstract class BaseIntegrationTest {
     private NetworkCurrency resolveNetworkCurrency() {
         return get(getRepositoryFactory(DEFAULT_REPOSITORY_TYPE).getNetworkCurrency());
     }
-
 
     private String resolveGenerationHash() {
         return get(getRepositoryFactory(DEFAULT_REPOSITORY_TYPE).getGenerationHash());
@@ -136,22 +121,13 @@ public abstract class BaseIntegrationTest {
 
     private Listener createListener(RepositoryType type) {
         Listener listener = getRepositoryFactory(type).createListener();
-        try {
-            listener.open().get(timeoutSeconds, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(
-                "Listener could not be created or opened. Error "
-                    + org.apache.commons.lang3.exception.ExceptionUtils
-                    .getMessage(e),
-                e);
-        }
+        this.helper.get(listener.open());
         return listener;
     }
 
     /**
-     * Method that create a {@link RepositoryFactory} based on the {@link RepositoryType} if
-     * necessary. The created repository factories are being cached for performance and multithread
-     * testing.
+     * Method that create a {@link RepositoryFactory} based on the {@link RepositoryType} if necessary. The created
+     * repository factories are being cached for performance and multithread testing.
      */
     public RepositoryFactory getRepositoryFactory(RepositoryType type) {
         return repositoryFactoryMap.computeIfAbsent(type, this::createRepositoryFactory);
@@ -173,7 +149,7 @@ public abstract class BaseIntegrationTest {
     }
 
     public Config config() {
-        return config;
+        return helper.config();
     }
 
     public JsonHelper jsonHelper() {
@@ -196,38 +172,17 @@ public abstract class BaseIntegrationTest {
         return this.config().getTestAccount().getPublicAccount();
     }
 
-    public Address getTestAccountAddress() {
-        return this.config().getTestAccount().getAddress();
-    }
-
-    public Account getTestMultisigAccount() {
-        return this.config().getMultisigAccount();
-    }
-
-    public Account getTestCosignatoryAccount() {
-        return this.config().getCosignatoryAccount();
-    }
-
-    public Account getTestCosignatoryAccount2() {
-        return this.config().getCosignatory2Account();
-    }
-
     public Address getRecipient() {
         return this.config().getTestAccount2().getAddress();
     }
-
 
     public String getGenerationHash() {
         return generationHash;
     }
 
-    public Long getTimeoutSeconds() {
-        return timeoutSeconds;
-    }
-
     /**
-     * An utility method that executes a rest call though the Observable. It simplifies and unifies
-     * the executions of rest calls.
+     * An utility method that executes a rest call though the Observable. It simplifies and unifies the executions of
+     * rest calls.
      *
      * This methods adds the necessary timeouts and exception handling,
      *
@@ -236,8 +191,7 @@ public abstract class BaseIntegrationTest {
      * @return the response from the rest call.
      */
     protected <T> T get(Observable<T> observable) {
-        return ExceptionUtils
-            .propagate(() -> observable.toFuture().get(getTimeoutSeconds(), TimeUnit.SECONDS));
+        return this.helper.get(observable);
     }
 
     /**
@@ -246,7 +200,6 @@ public abstract class BaseIntegrationTest {
     public Listener getListener(RepositoryType type) {
         return listenerMap.computeIfAbsent(type, this::createListener);
     }
-
 
     <T extends Transaction> Pair<T, AggregateTransaction> announceAggregateAndValidate(
         RepositoryType type, T transaction,
@@ -274,7 +227,6 @@ public abstract class BaseIntegrationTest {
                 .getTransactionInfo().get().getHash().get());
         return Pair.of(announcedCorrectly, announcedAggregateTransaction);
     }
-
 
     <T extends Transaction> T announceAndValidate(RepositoryType type, Account testAccount,
         T transaction) {
@@ -312,14 +264,14 @@ public abstract class BaseIntegrationTest {
     }
 
     /**
-     * This method listens for the next object in observable but if a status error happens first it
-     * will raise an error. This speeds up the tests, if a transaction is not announced  correctly,
-     * the method will fail before timing out as it listens errors raised by the server.
+     * This method listens for the next object in observable but if a status error happens first it will raise an error.
+     * This speeds up the tests, if a transaction is not announced  correctly, the method will fail before timing out as
+     * it listens errors raised by the server.
      */
     protected <T> T getTransactionOrFail(Observable<T> observable,
         Transaction originalTransaction) {
         try {
-            return (T) get(observable.take(1));
+            return get(observable.take(1));
         } catch (Exception e) {
             throw new IllegalArgumentException(
                 e.getMessage() + ". Failed Transaction json: \n" + toJson(originalTransaction), e);

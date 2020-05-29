@@ -193,7 +193,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         TransactionRepository transactionRepository = getRepositoryFactory(type)
             .createTransactionRepository();
 
-        List<Transaction> transactions = get(transactionRepository.searchTransactions(
+        List<Transaction> transactions = get(transactionRepository.search(
             new TransactionSearchCriteria().transactionTypes(Collections.singletonList(
                 TransactionType.AGGREGATE_BONDED))
                 .signerPublicKey(this.cosignatoryAccount.getPublicAccount().getPublicKey())))

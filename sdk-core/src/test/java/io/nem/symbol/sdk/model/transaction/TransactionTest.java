@@ -88,7 +88,8 @@ public class TransactionTest {
     @Test
     void shouldReturnTransactionIsUnconfirmedWhenHeightIs0() {
         TransactionInfo transactionInfo = TransactionInfo
-            .create(BigInteger.valueOf(0), 1, "hash", "hash");
+            .create(BigInteger.valueOf(0), 1,
+                "ABC", "hash", "hash");
         FakeTransferTransaction fakeTransaction =
             new FakeTransferTransactionFactory(networkType)
                 .deadline(new FakeDeadline())
@@ -103,7 +104,8 @@ public class TransactionTest {
     @Test
     void shouldReturnTransactionIsNotUnconfirmedWhenHeightIsNot0() {
         TransactionInfo transactionInfo = TransactionInfo
-            .create(BigInteger.valueOf(100), 1, "hash", "hash");
+            .create(BigInteger.valueOf(100), 1,
+                "ABC", "hash", "hash");
         FakeTransferTransaction fakeTransaction =
             new FakeTransferTransactionFactory(networkType)
                 .deadline(new FakeDeadline())
@@ -118,7 +120,8 @@ public class TransactionTest {
     @Test
     void shouldReturnTransactionIsConfirmedWhenHeightIsNot0() {
         TransactionInfo transactionInfo = TransactionInfo
-            .create(BigInteger.valueOf(100), 1, "hash", "hash");
+            .create(BigInteger.valueOf(100), 1,
+                "ABC","hash", "hash");
         FakeTransferTransaction fakeTransaction =
             new FakeTransferTransactionFactory(networkType)
                 .deadline(new FakeDeadline())
@@ -133,7 +136,8 @@ public class TransactionTest {
     @Test
     void shouldReturnTransactionIsAggregateBondedWhenHeightIs0AndHashAndMerkHashAreDifferent() {
         TransactionInfo transactionInfo = TransactionInfo
-            .create(BigInteger.valueOf(0), 1, "hash", "hash_2");
+            .create(BigInteger.valueOf(0), 1,
+                "ABC","hash", "hash_2");
         FakeTransferTransaction fakeTransaction =
             new FakeTransferTransactionFactory(networkType)
                 .deadline(new FakeDeadline())

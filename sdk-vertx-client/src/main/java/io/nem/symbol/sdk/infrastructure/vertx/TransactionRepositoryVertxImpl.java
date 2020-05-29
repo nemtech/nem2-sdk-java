@@ -80,7 +80,7 @@ public class TransactionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
     }
 
     @Override
-    public Observable<Page<Transaction>> searchTransactions(TransactionSearchCriteria criteria) {
+    public Observable<Page<Transaction>> search(TransactionSearchCriteria criteria) {
         Consumer<Handler<AsyncResult<TransactionPage>>> callback = handler -> getClient()
             .searchTransactions(toDto(criteria.getAddress()),
                 toDto(criteria.getRecipientAddress()),

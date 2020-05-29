@@ -24,6 +24,7 @@ import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.StringUtils;
 import io.nem.symbol.sdk.api.BinarySerialization;
 import io.nem.symbol.sdk.infrastructure.BinarySerializationImpl;
+import io.nem.symbol.sdk.model.Stored;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.network.NetworkType;
@@ -35,7 +36,7 @@ import java.util.Optional;
  *
  * @since 1.0
  */
-public abstract class Transaction {
+public abstract class Transaction implements Stored {
 
     /**
      * The BinarySerialization object.
@@ -103,9 +104,8 @@ public abstract class Transaction {
     }
 
     /**
-     * Returns the fee for the transaction. The higher the fee, the higher the priority of the
-     * transaction. Transactions with high priority get included in a block before transactions with
-     * lower priority.
+     * Returns the fee for the transaction. The higher the fee, the higher the priority of the transaction. Transactions
+     * with high priority get included in a block before transactions with lower priority.
      *
      * @return fee amount
      */
@@ -141,8 +141,7 @@ public abstract class Transaction {
     }
 
     /**
-     * Serialises a transaction model into binary (unsigned payload). Gets the serialised bytes for
-     * a transaction.
+     * Serialises a transaction model into binary (unsigned payload). Gets the serialised bytes for a transaction.
      *
      * @return bytes of the transaction
      */
@@ -281,4 +280,11 @@ public abstract class Transaction {
         return !this.getTransactionInfo().isPresent();
     }
 
+    /**
+     * @return the database id if known.
+     */
+    @Override
+    public Optional<String> getDatabaseId() {
+        return this.getTransactionInfo().flatMap(TransactionInfo::getId);
+    }
 }

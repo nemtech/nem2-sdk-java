@@ -164,7 +164,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
         mockRemoteCall(toPage(dto));
 
         List<BlockInfo> resolvedList = repository
-            .searchBlocks(new BlockSearchCriteria().offset("abc")).toFuture().get()
+            .search(new BlockSearchCriteria().offset("abc")).toFuture().get()
             .getData();
 
         BlockInfo info = resolvedList.get(0);

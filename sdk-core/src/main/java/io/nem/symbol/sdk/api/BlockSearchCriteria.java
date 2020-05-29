@@ -5,7 +5,7 @@ import io.nem.symbol.core.crypto.PublicKey;
 /**
  * Criteria used to search blocks
  */
-public class BlockSearchCriteria extends SearchCriteria{
+public class BlockSearchCriteria extends SearchCriteria {
 
     /**
      * Search block by signer.
@@ -59,6 +59,7 @@ public class BlockSearchCriteria extends SearchCriteria{
     public void setOffset(String offset) {
         this.offset = offset;
     }
+
     /**
      * Sets the signerPublicKey builder style.
      *

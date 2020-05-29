@@ -33,9 +33,7 @@ import io.nem.symbol.sdk.model.mosaic.NetworkCurrencyBuilder;
 import io.nem.symbol.sdk.model.namespace.NamespaceName;
 import io.nem.symbol.sdk.model.network.ChainProperties;
 import io.nem.symbol.sdk.model.network.NetworkConfiguration;
-import io.nem.symbol.sdk.model.network.NetworkProperties;
 import io.nem.symbol.sdk.model.network.NetworkType;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.NetworkConfigurationDTO;
 import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.Collections;
@@ -166,7 +164,7 @@ public class RepositoryFactoryOkHttpImplTest {
         MosaicRepository mosaicRepositoryMock = Mockito.mock(MosaicRepository.class);
 
         MosaicId networkMosaicId = new MosaicId("62EF46FD6555AAAA");
-        MosaicInfo networkMosaic = MosaicInfo.create(networkMosaicId, BigInteger.valueOf(1),
+        MosaicInfo networkMosaic = new MosaicInfo("abc", networkMosaicId, BigInteger.valueOf(1),
             BigInteger.valueOf(2),
             Account.generateNewAccount(NetworkType.MIJIN_TEST).getPublicAccount(), 4,
             MosaicFlags.create(true, false, true), 5, BigInteger.valueOf(10));
@@ -174,7 +172,7 @@ public class RepositoryFactoryOkHttpImplTest {
             .thenReturn(Observable.just(networkMosaic));
 
         MosaicId harvestMosaicId = new MosaicId("62EF46FD6555BBBB");
-        MosaicInfo harvestMosaic = MosaicInfo.create(harvestMosaicId, BigInteger.valueOf(1),
+        MosaicInfo harvestMosaic = new MosaicInfo("abc", harvestMosaicId, BigInteger.valueOf(1),
             BigInteger.valueOf(2),
             Account.generateNewAccount(NetworkType.MIJIN_TEST).getPublicAccount(), 10,
             MosaicFlags.create(false, true, false), 4, BigInteger.valueOf(20));
@@ -255,7 +253,7 @@ public class RepositoryFactoryOkHttpImplTest {
         MosaicRepository mosaicRepositoryMock = Mockito.mock(MosaicRepository.class);
 
         MosaicId networkMosaicId = new MosaicId("62EF46FD6555AAAA");
-        MosaicInfo networkMosaic = MosaicInfo.create(networkMosaicId, BigInteger.valueOf(1),
+        MosaicInfo networkMosaic = new MosaicInfo("abc", networkMosaicId, BigInteger.valueOf(1),
             BigInteger.valueOf(2),
             Account.generateNewAccount(NetworkType.MIJIN_TEST).getPublicAccount(), 4,
             MosaicFlags.create(true, false, true), 5, BigInteger.valueOf(10));

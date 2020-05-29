@@ -16,7 +16,6 @@
 
 package io.nem.symbol.sdk.api;
 
-import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
 import io.reactivex.Observable;
@@ -27,7 +26,7 @@ import java.util.List;
  *
  * @since 1.0
  */
-public interface MosaicRepository {
+public interface MosaicRepository extends Searcher<MosaicInfo, MosaicSearchCriteria> {
 
     /**
      * Gets a MosaicInfo for a given mosaicId
@@ -44,15 +43,5 @@ public interface MosaicRepository {
      * @return {@link Observable} of {@link MosaicInfo} List
      */
     Observable<List<MosaicInfo>> getMosaics(List<MosaicId> mosaicIds);
-
-
-    /**
-     * It searches mosaics based on a criteria.
-     *
-     * @param criteria the criteria
-     * @return a page of mosaic infos.
-     */
-    Observable<Page<MosaicInfo>> searchMosaics(MosaicSearchCriteria criteria);
-
 
 }

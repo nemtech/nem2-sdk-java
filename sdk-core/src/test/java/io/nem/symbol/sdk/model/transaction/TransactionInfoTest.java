@@ -55,12 +55,13 @@ public class TransactionInfoTest {
             TransactionInfo.create(
                 new BigInteger("121855"),
                 1,
+                "ABC",
                 "B6C7648A3DDF71415650805E9E7801424FE03BBEE7D21F9C57B60220D3E95B2F",
                 "B6C7648A3DDF71415650805E9E7801424FE03BBEE7D21F9C57B60220D3E95B2F");
 
         assertEquals(new BigInteger("121855"), transactionInfo.getHeight());
         assertTrue(transactionInfo.getIndex().isPresent());
-        assertFalse(transactionInfo.getId().isPresent());
+        assertEquals("ABC", transactionInfo.getId().get());
         assertFalse(transactionInfo.getAggregateHash().isPresent());
         assertFalse(transactionInfo.getAggregateId().isPresent());
         assertTrue(transactionInfo.getHash().isPresent());

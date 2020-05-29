@@ -90,7 +90,7 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl imple
 
 
     @Override
-    public Observable<Page<MosaicInfo>> searchMosaics(MosaicSearchCriteria criteria) {
+    public Observable<Page<MosaicInfo>> search(MosaicSearchCriteria criteria) {
         Consumer<Handler<AsyncResult<MosaicPage>>> callback = handler -> getClient()
             .searchMosaics(toDto(criteria.getOwnerAddress()),
                 criteria.getPageSize(),
@@ -105,11 +105,12 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl imple
 
 
     private MosaicInfo createMosaicInfo(MosaicInfoDTO mosaicInfoDTO, NetworkType networkType) {
-        return createMosaicInfo(mosaicInfoDTO.getMosaic(), networkType);
+        return createMosaicInfo(mosaicInfoDTO.getMosaic(),mosaicInfoDTO.getId(), networkType);
     }
 
-    private MosaicInfo createMosaicInfo(MosaicDTO mosaic, NetworkType networkType) {
-        return MosaicInfo.create(
+    private MosaicInfo createMosaicInfo(MosaicDTO mosaic, String databaseId, NetworkType networkType) {
+        return new MosaicInfo(
+            databaseId,
             toMosaicId(mosaic.getId()),
             mosaic.getSupply(),
             mosaic.getStartHeight(),

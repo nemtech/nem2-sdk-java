@@ -38,7 +38,6 @@ import io.vertx.core.Handler;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -65,10 +64,10 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
     }
 
     @Override
-    public Observable<Page<BlockInfo>> searchBlocks(BlockSearchCriteria criteria) {
+    public Observable<Page<BlockInfo>> search(BlockSearchCriteria criteria) {
         Consumer<Handler<AsyncResult<BlockPage>>> callback = handler -> getClient()
             .searchBlocks(toDto(criteria.getSignerPublicKey()),
-                toDto(criteria.getSignerPublicKey()),
+                toDto(criteria.getBeneficiaryPublicKey()),
                 criteria.getPageSize(),
                 criteria.getPageNumber(), criteria.getOffset(),
                 toDto(criteria.getOrder()), toDto(criteria.getOrderBy()),handler);
@@ -106,7 +105,7 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
 
     public static BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO) {
         return BlockInfo.create(
-            blockInfoDTO.getMeta().getHash(),
+            blockInfoDTO.getId(), blockInfoDTO.getMeta().getHash(),
             blockInfoDTO.getMeta().getGenerationHash(),
             blockInfoDTO.getMeta().getTotalFee(),
             blockInfoDTO.getMeta().getNumTransactions(),

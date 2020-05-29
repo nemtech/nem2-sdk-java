@@ -34,7 +34,8 @@ class MosaicInfoTest {
         MosaicId mosaicId = new MosaicId(new BigInteger("-3087871471161192663"));
 
         MosaicInfo mosaicInfo =
-            MosaicInfo.create(
+            new MosaicInfo(
+                "abc",
                 mosaicId,
                 new BigInteger("100"),
                 new BigInteger("0"),
@@ -58,6 +59,7 @@ class MosaicInfoTest {
         assertTrue(mosaicInfo.isTransferable());
         assertEquals(3, mosaicInfo.getDivisibility());
         assertEquals(BigInteger.valueOf(10), mosaicInfo.getDuration());
+        assertEquals("abc", mosaicInfo.getDatabaseId().get());
     }
 
     @Test
@@ -66,7 +68,7 @@ class MosaicInfoTest {
             MosaicFlags.create(true, true, true);
 
         MosaicInfo mosaicInfo =
-            MosaicInfo.create(
+            new MosaicInfo("abc",
                 new MosaicId(new BigInteger("-3087871471161192663")),
                 new BigInteger("100"),
                 new BigInteger("0"),
@@ -87,7 +89,7 @@ class MosaicInfoTest {
             MosaicFlags.create(false, true, true);
 
         MosaicInfo mosaicInfo =
-            MosaicInfo.create(
+            new MosaicInfo("abc",
                 new MosaicId(new BigInteger("-3087871471161192663")),
                 new BigInteger("100"),
                 new BigInteger("0"),
@@ -108,7 +110,7 @@ class MosaicInfoTest {
             MosaicFlags.create(true, true, true);
 
         MosaicInfo mosaicInfo =
-            MosaicInfo.create(
+            new MosaicInfo("abc",
                 new MosaicId(new BigInteger("-3087871471161192663")),
                 new BigInteger("100"),
                 new BigInteger("0"),
@@ -129,7 +131,7 @@ class MosaicInfoTest {
             MosaicFlags.create(true, false, true);
 
         MosaicInfo mosaicInfo =
-            MosaicInfo.create(
+            new MosaicInfo("abc",
                 new MosaicId(new BigInteger("-3087871471161192663")),
                 new BigInteger("100"),
                 new BigInteger("0"),
@@ -150,7 +152,7 @@ class MosaicInfoTest {
             MosaicFlags.create(true, true, true);
 
         MosaicInfo mosaicInfo =
-            MosaicInfo.create(
+            new MosaicInfo("abc",
                 new MosaicId(new BigInteger("-3087871471161192663")),
                 new BigInteger("100"),
                 new BigInteger("0"),
@@ -171,7 +173,7 @@ class MosaicInfoTest {
             MosaicFlags.create(true, true, false);
 
         MosaicInfo mosaicInfo =
-            MosaicInfo.create(
+            new MosaicInfo("abc",
                 new MosaicId(new BigInteger("-3087871471161192663")),
                 new BigInteger("100"),
                 new BigInteger("0"),

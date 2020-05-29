@@ -235,7 +235,7 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
      * @return the list of all the transaction of the given height starting from from id
      */
     private Observable<List<Transaction>> getBlockTransactions(BigInteger height, int pageNumber) {
-        return this.transactionRepository.searchTransactions(
+        return this.transactionRepository.search(
             new TransactionSearchCriteria().height(height).pageNumber(pageNumber))
             .flatMap(page -> {
                 if (page.getPageNumber() <= pageNumber) {

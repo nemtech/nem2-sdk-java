@@ -48,6 +48,7 @@ class BlockInfoTest {
     private String proofGamma = "proofGamma";
     private String proofScalar = "proofScalar";
     private String proofVerificationHash = "proofVerificationHash";
+    private String id;
 
     @BeforeAll
     void setup() {
@@ -63,8 +64,10 @@ class BlockInfoTest {
         stateHash = "702090BA31CEF9E90C62BBDECC0CCCC0F88192B6625839382850357F70DD68A0";
         subCacheMerkleRoots = new ArrayList<>();
         beneficiaryPublicKey = "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF";
+        id = "abc";
         blockInfo =
             BlockInfo.create(
+                id,
                 hash,
                 generationHash,
                 BigInteger.ZERO,
@@ -117,5 +120,6 @@ class BlockInfoTest {
         assertEquals(proofGamma, blockInfo.getProofGamma());
         assertEquals(proofScalar, blockInfo.getProofScalar());
         assertEquals(proofVerificationHash, blockInfo.getProofVerificationHash());
+        assertEquals("abc", blockInfo.getDatabaseId().get());
     }
 }

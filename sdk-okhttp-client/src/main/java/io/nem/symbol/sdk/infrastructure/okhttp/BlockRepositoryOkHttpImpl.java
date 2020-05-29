@@ -56,6 +56,7 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
 
     public static BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO) {
         return BlockInfo.create(
+            blockInfoDTO.getId(),
             blockInfoDTO.getMeta().getHash(),
             blockInfoDTO.getMeta().getGenerationHash(),
             blockInfoDTO.getMeta().getTotalFee(),
@@ -88,10 +89,10 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
     }
 
     @Override
-    public Observable<Page<BlockInfo>> searchBlocks(BlockSearchCriteria criteria) {
+    public Observable<Page<BlockInfo>> search(BlockSearchCriteria criteria) {
         Callable<BlockPage> callback = () -> getClient()
             .searchBlocks(toDto(criteria.getSignerPublicKey()),
-                toDto(criteria.getSignerPublicKey()),
+                toDto(criteria.getBeneficiaryPublicKey()),
                 criteria.getPageSize(),
                 criteria.getPageNumber(), criteria.getOffset(),
                 toDto(criteria.getOrder()), toDto(criteria.getOrderBy()));
