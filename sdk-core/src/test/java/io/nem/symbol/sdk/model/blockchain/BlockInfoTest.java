@@ -120,6 +120,6 @@ class BlockInfoTest {
         assertEquals(proofGamma, blockInfo.getProofGamma());
         assertEquals(proofScalar, blockInfo.getProofScalar());
         assertEquals(proofVerificationHash, blockInfo.getProofVerificationHash());
-        assertEquals("abc", blockInfo.getDatabaseId().get());
+        assertEquals("abc", blockInfo.getRecordId().get());
     }
 }

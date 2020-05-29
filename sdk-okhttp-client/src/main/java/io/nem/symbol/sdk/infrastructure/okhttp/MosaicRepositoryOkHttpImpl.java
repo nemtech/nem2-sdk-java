@@ -101,9 +101,9 @@ public class MosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imp
         return createMosaicInfo(mosaicInfoDTO.getMosaic(),mosaicInfoDTO.getId(), networkType);
     }
 
-    private MosaicInfo createMosaicInfo(MosaicDTO mosaic, String databaseId, NetworkType networkType) {
+    private MosaicInfo createMosaicInfo(MosaicDTO mosaic, String recordId, NetworkType networkType) {
         return new MosaicInfo(
-            databaseId,
+            recordId,
             toMosaicId(mosaic.getId()),
             mosaic.getSupply(),
             mosaic.getStartHeight(),

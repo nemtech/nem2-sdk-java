@@ -15,10 +15,10 @@ import java.util.Optional;
 public interface Stored {
 
     /**
-     * Returns database id of the entity.
+     * Returns database record id of the entity.
      *
-     * @return The database id of the entity if it's known.
+     * @return The record id of the entity if it's known.
      */
-    Optional<String> getDatabaseId();
+    Optional<String> getRecordId();
 
 }

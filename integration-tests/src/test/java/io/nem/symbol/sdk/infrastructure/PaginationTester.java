@@ -28,8 +28,8 @@ public class PaginationTester<E extends Stored, C extends SearchCriteria> {
     }
 
     public static <E extends Stored> void sameEntities(List<E> firstList, List<E> secondList) {
-        Assertions.assertEquals(firstList.stream().map(Stored::getDatabaseId).collect(Collectors.toList()),
-            secondList.stream().map(Stored::getDatabaseId).collect(Collectors.toList()));
+        Assertions.assertEquals(firstList.stream().map(Stored::getRecordId).collect(Collectors.toList()),
+            secondList.stream().map(Stored::getRecordId).collect(Collectors.toList()));
     }
 
     public void basicTestSearch(Integer pageSizeParam) {
@@ -96,6 +96,6 @@ public class PaginationTester<E extends Stored, C extends SearchCriteria> {
     }
 
     private String getDatabaseId(Stored stored) {
-        return stored.getDatabaseId().orElseThrow(IllegalStateException::new);
+        return stored.getRecordId().orElseThrow(IllegalStateException::new);
     }
 }

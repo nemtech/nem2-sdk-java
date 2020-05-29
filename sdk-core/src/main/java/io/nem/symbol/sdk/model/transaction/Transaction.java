@@ -284,7 +284,7 @@ public abstract class Transaction implements Stored {
      * @return the database id if known.
      */
     @Override
-    public Optional<String> getDatabaseId() {
+    public Optional<String> getRecordId() {
         return this.getTransactionInfo().flatMap(TransactionInfo::getId);
     }
 }

@@ -28,7 +28,7 @@ import java.util.Optional;
  */
 public class BlockInfo implements Stored {
 
-    private final String databaseId;
+    private final String recordId;
     private final String hash;
     private final String generationHash;
     private final BigInteger totalFee;
@@ -55,7 +55,7 @@ public class BlockInfo implements Stored {
 
     @SuppressWarnings("squid:S00107")
     private BlockInfo(
-        String databaseId,
+        String recordId,
         String hash,
         String generationHash,
         BigInteger totalFee,
@@ -79,7 +79,7 @@ public class BlockInfo implements Stored {
         String proofScalar,
         String proofVerificationHash,
         PublicAccount beneficiaryPublicAccount) {
-        this.databaseId = databaseId;
+        this.recordId = recordId;
         this.hash = hash;
         this.generationHash = generationHash;
         this.totalFee = totalFee;
@@ -107,7 +107,7 @@ public class BlockInfo implements Stored {
 
     @SuppressWarnings("squid:S00107")
     public static BlockInfo create(
-        String databaseId, String hash,
+        String recordId, String hash,
         String generationHash,
         BigInteger totalFee,
         Integer numTransactions,
@@ -134,7 +134,7 @@ public class BlockInfo implements Stored {
         PublicAccount beneficiaryPublicAccount = beneficiaryPublicKey == null ? null :
             BlockInfo.getPublicAccount(beneficiaryPublicKey, networkType);
         return new BlockInfo(
-            databaseId,
+            recordId,
             hash,
             generationHash,
             totalFee,
@@ -401,7 +401,7 @@ public class BlockInfo implements Stored {
      *
      * @return The database id of the block.
      */
-    public Optional<String> getDatabaseId() {
-        return Optional.ofNullable(databaseId);
+    public Optional<String> getRecordId() {
+        return Optional.ofNullable(recordId);
     }
 }

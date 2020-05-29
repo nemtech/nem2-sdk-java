@@ -18,18 +18,13 @@ package io.nem.symbol.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.nem.symbol.sdk.api.BlockPaginationStreamer;
-import io.nem.symbol.sdk.api.BlockRepository;
-import io.nem.symbol.sdk.api.BlockSearchCriteria;
 import io.nem.symbol.sdk.api.MosaicPaginationStreamer;
 import io.nem.symbol.sdk.api.MosaicRepository;
 import io.nem.symbol.sdk.api.MosaicSearchCriteria;
-import io.nem.symbol.sdk.api.OrderBy;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.blockchain.BlockDuration;
-import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
@@ -39,7 +34,6 @@ import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransactionFactory;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
@@ -221,7 +215,7 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
         criteria.setPageSize(10);
         int offsetIndex = 2;
         List<MosaicInfo> mosaicsWithoutOffset = get(streamer.search(criteria).toList().toObservable());
-        criteria.setOffset(mosaicsWithoutOffset.get(offsetIndex).getDatabaseId().get());
+        criteria.setOffset(mosaicsWithoutOffset.get(offsetIndex).getRecordId().get());
 
         List<MosaicInfo> mosaicFromOffsets = get(streamer.search(criteria).toList().toObservable());
         PaginationTester.sameEntities(mosaicsWithoutOffset.stream().skip(offsetIndex + 1).collect(Collectors.toList()), mosaicFromOffsets);

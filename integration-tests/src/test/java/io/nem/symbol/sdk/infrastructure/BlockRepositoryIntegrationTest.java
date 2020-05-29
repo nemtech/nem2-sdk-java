@@ -26,7 +26,6 @@ import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.BlockSearchCriteria;
 import io.nem.symbol.sdk.api.OrderBy;
 import io.nem.symbol.sdk.api.RepositoryCallException;
-import io.nem.symbol.sdk.model.Stored;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import java.math.BigInteger;
 import java.util.Comparator;
@@ -181,7 +180,7 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
         criteria.setPageSize(10);
         int offsetIndex = 2;
         List<BlockInfo> blocksWithoutOffset = get(streamer.search(criteria).toList().toObservable());
-        criteria.setOffset(blocksWithoutOffset.get(offsetIndex).getDatabaseId().get());
+        criteria.setOffset(blocksWithoutOffset.get(offsetIndex).getRecordId().get());
         List<BlockInfo> blockFromOffsets = get(streamer.search(criteria).toList().toObservable());
         PaginationTester.sameEntities(blocksWithoutOffset.stream().skip(offsetIndex + 1).collect(Collectors.toList()), blockFromOffsets);
     }

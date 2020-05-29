@@ -30,7 +30,7 @@ public class MosaicInfo implements Stored {
     /**
      * The database id.
      */
-    private final String databaseId;
+    private final String recordId;
     private final MosaicId mosaicId;
     private final BigInteger supply;
     private final BigInteger startHeight;
@@ -41,10 +41,10 @@ public class MosaicInfo implements Stored {
     private final BigInteger duration;
 
     @SuppressWarnings("squid:S00107")
-    public MosaicInfo(final String databaseId, final MosaicId mosaicId, final BigInteger supply,
+    public MosaicInfo(final String recordId, final MosaicId mosaicId, final BigInteger supply,
         final BigInteger startHeight, final PublicAccount owner, final Integer revision,
         final MosaicFlags mosaicFlags, final int divisibility, final BigInteger duration) {
-        this.databaseId = databaseId;
+        this.recordId = recordId;
         this.mosaicId = mosaicId;
         this.supply = supply;
         this.startHeight = startHeight;
@@ -148,7 +148,7 @@ public class MosaicInfo implements Stored {
     /**
      * @return the internal database id.
      */
-    public Optional<String> getDatabaseId() {
-        return Optional.ofNullable(databaseId);
+    public Optional<String> getRecordId() {
+        return Optional.ofNullable(recordId);
     }
 }

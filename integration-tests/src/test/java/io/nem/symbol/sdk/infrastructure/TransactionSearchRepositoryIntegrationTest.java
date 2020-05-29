@@ -81,7 +81,7 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
         criteria.setPageSize(10);
         int offsetIndex = 2;
         List<Transaction> transactionsWithoutOffset = get(streamer.search(criteria).toList().toObservable());
-        criteria.setOffset(transactionsWithoutOffset.get(offsetIndex).getDatabaseId().get());
+        criteria.setOffset(transactionsWithoutOffset.get(offsetIndex).getRecordId().get());
         List<Transaction> transactionFromOffsets = get(streamer.search(criteria).toList().toObservable());
         PaginationTester
             .sameEntities(transactionsWithoutOffset.stream().skip(offsetIndex + 1).collect(Collectors.toList()),

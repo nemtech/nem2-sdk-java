@@ -59,7 +59,7 @@ class MosaicInfoTest {
         assertTrue(mosaicInfo.isTransferable());
         assertEquals(3, mosaicInfo.getDivisibility());
         assertEquals(BigInteger.valueOf(10), mosaicInfo.getDuration());
-        assertEquals("abc", mosaicInfo.getDatabaseId().get());
+        assertEquals("abc", mosaicInfo.getRecordId().get());
     }
 
     @Test

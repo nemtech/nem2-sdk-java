@@ -165,7 +165,7 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
     public TransactionInfoDTO map(Transaction transaction) {
         TransactionInfoDTO dto = new TransactionInfoDTO();
         dto.setMeta(createTransactionInfo(transaction));
-        dto.setId(transaction.getDatabaseId().orElse(null));
+        dto.setId(transaction.getRecordId().orElse(null));
         dto.setTransaction(mapTransaction(transaction, false));
         return dto;
     }
