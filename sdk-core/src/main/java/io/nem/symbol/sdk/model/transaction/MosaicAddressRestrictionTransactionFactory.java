@@ -26,7 +26,8 @@ import org.apache.commons.lang3.Validate;
  * Factory of {@link MosaicAddressRestrictionTransaction}
  */
 public class MosaicAddressRestrictionTransactionFactory
-    extends TransactionFactory<MosaicAddressRestrictionTransaction> {
+    extends TransactionFactory<MosaicAddressRestrictionTransaction> implements
+    TargetAddressTransaction {
 
     private final UnresolvedMosaicId mosaicId;
     private final BigInteger restrictionKey;
@@ -76,7 +77,8 @@ public class MosaicAddressRestrictionTransactionFactory
         BigInteger restrictionKey,
         UnresolvedAddress targetAddress,
         BigInteger newRestrictionValue) {
-        return new MosaicAddressRestrictionTransactionFactory(networkType, mosaicId, restrictionKey, targetAddress, newRestrictionValue);
+        return new MosaicAddressRestrictionTransactionFactory(networkType, mosaicId, restrictionKey,
+            targetAddress, newRestrictionValue);
     }
 
     @Override
@@ -107,6 +109,7 @@ public class MosaicAddressRestrictionTransactionFactory
      *
      * @return {@link UnresolvedAddress}
      */
+    @Override
     public UnresolvedAddress getTargetAddress() {
         return targetAddress;
     }
@@ -122,6 +125,7 @@ public class MosaicAddressRestrictionTransactionFactory
 
     /**
      * It sets the previoudRestrictionValue when necessary.
+     *
      * @param previousRestrictionValue the previous restriction value
      * @return this factory.
      */

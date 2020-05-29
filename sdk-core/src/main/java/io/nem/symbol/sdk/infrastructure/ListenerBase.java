@@ -18,22 +18,32 @@ package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.Listener;
+import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
+import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.namespace.NamespaceName;
+import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
+import io.nem.symbol.sdk.model.transaction.MetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransaction;
+import io.nem.symbol.sdk.model.transaction.PublicKeyLinkTransaction;
+import io.nem.symbol.sdk.model.transaction.RecipientTransaction;
+import io.nem.symbol.sdk.model.transaction.TargetAddressTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionStatusError;
 import io.nem.symbol.sdk.model.transaction.TransactionStatusException;
-import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import java.math.BigInteger;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -45,13 +55,15 @@ public abstract class ListenerBase implements Listener {
 
     private final Subject<ListenerMessage> messageSubject = PublishSubject.create();
 
-
     private final JsonHelper jsonHelper;
+    private final NamespaceRepository namespaceRepository;
 
     private String uid;
 
-    protected ListenerBase(JsonHelper jsonHelper) {
+    protected ListenerBase(JsonHelper jsonHelper,
+        NamespaceRepository namespaceRepository) {
         this.jsonHelper = jsonHelper;
+        this.namespaceRepository = namespaceRepository;
     }
 
     /**
@@ -102,140 +114,68 @@ public abstract class ListenerBase implements Listener {
             .map(rawMessage -> (BlockInfo) rawMessage.getMessage());
     }
 
-    /**
-     * Returns an observable stream of Transaction for a specific address. Each time a transaction
-     * is in confirmed state an it involves the address, it emits a new Transaction in the event
-     * stream.
-     *
-     * @param address address we listen when a transaction is in confirmed state
-     * @return an observable stream of Transaction with state confirmed
-     */
     @Override
-    public Observable<Transaction> confirmed(final Address address) {
-        Validate.notNull(address, "Address is required");
-        validateOpen();
-        this.subscribeTo(ListenerChannel.CONFIRMED_ADDED.toString() + "/" + address.plain());
-        return getMessageSubject()
-            .filter(rawMessage -> rawMessage.getChannel().equals(ListenerChannel.CONFIRMED_ADDED))
-            .map(rawMessage -> (Transaction) rawMessage.getMessage())
-            .filter(transaction -> this.transactionFromAddress(transaction, address));
+    public Observable<Transaction> confirmed(final Address address, final String transactionHash) {
+        return subscribeTransaction(ListenerChannel.CONFIRMED_ADDED, address, transactionHash);
     }
 
-
-    /**
-     * Returns an observable stream of Transaction for a specific address. Each time a transaction
-     * is in unconfirmed state an it involves the address, it emits a new Transaction in the event
-     * stream.
-     *
-     * @param address address we listen when a transaction is in unconfirmed state
-     * @return an observable stream of Transaction with state unconfirmed
-     */
     @Override
-    public Observable<Transaction> unconfirmedAdded(Address address) {
-        Validate.notNull(address, "Address is required");
-        validateOpen();
-        this.subscribeTo(ListenerChannel.UNCONFIRMED_ADDED + "/" + address.plain());
-        return getMessageSubject()
-            .filter(rawMessage -> rawMessage.getChannel().equals(ListenerChannel.UNCONFIRMED_ADDED))
-            .map(rawMessage -> (Transaction) rawMessage.getMessage())
-            .filter(transaction -> this.transactionFromAddress(transaction, address));
+    public Observable<Transaction> confirmedOrError(Address address, String transactionHash) {
+        // I may move this method to the Listener
+        Validate.notNull(transactionHash, "TransactionHash is required");
+        return getTransactionOrRaiseError(address, transactionHash,
+            confirmed(address, transactionHash));
     }
 
-    /**
-     * Returns an observable stream of Transaction Hashes for specific address. Each time a
-     * transaction with state unconfirmed changes its state, it emits a new message with the
-     * transaction hash in the event stream.
-     *
-     * @param address address we listen when a transaction is removed from unconfirmed state
-     * @return an observable stream of Strings with the transaction hash
-     */
     @Override
-    public Observable<String> unconfirmedRemoved(Address address) {
-        Validate.notNull(address, "Address is required");
-        validateOpen();
-        this.subscribeTo(ListenerChannel.UNCONFIRMED_REMOVED + "/" + address.plain());
-        return getMessageSubject()
-            .filter(
-                rawMessage -> rawMessage.getChannel().equals(ListenerChannel.UNCONFIRMED_REMOVED))
-            .map(rawMessage -> (String) rawMessage.getMessage());
+    public Observable<Transaction> unconfirmedAdded(Address address, String transactionHash) {
+        return subscribeTransaction(ListenerChannel.UNCONFIRMED_ADDED, address, transactionHash);
     }
 
-    /**
-     * Return an observable of {@link AggregateTransaction} for specific address. Each time an
-     * aggregate bonded transaction is announced, it emits a new {@link AggregateTransaction} in the
-     * event stream.
-     *
-     * @param address address we listen when a transaction with missing signatures state
-     * @return an observable stream of AggregateTransaction with missing signatures state
-     */
     @Override
-    public Observable<AggregateTransaction> aggregateBondedAdded(Address address) {
-        Validate.notNull(address, "Address is required");
-        validateOpen();
-        this.subscribeTo(ListenerChannel.AGGREGATE_BONDED_ADDED + "/" + address.plain());
-        return getMessageSubject()
-            .filter(rawMessage -> rawMessage.getChannel()
-                .equals(ListenerChannel.AGGREGATE_BONDED_ADDED))
-            .map(rawMessage -> (AggregateTransaction) rawMessage.getMessage())
-            .filter(transaction -> this.transactionFromAddress(transaction, address));
+    public Observable<String> unconfirmedRemoved(Address address, String transactionHash) {
+        return subscribeTransactionHash(ListenerChannel.UNCONFIRMED_REMOVED, address,
+            transactionHash);
     }
 
-    /**
-     * Returns an observable stream of Transaction Hashes for specific address. Each time an
-     * aggregate bonded transaction is announced, it emits a new message with the transaction hash
-     * in the event stream.
-     *
-     * @param address address we listen when a transaction is confirmed or rejected
-     * @return an observable stream of Strings with the transaction hash
-     */
     @Override
-    public Observable<String> aggregateBondedRemoved(Address address) {
-        Validate.notNull(address, "Address is required");
-        validateOpen();
-        this.subscribeTo(ListenerChannel.AGGREGATE_BONDED_REMOVED + "/" + address.plain());
-        return getMessageSubject()
-            .filter(
-                rawMessage -> rawMessage.getChannel()
-                    .equals(ListenerChannel.AGGREGATE_BONDED_REMOVED))
-            .map(rawMessage -> (String) rawMessage.getMessage());
+    public Observable<AggregateTransaction> aggregateBondedAdded(Address address,
+        String transactionHash) {
+        return subscribeTransaction(ListenerChannel.AGGREGATE_BONDED_ADDED, address,
+            transactionHash);
     }
 
-    /**
-     * Returns an observable stream of {@link TransactionStatusError} for specific address. Each
-     * time a transaction contains an error, it emits a new message with the transaction status
-     * error in the event stream.
-     *
-     * @param address address we listen to be notified when some error happened
-     * @return an observable stream of {@link TransactionStatusError}
-     */
     @Override
-    public Observable<TransactionStatusError> status(Address address) {
+    public Observable<String> aggregateBondedRemoved(Address address, String transactionHash) {
+        return subscribeTransactionHash(ListenerChannel.AGGREGATE_BONDED_REMOVED, address,
+            transactionHash);
+    }
+
+    @Override
+    public Observable<TransactionStatusError> status(Address address, String transactionHash) {
         Validate.notNull(address, "Address is required");
         validateOpen();
         this.subscribeTo(ListenerChannel.STATUS + "/" + address.plain());
         return getMessageSubject()
             .filter(rawMessage -> rawMessage.getChannel().equals(ListenerChannel.STATUS))
             .map(rawMessage -> (TransactionStatusError) rawMessage.getMessage())
-            .filter(status -> address.equals(status.getAddress()));
+            .filter(status -> address.equals(status.getAddress()))
+            .filter(status -> transactionHash == null || transactionHash
+                .equalsIgnoreCase(status.getHash()));
     }
 
-    /**
-     * Returns an observable stream of {@link CosignatureSignedTransaction} for specific address.
-     * Each time a cosigner signs a transaction the address initialized, it emits a new message with
-     * the cosignatory signed transaction in the even stream.
-     *
-     * @param address address we listen when a cosignatory is added to some transaction address
-     * sent
-     * @return an observable stream of {@link CosignatureSignedTransaction}
-     */
     @Override
-    public Observable<CosignatureSignedTransaction> cosignatureAdded(Address address) {
+    public Observable<CosignatureSignedTransaction> cosignatureAdded(Address address,
+        String parentTransactionHash) {
         Validate.notNull(address, "Address is required");
         validateOpen();
-        this.subscribeTo(ListenerChannel.COSIGNATURE + "/" + address.plain());
+        ListenerChannel channel = ListenerChannel.COSIGNATURE;
+        this.subscribeTo(channel + "/" + address.plain());
         return getMessageSubject()
-            .filter(rawMessage -> rawMessage.getChannel().equals(ListenerChannel.COSIGNATURE))
-            .map(rawMessage -> (CosignatureSignedTransaction) rawMessage.getMessage());
+            .filter(rawMessage -> rawMessage.getChannel().equals(channel))
+            .map(rawMessage -> (CosignatureSignedTransaction) rawMessage.getMessage())
+            .filter(status -> parentTransactionHash == null || parentTransactionHash
+                .equalsIgnoreCase(status.getParentHash()));
     }
 
     private void validateOpen() {
@@ -246,45 +186,18 @@ public abstract class ListenerBase implements Listener {
     }
 
     @Override
-    public Observable<Transaction> confirmed(Address address, String transactionHash) {
-
-        // I may move this method to the Listener
-        Validate.notNull(address, "Address is required");
-        Validate.notNull(transactionHash, "TransactionHash is required");
-
-        Observable<Transaction> transactionListener = confirmed(address)
-            .filter(t -> t.getTransactionInfo()
-                .filter(
-                    info -> info.getHash().filter(transactionHash::equalsIgnoreCase).isPresent())
-                .isPresent());
-
-        return getTransactionOrRaiseError(address, transactionHash, transactionListener);
-    }
-
-    @Override
-    public Observable<AggregateTransaction> aggregateBondedAdded(Address address,
+    public Observable<AggregateTransaction> aggregateBondedAddedOrError(Address address,
         String transactionHash) {
-        Validate.notNull(address, "Address is required");
-        Validate.notNull(transactionHash, "TransactionHash is required");
-
-        // I may move this method to the Listener
-        Observable<AggregateTransaction> transactionListener = aggregateBondedAdded(address)
-            .filter(t -> t.getTransactionInfo()
-                .filter(
-                    info -> info.getHash().filter(transactionHash::equalsIgnoreCase).isPresent())
-                .isPresent());
-
-        return getTransactionOrRaiseError(address, transactionHash, transactionListener);
+        return getTransactionOrRaiseError(address, transactionHash,
+            aggregateBondedAdded(address, transactionHash));
     }
 
 
     private <T extends Transaction> Observable<T> getTransactionOrRaiseError(Address address,
         String transactionHash, Observable<T> transactionListener) {
-
         // I may move this method to the Listener
         IllegalStateException caller = new IllegalStateException("The Caller");
-        Observable<TransactionStatusError> errorListener = status(address)
-            .filter(m -> transactionHash.equalsIgnoreCase(m.getHash()));
+        Observable<TransactionStatusError> errorListener = status(address, transactionHash);
         Observable<Object> errorOrTransactionObservable = Observable
             .merge(transactionListener, errorListener).take(1);
         return errorOrTransactionObservable.map(errorOrTransaction -> {
@@ -298,30 +211,141 @@ public abstract class ListenerBase implements Listener {
     }
 
 
-    public boolean transactionFromAddress(final Transaction transaction, final Address address) {
+    private <T extends Transaction> Observable<T> subscribeTransaction(ListenerChannel channel,
+        Address address,
+        String transactionHash) {
+        Validate.notNull(address, "Address is required");
+        validateOpen();
+        this.subscribeTo(channel.toString() + "/" + address.plain());
+        return getMessageSubject()
+            .filter(rawMessage -> rawMessage.getChannel().equals(channel))
+            .map(rawMessage -> (T) rawMessage.getMessage())
+            .filter(t -> t.getTransactionInfo()
+                .filter(
+                    info -> transactionHash == null || info.getHash()
+                        .filter(transactionHash::equalsIgnoreCase).isPresent())
+                .isPresent())
+            .flatMap(transaction -> this.transactionFromAddress(transaction, address,
+                getNamespaceIds(address)).flatMap(
+                include -> include ? Observable.just(transaction) : Observable.empty()));
+    }
+
+    private Observable<String> subscribeTransactionHash(ListenerChannel channel, Address address,
+        String transactionHash) {
+        Validate.notNull(address, "Address is required");
+        validateOpen();
+        this.subscribeTo(channel + "/" + address.plain());
+        return getMessageSubject()
+            .filter(rawMessage -> rawMessage.getChannel().equals(channel))
+            .map(rawMessage -> (String) rawMessage.getMessage())
+            .filter(hash -> transactionHash == null || transactionHash.equalsIgnoreCase(hash));
+    }
+
+    public Observable<Boolean> transactionFromAddress(final Transaction transaction,
+        final Address address, final Observable<List<NamespaceId>> namespaceIdsObservable) {
         if (transaction.getSigner().filter(s -> s.getAddress().equals(address)).isPresent()) {
-            return true;
-        }
-
-        if (transaction instanceof TransferTransaction) {
-            return ((TransferTransaction) transaction).getRecipient().equals(address);
-        }
-
-        if (transaction instanceof MultisigAccountModificationTransaction) {
-            return ((MultisigAccountModificationTransaction) transaction).getPublicKeyAdditions()
-                .stream().anyMatch(m -> m.getAddress().equals(address));
+            return Observable.just(true);
         }
         if (transaction instanceof AggregateTransaction) {
             final AggregateTransaction aggregateTransaction = (AggregateTransaction) transaction;
             if (aggregateTransaction.getCosignatures()
                 .stream().anyMatch(c -> c.getSigner().getAddress().equals(address))) {
-                return true;
+                return Observable.just(true);
             }
             //Recursion...
-            return aggregateTransaction.getInnerTransactions()
-                .stream().anyMatch(t -> this.transactionFromAddress(t, address));
+            Observable<Transaction> innerTransactionObservable = Observable
+                .fromIterable(aggregateTransaction.getInnerTransactions());
+
+            return innerTransactionObservable
+                .flatMap(t -> this.transactionFromAddress(t, address, namespaceIdsObservable)
+                    .filter(a -> a))
+                .first(false).toObservable();
         }
-        return false;
+        if (transaction instanceof PublicKeyLinkTransaction) {
+            return Observable.just(Address.createFromPublicKey(
+                ((PublicKeyLinkTransaction) transaction).getLinkedPublicKey().toHex(),
+                transaction.getNetworkType()).equals(address));
+        }
+
+        if (transaction instanceof MetadataTransaction) {
+            MetadataTransaction metadataTransaction = (MetadataTransaction) transaction;
+            return Observable.just(
+                metadataTransaction.getTargetAccount().getAddress().equals(address));
+        }
+
+        if (transaction instanceof TargetAddressTransaction) {
+            TargetAddressTransaction targetAddressTransaction = (TargetAddressTransaction) transaction;
+            if (targetAddressTransaction.getTargetAddress() instanceof Address) {
+                return Observable.just(targetAddressTransaction.getTargetAddress().equals(address));
+            }
+            return namespaceIdsObservable
+                .map(namespaceIds -> namespaceIds
+                    .contains(targetAddressTransaction.getTargetAddress()));
+        }
+
+        if (transaction instanceof MultisigAccountModificationTransaction) {
+            MultisigAccountModificationTransaction multisigAccountModificationTransaction = (MultisigAccountModificationTransaction) transaction;
+            if (multisigAccountModificationTransaction.getPublicKeyAdditions().stream()
+                .anyMatch(a -> a.getAddress().equals(address))) {
+                return Observable.just(true);
+            }
+
+            return Observable
+                .just(multisigAccountModificationTransaction.getPublicKeyDeletions().stream()
+                    .anyMatch(a -> a.getAddress().equals(address)));
+
+        }
+
+        if (transaction instanceof AccountAddressRestrictionTransaction) {
+            AccountAddressRestrictionTransaction accountAddressRestrictionTransaction = (AccountAddressRestrictionTransaction) transaction;
+            if (accountAddressRestrictionTransaction.getRestrictionAdditions().contains(address)) {
+                return Observable.just(true);
+            }
+            if (accountAddressRestrictionTransaction.getRestrictionDeletions().contains(address)) {
+                return Observable.just(true);
+            }
+            return namespaceIdsObservable
+                .flatMap(namespaceIds -> {
+                    if (namespaceIds.stream().anyMatch(
+                        namespaceId -> accountAddressRestrictionTransaction
+                            .getRestrictionAdditions().contains(namespaceId))) {
+                        return Observable.just(true);
+                    }
+                    if (namespaceIds.stream().anyMatch(
+                        namespaceId -> accountAddressRestrictionTransaction
+                            .getRestrictionDeletions().contains(namespaceId))) {
+                        return Observable.just(true);
+                    }
+                    return Observable.just(false);
+                });
+        }
+
+        if (transaction instanceof RecipientTransaction) {
+            RecipientTransaction recipientTransaction = (RecipientTransaction) transaction;
+            if (recipientTransaction.getRecipient() instanceof NamespaceId) {
+                return namespaceIdsObservable
+                    .map(namespaceIds -> namespaceIds
+                        .contains(recipientTransaction.getRecipient()));
+            }
+            return Observable.just(recipientTransaction.getRecipient().equals(address));
+
+        }
+
+        return Observable.just(false);
+    }
+
+    /**
+     * Returns the namespaces ids for the given address.
+     *
+     * @param address the address
+     * @return observable of namespace ids.
+     */
+    private Observable<List<NamespaceId>> getNamespaceIds(Address address) {
+        return Observable.defer(() -> namespaceRepository
+            .getAccountsNames(Collections.singletonList(address)).map(
+                accountNames -> accountNames.stream()
+                    .flatMap(accountName -> accountName.getNames().stream().map(
+                        NamespaceName::getNamespaceId)).collect(Collectors.toList()))).cache();
     }
 
 

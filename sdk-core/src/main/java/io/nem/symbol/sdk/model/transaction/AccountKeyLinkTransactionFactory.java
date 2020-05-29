@@ -34,7 +34,7 @@ public class AccountKeyLinkTransactionFactory extends TransactionFactory<Account
         final PublicKey linkedPublicKey,
         final LinkAction linkAction) {
         super(TransactionType.ACCOUNT_KEY_LINK, networkType);
-        Validate.notNull(linkedPublicKey, "RemoteAccount must not be null");
+        Validate.notNull(linkedPublicKey, "LinkedPublicKey must not be null");
         Validate.notNull(linkAction, "LinkAction must not be null");
         this.linkedPublicKey = linkedPublicKey;
         this.linkAction = linkAction;

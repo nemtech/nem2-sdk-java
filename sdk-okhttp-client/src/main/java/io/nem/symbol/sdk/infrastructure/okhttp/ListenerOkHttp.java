@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import com.google.gson.JsonObject;
 import io.nem.symbol.sdk.api.Listener;
+import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.infrastructure.ListenerBase;
 import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.symbol.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
@@ -58,8 +59,9 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
      * @param url nis host
      * @param json gson's json.
      */
-    public ListenerOkHttp(OkHttpClient httpClient, String url, JSON json) {
-        super(new JsonHelperGson(json.getGson()));
+    public ListenerOkHttp(OkHttpClient httpClient, String url, JSON json,
+        NamespaceRepository namespaceRepository) {
+        super(new JsonHelperGson(json.getGson()), namespaceRepository);
         try {
             this.url = new URL(url);
         } catch (MalformedURLException e) {

@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.gson.JsonObject;
 import io.nem.symbol.sdk.api.Listener;
+import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.infrastructure.ListenerChannel;
 import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.symbol.sdk.model.account.Account;
@@ -62,6 +63,8 @@ public class ListenerOkHttpTest {
 
     private OkHttpClient httpClientMock;
 
+    private NamespaceRepository namespaceRepository;
+
     private WebSocket webSocketMock;
 
     private JsonHelper jsonHelper;
@@ -71,8 +74,9 @@ public class ListenerOkHttpTest {
     @BeforeEach
     public void setUp() {
         httpClientMock = Mockito.mock(OkHttpClient.class);
+        namespaceRepository = Mockito.mock(NamespaceRepository.class);
         String url = "http://nem.com:3000/";
-        listener = new ListenerOkHttp(httpClientMock, url, new JSON());
+        listener = new ListenerOkHttp(httpClientMock, url, new JSON(), namespaceRepository);
         jsonHelper = listener.getJsonHelper();
     }
 
@@ -208,7 +212,7 @@ public class ListenerOkHttpTest {
 
         List<Transaction> transactions = new ArrayList<>();
         List<Throwable> exceptions = new ArrayList<>();
-        listener.confirmed(address, transactionInfo.getMeta().getHash()).doOnError(exceptions::add)
+        listener.confirmedOrError(address, transactionInfo.getMeta().getHash()).doOnError(exceptions::add)
             .forEach(transactions::add);
 
         listener.handle(transactionInfoDtoJsonObject, null);
@@ -252,7 +256,7 @@ public class ListenerOkHttpTest {
 
         List<Transaction> transactions = new ArrayList<>();
         List<Throwable> exceptions = new ArrayList<>();
-        listener.confirmed(address, transactionInfo.getMeta().getHash()).doOnError(exceptions::add)
+        listener.confirmedOrError(address, transactionInfo.getMeta().getHash()).doOnError(exceptions::add)
             .forEach(transactions::add);
 
         listener.handle(transactionStatusError, null);
@@ -295,7 +299,7 @@ public class ListenerOkHttpTest {
 
         List<Transaction> transactions = new ArrayList<>();
         List<Throwable> exceptions = new ArrayList<>();
-        listener.aggregateBondedAdded(address, transactionInfo.getMeta().getHash())
+        listener.aggregateBondedAddedOrError(address, transactionInfo.getMeta().getHash())
             .doOnError(exceptions::add)
             .forEach(transactions::add);
 
@@ -340,7 +344,7 @@ public class ListenerOkHttpTest {
 
         List<Transaction> transactions = new ArrayList<>();
         List<Throwable> exceptions = new ArrayList<>();
-        listener.aggregateBondedAdded(address, transactionInfo.getMeta().getHash())
+        listener.aggregateBondedAddedOrError(address, transactionInfo.getMeta().getHash())
             .doOnError(exceptions::add)
             .forEach(transactions::add);
 

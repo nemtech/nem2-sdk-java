@@ -150,7 +150,7 @@ class TransactionServiceTest {
             Observable.just(transactionAnnounceResponse));
 
         Mockito
-            .when(listener.confirmed(Mockito.eq(account.getAddress()),
+            .when(listener.confirmedOrError(Mockito.eq(account.getAddress()),
                 Mockito.eq(signedTransaction.getHash())))
             .thenReturn(Observable.just(transferTransaction));
 
@@ -180,7 +180,7 @@ class TransactionServiceTest {
             Observable.just(aggregateTransactionAnnounceResponse));
 
         Mockito
-            .when(listener.aggregateBondedAdded(Mockito.eq(account.getAddress()),
+            .when(listener.aggregateBondedAddedOrError(Mockito.eq(account.getAddress()),
                 Mockito.eq(aggregateSignedTransaction.getHash())))
             .thenReturn(Observable.just(aggregateTransaction));
 
@@ -228,12 +228,12 @@ class TransactionServiceTest {
                 Observable.just(hashTransactionAnnounceResponse));
 
         Mockito
-            .when(listener.confirmed(Mockito.eq(account.getAddress()),
+            .when(listener.confirmedOrError(Mockito.eq(account.getAddress()),
                 Mockito.eq(hashLockSignedTranscation.getHash())))
             .thenReturn(Observable.just(hashLockTransaction));
 
         Mockito
-            .when(listener.aggregateBondedAdded(Mockito.eq(account.getAddress()),
+            .when(listener.aggregateBondedAddedOrError(Mockito.eq(account.getAddress()),
                 Mockito.eq(aggregateSignedTransaction.getHash())))
             .thenReturn(Observable.just(aggregateTransaction));
 
