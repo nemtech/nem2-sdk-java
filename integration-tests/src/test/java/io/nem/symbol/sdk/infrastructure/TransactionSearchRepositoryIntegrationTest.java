@@ -157,6 +157,45 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
         Assertions.assertTrue(transactions.isEmpty());
     }
 
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void searchEmbedded(RepositoryType type) {
+        TransactionRepository transactionRepository = getTransactionRepository(type);
+        TransactionPaginationStreamer streamer = new TransactionPaginationStreamer(transactionRepository);
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria();
+        criteria.setEmbedded(true);
+        List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
+        Assertions.assertFalse(transactions.isEmpty());
+
+        transactions.forEach(t -> {
+            Assertions.assertTrue(t.getTransactionInfo().isPresent());
+            Assertions.assertTrue(
+                t.getTransactionInfo().get().getHash().isPresent() || t.getTransactionInfo().get().getAggregateId()
+                    .isPresent());
+            Assertions.assertTrue(t.getTransactionInfo().get().getId().isPresent());
+            Assertions.assertNotNull(t.getTransactionInfo().get().getHeight());
+            Assertions.assertTrue(t.getTransactionInfo().get().getIndex().isPresent());
+            if (t.getTransactionInfo().get().getHash().isPresent()) {
+                Assertions.assertTrue(t.getTransactionInfo().get().getHash().isPresent());
+                Assertions.assertTrue(t.getTransactionInfo().get().getMerkleComponentHash().isPresent());
+                Assertions.assertFalse(t.getTransactionInfo().get().getAggregateHash().isPresent());
+                Assertions.assertFalse(t.getTransactionInfo().get().getAggregateId().isPresent());
+            }
+
+            if (t.getTransactionInfo().get().getAggregateHash().isPresent()) {
+                Assertions.assertFalse(t.getTransactionInfo().get().getHash().isPresent());
+                Assertions.assertFalse(t.getTransactionInfo().get().getMerkleComponentHash().isPresent());
+                Assertions.assertTrue(t.getTransactionInfo().get().getAggregateHash().isPresent());
+                Assertions.assertTrue(t.getTransactionInfo().get().getAggregateId().isPresent());
+            }
+            if (t.getType() == TransactionType.AGGREGATE_BONDED || t.getType() == TransactionType.AGGREGATE_COMPLETE) {
+                Assertions.assertThrows(IllegalArgumentException.class, t::getSize);
+            } else {
+                Assertions.assertTrue(t.getSize() > 0);
+            }
+        });
+    }
+
 
     private PaginationTester<Transaction, TransactionSearchCriteria> getPaginationTester(RepositoryType type) {
         return new PaginationTester<>(

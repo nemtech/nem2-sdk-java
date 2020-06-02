@@ -75,10 +75,11 @@ public interface JsonHelper {
      *
      * @param object the json object (like a json native object or a map)
      * @param instanceClass the class of the converted object
+     * @param path the path
      * @param <T> he type of the converted object
      * @return the converted object o null if the object is null;
      */
-    <T> T convert(Object object, Class<T> instanceClass);
+    <T> T convert(Object object, Class<T> instanceClass, String... path);
 
 
     /**

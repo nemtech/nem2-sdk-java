@@ -67,10 +67,10 @@ public class TransactionMapperSerializationTest {
         TransactionInfoDTO originalTransactionInfo = jsonHelper
             .parse(json, TransactionInfoDTO.class);
 
-        Transaction transactionModel = transactionMapper.map(originalTransactionInfo);
+        Transaction transactionModel = transactionMapper.mapFromDto(originalTransactionInfo);
         Assertions.assertNotNull(transactionModel);
 
-        TransactionInfoDTO mappedTransactionInfo = transactionMapper.map(transactionModel);
+        TransactionInfoDTO mappedTransactionInfo = (TransactionInfoDTO) transactionMapper.mapToDto(transactionModel);
 
         //Patching the sort
         mappedTransactionInfo
@@ -82,7 +82,7 @@ public class TransactionMapperSerializationTest {
 
         BinarySerialization serialization = new BinarySerializationImpl();
         Assertions.assertEquals(ConvertUtils.toHex(serialization.serialize(transactionModel)),
-            ConvertUtils.toHex(serialization.serialize(transactionMapper.map(mappedTransactionInfo))));
+            ConvertUtils.toHex(serialization.serialize(transactionMapper.mapFromDto(mappedTransactionInfo))));
 
         originalTransactionInfo.setMeta(null);
         Map<String, Object> transactionJson = (Map<String, Object>) originalTransactionInfo

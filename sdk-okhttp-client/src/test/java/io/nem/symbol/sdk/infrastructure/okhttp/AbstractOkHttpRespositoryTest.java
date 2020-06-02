@@ -53,10 +53,11 @@ public abstract class AbstractOkHttpRespositoryTest {
 
     @BeforeEach
     public void setUp() {
-        apiClientMock = Mockito.spy(new ApiClient());
-        JSON value = new JSON();
-        value.setGson(new Gson());
-        jsonHelper = new JsonHelperGson(value.getGson());
+        Gson gson = JsonHelperGson.creatGson(false);
+        ApiClient client = new ApiClient();
+        client.getJSON().setGson(gson);
+        apiClientMock = Mockito.spy(client);
+        jsonHelper = new JsonHelperGson(gson);
     }
 
     protected String encodeAddress(Address address) {

@@ -138,6 +138,7 @@ import io.nem.symbol.sdk.model.transaction.SecretProofTransaction;
 import io.nem.symbol.sdk.model.transaction.SecretProofTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionFactory;
+import io.nem.symbol.sdk.model.transaction.TransactionInfo;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
@@ -314,6 +315,7 @@ public class BinarySerializationImpl implements BinarySerialization {
      * @return the serialized transaction.
      */
     private <T extends Transaction> byte[] serializeTransaction(byte[] commonBytes, T transaction) {
+        Validate.isTrue(transaction.isTransactionFullyLoaded(), "Partially loaded and incomplete transactions cannot be serialized.");
         TransactionSerializer<T> transactionSerializer = resolveSerializer(transaction.getType());
         Validate.isTrue(
             transactionSerializer.getTransactionClass().isAssignableFrom(transaction.getClass()),
@@ -331,6 +333,7 @@ public class BinarySerializationImpl implements BinarySerialization {
      */
     @Override
     public <T extends Transaction> int getSize(T transaction) {
+        Validate.isTrue(transaction.isTransactionFullyLoaded(), "Size cannot be resolved from partially loaded or incomplete transactions.");
         return getTransactionBuilder(transaction).getSize() + resolveSerializer(
             transaction.getType()).toBodyBuilder(transaction)
             .getSize();

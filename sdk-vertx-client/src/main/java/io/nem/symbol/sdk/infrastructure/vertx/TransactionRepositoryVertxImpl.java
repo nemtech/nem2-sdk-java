@@ -16,15 +16,12 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx;
 
-import io.nem.symbol.core.crypto.PublicKey;
-import io.nem.symbol.sdk.api.OrderBy;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.TransactionRepository;
 import io.nem.symbol.sdk.api.TransactionSearchCriteria;
 import io.nem.symbol.sdk.api.TransactionSearchGroup;
 import io.nem.symbol.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
-import io.nem.symbol.sdk.infrastructure.vertx.mappers.TransactionMapper;
-import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.infrastructure.TransactionMapper;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
@@ -38,12 +35,9 @@ import io.nem.symbol.sdk.openapi.vertx.api.TransactionRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.vertx.model.AnnounceTransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.Cosignature;
-import io.nem.symbol.sdk.openapi.vertx.model.Order;
-import io.nem.symbol.sdk.openapi.vertx.model.Pagination;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionGroupSubsetEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionHashes;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionIds;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoExtendedDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionPage;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionPayload;
@@ -93,7 +87,7 @@ public class TransactionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
 
         return exceptionHandling(call(callback)
             .map(p -> {
-                List<Transaction> data = p.getData().stream().map(transactionMapper::map)
+                List<Transaction> data = p.getData().stream().map(o -> (Object) o).map(transactionMapper::mapFromDto)
                     .collect(Collectors.toList());
                 return toPage(p.getPagination(), data);
             }));
@@ -111,9 +105,9 @@ public class TransactionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
 
     @Override
     public Observable<Transaction> getTransaction(String transactionHash) {
-        Consumer<Handler<AsyncResult<TransactionInfoDTO>>> callback = handler -> getClient()
+        Consumer<Handler<AsyncResult<TransactionInfoExtendedDTO>>> callback = handler -> getClient()
             .getTransaction(transactionHash, handler);
-        return exceptionHandling(call(callback).map(transactionMapper::map));
+        return exceptionHandling(call(callback).map(transactionMapper::mapFromDto));
     }
 
 
@@ -123,7 +117,7 @@ public class TransactionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
             client.getTransactionsById(new TransactionIds().transactionIds(transactionHashes),
                 handler);
         return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(transactionMapper::map).toList()
+            call(callback).flatMapIterable(item -> item).map(transactionMapper::mapFromDto).toList()
                 .toObservable());
     }
 

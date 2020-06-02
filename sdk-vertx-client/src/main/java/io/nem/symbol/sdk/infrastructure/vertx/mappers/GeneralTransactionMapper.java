@@ -16,12 +16,10 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
+import io.nem.symbol.sdk.infrastructure.TransactionMapper;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
-import io.nem.symbol.sdk.openapi.vertx.model.EmbeddedTransactionInfoDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoExtendedDTO;
 import java.util.EnumMap;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -78,36 +76,17 @@ public class GeneralTransactionMapper implements TransactionMapper {
         }
     }
 
-    @Override
-    public Transaction map(EmbeddedTransactionInfoDTO transactionInfoDTO) {
-        Validate.notNull(transactionInfoDTO, "transactionInfoDTO must not be null");
-        return resolveMapper(transactionInfoDTO).map(transactionInfoDTO);
-    }
-
 
     @Override
-    public Transaction map(TransactionInfoDTO transactionInfoDTO) {
+    public Transaction mapFromDto(Object transactionInfoDTO) {
         Validate.notNull(transactionInfoDTO, "transactionInfoDTO must not be null");
-        return resolveMapper(transactionInfoDTO).map(transactionInfoDTO);
+        return resolveMapper(transactionInfoDTO).mapFromDto(transactionInfoDTO);
     }
 
     @Override
-    public EmbeddedTransactionInfoDTO mapToEmbedded(Transaction transaction) {
+    public Object mapToDto(Transaction transaction, Boolean embedded) {
         Validate.notNull(transaction, "transaction must not be null");
-        return resolveMapper(transaction.getType()).mapToEmbedded(transaction);
-    }
-
-    @Override
-    public TransactionInfoDTO map(Transaction transaction) {
-        Validate.notNull(transaction, "transaction must not be null");
-        return resolveMapper(transaction.getType()).map(transaction);
-    }
-
-
-    @Override
-    public Transaction map(TransactionInfoExtendedDTO transactionInfoDTO) {
-        Validate.notNull(transactionInfoDTO, "transactionInfoDTO must not be null");
-        return resolveMapper(transactionInfoDTO).map(transactionInfoDTO);
+        return resolveMapper(transaction.getType()).mapToDto(transaction, embedded);
     }
 
     @Override
@@ -138,4 +117,5 @@ public class GeneralTransactionMapper implements TransactionMapper {
     public JsonHelper getJsonHelper() {
         return jsonHelper;
     }
+
 }

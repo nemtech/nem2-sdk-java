@@ -120,14 +120,15 @@ public class JsonHelperJackson2 implements JsonHelper {
     }
 
     @Override
-    public <T> T convert(Object object, Class<T> instanceClass) {
-        if (object == null) {
+    public <T> T convert(Object object, Class<T> instanceClass, String... path) {
+        Object child = path.length == 0 ? object : getNode(convert(object, JsonNode.class), path);
+        if (child == null) {
             return null;
         }
-        if (instanceClass.isInstance(object)) {
-            return (T) object;
+        if (instanceClass.isInstance(child)) {
+            return (T) child;
         }
-        return parse(print(object), instanceClass);
+        return parse(print(child), instanceClass);
     }
 
     @Override

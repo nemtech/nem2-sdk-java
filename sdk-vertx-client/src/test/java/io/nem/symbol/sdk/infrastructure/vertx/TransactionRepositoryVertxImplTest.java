@@ -76,26 +76,28 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     @Test
     public void shouldGetTransaction() throws Exception {
 
-        TransactionInfoDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "aggregateMosaicCreationTransaction.json");
+        TransactionInfoExtendedDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
+            "aggregateMosaicCreationTransaction.json", TransactionInfoExtendedDTO.class);
+        String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
 
         mockRemoteCall(transactionInfoDTO);
 
         Transaction transaction = repository
-            .getTransaction(transactionInfoDTO.getMeta().getHash()).toFuture().get();
+            .getTransaction(hash).toFuture().get();
 
         Assertions.assertNotNull(transaction);
 
-        Assertions.assertEquals(transactionInfoDTO.getMeta().getHash(),
+        Assertions.assertEquals(hash,
             transaction.getTransactionInfo().get().getHash().get());
     }
 
     @Test
     public void exceptionWhenMapperFails() {
 
-        TransactionInfoDTO transactionInfoDTO = new TransactionInfoDTO();
+        TransactionInfoExtendedDTO transactionInfoDTO = new TransactionInfoExtendedDTO();
         TransactionMetaDTO meta = new TransactionMetaDTO();
-        meta.setHash("ABC");
+        String hash = "ABC";
+        meta.setHash(hash);
         transactionInfoDTO.setMeta(meta);
 
         mockRemoteCall(transactionInfoDTO);
@@ -104,7 +106,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
             .assertThrows(RepositoryCallException.class, () -> {
                 ExceptionUtils.propagateVoid(() -> {
                     repository
-                        .getTransaction(transactionInfoDTO.getMeta().getHash()).toFuture().get();
+                        .getTransaction(hash).toFuture().get();
                 });
             });
 
@@ -140,15 +142,17 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
         TransactionInfoExtendedDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
             "aggregateMosaicCreationTransaction.json", TransactionInfoExtendedDTO.class);
 
+        String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
+
         mockRemoteCall(Collections.singletonList(transactionInfoDTO));
 
         Transaction transaction = repository
-            .getTransactions(Collections.singletonList(transactionInfoDTO.getMeta().getHash()))
+            .getTransactions(Collections.singletonList(hash))
             .toFuture().get().get(0);
 
         Assertions.assertNotNull(transaction);
 
-        Assertions.assertEquals(transactionInfoDTO.getMeta().getHash(),
+        Assertions.assertEquals(hash,
             transaction.getTransactionInfo().get().getHash().get());
     }
 

@@ -164,8 +164,17 @@ class TransactionServiceTest {
     @Test
     void announceAggregateBonded() throws ExecutionException, InterruptedException {
 
+        TransferTransaction transaction1 =
+            TransferTransactionFactory.create(
+                networkType,
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", networkType),
+                Arrays.asList(
+                    new Mosaic(
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
+                new PlainMessage("Some Message")).signer(account.getPublicAccount()).build();
+
         AggregateTransaction aggregateTransaction = AggregateTransactionFactory
-            .create(TransactionType.AGGREGATE_BONDED, networkType, Collections.emptyList(),
+            .create(TransactionType.AGGREGATE_BONDED, networkType, Collections.singletonList(transaction1),
                 Collections.emptyList()).deadline(new FakeDeadline()).build();
 
         String generationHash = "abc";
@@ -194,8 +203,17 @@ class TransactionServiceTest {
     @Test
     void announceHashLockAggregateBonded() throws ExecutionException, InterruptedException {
 
+        TransferTransaction transaction1 =
+            TransferTransactionFactory.create(
+                networkType,
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", networkType),
+                Arrays.asList(
+                    new Mosaic(
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
+                new PlainMessage("Some Message")).signer(account.getPublicAccount()).build();
+
         AggregateTransaction aggregateTransaction = AggregateTransactionFactory
-            .create(TransactionType.AGGREGATE_BONDED, networkType, Collections.emptyList(),
+            .create(TransactionType.AGGREGATE_BONDED, networkType, Collections.singletonList(transaction1),
                 Collections.emptyList()).deadline(new FakeDeadline()).build();
 
         String generationHash = "abc";

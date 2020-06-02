@@ -41,7 +41,6 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.AnnounceTransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Cosignature;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Pagination;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionGroupEnum;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoExtendedDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionPage;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionStatusDTO;
@@ -73,17 +72,18 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
     @Test
     public void shouldGetTransaction() throws Exception {
 
-        TransactionInfoDTO transactionInfoDTO = loadTransactionInfoDTO(
-            "aggregateMosaicCreationTransaction.json");
+        TransactionInfoExtendedDTO transactionInfoDTO = loadTransactionInfoDTO(
+            "aggregateMosaicCreationTransaction.json", TransactionInfoExtendedDTO.class);
 
+        String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
         mockRemoteCall(transactionInfoDTO);
 
         Transaction transaction = repository
-            .getTransaction(transactionInfoDTO.getMeta().getHash()).toFuture().get();
+            .getTransaction(hash).toFuture().get();
 
         Assertions.assertNotNull(transaction);
 
-        Assertions.assertEquals(transactionInfoDTO.getMeta().getHash(),
+        Assertions.assertEquals(hash,
             transaction.getTransactionInfo().get().getHash().get());
     }
 
@@ -92,16 +92,17 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
 
         TransactionInfoExtendedDTO transactionInfoDTO = loadTransactionInfoDTO(
             "aggregateMosaicCreationTransaction.json", TransactionInfoExtendedDTO.class);
+        String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
 
         mockRemoteCall(Collections.singletonList(transactionInfoDTO));
 
         Transaction transaction = repository
-            .getTransactions(Collections.singletonList(transactionInfoDTO.getMeta().getHash()))
+            .getTransactions(Collections.singletonList(hash))
             .toFuture().get().get(0);
 
         Assertions.assertNotNull(transaction);
 
-        Assertions.assertEquals(transactionInfoDTO.getMeta().getHash(),
+        Assertions.assertEquals(hash,
             transaction.getTransactionInfo().get().getHash().get());
     }
 
@@ -251,7 +252,8 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
     @Test
     public void searchTransactions() throws Exception {
 
-        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO("standaloneTransferTransaction.json");
+        TransactionInfoExtendedDTO transferTransactionDTO = loadTransactionInfoDTO("standaloneTransferTransaction.json",
+            TransactionInfoExtendedDTO.class);
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
@@ -274,7 +276,8 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
     @Test
     public void searchTransactionsTransactionTypes() throws Exception {
 
-        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO("standaloneTransferTransaction.json");
+        TransactionInfoExtendedDTO transferTransactionDTO = loadTransactionInfoDTO("standaloneTransferTransaction.json",
+            TransactionInfoExtendedDTO.class);
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
@@ -296,7 +299,7 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
 
     }
 
-    private TransactionPage toPage(TransactionInfoDTO dto) {
+    private TransactionPage toPage(TransactionInfoExtendedDTO dto) {
         return new TransactionPage()
             .data(Collections.singletonList(jsonHelper.parse(jsonHelper.print(dto),
                 TransactionInfoExtendedDTO.class)))

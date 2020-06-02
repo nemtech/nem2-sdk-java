@@ -16,13 +16,14 @@
 
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import io.nem.symbol.sdk.api.Listener;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.infrastructure.ListenerBase;
 import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
+import io.nem.symbol.sdk.infrastructure.TransactionMapper;
 import io.nem.symbol.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
-import io.nem.symbol.sdk.infrastructure.okhttp.mappers.TransactionMapper;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
@@ -57,11 +58,11 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
     /**
      * @param httpClient the ok http client
      * @param url nis host
-     * @param json gson's json.
+     * @param gson gson's gson.
      */
-    public ListenerOkHttp(OkHttpClient httpClient, String url, JSON json,
+    public ListenerOkHttp(OkHttpClient httpClient, String url, Gson gson,
         NamespaceRepository namespaceRepository) {
-        super(new JsonHelperGson(json.getGson()), namespaceRepository);
+        super(new JsonHelperGson(gson), namespaceRepository);
         try {
             this.url = new URL(url);
         } catch (MalformedURLException e) {
@@ -107,8 +108,7 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
 
     @Override
     protected Transaction toTransaction(Object transactionInfo) {
-        return transactionMapper
-            .map(getJsonHelper().convert(transactionInfo, TransactionInfoDTO.class));
+        return transactionMapper.mapFromDto(transactionInfo);
     }
 
     @Override

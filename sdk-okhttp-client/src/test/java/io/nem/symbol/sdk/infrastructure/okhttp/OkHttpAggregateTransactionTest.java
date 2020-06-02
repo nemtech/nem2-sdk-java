@@ -154,7 +154,7 @@ public class OkHttpAggregateTransactionTest {
 
         AggregateTransaction aggregateTransferTransaction =
             (AggregateTransaction) new GeneralTransactionMapper(jsonHelper)
-                .map(aggregateTransferTransactionDTO);
+                .mapFromDto(aggregateTransferTransactionDTO);
 
         assertTrue(
             aggregateTransferTransaction.signedByAccount(

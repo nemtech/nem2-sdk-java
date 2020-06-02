@@ -281,6 +281,15 @@ public abstract class Transaction implements Stored {
     }
 
     /**
+     * Returns if the transaction has been fully loaded from rest, if not, the transaction cannot be serialized.
+     *
+     * @return if the transaction has been fully loaded from rest.
+     */
+    public boolean isTransactionFullyLoaded(){
+        return true;
+    }
+
+    /**
      * @return the database id if known.
      */
     @Override

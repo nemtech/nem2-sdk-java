@@ -18,17 +18,26 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.TypeAdapter;
 import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.JSON;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.JSON.ByteArrayAdapter;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.JSON.DateTypeAdapter;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.JSON.SqlDateTypeAdapter;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.Collection;
@@ -133,14 +142,15 @@ public class JsonHelperGson implements JsonHelper {
     }
 
     @Override
-    public <T> T convert(Object object, Class<T> instanceClass) {
-        if (object == null) {
+    public <T> T convert(Object object, Class<T> instanceClass, String... path) {
+        Object child = path.length == 0 ? object : getNode(convert(object, JsonObject.class), path);
+        if (child == null) {
             return null;
         }
-        if (instanceClass.isInstance(object)) {
-            return (T) object;
+        if (instanceClass.isInstance(child)) {
+            return (T) child;
         }
-        return parse(print(object), instanceClass);
+        return parse(print(child), instanceClass);
     }
 
     @Override

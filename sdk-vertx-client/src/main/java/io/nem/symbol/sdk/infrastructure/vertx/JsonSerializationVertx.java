@@ -42,12 +42,12 @@ public class JsonSerializationVertx implements JsonSerialization {
     @Override
     public String transactionToJson(Transaction transaction) {
         Validate.notNull(transaction, "Transaction must not be null");
-        return jsonHelper.print(generalTransactionMapper.map(transaction));
+        return jsonHelper.print(generalTransactionMapper.mapToDto(transaction));
     }
 
     @Override
     public Transaction jsonToTransaction(String json) {
         Validate.notNull(json, "Json must not be null");
-        return generalTransactionMapper.map(jsonHelper.parse(json, TransactionInfoDTO.class));
+        return generalTransactionMapper.mapFromDto(jsonHelper.parse(json, TransactionInfoDTO.class));
     }
 }

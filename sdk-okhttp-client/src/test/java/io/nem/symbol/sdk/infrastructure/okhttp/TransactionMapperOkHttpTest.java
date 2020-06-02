@@ -355,7 +355,7 @@ public class TransactionMapperOkHttpTest {
     }
 
     private Transaction map(TransactionInfoDTO jsonObject) {
-        return new GeneralTransactionMapper(jsonHelper).map(jsonObject);
+        return new GeneralTransactionMapper(jsonHelper).mapFromDto(jsonObject);
     }
 
     void validateStandaloneTransaction(Transaction transaction, TransactionInfoDTO transactionDTO) {

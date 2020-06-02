@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
 import io.nem.symbol.core.crypto.PublicKey;
+import io.nem.symbol.sdk.infrastructure.TransactionMapper;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.Deadline;
@@ -32,6 +33,7 @@ import io.nem.symbol.sdk.openapi.vertx.model.TransactionDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoExtendedDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionMetaDTO;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * Abstract transaction mapper for the transaction mappers that support a specific type of transaction (Account Link,
@@ -55,25 +57,54 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
         this.transactionDtoClass = transactionDtoClass;
     }
 
-
     @Override
-    public Transaction map(EmbeddedTransactionInfoDTO transactionInfoDTO) {
-        TransactionInfo transactionInfo = createTransactionInfo(transactionInfoDTO.getMeta());
-        return createModel(transactionInfo, transactionInfoDTO.getTransaction());
-    }
-
-    @Override
-    public Transaction map(TransactionInfoExtendedDTO transactionInfoExtendedDTO) {
-        TransactionInfo transactionInfo = createTransactionInfo(transactionInfoExtendedDTO.getMeta(),
-            transactionInfoExtendedDTO.getId());
-        return createModel(transactionInfo, transactionInfoExtendedDTO.getTransaction());
-    }
-
-    @Override
-    public Transaction map(TransactionInfoDTO transactionInfoDTO) {
+    public Transaction mapFromDto(Object object) {
+        TransactionInfoExtendedDTO transactionInfoDTO = this.jsonHelper
+            .convert(object, TransactionInfoExtendedDTO.class);
         TransactionInfo transactionInfo = createTransactionInfo(transactionInfoDTO.getMeta(),
             transactionInfoDTO.getId());
         return createModel(transactionInfo, transactionInfoDTO.getTransaction());
+    }
+
+    protected TransactionInfo createTransactionInfo(Object meta, String id) {
+        if (meta == null) {
+            return null;
+        }
+        if (this.jsonHelper.contains(meta, "aggregateHash")) {
+            EmbeddedTransactionMetaDTO embedded = this.jsonHelper.convert(meta, EmbeddedTransactionMetaDTO.class);
+            return TransactionInfo.createAggregate(
+                embedded.getHeight(),
+                embedded.getIndex(),
+                ObjectUtils.firstNonNull(embedded.getId(), id),
+                embedded.getAggregateHash(),
+                embedded.getAggregateId());
+        } else {
+            TransactionMetaDTO toplevel = this.jsonHelper.convert(meta, TransactionMetaDTO.class);
+            return TransactionInfo.create(
+                toplevel.getHeight(),
+                toplevel.getIndex(),
+                id,
+                toplevel.getHash(),
+                toplevel.getMerkleComponentHash());
+        }
+    }
+
+
+    @Override
+    public Object mapToDto(Transaction transaction, Boolean embedded) {
+        if (transaction.getTransactionInfo().flatMap(TransactionInfo::getAggregateHash).isPresent() || Boolean.TRUE
+            .equals(embedded)) {
+            EmbeddedTransactionInfoDTO dto = new EmbeddedTransactionInfoDTO();
+            dto.setMeta(createTransactionInfoEmbedded(transaction));
+            dto.setTransaction(mapTransaction(transaction, true));
+            return dto;
+        } else {
+            TransactionInfoDTO dto = new TransactionInfoDTO();
+            dto.setMeta(createTransactionInfo(transaction));
+            dto.setId(transaction.getRecordId().orElse(null));
+            dto.setTransaction(mapTransaction(transaction, false));
+            return dto;
+        }
     }
 
     protected final T createModel(TransactionInfo transactionInfo, Object transactionDto) {
@@ -111,31 +142,6 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
 
     protected abstract TransactionFactory<T> createFactory(NetworkType networkType, D transaction);
 
-    protected TransactionInfo createTransactionInfo(TransactionMetaDTO meta, String id) {
-        return meta == null ? null : TransactionInfo.create(meta.getHeight(),
-            meta.getIndex(),
-            id,
-            meta.getHash(),
-            meta.getMerkleComponentHash());
-    }
-
-    protected TransactionInfo createTransactionInfo(EmbeddedTransactionMetaDTO meta) {
-        return meta == null ? null : TransactionInfo.createAggregate(
-            meta.getHeight(),
-            meta.getIndex(),
-            meta.getId(),
-            meta.getAggregateHash(),
-            meta.getAggregateId());
-    }
-
-    @Override
-    public EmbeddedTransactionInfoDTO mapToEmbedded(Transaction transaction) {
-        EmbeddedTransactionInfoDTO dto = new EmbeddedTransactionInfoDTO();
-        dto.setMeta(createTransactionInfoEmbedded(transaction));
-        dto.setTransaction(mapTransaction(transaction, true));
-        return dto;
-    }
-
 
     private EmbeddedTransactionMetaDTO createTransactionInfoEmbedded(Transaction transaction) {
         return transaction.getTransactionInfo().map(i -> {
@@ -158,16 +164,6 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
             dto.setMerkleComponentHash(i.getMerkleComponentHash().orElse(null));
             return dto;
         }).orElse(null);
-    }
-
-
-    @Override
-    public TransactionInfoDTO map(Transaction transaction) {
-        TransactionInfoDTO dto = new TransactionInfoDTO();
-        dto.setMeta(createTransactionInfo(transaction));
-        dto.setId(transaction.getRecordId().orElse(null));
-        dto.setTransaction(mapTransaction(transaction, false));
-        return dto;
     }
 
     private D mapTransaction(Transaction transaction, boolean embedded) {

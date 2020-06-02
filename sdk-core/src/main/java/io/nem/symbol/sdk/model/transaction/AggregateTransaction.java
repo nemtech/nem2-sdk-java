@@ -26,8 +26,7 @@ import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
- * The aggregate innerTransactions contain multiple innerTransactions that can be initiated by
- * different accounts.
+ * The aggregate innerTransactions contain multiple innerTransactions that can be initiated by different accounts.
  *
  * @since 1.0
  */
@@ -136,5 +135,13 @@ public class AggregateTransaction extends Transaction {
     public boolean signedByAccount(PublicAccount publicAccount) {
         return this.getSigner().filter(a -> a.equals(publicAccount)).isPresent()
             || this.getCosignatures().stream().anyMatch(o -> o.getSigner().equals(publicAccount));
+    }
+
+    /**
+     * @return the transaction is not fully loaded if there are not inner transactions.
+     */
+    @Override
+    public boolean isTransactionFullyLoaded() {
+        return !this.innerTransactions.isEmpty();
     }
 }

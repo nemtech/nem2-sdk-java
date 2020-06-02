@@ -16,6 +16,7 @@
 
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
+import com.google.gson.Gson;
 import io.nem.symbol.sdk.api.AccountRepository;
 import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.ChainRepository;
@@ -49,6 +50,7 @@ public class RepositoryFactoryOkHttpImpl extends RepositoryFactoryBase {
 
     private final ApiClient apiClient;
 
+    private final Gson gson = JsonHelperGson.creatGson(false);
 
     public RepositoryFactoryOkHttpImpl(String baseUrl) {
         this(new RepositoryFactoryConfiguration(baseUrl));
@@ -58,7 +60,7 @@ public class RepositoryFactoryOkHttpImpl extends RepositoryFactoryBase {
         super(configuration);
         this.apiClient = new ApiClient();
         this.apiClient.setBasePath(getBaseUrl());
-        this.apiClient.getJSON().setGson(JsonHelperGson.creatGson(false));
+        this.apiClient.getJSON().setGson(gson);
     }
 
     @Override
@@ -128,7 +130,7 @@ public class RepositoryFactoryOkHttpImpl extends RepositoryFactoryBase {
 
     @Override
     public Listener createListener() {
-        return new ListenerOkHttp(apiClient.getHttpClient(), getBaseUrl(), apiClient.getJSON(), createNamespaceRepository());
+        return new ListenerOkHttp(apiClient.getHttpClient(), getBaseUrl(), gson, createNamespaceRepository());
     }
 
     @Override

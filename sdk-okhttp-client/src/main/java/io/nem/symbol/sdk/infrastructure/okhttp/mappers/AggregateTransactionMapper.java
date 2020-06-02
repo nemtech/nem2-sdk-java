@@ -16,6 +16,7 @@
 
 package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
+import io.nem.symbol.sdk.infrastructure.TransactionMapper;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
 class AggregateTransactionMapper extends
     AbstractTransactionMapper<AggregateTransactionExtendedDTO, AggregateTransaction> {
 
-    private TransactionMapper transactionMapper;
+    private final TransactionMapper transactionMapper;
 
     public AggregateTransactionMapper(JsonHelper jsonHelper,
         TransactionType transactionType,
@@ -63,7 +64,7 @@ class AggregateTransactionMapper extends
                 innerTransaction.put("deadline", transaction.getDeadline());
                 innerTransaction.put("maxFee", transaction.getMaxFee());
                 innerTransaction.put("signature", transaction.getSignature());
-                return transactionMapper.map(transactionInfoDTO);
+                return transactionMapper.mapFromDto(transactionInfoDTO);
 
             }).collect(Collectors.toList());
 
@@ -93,8 +94,8 @@ class AggregateTransactionMapper extends
     @Override
     protected void copyToDto(AggregateTransaction transaction, AggregateTransactionExtendedDTO dto) {
         List<EmbeddedTransactionInfoDTO> transactions = transaction.getInnerTransactions().stream()
-            .map(embeddedTransactionInfoDTO -> transactionMapper
-                .mapToEmbedded(embeddedTransactionInfoDTO)).collect(Collectors.toList());
+            .map(embeddedTransactionInfoDTO -> (EmbeddedTransactionInfoDTO) transactionMapper
+                .mapToDto(embeddedTransactionInfoDTO, true)).collect(Collectors.toList());
         List<CosignatureDTO> cosignatures = new ArrayList<>();
         if (transaction.getCosignatures() != null) {
             cosignatures =

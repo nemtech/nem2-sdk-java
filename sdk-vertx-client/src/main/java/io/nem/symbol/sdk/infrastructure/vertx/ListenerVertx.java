@@ -22,7 +22,7 @@ import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.infrastructure.ListenerBase;
 import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.symbol.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
-import io.nem.symbol.sdk.infrastructure.vertx.mappers.TransactionMapper;
+import io.nem.symbol.sdk.infrastructure.TransactionMapper;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
@@ -111,7 +111,7 @@ public class ListenerVertx extends ListenerBase implements Listener {
     @Override
     protected Transaction toTransaction(Object transactionInfo) {
         return transactionMapper
-            .map(getJsonHelper().convert(transactionInfo, TransactionInfoDTO.class));
+            .mapFromDto(getJsonHelper().convert(transactionInfo, TransactionInfoDTO.class));
     }
 
     @Override

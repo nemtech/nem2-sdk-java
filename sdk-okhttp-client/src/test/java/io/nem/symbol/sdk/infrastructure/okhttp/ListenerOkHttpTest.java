@@ -76,7 +76,7 @@ public class ListenerOkHttpTest {
         httpClientMock = Mockito.mock(OkHttpClient.class);
         namespaceRepository = Mockito.mock(NamespaceRepository.class);
         String url = "http://nem.com:3000/";
-        listener = new ListenerOkHttp(httpClientMock, url, new JSON(), namespaceRepository);
+        listener = new ListenerOkHttp(httpClientMock, url, JsonHelperGson.creatGson(false), namespaceRepository);
         jsonHelper = listener.getJsonHelper();
     }
 

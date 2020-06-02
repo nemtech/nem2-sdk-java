@@ -52,10 +52,8 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
                 Collections.emptyList()).deadline(new FakeDeadline()).build();
         String expected = "a80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019041420000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
-        AggregateTransaction serialized = assertSerialization(expected,
-            aggregateTransaction);
-        Assertions.assertEquals(0, serialized.getInnerTransactions().size());
-        Assertions.assertEquals(0, serialized.getCosignatures().size());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> assertSerialization(expected,
+            aggregateTransaction));
     }
 
     @Test
@@ -174,9 +172,18 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
                     "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456333",
                     networkType));
 
+        TransferTransaction transaction1 =
+            TransferTransactionFactory.create(
+                networkType,
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", networkType),
+                Arrays.asList(
+                    new Mosaic(
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
+                new PlainMessage("Some Message")).signer(account.getPublicAccount()).build();
+
         AggregateTransactionFactory aggregateTransaction = AggregateTransactionFactory
             .create(TransactionType.AGGREGATE_COMPLETE, networkType,
-                Collections.emptyList(),
+                Collections.singletonList(transaction1),
                 Arrays.asList(cosignature1, cosignature2, cosignature3));
 
         int multiplier = 10;
@@ -244,27 +251,9 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
 
         String expected = "c801000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000190414100000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456111aaa9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456111aaa9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea654561119a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222bbb9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222bbb9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea654562229a49366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456333ccc9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222bbb9366406aca952b88badf5f1e9be6ce4968141035a60be503273ea65456222";
 
-        AggregateTransaction serialized = assertSerialization(expected,
-            aggregateTransaction);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> assertSerialization(expected,
+            aggregateTransaction));
 
-        Assertions.assertEquals(TransactionType.AGGREGATE_COMPLETE, serialized.getType());
-
-        Assertions.assertEquals(0, serialized.getInnerTransactions().size());
-        Assertions.assertEquals(3, serialized.getCosignatures().size());
-        Assertions.assertEquals(cosignature1.getSigner(),
-            serialized.getCosignatures().get(0).getSigner());
-        Assertions.assertEquals(cosignature1.getSignature(),
-            serialized.getCosignatures().get(0).getSignature().toUpperCase());
-
-        Assertions.assertEquals(cosignature2.getSigner(),
-            serialized.getCosignatures().get(1).getSigner());
-        Assertions.assertEquals(cosignature2.getSignature(),
-            serialized.getCosignatures().get(1).getSignature().toUpperCase());
-
-        Assertions.assertEquals(cosignature3.getSigner(),
-            serialized.getCosignatures().get(2).getSigner());
-        Assertions.assertEquals(cosignature3.getSignature(),
-            serialized.getCosignatures().get(2).getSignature().toUpperCase());
     }
 
     @Test

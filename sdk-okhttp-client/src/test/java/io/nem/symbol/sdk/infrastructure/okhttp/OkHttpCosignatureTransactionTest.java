@@ -54,7 +54,7 @@ public class OkHttpCosignatureTransactionTest {
             "cosignatureTransactionViaConstructor.json");
         AggregateTransaction aggregateTransaction =
             (AggregateTransaction) new GeneralTransactionMapper(jsonHelper)
-                .map(transactionInfoDTO);
+                .mapFromDto(transactionInfoDTO);
 
         CosignatureTransaction cosignatureTransaction =
             CosignatureTransaction.create(aggregateTransaction);
