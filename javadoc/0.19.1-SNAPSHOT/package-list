@@ -9,6 +9,7 @@ io.nem.symbol.sdk.infrastructure.okhttp
 io.nem.symbol.sdk.infrastructure.okhttp.mappers
 io.nem.symbol.sdk.infrastructure.vertx
 io.nem.symbol.sdk.infrastructure.vertx.mappers
+io.nem.symbol.sdk.model
 io.nem.symbol.sdk.model.account
 io.nem.symbol.sdk.model.blockchain
 io.nem.symbol.sdk.model.message
