@@ -28,7 +28,7 @@
           "id": "5D5F9E27EBB06700013CB1C2"
         },
         "transaction": {
-          "targetPublicKey": "69970C5FB7A72662A6457504851DC11B10B19EB8A7D8C5E22301F1DC7492F292",
+          "targetAddress": "90E6FF7755A80B6AA935A5C31B6D3D0CFAF82E06BF2B9CC9",
           "version": 1,
           "network": 144,
           "type": 17220,

@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
@@ -35,11 +36,11 @@ public class NamespaceMetadataTransactionFactory extends
 
     private NamespaceMetadataTransactionFactory(
         NetworkType networkType,
-        PublicAccount targetAccount,
+        UnresolvedAddress targetAddress,
         NamespaceId targetNamespaceId,
         BigInteger scopedMetadataKey,
         String value) {
-        super(TransactionType.NAMESPACE_METADATA, networkType, targetAccount,
+        super(TransactionType.NAMESPACE_METADATA, networkType, targetAddress,
             scopedMetadataKey, value);
         Validate.notNull(targetNamespaceId, "TargetNamespaceId must not be null");
         this.targetNamespaceId = targetNamespaceId;
@@ -49,15 +50,15 @@ public class NamespaceMetadataTransactionFactory extends
      * Static create method for factory.
      *
      * @param networkType Network type.
-     * @param targetAccount Target account.
+     * @param targetAddress Target address.
      * @param targetNamespaceId Target namespace id.
      * @param scopedMetadataKey Scoped metadata key.
      * @param value Value.
      * @return Namespace metadata transaction.
      */
     public static NamespaceMetadataTransactionFactory create(NetworkType networkType,
-        PublicAccount targetAccount, NamespaceId targetNamespaceId, BigInteger scopedMetadataKey, String value) {
-        return new NamespaceMetadataTransactionFactory(networkType, targetAccount, targetNamespaceId, scopedMetadataKey, value);
+        UnresolvedAddress targetAddress, NamespaceId targetNamespaceId, BigInteger scopedMetadataKey, String value) {
+        return new NamespaceMetadataTransactionFactory(networkType, targetAddress, targetNamespaceId, scopedMetadataKey, value);
     }
 
     public NamespaceId getTargetNamespaceId() {

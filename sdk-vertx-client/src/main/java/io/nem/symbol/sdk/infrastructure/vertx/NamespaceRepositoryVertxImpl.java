@@ -16,7 +16,6 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx;
 
-import static io.nem.symbol.core.utils.MapperUtils.toAddressFromEncoded;
 import static io.nem.symbol.core.utils.MapperUtils.toNamespaceId;
 
 import io.nem.symbol.core.utils.MapperUtils;
@@ -24,7 +23,6 @@ import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.api.QueryParams;
 import io.nem.symbol.sdk.model.account.AccountNames;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNames;
 import io.nem.symbol.sdk.model.namespace.AddressAlias;
@@ -233,8 +231,7 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
             namespaceInfoDTO.getNamespace().getDepth(),
             this.extractLevels(namespaceInfoDTO),
             toNamespaceId(namespaceInfoDTO.getNamespace().getParentId()),
-            new PublicAccount(namespaceInfoDTO.getNamespace().getOwnerPublicKey(),
-                networkType),
+            MapperUtils.toUnresolvedAddress(namespaceInfoDTO.getNamespace().getOwnerAddress()),
             namespaceInfoDTO.getNamespace().getStartHeight(),
             namespaceInfoDTO.getNamespace().getEndHeight(),
             this.extractAlias(namespaceInfoDTO.getNamespace()));
@@ -261,7 +258,7 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
             .equals(namespaceDTO.getAlias().getType().getValue())) {
             String encodedAddress = namespaceDTO.getAlias().getAddress();
             if (encodedAddress != null) {
-                address = MapperUtils.toAddressFromEncoded(encodedAddress);
+                address = MapperUtils.toAddress(encodedAddress);
             }
         }
         return address;
@@ -292,7 +289,7 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
      */
     private AccountNames toAccountNames(AccountNamesDTO dto) {
         return new AccountNames(
-            toAddressFromEncoded(dto.getAddress()),
+            MapperUtils.toAddress(dto.getAddress()),
             dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
     }
 

@@ -57,7 +57,7 @@ public class NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
         BigInteger key = BigInteger.TEN;
         NamespaceMetadataTransaction transaction =
             NamespaceMetadataTransactionFactory.create(
-                getNetworkType(), testAccount.getPublicAccount(), targetNamespaceId,
+                getNetworkType(), testAccount.getAddress(), targetNamespaceId,
                 key, message
             ).maxFee(this.maxFee).build();
 
@@ -102,7 +102,7 @@ public class NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
         assertMetadata(transaction,
             Collections.singletonList(get(getRepositoryFactory(type).createMetadataRepository()
                 .getNamespaceMetadataByKeyAndSender(targetNamespaceId, key,
-                    testAccount.getPublicKey()))));
+                    testAccount.getAddress()))));
 
         Assertions.assertEquals(message, processedTransaction.getValue());
 
@@ -117,7 +117,7 @@ public class NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
                 m.getMetadataEntry().getMetadataType()
                     .equals(MetadataType.NAMESPACE) &&
                 m.getMetadataEntry()
-                    .getTargetPublicKey().equals(testAccount.getPublicKey())).findFirst();
+                    .getTargetAddress().equals(testAccount.getPublicKey())).findFirst();
 
         Assertions.assertTrue(endpointMetadata.isPresent());
 

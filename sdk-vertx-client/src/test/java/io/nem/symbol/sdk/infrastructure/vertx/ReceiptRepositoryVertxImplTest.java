@@ -52,9 +52,10 @@ public class ReceiptRepositoryVertxImplTest extends AbstractVertxRespositoryTest
         StatementsDTO dto = new StatementsDTO();
         ResolutionStatementDTO addressResolutionStatement = new ResolutionStatementDTO();
 
+        Address address = Address.generateRandom(this.networkType);
         ResolutionStatementBodyDTO statement1 = new ResolutionStatementBodyDTO();
         addressResolutionStatement.setStatement(statement1);
-        statement1.setUnresolved("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142");
+        statement1.setUnresolved(address.encoded());
         statement1.setHeight(BigInteger.valueOf(6L));
         dto.setAddressResolutionStatements(Collections.singletonList(addressResolutionStatement));
 
@@ -76,7 +77,7 @@ public class ReceiptRepositoryVertxImplTest extends AbstractVertxRespositoryTest
         Assertions.assertEquals(BigInteger.valueOf(6L),
             info.getAddressResolutionStatements().get(0).getHeight());
         Assertions
-            .assertEquals(Address.createFromRawAddress("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC"),
+            .assertEquals(address,
                 info.getAddressResolutionStatements().get(0).getUnresolved());
 
         Assertions.assertEquals(1, info.getMosaicResolutionStatement().size());

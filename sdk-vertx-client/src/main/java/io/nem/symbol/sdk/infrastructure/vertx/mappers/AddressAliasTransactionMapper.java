@@ -17,7 +17,7 @@
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
 import static io.nem.symbol.core.utils.MapperUtils.getIdAsHex;
-import static io.nem.symbol.core.utils.MapperUtils.toAddressFromEncoded;
+import static io.nem.symbol.core.utils.MapperUtils.toAddress;
 
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
@@ -51,7 +51,7 @@ class AddressAliasTransactionMapper extends
             networkType,
             aliasAction,
             namespaceId,
-            toAddressFromEncoded(transaction.getAddress()));
+            toAddress(transaction.getAddress()));
     }
 
     @Override

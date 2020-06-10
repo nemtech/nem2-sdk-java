@@ -121,7 +121,7 @@ public class MapperUtils {
      * @param encodedAddress the encodedAddress
      * @return a {@link Address} from the unresolved  address or null if the parameter is null
      */
-    public static Address toAddressFromEncoded(String encodedAddress) {
+    public static Address toAddress(String encodedAddress) {
         return encodedAddress != null ? Address.createFromEncoded(encodedAddress) : null;
     }
 

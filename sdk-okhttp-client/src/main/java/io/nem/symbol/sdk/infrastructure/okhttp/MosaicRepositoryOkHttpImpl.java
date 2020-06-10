@@ -18,10 +18,10 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import static io.nem.symbol.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.MosaicRepository;
 import io.nem.symbol.sdk.api.MosaicSearchCriteria;
 import io.nem.symbol.sdk.api.Page;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
@@ -98,16 +98,16 @@ public class MosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl imp
 
 
     private MosaicInfo createMosaicInfo(MosaicInfoDTO mosaicInfoDTO, NetworkType networkType) {
-        return createMosaicInfo(mosaicInfoDTO.getMosaic(),mosaicInfoDTO.getId(), networkType);
+        return createMosaicInfo(mosaicInfoDTO.getMosaic(),mosaicInfoDTO.getId());
     }
 
-    private MosaicInfo createMosaicInfo(MosaicDTO mosaic, String recordId, NetworkType networkType) {
+    private MosaicInfo createMosaicInfo(MosaicDTO mosaic, String recordId) {
         return new MosaicInfo(
             recordId,
             toMosaicId(mosaic.getId()),
             mosaic.getSupply(),
             mosaic.getStartHeight(),
-            new PublicAccount(mosaic.getOwnerPublicKey(), networkType),
+            MapperUtils.toAddress(mosaic.getOwnerAddress()),
             mosaic.getRevision(),
             extractMosaicFlags(mosaic),
             mosaic.getDivisibility(),

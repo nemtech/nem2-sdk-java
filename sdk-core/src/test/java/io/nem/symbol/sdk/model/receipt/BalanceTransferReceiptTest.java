@@ -24,7 +24,6 @@ import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
@@ -42,12 +41,9 @@ public class BalanceTransferReceiptTest {
 
     @BeforeAll
     public static void setup() {
-        account =
-            new Account("787225aaff3d2c71f4ffa32d4f19ec4922f3cd869747f267378f81f8e3fcb12d",
-                networkType);
+        account = Account.generateNewAccount(networkType);
         mosaicId = new MosaicId("85BBEA6CC462B244");
-        address = new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
-            NetworkType.MIJIN_TEST);
+        address = Address.generateRandom(networkType);
         unresolvedAddress = address;
 
     }
@@ -57,7 +53,7 @@ public class BalanceTransferReceiptTest {
 
         BalanceTransferReceipt balanceTransferReceipt =
             new BalanceTransferReceipt(
-                account.getPublicAccount(),
+                account.getAddress(),
                 unresolvedAddress,
                 mosaicId,
                 BigInteger.valueOf(10),
@@ -67,30 +63,31 @@ public class BalanceTransferReceiptTest {
         assertFalse(balanceTransferReceipt.getSize().isPresent());
         assertEquals(ReceiptVersion.BALANCE_TRANSFER, balanceTransferReceipt.getVersion());
         assertEquals(
-            balanceTransferReceipt.getSender().getPublicKey().toHex().toUpperCase(),
-            account.getPublicKey().toUpperCase());
-        assertEquals(MapperUtils.toAddressFromEncoded(balanceTransferReceipt.getRecipient().encoded(
+            balanceTransferReceipt.getSender(),
+            account.getAddress());
+        assertEquals(MapperUtils.toAddress(balanceTransferReceipt.getRecipient().encoded(
             networkType)), address);
         assertEquals("85BBEA6CC462B244",
             balanceTransferReceipt.getMosaicId().getIdAsHex().toUpperCase());
         assertEquals(BigInteger.TEN, balanceTransferReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceTransferReceipt.serialize());
+
         Assertions.assertEquals(
-            "01004D1244B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F290CCB2D8723A173450E6404FDA1AFAAE0BDAB524508430C75E",
+            "01004D1244B262C46CEABB850A00000000000000" + account.getPublicAccount().getAddress().encoded()
+                + unresolvedAddress.encoded(),
             hex);
 
     }
 
     @Test
     void shouldSerializeTheSameAsTypescript() {
-
+        Address sender = Address.generateRandom(networkType);
+        Address recipient = Address.generateRandom(networkType);
         BalanceTransferReceipt balanceTransferReceipt =
             new BalanceTransferReceipt(
-                Account.createFromPrivateKey(
-                    "D242FB34C2C4DD36E995B9C865F93940065E326661BA5A4A247331D211FE3A3D", networkType)
-                    .getPublicAccount(),
-                Address.createFromEncoded("9103B60AAF2762688300000000000000000000000000000000"),
+                sender,
+                recipient,
                 new MosaicId("941299B2B7E1291C"),
                 BigInteger.valueOf(1000),
                 ReceiptType.MOSAIC_RENTAL_FEE,
@@ -98,7 +95,7 @@ public class BalanceTransferReceiptTest {
 
         String hex = ConvertUtils.toHex(balanceTransferReceipt.serialize());
         Assertions.assertEquals(
-            "01004D121C29E1B7B2991294E803000000000000DF9B9967718FFCF2BEE9112A61EECA2BA0CDD29E5E4A3CD04A39FC3A78EAC94F9103B60AAF2762688300000000000000000000000000000000",
+            "01004D121C29E1B7B2991294E803000000000000" + sender.encoded() + recipient.encoded(),
             hex.toUpperCase());
     }
 
@@ -107,7 +104,7 @@ public class BalanceTransferReceiptTest {
 
         BalanceTransferReceipt balanceTransferReceipt =
             new BalanceTransferReceipt(
-                account.getPublicAccount(),
+                account.getPublicAccount().getAddress(),
                 unresolvedAddress,
                 mosaicId,
                 BigInteger.valueOf(10),
@@ -117,17 +114,22 @@ public class BalanceTransferReceiptTest {
         assertFalse(balanceTransferReceipt.getSize().isPresent());
         assertEquals(ReceiptVersion.BALANCE_TRANSFER, balanceTransferReceipt.getVersion());
         assertEquals(
-            balanceTransferReceipt.getSender().getPublicKey().toHex().toUpperCase(),
-            account.getPublicKey().toUpperCase());
-        assertEquals(MapperUtils.toAddressFromEncoded(balanceTransferReceipt.getRecipient().encoded(
+            balanceTransferReceipt.getSender(),
+            account.getAddress());
+        assertEquals(MapperUtils.toAddress(balanceTransferReceipt.getRecipient().encoded(
             networkType)), address);
         assertEquals("85BBEA6CC462B244",
             balanceTransferReceipt.getMosaicId().getIdAsHex().toUpperCase());
         assertEquals(BigInteger.TEN, balanceTransferReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceTransferReceipt.serialize());
+
+        System.out.println(account.getPublicAccount().getAddress().encoded());
+        System.out.println(unresolvedAddress.encoded());
+
         Assertions.assertEquals(
-            "01004E1344B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F290CCB2D8723A173450E6404FDA1AFAAE0BDAB524508430C75E",
+            "01004E1344B262C46CEABB850A00000000000000" + account.getPublicAccount().getAddress().encoded()
+                + unresolvedAddress.encoded(),
             hex);
 
     }
@@ -137,7 +139,7 @@ public class BalanceTransferReceiptTest {
 
         BalanceTransferReceipt balanceTransferReceipt =
             new BalanceTransferReceipt(
-                account.getPublicAccount(),
+                account.getAddress(),
                 unresolvedAddress,
                 mosaicId,
                 BigInteger.valueOf(10),
@@ -146,20 +148,19 @@ public class BalanceTransferReceiptTest {
         assertEquals(ReceiptType.NAMESPACE_RENTAL_FEE, balanceTransferReceipt.getType());
         assertFalse(balanceTransferReceipt.getSize().isPresent());
         assertEquals(ReceiptVersion.BALANCE_TRANSFER, balanceTransferReceipt.getVersion());
-        assertEquals(
-            balanceTransferReceipt.getSender().getPublicKey().toHex().toUpperCase(),
-            account.getPublicKey().toUpperCase());
-        assertEquals(MapperUtils.toAddressFromEncoded(balanceTransferReceipt.getRecipient().encoded(
+        assertEquals(balanceTransferReceipt.getSender(), account.getAddress());
+        assertEquals(MapperUtils.toAddress(balanceTransferReceipt.getRecipient().encoded(
             networkType)), address);
         assertEquals("85BBEA6CC462B244",
             balanceTransferReceipt.getMosaicId().getIdAsHex().toUpperCase());
         assertEquals(BigInteger.TEN, balanceTransferReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceTransferReceipt.serialize());
-        Assertions.assertEquals(
-            "01004E1344B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F290CCB2D8723A173450E6404FDA1AFAAE0BDAB524508430C75E",
-            hex);
 
+        Assertions.assertEquals(
+            "01004E1344B262C46CEABB850A00000000000000" + account.getPublicAccount().getAddress().encoded()
+                + unresolvedAddress.encoded(),
+            hex);
     }
 
     @Test
@@ -168,7 +169,7 @@ public class BalanceTransferReceiptTest {
             IllegalArgumentException.class,
             () -> {
                 new BalanceChangeReceipt(
-                    account.getPublicAccount(),
+                    account.getAddress(),
                     mosaicId,
                     BigInteger.valueOf(10),
                     ReceiptType.NAMESPACE_EXPIRED,

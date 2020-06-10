@@ -20,6 +20,8 @@ import io.nem.symbol.sdk.api.BlockOrderBy;
 import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.BlockSearchCriteria;
 import io.nem.symbol.sdk.api.Page;
+import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerklePathItem;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
@@ -67,10 +69,10 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
     public Observable<Page<BlockInfo>> search(BlockSearchCriteria criteria) {
         Consumer<Handler<AsyncResult<BlockPage>>> callback = handler -> getClient()
             .searchBlocks(toDto(criteria.getSignerPublicKey()),
-                toDto(criteria.getBeneficiaryPublicKey()),
+                toDto(criteria.getBeneficiaryAddress()),
                 criteria.getPageSize(),
                 criteria.getPageNumber(), criteria.getOffset(),
-                toDto(criteria.getOrder()), toDto(criteria.getOrderBy()),handler);
+                toDto(criteria.getOrder()), toDto(criteria.getOrderBy()), handler);
 
         return exceptionHandling(
             call(callback).map(mosaicPage -> this.toPage(mosaicPage.getPagination(),
@@ -104,7 +106,8 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
 
 
     public static BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO) {
-        return BlockInfo.create(
+        NetworkType networkType = NetworkType.rawValueOf(blockInfoDTO.getBlock().getNetwork().getValue());
+        return new BlockInfo(
             blockInfoDTO.getId(), blockInfoDTO.getMeta().getHash(),
             blockInfoDTO.getMeta().getGenerationHash(),
             blockInfoDTO.getMeta().getTotalFee(),
@@ -112,8 +115,8 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
             Optional.ofNullable(blockInfoDTO.getMeta().getNumStatements()),
             blockInfoDTO.getMeta().getStateHashSubCacheMerkleRoots(),
             blockInfoDTO.getBlock().getSignature(),
-            blockInfoDTO.getBlock().getSignerPublicKey(),
-            NetworkType.rawValueOf(blockInfoDTO.getBlock().getNetwork().getValue()),
+            PublicAccount.createFromPublicKey(blockInfoDTO.getBlock().getSignerPublicKey(), networkType),
+            networkType,
             blockInfoDTO.getBlock().getVersion(),
             blockInfoDTO.getBlock().getType(),
             blockInfoDTO.getBlock().getHeight(),
@@ -127,7 +130,7 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
             blockInfoDTO.getBlock().getProofGamma(),
             blockInfoDTO.getBlock().getProofScalar(),
             blockInfoDTO.getBlock().getProofVerificationHash(),
-            blockInfoDTO.getBlock().getBeneficiaryPublicKey());
+            Address.createFromEncoded(blockInfoDTO.getBlock().getBeneficiaryAddress()));
     }
 
     public BlockRoutesApi getClient() {

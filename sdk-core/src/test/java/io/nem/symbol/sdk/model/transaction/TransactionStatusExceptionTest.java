@@ -19,6 +19,7 @@ package io.nem.symbol.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,7 @@ class TransactionStatusExceptionTest {
 
     @Test
     void getStatusError() {
-        Address address = Address.createFromRawAddress("SCJFR55L7KWHERD2VW6C3NR2MBZLVDQWDHCHH6ZP");
+        Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
         TransactionStatusError transactionStatusError =
             new TransactionStatusError(address, "hash", "error",
                 new Deadline(BigInteger.valueOf(1)));

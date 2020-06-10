@@ -79,7 +79,7 @@ class MosaicIdTest {
         byte[] bytes = new byte[]{0x0, 0x0, 0x0, 0x0};
         MosaicNonce nonce = new MosaicNonce(bytes);
         MosaicId mosaicId = MosaicId.createFromNonce(nonce, owner);
-        MosaicId mosaicId2 = new MosaicId(new BigInteger("992621222383397347"));
+        MosaicId mosaicId2 = new MosaicId(new BigInteger("5331590414131997017"));
         assertTrue(mosaicId.equals(mosaicId2));
     }
 

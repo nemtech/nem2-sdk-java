@@ -17,7 +17,9 @@
 package io.nem.symbol.sdk.model.mosaic;
 
 import io.nem.symbol.sdk.model.Stored;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import java.math.BigInteger;
 import java.util.Optional;
 
@@ -34,7 +36,7 @@ public class MosaicInfo implements Stored {
     private final MosaicId mosaicId;
     private final BigInteger supply;
     private final BigInteger startHeight;
-    private final PublicAccount owner;
+    private final Address ownerAddress;
     private final Integer revision;
     private final MosaicFlags mosaicFlags;
     private final int divisibility;
@@ -42,13 +44,13 @@ public class MosaicInfo implements Stored {
 
     @SuppressWarnings("squid:S00107")
     public MosaicInfo(final String recordId, final MosaicId mosaicId, final BigInteger supply,
-        final BigInteger startHeight, final PublicAccount owner, final Integer revision,
+        final BigInteger startHeight, final Address ownerAddress, final Integer revision,
         final MosaicFlags mosaicFlags, final int divisibility, final BigInteger duration) {
         this.recordId = recordId;
         this.mosaicId = mosaicId;
         this.supply = supply;
         this.startHeight = startHeight;
-        this.owner = owner;
+        this.ownerAddress = ownerAddress;
         this.revision = revision;
         this.mosaicFlags = mosaicFlags;
         this.divisibility = divisibility;
@@ -83,12 +85,12 @@ public class MosaicInfo implements Stored {
     }
 
     /**
-     * Returns the mosaic account owner
+     * Returns the mosaic account address
      *
      * @return mosaic account owner
      */
-    public PublicAccount getOwner() {
-        return owner;
+    public UnresolvedAddress getOwnerAddress() {
+        return ownerAddress;
     }
 
     /**

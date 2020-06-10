@@ -30,10 +30,11 @@ import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.AddressAlias;
 import java.math.BigInteger;
 import java.util.Optional;
+import org.apache.commons.lang3.Validate;
 
 public class BalanceTransferReceipt extends Receipt {
 
-    private final PublicAccount sender;
+    private final Address sender;
     private final Address recipient;
     private final MosaicId mosaicId;
     private final BigInteger amount;
@@ -41,7 +42,7 @@ public class BalanceTransferReceipt extends Receipt {
     /**
      * Constructor
      *
-     * @param sender Sender's Public Account
+     * @param sender Sender's Address
      * @param recipient Recipient Address
      * @param mosaicId Mosaic Id
      * @param amount Amount
@@ -50,7 +51,7 @@ public class BalanceTransferReceipt extends Receipt {
      * @param size Receipt Size
      */
     public BalanceTransferReceipt(
-        PublicAccount sender,
+        Address sender,
         Address recipient,
         MosaicId mosaicId,
         BigInteger amount,
@@ -58,6 +59,10 @@ public class BalanceTransferReceipt extends Receipt {
         ReceiptVersion version,
         Optional<Integer> size) {
         super(type, version, size);
+        Validate.notNull(sender, "sender must not be null");
+        Validate.notNull(recipient, "recipient must not be null");
+        Validate.notNull(amount, "amount must not be null");
+        Validate.notNull(mosaicId, "mosaicId must not be null");
         this.sender = sender;
         this.recipient = recipient;
         this.amount = amount;
@@ -77,7 +82,7 @@ public class BalanceTransferReceipt extends Receipt {
      * @param version Receipt Version
      */
     public BalanceTransferReceipt(
-        PublicAccount sender,
+        Address sender,
         Address recipient,
         MosaicId mosaicId,
         BigInteger amount,
@@ -96,7 +101,7 @@ public class BalanceTransferReceipt extends Receipt {
      *
      * @return sender's Public Account
      */
-    public PublicAccount getSender() {
+    public Address getSender() {
         return this.sender;
     }
 
@@ -139,10 +144,10 @@ public class BalanceTransferReceipt extends Receipt {
         final MosaicBuilder mosaic = MosaicBuilder
             .create(new MosaicIdDto(getMosaicId().getIdAsLong()),
                 new AmountDto(getAmount().longValue()));
-        final KeyDto senderPublicKey = SerializationUtils.toKeyDto(getSender().getPublicKey());
+        final AddressDto senderAddress = SerializationUtils.toAddressDto(getSender());
         final AddressDto recipientAddress = SerializationUtils.toAddressDto(getRecipient());
         return BalanceTransferReceiptBuilder
-            .create(version, type, mosaic, senderPublicKey, recipientAddress).serialize();
+            .create(version, type, mosaic, senderAddress, recipientAddress).serialize();
     }
 
     /**

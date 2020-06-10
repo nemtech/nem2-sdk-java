@@ -52,9 +52,8 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     }
     @Test
     public void shouldGetAccountInfo() throws Exception {
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+
+        Address address = Address.generateRandom(networkType);
 
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
@@ -97,9 +96,8 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
 
     @Test
     public void shouldGetAccountsInfoFromAddresses() throws Exception {
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+
+        Address address = Address.generateRandom(networkType);
 
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
@@ -141,9 +139,8 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
 
     @Test
     public void shouldProcessExceptionWhenNotFound() throws Exception {
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+
+        Address address = Address.generateRandom(networkType);
 
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
@@ -165,9 +162,8 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
 
     @Test
     public void shouldProcessExceptionWhenNotFoundInvalidResponse() throws Exception {
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+
+        Address address = Address.generateRandom(networkType);
 
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);

@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.model.blockchain;
 
 import io.nem.symbol.sdk.model.Stored;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
@@ -51,10 +52,10 @@ public class BlockInfo implements Stored {
     private final String proofGamma;
     private final String proofScalar;
     private final String proofVerificationHash;
-    private final PublicAccount beneficiaryPublicAccount;
+    private final Address beneficiaryAddress;
 
     @SuppressWarnings("squid:S00107")
-    private BlockInfo(
+    public BlockInfo(
         String recordId,
         String hash,
         String generationHash,
@@ -78,7 +79,7 @@ public class BlockInfo implements Stored {
         String proofGamma,
         String proofScalar,
         String proofVerificationHash,
-        PublicAccount beneficiaryPublicAccount) {
+        Address beneficiaryAddress) {
         this.recordId = recordId;
         this.hash = hash;
         this.generationHash = generationHash;
@@ -102,63 +103,9 @@ public class BlockInfo implements Stored {
         this.proofGamma = proofGamma;
         this.proofScalar = proofScalar;
         this.proofVerificationHash = proofVerificationHash;
-        this.beneficiaryPublicAccount = beneficiaryPublicAccount;
+        this.beneficiaryAddress = beneficiaryAddress;
     }
 
-    @SuppressWarnings("squid:S00107")
-    public static BlockInfo create(
-        String recordId, String hash,
-        String generationHash,
-        BigInteger totalFee,
-        Integer numTransactions,
-        Optional<Integer> numStatements,
-        List<String> subCacheMerkleRoots,
-        String signature,
-        String signer,
-        NetworkType networkType,
-        Integer version,
-        int type,
-        BigInteger height,
-        BigInteger timestamp,
-        BigInteger difficulty,
-        Integer feeMultiplier,
-        String previousBlockHash,
-        String blockTransactionsHash,
-        String blockReceiptsHash,
-        String stateHash,
-        String proofGamma,
-        String proofScalar,
-        String proofVerificationHash,
-        String beneficiaryPublicKey) {
-        PublicAccount signerPublicAccount = BlockInfo.getPublicAccount(signer, networkType);
-        PublicAccount beneficiaryPublicAccount = beneficiaryPublicKey == null ? null :
-            BlockInfo.getPublicAccount(beneficiaryPublicKey, networkType);
-        return new BlockInfo(
-            recordId,
-            hash,
-            generationHash,
-            totalFee,
-            numTransactions,
-            numStatements,
-            subCacheMerkleRoots,
-            signature,
-            signerPublicAccount,
-            networkType,
-            version,
-            type,
-            height,
-            timestamp,
-            difficulty,
-            feeMultiplier,
-            previousBlockHash,
-            blockTransactionsHash,
-            blockReceiptsHash,
-            stateHash,
-            proofGamma,
-            proofScalar,
-            proofVerificationHash,
-            beneficiaryPublicAccount);
-    }
 
     /**
      * Get public account
@@ -361,12 +308,12 @@ public class BlockInfo implements Stored {
     }
 
     /**
-     * Returns the beneficiary public account.
+     * Returns the beneficiary address.
      *
      * @return PublicAccount
      */
-    public PublicAccount getBeneficiaryPublicAccount() {
-        return beneficiaryPublicAccount;
+    public Address getBeneficiaryAddress() {
+        return beneficiaryAddress;
     }
 
     /**

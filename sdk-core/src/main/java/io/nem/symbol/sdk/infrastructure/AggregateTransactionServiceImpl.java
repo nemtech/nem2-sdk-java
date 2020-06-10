@@ -26,6 +26,7 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountGraphInfo;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionCosignature;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransaction;
@@ -70,11 +71,11 @@ public class AggregateTransactionServiceImpl implements AggregateTransactionServ
         /*
          * Include both initiator & cosigners
          */
-        Set<PublicKey> signers = transaction.getCosignatures().stream()
+        Set<Address> signers = transaction.getCosignatures().stream()
             .map(AggregateTransactionCosignature::getSigner)
-            .map(PublicAccount::getPublicKey).collect(Collectors.toSet());
+            .map(PublicAccount::getAddress).collect(Collectors.toSet());
 
-        signers.add(signedTransaction.getSigner().getPublicKey());
+        signers.add(signedTransaction.getSigner().getAddress());
 
         return Observable.fromIterable(transaction.getInnerTransactions())
             .flatMap(innerTransaction ->
@@ -83,10 +84,10 @@ public class AggregateTransactionServiceImpl implements AggregateTransactionServ
                         .getAddress()).flatMap(multisigAccountInfo ->
                     multisigAccountInfo.getMinRemoval() != 0
                         && multisigAccountInfo.getMinApproval() != 0 ? multisigRepository
-                        .getMultisigAccountGraphInfo(multisigAccountInfo.getAccount().getAddress())
+                        .getMultisigAccountGraphInfo(multisigAccountInfo.getAccountAddress())
                         .map(graphInfo -> validateCosignatories(graphInfo, signers,
                             innerTransaction)) : Observable.just(signers.stream()
-                        .anyMatch(s -> s.equals(multisigAccountInfo.getAccount().getPublicKey()))))
+                        .anyMatch(s -> s.equals(multisigAccountInfo.getAccountAddress()))))
             ).all(v -> v).toObservable();
     }
 
@@ -97,8 +98,7 @@ public class AggregateTransactionServiceImpl implements AggregateTransactionServ
                 Stream<Address> publicAccountStream = multisigAccountGraphInfo
                     .getMultisigAccounts().values().stream().flatMap(
                         accounts -> accounts.stream()
-                            .flatMap(account -> account.getCosignatories().stream()
-                                .map(PublicAccount::getAddress)));
+                            .flatMap(account -> account.getCosignatoryAddresses().stream()));
                 return publicAccountStream.collect(Collectors.toSet()).size();
             });
     }
@@ -128,10 +128,10 @@ public class AggregateTransactionServiceImpl implements AggregateTransactionServ
      * @return true if the cosignatories are enough to sign.
      */
     private boolean validateCosignatories(MultisigAccountGraphInfo graphInfo,
-        Set<PublicKey> cosignatories,
+        Set<Address> cosignatories,
         Transaction innerTransaction) {
         // Validate cosignatories from bottom level to top
-        Set<PublicKey> cosignatoriesReceived = new HashSet<>(cosignatories);
+        Set<Address> cosignatoriesReceived = new HashSet<>(cosignatories);
 
         // Check inner transaction. If remove cosigner from multisig account,
         // use minRemoval instead of minApproval for cosignatories validation.
@@ -139,7 +139,7 @@ public class AggregateTransactionServiceImpl implements AggregateTransactionServ
         boolean isMultisigRemoval =
             (innerTransaction.getType() == TransactionType.MULTISIG_ACCOUNT_MODIFICATION)
                 && !((MultisigAccountModificationTransaction) innerTransaction)
-                .getPublicKeyDeletions()
+                .getAddressDeletions()
                 .isEmpty();
 
         Map<Integer, List<MultisigAccountInfo>> storedMap = new TreeMap<>(graphInfo
@@ -149,8 +149,7 @@ public class AggregateTransactionServiceImpl implements AggregateTransactionServ
             .anyMatch(entry -> entry.stream().allMatch(multisig -> {
                 if (multisig.getMinApproval() > 0 && multisig.getMinRemoval() > 0) {
                     // To make sure it is multisig account
-                    Set<PublicKey> matchedCosignatories = multisig.getCosignatories().stream()
-                        .map(PublicAccount::getPublicKey).collect(
+                    Set<Address> matchedCosignatories = multisig.getCosignatoryAddresses().stream().collect(
                             Collectors.toSet());
                     matchedCosignatories.retainAll(cosignatoriesReceived);
                     /*
@@ -162,7 +161,7 @@ public class AggregateTransactionServiceImpl implements AggregateTransactionServ
                         && !isMultisigRemoval) || (
                         matchedCosignatories.size() >= multisig.getMinRemoval()
                             && isMultisigRemoval)) {
-                        cosignatoriesReceived.add(multisig.getAccount().getPublicKey());
+                        cosignatoriesReceived.add(multisig.getAccountAddress());
                         return true;
                     } else {
                         return false;

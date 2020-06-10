@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +39,7 @@ class MosaicSearchCriteriaTest {
     @Test
     void shouldSetValues() {
 
-        Address address1 = Address.createFromRawAddress("MCTVW23D2MN5VE4AQ4TZIDZENGNOZXPRPR72DY33");
+        Address address1 = Address.generateRandom(NetworkType.MIJIN_TEST);
 
         MosaicSearchCriteria criteria = new MosaicSearchCriteria();
 
@@ -58,7 +59,7 @@ class MosaicSearchCriteriaTest {
     @Test
     void shouldUseBuilderMethods() {
 
-        Address address1 = Address.createFromRawAddress("MCTVW23D2MN5VE4AQ4TZIDZENGNOZXPRPR72DY33");
+        Address address1 = Address.generateRandom(NetworkType.MIJIN_TEST);
 
         MosaicSearchCriteria criteria = new MosaicSearchCriteria()
             .order(OrderBy.ASC).pageSize(10).pageNumber(5).ownerAddress(address1).offset("abc");
@@ -73,7 +74,7 @@ class MosaicSearchCriteriaTest {
     @Test
     void shouldBeEquals() {
 
-        Address address1 = Address.createFromRawAddress("MCTVW23D2MN5VE4AQ4TZIDZENGNOZXPRPR72DY33");
+        Address address1 = Address.generateRandom(NetworkType.MIJIN_TEST);
 
         MosaicSearchCriteria criteria1 = new MosaicSearchCriteria()
             .order(OrderBy.ASC).pageSize(10).pageNumber(5).ownerAddress(address1).offset("abc");

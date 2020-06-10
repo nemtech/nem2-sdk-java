@@ -17,6 +17,8 @@
 package io.nem.symbol.sdk.model.metadata;
 
 import io.nem.symbol.core.utils.MapperUtils;
+import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import java.math.BigInteger;
@@ -33,14 +35,14 @@ public class MetadataEntry {
      */
     private final String compositeHash;
     /**
-     * The metadata sender's public key
+     * The metadata source address
      */
-    private final String senderPublicKey;
+    private final Address sourceAddress;
 
     /**
-     * The metadata target public key
+     * The metadata target address
      */
-    private final String targetPublicKey;
+    private final Address targetAddress;
 
     /**
      * The key scoped to source, target and type
@@ -67,12 +69,12 @@ public class MetadataEntry {
     private final Optional<Object> targetId;
 
     @SuppressWarnings("squid:S00107")
-    public MetadataEntry(String compositeHash, String senderPublicKey, String targetPublicKey,
+    public MetadataEntry(String compositeHash, Address sourceAddress, Address targetAddress,
         BigInteger scopedMetadataKey, MetadataType metadataType,
         String value, Optional<String> targetId) {
         this.compositeHash = compositeHash;
-        this.senderPublicKey = senderPublicKey;
-        this.targetPublicKey = targetPublicKey;
+        this.sourceAddress = sourceAddress;
+        this.targetAddress = targetAddress;
         this.scopedMetadataKey = scopedMetadataKey;
         this.metadataType = metadataType;
         this.value = value;
@@ -97,12 +99,12 @@ public class MetadataEntry {
         return compositeHash;
     }
 
-    public String getSenderPublicKey() {
-        return senderPublicKey;
+    public Address getSourceAddress() {
+        return sourceAddress;
     }
 
-    public String getTargetPublicKey() {
-        return targetPublicKey;
+    public Address getTargetAddress() {
+        return targetAddress;
     }
 
     public BigInteger getScopedMetadataKey() {

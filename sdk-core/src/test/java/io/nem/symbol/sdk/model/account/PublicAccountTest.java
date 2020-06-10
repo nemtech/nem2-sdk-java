@@ -26,18 +26,17 @@ import org.junit.jupiter.api.Test;
 
 class PublicAccountTest {
 
-    private String plain = "SAKQRU2RTNWMBE3KAQRTA46T3EB6DX567FO4EBFL";
-    private String pretty = "SAKQRU-2RTNWM-BE3KAQ-RTA46T-3EB6DX-567FO4-EBFL";
-    private String encoded = "901508D3519B6CC0936A04233073D3D903E1DFBEF95DC204AB";
-    private String publicKey = "089E931203F63EECF695DB94957B03E1A6B7941532069B687386D6D4A7B6BE4A";
-    private NetworkType networkType = NetworkType.MIJIN_TEST;
+    private final String plain = "SAKQRU2RTNWMBE3KAQRTA46T3EB6DX567FO4EBA";
+    private final String pretty = "SAKQRU-2RTNWM-BE3KAQ-RTA46T-3EB6DX-567FO4-EBA";
+    private final String encoded = "901508D3519B6CC0936A04233073D3D903E1DFBEF95DC204";
+    private final String publicKey = "089E931203F63EECF695DB94957B03E1A6B7941532069B687386D6D4A7B6BE4A";
+    private final NetworkType networkType = NetworkType.MIJIN_TEST;
 
     @Test
     void shouldCreatePublicAccountViaConstructor() {
         PublicAccount publicAccount = new PublicAccount(publicKey, NetworkType.MIJIN_TEST);
         assertEquals(publicKey.toUpperCase(), publicAccount.getPublicKey().toHex());
-        assertEquals(plain,
-            publicAccount.getAddress().plain());
+        assertEquals(plain, publicAccount.getAddress().plain());
     }
 
     @Test
@@ -68,11 +67,12 @@ class PublicAccountTest {
     public void testAddresses() {
         assertAddress(Address.createFromRawAddress(plain));
         assertAddress(Address.createFromRawAddress(pretty));
-        assertAddress(Address.createFromEncoded(encoded));
         assertAddress(Address.createFromPublicKey(publicKey, networkType));
+        assertAddress(Address.createFromEncoded(encoded));
     }
 
     private void assertAddress(Address address) {
+        assertEquals(encoded, address.encoded());
         assertEquals(plain, address.plain());
         assertEquals(pretty, address.pretty());
         Assertions.assertEquals(networkType, address.getNetworkType());

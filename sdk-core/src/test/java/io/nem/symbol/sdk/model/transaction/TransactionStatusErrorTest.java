@@ -19,6 +19,7 @@ package io.nem.symbol.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,7 @@ class TransactionStatusErrorTest {
 
     @Test
     void getHash() {
-        Address address = Address.createFromRawAddress("SCJFR55L7KWHERD2VW6C3NR2MBZLVDQWDHCHH6ZP");
+        Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
         final TransactionStatusError transactionStatusError =
             new TransactionStatusError(address, "hash", "error",
                 new Deadline(BigInteger.valueOf(1)));
@@ -35,7 +36,7 @@ class TransactionStatusErrorTest {
 
     @Test
     void getStatus() {
-        Address address = Address.createFromRawAddress("SCJFR55L7KWHERD2VW6C3NR2MBZLVDQWDHCHH6ZP");
+        Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
         final TransactionStatusError transactionStatusError =
             new TransactionStatusError(address, "hash", "error",
                 new Deadline(BigInteger.valueOf(1)));
@@ -44,7 +45,7 @@ class TransactionStatusErrorTest {
 
     @Test
     void getDeadline() {
-        Address address = Address.createFromRawAddress("SCJFR55L7KWHERD2VW6C3NR2MBZLVDQWDHCHH6ZP");
+        Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
         Deadline deadline = new Deadline(BigInteger.valueOf(1));
         final TransactionStatusError transactionStatusError =
             new TransactionStatusError(address, "hash", "error", deadline);
@@ -53,7 +54,7 @@ class TransactionStatusErrorTest {
 
     @Test
     void getAddress() {
-        Address address = Address.createFromRawAddress("SCJFR55L7KWHERD2VW6C3NR2MBZLVDQWDHCHH6ZP");
+        Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
         Deadline deadline = new Deadline(BigInteger.valueOf(1));
         final TransactionStatusError transactionStatusError =
             new TransactionStatusError(address, "hash", "error", deadline);

@@ -50,7 +50,7 @@ public class AccountMetadataIntegrationTest extends BaseIntegrationTest {
 
         AccountMetadataTransaction transaction =
             AccountMetadataTransactionFactory.create(
-                getNetworkType(), testAccount.getPublicAccount(),
+                getNetworkType(), testAccount.getAddress(),
                 key,
                 message
             ).maxFee(this.maxFee).build();
@@ -78,7 +78,7 @@ public class AccountMetadataIntegrationTest extends BaseIntegrationTest {
         assertMetadata(transaction,
             Collections.singletonList(get(getRepositoryFactory(type).createMetadataRepository()
                 .getAccountMetadataByKeyAndSender(testAccount.getAddress(), key,
-                    testAccount.getPublicKey()))));
+                    testAccount.getAddress()))));
 
         Assertions.assertEquals(message, processedTransaction.getValue());
     }
@@ -93,7 +93,7 @@ public class AccountMetadataIntegrationTest extends BaseIntegrationTest {
                 m.getMetadataEntry().getMetadataType()
                     .equals(MetadataType.ACCOUNT) &&
                 m.getMetadataEntry()
-                    .getTargetPublicKey().equals(testAccount.getPublicKey())).findFirst();
+                    .getTargetAddress().equals(testAccount.getAddress())).findFirst();
 
         Assertions.assertTrue(endpointMetadata.isPresent());
         Assertions.assertEquals(transaction.getValue(),

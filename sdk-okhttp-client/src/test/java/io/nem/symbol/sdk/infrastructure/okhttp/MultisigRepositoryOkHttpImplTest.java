@@ -37,10 +37,10 @@ import org.junit.jupiter.api.Test;
 public class MultisigRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest {
 
     private MultisigRepositoryOkHttpImpl repository;
-    private Account account = Account.generateNewAccount(networkType);
-    private Account account1 = Account.generateNewAccount(networkType);
-    private Account account2 = Account.generateNewAccount(networkType);
-    private Account account3 = Account.generateNewAccount(networkType);
+    private final Account account = Account.generateNewAccount(networkType);
+    private final Account account1 = Account.generateNewAccount(networkType);
+    private final Account account2 = Account.generateNewAccount(networkType);
+    private final Account account3 = Account.generateNewAccount(networkType);
 
     @BeforeEach
     public void setUp() {
@@ -65,12 +65,12 @@ public class MultisigRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
 
     private void assertMultisignAccountInfo(MultisigAccountInfo multisigAccountInfo) {
         Assertions
-            .assertEquals(Arrays.asList(account1.getPublicAccount(), account2.getPublicAccount()),
-                multisigAccountInfo.getCosignatories());
+            .assertEquals(Arrays.asList(account1.getAddress(), account2.getAddress()),
+                multisigAccountInfo.getCosignatoryAddresses());
 
         Assertions
-            .assertEquals(Arrays.asList(account2.getPublicAccount(), account3.getPublicAccount()),
-                multisigAccountInfo.getMultisigAccounts());
+            .assertEquals(Arrays.asList(account2.getAddress(), account3.getAddress()),
+                multisigAccountInfo.getMultisigAddresses());
 
         Assertions
             .assertEquals(1,
@@ -81,8 +81,8 @@ public class MultisigRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
                 multisigAccountInfo.getMinRemoval());
 
         Assertions
-            .assertEquals(account.getPublicAccount(),
-                multisigAccountInfo.getAccount());
+            .assertEquals(account.getAddress(),
+                multisigAccountInfo.getAccountAddress());
     }
 
     @Test
@@ -118,13 +118,12 @@ public class MultisigRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
 
         MultisigDTO multisigDto = new MultisigDTO();
         multisigDto.setAccountAddress(account.getAddress().encoded());
-        multisigDto.setAccountPublicKey(account.getPublicKey());
         multisigDto.setMinApproval(1);
         multisigDto.setMinRemoval(2);
-        multisigDto.setCosignatoryPublicKeys(
-            Arrays.asList(account1.getPublicKey(), account2.getPublicKey()));
+        multisigDto.setCosignatoryAddresses(
+            Arrays.asList(account1.getAddress().encoded(), account2.getAddress().encoded()));
         multisigDto
-            .setMultisigPublicKeys(Arrays.asList(account2.getPublicKey(), account3.getPublicKey()));
+            .setMultisigAddresses(Arrays.asList(account2.getAddress().encoded(), account3.getAddress().encoded()));
         dto.setMultisig(multisigDto);
         return dto;
     }

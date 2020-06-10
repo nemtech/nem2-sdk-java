@@ -76,8 +76,7 @@ public class Account {
      * @return the account.
      */
     public static Account generateNewAccount(NetworkType networkType) {
-        KeyPair keyPair = KeyPair.random();
-        return new Account(keyPair.getPrivateKey().toHex(), networkType);
+        return new Account(KeyPair.random(), networkType);
     }
 
     /**
@@ -95,7 +94,7 @@ public class Account {
      * @return {@link String}
      */
     public String getPrivateKey() {
-        return this.keyPair.getPrivateKey().toHex().toUpperCase();
+        return this.keyPair.getPrivateKey().toHex();
     }
 
     /**

@@ -50,7 +50,7 @@ class AddressAliasTransactionMapper extends
             networkType,
             aliasAction,
             namespaceId,
-            MapperUtils.toAddressFromEncoded(transaction.getAddress()));
+            MapperUtils.toAddress(transaction.getAddress()));
     }
 
     @Override

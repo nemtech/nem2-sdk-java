@@ -183,9 +183,7 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         Account account = Account.createFromPrivateKey(
             "063F36659A8BB01D5685826C19E2C2CA9D281465B642BD5E43CB69510408ECF7", networkType);
 
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = Address.generateRandom(networkType);
 
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(NetworkType.MIJIN_TEST,

@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.sdk.api.BlockSearchCriteria;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.symbol.sdk.model.blockchain.Position;
@@ -76,6 +77,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
     @Test
     public void shouldGetBlockByHeight() throws Exception {
 
+        Address address = Address.generateRandom(networkType);
         BlockInfoDTO dto = new BlockInfoDTO();
         BlockMetaDTO metaDTO = new BlockMetaDTO();
         metaDTO.setHash("someHash");
@@ -92,8 +94,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
         blockDto.setVersion(3);
         blockDto
             .setSignerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
-        blockDto.setBeneficiaryPublicKey(
-            "B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
+        blockDto.setBeneficiaryAddress(address.encoded());
         blockDto.setHeight(BigInteger.valueOf(9L));
 
         blockDto.setNetwork(NetworkTypeEnum.NUMBER_144);
@@ -106,8 +107,8 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
 
         Assertions.assertNotNull(info);
 
-        Assertions.assertEquals(blockDto.getBeneficiaryPublicKey(),
-            info.getBeneficiaryPublicAccount().getPublicKey().toHex());
+        Assertions.assertEquals(blockDto.getBeneficiaryAddress(),
+            info.getBeneficiaryAddress().encoded());
 
         Assertions.assertEquals(blockDto.getSignerPublicKey(),
             info.getSignerPublicAccount().getPublicKey().toHex());
@@ -126,12 +127,14 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
             .assertEquals(metaDTO.getTotalFee(), info.getTotalFee());
 
         Assertions.assertEquals(blockDto.getHeight(), info.getHeight());
+        Assertions.assertEquals(address, info.getBeneficiaryAddress());
 
     }
 
     @Test
     public void shouldGetBlocksByHeightWithLimit() throws Exception {
 
+        Address address = Address.generateRandom(networkType);
         BlockInfoDTO dto = new BlockInfoDTO();
         BlockMetaDTO metaDTO = new BlockMetaDTO();
         metaDTO.setHash("someHash");
@@ -148,8 +151,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
         blockDto.setVersion(3);
         blockDto
             .setSignerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
-        blockDto.setBeneficiaryPublicKey(
-            "B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
+        blockDto.setBeneficiaryAddress(address.encoded());
         blockDto.setHeight(BigInteger.valueOf(9L));
         blockDto.setNetwork(NetworkTypeEnum.NUMBER_144);
 
@@ -170,8 +172,8 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
         BlockInfo info = resolvedList.get(0);
         Assertions.assertNotNull(info);
 
-        Assertions.assertEquals(blockDto.getBeneficiaryPublicKey(),
-            info.getBeneficiaryPublicAccount().getPublicKey().toHex());
+        Assertions.assertEquals(blockDto.getBeneficiaryAddress(),
+            info.getBeneficiaryAddress().encoded());
 
         Assertions.assertEquals(blockDto.getSignerPublicKey(),
             info.getSignerPublicAccount().getPublicKey().toHex());
@@ -193,6 +195,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
         Assertions.assertEquals(blockDto.getProofGamma(), info.getProofGamma());
         Assertions.assertEquals(blockDto.getProofScalar(), info.getProofScalar());
         Assertions.assertEquals(blockDto.getProofVerificationHash(), info.getProofVerificationHash());
+        Assertions.assertEquals(address, info.getBeneficiaryAddress());
     }
 
 

@@ -55,11 +55,11 @@ public interface MetadataRepository {
      * @param targetAddress the address that holds the medata values with the given key sent by the
      * given public key.
      * @param key - Metadata key
-     * @param senderPublicKey The public key of the account that created the metadata.
+     * @param sourceAddress The address of the account that created the metadata.
      * @return Observable of {@link Metadata}
      */
     Observable<Metadata> getAccountMetadataByKeyAndSender(Address targetAddress, BigInteger key,
-        String senderPublicKey);
+        Address sourceAddress);
 
     /**
      * Returns the mosaic metadata given a mosaic id.
@@ -85,11 +85,11 @@ public interface MetadataRepository {
      *
      * @param targetMosaicId The mosaic id that holds the metadata values.
      * @param key Metadata key.
-     * @param senderPublicKey The public key of the account that created the metadata.
+     * @param sourceAddress The address of the account that created the metadata.
      * @return Observable of {@link Metadata} {@link List}
      */
     Observable<Metadata> getMosaicMetadataByKeyAndSender(MosaicId targetMosaicId, BigInteger key,
-        String senderPublicKey);
+        Address sourceAddress);
 
     /**
      * Returns the mosaic metadata given a mosaic id.
@@ -116,10 +116,10 @@ public interface MetadataRepository {
      *
      * @param targetNamespaceId The namespace id that holds the metadata values.
      * @param key Metadata key.
-     * @param senderPublicKey The public key of the account that created the metadata.
+     * @param sourceAddress The address of the account that created the metadata.
      * @return Observable of {@link Metadata}
      */
     Observable<Metadata> getNamespaceMetadataByKeyAndSender(NamespaceId targetNamespaceId,
-        BigInteger key, String senderPublicKey);
+        BigInteger key, Address sourceAddress);
 
 }

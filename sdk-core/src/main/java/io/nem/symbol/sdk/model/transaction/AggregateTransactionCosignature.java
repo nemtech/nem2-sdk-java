@@ -25,6 +25,7 @@ import io.nem.symbol.sdk.model.account.PublicAccount;
  */
 public class AggregateTransactionCosignature {
 
+    public static final long VERSION = 1;
     private final String signature;
     private final PublicAccount signer;
 

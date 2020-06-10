@@ -17,6 +17,8 @@
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.core.crypto.PublicKey;
+import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,9 +26,10 @@ import org.junit.jupiter.api.Test;
  * Test of {@link BlockSearchCriteria}
  */
 class BlockSearchCriteriaTest {
-
-    private final PublicKey publicKey1 = PublicKey.generateRandom();
-    private final PublicKey publicKey2 = PublicKey.generateRandom();
+    private final Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+    private final Account account2 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+    private final PublicKey publicKey1 = account1.getKeyPair().getPublicKey();
+    private final PublicKey publicKey2 = account2.getKeyPair().getPublicKey();
 
     @Test
     void shouldCreate() {
@@ -35,7 +38,7 @@ class BlockSearchCriteriaTest {
         Assertions.assertNull(criteria.getPageSize());
         Assertions.assertNull(criteria.getPageNumber());
         Assertions.assertNull(criteria.getOffset());
-        Assertions.assertNull(criteria.getBeneficiaryPublicKey());
+        Assertions.assertNull(criteria.getBeneficiaryAddress());
         Assertions.assertNull(criteria.getSignerPublicKey());
         Assertions.assertNull(criteria.getOrderBy());
     }
@@ -48,7 +51,7 @@ class BlockSearchCriteriaTest {
         criteria.setPageSize(10);
         criteria.setPageNumber(5);
         criteria.setOffset("abc");
-        criteria.setBeneficiaryPublicKey(publicKey1);
+        criteria.setBeneficiaryAddress(account1.getAddress());
         criteria.setSignerPublicKey(publicKey2);
         criteria.setOrderBy(BlockOrderBy.HEIGHT);
 
@@ -56,7 +59,7 @@ class BlockSearchCriteriaTest {
         Assertions.assertEquals(10, criteria.getPageSize());
         Assertions.assertEquals(5, criteria.getPageNumber());
         Assertions.assertEquals("abc", criteria.getOffset());
-        Assertions.assertEquals(publicKey1, criteria.getBeneficiaryPublicKey());
+        Assertions.assertEquals(account1.getAddress(), criteria.getBeneficiaryAddress());
         Assertions.assertEquals(publicKey2, criteria.getSignerPublicKey());
         Assertions.assertEquals(BlockOrderBy.HEIGHT, criteria.getOrderBy());
     }
@@ -65,14 +68,14 @@ class BlockSearchCriteriaTest {
     void shouldUseBuilderMethods() {
 
         BlockSearchCriteria criteria = new BlockSearchCriteria()
-            .order(OrderBy.ASC).pageSize(10).pageNumber(5).offset("abc").beneficiaryPublicKey(publicKey1)
+            .order(OrderBy.ASC).pageSize(10).pageNumber(5).offset("abc").beneficiaryAddress(account1.getAddress())
             .signerPublicKey(publicKey2).orderBy(BlockOrderBy.HEIGHT);
 
         Assertions.assertEquals(OrderBy.ASC, criteria.getOrder());
         Assertions.assertEquals(10, criteria.getPageSize());
         Assertions.assertEquals(5, criteria.getPageNumber());
         Assertions.assertEquals("abc", criteria.getOffset());
-        Assertions.assertEquals(publicKey1, criteria.getBeneficiaryPublicKey());
+        Assertions.assertEquals(account1.getAddress(), criteria.getBeneficiaryAddress());
         Assertions.assertEquals(publicKey2, criteria.getSignerPublicKey());
         Assertions.assertEquals(BlockOrderBy.HEIGHT, criteria.getOrderBy());
     }
@@ -81,11 +84,11 @@ class BlockSearchCriteriaTest {
     void shouldBeEquals() {
 
         BlockSearchCriteria criteria1 = new BlockSearchCriteria()
-            .order(OrderBy.ASC).pageSize(10).pageNumber(5).offset("abc").beneficiaryPublicKey(publicKey1)
+            .order(OrderBy.ASC).pageSize(10).pageNumber(5).offset("abc").beneficiaryAddress(account1.getAddress())
             .signerPublicKey(publicKey2).orderBy(BlockOrderBy.HEIGHT);
 
         BlockSearchCriteria criteria2 = new BlockSearchCriteria()
-            .order(OrderBy.ASC).pageSize(10).pageNumber(5).offset("abc").beneficiaryPublicKey(publicKey1)
+            .order(OrderBy.ASC).pageSize(10).pageNumber(5).offset("abc").beneficiaryAddress(account1.getAddress())
             .signerPublicKey(publicKey2).orderBy(BlockOrderBy.HEIGHT);
 
         Assertions.assertEquals(new BlockSearchCriteria(), new BlockSearchCriteria());

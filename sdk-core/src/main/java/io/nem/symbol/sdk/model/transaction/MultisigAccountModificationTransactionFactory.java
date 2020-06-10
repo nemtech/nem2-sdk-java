@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -29,22 +30,22 @@ public class MultisigAccountModificationTransactionFactory extends
 
     private final byte minApprovalDelta;
     private final byte minRemovalDelta;
-    private final List<PublicAccount> publicKeyAdditions;
-    private final List<PublicAccount> publicKeyDeletions;
+    private final List<UnresolvedAddress> addressAdditions;
+    private final List<UnresolvedAddress> addressDeletions;
 
     private MultisigAccountModificationTransactionFactory(
         NetworkType networkType,
         byte minApprovalDelta,
         byte minRemovalDelta,
-        List<PublicAccount> publicKeyAdditions,
-        List<PublicAccount> publicKeyDeletions) {
+        List<UnresolvedAddress> addressAdditions,
+        List<UnresolvedAddress> addressDeletions) {
         super(TransactionType.MULTISIG_ACCOUNT_MODIFICATION, networkType);
-        Validate.notNull(publicKeyAdditions, "PublicKeyAdditions must not be null");
-        Validate.notNull(publicKeyDeletions, "PublicKeyDeletions must not be null");
+        Validate.notNull(addressAdditions, "AddressAdditions must not be null");
+        Validate.notNull(addressDeletions, "AddressDeletions must not be null");
         this.minApprovalDelta = minApprovalDelta;
         this.minRemovalDelta = minRemovalDelta;
-        this.publicKeyAdditions = publicKeyAdditions;
-        this.publicKeyDeletions = publicKeyDeletions;
+        this.addressAdditions = addressAdditions;
+        this.addressDeletions = addressDeletions;
     }
 
     /**
@@ -53,9 +54,9 @@ public class MultisigAccountModificationTransactionFactory extends
      * @param networkType Network type.
      * @param minApprovalDelta Minimum approval delta.
      * @param minRemovalDelta Minimum removal delta.
-     * @param publicKeyAdditions List of public accounts that are going to be added to the multisig
+     * @param addressAdditions List of public accounts that are going to be added to the multisig
      * account.
-     * @param publicKeyDeletions List of public accounts that are going to be removed from the
+     * @param addressDeletions List of public accounts that are going to be removed from the
      * multisig account.
      * @return Multisig account modification transaction.
      */
@@ -63,11 +64,11 @@ public class MultisigAccountModificationTransactionFactory extends
         NetworkType networkType,
         byte minApprovalDelta,
         byte minRemovalDelta,
-        List<PublicAccount> publicKeyAdditions,
-        List<PublicAccount> publicKeyDeletions) {
+        List<UnresolvedAddress> addressAdditions,
+        List<UnresolvedAddress> addressDeletions) {
         return new MultisigAccountModificationTransactionFactory(networkType, minApprovalDelta,
             minRemovalDelta,
-            publicKeyAdditions, publicKeyDeletions);
+            addressAdditions, addressDeletions);
     }
 
     /**
@@ -91,17 +92,17 @@ public class MultisigAccountModificationTransactionFactory extends
     }
 
     /**
-     * @return List of public accounts that are going to be added to the multisig account.
+     * @return List of addresses or aliasees that are going to be added to the multisig account.
      */
-    public List<PublicAccount> getPublicKeyAdditions() {
-        return publicKeyAdditions;
+    public List<UnresolvedAddress> getAddressAdditions() {
+        return addressAdditions;
     }
 
     /**
-     * @return List of public accounts that are going to be removed from the multisig account.
+     * @return List of addresses or aliasees that are going to be removed from the multisig account.
      */
-    public List<PublicAccount> getPublicKeyDeletions() {
-        return publicKeyDeletions;
+    public List<UnresolvedAddress> getAddressDeletions() {
+        return addressDeletions;
     }
 
 

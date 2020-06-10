@@ -54,7 +54,7 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
         BigInteger key = BigInteger.TEN;
         MosaicMetadataTransaction transaction =
             MosaicMetadataTransactionFactory.create(
-                getNetworkType(), testAccount.getPublicAccount(), alias,
+                getNetworkType(), testAccount.getAddress(), alias,
                 key, message
             ).maxFee(this.maxFee).build();
 
@@ -98,7 +98,7 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
         assertMetadata(targetMosaicId, transaction,
             Collections.singletonList(get(getRepositoryFactory(type).createMetadataRepository()
                 .getMosaicMetadataByKeyAndSender(targetMosaicId, key,
-                    testAccount.getPublicKey()))));
+                    testAccount.getAddress()))));
 
         assertMetadata(targetMosaicId, transaction, metadata);
         Assertions.assertEquals(message, processedTransaction.getValue());
@@ -114,7 +114,7 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
                 m.getMetadataEntry().getMetadataType()
                     .equals(MetadataType.MOSAIC) &&
                 m.getMetadataEntry()
-                    .getTargetPublicKey().equals(testAccount.getPublicKey())).findFirst();
+                    .getTargetAddress().equals(testAccount.getPublicKey())).findFirst();
 
         Assertions.assertTrue(endpointMetadata.isPresent());
         System.out.println(endpointMetadata.get().getId());

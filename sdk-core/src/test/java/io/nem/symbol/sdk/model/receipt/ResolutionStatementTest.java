@@ -45,7 +45,7 @@ public class ResolutionStatementTest {
 
     @BeforeAll
     public static void setup() {
-        address = new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
+        address = new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR2",
             networkType);
         mosaicId = new MosaicId("85BBEA6CC462B244");
         namespaceId = NamespaceId.createFromName("money");
@@ -144,7 +144,7 @@ public class ResolutionStatementTest {
         String hash = resolutionStatement.generateHash(networkType);
 
         assertFalse(hash.isEmpty());
-        assertEquals("DD7E0D121A33C7133366F8FD36DD6CD5DE01D9008BA9369D2B7DA1BCCBB04A72", hash);
+        assertEquals("083827D961D3CE3AF734865D9D645E6FBC1256B921E485013F455C7385AC72F9", hash);
     }
 
     @Test

@@ -48,9 +48,7 @@ public class RestrictionAccountRepositoryOkHttpImplTest extends AbstractOkHttpRe
 
     @Test
     public void shouldGetAccountRestrictions() throws Exception {
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = Address.generateRandom(networkType);
 
         AccountRestrictionsDTO dto = new AccountRestrictionsDTO();
         dto.setAddress(address.encoded());
@@ -78,15 +76,13 @@ public class RestrictionAccountRepositoryOkHttpImplTest extends AbstractOkHttpRe
 
     @Test
     public void shouldGetAccountsRestrictionsFromAddresses() throws Exception {
-        Address address =
-            Address.createFromEncoded(
-                "9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142");
+        Address address = Address.generateRandom(networkType);
 
         AccountRestrictionsDTO dto = new AccountRestrictionsDTO();
         dto.setAddress(address.encoded());
         AccountRestrictionDTO restriction = new AccountRestrictionDTO();
         restriction.setRestrictionFlags(AccountRestrictionFlagsEnum.NUMBER_1);
-        restriction.setValues(Arrays.asList("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142"));
+        restriction.setValues(Arrays.asList("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1"));
         dto.setRestrictions(Collections.singletonList(restriction));
 
         AccountRestrictionsInfoDTO info = new AccountRestrictionsInfoDTO();
@@ -102,7 +98,7 @@ public class RestrictionAccountRepositoryOkHttpImplTest extends AbstractOkHttpRe
         Assertions.assertEquals(AccountRestrictionFlags.ALLOW_INCOMING_ADDRESS,
             accountRestrictions.getRestrictions().get(0).getRestrictionFlags());
         Assertions.assertEquals(Collections.singletonList(MapperUtils
-                .toUnresolvedAddress("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E142")),
+                .toUnresolvedAddress("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1")),
             accountRestrictions.getRestrictions().get(0).getValues());
 
     }

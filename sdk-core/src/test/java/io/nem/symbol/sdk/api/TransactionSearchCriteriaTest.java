@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import java.math.BigInteger;
 import java.util.Collections;
@@ -49,8 +50,8 @@ class TransactionSearchCriteriaTest {
     @Test
     void shouldSetValues() {
 
-        Address address1 = Address.createFromRawAddress("MCTVW23D2MN5VE4AQ4TZIDZENGNOZXPRPR72DY33");
-        Address address2 = Address.createFromRawAddress("MCTVW23D2MN5VE4AQ4TZIDZENGNOZXPRPR72DY22");
+        Address address1 = Address.generateRandom(NetworkType.MIJIN_TEST);
+        Address address2 = Address.generateRandom(NetworkType.MIJIN_TEST);
         PublicKey signerPublicKey = PublicKey.fromHexString("227F");
 
         TransactionSearchCriteria criteria = new TransactionSearchCriteria();
@@ -88,8 +89,8 @@ class TransactionSearchCriteriaTest {
     @Test
     void shouldUseBuilderMethods() {
 
-        Address address1 = Address.createFromRawAddress("MCTVW23D2MN5VE4AQ4TZIDZENGNOZXPRPR72DY33");
-        Address address2 = Address.createFromRawAddress("MCTVW23D2MN5VE4AQ4TZIDZENGNOZXPRPR72DY22");
+        Address address1 = Address.generateRandom(NetworkType.MIJIN_TEST);
+        Address address2 = Address.generateRandom(NetworkType.MIJIN_TEST);
         PublicKey signerPublicKey = PublicKey.fromHexString("227F");
 
         TransactionSearchCriteria criteria = new TransactionSearchCriteria().id("theId")
@@ -122,8 +123,8 @@ class TransactionSearchCriteriaTest {
     @Test
     void shouldBeEquals() {
 
-        Address address1 = Address.createFromRawAddress("MCTVW23D2MN5VE4AQ4TZIDZENGNOZXPRPR72DY33");
-        Address address2 = Address.createFromRawAddress("MCTVW23D2MN5VE4AQ4TZIDZENGNOZXPRPR72DY22");
+        Address address1 = Address.generateRandom(NetworkType.MIJIN_TEST);
+        Address address2 = Address.generateRandom(NetworkType.MIJIN_TEST);
         PublicKey signerPublicKey = PublicKey.fromHexString("227F");
 
         TransactionSearchCriteria criteria1 = new TransactionSearchCriteria().id("theId")

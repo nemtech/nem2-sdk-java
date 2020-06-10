@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
@@ -35,11 +36,11 @@ public class MosaicMetadataTransactionFactory extends
 
     private MosaicMetadataTransactionFactory(
         NetworkType networkType,
-        PublicAccount targetAccount,
+        UnresolvedAddress targetAddress,
         UnresolvedMosaicId targetMosaicId,
         BigInteger scopedMetadataKey,
         String value) {
-        super(TransactionType.MOSAIC_METADATA, networkType, targetAccount,
+        super(TransactionType.MOSAIC_METADATA, networkType, targetAddress,
             scopedMetadataKey, value);
         Validate.notNull(targetMosaicId, "TargetMosaicId must not be null");
         this.targetMosaicId = targetMosaicId;
@@ -49,15 +50,15 @@ public class MosaicMetadataTransactionFactory extends
      * Static create method for factory.
      *
      * @param networkType Network type.
-     * @param targetAccount Target account.
+     * @param targetAddress Target address.
      * @param targetMosaicId Target mosaic id.
      * @param scopedMetadataKey Scoped metadata key.
      * @param value Value.
      * @return Mosaic metadata transaction.
      */
     public static MosaicMetadataTransactionFactory create(NetworkType networkType,
-        PublicAccount targetAccount, UnresolvedMosaicId targetMosaicId, BigInteger scopedMetadataKey, String value) {
-        return new MosaicMetadataTransactionFactory(networkType, targetAccount, targetMosaicId, scopedMetadataKey, value);
+        UnresolvedAddress targetAddress, UnresolvedMosaicId targetMosaicId, BigInteger scopedMetadataKey, String value) {
+        return new MosaicMetadataTransactionFactory(networkType, targetAddress, targetMosaicId, scopedMetadataKey, value);
     }
 
     public UnresolvedMosaicId getTargetMosaicId() {

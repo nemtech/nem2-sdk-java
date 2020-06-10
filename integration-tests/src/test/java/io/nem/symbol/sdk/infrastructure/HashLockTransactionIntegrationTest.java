@@ -17,11 +17,13 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
+import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
 import java.util.Collections;
 import org.junit.jupiter.api.TestInstance;
@@ -32,15 +34,25 @@ import org.junit.jupiter.params.provider.EnumSource;
 @SuppressWarnings("squid:S2699")
 public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
 
-    private Account account = config().getDefaultAccount();
+    private final Account account = config().getDefaultAccount();
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void standaloneLockFundsTransaction(RepositoryType type) {
+
+        TransferTransactionFactory factory =
+            TransferTransactionFactory.create(
+                getNetworkType(),
+                account.getAddress(),
+                Collections.singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
+                new PlainMessage("E2ETest:standaloneLockFundsTransaction")
+            );
+
         AggregateTransaction aggregateTransaction =
             AggregateTransactionFactory.createBonded(
                 getNetworkType(),
-                Collections.emptyList()).maxFee(this.maxFee).build();
+                Collections.singletonList(factory.build().toAggregate(account.getPublicAccount()))).maxFee(this.maxFee)
+                .build();
         SignedTransaction signedTransaction = this.account
             .sign(aggregateTransaction, getGenerationHash());
 
@@ -52,15 +64,28 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
             ).maxFee(this.maxFee).build();
 
         announceAndValidate(type, this.account, hashLockTransaction);
+
+        announceAndValidate(type, this.account, aggregateTransaction);
     }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void aggregateLockFundsTransaction(RepositoryType type) {
+
+        TransferTransactionFactory factory =
+            TransferTransactionFactory.create(
+                getNetworkType(),
+                this.account.getAddress(),
+                Collections.singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
+                new PlainMessage("E2ETest:standaloneLockFundsTransaction")
+            );
+
         AggregateTransaction aggregateTransaction =
             AggregateTransactionFactory.createBonded(
                 getNetworkType(),
-                Collections.emptyList()).maxFee(this.maxFee).build();
+                Collections.singletonList(factory.build().toAggregate(account.getPublicAccount()))).maxFee(this.maxFee)
+                .build();
+
         SignedTransaction signedTransaction = this.account
             .sign(aggregateTransaction, getGenerationHash());
         HashLockTransaction hashLockTransaction =
@@ -71,5 +96,7 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
                 signedTransaction).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, hashLockTransaction, this.account);
+
+        announceAndValidate(type, this.account, aggregateTransaction);
     }
 }

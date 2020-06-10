@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 
@@ -28,10 +29,10 @@ public class AccountMetadataTransactionFactory extends
 
     private AccountMetadataTransactionFactory(
         NetworkType networkType,
-        PublicAccount targetAccount,
+        UnresolvedAddress targetAddress,
         BigInteger scopedMetadataKey,
         String value) {
-        super(TransactionType.ACCOUNT_METADATA, networkType, targetAccount,
+        super(TransactionType.ACCOUNT_METADATA, networkType, targetAddress,
             scopedMetadataKey, value);
     }
 
@@ -39,14 +40,14 @@ public class AccountMetadataTransactionFactory extends
      * Static create method for factory.
      *
      * @param networkType Network type.
-     * @param targetAccount Target account.
+     * @param targetAddress Target address.
      * @param scopedMetadataKey Scoped metadata key.
      * @param value Value.
      * @return Account metadata transaction.
      */
     public static AccountMetadataTransactionFactory create(NetworkType networkType,
-        PublicAccount targetAccount, BigInteger scopedMetadataKey, String value) {
-        return new AccountMetadataTransactionFactory(networkType, targetAccount, scopedMetadataKey,
+        UnresolvedAddress targetAddress, BigInteger scopedMetadataKey, String value) {
+        return new AccountMetadataTransactionFactory(networkType, targetAddress, scopedMetadataKey,
             value);
     }
 

@@ -56,15 +56,20 @@ class AddressVectorTester extends AbstractVectorTester {
         return Arguments.of(networkType, entry.get("publicKey"), address);
     }
 
-
     @ParameterizedTest
     @MethodSource("testAddress")
-    void testAddress(NetworkType networkType, String publicKey, String encoded) {
+    void testAddress(NetworkType networkType, String publicKey, String plain) {
         Address address = Address.createFromPublicKey(publicKey, networkType);
-        Assertions.assertEquals(encoded, address.plain());
+        String encoded = address.encoded();
+        Assertions.assertEquals(plain, address.plain());
         Assertions.assertEquals(networkType, address.getNetworkType());
-        Assertions.assertTrue(Address.isValidPlainAddress(encoded));
-        Assertions.assertTrue(Address.isValidEncodedAddress(address.encoded()));
+
+        Address address2 = Address.createFromEncoded(encoded);
+        Assertions.assertEquals(address, address2);
+        Assertions.assertNull(Address.validatePlainAddress(plain).orElse(null));
+        Assertions.assertNull(Address.validateEncodedAddress(encoded).orElse(null));
+        Assertions.assertTrue(Address.isValidPlainAddress(plain));
+        Assertions.assertTrue(Address.isValidEncodedAddress(encoded));
     }
 
 }

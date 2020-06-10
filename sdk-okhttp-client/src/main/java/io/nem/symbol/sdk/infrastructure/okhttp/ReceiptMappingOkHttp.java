@@ -16,12 +16,11 @@
 
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
-import static io.nem.symbol.core.utils.MapperUtils.toAddressFromEncoded;
+import static io.nem.symbol.core.utils.MapperUtils.toAddress;
 import static io.nem.symbol.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
@@ -88,7 +87,7 @@ public class ReceiptMappingOkHttp {
                 .map(
                     entry ->
                         ResolutionEntry.forAddress(
-                            toAddressFromEncoded(entry.getResolved()),
+                            toAddress(entry.getResolved()),
                             new ReceiptSource(entry.getSource().getPrimaryId(),
                                 entry.getSource().getSecondaryId())))
                 .collect(Collectors.toList()));
@@ -120,11 +119,11 @@ public class ReceiptMappingOkHttp {
                 input.getStatement().getSource().getPrimaryId(),
                 input.getStatement().getSource().getSecondaryId()),
             input.getStatement().getReceipts().stream()
-                .map(receipt -> createReceiptFromDto(receipt, networkType))
+                .map(receipt -> createReceiptFromDto(receipt))
                 .collect(Collectors.toList()));
     }
 
-    public Receipt createReceiptFromDto(Object receiptDto, NetworkType networkType) {
+    public Receipt createReceiptFromDto(Object receiptDto) {
         ReceiptType type = ReceiptType.rawValueOf(jsonHelper.getInteger(receiptDto, "type"));
         switch (type) {
             case HARVEST_FEE:
@@ -135,11 +134,11 @@ public class ReceiptMappingOkHttp {
             case LOCK_SECRET_COMPLETED:
             case LOCK_SECRET_EXPIRED:
                 return createBalanceChangeReceipt(
-                    jsonHelper.convert(receiptDto, BalanceChangeReceiptDTO.class), networkType);
+                    jsonHelper.convert(receiptDto, BalanceChangeReceiptDTO.class));
             case MOSAIC_RENTAL_FEE:
             case NAMESPACE_RENTAL_FEE:
                 return createBalanceTransferRecipient(
-                    jsonHelper.convert(receiptDto, BalanceTransferReceiptDTO.class), networkType);
+                    jsonHelper.convert(receiptDto, BalanceTransferReceiptDTO.class));
             case MOSAIC_EXPIRED:
                 return createArtifactExpiryReceipt(
                     jsonHelper.convert(receiptDto, MosaicExpiryReceiptDTO.class), type);
@@ -170,20 +169,17 @@ public class ReceiptMappingOkHttp {
     }
 
 
-    public BalanceChangeReceipt createBalanceChangeReceipt(
-        BalanceChangeReceiptDTO receipt, NetworkType networkType) {
-        return new BalanceChangeReceipt(
-            PublicAccount.createFromPublicKey(receipt.getTargetPublicKey(), networkType),
+    public BalanceChangeReceipt createBalanceChangeReceipt(BalanceChangeReceiptDTO receipt) {
+        return new BalanceChangeReceipt(MapperUtils.toAddress(receipt.getTargetAddress()),
             new MosaicId(receipt.getMosaicId()),
             receipt.getAmount(),
             ReceiptType.rawValueOf(receipt.getType().getValue()),
             ReceiptVersion.BALANCE_CHANGE);
     }
 
-    public BalanceTransferReceipt createBalanceTransferRecipient(
-        BalanceTransferReceiptDTO receipt, NetworkType networkType) {
+    public BalanceTransferReceipt createBalanceTransferRecipient(BalanceTransferReceiptDTO receipt) {
         return new BalanceTransferReceipt(
-            PublicAccount.createFromPublicKey(receipt.getSenderPublicKey(), networkType),
+            MapperUtils.toAddress(receipt.getSenderAddress()),
             Address.createFromEncoded(receipt.getRecipientAddress()),
             new MosaicId(receipt.getMosaicId()),
             receipt.getAmount(),

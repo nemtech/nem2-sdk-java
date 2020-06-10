@@ -51,7 +51,7 @@ public class ReceiptMappingOkHttpTest {
     public void getTransactionStatementshash() {
         Statement statement = getStatement();
         Assertions
-            .assertEquals("78E5F66EC55D1331646528F9BF7EC247C68F58E651223E7F05CBD4FBF0BF88FA",
+            .assertEquals("82FEFFC329618ECF56B8A6FDBCFCF1BF0A4B6747AB6A5746B195CEEB810F335C",
                 statement.getTransactionStatements().get(0).generateHash().toUpperCase());
     }
 
@@ -59,7 +59,7 @@ public class ReceiptMappingOkHttpTest {
     public void getTransactionStatements2Recipients() {
         Statement statement = getStatement();
         TransactionStatement transactionStatement = statement.getTransactionStatements().get(1);
-        Assertions.assertEquals("450C393FD6D1915538194943D3417A82C8428F76C222D645E35C7396F63CE641",
+        Assertions.assertEquals("41BF730BD307EB507880CA0576A4CCEFEF95F3060DC334CA364AE737114D1F60",
             transactionStatement.generateHash().toUpperCase());
 
         Assertions.assertEquals(5, transactionStatement.getReceipts().size());
@@ -99,7 +99,7 @@ public class ReceiptMappingOkHttpTest {
         ReceiptMappingOkHttp receiptMappingOkHttp = new ReceiptMappingOkHttp(jsonHelper);
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, () -> {
             receiptMappingOkHttp
-                .createReceiptFromDto(Collections.singletonMap("type", 61763), networkType);
+                .createReceiptFromDto(Collections.singletonMap("type", 61763));
         });
         Assertions.assertEquals("Receipt type: ADDRESS_ALIAS_RESOLUTION not valid", e.getMessage());
     }
@@ -109,7 +109,7 @@ public class ReceiptMappingOkHttpTest {
     public void getAddressResolutionStatementsHash() {
         Statement statement = getStatement();
         Assertions
-            .assertEquals("812AA120525990BE821035BC9CBCCD569F807B5338BA9D13DD63D99F3697ACCA",
+            .assertEquals("9FB5235FB53C815DEFDCC9FC137BF949987097BDE2D3132EEF746F0AE0A6B02F",
                 statement.getAddressResolutionStatements().get(0).generateHash(networkType));
     }
 

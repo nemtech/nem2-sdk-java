@@ -736,8 +736,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         public TransactionFactory fromBodyBuilder(NetworkType networkType,
             Serializer transactionBuilder) {
             AccountMetadataTransactionBodyBuilder builder = (AccountMetadataTransactionBodyBuilder) transactionBuilder;
-            PublicAccount targetAccount = SerializationUtils
-                .toPublicAccount(builder.getTargetPublicKey(), networkType);
+            UnresolvedAddress targetAccount = SerializationUtils.toUnresolvedAddress(builder.getTargetAddress());
             BigInteger scopedMetadataKey = SerializationUtils
                 .toUnsignedBigInteger(builder.getScopedMetadataKey());
             String value = SerializationUtils.toString(builder.getValue());
@@ -749,7 +748,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         @Override
         public Serializer toBodyBuilder(AccountMetadataTransaction transaction) {
             return AccountMetadataTransactionBodyBuilder.create(
-                SerializationUtils.toKeyDto(transaction.getTargetAccount().getPublicKey()),
+                SerializationUtils.toUnresolvedAddress(transaction.getTargetAddress(), transaction.getNetworkType()),
                 transaction.getScopedMetadataKey().longValue(),
                 (short) transaction.getValueSizeDelta(),
                 ByteBuffer.wrap(MetadataTransaction.toByteArray(transaction.getValue()))
@@ -776,8 +775,8 @@ public class BinarySerializationImpl implements BinarySerialization {
         public TransactionFactory fromBodyBuilder(NetworkType networkType,
             Serializer transactionBuilder) {
             MosaicMetadataTransactionBodyBuilder builder = (MosaicMetadataTransactionBodyBuilder) transactionBuilder;
-            PublicAccount targetAccount = SerializationUtils
-                .toPublicAccount(builder.getTargetPublicKey(), networkType);
+            UnresolvedAddress targetAccount = SerializationUtils
+                .toUnresolvedAddress(builder.getTargetAddress());
             BigInteger scopedMetadataKey = SerializationUtils
                 .toUnsignedBigInteger(builder.getScopedMetadataKey());
             String value = StringEncoder.getString(builder.getValue().array());
@@ -791,7 +790,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         @Override
         public Serializer toBodyBuilder(MosaicMetadataTransaction transaction) {
             return MosaicMetadataTransactionBodyBuilder.create(
-                SerializationUtils.toKeyDto(transaction.getTargetAccount().getPublicKey()),
+                SerializationUtils.toUnresolvedAddress(transaction.getTargetAddress(), transaction.getNetworkType()),
                 transaction.getScopedMetadataKey().longValue(),
                 SerializationUtils.toUnresolvedMosaicIdDto(transaction.getTargetMosaicId()),
                 (short) transaction.getValueSizeDelta(),
@@ -820,22 +819,22 @@ public class BinarySerializationImpl implements BinarySerialization {
         public TransactionFactory fromBodyBuilder(NetworkType networkType,
             Serializer transactionBuilder) {
             NamespaceMetadataTransactionBodyBuilder builder = (NamespaceMetadataTransactionBodyBuilder) transactionBuilder;
-            PublicAccount targetAccount = SerializationUtils
-                .toPublicAccount(builder.getTargetPublicKey(), networkType);
+            UnresolvedAddress targetAddress = SerializationUtils
+                .toUnresolvedAddress(builder.getTargetAddress());
             BigInteger scopedMetadataKey = SerializationUtils
                 .toUnsignedBigInteger(builder.getScopedMetadataKey());
             String value = StringEncoder.getString(builder.getValue().array());
             NamespaceId targetNamespaceId = SerializationUtils
                 .toNamespaceId(builder.getTargetNamespaceId());
             return NamespaceMetadataTransactionFactory
-                .create(networkType, targetAccount, targetNamespaceId, scopedMetadataKey, value)
+                .create(networkType, targetAddress, targetNamespaceId, scopedMetadataKey, value)
                 .valueSizeDelta(SerializationUtils.shortToUnsignedInt(builder.getValueSizeDelta()));
         }
 
         @Override
         public Serializer toBodyBuilder(NamespaceMetadataTransaction transaction) {
             return NamespaceMetadataTransactionBodyBuilder.create(
-                new KeyDto(transaction.getTargetAccount().getPublicKey().getByteBuffer()),
+                SerializationUtils.toUnresolvedAddress(transaction.getTargetAddress(), transaction.getNetworkType()),
                 transaction.getScopedMetadataKey().longValue(),
                 new NamespaceIdDto(transaction.getTargetNamespaceId().getId().longValue()),
                 (short) transaction.getValueSizeDelta(),
@@ -1499,41 +1498,40 @@ public class BinarySerializationImpl implements BinarySerialization {
             byte minApprovalDelta = builder.getMinApprovalDelta();
             byte minRemovalDelta = builder.getMinRemovalDelta();
 
-            List<PublicAccount> publicKeyAdditions = builder.getPublicKeyAdditions()
+            List<UnresolvedAddress> addressAdditions = builder.getAddressAdditions()
                 .stream()
-                .map(op -> SerializationUtils.toPublicAccount(op, networkType))
+                .map(op -> SerializationUtils.toUnresolvedAddress(op))
                 .collect(Collectors.toList());
 
-            List<PublicAccount> publicKeyDeletions = builder.getPublicKeyDeletions()
+            List<UnresolvedAddress> addressDeletions = builder.getAddressDeletions()
                 .stream()
-                .map(op -> SerializationUtils.toPublicAccount(op, networkType))
+                .map(op -> SerializationUtils.toUnresolvedAddress(op))
                 .collect(Collectors.toList());
 
             return MultisigAccountModificationTransactionFactory
-                .create(networkType, minApprovalDelta, minRemovalDelta, publicKeyAdditions,
-                    publicKeyDeletions);
+                .create(networkType, minApprovalDelta, minRemovalDelta, addressAdditions,
+                    addressDeletions);
         }
 
         @Override
         public Serializer toBodyBuilder(MultisigAccountModificationTransaction transaction) {
 
-            List<KeyDto> publicKeyAdditions = transaction.getPublicKeyAdditions()
+            List<UnresolvedAddressDto> addressAdditions = transaction.getAddressAdditions()
                 .stream()
                 .map(
-                    a -> SerializationUtils.toKeyDto(a.getPublicKey()))
+                    a -> SerializationUtils.toUnresolvedAddress(a, transaction.getNetworkType()))
                 .collect(Collectors.toList());
 
-            List<KeyDto> publicKeyDeletions = transaction.getPublicKeyDeletions()
+            List<UnresolvedAddressDto> addressDeletions = transaction.getAddressDeletions()
                 .stream()
                 .map(
-                    a -> SerializationUtils.toKeyDto(a.getPublicKey()))
+                    a -> SerializationUtils.toUnresolvedAddress(a, transaction.getNetworkType()))
                 .collect(Collectors.toList());
 
             return MultisigAccountModificationTransactionBodyBuilder.create(
                 transaction.getMinRemovalDelta(),
                 transaction.getMinApprovalDelta(),
-
-                publicKeyAdditions, publicKeyDeletions);
+                addressAdditions, addressDeletions);
         }
 
 
@@ -1609,7 +1607,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
         private CosignatureBuilder getCosignatureBuilder(AggregateTransactionCosignature c) {
             return CosignatureBuilder
-                .create(SerializationUtils.toKeyDto(c.getSigner().getPublicKey()),
+                .create(AggregateTransactionCosignature.VERSION, SerializationUtils.toKeyDto(c.getSigner().getPublicKey()),
                     SerializationUtils.toSignatureDto(c.getSignature()));
         }
     }

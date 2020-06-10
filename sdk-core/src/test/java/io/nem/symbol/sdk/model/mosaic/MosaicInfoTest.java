@@ -20,7 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
@@ -33,15 +34,14 @@ class MosaicInfoTest {
             MosaicFlags.create(true, true, true);
         MosaicId mosaicId = new MosaicId(new BigInteger("-3087871471161192663"));
 
+        Address address = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
         MosaicInfo mosaicInfo =
             new MosaicInfo(
                 "abc",
                 mosaicId,
                 new BigInteger("100"),
                 new BigInteger("0"),
-                new PublicAccount(
-                    "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                    NetworkType.MIJIN_TEST),
+                address,
                 1,
                 mosaicFlags,
                 3,
@@ -50,11 +50,7 @@ class MosaicInfoTest {
         assertEquals(mosaicId, mosaicInfo.getMosaicId());
         assertEquals(new BigInteger("100"), mosaicInfo.getSupply());
         assertEquals(new BigInteger("0"), mosaicInfo.getStartHeight());
-        assertEquals(
-            new PublicAccount(
-                "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                NetworkType.MIJIN_TEST),
-            mosaicInfo.getOwner());
+        assertEquals(address, mosaicInfo.getOwnerAddress());
         assertTrue(mosaicInfo.isSupplyMutable());
         assertTrue(mosaicInfo.isTransferable());
         assertEquals(3, mosaicInfo.getDivisibility());
@@ -72,9 +68,7 @@ class MosaicInfoTest {
                 new MosaicId(new BigInteger("-3087871471161192663")),
                 new BigInteger("100"),
                 new BigInteger("0"),
-                new PublicAccount(
-                    "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                    NetworkType.MIJIN_TEST),
+                Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress(),
                 1,
                 mosaicFlags,
                 3,
@@ -93,9 +87,7 @@ class MosaicInfoTest {
                 new MosaicId(new BigInteger("-3087871471161192663")),
                 new BigInteger("100"),
                 new BigInteger("0"),
-                new PublicAccount(
-                    "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                    NetworkType.MIJIN_TEST),
+                Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress(),
                 1,
                 mosaicFlags,
                 3,
@@ -114,9 +106,7 @@ class MosaicInfoTest {
                 new MosaicId(new BigInteger("-3087871471161192663")),
                 new BigInteger("100"),
                 new BigInteger("0"),
-                new PublicAccount(
-                    "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                    NetworkType.MIJIN_TEST),
+                Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress(),
                 1,
                 mosaicFlags,
                 3,
@@ -135,9 +125,7 @@ class MosaicInfoTest {
                 new MosaicId(new BigInteger("-3087871471161192663")),
                 new BigInteger("100"),
                 new BigInteger("0"),
-                new PublicAccount(
-                    "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                    NetworkType.MIJIN_TEST),
+                Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress(),
                 1,
                 mosaicFlags,
                 3,
@@ -156,9 +144,7 @@ class MosaicInfoTest {
                 new MosaicId(new BigInteger("-3087871471161192663")),
                 new BigInteger("100"),
                 new BigInteger("0"),
-                new PublicAccount(
-                    "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                    NetworkType.MIJIN_TEST),
+                Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress(),
                 1,
                 mosaicFlags,
                 3,
@@ -177,9 +163,7 @@ class MosaicInfoTest {
                 new MosaicId(new BigInteger("-3087871471161192663")),
                 new BigInteger("100"),
                 new BigInteger("0"),
-                new PublicAccount(
-                    "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                    NetworkType.MIJIN_TEST),
+                Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress(),
                 1,
                 mosaicFlags,
                 3,

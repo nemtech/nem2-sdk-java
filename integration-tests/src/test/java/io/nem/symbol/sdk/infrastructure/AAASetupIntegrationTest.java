@@ -21,8 +21,10 @@ import io.nem.symbol.sdk.api.MultisigRepository;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.AccountInfo;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
@@ -30,6 +32,7 @@ import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
+import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
@@ -116,18 +119,18 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
                 multisigRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
 
             System.out.println(
-                "Multisig account with address " + multisigAccount.getAddress() + " already exist");
+                "Multisig account with address " + multisigAccount.getAddress().plain() + " already exist");
             System.out.println(jsonHelper().print(multisigAccountInfo));
             return;
         } catch (RepositoryCallException e) {
             System.out.println(
-                "Multisig account with address " + multisigAccount.getAddress()
+                "Multisig account with address " + multisigAccount.getAddress().plain()
                     + " does not exist. Creating");
         }
 
-        System.out.println("Creating multisg account");
-        List<PublicAccount> additions = Arrays.stream(accounts)
-            .map(Account::getPublicAccount).collect(Collectors.toList());
+        System.out.println("Creating multisg account " +  multisigAccount.getAddress().plain());
+        List<UnresolvedAddress> additions = Arrays.stream(accounts)
+            .map(Account::getAddress).collect(Collectors.toList());
         MultisigAccountModificationTransaction convertIntoMultisigTransaction = MultisigAccountModificationTransactionFactory
             .create(getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList())
             .maxFee(this.maxFee).build();
@@ -154,6 +157,12 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
                 .announceHashLockAggregateBonded(getListener(type), signedHashLockTransaction,
                     signedAggregateTransaction), aggregateTransaction);
 
+        sleep(1000);
+        Transaction transaction = get(
+            getRepositoryFactory(type).createTransactionRepository()
+                .getTransaction(signedAggregateTransaction.getHash()));
+
+        System.out.println(toJson(transaction));
     }
 
     private void sendMosaicFromNemesis(Account recipient, boolean force) {

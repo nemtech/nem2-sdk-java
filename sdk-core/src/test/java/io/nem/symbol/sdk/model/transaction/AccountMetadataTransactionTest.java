@@ -45,7 +45,7 @@ public class AccountMetadataTransactionTest extends AbstractTransactionTester {
         AccountMetadataTransaction transaction =
             AccountMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                account.getPublicAccount(),
+                account.getPublicAccount().getAddress(),
                 BigInteger.TEN, "123BAC").valueSizeDelta(10)
                 .deadline(new FakeDeadline()).build();
 
@@ -54,8 +54,7 @@ public class AccountMetadataTransactionTest extends AbstractTransactionTester {
         assertEquals(10, transaction.getValueSizeDelta());
         assertEquals(BigInteger.TEN, transaction.getScopedMetadataKey());
 
-        assertEquals(account.getPublicKey(),
-            transaction.getTargetAccount().getPublicKey().toHex());
+        assertEquals(account.getAddress(), transaction.getTargetAddress());
 
     }
 
@@ -64,16 +63,16 @@ public class AccountMetadataTransactionTest extends AbstractTransactionTester {
         AccountMetadataTransaction transaction =
             AccountMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                account.getPublicAccount(),
+                account.getPublicAccount().getAddress(),
                 BigInteger.TEN, "123BAC").valueSizeDelta(10)
                 .signer(account.getPublicAccount())
                 .deadline(new FakeDeadline()).build();
 
-        String expected = "b20000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e6000000000190444100000000000000000100000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60a000000000000000a000600313233424143";
+        String expected = "AA0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E60000000001904441000000000000000001000000000000009083025FF3A8AB5AD104631FB370F290004952CD1FDDC4C90A000000000000000A000600313233424143";
 
         assertSerialization(expected, transaction);
 
-        String expectedEmbeddedHash = "6200000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001904441f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60a000000000000000a000600313233424143";
+        String expectedEmbeddedHash = "5A00000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E600000000019044419083025FF3A8AB5AD104631FB370F290004952CD1FDDC4C90A000000000000000A000600313233424143";
         assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
     }
 }

@@ -27,7 +27,7 @@ import java.util.Arrays;
  */
 public class RawAddress {
 
-    private static final int NUM_CHECKSUM_BYTES = 4;
+    public static final int NUM_CHECKSUM_BYTES = 3;
 
     /**
      * Private utility class constructor.
@@ -37,9 +37,8 @@ public class RawAddress {
     }
 
     /**
-     * This method generates an address based on the public key and the Symbol configuration
-     * network type. The sign schema is resolved based on the network type. MIJIN networks use SHA3,
-     * Public network use KECCAK.
+     * This method generates an address based on the public key and the Symbol configuration network type. The sign
+     * schema is resolved based on the network type. MIJIN networks use SHA3, Public network use KECCAK.
      *
      * @param publicKey the public key
      * @param networkType the network type
@@ -47,7 +46,7 @@ public class RawAddress {
      */
     public static String generateAddress(final String publicKey, final NetworkType networkType) {
 
-        byte version = (byte) networkType.getValue();
+        byte networkTypeValue = (byte) networkType.getValue();
         // step 1: sha3 hash of the public key
         byte[] publicKeyBytes;
         try {
@@ -60,9 +59,9 @@ public class RawAddress {
         // step 2: ripemd160 hash of (1)
         final byte[] ripemd160StepOneHash = Hashes.ripemd160(publicKeyHash);
 
-        // step 3: add version byte in front of (2)
+        // step 3: add network type byte in front of (2)
         final byte[] versionPrefixedRipemd160Hash =
-            ArrayUtils.concat(new byte[]{version}, ripemd160StepOneHash);
+            ArrayUtils.concat(new byte[]{networkTypeValue}, ripemd160StepOneHash);
 
         // step 4: get the checksum of (3)
         final byte[] stepThreeChecksum = generateChecksum(versionPrefixedRipemd160Hash);
@@ -72,7 +71,8 @@ public class RawAddress {
             ArrayUtils.concat(versionPrefixedRipemd160Hash, stepThreeChecksum);
 
         // step 6: base32 encode (5)
-        return Base32Encoder.getString(concatStepThreeAndStepSix);
+        String base32 = Base32Encoder.getString(concatStepThreeAndStepSix);
+        return base32.substring(0, base32.length() - 1);
     }
 
 

@@ -59,8 +59,8 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
         MosaicMetadataTransaction originalTransaction = get(service
             .createMosaicMetadataTransactionFactory(
-                targetAccount.getPublicAccount(), key, originalMessage,
-                signerAccount.getPublicAccount().getPublicKey(), targetMosaicId))
+                targetAccount.getAddress(), key, originalMessage,
+                signerAccount.getAddress(), targetMosaicId))
             .maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, originalTransaction, signerAccount);
@@ -69,8 +69,8 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
         MosaicMetadataTransaction updateTransaction = get(service
             .createMosaicMetadataTransactionFactory(
-                targetAccount.getPublicAccount(), key, newMessage,
-                signerAccount.getPublicAccount().getPublicKey(), targetMosaicId))
+                targetAccount.getAddress(), key, newMessage,
+                signerAccount.getAddress(), targetMosaicId))
             .maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, updateTransaction, signerAccount);
@@ -84,7 +84,7 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
         MetadataRepository metadataRepository) {
         Metadata originalMetadata = get(metadataRepository
             .getMosaicMetadataByKeyAndSender(targetMosaicId, key,
-                signerAccount.getPublicAccount().getPublicKey().toHex()));
+                signerAccount.getPublicAccount().getAddress()));
 
         Assertions.assertEquals(value, originalMetadata.getMetadataEntry().getValue());
     }

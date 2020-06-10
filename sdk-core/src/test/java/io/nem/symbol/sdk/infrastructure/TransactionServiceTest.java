@@ -135,9 +135,8 @@ class TransactionServiceTest {
     void announce() throws ExecutionException, InterruptedException {
 
         TransferTransaction transferTransaction = TransferTransactionFactory
-            .create(NetworkType.MIJIN_TEST,
-                new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
-                    networkType),
+            .create(networkType,
+                Address.generateRandom(networkType),
                 Collections.emptyList(),
                 PlainMessage.Empty
             ).build();
@@ -167,7 +166,7 @@ class TransactionServiceTest {
         TransferTransaction transaction1 =
             TransferTransactionFactory.create(
                 networkType,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", networkType),
+                Address.generateRandom(networkType),
                 Arrays.asList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
@@ -206,8 +205,8 @@ class TransactionServiceTest {
         TransferTransaction transaction1 =
             TransferTransactionFactory.create(
                 networkType,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", networkType),
-                Arrays.asList(
+                Address.generateRandom(networkType),
+                Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
                 new PlainMessage("Some Message")).signer(account.getPublicAccount()).build();
@@ -575,7 +574,7 @@ class TransactionServiceTest {
 
         TransactionFactory<MosaicMetadataTransaction> factory = MosaicMetadataTransactionFactory
             .create(NetworkType.MIJIN_TEST,
-                Account.generateNewAccount(networkType).getPublicAccount(), mosaicNamespace2,
+                Account.generateNewAccount(networkType).getAddress(), mosaicNamespace2,
                 BigInteger.TEN, "Value")
             .transactionInfo(TransactionInfo.create(height, 4, "ABC", transactionHash, ""));
 

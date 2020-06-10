@@ -18,6 +18,8 @@ package io.nem.symbol.sdk.model.blockchain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
@@ -38,16 +40,16 @@ class BlockInfoTest {
     private String hash;
     private String generationHash;
     private String signature;
-    private String signer;
+    private PublicAccount signer;
     private String previousBlockHash;
     private String blockTransactionsHash;
     private String blockReceiptsHash;
     private String stateHash;
-    private String beneficiaryPublicKey;
+    private Address beneficiaryAddress;
     private List<String> subCacheMerkleRoots;
-    private String proofGamma = "proofGamma";
-    private String proofScalar = "proofScalar";
-    private String proofVerificationHash = "proofVerificationHash";
+    private final String proofGamma = "proofGamma";
+    private final String proofScalar = "proofScalar";
+    private final String proofVerificationHash = "proofVerificationHash";
     private String id;
 
     @BeforeAll
@@ -57,16 +59,16 @@ class BlockInfoTest {
         signature =
             "37351C8244AC166BE6664E3FA954E99A3239AC46E51E2B32CEA1C72DD0851100A7731868E932E1A9BEF8A27D48E1"
                 + "FFEE401E933EB801824373E7537E51733E0F";
-        signer = "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF";
+        signer = Account.generateNewAccount(NetworkType.MIJIN_TEST).getPublicAccount();
         previousBlockHash = "0000000000000000000000000000000000000000000000000000000000000000";
         blockTransactionsHash = "702090BA31CEF9E90C62BBDECC0CCCC0F88192B6625839382850357F70DD68A0";
         blockReceiptsHash = "702090BA31CEF9E90C62BBDECC0CCCC0F88192B6625839382850357F70DD68A0";
         stateHash = "702090BA31CEF9E90C62BBDECC0CCCC0F88192B6625839382850357F70DD68A0";
         subCacheMerkleRoots = new ArrayList<>();
-        beneficiaryPublicKey = "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF";
+        beneficiaryAddress = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
         id = "abc";
         blockInfo =
-            BlockInfo.create(
+            new BlockInfo(
                 id,
                 hash,
                 generationHash,
@@ -90,7 +92,7 @@ class BlockInfoTest {
                 proofGamma,
                 proofScalar,
                 proofVerificationHash,
-                beneficiaryPublicKey);
+                beneficiaryAddress);
     }
 
     @Test
@@ -101,8 +103,7 @@ class BlockInfoTest {
         assertEquals(25, blockInfo.getNumTransactions());
         assertEquals(35, blockInfo.getNumStatements().get());
         assertEquals(signature, blockInfo.getSignature());
-        Assertions.assertEquals(
-            new PublicAccount(signer, NetworkType.MIJIN_TEST), blockInfo.getSignerPublicAccount());
+        Assertions.assertEquals(signer, blockInfo.getSignerPublicAccount());
         assertEquals(NetworkType.MIJIN_TEST, blockInfo.getNetworkType());
         assertEquals(1, (int) blockInfo.getVersion());
         assertEquals(32768, blockInfo.getType());
@@ -114,9 +115,7 @@ class BlockInfoTest {
         assertEquals(blockTransactionsHash, blockInfo.getBlockTransactionsHash());
         assertEquals(blockReceiptsHash, blockInfo.getBlockReceiptsHash());
         assertEquals(stateHash, blockInfo.getStateHash());
-        assertEquals(
-            new PublicAccount(beneficiaryPublicKey, NetworkType.MIJIN_TEST),
-            blockInfo.getBeneficiaryPublicAccount());
+        assertEquals(beneficiaryAddress, blockInfo.getBeneficiaryAddress());
         assertEquals(proofGamma, blockInfo.getProofGamma());
         assertEquals(proofScalar, blockInfo.getProofScalar());
         assertEquals(proofVerificationHash, blockInfo.getProofVerificationHash());

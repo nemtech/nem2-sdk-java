@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import org.apache.commons.lang3.Validate;
@@ -30,7 +31,7 @@ public abstract class MetadataTransactionFactory<T extends MetadataTransaction> 
     /**
      * Metadata target public key.
      */
-    private final PublicAccount targetAccount;
+    private final UnresolvedAddress targetAddress;
 
     /**
      * Metadata key scoped to source, target and type.
@@ -55,16 +56,16 @@ public abstract class MetadataTransactionFactory<T extends MetadataTransaction> 
     MetadataTransactionFactory(
         TransactionType transactionType,
         NetworkType networkType,
-        PublicAccount targetAccount,
+        UnresolvedAddress targetAddress,
         BigInteger scopedMetadataKey,
         String value) {
         super(transactionType, networkType);
 
-        Validate.notNull(targetAccount, "TargetAccount must not be null");
+        Validate.notNull(targetAddress, "TargetAddress must not be null");
         Validate.notNull(scopedMetadataKey, "ScopedMetadataKey must not be null");
         Validate.notNull(value, "Value must not be null");
 
-        this.targetAccount = targetAccount;
+        this.targetAddress = targetAddress;
         this.scopedMetadataKey = scopedMetadataKey;
         this.value = value;
         int defaultSize = MetadataTransaction.toByteArray(value).length;
@@ -72,8 +73,8 @@ public abstract class MetadataTransactionFactory<T extends MetadataTransaction> 
         this.valueSize = defaultSize;
     }
 
-    public PublicAccount getTargetAccount() {
-        return targetAccount;
+    public UnresolvedAddress getTargetAddress() {
+        return targetAddress;
     }
 
     public BigInteger getScopedMetadataKey() {

@@ -34,8 +34,7 @@ public class ResolutionEntryTest {
 
     @BeforeAll
     public static void setup() {
-        address = new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26",
-            NetworkType.MIJIN_TEST);
+        address = Address.generateRandom(NetworkType.MIJIN_TEST);
         mosaicId = new MosaicId("85BBEA6CC462B244");
         receiptSource = new ReceiptSource(1, 1);
     }
@@ -47,7 +46,7 @@ public class ResolutionEntryTest {
         assertEquals(ReceiptType.ADDRESS_ALIAS_RESOLUTION, resolutionEntry.getType());
         assertEquals(resolutionEntry.getReceiptSource(), receiptSource);
         assertEquals(resolutionEntry.getResolved(), address);
-        assertEquals("010000000100000090CCB2D8723A173450E6404FDA1AFAAE0BDAB524508430C75E",
+        assertEquals("0100000001000000" + address.encoded(),
             ConvertUtils.toHex(resolutionEntry.serialize()));
     }
 

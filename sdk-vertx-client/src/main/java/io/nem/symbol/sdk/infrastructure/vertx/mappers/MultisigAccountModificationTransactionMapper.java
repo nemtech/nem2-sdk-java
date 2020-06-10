@@ -16,7 +16,10 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
+import io.nem.symbol.core.utils.MapperUtils;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransaction;
@@ -40,14 +43,10 @@ class MultisigAccountModificationTransactionMapper extends
     @Override
     protected MultisigAccountModificationTransactionFactory createFactory(
         NetworkType networkType, MultisigAccountModificationTransactionDTO transaction) {
-        List<PublicAccount> additions = transaction.getPublicKeyAdditions().stream()
-            .map(publicKey -> PublicAccount.createFromPublicKey(
-                publicKey,
-                networkType)).collect(Collectors.toList());
-        List<PublicAccount> deletions = transaction.getPublicKeyDeletions().stream()
-            .map(publicKey -> PublicAccount.createFromPublicKey(
-                publicKey,
-                networkType)).collect(Collectors.toList());
+        List<UnresolvedAddress> additions = transaction.getAddressAdditions().stream()
+            .map(MapperUtils::toUnresolvedAddress).collect(Collectors.toList());
+        List<UnresolvedAddress> deletions = transaction.getAddressDeletions().stream()
+            .map(MapperUtils::toUnresolvedAddress).collect(Collectors.toList());
         return MultisigAccountModificationTransactionFactory.create(
             networkType,
             transaction.getMinApprovalDelta().byteValue(),
@@ -60,12 +59,12 @@ class MultisigAccountModificationTransactionMapper extends
         MultisigAccountModificationTransactionDTO dto) {
         dto.setMinApprovalDelta((int) transaction.getMinApprovalDelta());
         dto.setMinRemovalDelta((int) transaction.getMinRemovalDelta());
-        dto.setPublicKeyAdditions(
-            transaction.getPublicKeyAdditions().stream().map(p -> p.getPublicKey().toHex())
+        dto.setAddressAdditions(
+            transaction.getAddressAdditions().stream().map(p -> p.encoded(transaction.getNetworkType()))
                 .collect(Collectors.toList()));
 
-        dto.setPublicKeyDeletions(
-            transaction.getPublicKeyDeletions().stream().map(p -> p.getPublicKey().toHex())
+        dto.setAddressDeletions(
+            transaction.getAddressDeletions().stream().map(p -> p.encoded(transaction.getNetworkType()))
                 .collect(Collectors.toList()));
     }
 

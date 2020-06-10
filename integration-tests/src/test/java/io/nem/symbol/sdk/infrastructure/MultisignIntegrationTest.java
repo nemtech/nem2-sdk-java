@@ -78,9 +78,9 @@ class MultisignIntegrationTest extends BaseIntegrationTest {
                 (byte) 2,
                 (byte) 1,
                 Arrays.asList(
-                    cosignAccount1.getPublicAccount(),
-                    cosignAccount2.getPublicAccount(),
-                    cosignAccount3.getPublicAccount()
+                    cosignAccount1.getAddress(),
+                    cosignAccount2.getAddress(),
+                    cosignAccount3.getAddress()
                 ),
                 Collections.emptyList()
             ).maxFee(maxFee).build();

@@ -67,7 +67,7 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
     }
 
     private void assertMosaic(MosaicInfo m) {
-        Assertions.assertEquals(testAccount.getPublicAccount(), m.getOwner());
+        Assertions.assertEquals(testAccount.getAddress(), m.getOwnerAddress());
         Assertions.assertNotNull(m.getMosaicId());
         Assertions.assertNotNull(m.getStartHeight());
         Assertions.assertNotNull(m.getDuration());
@@ -115,8 +115,11 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
     }
 
     private MosaicId createMosaic(RepositoryType type, Account testAccount) {
-        MosaicNonce nonce = MosaicNonce.createRandom();
+        MosaicNonce nonce = new MosaicNonce(new byte[4]);
+        System.out.println("Nonce: " + nonce.getNonceAsInt());
+        System.out.println("Address: " +testAccount.getAddress().plain());
         MosaicId mosaicId = MosaicId.createFromNonce(nonce, testAccount.getPublicAccount());
+        System.out.println("mosaicId Hex: " + mosaicId.getIdAsHex());
 
         System.out.println(mosaicId.getIdAsHex());
 
@@ -142,7 +145,7 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
         criteria.ownerAddress(address);
         MosaicPaginationStreamer streamer = new MosaicPaginationStreamer(getMosaicRepository(type));
         List<MosaicInfo> mosaics = get(streamer.search(criteria).toList().toObservable());
-        mosaics.forEach(m -> Assertions.assertEquals(address, m.getOwner().getAddress()));
+        mosaics.forEach(m -> Assertions.assertEquals(address, m.getOwnerAddress()));
         Assertions.assertFalse(mosaics.isEmpty());
 
     }

@@ -16,10 +16,12 @@
 
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
+import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.BlockOrderBy;
 import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.BlockSearchCriteria;
 import io.nem.symbol.sdk.api.Page;
+import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerklePathItem;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
@@ -55,7 +57,8 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
     }
 
     public static BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO) {
-        return BlockInfo.create(
+        NetworkType networkType = NetworkType.rawValueOf(blockInfoDTO.getBlock().getNetwork().getValue());
+        return new BlockInfo(
             blockInfoDTO.getId(),
             blockInfoDTO.getMeta().getHash(),
             blockInfoDTO.getMeta().getGenerationHash(),
@@ -64,8 +67,8 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
             Optional.ofNullable(blockInfoDTO.getMeta().getNumStatements()),
             blockInfoDTO.getMeta().getStateHashSubCacheMerkleRoots(),
             blockInfoDTO.getBlock().getSignature(),
-            blockInfoDTO.getBlock().getSignerPublicKey(),
-            NetworkType.rawValueOf(blockInfoDTO.getBlock().getNetwork().getValue()),
+            PublicAccount.createFromPublicKey(blockInfoDTO.getBlock().getSignerPublicKey(), networkType),
+            networkType,
             blockInfoDTO.getBlock().getVersion(),
             blockInfoDTO.getBlock().getType(),
             blockInfoDTO.getBlock().getHeight(),
@@ -79,7 +82,7 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
             blockInfoDTO.getBlock().getProofGamma(),
             blockInfoDTO.getBlock().getProofScalar(),
             blockInfoDTO.getBlock().getProofVerificationHash(),
-            blockInfoDTO.getBlock().getBeneficiaryPublicKey());
+            MapperUtils.toAddress(blockInfoDTO.getBlock().getBeneficiaryAddress()));
     }
 
     @Override
@@ -92,7 +95,7 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
     public Observable<Page<BlockInfo>> search(BlockSearchCriteria criteria) {
         Callable<BlockPage> callback = () -> getClient()
             .searchBlocks(toDto(criteria.getSignerPublicKey()),
-                toDto(criteria.getBeneficiaryPublicKey()),
+                toDto(criteria.getBeneficiaryAddress()),
                 criteria.getPageSize(),
                 criteria.getPageNumber(), criteria.getOffset(),
                 toDto(criteria.getOrder()), toDto(criteria.getOrderBy()));

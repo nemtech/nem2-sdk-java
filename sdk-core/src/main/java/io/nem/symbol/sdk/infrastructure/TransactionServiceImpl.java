@@ -359,7 +359,7 @@ public class TransactionServiceImpl implements TransactionService {
             transaction.getTargetMosaicId(), statementObservable, expectedReceiptSource);
 
         return resolvedMosaicId.map(mosaicId -> MosaicMetadataTransactionFactory
-            .create(transaction.getNetworkType(), transaction.getTargetAccount(), mosaicId,
+            .create(transaction.getNetworkType(), transaction.getTargetAddress(), mosaicId,
                 transaction.getScopedMetadataKey(), transaction.getValue())
             .valueSizeDelta(transaction.getValueSizeDelta()).valueSize(transaction.getValueSize()));
     }

@@ -16,8 +16,10 @@
 
 package io.nem.symbol.sdk.model.mosaic;
 
+import io.nem.symbol.core.utils.Base32Encoder;
 import io.nem.symbol.core.utils.ByteUtils;
 import io.nem.symbol.core.utils.ConvertUtils;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.transaction.IdGenerator;
 import java.math.BigInteger;
@@ -54,25 +56,46 @@ public class MosaicId implements UnresolvedMosaicId {
     }
 
     /**
+     * Create MosaicId from a MosaicNonce and an Address
+     *
+     * @param mosaicNonce the mosaic nonce.
+     * @param owner the address of the owner
+     */
+    public MosaicId(MosaicNonce mosaicNonce, Address owner) {
+        this.id = IdGenerator
+            .generateMosaicId(mosaicNonce.getNonce(), Base32Encoder.getBytes(owner.plain()));
+    }
+
+    /**
      * Create MosaicId from a MosaicNonce and a PublicAccount
      *
      * @param mosaicNonce the mosaic nonce.
      * @param owner the public account.
      */
     public MosaicId(MosaicNonce mosaicNonce, PublicAccount owner) {
-        this.id = IdGenerator
-            .generateMosaicId(mosaicNonce.getNonce(), owner.getPublicKey().getBytes());
+        this(mosaicNonce, owner.getAddress());
     }
 
     /**
-     * Create MosaicId from a MosaicNonce and a PublicAccount
+     * Create MosaicId from a MosaicNonce and the owner Address
+     *
+     * @param mosaicNonce the mosaic nonce
+     * @param owner thw account owner.
+     * @return the created {@link MosaicId}.
+     */
+    public static MosaicId createFromNonce(MosaicNonce mosaicNonce, Address owner) {
+        return new MosaicId(mosaicNonce, owner);
+    }
+
+    /**
+     * Create MosaicId from a MosaicNonce and the owner PublicAccount
      *
      * @param mosaicNonce the mosaic nonce
      * @param owner thw account owner.
      * @return the created {@link MosaicId}.
      */
     public static MosaicId createFromNonce(MosaicNonce mosaicNonce, PublicAccount owner) {
-        return new MosaicId(mosaicNonce, owner);
+        return MosaicId.createFromNonce(mosaicNonce,owner.getAddress());
     }
 
     /**

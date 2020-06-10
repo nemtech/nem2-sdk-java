@@ -49,6 +49,7 @@ class BlockServiceIntegrationTest extends BaseIntegrationTest {
 
         transactions.forEach(t -> {
             String hash = t.getTransactionInfo().get().getHash().get();
+            Assertions.assertNotNull(hash);
 
             Boolean valid = get(service.isValidTransactionInBlock(height, hash));
             Assertions.assertTrue(valid);

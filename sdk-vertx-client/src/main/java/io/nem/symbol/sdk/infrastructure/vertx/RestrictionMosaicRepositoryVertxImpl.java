@@ -128,7 +128,7 @@ public class RestrictionMosaicRepositoryVertxImpl extends AbstractRepositoryVert
         return new MosaicAddressRestriction(dto.getCompositeHash(),
             MosaicRestrictionEntryType.rawValueOf(dto.getEntryType().getValue()),
             MapperUtils.toMosaicId(dto.getMosaicId()), MapperUtils
-            .toAddressFromEncoded(dto.getTargetAddress()),
+            .toAddress(dto.getTargetAddress()),
             restrictions);
     }
 

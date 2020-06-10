@@ -16,9 +16,12 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
+import static io.nem.symbol.core.utils.MapperUtils.toUnresolvedAddress;
+
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
@@ -42,8 +45,7 @@ class MosaicMetadataTransactionMapper extends
     @Override
     protected MosaicMetadataTransactionFactory createFactory(NetworkType networkType,
         MosaicMetadataTransactionDTO transaction) {
-        PublicAccount targetAccount = PublicAccount
-            .createFromPublicKey(transaction.getTargetPublicKey(), networkType);
+        UnresolvedAddress targetAddress = toUnresolvedAddress(transaction.getTargetAddress());
         Integer valueSizeDelta = transaction.getValueSizeDelta();
         BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey(), 16);
         String value = ConvertUtils.fromHexToString(transaction.getValue());
@@ -51,7 +53,7 @@ class MosaicMetadataTransactionMapper extends
             .toUnresolvedMosaicId(transaction.getTargetMosaicId());
         MosaicMetadataTransactionFactory factory = MosaicMetadataTransactionFactory.create(
             networkType,
-            targetAccount,
+            targetAddress,
             targetMosaic,
             scopedMetaDataKey,
             value);
@@ -66,7 +68,7 @@ class MosaicMetadataTransactionMapper extends
     @Override
     protected void copyToDto(MosaicMetadataTransaction transaction,
         MosaicMetadataTransactionDTO dto) {
-        dto.setTargetPublicKey(transaction.getTargetAccount().getPublicKey().toHex());
+        dto.setTargetAddress(transaction.getTargetAddress().encoded(transaction.getNetworkType()));
         dto.setTargetMosaicId(MapperUtils.getIdAsHex(transaction.getTargetMosaicId()));
         dto.setScopedMetadataKey(transaction.getScopedMetadataKey().toString());
         dto.setValue(ConvertUtils.fromStringToHex(transaction.getValue()));

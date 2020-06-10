@@ -98,7 +98,9 @@ public class BlockServiceImpl implements BlockService {
             String hroot0 = merklePath.stream().reduce(leaf, accumulator, (s1, s2) -> s1);
             return root.equalsIgnoreCase(hroot0);
         };
-        return Observable.zip(rootObservable, merkleTransactionObservable, zipper)
-            .onErrorReturnItem(false);
+        return Observable.zip(rootObservable, merkleTransactionObservable, zipper).onErrorReturn((e) -> {
+            e.printStackTrace();
+            return false;
+        });
     }
 }

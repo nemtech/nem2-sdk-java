@@ -62,7 +62,7 @@ class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
             get(getNamespaceRepository(type).getNamespacesFromAccount(account.getAddress()));
 
         namespacesInfo.forEach(n -> {
-            Assertions.assertEquals(account.getPublicAccount(), n.getOwner());
+            Assertions.assertEquals(account.getAddress(), n.getOwnerAddress());
         });
     }
 
@@ -76,7 +76,7 @@ class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
                     account.getAddress())));
 
         namespacesInfo.forEach(n -> {
-            Assertions.assertEquals(account.getPublicAccount(), n.getOwner());
+            Assertions.assertEquals(account.getAddress(), n.getOwnerAddress());
         });
 
     }

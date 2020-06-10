@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.model.namespace;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class NamespaceInfo {
     private final Integer depth;
     private final List<NamespaceId> levels;
     private final NamespaceId parentId;
-    private final PublicAccount owner;
+    private final UnresolvedAddress ownerAddress;
     private final BigInteger startHeight;
     private final BigInteger endHeight;
     private final Alias alias;
@@ -48,7 +49,7 @@ public class NamespaceInfo {
         Integer depth,
         List<NamespaceId> levels,
         NamespaceId parentId,
-        PublicAccount owner,
+        UnresolvedAddress ownerAddress,
         BigInteger startHeight,
         BigInteger endHeight,
         Alias alias) {
@@ -59,7 +60,7 @@ public class NamespaceInfo {
         this.depth = depth;
         this.levels = levels;
         this.parentId = parentId;
-        this.owner = owner;
+        this.ownerAddress = ownerAddress;
         this.startHeight = startHeight;
         this.endHeight = endHeight;
         this.alias = alias;
@@ -119,12 +120,12 @@ public class NamespaceInfo {
     }
 
     /**
-     * Returns the mosaic owner account
+     * Returns the namespace owner address
      *
-     * @return mosaic owner account
+     * @return mosaic namespace owner
      */
-    public PublicAccount getOwner() {
-        return owner;
+    public UnresolvedAddress getOwnerAddress() {
+        return ownerAddress;
     }
 
     /**

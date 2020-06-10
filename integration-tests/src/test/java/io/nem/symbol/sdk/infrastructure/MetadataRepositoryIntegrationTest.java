@@ -40,9 +40,9 @@ public class MetadataRepositoryIntegrationTest extends BaseIntegrationTest {
         RepositoryCallException exception = Assertions
             .assertThrows(RepositoryCallException.class, () -> get(metadataRepository
                 .getAccountMetadataByKeyAndSender(getRecipient(), metadataKey,
-                    getTestAccount().getPublicKey())));
+                    getTestAccount().getAddress())));
         Assertions.assertEquals(
-            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'SDTP652VVAFWVKJVUXBRW3J5BT5PQLQGX4VZZSPA'",
+            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '152,2,245,29,21,107,94,139,109,154,112,80,158,70,82,43,162,79,185,29,57,232,10,95'",
             exception.getMessage());
         Assertions.assertEquals(404, exception.getStatusCode());
     }

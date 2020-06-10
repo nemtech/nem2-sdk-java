@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.core.utils.StringEncoder;
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import java.math.BigInteger;
 
 /**
@@ -28,7 +29,7 @@ public abstract class MetadataTransaction extends Transaction {
     /**
      * Metadata target public key.
      */
-    private final PublicAccount targetAccount;
+    private final UnresolvedAddress targetAddress;
 
     /**
      * Metadata key scoped to source, target and type.
@@ -59,7 +60,7 @@ public abstract class MetadataTransaction extends Transaction {
      */
     MetadataTransaction(MetadataTransactionFactory<?> factory) {
         super(factory);
-        this.targetAccount = factory.getTargetAccount();
+        this.targetAddress = factory.getTargetAddress();
         this.scopedMetadataKey = factory.getScopedMetadataKey();
         this.valueSizeDelta = factory.getValueSizeDelta();
         this.value = factory.getValue();
@@ -67,8 +68,8 @@ public abstract class MetadataTransaction extends Transaction {
     }
 
 
-    public PublicAccount getTargetAccount() {
-        return targetAccount;
+    public UnresolvedAddress getTargetAddress() {
+        return targetAddress;
     }
 
     public BigInteger getScopedMetadataKey() {

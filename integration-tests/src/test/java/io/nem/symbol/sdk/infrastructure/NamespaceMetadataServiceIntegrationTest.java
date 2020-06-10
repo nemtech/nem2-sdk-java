@@ -35,9 +35,9 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NamespaceMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
-    private Account signerAccount = config().getDefaultAccount();
+    private final Account signerAccount = config().getDefaultAccount();
 
-    private Account targetAccount = config().getDefaultAccount();
+    private final Account targetAccount = config().getDefaultAccount();
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
@@ -64,8 +64,8 @@ class NamespaceMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
         NamespaceMetadataTransaction originalTransaction = get(service
             .createNamespaceMetadataTransactionFactory(
-                targetAccount.getPublicAccount(), key, originalMessage,
-                signerAccount.getPublicAccount().getPublicKey(), targetNamespaceId))
+                targetAccount.getAddress(), key, originalMessage,
+                signerAccount.getAddress(), targetNamespaceId))
             .maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, originalTransaction, signerAccount);
@@ -74,8 +74,8 @@ class NamespaceMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
         NamespaceMetadataTransaction updateTransaction = get(service
             .createNamespaceMetadataTransactionFactory(
-                targetAccount.getPublicAccount(), key, newMessage,
-                signerAccount.getPublicAccount().getPublicKey(), targetNamespaceId))
+                targetAccount.getAddress(), key, newMessage,
+                signerAccount.getAddress(), targetNamespaceId))
             .maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, updateTransaction, signerAccount);
@@ -89,7 +89,7 @@ class NamespaceMetadataServiceIntegrationTest extends BaseIntegrationTest {
         MetadataRepository metadataRepository) {
         Metadata originalMetadata = get(metadataRepository
             .getNamespaceMetadataByKeyAndSender(targetNamespaceId, key,
-                signerAccount.getPublicAccount().getPublicKey().toHex()));
+                signerAccount.getAddress()));
 
         Assertions.assertEquals(value, originalMetadata.getMetadataEntry().getValue());
     }

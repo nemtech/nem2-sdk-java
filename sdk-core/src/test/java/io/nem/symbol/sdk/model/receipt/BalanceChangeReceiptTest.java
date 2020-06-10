@@ -52,7 +52,7 @@ public class BalanceChangeReceiptTest {
 
         BalanceChangeReceipt balanceChangeReceipt =
             new BalanceChangeReceipt(
-                account.getPublicAccount(),
+                account.getAddress(),
                 mosaicId,
                 BigInteger.valueOf(10),
                 ReceiptType.HARVEST_FEE,
@@ -61,14 +61,14 @@ public class BalanceChangeReceiptTest {
         assertFalse(balanceChangeReceipt.getSize().isPresent());
         assertEquals(ReceiptVersion.BALANCE_CHANGE, balanceChangeReceipt.getVersion());
         assertEquals(
-            balanceChangeReceipt.getAccount().getPublicKey().toHex().toUpperCase(),
-            account.getPublicKey().toUpperCase());
+            balanceChangeReceipt.getTargetAddress(),
+            account.getAddress());
         assertEquals("85BBEA6CC462B244",
             balanceChangeReceipt.getMosaicId().getIdAsHex().toUpperCase());
         assertEquals(BigInteger.TEN, balanceChangeReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceChangeReceipt.serialize());
-        Assertions.assertEquals("0100432144B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2", hex);
+        Assertions.assertEquals("0100432144B262C46CEABB850A0000000000000090089108860764C22FDD34EB8979FEAE8BD9B9E303AA0176", hex);
     }
 
     @Test
@@ -76,7 +76,7 @@ public class BalanceChangeReceiptTest {
 
         BalanceChangeReceipt balanceChangeReceipt =
             new BalanceChangeReceipt(
-                account.getPublicAccount(),
+                account.getAddress(),
                 mosaicId,
                 BigInteger.valueOf(10),
                 ReceiptType.LOCK_HASH_CREATED,
@@ -84,15 +84,15 @@ public class BalanceChangeReceiptTest {
         assertEquals(ReceiptType.LOCK_HASH_CREATED, balanceChangeReceipt.getType());assertFalse(balanceChangeReceipt.getSize().isPresent());
         assertEquals(ReceiptVersion.BALANCE_CHANGE, balanceChangeReceipt.getVersion());
         assertEquals(
-            balanceChangeReceipt.getAccount().getPublicKey().toHex().toUpperCase(),
-            account.getPublicKey().toUpperCase());
+            balanceChangeReceipt.getTargetAddress(),
+            account.getAddress());
         assertEquals("85BBEA6CC462B244",
             balanceChangeReceipt.getMosaicId().getIdAsHex().toUpperCase()
         );
         assertEquals(BigInteger.TEN, balanceChangeReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceChangeReceipt.serialize());
-        Assertions.assertEquals("0100483144B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2", hex);
+        Assertions.assertEquals("0100483144B262C46CEABB850A0000000000000090089108860764C22FDD34EB8979FEAE8BD9B9E303AA0176", hex);
     }
 
     @Test
@@ -100,7 +100,7 @@ public class BalanceChangeReceiptTest {
 
         BalanceChangeReceipt balanceChangeReceipt =
             new BalanceChangeReceipt(
-                account.getPublicAccount(),
+                account.getAddress(),
                 mosaicId,
                 BigInteger.valueOf(10),
                 ReceiptType.LOCK_HASH_EXPIRED,
@@ -109,15 +109,15 @@ public class BalanceChangeReceiptTest {
         assertFalse(balanceChangeReceipt.getSize().isPresent());
         assertEquals(ReceiptVersion.BALANCE_CHANGE, balanceChangeReceipt.getVersion());
         assertEquals(
-            balanceChangeReceipt.getAccount().getPublicKey().toHex().toUpperCase(),
-            account.getPublicKey().toUpperCase());
+            balanceChangeReceipt.getTargetAddress(),
+            account.getAddress());
         assertEquals("85BBEA6CC462B244",
             balanceChangeReceipt.getMosaicId().getIdAsHex().toUpperCase()
         );
         assertEquals(BigInteger.TEN, balanceChangeReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceChangeReceipt.serialize());
-        Assertions.assertEquals("0100482344B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2", hex);
+        Assertions.assertEquals("0100482344B262C46CEABB850A0000000000000090089108860764C22FDD34EB8979FEAE8BD9B9E303AA0176", hex);
     }
 
     @Test
@@ -125,7 +125,7 @@ public class BalanceChangeReceiptTest {
 
         BalanceChangeReceipt balanceChangeReceipt =
             new BalanceChangeReceipt(
-                account.getPublicAccount(),
+                account.getAddress(),
                 mosaicId,
                 BigInteger.valueOf(10),
                 ReceiptType.LOCK_HASH_COMPLETED,
@@ -133,15 +133,15 @@ public class BalanceChangeReceiptTest {
         assertEquals(ReceiptType.LOCK_HASH_COMPLETED, balanceChangeReceipt.getType());assertFalse(balanceChangeReceipt.getSize().isPresent());
         assertEquals(ReceiptVersion.BALANCE_CHANGE, balanceChangeReceipt.getVersion());
         assertEquals(
-            balanceChangeReceipt.getAccount().getPublicKey().toHex().toUpperCase(),
-            account.getPublicKey().toUpperCase());
+            balanceChangeReceipt.getTargetAddress(),
+            account.getAddress());
         assertEquals("85BBEA6CC462B244",
             balanceChangeReceipt.getMosaicId().getIdAsHex().toUpperCase()
         );
         assertEquals(BigInteger.TEN, balanceChangeReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceChangeReceipt.serialize());
-        Assertions.assertEquals("0100482244B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2", hex);
+        Assertions.assertEquals("0100482244B262C46CEABB850A0000000000000090089108860764C22FDD34EB8979FEAE8BD9B9E303AA0176", hex);
     }
 
     @Test
@@ -149,7 +149,7 @@ public class BalanceChangeReceiptTest {
 
         BalanceChangeReceipt balanceChangeReceipt =
             new BalanceChangeReceipt(
-                account.getPublicAccount(),
+                account.getAddress(),
                 mosaicId,
                 BigInteger.valueOf(10),
                 ReceiptType.LOCK_SECRET_CREATED,
@@ -158,15 +158,15 @@ public class BalanceChangeReceiptTest {
         assertFalse(balanceChangeReceipt.getSize().isPresent());
         assertEquals(ReceiptVersion.BALANCE_CHANGE, balanceChangeReceipt.getVersion());
         assertEquals(
-            balanceChangeReceipt.getAccount().getPublicKey().toHex().toUpperCase(),
-            account.getPublicKey().toUpperCase());
+            balanceChangeReceipt.getTargetAddress(),
+            account.getAddress());
         assertEquals("85BBEA6CC462B244",
             balanceChangeReceipt.getMosaicId().getIdAsHex().toUpperCase()
         );
         assertEquals(BigInteger.TEN, balanceChangeReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceChangeReceipt.serialize());
-        Assertions.assertEquals("0100523144B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2", hex);
+        Assertions.assertEquals("0100523144B262C46CEABB850A0000000000000090089108860764C22FDD34EB8979FEAE8BD9B9E303AA0176", hex);
     }
 
     @Test
@@ -174,7 +174,7 @@ public class BalanceChangeReceiptTest {
 
         BalanceChangeReceipt balanceChangeReceipt =
             new BalanceChangeReceipt(
-                account.getPublicAccount(),
+                account.getAddress(),
                 mosaicId,
                 BigInteger.valueOf(10),
                 ReceiptType.LOCK_SECRET_EXPIRED,
@@ -183,15 +183,15 @@ public class BalanceChangeReceiptTest {
         assertFalse(balanceChangeReceipt.getSize().isPresent());
         assertEquals(ReceiptVersion.BALANCE_CHANGE, balanceChangeReceipt.getVersion());
         assertEquals(
-            balanceChangeReceipt.getAccount().getPublicKey().toHex().toUpperCase(),
-            account.getPublicKey().toUpperCase());
+            balanceChangeReceipt.getTargetAddress(),
+            account.getAddress());
         assertEquals("85BBEA6CC462B244",
             balanceChangeReceipt.getMosaicId().getIdAsHex().toUpperCase()
         );
         assertEquals(BigInteger.TEN, balanceChangeReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceChangeReceipt.serialize());
-        Assertions.assertEquals("0100522344B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2", hex);
+        Assertions.assertEquals("0100522344B262C46CEABB850A0000000000000090089108860764C22FDD34EB8979FEAE8BD9B9E303AA0176", hex);
     }
 
     @Test
@@ -199,7 +199,7 @@ public class BalanceChangeReceiptTest {
 
         BalanceChangeReceipt balanceChangeReceipt =
             new BalanceChangeReceipt(
-                account.getPublicAccount(),
+                account.getAddress(),
                 mosaicId,
                 BigInteger.valueOf(10),
                 ReceiptType.LOCK_SECRET_COMPLETED,
@@ -207,16 +207,14 @@ public class BalanceChangeReceiptTest {
         assertEquals(ReceiptType.LOCK_SECRET_COMPLETED, balanceChangeReceipt.getType());
         assertFalse(balanceChangeReceipt.getSize().isPresent());
         assertEquals(ReceiptVersion.BALANCE_CHANGE, balanceChangeReceipt.getVersion());
-        assertEquals(
-            balanceChangeReceipt.getAccount().getPublicKey().toHex().toUpperCase(),
-            account.getPublicKey().toUpperCase());
+        assertEquals(balanceChangeReceipt.getTargetAddress(), account.getAddress());
         assertEquals("85BBEA6CC462B244",
             balanceChangeReceipt.getMosaicId().getIdAsHex().toUpperCase()
         );
         assertEquals(BigInteger.TEN, balanceChangeReceipt.getAmount());
 
         String hex = ConvertUtils.toHex(balanceChangeReceipt.serialize());
-        Assertions.assertEquals("0100522244B262C46CEABB850A000000000000002134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2", hex);
+        Assertions.assertEquals("0100522244B262C46CEABB850A0000000000000090089108860764C22FDD34EB8979FEAE8BD9B9E303AA0176", hex);
     }
 
     @Test
@@ -225,7 +223,7 @@ public class BalanceChangeReceiptTest {
             IllegalArgumentException.class,
             () -> {
                 new BalanceChangeReceipt(
-                    account.getPublicAccount(),
+                    account.getAddress(),
                     mosaicId,
                     BigInteger.valueOf(10),
                     ReceiptType.NAMESPACE_EXPIRED,

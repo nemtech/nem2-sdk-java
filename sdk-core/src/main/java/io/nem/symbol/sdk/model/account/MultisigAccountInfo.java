@@ -25,23 +25,23 @@ import java.util.List;
  */
 public class MultisigAccountInfo {
 
-    private final PublicAccount account;
+    private final Address accountAddress;
     private final int minApproval;
     private final int minRemoval;
-    private final List<PublicAccount> cosignatories;
-    private final List<PublicAccount> multisigAccounts;
+    private final List<Address> cosignatoryAddresses;
+    private final List<Address> multisigAddresses;
 
     public MultisigAccountInfo(
-        PublicAccount account,
+        Address accountAddress,
         int minApproval,
         int minRemoval,
-        List<PublicAccount> cosignatories,
-        List<PublicAccount> multisigAccounts) {
-        this.account = account;
+        List<Address> cosignatories,
+        List<Address> multisigAddresses) {
+        this.accountAddress = accountAddress;
         this.minApproval = minApproval;
         this.minRemoval = minRemoval;
-        this.cosignatories = cosignatories;
-        this.multisigAccounts = multisigAccounts;
+        this.cosignatoryAddresses = cosignatories;
+        this.multisigAddresses = multisigAddresses;
     }
 
     /**
@@ -49,8 +49,8 @@ public class MultisigAccountInfo {
      *
      * @return PublicAccount
      */
-    public PublicAccount getAccount() {
-        return account;
+    public Address getAccountAddress() {
+        return accountAddress;
     }
 
     /**
@@ -76,8 +76,8 @@ public class MultisigAccountInfo {
      *
      * @return List of {@link PublicAccount}
      */
-    public List<PublicAccount> getCosignatories() {
-        return cosignatories;
+    public List<Address> getCosignatoryAddresses() {
+        return cosignatoryAddresses;
     }
 
     /**
@@ -85,8 +85,8 @@ public class MultisigAccountInfo {
      *
      * @return List of {@link PublicAccount}
      */
-    public List<PublicAccount> getMultisigAccounts() {
-        return multisigAccounts;
+    public List<Address> getMultisigAddresses() {
+        return multisigAddresses;
     }
 
     /**
@@ -95,8 +95,8 @@ public class MultisigAccountInfo {
      * @param account PublicAccount
      * @return boolean
      */
-    public boolean hasCosigner(PublicAccount account) {
-        return this.cosignatories.contains(account);
+    public boolean hasCosigner(Address account) {
+        return this.cosignatoryAddresses.contains(account);
     }
 
     /**
@@ -105,8 +105,8 @@ public class MultisigAccountInfo {
      * @param account PublicAccount
      * @return boolean
      */
-    public boolean isCosignerOfMultisigAccount(PublicAccount account) {
-        return this.multisigAccounts.contains(account);
+    public boolean isCosignerOfMultisigAccount(Address account) {
+        return this.multisigAddresses.contains(account);
     }
 
     /**

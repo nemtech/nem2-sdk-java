@@ -18,10 +18,10 @@ package io.nem.symbol.sdk.infrastructure.vertx;
 
 import static io.nem.symbol.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.MosaicRepository;
 import io.nem.symbol.sdk.api.MosaicSearchCriteria;
 import io.nem.symbol.sdk.api.Page;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
@@ -69,7 +69,7 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl imple
         Consumer<Handler<AsyncResult<MosaicInfoDTO>>> callback = handler -> getClient()
             .getMosaic(mosaicId.getIdAsHex(), handler);
         return exceptionHandling(networkTypeObservable.flatMap(networkType -> call(callback).map(
-            mosaicInfoDTO -> createMosaicInfo(mosaicInfoDTO, networkType))));
+            mosaicInfoDTO -> createMosaicInfo(mosaicInfoDTO))));
     }
 
     @Override
@@ -83,7 +83,7 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl imple
             .getMosaics(mosaicIds, handler);
         return exceptionHandling(networkTypeObservable.flatMap(networkType ->
             call(callback).flatMapIterable(item -> item).map(
-                mosaicInfoDTO -> createMosaicInfo(mosaicInfoDTO, networkType))
+                mosaicInfoDTO -> createMosaicInfo(mosaicInfoDTO))
                 .toList()
                 .toObservable()));
     }
@@ -99,22 +99,22 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl imple
 
         return exceptionHandling(networkTypeObservable.flatMap(networkType ->
             call(callback).map(mosaicPage -> this.toPage(mosaicPage.getPagination(),
-                mosaicPage.getData().stream().map(dto -> this.createMosaicInfo(dto, networkType)).collect(
+                mosaicPage.getData().stream().map(this::createMosaicInfo).collect(
                     Collectors.toList())))));
     }
 
 
-    private MosaicInfo createMosaicInfo(MosaicInfoDTO mosaicInfoDTO, NetworkType networkType) {
-        return createMosaicInfo(mosaicInfoDTO.getMosaic(),mosaicInfoDTO.getId(), networkType);
+    private MosaicInfo createMosaicInfo(MosaicInfoDTO mosaicInfoDTO) {
+        return createMosaicInfo(mosaicInfoDTO.getMosaic(),mosaicInfoDTO.getId());
     }
 
-    private MosaicInfo createMosaicInfo(MosaicDTO mosaic, String recordId, NetworkType networkType) {
+    private MosaicInfo createMosaicInfo(MosaicDTO mosaic, String recordId) {
         return new MosaicInfo(
             recordId,
             toMosaicId(mosaic.getId()),
             mosaic.getSupply(),
             mosaic.getStartHeight(),
-            new PublicAccount(mosaic.getOwnerPublicKey(), networkType),
+            MapperUtils.toAddress(mosaic.getOwnerAddress()),
             mosaic.getRevision(),
             extractMosaicFlags(mosaic),
             mosaic.getDivisibility(),

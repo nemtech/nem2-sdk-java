@@ -16,11 +16,11 @@
 
 package io.nem.symbol.sdk.infrastructure.vertx;
 
+import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.MultisigRepository;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountGraphInfo;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.openapi.vertx.api.MultisigRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.MultisigRoutesApiImpl;
@@ -56,7 +56,7 @@ public class MultisigRepositoryVertxImpl extends AbstractRepositoryVertxImpl imp
             (Handler<AsyncResult<MultisigAccountInfoDTO>> handler) -> getClient()
                 .getAccountMultisig(address.plain(), handler))
             .map(MultisigAccountInfoDTO::getMultisig)
-            .map(dto -> toMultisigAccountInfo(dto, networkType))));
+            .map(this::toMultisigAccountInfo)));
 
     }
 
@@ -75,38 +75,30 @@ public class MultisigRepositoryVertxImpl extends AbstractRepositoryVertxImpl imp
                         item ->
                             multisigAccountInfoMap.put(
                                 item.getLevel(),
-                                toMultisigAccountInfo(item, networkType)));
+                                toMultisigAccountInfo(item)));
                     return new MultisigAccountGraphInfo(multisigAccountInfoMap);
                 })));
     }
 
 
-    private List<MultisigAccountInfo> toMultisigAccountInfo(MultisigAccountGraphInfoDTO item,
-        NetworkType networkType) {
+    private List<MultisigAccountInfo> toMultisigAccountInfo(MultisigAccountGraphInfoDTO item) {
         return item.getMultisigEntries().stream()
             .map(MultisigAccountInfoDTO::getMultisig)
-            .map(dto -> toMultisigAccountInfo(dto, networkType))
+            .map(dto -> toMultisigAccountInfo(dto))
             .collect(Collectors.toList());
     }
 
 
-    private MultisigAccountInfo toMultisigAccountInfo(MultisigDTO dto, NetworkType networkType) {
+    private MultisigAccountInfo toMultisigAccountInfo(MultisigDTO dto) {
         return new MultisigAccountInfo(
-            new PublicAccount(dto.getAccountPublicKey(), networkType),
+            MapperUtils.toAddress(dto.getAccountAddress()),
             dto.getMinApproval(),
             dto.getMinRemoval(),
-            dto.getCosignatoryPublicKeys().stream()
-                .map(
-                    cosigner ->
-                        new PublicAccount(
-                            cosigner, networkType))
+            dto.getCosignatoryAddresses().stream()
+                .map(MapperUtils::toAddress)
                 .collect(Collectors.toList()),
-            dto.getMultisigPublicKeys().stream()
-                .map(
-                    multisigAccount ->
-                        new PublicAccount(
-                            multisigAccount,
-                            networkType))
+            dto.getMultisigAddresses().stream()
+                .map(MapperUtils::toAddress)
                 .collect(Collectors.toList()));
     }
 

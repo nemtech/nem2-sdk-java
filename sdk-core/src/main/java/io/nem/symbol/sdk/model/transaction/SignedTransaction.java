@@ -19,8 +19,8 @@ package io.nem.symbol.sdk.model.transaction;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 
 /**
- * The signed transaction object is used to transfer the transaction data and the signature to NIS
- * in order to initiate and broadcast a transaction.
+ * The signed transaction object is used to transfer the transaction data and the signature to NIS in order to initiate
+ * and broadcast a transaction.
  *
  * @since 1.0
  */
@@ -82,4 +82,5 @@ public class SignedTransaction {
     public TransactionType getType() {
         return type;
     }
+
 }

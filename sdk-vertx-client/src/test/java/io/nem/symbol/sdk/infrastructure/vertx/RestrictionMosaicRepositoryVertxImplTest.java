@@ -61,9 +61,7 @@ public class RestrictionMosaicRepositoryVertxImplTest extends AbstractVertxRespo
 
     @Test
     public void shouldGetMosaicAddressRestrictions() throws Exception {
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = Address.generateRandom(this.networkType);
 
         MosaicId mosaicId = MapperUtils.toMosaicId("123");
 
@@ -227,9 +225,7 @@ public class RestrictionMosaicRepositoryVertxImplTest extends AbstractVertxRespo
 
     @Test
     public void shouldGetMosaicAddressRestriction() throws Exception {
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = Address.generateRandom(this.networkType);
 
         MosaicId mosaicId = MapperUtils.toMosaicId("123");
 

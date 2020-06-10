@@ -11,7 +11,7 @@
           {
             "version": 1,
             "type": 8515,
-            "targetPublicKey": "2FC3872A792933617D70E02AFF8FBDE152821A0DF0CA5FB04CB56FC3D21C8863",
+            "targetAddress": "90E6FF7755A80B6AA935A5C31B6D3D0CFAF82E06BF2B9CC9",
             "mosaicId": "85BBEA6CC462B244",
             "amount": "1000"
           }
@@ -29,9 +29,9 @@
           {
             "version": 1,
             "type": 4942,
-            "senderPublicKey": "2FC3872A792933617D70E02AFF8FBDE152821A0DF0CA5FB04CB56FC3D21C8863",
+            "senderAddress": "90E6FF7755A80B6AA935A5C31B6D3D0CFAF82E06BF2B9CC9",
             "mosaicId": "85BBEA6CC462B244",
-            "recipientAddress": "90CCB2D8723A173450E6404FDA1AFAAE0BDAB524508430C75E",
+            "recipientAddress": "903CC58E8C242DCFC33DE4E2F8B434C77F93A48BA13BC3E3",
             "amount": "1000"
           },
           {
@@ -63,14 +63,14 @@
     {
       "statement": {
         "height": "1488",
-        "unresolved": "9103B60AAF2762688300000000000000000000000000000000",
+        "unresolved": "9103B60AAF27626883000000000000000000000000000000",
         "resolutionEntries": [
           {
             "source": {
               "primaryId": 4,
               "secondaryId": 0
             },
-            "resolved": "917E7E29A01014C2F300000000000000000000000000000000"
+            "resolved": "903CC58E8C242DCFC33DE4E2F8B434C77F93A48BA13BC3E3"
           }
         ]
       }
@@ -78,14 +78,14 @@
     {
       "statement": {
         "height": "1488",
-        "unresolved": "917E7E29A01014C2F300000000000000000000000000000000",
+        "unresolved": "917E7E29A01014C2F3000000000000000000000000000000",
         "resolutionEntries": [
           {
             "source": {
               "primaryId": 2,
               "secondaryId": 0
             },
-            "resolved": "9103B60AAF2762688300000000000000000000000000000000"
+            "resolved": "903CC58E8C242DCFC33DE4E2F8B434C77F93A48BA13BC3E3"
           }
         ]
       }

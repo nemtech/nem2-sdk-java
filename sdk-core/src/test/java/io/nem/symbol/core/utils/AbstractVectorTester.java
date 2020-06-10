@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.provider.Arguments;
 
 /**
@@ -38,8 +39,9 @@ public class AbstractVectorTester {
         Function<Map<String, String>, List<Arguments>> extractArguments, int limit) {
         try {
             //The files loaded here are a trimmed down version of the vectors tests https://github.com/nemtech/test-vectors
-            URL url = AbstractVectorTester.class.getClassLoader()
-                .getResource("vectors/" + fileName);
+            String resourceName = "vectors/" + fileName;
+            URL url = AbstractVectorTester.class.getClassLoader().getResource(resourceName);
+            Assertions.assertNotNull(url, "Vector test not found: " + resourceName);
             ObjectMapper objectMapper = new ObjectMapper();
             // Change this to just load the first 'limit' objects from the json array file.
             List<Map<String, String>> list = objectMapper

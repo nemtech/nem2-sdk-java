@@ -16,13 +16,14 @@
 
 package io.nem.symbol.sdk.model.receipt;
 
+import io.nem.symbol.catapult.builders.AddressDto;
 import io.nem.symbol.catapult.builders.AmountDto;
 import io.nem.symbol.catapult.builders.BalanceChangeReceiptBuilder;
-import io.nem.symbol.catapult.builders.KeyDto;
 import io.nem.symbol.catapult.builders.MosaicBuilder;
 import io.nem.symbol.catapult.builders.MosaicIdDto;
 import io.nem.symbol.catapult.builders.ReceiptTypeDto;
 import io.nem.symbol.sdk.infrastructure.SerializationUtils;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
@@ -30,14 +31,14 @@ import java.util.Optional;
 
 public class BalanceChangeReceipt extends Receipt {
 
-    private final PublicAccount account;
+    private final Address targetAddress;
     private final MosaicId mosaicId;
     private final BigInteger amount;
 
     /**
      * Constructor BalanceChangeReceipt
      *
-     * @param account Public Account
+     * @param targetAddress Public Account
      * @param mosaicId Mosaic Id
      * @param amount Amount
      * @param type Receipt Type
@@ -45,14 +46,14 @@ public class BalanceChangeReceipt extends Receipt {
      * @param size Receipt Size
      */
     public BalanceChangeReceipt(
-        PublicAccount account,
+        Address targetAddress,
         MosaicId mosaicId,
         BigInteger amount,
         ReceiptType type,
         ReceiptVersion version,
         Optional<Integer> size) {
         super(type, version, size);
-        this.account = account;
+        this.targetAddress = targetAddress;
         this.amount = amount;
         this.mosaicId = mosaicId;
         this.validateReceiptType(type);
@@ -61,19 +62,19 @@ public class BalanceChangeReceipt extends Receipt {
     /**
      * Constructor BalanceChangeReceipt
      *
-     * @param account Public Account
+     * @param targetAddress Public Account
      * @param mosaicId Mosaic Id
      * @param amount Amount
      * @param type Receipt Type
      * @param version Receipt Version
      */
     public BalanceChangeReceipt(
-        PublicAccount account,
+        Address targetAddress,
         MosaicId mosaicId,
         BigInteger amount,
         ReceiptType type,
         ReceiptVersion version) {
-        this(account,
+        this(targetAddress,
             mosaicId,
             amount,
             type,
@@ -85,8 +86,8 @@ public class BalanceChangeReceipt extends Receipt {
      *
      * @return account
      */
-    public PublicAccount getAccount() {
-        return this.account;
+    public Address getTargetAddress() {
+        return this.targetAddress;
     }
 
     /**
@@ -120,9 +121,9 @@ public class BalanceChangeReceipt extends Receipt {
         MosaicBuilder mosaic = MosaicBuilder
             .create(new MosaicIdDto(getMosaicId().getIdAsLong()),
                 new AmountDto(getAmount().longValue()));
-        KeyDto targetPublicKey = SerializationUtils.toKeyDto(getAccount().getPublicKey());
+        AddressDto targetAddress = SerializationUtils.toAddressDto(getTargetAddress());
         return BalanceChangeReceiptBuilder
-            .create(version, type, mosaic, targetPublicKey).serialize();
+            .create(version, type, mosaic, targetAddress).serialize();
     }
 
     /**

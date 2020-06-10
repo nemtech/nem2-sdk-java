@@ -37,6 +37,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,9 +60,7 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
 
     @Test
     public void shouldGetAccountInfo() throws Exception {
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = Address.generateRandom(this.networkType);
 
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
@@ -85,10 +84,9 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     }
 
     @Test
-    public void shouldGetAccountsInfoFromAddresses() throws Exception {
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+    public void shouldGetAccountsInfoFromAddresses() throws ExecutionException, InterruptedException {
+
+        Address address = Address.generateRandom(this.networkType);
 
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
@@ -130,10 +128,8 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
 
 
     @Test
-    public void shouldProcessExceptionWhenNotFound() throws Exception {
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+    public void shouldProcessExceptionWhenNotFound() {
+        Address address = Address.generateRandom(this.networkType);
 
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
@@ -154,10 +150,9 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     }
 
     @Test
-    public void shouldProcessExceptionWhenNotFoundInvalidResponse() throws Exception {
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+    public void shouldProcessExceptionWhenNotFoundInvalidResponse() {
+
+        Address address = Address.generateRandom(this.networkType);
 
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);

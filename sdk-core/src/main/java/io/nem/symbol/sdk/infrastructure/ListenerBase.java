@@ -88,7 +88,7 @@ public abstract class ListenerBase implements Listener {
         } else if (jsonHelper.contains(message, "code")) {
             TransactionStatusError messageObject = new TransactionStatusError(
                 MapperUtils
-                    .toAddressFromEncoded(jsonHelper.getString(message, "address")),
+                    .toAddress(jsonHelper.getString(message, "address")),
                 jsonHelper.getString(message, "hash"),
                 jsonHelper.getString(message, "code"),
                 new Deadline(
@@ -270,7 +270,7 @@ public abstract class ListenerBase implements Listener {
         if (transaction instanceof MetadataTransaction) {
             MetadataTransaction metadataTransaction = (MetadataTransaction) transaction;
             return Observable.just(
-                metadataTransaction.getTargetAccount().getAddress().equals(address));
+                metadataTransaction.getTargetAddress().equals(address));
         }
 
         if (transaction instanceof TargetAddressTransaction) {
@@ -285,14 +285,14 @@ public abstract class ListenerBase implements Listener {
 
         if (transaction instanceof MultisigAccountModificationTransaction) {
             MultisigAccountModificationTransaction multisigAccountModificationTransaction = (MultisigAccountModificationTransaction) transaction;
-            if (multisigAccountModificationTransaction.getPublicKeyAdditions().stream()
-                .anyMatch(a -> a.getAddress().equals(address))) {
+            if (multisigAccountModificationTransaction.getAddressAdditions().stream()
+                .anyMatch(a -> a.equals(address))) {
                 return Observable.just(true);
             }
 
             return Observable
-                .just(multisigAccountModificationTransaction.getPublicKeyDeletions().stream()
-                    .anyMatch(a -> a.getAddress().equals(address)));
+                .just(multisigAccountModificationTransaction.getAddressDeletions().stream()
+                    .anyMatch(a -> a.equals(address)));
 
         }
 

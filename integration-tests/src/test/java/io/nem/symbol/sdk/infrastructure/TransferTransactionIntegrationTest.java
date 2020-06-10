@@ -39,7 +39,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
 
-
     private Account account = config().getDefaultAccount();
 
     @ParameterizedTest
@@ -73,7 +72,6 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         ).getKey();
         Assertions.assertEquals(message, processed.getMessage().getPayload());
     }
-
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)

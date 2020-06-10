@@ -16,12 +16,16 @@
 
 package io.nem.symbol.sdk.model.transaction;
 
+import io.nem.symbol.catapult.builders.CosignatureBuilder;
+import io.nem.symbol.catapult.builders.SignatureDto;
 import io.nem.symbol.core.crypto.CryptoEngines;
 import io.nem.symbol.core.crypto.DsaSigner;
 import io.nem.symbol.core.utils.ConvertUtils;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -93,7 +97,10 @@ public class AggregateTransaction extends Transaction {
                 .createDsaSigner(cosignatory.getKeyPair());
             byte[] bytes = ConvertUtils.fromHexToBytes(signedTransaction.getHash());
             byte[] signatureBytes = signer.sign(bytes).getBytes();
-            payload.append(cosignatory.getPublicKey()).append(ConvertUtils.toHex(signatureBytes));
+            SignatureDto signature = SerializationUtils.toSignatureDto(ConvertUtils.toHex(signatureBytes));
+            CosignatureBuilder builder = CosignatureBuilder.create(AggregateTransactionCosignature.VERSION,
+                SerializationUtils.toKeyDto(cosignatory.getPublicAccount().getPublicKey()), signature);
+            payload.append(ConvertUtils.toHex(builder.serialize()));
         }
 
         byte[] payloadBytes = ConvertUtils.fromHexToBytes(payload.toString());
@@ -103,9 +110,41 @@ public class AggregateTransaction extends Transaction {
 
         System.arraycopy(size, 0, payloadBytes, 0, size.length);
 
+        System.out.println("1 signedTransaction.getHash()  " + signedTransaction.getHash());
         return new SignedTransaction(initiatorAccount.getPublicAccount(),
             ConvertUtils.toHex(payloadBytes), signedTransaction.getHash(), getType());
     }
+//
+//
+//    public SignedTransaction signTransactionWithCosigners2(
+//        final Account initiatorAccount,
+//        final List<Account> cosignatories,
+//        final String generationHash) {
+//        SignedTransaction signedTransaction = this.signWith(initiatorAccount, generationHash);
+//
+//        List<AggregateTransactionCosignature> cosignatures = new ArrayList<>(this.getCosignatures());
+//
+//        for (Account cosignatory : cosignatories) {
+//            final DsaSigner signer = CryptoEngines.defaultEngine().createDsaSigner(cosignatory.getKeyPair());
+//            byte[] bytes = ConvertUtils.fromHexToBytes(signedTransaction.getHash());
+//            byte[] signatureBytes = signer.sign(bytes).getBytes();
+//            cosignatures.add(new AggregateTransactionCosignature(ConvertUtils.toHex(signatureBytes),
+//                PublicAccount.createFromPublicKey(cosignatory.getPublicKey(), this.getNetworkType())));
+//        }
+//
+//        AggregateTransactionFactory newAggregateTransactionFactory = AggregateTransactionFactory
+//            .create(this.getType(), this.getNetworkType(), innerTransactions, cosignatures);
+//        newAggregateTransactionFactory.signer(signedTransaction.getSigner());
+//        newAggregateTransactionFactory.signature(signedTransaction.getSignature());
+//        System.out.println("2 signedTransaction.getHash()  " + signedTransaction.getHash());
+//        AggregateTransaction newTransaction = newAggregateTransactionFactory.build();
+//        System.out.println("2 newTransaction.getTransactionsHash()  " + newTransaction.getTransactionsHash());
+//        SignedTransaction newSigned = initiatorAccount.sign(newTransaction, generationHash);
+//        System.out.println("2 newSigned.getHash()  " + newSigned.getHash());
+//        return new SignedTransaction(initiatorAccount.getPublicAccount(),
+//            ConvertUtils.toHex(newTransaction.serialize()),
+//            signedTransaction.getHash(), getType());
+//    }
 
     /**
      * Get the bytes required for signing.

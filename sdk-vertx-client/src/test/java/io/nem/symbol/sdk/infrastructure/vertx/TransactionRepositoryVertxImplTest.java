@@ -282,7 +282,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
 
         Address recipientAddress =
             Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QX");
 
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(

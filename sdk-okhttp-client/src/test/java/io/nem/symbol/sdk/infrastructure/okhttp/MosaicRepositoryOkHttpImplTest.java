@@ -19,6 +19,7 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.MosaicSearchCriteria;
 import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
@@ -51,12 +52,11 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
     @Test
     public void shouldGetMosaics() throws Exception {
         MosaicId mosaicId = MapperUtils.toMosaicId("481110499AAA");
-
+        Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
         MosaicDTO mosaicDto = new MosaicDTO();
         MosaicInfoDTO mosaicInfoDto = new MosaicInfoDTO();
 
-        mosaicDto
-            .setOwnerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
+        mosaicDto.setOwnerAddress(ownerAddress.encoded());
         mosaicDto.setId("481110499AAA");
         mosaicDto.setRevision(123);
 
@@ -77,8 +77,8 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
         Assertions.assertEquals(mosaicId, mosaicInfo.getMosaicId());
         Assertions.assertEquals(mosaicDto.getRevision(), mosaicInfo.getRevision());
         Assertions
-            .assertEquals(mosaicDto.getOwnerPublicKey(),
-                mosaicInfo.getOwner().getPublicKey().toHex());
+            .assertEquals(mosaicDto.getOwnerAddress(),
+                mosaicInfo.getOwnerAddress().encoded(networkType));
 
         Assertions.assertFalse(mosaicInfo.isTransferable());
         Assertions.assertEquals(6, mosaicInfo.getDivisibility());
@@ -90,12 +90,10 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
 
         MosaicId mosaicId = MapperUtils.toMosaicId("481110499AAA");
 
-        MosaicDTO mosiacMetaDto = new MosaicDTO();
+        Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
         MosaicDTO mosaicDto = new MosaicDTO();
         MosaicInfoDTO mosaicInfoDto = new MosaicInfoDTO();
-
-        mosaicDto
-            .setOwnerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
+        mosaicDto.setOwnerAddress(ownerAddress.encoded());
         mosaicDto.setId("481110499AAA");
         mosaicDto.setRevision(123);
 
@@ -113,8 +111,8 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
         Assertions.assertEquals(mosaicId, mosaicInfo.getMosaicId());
         Assertions.assertEquals(mosaicDto.getRevision(), mosaicInfo.getRevision());
         Assertions
-            .assertEquals(mosaicDto.getOwnerPublicKey(),
-                mosaicInfo.getOwner().getPublicKey().toHex());
+            .assertEquals(mosaicDto.getOwnerAddress(),
+                mosaicInfo.getOwnerAddress().encoded(networkType));
 
         Assertions.assertFalse(mosaicInfo.isTransferable());
         Assertions.assertEquals(6, mosaicInfo.getDivisibility());
@@ -127,11 +125,9 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
         MosaicId mosaicId = MapperUtils.toMosaicId("481110499AAA");
-
+        Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
         MosaicDTO mosaicDto = new MosaicDTO();
-
-        mosaicDto
-            .setOwnerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
+        mosaicDto.setOwnerAddress(ownerAddress.encoded());
         mosaicDto.setId("481110499AAA");
         mosaicDto.setRevision(123);
 
@@ -151,8 +147,8 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
         Assertions.assertEquals(mosaicId, mosaicInfo.getMosaicId());
         Assertions.assertEquals(mosaicDto.getRevision(), mosaicInfo.getRevision());
         Assertions
-            .assertEquals(mosaicDto.getOwnerPublicKey(),
-                mosaicInfo.getOwner().getPublicKey().toHex());
+            .assertEquals(mosaicDto.getOwnerAddress(),
+                mosaicInfo.getOwnerAddress().encoded(networkType));
 
         Assertions.assertFalse(mosaicInfo.isTransferable());
         Assertions.assertEquals(6, mosaicInfo.getDivisibility());

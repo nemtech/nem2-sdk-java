@@ -54,8 +54,8 @@ class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
         AccountMetadataTransaction originalTransaction = get(service
             .createAccountMetadataTransactionFactory(
-                targetAccount.getPublicAccount(), key, originalMessage,
-                signerAccount.getPublicAccount().getPublicKey())).maxFee(this.maxFee).build();
+                targetAccount.getAddress(), key, originalMessage,
+                signerAccount.getAddress())).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, originalTransaction, signerAccount);
         sleep(1000);
@@ -64,8 +64,8 @@ class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
         AccountMetadataTransaction updateTransaction = get(service
             .createAccountMetadataTransactionFactory(
-                targetAccount.getPublicAccount(), key, newMessage,
-                signerAccount.getPublicAccount().getPublicKey())).maxFee(this.maxFee).build();
+                targetAccount.getAddress(), key, newMessage,
+                signerAccount.getAddress())).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, updateTransaction, signerAccount);
         sleep(1000);
@@ -78,7 +78,7 @@ class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
         MetadataRepository metadataRepository) {
         Metadata originalMetadata = get(metadataRepository
             .getAccountMetadataByKeyAndSender(targetAccount.getAddress(), key,
-                signerAccount.getPublicAccount().getPublicKey().toHex()));
+                signerAccount.getAddress()));
 
         Assertions.assertEquals(value, originalMetadata.getMetadataEntry().getValue());
     }

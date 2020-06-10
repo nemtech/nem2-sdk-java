@@ -127,7 +127,7 @@ public class SerializationUtils {
         Validate.notNull(unresolvedAddress, "unresolvedAddress must not be null");
 
         if (unresolvedAddress instanceof NamespaceId) {
-            final ByteBuffer namespaceIdAlias = ByteBuffer.allocate(25);
+            final ByteBuffer namespaceIdAlias = ByteBuffer.allocate(24);
             NamespaceId namespaceId = (NamespaceId) unresolvedAddress;
             final byte firstByte = (byte) (networkType.getValue() | 0x01);
             namespaceIdAlias.order(ByteOrder.LITTLE_ENDIAN);

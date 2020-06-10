@@ -74,7 +74,7 @@ class BinarySerializationTest {
         TransferTransaction transaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                Address.generateRandom(NetworkType.MIJIN_TEST),
                 Arrays.asList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
@@ -97,7 +97,7 @@ class BinarySerializationTest {
         TransferTransaction transaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                Address.generateRandom(NetworkType.MIJIN_TEST),
                 Arrays.asList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),

@@ -16,7 +16,7 @@
 
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
-import static io.nem.symbol.core.utils.MapperUtils.toAddressFromEncoded;
+import static io.nem.symbol.core.utils.MapperUtils.toAddress;
 import static io.nem.symbol.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.symbol.sdk.api.AccountRepository;
@@ -26,7 +26,6 @@ import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.ActivityBucket;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.KeyType;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.AccountRoutesApi;
@@ -80,7 +79,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
 
     private AccountInfo toAccountInfo(AccountDTO accountDTO) {
         return new AccountInfo(
-            toAddressFromEncoded(accountDTO.getAddress()),
+            toAddress(accountDTO.getAddress()),
             accountDTO.getAddressHeight(),
             accountDTO.getPublicKey(),
             accountDTO.getPublicKeyHeight(),

@@ -18,10 +18,9 @@ package io.nem.symbol.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountGraphInfo;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
-import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
@@ -37,15 +36,15 @@ public class MultisigRepositoryIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getMultisigAccountInfo(RepositoryType type) {
+        System.out.println(config().getMultisigAccount().getAddress().plain());
         MultisigAccountInfo multisigAccountInfo = get(getRepositoryFactory(type)
             .createMultisigRepository()
             .getMultisigAccountInfo(
                 config().getMultisigAccount().getAddress())
         );
 
-        Set<Address> cosignatoriesSet = multisigAccountInfo.getCosignatories().stream()
-            .map(PublicAccount::getAddress).collect(
-                Collectors.toSet());
+        Set<UnresolvedAddress> cosignatoriesSet = multisigAccountInfo.getCosignatoryAddresses().stream().collect(
+            Collectors.toSet());
 
         Assertions.assertEquals(Sets.newSet(config().getCosignatoryAccount().getAddress(),
             config().getCosignatory2Account().getAddress()), cosignatoriesSet);
@@ -53,8 +52,8 @@ public class MultisigRepositoryIntegrationTest extends BaseIntegrationTest {
         Assertions.assertTrue(multisigAccountInfo.isMultisig());
 
         assertEquals(
-            config().getMultisigAccount().getPublicKey(),
-            multisigAccountInfo.getAccount().getPublicKey().toHex());
+            config().getMultisigAccount().getAddress(),
+            multisigAccountInfo.getAccountAddress());
 
         Assertions.assertEquals(1,
             multisigAccountInfo.getMinApproval());
@@ -87,8 +86,7 @@ public class MultisigRepositoryIntegrationTest extends BaseIntegrationTest {
             multisigAccountGraphInfos.getMultisigAccounts().get(1).size());
 
         assertEquals(config().getMultisigAccount().getAddress(),
-            multisigAccountGraphInfos.getMultisigAccounts().get(0).get(0).getAccount()
-                .getAddress());
+            multisigAccountGraphInfos.getMultisigAccounts().get(0).get(0).getAccountAddress());
 
     }
 

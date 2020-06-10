@@ -222,8 +222,7 @@ public abstract class Transaction implements Stored {
         System.arraycopy(bytes, 104, payload, 104, bytes.length - 104);
 
         final String hash = createTransactionHash(ConvertUtils.toHex(payload), generationHashBytes);
-        return new SignedTransaction(account.getPublicAccount(), ConvertUtils.toHex(payload), hash,
-            type);
+        return new SignedTransaction(account.getPublicAccount(), ConvertUtils.toHex(payload), hash, type);
     }
 
     /**

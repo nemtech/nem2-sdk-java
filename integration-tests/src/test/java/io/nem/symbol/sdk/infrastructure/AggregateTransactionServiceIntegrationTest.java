@@ -19,6 +19,7 @@ package io.nem.symbol.sdk.infrastructure;
 import io.nem.symbol.sdk.api.AggregateTransactionService;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
@@ -61,8 +62,8 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
         List<Account> accounts = Arrays.asList(config().getCosignatoryAccount(),
             config().getCosignatory2Account());
 
-        List<PublicAccount> additions = accounts.stream()
-            .map(Account::getPublicAccount).collect(Collectors.toList());
+        List<UnresolvedAddress> additions = accounts.stream()
+            .map(Account::getAddress).collect(Collectors.toList());
         MultisigAccountModificationTransaction multisigAccountModificationTransaction = MultisigAccountModificationTransactionFactory
             .create(getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList())
             .maxFee(this.maxFee).build();
@@ -155,8 +156,8 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
         List<Account> accounts = Arrays.asList(config().getCosignatoryAccount(),
             config().getCosignatory2Account());
 
-        List<PublicAccount> additions = accounts.stream()
-            .map(Account::getPublicAccount).collect(Collectors.toList());
+        List<UnresolvedAddress> additions = accounts.stream()
+            .map(Account::getAddress).collect(Collectors.toList());
         MultisigAccountModificationTransaction multisigAccountModificationTransaction = MultisigAccountModificationTransactionFactory
             .create(getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList())
             .maxFee(this.maxFee).build();
@@ -190,7 +191,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
 
         MultisigAccountModificationTransaction multisigAccountModificationTransaction = MultisigAccountModificationTransactionFactory
             .create(getNetworkType(), (byte) 1, (byte) 1, Collections.emptyList(),
-                Collections.singletonList(accounts.get(0).getPublicAccount()))
+                Collections.singletonList(accounts.get(0).getAddress()))
             .maxFee(this.maxFee).build();
 
         AggregateTransaction aggregateTransaction = AggregateTransactionFactory.createComplete(
@@ -225,7 +226,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
             .map(Account::getPublicAccount).collect(Collectors.toList());
         MultisigAccountModificationTransaction multisigAccountModificationTransaction = MultisigAccountModificationTransactionFactory
             .create(getNetworkType(), (byte) 1, (byte) 1, Collections.emptyList(),
-                Collections.singletonList(accounts.get(0).getPublicAccount()))
+                Collections.singletonList(accounts.get(0).getAddress()))
             .maxFee(this.maxFee).build();
 
         AggregateTransaction aggregateTransaction = AggregateTransactionFactory.createComplete(

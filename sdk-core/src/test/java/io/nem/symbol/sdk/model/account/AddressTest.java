@@ -19,8 +19,10 @@ package io.nem.symbol.sdk.model.account;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.symbol.sdk.model.network.NetworkType;
+import java.util.Arrays;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,51 +33,45 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class AddressTest {
 
+    private static Address generateAddress(NetworkType networkType) {
+        return Account.generateNewAccount(networkType).getAddress();
+    }
+
     private static Stream<Arguments> provider() {
-        return Stream.of(
-            Arguments
-                .of("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST, true),
-            Arguments
-                .of("MDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN, false),
-            Arguments
-                .of("TDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.TEST_NET, false),
-            Arguments
-                .of("NDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MAIN_NET, false));
+        return Arrays.stream(NetworkType.values())
+            .map(networkType -> Arguments.of(generateAddress(networkType), networkType));
     }
 
     private static Stream<Arguments> assertExceptionProvider() {
-        return Stream.of(
-            Arguments.of("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN),
-            Arguments.of("MDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MAIN_NET),
-            Arguments.of("TDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST),
-            Arguments.of("NDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.TEST_NET));
+        return Arrays.stream(NetworkType.values()).map(networkType -> Arguments.of(generateAddress(networkType).plain(),
+            Arrays.stream(NetworkType.values()).filter(n -> n != networkType).findFirst().orElse(null)));
     }
 
 
     @Test
     void testAddressCreation() {
         Address address =
-            new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26", NetworkType.MIJIN_TEST);
-        assertEquals("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR26", address.plain());
+            new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR2", NetworkType.MIJIN_TEST);
+        assertEquals("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR2", address.plain());
     }
 
     @Test
     void testAddressWithSpacesCreation() {
         Address address =
-            new Address(" SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR26 ", NetworkType.MIJIN_TEST);
-        assertEquals("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR26", address.plain());
+            new Address(" SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR2 ", NetworkType.MIJIN_TEST);
+        assertEquals("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR2", address.plain());
     }
 
     @Test
     void testLowerCaseAddressCreation() {
         Address address =
-            new Address("sdglfw-dshilt-iuhgib-h5ugx2-vyf5vn-jekccd-br26", NetworkType.MIJIN_TEST);
-        assertEquals("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR26", address.plain());
+            new Address("sdglfw-dshilt-iuhgib-h5ugx2-vyf5vn-jekccd-br2", NetworkType.MIJIN_TEST);
+        assertEquals("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR2", address.plain());
     }
 
     @Test
     void shouldCreateFromEncoded() {
-        String encoded = "901508D3519B6CC0936A04233073D3D903E1DFBEF95DC204AB";
+        String encoded = "6826D27E1D0A26CA4E316F901E23E55C8711DB20DF250DEF";
         Address address = Address
             .createFromEncoded(encoded);
         assertEquals(encoded, address.encoded());
@@ -94,25 +90,48 @@ class AddressTest {
     @Test
     void addressInPrettyFormat() {
         Address address =
-            new Address("SDRDGF-TDLLCB-67D4HP-GIMIHP-NSRYRJ-RT7DOB-GWZY", NetworkType.MIJIN_TEST);
-        assertEquals("SDRDGF-TDLLCB-67D4HP-GIMIHP-NSRYRJ-RT7DOB-GWZY", address.pretty());
+            new Address("SDRDGF-TDLLCB-67D4HP-GIMIHP-NSRYRJ-RT7DOB-GWZ", NetworkType.MIJIN_TEST);
+        assertEquals("SDRDGF-TDLLCB-67D4HP-GIMIHP-NSRYRJ-RT7DOB-GWZ", address.pretty());
     }
+
+    @Test
+    void createFromEncodedSameResult() {
+        Address address2 = Address.createFromRawAddress("NAR3W7B4BCOZSZMFIZRYB3N5YGOUSWIYJCJ6HDF");
+        Address address1 = Address.createFromRawAddress("NAR3W7B4BCOZSZMFIZRYB3N5YGOUSWIYJCJ6HDA");
+        assertEquals(address1.encoded(), address2.encoded());
+        assertEquals(address1, Address.createFromEncoded(address1.encoded()));
+        assertNotEquals(address1.plain(), address2.plain());
+    }
+
+    @Test
+    void createFromEncoded() {
+        Address address2 = Address.createFromRawAddress("NAR3W7B4BCOZSZMFIZRYB3N5YGOUSWIYJCJ6HDA");
+        Address address1 = Address.createFromEncoded("6823BB7C3C089D996585466380EDBDC19D4959184893E38C");
+        assertEquals(address1.plain(), address2.plain());
+    }
+
+    @Test
+    void createFromEncodedDuplicated() {
+        Address address2 = Address.createFromRawAddress("NAR3W7B4BCOZSZMFIZRYB3N5YGOUSWIYJCJ6HDF");
+        Address address1 = Address.createFromEncoded("6823BB7C3C089D996585466380EDBDC19D4959184893E38C");
+        assertEquals("NAR3W7B4BCOZSZMFIZRYB3N5YGOUSWIYJCJ6HDF", address2.plain());
+        assertEquals("NAR3W7B4BCOZSZMFIZRYB3N5YGOUSWIYJCJ6HDA", address1.plain());
+    }
+
 
     @Test
     void equality() {
         Address address1 =
-            new Address("SDRDGF-TDLLCB-67D4HP-GIMIHP-NSRYRJ-RT7DOB-GWZY", NetworkType.MIJIN_TEST);
+            new Address("SDRDGF-TDLLCB-67D4HP-GIMIHP-NSRYRJ-RT7DOB-GWZ", NetworkType.MIJIN_TEST);
         Address address2 =
-            new Address("SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZY", NetworkType.MIJIN_TEST);
+            new Address("SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZ", NetworkType.MIJIN_TEST);
         assertEquals(address1, address2);
     }
 
     @Test
     void noEquality() {
-        Address address1 =
-            new Address("SRRRRR-TTTTTT-555555-GIMIHP-NSRYRJ-RT7DOB-GWZY", NetworkType.MIJIN_TEST);
-        Address address2 =
-            new Address("SDRDGF-TDLLCB-67D4HP-GIMIHP-NSRYRJ-RT7DOB-GWZY", NetworkType.MIJIN_TEST);
+        Address address1 = generateAddress(NetworkType.MIJIN_TEST);
+        Address address2 = generateAddress(NetworkType.MIJIN_TEST);
         assertNotEquals(address1, address2);
         assertNotEquals("notAndAddress", address2);
     }
@@ -138,7 +157,7 @@ class AddressTest {
 
     @Test
     void createFromRawAddressShouldFailWhenInvalidSize() {
-        Assertions.assertEquals("Address X has to be 40 characters long.", assertThrows(
+        Assertions.assertEquals("Plain address 'X' size is 1 when 39 is required", assertThrows(
             IllegalArgumentException.class,
             () -> {
                 Address.createFromRawAddress("X");
@@ -147,11 +166,12 @@ class AddressTest {
 
     @Test
     void createFromRawAddressShouldFailWhenInvalidSuffix() {
-        Assertions.assertEquals("ADRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZY is an invalid address.",
+        Assertions.assertEquals(
+            "Plain address 'ADRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZ' checksum is incorrect. Address checksum is 'DC135B' when '61DABF' is expected",
             assertThrows(
                 IllegalArgumentException.class,
                 () -> {
-                    Address.createFromRawAddress("ADRDGF-TDLLCB-67D4HP-GIMIHP-NSRYRJ-RT7DOB-GWZY");
+                    Address.createFromRawAddress("ADRDGF-TDLLCB-67D4HP-GIMIHP-NSRYRJ-RT7DOB-GWZ");
                 }).getMessage());
     }
 
@@ -166,10 +186,10 @@ class AddressTest {
 
     @ParameterizedTest
     @MethodSource("provider")
-    void testUInt64FromBigInteger(String rawAddress, NetworkType input, boolean validChecksum) {
-        Address address = new Address(rawAddress, input);
+    void tesNetworkTypeFromRawAddress(Address paramAddress, NetworkType input) {
+        Address address = new Address(paramAddress.plain(), input);
         assertEquals(input, address.getNetworkType());
-        assertEquals(validChecksum, Address.isValidPlainAddress(address.plain()));
+        assertTrue(Address.isValidPlainAddress(address.plain()));
     }
 
     @ParameterizedTest
@@ -188,9 +208,8 @@ class AddressTest {
     @ParameterizedTest
     @EnumSource(NetworkType.class)
     void isValidAddressFromGeneratedPublicKey(NetworkType networkType) {
-        Account account = Account.generateNewAccount(networkType);
-        Assertions.assertTrue(Address.isValidPlainAddress(account.getAddress().plain()));
-        Assertions.assertTrue(Address.isValidEncodedAddress(account.getAddress().encoded()));
+        Assertions.assertTrue(Address.isValidPlainAddress(generateAddress(networkType).plain()));
+        Assertions.assertTrue(Address.isValidEncodedAddress(generateAddress(networkType).encoded()));
     }
 
 }

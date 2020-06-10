@@ -23,7 +23,6 @@ import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.api.QueryParams;
 import io.nem.symbol.sdk.model.account.AccountNames;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNames;
 import io.nem.symbol.sdk.model.namespace.AddressAlias;
@@ -84,7 +83,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
         Callable<NamespaceInfoDTO> callback = () -> getClient()
             .getNamespace(namespaceId.getIdAsHex());
         return exceptionHandling(networkTypeObservable.flatMap(networkType -> call(callback).map(
-            namespaceInfoDTO -> toNamespaceInfo(namespaceInfoDTO, networkType))));
+            namespaceInfoDTO -> toNamespaceInfo(namespaceInfoDTO))));
     }
 
     @Override
@@ -109,7 +108,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
 
         return exceptionHandling(networkTypeObservable.flatMap(networkType ->
             call(callback).flatMapIterable(NamespacesInfoDTO::getNamespaces)
-                .map(namespaceInfoDTO -> toNamespaceInfo(namespaceInfoDTO, networkType)).toList()
+                .map(namespaceInfoDTO -> toNamespaceInfo(namespaceInfoDTO)).toList()
                 .toObservable()));
     }
 
@@ -126,7 +125,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
 
         return exceptionHandling(networkTypeObservable.flatMap(networkType ->
             call(callback).flatMapIterable(NamespacesInfoDTO::getNamespaces)
-                .map(namespaceInfoDTO -> toNamespaceInfo(namespaceInfoDTO, networkType)).toList()
+                .map(namespaceInfoDTO -> toNamespaceInfo(namespaceInfoDTO)).toList()
                 .toObservable()));
     }
 
@@ -204,7 +203,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
      * @return {@link AccountNames}
      */
     private AccountNames toAccountNames(AccountNamesDTO dto) {
-        return new AccountNames(MapperUtils.toAddressFromEncoded(dto.getAddress()),
+        return new AccountNames(MapperUtils.toAddress(dto.getAddress()),
             dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
     }
 
@@ -239,10 +238,8 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
      * Create a NamespaceInfo from a NamespaceInfoDTO and a NetworkType
      *
      * @param namespaceInfoDTO, networkType
-     * @param networkType the network type
      */
-    private NamespaceInfo toNamespaceInfo(
-        NamespaceInfoDTO namespaceInfoDTO, NetworkType networkType) {
+    private NamespaceInfo toNamespaceInfo(NamespaceInfoDTO namespaceInfoDTO) {
         return new NamespaceInfo(
             namespaceInfoDTO.getMeta().getActive(),
             namespaceInfoDTO.getMeta().getIndex(),
@@ -252,7 +249,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
             namespaceInfoDTO.getNamespace().getDepth(),
             this.extractLevels(namespaceInfoDTO),
             toNamespaceId(namespaceInfoDTO.getNamespace().getParentId()),
-            new PublicAccount(namespaceInfoDTO.getNamespace().getOwnerPublicKey(), networkType),
+           MapperUtils.toAddress(namespaceInfoDTO.getNamespace().getOwnerAddress()),
             namespaceInfoDTO.getNamespace().getStartHeight(),
             namespaceInfoDTO.getNamespace().getEndHeight(),
             this.extractAlias(namespaceInfoDTO.getNamespace()));
@@ -314,7 +311,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
     private Address toAddress(NamespaceDTO namespaceDTO) {
         if (namespaceDTO.getAlias() != null && AliasType.ADDRESS.getValue()
             .equals(namespaceDTO.getAlias().getType().getValue())) {
-            return MapperUtils.toAddressFromEncoded(namespaceDTO.getAlias().getAddress());
+            return MapperUtils.toAddress(namespaceDTO.getAlias().getAddress());
         } else {
             return null;
         }

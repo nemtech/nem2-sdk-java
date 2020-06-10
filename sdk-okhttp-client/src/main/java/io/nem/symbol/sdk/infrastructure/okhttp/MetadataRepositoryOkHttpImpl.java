@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.core.utils.ConvertUtils;
+import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.MetadataRepository;
 import io.nem.symbol.sdk.api.QueryParams;
 import io.nem.symbol.sdk.model.account.Address;
@@ -89,19 +90,19 @@ public class MetadataRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl i
 
     @Override
     public Observable<Metadata> getAccountMetadataByKeyAndSender(Address targetAddress, BigInteger key,
-        String senderPublicKey) {
+        Address sourceAddress) {
         Callable<MetadataDTO> callback = () -> getClient()
-            .getAccountMetadataByKeyAndSender(targetAddress.plain(), toHex(key), senderPublicKey);
+            .getAccountMetadataByKeyAndSender(targetAddress.plain(), toHex(key), sourceAddress.plain());
         return handleOne(callback);
     }
 
 
     @Override
     public Observable<Metadata> getMosaicMetadataByKeyAndSender(MosaicId targetMosaicId, BigInteger key,
-        String senderPublicKey) {
+        Address sourceAddress) {
         Callable<MetadataDTO> callback = () -> getClient()
             .getMosaicMetadataByKeyAndSender(targetMosaicId.getIdAsHex(), toHex(key),
-                senderPublicKey);
+                sourceAddress.plain());
         return handleOne(callback);
     }
 
@@ -126,10 +127,10 @@ public class MetadataRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl i
 
     @Override
     public Observable<Metadata> getNamespaceMetadataByKeyAndSender(NamespaceId targetNamespaceId,
-        BigInteger key, String senderPublicKey) {
+        BigInteger key, Address sourceAddress) {
         Callable<MetadataDTO> callback = () -> getClient()
             .getNamespaceMetadataByKeyAndSender(targetNamespaceId.getIdAsHex(),
-                MetadataRepositoryOkHttpImpl.this.toHex(key), senderPublicKey);
+                MetadataRepositoryOkHttpImpl.this.toHex(key), sourceAddress.plain());
         return handleOne(callback);
     }
 
@@ -138,8 +139,8 @@ public class MetadataRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl i
     }
 
     /**
-     * It handles the callback that returns a list of {@link MetadataEntriesDTO} converting it into
-     * a {@link Observable} list of {@link Metadata}.
+     * It handles the callback that returns a list of {@link MetadataEntriesDTO} converting it into a {@link Observable}
+     * list of {@link Metadata}.
      *
      * @param callback the callback
      * @return the {@link Observable} list of {@link Metadata}.
@@ -153,8 +154,8 @@ public class MetadataRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl i
     }
 
     /**
-     * It handles the callback that returns one {@link MetadataEntriesDTO} converting it into a
-     * {@link Observable} of {@link Metadata}.
+     * It handles the callback that returns one {@link MetadataEntriesDTO} converting it into a {@link Observable} of
+     * {@link Metadata}.
      *
      * @param callback the callback
      * @return the {@link Observable} of {@link Metadata}.
@@ -174,7 +175,8 @@ public class MetadataRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl i
     private Metadata toMetadata(MetadataDTO dto) {
         MetadataEntryDTO entryDto = dto.getMetadataEntry();
         MetadataEntry metadataEntry = new MetadataEntry(entryDto.getCompositeHash(),
-            entryDto.getSenderPublicKey(), entryDto.getTargetPublicKey(),
+            MapperUtils.toAddress(entryDto.getSourceAddress()),
+            MapperUtils.toAddress(entryDto.getTargetAddress()),
             new BigInteger(entryDto.getScopedMetadataKey(), 16),
             MetadataType.rawValueOf(entryDto.getMetadataType().getValue()),
             ConvertUtils.fromHexToString(entryDto.getValue()),

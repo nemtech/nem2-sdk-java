@@ -26,6 +26,8 @@ import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.BlockSearchCriteria;
 import io.nem.symbol.sdk.api.OrderBy;
 import io.nem.symbol.sdk.api.RepositoryCallException;
+import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import java.math.BigInteger;
 import java.util.Comparator;
@@ -38,7 +40,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
-
 
     private BlockRepository getBlockRepository(RepositoryType type) {
         return getRepositoryFactory(type).createBlockRepository();
@@ -69,26 +70,25 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void searchByBeneficiaryPublicKey(RepositoryType type) {
+    void searchByBeneficiaryAddress(RepositoryType type) {
         BlockRepository blockRepository = getBlockRepository(type);
         BlockInfo block1 = get(blockRepository.getBlockByHeight(BigInteger.ONE));
         BlockSearchCriteria criteria = new BlockSearchCriteria();
-        PublicKey expectedBeneficiaryPublicKey = block1.getBeneficiaryPublicAccount().getPublicKey();
-        criteria.setBeneficiaryPublicKey(expectedBeneficiaryPublicKey);
+        Address expectedBeneficiaryAddress = block1.getBeneficiaryAddress();
+        criteria.setBeneficiaryAddress(expectedBeneficiaryAddress);
         BlockPaginationStreamer streamer = new BlockPaginationStreamer(blockRepository);
         List<BlockInfo> blocks = get(streamer.search(criteria).toList().toObservable());
-        blocks.forEach(
-            b -> Assertions.assertEquals(expectedBeneficiaryPublicKey, b.getBeneficiaryPublicAccount().getPublicKey()));
+        blocks.forEach(b -> Assertions.assertEquals(expectedBeneficiaryAddress, b.getBeneficiaryAddress()));
         Assertions.assertFalse(blocks.isEmpty());
     }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void searchByBeneficiaryPublicKeyWhenInvalid(RepositoryType type) {
+    void searchByBeneficiaryAddressWhenInvalid(RepositoryType type) {
         BlockRepository blockRepository = getBlockRepository(type);
         BlockSearchCriteria criteria = new BlockSearchCriteria();
-        PublicKey expectedBeneficiaryPublicKey = PublicKey.generateRandom();
-        criteria.setBeneficiaryPublicKey(expectedBeneficiaryPublicKey);
+        Address expectedBeneficiaryAddress = Account.generateNewAccount(getNetworkType()).getAddress();
+        criteria.setBeneficiaryAddress(expectedBeneficiaryAddress);
         BlockPaginationStreamer streamer = new BlockPaginationStreamer(blockRepository);
         List<BlockInfo> blocks = get(streamer.search(criteria).toList().toObservable());
         Assertions.assertTrue(blocks.isEmpty());
@@ -182,7 +182,8 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
         List<BlockInfo> blocksWithoutOffset = get(streamer.search(criteria).toList().toObservable());
         criteria.setOffset(blocksWithoutOffset.get(offsetIndex).getRecordId().get());
         List<BlockInfo> blockFromOffsets = get(streamer.search(criteria).toList().toObservable());
-        PaginationTester.sameEntities(blocksWithoutOffset.stream().skip(offsetIndex + 1).collect(Collectors.toList()), blockFromOffsets);
+        PaginationTester.sameEntities(blocksWithoutOffset.stream().skip(offsetIndex + 1).collect(Collectors.toList()),
+            blockFromOffsets);
     }
 
     @ParameterizedTest

@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import java.util.List;
 
 /**
@@ -30,16 +31,16 @@ public class MultisigAccountModificationTransaction extends Transaction {
 
     private final byte minApprovalDelta;
     private final byte minRemovalDelta;
-    private final List<PublicAccount> publicKeyAdditions;
-    private final List<PublicAccount> publicKeyDeletions;
+    private final List<UnresolvedAddress> addressAdditions;
+    private final List<UnresolvedAddress> addressDeletions;
 
     public MultisigAccountModificationTransaction(
         MultisigAccountModificationTransactionFactory factory) {
         super(factory);
         this.minApprovalDelta = factory.getMinApprovalDelta();
         this.minRemovalDelta = factory.getMinRemovalDelta();
-        this.publicKeyAdditions = factory.getPublicKeyAdditions();
-        this.publicKeyDeletions = factory.getPublicKeyDeletions();
+        this.addressAdditions = factory.getAddressAdditions();
+        this.addressDeletions = factory.getAddressDeletions();
     }
 
     /**
@@ -65,15 +66,15 @@ public class MultisigAccountModificationTransaction extends Transaction {
     /**
      * @return List of public accounts that are going to be added to the multisig account.
      */
-    public List<PublicAccount> getPublicKeyAdditions() {
-        return publicKeyAdditions;
+    public List<UnresolvedAddress> getAddressAdditions() {
+        return addressAdditions;
     }
 
     /**
      * @return List of public accounts that are going to be removed from the multisig account.
      */
-    public List<PublicAccount> getPublicKeyDeletions() {
-        return publicKeyDeletions;
+    public List<UnresolvedAddress> getAddressDeletions() {
+        return addressDeletions;
     }
 
 

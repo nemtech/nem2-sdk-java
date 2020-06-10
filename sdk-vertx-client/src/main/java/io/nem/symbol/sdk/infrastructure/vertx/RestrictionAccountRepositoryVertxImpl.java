@@ -77,7 +77,7 @@ public class RestrictionAccountRepositoryVertxImpl extends AbstractRepositoryVer
 
 
     private AccountRestrictions toAccountRestrictions(AccountRestrictionsDTO dto) {
-        return new AccountRestrictions(MapperUtils.toAddressFromEncoded(dto.getAddress()),
+        return new AccountRestrictions(MapperUtils.toAddress(dto.getAddress()),
             dto.getRestrictions().stream().map(this::toAccountRestriction).collect(
                 Collectors.toList()));
     }

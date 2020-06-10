@@ -16,7 +16,6 @@
 
 package io.nem.symbol.sdk.infrastructure;
 
-import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.StringEncoder;
 import io.nem.symbol.sdk.api.AliasService;
@@ -25,7 +24,6 @@ import io.nem.symbol.sdk.api.MetadataTransactionService;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.metadata.Metadata;
 import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
@@ -59,46 +57,44 @@ public class MetadataTransactionServiceImpl implements MetadataTransactionServic
 
     @Override
     public Observable<AccountMetadataTransactionFactory> createAccountMetadataTransactionFactory(
-        PublicAccount targetPublicAccount, BigInteger key, String value,
-        PublicKey senderPublicKey) {
-        Address address = targetPublicAccount.getAddress();
+        Address targetAddress, BigInteger key, String value,
+        Address senderSource) {
         BiFunction<String, NetworkType, AccountMetadataTransactionFactory> factory = (newValue, networkType) -> AccountMetadataTransactionFactory
-            .create(networkType, targetPublicAccount, key, newValue);
+            .create(networkType, targetAddress, key, newValue);
         return processMetadata(metadataRepository
-                .getAccountMetadataByKeyAndSender(address, key, senderPublicKey.toHex()), factory,
+                .getAccountMetadataByKeyAndSender(targetAddress, key, senderSource), factory,
             value);
     }
 
     @Override
     public Observable<MosaicMetadataTransactionFactory> createMosaicMetadataTransactionFactory(
-        PublicAccount targetPublicAccount, BigInteger key, String value,
-        PublicKey senderPublicKey, UnresolvedMosaicId unresolvedTargetId) {
+        Address targetAddress, BigInteger key, String value,
+        Address senderSource, UnresolvedMosaicId unresolvedTargetId) {
 
         return aliasService.resolveMosaicId(unresolvedTargetId).flatMap(targetId -> {
             BiFunction<String, NetworkType, MosaicMetadataTransactionFactory> factory = (newValue, networkType) -> MosaicMetadataTransactionFactory
-                .create(networkType, targetPublicAccount, unresolvedTargetId, key, newValue);
+                .create(networkType, targetAddress, unresolvedTargetId, key, newValue);
             return processMetadata(metadataRepository
-                    .getMosaicMetadataByKeyAndSender(targetId, key, senderPublicKey.toHex()), factory,
+                    .getMosaicMetadataByKeyAndSender(targetId, key, senderSource), factory,
                 value);
         });
     }
 
     @Override
     public Observable<NamespaceMetadataTransactionFactory> createNamespaceMetadataTransactionFactory(
-        PublicAccount targetPublicAccount, BigInteger key, String value,
-        PublicKey senderPublicKey,
+        Address targetAddress, BigInteger key, String value,
+        Address senderSource,
         NamespaceId targetId) {
         BiFunction<String, NetworkType, NamespaceMetadataTransactionFactory> factory = (newValue, networkType) -> NamespaceMetadataTransactionFactory
-            .create(networkType, targetPublicAccount, targetId, key, newValue);
+            .create(networkType, targetAddress, targetId, key, newValue);
         return processMetadata(metadataRepository
-                .getNamespaceMetadataByKeyAndSender(targetId, key, senderPublicKey.toHex()), factory,
+                .getNamespaceMetadataByKeyAndSender(targetId, key, senderSource), factory,
             value);
     }
 
     /**
-     * Generic way of processing a metadata entity and creating a new metadata transaction factory
-     * depending on the existing metadata value. This works for Account, Mosaic and Namespace
-     * metadata.
+     * Generic way of processing a metadata entity and creating a new metadata transaction factory depending on the
+     * existing metadata value. This works for Account, Mosaic and Namespace metadata.
      *
      * @param metadataObservable the metadata observable
      * @param transactionFactory the function that creates a transaction factory

@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.core.utils.MapperUtils;
+import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.AccountNames;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -25,6 +26,7 @@ import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.namespace.NamespaceInfo;
 import io.nem.symbol.sdk.model.namespace.NamespaceName;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountNamesDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountsNamesDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AliasDTO;
@@ -64,6 +66,8 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
     @Test
     public void shouldGetNamespace() throws Exception {
 
+        Address ownerAccount = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
+
         NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
@@ -78,8 +82,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
         namespace.setStartHeight(BigInteger.valueOf(4));
         namespace.setEndHeight(BigInteger.valueOf(5));
         namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
-        namespace
-            .setOwnerPublicKey("AC1A6E1D8DE5B17D2C6B1293F1CAD3829EEACF38D09311BB3C8E5A880092DE26");
+        namespace.setOwnerAddress(ownerAccount.encoded());
 
         AliasDTO alias = new AliasDTO();
         alias.setType(AliasTypeEnum.NUMBER_1);
@@ -107,9 +110,8 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
     @Test
     public void shouldGetNamespacesFromAccount() throws Exception {
-
-        Address address = MapperUtils
-            .toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = Address.generateRandom(networkType);
+        Address ownerAccount = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
         NamespaceMetaDTO meta = new NamespaceMetaDTO();
@@ -123,8 +125,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
         namespace.setStartHeight(BigInteger.valueOf(4));
         namespace.setEndHeight(BigInteger.valueOf(5));
         namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
-        namespace
-            .setOwnerPublicKey("AC1A6E1D8DE5B17D2C6B1293F1CAD3829EEACF38D09311BB3C8E5A880092DE26");
+        namespace.setOwnerAddress(ownerAccount.encoded());
 
         AliasDTO alias = new AliasDTO();
         alias.setType(AliasTypeEnum.NUMBER_2);
@@ -152,10 +153,8 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
     @Test
     public void shouldGetNamespacesFromAccounts() throws Exception {
-
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = Address.generateRandom(networkType);
+        Address ownerAccount = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
         NamespaceMetaDTO meta = new NamespaceMetaDTO();
@@ -169,8 +168,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
         namespace.setStartHeight(BigInteger.valueOf(4));
         namespace.setEndHeight(BigInteger.valueOf(5));
         namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
-        namespace
-            .setOwnerPublicKey("AC1A6E1D8DE5B17D2C6B1293F1CAD3829EEACF38D09311BB3C8E5A880092DE26");
+        namespace.setOwnerAddress(ownerAccount.encoded());
 
         AliasDTO alias = new AliasDTO();
         alias.setType(AliasTypeEnum.NUMBER_2);
@@ -230,12 +228,10 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
     @Test
     public void shouldGetLinkedAddress() throws Exception {
-
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = Address.generateRandom(networkType);
 
         NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
+        Address ownerAccount = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
         NamespaceMetaDTO meta = new NamespaceMetaDTO();
@@ -247,8 +243,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
         NamespaceDTO namespace = new NamespaceDTO();
         namespace.setDepth(111);
         namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_0);
-        namespace
-            .setOwnerPublicKey("AC1A6E1D8DE5B17D2C6B1293F1CAD3829EEACF38D09311BB3C8E5A880092DE26");
+        namespace.setOwnerAddress(ownerAccount.encoded());
 
         AliasDTO alias = new AliasDTO();
         alias.setType(AliasTypeEnum.NUMBER_2);
@@ -269,6 +264,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
     @Test
     public void shouldGetLinkedMosaicId() throws Exception {
 
+        Address ownerAccount = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
         NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
         NamespaceMetaDTO meta = new NamespaceMetaDTO();
@@ -280,8 +276,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
         NamespaceDTO namespace = new NamespaceDTO();
         namespace.setDepth(111);
         namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_0);
-        namespace
-            .setOwnerPublicKey("AC1A6E1D8DE5B17D2C6B1293F1CAD3829EEACF38D09311BB3C8E5A880092DE26");
+        namespace.setOwnerAddress(ownerAccount.encoded());
 
         AliasDTO alias = new AliasDTO();
         alias.setType(AliasTypeEnum.NUMBER_1);
@@ -329,9 +324,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
     @Test
     public void shouldGetAccountsNamesFromAddresses() throws Exception {
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = Address.generateRandom(networkType);
 
         AccountNamesDTO dto = new AccountNamesDTO();
         dto.setAddress(encodeAddress(address));

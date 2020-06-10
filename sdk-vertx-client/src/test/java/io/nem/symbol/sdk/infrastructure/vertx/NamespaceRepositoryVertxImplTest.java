@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.core.utils.MapperUtils;
+import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.AccountNames;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -63,6 +64,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
     @Test
     public void shouldGetNamespace() throws Exception {
 
+        Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
         NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
@@ -77,8 +79,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
         namespace.setStartHeight(BigInteger.valueOf(4));
         namespace.setEndHeight(BigInteger.valueOf(5));
         namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
-        namespace
-            .setOwnerPublicKey("AC1A6E1D8DE5B17D2C6B1293F1CAD3829EEACF38D09311BB3C8E5A880092DE26");
+        namespace.setOwnerAddress(ownerAddress.encoded());
 
         AliasDTO alias = new AliasDTO();
         alias.setType(AliasTypeEnum.NUMBER_1);
@@ -107,8 +108,8 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
     @Test
     public void shouldGetNamespacesFromAccount() throws Exception {
 
-        Address address = MapperUtils
-            .toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = Address.generateRandom(this.networkType);
+        Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
         NamespaceMetaDTO meta = new NamespaceMetaDTO();
@@ -122,8 +123,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
         namespace.setStartHeight(BigInteger.valueOf(4));
         namespace.setEndHeight(BigInteger.valueOf(5));
         namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
-        namespace
-            .setOwnerPublicKey("AC1A6E1D8DE5B17D2C6B1293F1CAD3829EEACF38D09311BB3C8E5A880092DE26");
+        namespace.setOwnerAddress(ownerAddress.encoded());
 
         AliasDTO alias = new AliasDTO();
         alias.setType(AliasTypeEnum.NUMBER_2);
@@ -152,9 +152,8 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
     @Test
     public void shouldGetNamespacesFromAccounts() throws Exception {
 
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = Address.generateRandom(this.networkType);
+        Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
         NamespaceMetaDTO meta = new NamespaceMetaDTO();
@@ -168,8 +167,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
         namespace.setStartHeight(BigInteger.valueOf(4));
         namespace.setEndHeight(BigInteger.valueOf(5));
         namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
-        namespace
-            .setOwnerPublicKey("AC1A6E1D8DE5B17D2C6B1293F1CAD3829EEACF38D09311BB3C8E5A880092DE26");
+        namespace.setOwnerAddress(ownerAddress.encoded());
 
         AliasDTO alias = new AliasDTO();
         alias.setType(AliasTypeEnum.NUMBER_2);
@@ -229,9 +227,8 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
     @Test
     public void shouldGetLinkedAddress() throws Exception {
 
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = Address.generateRandom(this.networkType);
+        Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
 
         NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
 
@@ -245,8 +242,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
         NamespaceDTO namespace = new NamespaceDTO();
         namespace.setDepth(111);
         namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_0);
-        namespace
-            .setOwnerPublicKey("AC1A6E1D8DE5B17D2C6B1293F1CAD3829EEACF38D09311BB3C8E5A880092DE26");
+        namespace.setOwnerAddress(ownerAddress.encoded());
 
         AliasDTO alias = new AliasDTO();
         alias.setType(AliasTypeEnum.NUMBER_2);
@@ -268,6 +264,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
     public void shouldGetLinkedMosaicId() throws Exception {
 
         NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
+        Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
         NamespaceMetaDTO meta = new NamespaceMetaDTO();
@@ -279,8 +276,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
         NamespaceDTO namespace = new NamespaceDTO();
         namespace.setDepth(111);
         namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_0);
-        namespace
-            .setOwnerPublicKey("AC1A6E1D8DE5B17D2C6B1293F1CAD3829EEACF38D09311BB3C8E5A880092DE26");
+        namespace.setOwnerAddress(ownerAddress.encoded());
 
         AliasDTO alias = new AliasDTO();
         alias.setType(AliasTypeEnum.NUMBER_1);
@@ -326,9 +322,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
     @Test
     public void shouldGetAccountsNamesFromAddresses() throws Exception {
-        Address address =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QXX");
+        Address address = Address.generateRandom(this.networkType);
 
         AccountNamesDTO dto = new AccountNamesDTO();
         dto.setAddress(encodeAddress(address));
@@ -348,6 +342,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
         Assertions.assertEquals(address, accountNames.getAddress());
         Assertions.assertEquals("accountalias", accountNames.getNames().get(0).getName());
+
     }
 
 

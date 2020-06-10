@@ -50,7 +50,7 @@ class AccountTest {
         assertEquals(
             "2134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2",
             account.getPublicKey());
-        assertEquals("SAEJCCEGA5SMEL65GTVYS6P6V2F5TOPDAOVAC5XI", account.getAddress().plain());
+        assertEquals("SAEJCCEGA5SMEL65GTVYS6P6V2F5TOPDAOVAC5Q", account.getAddress().plain());
     }
 
     @Test
@@ -65,7 +65,7 @@ class AccountTest {
         assertEquals(
             "2134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F2",
             account.getPublicKey());
-        assertEquals("SAEJCCEGA5SMEL65GTVYS6P6V2F5TOPDAOVAC5XI", account.getAddress().plain());
+        assertEquals("SAEJCCEGA5SMEL65GTVYS6P6V2F5TOPDAOVAC5Q", account.getAddress().plain());
     }
 
     @Test
@@ -80,7 +80,7 @@ class AccountTest {
         assertEquals(
             "8A6ADEDF033FFDA38E2E762F5A729AAF2AAE4EEACF9297CC886FFFE2765333AB",
             account.getPublicKey());
-        assertEquals("SD3LI4-KBRLPF-4VEHE5-VGEXT2-UWS4GE-EBRMBB-JREK",
+        assertEquals("SD3LI4-KBRLPF-4VEHE5-VGEXT2-UWS4GE-EBRMBB-JRA",
             account.getAddress().pretty());
     }
 
@@ -96,7 +96,7 @@ class AccountTest {
         assertEquals(
             "F9D6329A1A927F5D8918D3D313524CF179DE126AF8F0E83F0FBF2782B5D8F68C",
             account.getPublicKey());
-        assertEquals("SDICGGG5273NEYOPJPRN5RXFLENIVYTEBC3F3A2A", account.getAddress().plain());
+        assertEquals("SDICGGG5273NEYOPJPRN5RXFLENIVYTEBC3F3AY", account.getAddress().plain());
     }
 
     @Test
@@ -117,7 +117,7 @@ class AccountTest {
         TransferTransaction transferTransaction =
             TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM", NetworkType.MIJIN_TEST),
+                new Address("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBF", NetworkType.MIJIN_TEST),
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
@@ -127,10 +127,10 @@ class AccountTest {
         SignedTransaction signedTransaction = account.sign(transferTransaction, generationHash);
         String payload = signedTransaction.getPayload();
         assertEquals(
-            "010000000000000090E8FEBD671DD41BEE94EC3BA5831CB608A312C2F203BA84AC01010000000000672B0000CE560000640000000000000000",
-            payload.substring(240));
+            "B1000000000000002740ABCB87D42B2BC2ED41E8D77FB07731B2572EF77F8ADB65C5BD0D763201B03F1AB7B08B3D75837D561472303290EFD6CFA21077DC5F7051744A2AC9C9190D2134E47AEE6F2392A5B3D1238CD7714EABEB739361B7CCF24BAE127F10DF17F200000000019054410000000000000000010000000000000090E8FEBD671DD41BEE94EC3BA5831CB608A312C2F203BA840100010000000000672B0000CE560000640000000000000000",
+            payload);
         assertEquals(
-            "29A319D68D7BC8994D8DEBCAC549AC2CAF725A5999372C6D984818847BE08B4D",
+            "91793BF5A61BC9A926B945BE900287D527D14D225B4B23167FEFE923FABAB7ED",
             signedTransaction.getHash());
     }
 
@@ -149,8 +149,8 @@ class AccountTest {
         Address address = Address
             .createFromPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C",
                 NetworkType.MIJIN_TEST);
-        assertEquals("SCUNEE-EE4FON-6N3DKD-FZUM6U-V7AU26-ZFTWT5-6NUX", address.pretty());
-        assertEquals("SCUNEEEE4FON6N3DKDFZUM6UV7AU26ZFTWT56NUX", address.plain());
+        assertEquals("SCUNEE-EE4FON-6N3DKD-FZUM6U-V7AU26-ZFTWT5-6NQ", address.pretty());
+        assertEquals("SCUNEEEE4FON6N3DKDFZUM6UV7AU26ZFTWT56NQ", address.plain());
     }
 
     @Test
@@ -159,9 +159,9 @@ class AccountTest {
             "A5F82EC8EBB341427B6785C8111906CD0DF18838FB11B51CE0E18B5E79DFF630",
             NetworkType.MIJIN_TEST);
 
-        assertEquals("SDWGJE7XOYRX5RQMMLWF4TE7U5Y2HUYBRDVX2OJE",
+        assertEquals("SDWGJE7XOYRX5RQMMLWF4TE7U5Y2HUYBRDVX2OI",
             account1.getAddress().plain());
-        assertEquals("SDWGJE-7XOYRX-5RQMML-WF4TE7-U5Y2HU-YBRDVX-2OJE",
+        assertEquals("SDWGJE-7XOYRX-5RQMML-WF4TE7-U5Y2HU-YBRDVX-2OI",
             account1.getAddress().pretty());
         assertEquals(
             "A5F82EC8EBB341427B6785C8111906CD0DF18838FB11B51CE0E18B5E79DFF630",

@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -37,14 +38,14 @@ class MultisigAccountModificationTransactionTest extends AbstractTransactionTest
 
     @Test
     void createAMultisigModificationTransactionViaConstructor() {
-        List<PublicAccount> additions = Collections.singletonList(
+        List<UnresolvedAddress> additions = Collections.singletonList(
             PublicAccount.createFromPublicKey(
                 "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b111",
-                NetworkType.MIJIN_TEST));
-        List<PublicAccount> deletions = Collections.singletonList(
+                NetworkType.MIJIN_TEST).getAddress());
+        List<UnresolvedAddress> deletions = Collections.singletonList(
             PublicAccount.createFromPublicKey(
                 "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b222",
-                NetworkType.MIJIN_TEST));
+                NetworkType.MIJIN_TEST).getAddress());
         MultisigAccountModificationTransaction multisigAccountModificationTransaction =
             MultisigAccountModificationTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
@@ -63,8 +64,8 @@ class MultisigAccountModificationTransactionTest extends AbstractTransactionTest
         assertEquals(BigInteger.valueOf(0), multisigAccountModificationTransaction.getMaxFee());
         assertEquals(2, multisigAccountModificationTransaction.getMinApprovalDelta());
         assertEquals(1, multisigAccountModificationTransaction.getMinRemovalDelta());
-        assertEquals(additions, multisigAccountModificationTransaction.getPublicKeyAdditions());
-        assertEquals(deletions, multisigAccountModificationTransaction.getPublicKeyDeletions());
+        assertEquals(additions, multisigAccountModificationTransaction.getAddressAdditions());
+        assertEquals(deletions, multisigAccountModificationTransaction.getAddressDeletions());
 
     }
 
@@ -72,14 +73,14 @@ class MultisigAccountModificationTransactionTest extends AbstractTransactionTest
     @DisplayName("Serialization")
     void serialization() {
         // Generated at symbol-library-js/test/transactions/ModifyMultisigAccountTransaction.spec.js
-        List<PublicAccount> additions = Collections.singletonList(
+        List<UnresolvedAddress> additions = Collections.singletonList(
             PublicAccount.createFromPublicKey(
                 "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b111",
-                NetworkType.MIJIN_TEST));
-        List<PublicAccount> deletions = Collections.singletonList(
+                NetworkType.MIJIN_TEST).getAddress());
+        List<UnresolvedAddress> deletions = Collections.singletonList(
             PublicAccount.createFromPublicKey(
                 "68b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b222",
-                NetworkType.MIJIN_TEST));
+                NetworkType.MIJIN_TEST).getAddress());
         MultisigAccountModificationTransaction transaction =
             MultisigAccountModificationTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
@@ -90,12 +91,12 @@ class MultisigAccountModificationTransactionTest extends AbstractTransactionTest
             ).signer(account.getPublicAccount()).deadline(new FakeDeadline()).build();
 
         String expected =
-            "c80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e6000000000190554100000000000000000100000000000000010201010000000068b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b11168b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b222";
+            "B80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E60000000001905541000000000000000001000000000000000102010100000000905ED2343582DFB4D14DC837BF18E3C9BE5271FF9B8A9EC1908760369DC78761E7EBCC6CFAEA44EE946ED0637B67EE55";
 
         assertSerialization(expected, transaction);
 
         String expectedEmbedded =
-            "7800000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001905541010201010000000068b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b11168b3fbb18729c1fde225c57f8ce080fa828f0067e451a3fd81fa628842b0b222";
+            "6800000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E600000000019055410102010100000000905ED2343582DFB4D14DC837BF18E3C9BE5271FF9B8A9EC1908760369DC78761E7EBCC6CFAEA44EE946ED0637B67EE55";
 
         assertEmbeddedSerialization(expectedEmbedded, transaction);
     }

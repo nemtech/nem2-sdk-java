@@ -166,7 +166,7 @@ public class RepositoryFactoryOkHttpImplTest {
         MosaicId networkMosaicId = new MosaicId("62EF46FD6555AAAA");
         MosaicInfo networkMosaic = new MosaicInfo("abc", networkMosaicId, BigInteger.valueOf(1),
             BigInteger.valueOf(2),
-            Account.generateNewAccount(NetworkType.MIJIN_TEST).getPublicAccount(), 4,
+            Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress(), 4,
             MosaicFlags.create(true, false, true), 5, BigInteger.valueOf(10));
         Mockito.when(mosaicRepositoryMock.getMosaic(networkMosaicId))
             .thenReturn(Observable.just(networkMosaic));
@@ -174,7 +174,7 @@ public class RepositoryFactoryOkHttpImplTest {
         MosaicId harvestMosaicId = new MosaicId("62EF46FD6555BBBB");
         MosaicInfo harvestMosaic = new MosaicInfo("abc", harvestMosaicId, BigInteger.valueOf(1),
             BigInteger.valueOf(2),
-            Account.generateNewAccount(NetworkType.MIJIN_TEST).getPublicAccount(), 10,
+            Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress(), 10,
             MosaicFlags.create(false, true, false), 4, BigInteger.valueOf(20));
         Mockito.when(mosaicRepositoryMock.getMosaic(harvestMosaicId))
             .thenReturn(Observable.just(harvestMosaic));
@@ -255,7 +255,7 @@ public class RepositoryFactoryOkHttpImplTest {
         MosaicId networkMosaicId = new MosaicId("62EF46FD6555AAAA");
         MosaicInfo networkMosaic = new MosaicInfo("abc", networkMosaicId, BigInteger.valueOf(1),
             BigInteger.valueOf(2),
-            Account.generateNewAccount(NetworkType.MIJIN_TEST).getPublicAccount(), 4,
+            Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress(), 4,
             MosaicFlags.create(true, false, true), 5, BigInteger.valueOf(10));
         Mockito.when(mosaicRepositoryMock.getMosaic(networkMosaicId))
             .thenReturn(Observable.just(networkMosaic));

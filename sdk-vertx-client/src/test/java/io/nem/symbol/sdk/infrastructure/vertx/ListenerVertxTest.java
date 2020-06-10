@@ -582,36 +582,35 @@ public class ListenerVertxTest {
 
         Assertions.assertTrue(transactionFromAddress(listener,
             multisigAccountModificationTransaction(account1.getPublicAccount(),
-                account3.getPublicAccount()),
+                account3.getAddress()),
             account1.getAddress()));
 
         Assertions.assertFalse(
             transactionFromAddress(listener,
                 multisigAccountModificationTransaction(account2.getPublicAccount(),
 
-                    account3.getPublicAccount()),
+                    account3.getAddress()),
                 account1.getAddress()));
 
         Assertions.assertFalse(transactionFromAddress(listener,
             multisigAccountModificationTransaction(null,
-                account3.getPublicAccount()),
+                account3.getAddress()),
             account1.getAddress()));
 
         Assertions.assertTrue(transactionFromAddress(listener,
             multisigAccountModificationTransaction(account1.getPublicAccount(),
 
-                account3.getPublicAccount()),
+                account3.getAddress()),
             account3.getAddress()));
 
         Assertions.assertTrue(transactionFromAddress(listener,
             multisigAccountModificationTransaction(account2.getPublicAccount(),
-
-                account3.getPublicAccount()),
+                account3.getAddress()),
             account3.getAddress()));
 
         Assertions.assertTrue(transactionFromAddress(listener,
             multisigAccountModificationTransaction(null,
-                account3.getPublicAccount()),
+                account3.getAddress()),
             account3.getAddress()));
     }
 
@@ -740,18 +739,18 @@ public class ListenerVertxTest {
         Assertions.assertTrue(
             transactionFromAddress(listener,
                 accountMetadataTransaction(account2.getPublicAccount(),
-                    account1.getPublicAccount()),
+                    account1.getAddress()),
                 account1.getAddress()));
 
         Assertions.assertFalse(
             transactionFromAddress(listener,
                 accountMetadataTransaction(account2.getPublicAccount(),
-                    account2.getPublicAccount()),
+                    account2.getAddress()),
                 account1.getAddress()));
     }
 
     private AccountMetadataTransaction accountMetadataTransaction(PublicAccount signer,
-        PublicAccount targetAccount) {
+        Address targetAccount) {
         AccountMetadataTransactionFactory factory = AccountMetadataTransactionFactory
             .create(NETWORK_TYPE, targetAccount, BigInteger.ONE, "someValue");
         if (signer != null) {
@@ -762,9 +761,9 @@ public class ListenerVertxTest {
 
     private MultisigAccountModificationTransaction multisigAccountModificationTransaction(
         PublicAccount signer,
-        PublicAccount cosignatoryPublicAccount) {
-        List<PublicAccount> additions = Collections.singletonList(cosignatoryPublicAccount);
-        List<PublicAccount> deletions = Collections.singletonList(cosignatoryPublicAccount);
+        UnresolvedAddress cosignatoryPublicAccount) {
+        List<UnresolvedAddress> additions = Collections.singletonList(cosignatoryPublicAccount);
+        List<UnresolvedAddress> deletions = Collections.singletonList(cosignatoryPublicAccount);
 
         MultisigAccountModificationTransactionFactory factory = MultisigAccountModificationTransactionFactory
             .create(NETWORK_TYPE, (byte) 0, (byte) 0, additions, deletions);

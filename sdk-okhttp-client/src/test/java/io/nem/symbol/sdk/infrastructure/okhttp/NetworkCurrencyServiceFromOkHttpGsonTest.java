@@ -76,8 +76,7 @@ public class NetworkCurrencyServiceFromOkHttpGsonTest {
         Gson gson = JsonHelperGson.creatGson(false);
 
         JsonSerialization serialization = new JsonSerializationOkHttp(gson);
-        Stream<String> stream = gson.fromJson(transactionJsonList, List.class).stream()
-            .map(Object::toString);
+        Stream<String> stream = gson.fromJson(transactionJsonList, List.class).stream().map(Object::toString);
         List<Transaction> transactions = stream.map(serialization::jsonToTransaction)
             .collect(Collectors.toList());
 

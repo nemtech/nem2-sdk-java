@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.model.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.network.NetworkType;
@@ -39,22 +40,24 @@ class AccountInfoTest {
         BigInteger rawScore = BigInteger.valueOf(4);
         ActivityBucket bucket = new ActivityBucket(startHeight, totalFeesPaid, beneficiaryCount, rawScore);
         List<ActivityBucket> activityBuckets = Collections.singletonList(bucket);
+        Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
+        String publicKey = PublicKey.generateRandom().toHex();
         AccountInfo accountInfo =
             new AccountInfo(
-                Address.createFromRawAddress("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR26"),
+                address,
                 new BigInteger("964"),
-                "cf893ffcc47c33e7f68ab1db56365c156b0736824a0c1e273f9e00b8df8f01eb",
+                publicKey,
                 new BigInteger("966"),
                 new BigInteger("777"),
                 new BigInteger("0"),
                 mosaics, AccountType.REMOTE_UNLINKED, supplementalAccountKeys, activityBuckets);
 
         assertEquals(
-            Address.createFromRawAddress("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR26"),
+            address,
             accountInfo.getAddress());
         assertEquals(new BigInteger("964"), accountInfo.getAddressHeight());
         assertEquals(
-            "cf893ffcc47c33e7f68ab1db56365c156b0736824a0c1e273f9e00b8df8f01eb",
+            publicKey,
             accountInfo.getPublicKey());
         assertEquals(new BigInteger("966"), accountInfo.getPublicKeyHeight());
         assertEquals(new BigInteger("777"), accountInfo.getImportances().get(0).getValue());
@@ -62,7 +65,7 @@ class AccountInfoTest {
         assertEquals(mosaics, accountInfo.getMosaics());
         assertEquals(
             PublicAccount.createFromPublicKey(
-                "cf893ffcc47c33e7f68ab1db56365c156b0736824a0c1e273f9e00b8df8f01eb",
+                publicKey,
                 NetworkType.MIJIN_TEST),
             accountInfo.getPublicAccount());
 

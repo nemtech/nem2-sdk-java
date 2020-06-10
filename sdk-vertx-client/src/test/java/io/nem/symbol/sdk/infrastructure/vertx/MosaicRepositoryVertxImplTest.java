@@ -19,9 +19,11 @@ package io.nem.symbol.sdk.infrastructure.vertx;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.MosaicSearchCriteria;
 import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicPage;
@@ -50,14 +52,13 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
 
     @Test
     public void shouldGetMosaics() throws Exception {
-
+        Address address = Address.generateRandom(this.networkType);
         MosaicId mosaicId = MapperUtils.toMosaicId("481110499AAA");
 
         MosaicDTO mosaicDto = new MosaicDTO();
         MosaicInfoDTO mosaicInfoDto = new MosaicInfoDTO();
 
-        mosaicDto
-            .setOwnerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
+        mosaicDto.setOwnerAddress(address.encoded());
         mosaicDto.setId("481110499AAA");
         mosaicDto.setRevision(123);
 
@@ -77,9 +78,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
         MosaicInfo mosaicInfo = resolvedList.get(0);
         Assertions.assertEquals(mosaicId, mosaicInfo.getMosaicId());
         Assertions.assertEquals(mosaicDto.getRevision(), mosaicInfo.getRevision());
-        Assertions
-            .assertEquals(mosaicDto.getOwnerPublicKey(),
-                mosaicInfo.getOwner().getPublicKey().toHex());
+        Assertions.assertEquals(mosaicDto.getOwnerAddress(), mosaicInfo.getOwnerAddress().encoded(networkType));
 
         Assertions.assertFalse(mosaicInfo.isTransferable());
         Assertions.assertEquals(6, mosaicInfo.getDivisibility());
@@ -88,6 +87,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
 
     @Test
     public void shouldGetMosaicsFromAccount() throws Exception {
+        Address address = Address.generateRandom(this.networkType);
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
@@ -95,8 +95,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
 
         MosaicDTO mosaicDto = new MosaicDTO();
 
-        mosaicDto
-            .setOwnerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
+        mosaicDto.setOwnerAddress(address.encoded());
         mosaicDto.setId("481110499AAA");
         mosaicDto.setRevision(123);
 
@@ -116,8 +115,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
         Assertions.assertEquals(mosaicId, mosaicInfo.getMosaicId());
         Assertions.assertEquals(mosaicDto.getRevision(), mosaicInfo.getRevision());
         Assertions
-            .assertEquals(mosaicDto.getOwnerPublicKey(),
-                mosaicInfo.getOwner().getPublicKey().toHex());
+            .assertEquals(mosaicDto.getOwnerAddress(), mosaicInfo.getOwnerAddress().encoded(NetworkType.MIJIN_TEST));
 
         Assertions.assertFalse(mosaicInfo.isTransferable());
         Assertions.assertEquals(6, mosaicInfo.getDivisibility());
@@ -133,13 +131,13 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
     @Test
     public void shouldGetMosaic() throws Exception {
 
+        Address address = Address.generateRandom(this.networkType);
         MosaicId mosaicId = MapperUtils.toMosaicId("481110499");
 
         MosaicDTO mosaicDto = new MosaicDTO();
         MosaicInfoDTO mosaicInfoDto = new MosaicInfoDTO();
 
-        mosaicDto
-            .setOwnerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
+        mosaicDto.setOwnerAddress(address.encoded());
         mosaicDto.setId("481110499");
         mosaicDto.setRevision(123);
 
@@ -156,9 +154,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
 
         Assertions.assertEquals(mosaicId, mosaicInfo.getMosaicId());
         Assertions.assertEquals(mosaicDto.getRevision(), mosaicInfo.getRevision());
-        Assertions
-            .assertEquals(mosaicDto.getOwnerPublicKey(),
-                mosaicInfo.getOwner().getPublicKey().toHex());
+        Assertions.assertEquals(mosaicDto.getOwnerAddress(), mosaicInfo.getOwnerAddress().encoded(networkType));
 
         Assertions.assertFalse(mosaicInfo.isTransferable());
         Assertions.assertEquals(6, mosaicInfo.getDivisibility());

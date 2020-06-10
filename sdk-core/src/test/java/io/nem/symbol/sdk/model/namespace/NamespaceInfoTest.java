@@ -18,9 +18,11 @@ package io.nem.symbol.sdk.model.namespace;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.network.NetworkType;
@@ -35,6 +37,7 @@ class NamespaceInfoTest {
     @Test
     void createANamespaceInfoViaConstructor() {
         NamespaceId namespaceId = NamespaceId.createFromId(new BigInteger("-8884663987180930485"));
+        Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
         NamespaceInfo namespaceInfo =
             new NamespaceInfo(
                 true,
@@ -44,29 +47,22 @@ class NamespaceInfoTest {
                 1,
                 Arrays.asList(namespaceId),
                 NamespaceId.createFromId(new BigInteger("0")),
-                new PublicAccount(
-                    "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                    NetworkType.MIJIN_TEST),
+                address,
                 new BigInteger("1"),
                 new BigInteger("-1"),
                 new MosaicAlias(new MosaicId(new BigInteger("100"))));
 
-        assertEquals(true, namespaceInfo.isActive());
-        assertTrue(namespaceInfo.getIndex() == 0);
+        assertTrue(namespaceInfo.isActive());
+        assertEquals(0, (int) namespaceInfo.getIndex());
         assertEquals("5A3CD9B09CD1E8000159249B", namespaceInfo.getMetaId());
-        assertTrue(namespaceInfo.getRegistrationType() == NamespaceRegistrationType.ROOT_NAMESPACE);
-        assertTrue(namespaceInfo.getDepth() == 1);
+        assertSame(namespaceInfo.getRegistrationType(), NamespaceRegistrationType.ROOT_NAMESPACE);
+        assertEquals(1, (int) namespaceInfo.getDepth());
         assertEquals(namespaceId, namespaceInfo.getLevels().get(0));
-        Assertions.assertEquals(
-            new PublicAccount(
-                "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                NetworkType.MIJIN_TEST),
-            namespaceInfo.getOwner());
+        Assertions.assertEquals(address, namespaceInfo.getOwnerAddress());
         assertEquals(new BigInteger("1"), namespaceInfo.getStartHeight());
         assertEquals(new BigInteger("-1"), namespaceInfo.getEndHeight());
         assertEquals(AliasType.MOSAIC, namespaceInfo.getAlias().getType());
-        assertEquals(
-            new BigInteger("100"), ((MosaicId) namespaceInfo.getAlias().getAliasValue()).getId());
+        assertEquals(new BigInteger("100"), ((MosaicId) namespaceInfo.getAlias().getAliasValue()).getId());
     }
 
     @Test
@@ -135,7 +131,7 @@ class NamespaceInfoTest {
             NamespaceId.createFromId(new BigInteger("0")),
             new PublicAccount(
                 "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                NetworkType.MIJIN_TEST),
+                NetworkType.MIJIN_TEST).getAddress(),
             new BigInteger("1"),
             new BigInteger("-1"),
             new MosaicAlias(new MosaicId(new BigInteger("100"))));
@@ -154,7 +150,7 @@ class NamespaceInfoTest {
             NamespaceId.createFromId(new BigInteger("-3087871471161192663")),
             new PublicAccount(
                 "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                NetworkType.MIJIN_TEST),
+                NetworkType.MIJIN_TEST).getAddress(),
             new BigInteger("1"),
             new BigInteger("-1"),
             new MosaicAlias(new MosaicId(new BigInteger("100"))));
