@@ -199,9 +199,7 @@ public class Address implements UnresolvedAddress {
                     + PLAIN_ADDRESS_SIZE + " is required");
             }
             byte[] decodedArray = Base32Encoder.getBytes(plainAddress);
-//            if (decodedArray[decodedArray.length - 1] != 0) {
-//                return false;
-//            }
+
             if (decodedArray.length != RAW_ADDRESS_SIZE) {
                 return Optional
                     .of("Plain address '" + plainAddress + "' decoded address size is " + decodedArray.length + " when "

@@ -95,7 +95,7 @@ public class MosaicId implements UnresolvedMosaicId {
      * @return the created {@link MosaicId}.
      */
     public static MosaicId createFromNonce(MosaicNonce mosaicNonce, PublicAccount owner) {
-        return MosaicId.createFromNonce(mosaicNonce,owner.getAddress());
+        return new MosaicId(mosaicNonce, owner);
     }
 
     /**

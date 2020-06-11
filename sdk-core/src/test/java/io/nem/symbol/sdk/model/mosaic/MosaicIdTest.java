@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.model.mosaic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
@@ -80,7 +81,27 @@ class MosaicIdTest {
         MosaicNonce nonce = new MosaicNonce(bytes);
         MosaicId mosaicId = MosaicId.createFromNonce(nonce, owner);
         MosaicId mosaicId2 = new MosaicId(new BigInteger("5331590414131997017"));
-        assertTrue(mosaicId.equals(mosaicId2));
+        MosaicId mosaicId3 = MosaicId.createFromNonce(nonce, owner.getAddress());
+        assertEquals(mosaicId, mosaicId);
+        assertEquals(mosaicId, mosaicId2);
+        assertEquals(mosaicId, mosaicId3);
+        assertEquals(5331590414131997017L, mosaicId2.getIdAsLong());
+    }
+
+    @Test
+    void hashCodeAndEquals() {
+        PublicAccount owner = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST);
+        byte[] bytes = new byte[]{0x0, 0x0, 0x0, 0x0};
+        MosaicNonce nonce = new MosaicNonce(bytes);
+        MosaicId mosaicId = MosaicId.createFromNonce(nonce, owner);
+        MosaicId mosaicId2 = new MosaicId(new BigInteger("5331590414131997017"));
+        MosaicId mosaicId3 = MosaicId.createFromNonce(nonce, owner.getAddress());
+        assertEquals(mosaicId, mosaicId);
+        assertNotEquals("", mosaicId);
+        assertNotEquals(mosaicId, "");
+        assertEquals(mosaicId, mosaicId2);
+        assertEquals(mosaicId.hashCode(), mosaicId2.hashCode());
+        assertEquals(mosaicId, mosaicId3);
     }
 
     @Test
@@ -90,6 +111,7 @@ class MosaicIdTest {
         MosaicNonce nonce = new MosaicNonce(bytes);
         MosaicId mosaicId1 = MosaicId.createFromNonce(nonce, owner);
         MosaicId mosaicId2 = MosaicId.createFromNonce(nonce, owner);
-        assertTrue(mosaicId1.equals(mosaicId2));
+        assertEquals(mosaicId1, mosaicId2);
+        assertEquals(mosaicId1.hashCode(), mosaicId2.hashCode());
     }
 }

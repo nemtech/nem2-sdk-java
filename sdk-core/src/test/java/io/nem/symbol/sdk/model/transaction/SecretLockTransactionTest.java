@@ -25,6 +25,7 @@ import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -112,19 +113,19 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
 
     @Test
     void shouldThrowErrorWhenSecretIsNotValid() {
-        assertThrows(
+        IllegalArgumentException e = assertThrows(
             IllegalArgumentException.class,
-            () -> {
-                SecretLockTransaction transaction =
-                    SecretLockTransactionFactory.create(
-                        NetworkType.MIJIN_TEST,
-                        NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
-                        BigInteger.valueOf(100),
-                        LockHashAlgorithmType.SHA3_256,
-                        "non valid hash",
-                        Address.createFromRawAddress("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM"))
-                        .deadline(new FakeDeadline()).build();
-            },
+            () -> SecretLockTransactionFactory.create(
+                NetworkType.MIJIN_TEST,
+                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
+                BigInteger.valueOf(100),
+                LockHashAlgorithmType.SHA3_256,
+                "non valid hash",
+                Address.generateRandom(NetworkType.MIJIN_TEST))
+                .deadline(new FakeDeadline()).build(),
             "not a valid secret");
+        Assertions
+            .assertEquals("HashType and Secret have incompatible length or not hexadecimal string", e.getMessage());
     }
+
 }

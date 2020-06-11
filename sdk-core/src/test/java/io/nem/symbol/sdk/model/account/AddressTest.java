@@ -212,4 +212,18 @@ class AddressTest {
         Assertions.assertTrue(Address.isValidEncodedAddress(generateAddress(networkType).encoded()));
     }
 
+
+    @Test
+    void validate() {
+        Assertions.assertEquals("Plain Address it nos provided", Address.validatePlainAddress(null).get());
+        Assertions.assertEquals("Plain address 'ABC' size is 3 when 39 is required",
+            Address.validatePlainAddress("ABC").get());
+        Assertions.assertEquals(
+            "Plain address 'S111GFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGGZ' is invalid. Error: IllegalArgumentException: malformed base32 string passed to getBytes",
+            Address.validatePlainAddress("S111GFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGGZ").get());
+        Assertions.assertEquals(
+            "Plain address 'SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGGZ' checksum is incorrect. Address checksum is 'DC131B' when 'DC135B' is expected",
+            Address.validatePlainAddress("SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGGZ").get());
+    }
+
 }

@@ -33,15 +33,6 @@ public class CryptoException extends RuntimeException {
     /**
      * Creates a new crypto exception.
      *
-     * @param cause The exception cause.
-     */
-    public CryptoException(final Throwable cause) {
-        this(null, cause);
-    }
-
-    /**
-     * Creates a new crypto exception.
-     *
      * @param message The exception message.
      * @param cause The exception cause.
      */

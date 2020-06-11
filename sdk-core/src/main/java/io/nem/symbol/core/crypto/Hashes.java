@@ -181,7 +181,7 @@ public class Hashes {
 
                 return digest.digest();
             },
-            CryptoException::new);
+            e -> new CryptoException(e.getMessage(), e));
     }
 
     /**

@@ -106,34 +106,6 @@ public class BlockInfo implements Stored {
         this.beneficiaryAddress = beneficiaryAddress;
     }
 
-
-    /**
-     * Get public account
-     *
-     * @param publicKey the public key
-     * @param networkType the {@link NetworkType}
-     * @return public account
-     */
-    public static PublicAccount getPublicAccount(String publicKey, NetworkType networkType) {
-        return new PublicAccount(publicKey, networkType);
-    }
-
-    /**
-     * Get public account if possible
-     *
-     * @param publicKey the public key
-     * @param networkType the {@link NetworkType}
-     * @return public account or empty if no public key is provided.
-     */
-    public static Optional<PublicAccount> getPublicAccount(
-        Optional<String> publicKey, NetworkType networkType) {
-        if (publicKey.isPresent() && !publicKey.get().isEmpty()) {
-            return Optional.of(new PublicAccount(publicKey.get(), networkType));
-        } else {
-            return Optional.empty();
-        }
-    }
-
     /**
      * Returns block hash.
      *
