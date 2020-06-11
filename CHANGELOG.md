@@ -23,7 +23,7 @@ Client Vertx | v0.8.10  | https://repo.maven.apache.org/maven2/io/nem/symbol-op
 - Added new transaction `VotingKeyLinkTransaction`.
 - Added new transaction `NodeKeyLinkTransaction`.
 - Added new properties `proofGamma`, `proofScalar`, `proofVarificationHash` in `BlockInfo`
-- Added new properties `harvestNetworkPercentage`, `harvestNetworkFeeSinkPublicKey` in `NetworkProperties`.
+- Added new properties `harvestNetworkPercentage`, `harvestNetworkFeeSinkAddress` in `NetworkProperties`.
 - Added new `KeyType`: Unset / Linked / VRF / Voting / Node / All.
 - Unified implementation of `PrivateKey` and `PublicKey`. Added `VotingKey`.
 - Transaction Factories can now calculate the max fees based on fee multipliers and cosignature configuration.

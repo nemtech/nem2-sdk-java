@@ -44,7 +44,7 @@ import io.nem.symbol.sdk.openapi.vertx.model.Cosignature;
 import io.nem.symbol.sdk.openapi.vertx.model.Pagination;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionGroupEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoExtendedDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionMetaDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionPage;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionStatusDTO;
@@ -76,8 +76,8 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     @Test
     public void shouldGetTransaction() throws Exception {
 
-        TransactionInfoExtendedDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "aggregateMosaicCreationTransaction.json", TransactionInfoExtendedDTO.class);
+        TransactionInfoDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
+            "aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
         String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
 
         mockRemoteCall(transactionInfoDTO);
@@ -94,7 +94,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     @Test
     public void exceptionWhenMapperFails() {
 
-        TransactionInfoExtendedDTO transactionInfoDTO = new TransactionInfoExtendedDTO();
+        TransactionInfoDTO transactionInfoDTO = new TransactionInfoDTO();
         TransactionMetaDTO meta = new TransactionMetaDTO();
         String hash = "ABC";
         meta.setHash(hash);
@@ -139,8 +139,8 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     @Test
     public void shouldGetTransactions() throws Exception {
 
-        TransactionInfoExtendedDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "aggregateMosaicCreationTransaction.json", TransactionInfoExtendedDTO.class);
+        TransactionInfoDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
+            "aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
 
         String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
 
@@ -354,7 +354,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     private TransactionPage toPage(TransactionInfoDTO dto) {
         return new TransactionPage()
             .data(Collections.singletonList(jsonHelper.parse(jsonHelper.print(dto),
-                TransactionInfoExtendedDTO.class)))
+                TransactionInfoDTO.class)))
             .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
     }
 

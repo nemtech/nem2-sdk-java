@@ -104,6 +104,7 @@ public class TransactionMapperSerializationTest {
 
     private void removeMeta(TransactionInfoDTO originalTransactionInfo) {
         originalTransactionInfo.setMeta(null);
+        originalTransactionInfo.setId(null);
         Map<String, Object> transactionJson = (Map<String, Object>) originalTransactionInfo
             .getTransaction();
         if (transactionJson.containsKey("transactions")) {

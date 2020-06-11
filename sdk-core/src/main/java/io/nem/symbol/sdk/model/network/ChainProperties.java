@@ -138,9 +138,9 @@ public class ChainProperties {
     private final String harvestNetworkPercentage;
 
     /**
-     * The harvest network fee sink public key.
+     * The harvest network fee sink address.
      */
-    private final String harvestNetworkFeeSinkPublicKey;
+    private final String harvestNetworkFeeSinkAddress;
     /**
      * Number of blocks between cache pruning.
      */
@@ -162,7 +162,7 @@ public class ChainProperties {
         String maxMosaicAtomicUnits, String totalChainImportance, String minHarvesterBalance,
         String maxHarvesterBalance, String minVoterBalance,
         String harvestBeneficiaryPercentage, String harvestNetworkPercentage,
-        String harvestNetworkFeeSinkPublicKey, String blockPruneInterval,
+        String harvestNetworkFeeSinkAddress, String blockPruneInterval,
         String maxTransactionsPerBlock) {
         this.enableVerifiableState = enableVerifiableState;
         this.enableVerifiableReceipts = enableVerifiableReceipts;
@@ -186,7 +186,7 @@ public class ChainProperties {
         this.minVoterBalance = minVoterBalance;
         this.harvestBeneficiaryPercentage = harvestBeneficiaryPercentage;
         this.harvestNetworkPercentage = harvestNetworkPercentage;
-        this.harvestNetworkFeeSinkPublicKey = harvestNetworkFeeSinkPublicKey;
+        this.harvestNetworkFeeSinkAddress = harvestNetworkFeeSinkAddress;
         this.blockPruneInterval = blockPruneInterval;
         this.maxTransactionsPerBlock = maxTransactionsPerBlock;
     }
@@ -279,8 +279,8 @@ public class ChainProperties {
         return harvestNetworkPercentage;
     }
 
-    public String getHarvestNetworkFeeSinkPublicKey() {
-        return harvestNetworkFeeSinkPublicKey;
+    public String getHarvestNetworkFeeSinkAddress() {
+        return harvestNetworkFeeSinkAddress;
     }
 
     public String getBlockPruneInterval() {

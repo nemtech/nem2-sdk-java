@@ -56,7 +56,7 @@ public class NamespaceNetworkProperties {
     /**
      * Public key.
      **/
-    private final String namespaceRentalFeeSinkPublicKey;
+    private final String namespaceRentalFeeSinkAddress;
 
     /**
      * Root namespace rental fee per block.
@@ -72,7 +72,7 @@ public class NamespaceNetworkProperties {
   public NamespaceNetworkProperties(String maxNameSize, String maxChildNamespaces,
       String maxNamespaceDepth, String minNamespaceDuration, String maxNamespaceDuration,
       String namespaceGracePeriodDuration, String reservedRootNamespaceNames,
-      String namespaceRentalFeeSinkPublicKey, String rootNamespaceRentalFeePerBlock,
+      String namespaceRentalFeeSinkAddress, String rootNamespaceRentalFeePerBlock,
       String childNamespaceRentalFee) {
     this.maxNameSize = maxNameSize;
     this.maxChildNamespaces = maxChildNamespaces;
@@ -81,7 +81,7 @@ public class NamespaceNetworkProperties {
     this.maxNamespaceDuration = maxNamespaceDuration;
     this.namespaceGracePeriodDuration = namespaceGracePeriodDuration;
     this.reservedRootNamespaceNames = reservedRootNamespaceNames;
-    this.namespaceRentalFeeSinkPublicKey = namespaceRentalFeeSinkPublicKey;
+    this.namespaceRentalFeeSinkAddress = namespaceRentalFeeSinkAddress;
     this.rootNamespaceRentalFeePerBlock = rootNamespaceRentalFeePerBlock;
     this.childNamespaceRentalFee = childNamespaceRentalFee;
   }
@@ -114,8 +114,8 @@ public class NamespaceNetworkProperties {
     return reservedRootNamespaceNames;
   }
 
-  public String getNamespaceRentalFeeSinkPublicKey() {
-    return namespaceRentalFeeSinkPublicKey;
+  public String getNamespaceRentalFeeSinkAddress() {
+    return namespaceRentalFeeSinkAddress;
   }
 
   public String getRootNamespaceRentalFeePerBlock() {

@@ -18,7 +18,7 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoExtendedDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
@@ -39,19 +39,14 @@ public class TestHelperOkHttp {
     }
 
 
-    public static TransactionInfoExtendedDTO loadTransactionInfoExtendedDTO(String name) {
-        String resourceName = "TransactionMapping-" + name;
-        return loadResource(resourceName, TransactionInfoExtendedDTO.class);
+    public static TransactionInfoDTO loadTransactionInfoDTO(String name) {
+        String resourceName = "transaction-" + name;
+        return loadResource(resourceName, TransactionInfoDTO.class);
     }
 
     public static <T> T loadTransactionInfoDTO(String name, Class<T> clazz) {
         String resourceName = "transaction-" + name;
         return loadResource(resourceName, clazz);
-    }
-
-    public static TransactionInfoDTO loadTransactionInfoDTO(String name) {
-        String resourceName = "transaction-" + name;
-        return loadResource(resourceName, TransactionInfoDTO.class);
     }
 
     public static <T> T loadResource(String resourceName, Class<T> clazz) {

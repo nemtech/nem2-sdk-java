@@ -40,7 +40,7 @@ public class MosaicNetworkProperties {
     /**
      * Public key.
      **/
-    private final String mosaicRentalFeeSinkPublicKey;
+    private final String mosaicRentalFeeSinkAddress;
 
     /**
      * Mosaic rental fee.
@@ -48,12 +48,12 @@ public class MosaicNetworkProperties {
     private final String mosaicRentalFee;
 
   public MosaicNetworkProperties(String maxMosaicsPerAccount, String maxMosaicDuration,
-      String maxMosaicDivisibility, String mosaicRentalFeeSinkPublicKey,
+      String maxMosaicDivisibility, String mosaicRentalFeeSinkAddress,
       String mosaicRentalFee) {
     this.maxMosaicsPerAccount = maxMosaicsPerAccount;
     this.maxMosaicDuration = maxMosaicDuration;
     this.maxMosaicDivisibility = maxMosaicDivisibility;
-    this.mosaicRentalFeeSinkPublicKey = mosaicRentalFeeSinkPublicKey;
+    this.mosaicRentalFeeSinkAddress = mosaicRentalFeeSinkAddress;
     this.mosaicRentalFee = mosaicRentalFee;
   }
 
@@ -69,8 +69,8 @@ public class MosaicNetworkProperties {
     return maxMosaicDivisibility;
   }
 
-  public String getMosaicRentalFeeSinkPublicKey() {
-    return mosaicRentalFeeSinkPublicKey;
+  public String getMosaicRentalFeeSinkAddress() {
+    return mosaicRentalFeeSinkAddress;
   }
 
   public String getMosaicRentalFee() {

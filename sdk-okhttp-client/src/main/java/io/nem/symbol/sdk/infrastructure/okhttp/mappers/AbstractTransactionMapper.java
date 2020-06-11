@@ -31,7 +31,7 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.EmbeddedTransactionMetaDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NetworkTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoExtendedDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionMetaDTO;
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -60,8 +60,13 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
 
     @Override
     public Transaction mapFromDto(Object object) {
-        TransactionInfoExtendedDTO transactionInfoDTO = this.jsonHelper
-            .convert(object, TransactionInfoExtendedDTO.class);
+        if (object instanceof EmbeddedTransactionInfoDTO) {
+            EmbeddedTransactionInfoDTO transactionInfoDTO = (EmbeddedTransactionInfoDTO) object;
+            TransactionInfo transactionInfo = createTransactionInfo(transactionInfoDTO.getMeta(),
+                transactionInfoDTO.getMeta().getId());
+            return createModel(transactionInfo, transactionInfoDTO.getTransaction());
+        }
+        TransactionInfoDTO transactionInfoDTO = this.jsonHelper.convert(object, TransactionInfoDTO.class);
         TransactionInfo transactionInfo = createTransactionInfo(transactionInfoDTO.getMeta(),
             transactionInfoDTO.getId());
         return createModel(transactionInfo, transactionInfoDTO.getTransaction());

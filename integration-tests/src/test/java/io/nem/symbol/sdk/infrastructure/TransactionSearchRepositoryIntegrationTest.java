@@ -25,6 +25,7 @@ import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -193,6 +194,23 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
             } else {
                 Assertions.assertTrue(t.getSize() > 0);
             }
+        });
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void searchEmbeddedTransactionType(RepositoryType type) {
+        TransactionRepository transactionRepository = getTransactionRepository(type);
+        TransactionPaginationStreamer streamer = new TransactionPaginationStreamer(transactionRepository);
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria();
+        criteria.setEmbedded(true);
+        criteria.setTransactionTypes(Collections.singletonList(TransactionType.TRANSFER));
+        List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
+        Assertions.assertFalse(transactions.isEmpty());
+
+        transactions.stream().forEach(t -> {
+            get(transactionRepository.getTransaction(t.getRecordId().get()));
+            get(transactionRepository.getTransaction(t.getTransactionInfo().get().getHash().get()));
         });
     }
 

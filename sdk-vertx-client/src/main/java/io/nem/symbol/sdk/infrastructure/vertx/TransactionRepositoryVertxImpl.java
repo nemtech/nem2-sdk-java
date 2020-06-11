@@ -38,7 +38,7 @@ import io.nem.symbol.sdk.openapi.vertx.model.Cosignature;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionGroupSubsetEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionHashes;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionIds;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoExtendedDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionPage;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionPayload;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionStatusDTO;
@@ -105,7 +105,7 @@ public class TransactionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
 
     @Override
     public Observable<Transaction> getTransaction(String transactionHash) {
-        Consumer<Handler<AsyncResult<TransactionInfoExtendedDTO>>> callback = handler -> getClient()
+        Consumer<Handler<AsyncResult<TransactionInfoDTO>>> callback = handler -> getClient()
             .getTransaction(transactionHash, handler);
         return exceptionHandling(call(callback).map(transactionMapper::mapFromDto));
     }
@@ -113,7 +113,7 @@ public class TransactionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
 
     @Override
     public Observable<List<Transaction>> getTransactions(List<String> transactionHashes) {
-        Consumer<Handler<AsyncResult<List<TransactionInfoExtendedDTO>>>> callback = handler ->
+        Consumer<Handler<AsyncResult<List<TransactionInfoDTO>>>> callback = handler ->
             client.getTransactionsById(new TransactionIds().transactionIds(transactionHashes),
                 handler);
         return exceptionHandling(

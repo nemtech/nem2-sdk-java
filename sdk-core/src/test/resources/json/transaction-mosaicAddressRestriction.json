@@ -4,6 +4,7 @@
     "height": "1168",
     "merkleComponentHash": "68E5080173C82EF2F64E98E292F717404E4F2CBD1EEB30E1EFD9A7ED1F5AB418"
   },
+  "id": "5A0069D83F17CF0001777E55",
   "transaction": {
     "deadline": "110764358842",
     "maxFee": "0",
@@ -12,6 +13,13 @@
     "transactionsHash": "ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234",
     "transactions": [
       {
+        "meta": {
+          "aggregateHash": "68E5080173C82EF2F64E98E292F717404E4F2CBD1EEB30E1EFD9A7ED1F5AB418",
+          "aggregateId": "5A0069D83F17CF0001777E55",
+          "height": "1168",
+          "id": "5A0069D83F17CF0001777E56",
+          "index": 0
+        },
         "transaction": {
           "mosaicId": "6542A217A3D0EC30",
           "newRestrictionValue": "30",

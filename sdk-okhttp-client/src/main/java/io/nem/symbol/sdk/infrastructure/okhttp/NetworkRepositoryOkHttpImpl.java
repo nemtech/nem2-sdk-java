@@ -117,7 +117,7 @@ public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
 
     private NetworkProperties toNetworkProperties(NetworkPropertiesDTO dto) {
         return new NetworkProperties(dto.getIdentifier(),
-            NodeIdentityEqualityStrategy.rawValueOf(dto.getNodeEqualityStrategy().getValue()), dto.getPublicKey(),
+            NodeIdentityEqualityStrategy.rawValueOf(dto.getNodeEqualityStrategy().getValue()), dto.getNemesisSignerPublicKey(),
             dto.getGenerationHashSeed(), dto.getEpochAdjustment());
     }
 
@@ -134,7 +134,7 @@ public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
             dto.getTotalChainImportance(), dto.getMinHarvesterBalance(),
             dto.getMaxHarvesterBalance(), dto.getMinVoterBalance(),
             dto.getHarvestBeneficiaryPercentage(),
-            dto.getHarvestNetworkPercentage(), dto.getHarvestNetworkFeeSinkPublicKey(),
+            dto.getHarvestNetworkPercentage(), dto.getHarvestNetworkFeeSinkAddress(),
             dto.getBlockPruneInterval(), dto.getMaxTransactionsPerBlock());
     }
 
@@ -180,7 +180,7 @@ public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
     private MosaicNetworkProperties toMosaic(MosaicNetworkPropertiesDTO dto) {
         return new MosaicNetworkProperties(dto.getMaxMosaicsPerAccount(),
             dto.getMaxMosaicDuration(), dto.getMaxMosaicDivisibility(),
-            dto.getMosaicRentalFeeSinkPublicKey(), dto.getMosaicRentalFee());
+            dto.getMosaicRentalFeeSinkAddress(), dto.getMosaicRentalFee());
     }
 
     private MultisigNetworkProperties toMultisig(MultisigNetworkPropertiesDTO dto) {
@@ -192,7 +192,7 @@ public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         return new NamespaceNetworkProperties(dto.getMaxNameSize(), dto.getMaxChildNamespaces(),
             dto.getMaxNamespaceDepth(), dto.getMinNamespaceDuration(),
             dto.getMaxNamespaceDuration(), dto.getNamespaceGracePeriodDuration(),
-            dto.getReservedRootNamespaceNames(), dto.getNamespaceRentalFeeSinkPublicKey(),
+            dto.getReservedRootNamespaceNames(), dto.getNamespaceRentalFeeSinkAddress(),
             dto.getRootNamespaceRentalFeePerBlock(), dto.getChildNamespaceRentalFee());
     }
 

@@ -34,7 +34,7 @@ public class NetworkProperties {
     /**
      * Public key.
      */
-    private final String publicKey;
+    private final String nemesisSignerPublicKey;
 
     /**
      * Get generationHash
@@ -47,11 +47,11 @@ public class NetworkProperties {
     private final String epochAdjustment;
 
     public NetworkProperties(String identifier,
-        NodeIdentityEqualityStrategy nodeEqualityStrategy, String publicKey,
+        NodeIdentityEqualityStrategy nodeEqualityStrategy, String nemesisSignerPublicKey,
         String generationHashSeed, String epochAdjustment) {
         this.identifier = identifier;
         this.nodeEqualityStrategy = nodeEqualityStrategy;
-        this.publicKey = publicKey;
+        this.nemesisSignerPublicKey = nemesisSignerPublicKey;
         this.generationHashSeed = generationHashSeed;
         this.epochAdjustment = epochAdjustment;
     }
@@ -60,8 +60,8 @@ public class NetworkProperties {
         return identifier;
     }
 
-    public String getPublicKey() {
-        return publicKey;
+    public String getNemesisSignerPublicKey() {
+        return nemesisSignerPublicKey;
     }
 
     public NodeIdentityEqualityStrategy getNodeEqualityStrategy() {

@@ -31,7 +31,7 @@ import io.nem.symbol.sdk.openapi.vertx.model.EmbeddedTransactionMetaDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NetworkTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoExtendedDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionMetaDTO;
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -59,8 +59,13 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
 
     @Override
     public Transaction mapFromDto(Object object) {
-        TransactionInfoExtendedDTO transactionInfoDTO = this.jsonHelper
-            .convert(object, TransactionInfoExtendedDTO.class);
+        if (object instanceof EmbeddedTransactionInfoDTO) {
+            EmbeddedTransactionInfoDTO transactionInfoDTO = (EmbeddedTransactionInfoDTO) object;
+            TransactionInfo transactionInfo = createTransactionInfo(transactionInfoDTO.getMeta(),
+                transactionInfoDTO.getMeta().getId());
+            return createModel(transactionInfo, transactionInfoDTO.getTransaction());
+        }
+        TransactionInfoDTO transactionInfoDTO = this.jsonHelper.convert(object, TransactionInfoDTO.class);
         TransactionInfo transactionInfo = createTransactionInfo(transactionInfoDTO.getMeta(),
             transactionInfoDTO.getId());
         return createModel(transactionInfo, transactionInfoDTO.getTransaction());

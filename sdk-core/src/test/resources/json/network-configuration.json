@@ -2,7 +2,7 @@
   "network": {
     "identifier": "public-test",
     "nodeEqualityStrategy": "public-key",
-    "publicKey": "E3F04CA92250B49679EBEF98FAC87C1CECAC7E7491ECBB2307DF1AD65BED57FD",
+    "nemesisSignerPublicKey": "E3F04CA92250B49679EBEF98FAC87C1CECAC7E7491ECBB2307DF1AD65BED57FD",
     "generationHashSeed": "AE6488282F9C09457F017BE5EE26387B21EB15CF32D6DA1E9846C25E00828329",
     "epochAdjustment": "1573430400s"
   },
@@ -27,7 +27,7 @@
     "maxHarvesterBalance": "50'000'000'000'000",
     "harvestBeneficiaryPercentage": "10",
     "harvestNetworkPercentage": "5",
-    "harvestNetworkFeeSinkPublicKey": "FF5563F1C5824EE0CD868799FBE8744B46D5549973FDA499939C952D951494E4",
+    "harvestNetworkFeeSinkAddress": "FF5563F1C5824EE0CD868799FBE8744B46D5549973FDA499939C952D951494E4",
     "blockPruneInterval": "360",
     "maxTransactionsPerBlock": "6'000"
   },
@@ -58,7 +58,7 @@
       "maxMosaicsPerAccount": "1'000",
       "maxMosaicDuration": "3650d",
       "maxMosaicDivisibility": "6",
-      "mosaicRentalFeeSinkPublicKey": "53E140B5947F104CABC2D6FE8BAEDBC30EF9A0609C717D9613DE593EC2A266D3",
+      "mosaicRentalFeeSinkAddress": "53E140B5947F104CABC2D6FE8BAEDBC30EF9A0609C717D9613DE593EC2A266D3",
       "mosaicRentalFee": "500"
     },
     "multisig": {
@@ -74,7 +74,7 @@
       "maxNamespaceDuration": "365d",
       "namespaceGracePeriodDuration": "30d",
       "reservedRootNamespaceNames": "xem, nem, user, account, org, com, biz, net, edu, mil, gov, info",
-      "namespaceRentalFeeSinkPublicKey": "3E82E1C1E4A75ADAA3CBA8C101C3CD31D9817A2EB966EB3B511FB2ED45B8E262",
+      "namespaceRentalFeeSinkAddress": "3E82E1C1E4A75ADAA3CBA8C101C3CD31D9817A2EB966EB3B511FB2ED45B8E262",
       "rootNamespaceRentalFeePerBlock": "1",
       "childNamespaceRentalFee": "100"
     },

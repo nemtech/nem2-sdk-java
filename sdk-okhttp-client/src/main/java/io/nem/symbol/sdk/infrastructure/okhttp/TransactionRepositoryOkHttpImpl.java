@@ -42,7 +42,7 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionGroupSubsetEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionHashes;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionIds;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoExtendedDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionPage;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionPayload;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionStatusDTO;
@@ -77,14 +77,14 @@ public class TransactionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImp
 
     @Override
     public Observable<Transaction> getTransaction(String transactionHash) {
-        Callable<TransactionInfoExtendedDTO> callback = () -> getClient()
+        Callable<TransactionInfoDTO> callback = () -> getClient()
             .getTransaction(transactionHash);
         return exceptionHandling(call(callback).map(this.transactionMapper::mapFromDto));
     }
 
     @Override
     public Observable<List<Transaction>> getTransactions(List<String> transactionHashes) {
-        Callable<List<TransactionInfoExtendedDTO>> callback = () ->
+        Callable<List<TransactionInfoDTO>> callback = () ->
             getClient().getTransactionsById(new TransactionIds().transactionIds(transactionHashes));
         return exceptionHandling(
             call(callback).flatMapIterable(item -> item).map(this.transactionMapper::mapFromDto).toList()

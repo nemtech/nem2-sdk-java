@@ -41,7 +41,7 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.AnnounceTransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Cosignature;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Pagination;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionGroupEnum;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoExtendedDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionPage;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionStatusDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionStatusEnum;
@@ -72,8 +72,8 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
     @Test
     public void shouldGetTransaction() throws Exception {
 
-        TransactionInfoExtendedDTO transactionInfoDTO = loadTransactionInfoDTO(
-            "aggregateMosaicCreationTransaction.json", TransactionInfoExtendedDTO.class);
+        TransactionInfoDTO transactionInfoDTO = loadTransactionInfoDTO(
+            "aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
 
         String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
         mockRemoteCall(transactionInfoDTO);
@@ -90,8 +90,8 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
     @Test
     public void shouldGetTransactions() throws Exception {
 
-        TransactionInfoExtendedDTO transactionInfoDTO = loadTransactionInfoDTO(
-            "aggregateMosaicCreationTransaction.json", TransactionInfoExtendedDTO.class);
+        TransactionInfoDTO transactionInfoDTO = loadTransactionInfoDTO(
+            "aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
         String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
 
         mockRemoteCall(Collections.singletonList(transactionInfoDTO));
@@ -250,8 +250,8 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
     @Test
     public void searchTransactions() throws Exception {
 
-        TransactionInfoExtendedDTO transferTransactionDTO = loadTransactionInfoDTO("standaloneTransferTransaction.json",
-            TransactionInfoExtendedDTO.class);
+        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO("standaloneTransferTransaction.json",
+            TransactionInfoDTO.class);
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
@@ -274,8 +274,8 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
     @Test
     public void searchTransactionsTransactionTypes() throws Exception {
 
-        TransactionInfoExtendedDTO transferTransactionDTO = loadTransactionInfoDTO("standaloneTransferTransaction.json",
-            TransactionInfoExtendedDTO.class);
+        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO("standaloneTransferTransaction.json",
+            TransactionInfoDTO.class);
 
         PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
@@ -297,10 +297,10 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
 
     }
 
-    private TransactionPage toPage(TransactionInfoExtendedDTO dto) {
+    private TransactionPage toPage(TransactionInfoDTO dto) {
         return new TransactionPage()
             .data(Collections.singletonList(jsonHelper.parse(jsonHelper.print(dto),
-                TransactionInfoExtendedDTO.class)))
+                TransactionInfoDTO.class)))
             .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
     }
 
