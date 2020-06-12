@@ -69,7 +69,7 @@ public class ListenerOkHttpTest {
 
     private JsonHelper jsonHelper;
 
-    private String wsId = "TheWSid";
+    private final String wsId = "TheWSid";
 
     @BeforeEach
     public void setUp() {
@@ -83,6 +83,10 @@ public class ListenerOkHttpTest {
     @AfterEach
     public void tearDown() {
         Mockito.verifyNoMoreInteractions(webSocketMock);
+    }
+
+    private String getHash(TransactionInfoDTO transactionInfo) {
+        return jsonHelper.getString(transactionInfo, "meta", "hash");
     }
 
     @Test
@@ -212,7 +216,7 @@ public class ListenerOkHttpTest {
 
         List<Transaction> transactions = new ArrayList<>();
         List<Throwable> exceptions = new ArrayList<>();
-        listener.confirmedOrError(address, transactionInfo.getMeta().getHash()).doOnError(exceptions::add)
+        listener.confirmedOrError(address, getHash(transactionInfo)).doOnError(exceptions::add)
             .forEach(transactions::add);
 
         listener.handle(transactionInfoDtoJsonObject, null);
@@ -251,12 +255,12 @@ public class ListenerOkHttpTest {
         Map<String, Object> transactionStatusError = new HashMap<>();
         transactionStatusError.put("address", address.encoded());
         transactionStatusError.put("code", "Fail 666");
-        transactionStatusError.put("hash", transactionInfo.getMeta().getHash());
+        transactionStatusError.put("hash", getHash(transactionInfo));
         transactionStatusError.put("deadline", 123);
 
         List<Transaction> transactions = new ArrayList<>();
         List<Throwable> exceptions = new ArrayList<>();
-        listener.confirmedOrError(address, transactionInfo.getMeta().getHash()).doOnError(exceptions::add)
+        listener.confirmedOrError(address, getHash(transactionInfo)).doOnError(exceptions::add)
             .forEach(transactions::add);
 
         listener.handle(transactionStatusError, null);
@@ -265,7 +269,7 @@ public class ListenerOkHttpTest {
         Assertions.assertEquals(1, exceptions.size());
         Assertions.assertEquals(TransactionStatusException.class, exceptions.get(0).getClass());
         Assertions
-            .assertEquals("Fail 666 processing transaction " + transactionInfo.getMeta().getHash(),
+            .assertEquals("Fail 666 processing transaction " + getHash(transactionInfo),
                 exceptions.get(0).getMessage());
 
         Mockito.verify(webSocketMock)
@@ -299,7 +303,7 @@ public class ListenerOkHttpTest {
 
         List<Transaction> transactions = new ArrayList<>();
         List<Throwable> exceptions = new ArrayList<>();
-        listener.aggregateBondedAddedOrError(address, transactionInfo.getMeta().getHash())
+        listener.aggregateBondedAddedOrError(address, getHash(transactionInfo))
             .doOnError(exceptions::add)
             .forEach(transactions::add);
 
@@ -339,12 +343,12 @@ public class ListenerOkHttpTest {
         Map<String, Object> transactionStatusError = new HashMap<>();
         transactionStatusError.put("address", address.encoded());
         transactionStatusError.put("code", "Fail 666");
-        transactionStatusError.put("hash", transactionInfo.getMeta().getHash());
+        transactionStatusError.put("hash", getHash(transactionInfo));
         transactionStatusError.put("deadline", 123);
 
         List<Transaction> transactions = new ArrayList<>();
         List<Throwable> exceptions = new ArrayList<>();
-        listener.aggregateBondedAddedOrError(address, transactionInfo.getMeta().getHash())
+        listener.aggregateBondedAddedOrError(address, getHash(transactionInfo))
             .doOnError(exceptions::add)
             .forEach(transactions::add);
 
@@ -362,7 +366,7 @@ public class ListenerOkHttpTest {
         Assertions.assertEquals(1, exceptions.size());
         Assertions.assertEquals(TransactionStatusException.class, exceptions.get(0).getClass());
         Assertions
-            .assertEquals("Fail 666 processing transaction " + transactionInfo.getMeta().getHash(),
+            .assertEquals("Fail 666 processing transaction " + getHash(transactionInfo),
                 exceptions.get(0).getMessage());
     }
 

@@ -24,9 +24,9 @@
           "height": "12010",
           "aggregateHash": "C0506377F3D9605145820919319CE77D6343AEBAA473E1467E5B1ABC9A2A1227",
           "aggregateId": "5D5F9E27EBB06700013CB1C1",
-          "index": 0,
-          "id": "5D5F9E27EBB06700013CB1C2"
+          "index": 0
         },
+        "id": "5D5F9E27EBB06700013CB1C2",
         "transaction": {
           "targetAddress": "90E6FF7755A80B6AA935A5C31B6D3D0CFAF82E06BF2B9CC9",
           "version": 1,

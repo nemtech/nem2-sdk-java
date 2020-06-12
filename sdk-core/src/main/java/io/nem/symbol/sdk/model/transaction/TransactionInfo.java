@@ -43,7 +43,6 @@ public class TransactionInfo {
         Optional<String> aggregateId) {
         Validate.notNull(height, "Height must not be null");
         this.height = height;
-
         this.index = index;
         this.id = id;
         this.hash = hash;
@@ -67,7 +66,7 @@ public class TransactionInfo {
         return new TransactionInfo(
             height,
             Optional.of(index),
-            Optional.of(id),
+            Optional.ofNullable(id),
             Optional.empty(),
             Optional.empty(),
             Optional.of(aggregateHash),

@@ -1,11 +1,4 @@
 {
-  "meta": {
-    "hash": "671653C94E2254F2A23EFEDB15D67C38332AED1FBD24B063C0A8E675582B6A96",
-    "height": "18160",
-    "index": 0,
-    "merkleComponentHash": "81E5E7AE49998802DABC816EC10158D3A7879702FF29084C2C992CD1289877A7"
-  },
-  "id": "5A0069D83F17CF0001777E55",
   "transaction": {
     "cosignatures": [
       {
@@ -24,9 +17,9 @@
           "height": "12010",
           "aggregateHash": "C0506377F3D9605145820919319CE77D6343AEBAA473E1467E5B1ABC9A2A1227",
           "aggregateId": "5D5F9E27EBB06700013CB1C1",
-          "index": 0,
-          "id": "5D5F9E27EBB06700013CB1C2"
+          "index": 0
         },
+        "id": "5D5F9E27EBB06700013CB1C2",
         "transaction": {
           "targetAddress": "9103B60AAF27626883000000000000000000000000000000",
           "version": 1,

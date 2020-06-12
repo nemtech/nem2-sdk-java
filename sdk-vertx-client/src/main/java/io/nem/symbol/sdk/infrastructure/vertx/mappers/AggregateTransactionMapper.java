@@ -55,16 +55,13 @@ class AggregateTransactionMapper extends
         List<Transaction> transactions = transaction.getTransactions().stream()
             .map(embeddedTransactionInfoDTO -> {
 
-                EmbeddedTransactionInfoDTO transactionInfoDTO = new EmbeddedTransactionInfoDTO();
-                transactionInfoDTO.setMeta(embeddedTransactionInfoDTO.getMeta());
-                transactionInfoDTO.setTransaction(embeddedTransactionInfoDTO.getTransaction());
                 Map<String, Object> innerTransaction = (Map<String, Object>) embeddedTransactionInfoDTO
                     .getTransaction();
 
                 innerTransaction.put("deadline", transaction.getDeadline());
                 innerTransaction.put("maxFee", transaction.getMaxFee());
                 innerTransaction.put("signature", transaction.getSignature());
-                return transactionMapper.mapFromDto(transactionInfoDTO);
+                return transactionMapper.mapFromDto(embeddedTransactionInfoDTO);
 
             }).collect(Collectors.toList());
 

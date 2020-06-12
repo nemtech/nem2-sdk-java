@@ -24,9 +24,9 @@
           "aggregateHash": "3D28C804EDD07D5A728E5C5FFEC01AB07AFA5766AE6997B38526D36015A4D006",
           "aggregateId": "5A0069D83F17CF0001777E55",
           "height": "18160",
-          "id": "5A0069D83F17CF0001777E56",
           "index": 0
         },
+        "id": "5A0069D83F17CF0001777E56",
         "transaction": {
           "nonce": 0,
           "id": "0000003248159581",

@@ -78,6 +78,7 @@ public abstract class ListenerBase implements Listener {
             uid = jsonHelper.getString(message, "uid");
             future.complete(null);
         } else if (jsonHelper.contains(message, "transaction")) {
+            System.out.println(message);
             Transaction messageObject = toTransaction(message);
             ListenerChannel channel = ListenerChannel
                 .rawValueOf(jsonHelper.getString(message, "meta", "channelName"));

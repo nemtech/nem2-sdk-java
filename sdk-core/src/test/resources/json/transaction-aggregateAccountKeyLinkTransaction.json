@@ -24,9 +24,9 @@
           "height": "12010",
           "aggregateHash": "C0506377F3D9605145820919319CE77D6343AEBAA473E1467E5B1ABC9A2A1227",
           "aggregateId": "5D5F9E27EBB06700013CB1C1",
-          "index": 0,
-          "id": "5D5F9E27EBB06700013CB1C2"
+          "index": 0
         },
+        "id": "5D5F9E27EBB06700013CB1C2",
         "transaction": {
           "signerPublicKey": "69970C5FB7A72662A6457504851DC11B10B19EB8A7D8C5E22301F1DC7492F292",
           "version": 1,

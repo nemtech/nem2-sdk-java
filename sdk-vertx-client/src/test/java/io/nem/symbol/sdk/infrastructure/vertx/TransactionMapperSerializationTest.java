@@ -80,6 +80,9 @@ public class TransactionMapperSerializationTest {
         mappedTransactionInfo
             .setTransaction(jsonHelper.convert(mappedTransactionInfo.getTransaction(), Map.class));
 
+        mappedTransactionInfo
+            .setMeta(jsonHelper.convert(mappedTransactionInfo.getMeta(), Map.class));
+
         Assertions.assertEquals(jsonHelper.prettyPrint(originalTransactionInfo),
             jsonHelper.prettyPrint(mappedTransactionInfo));
 
@@ -111,6 +114,7 @@ public class TransactionMapperSerializationTest {
             List<Map<String, Object>> transactionsJson = (List<Map<String, Object>>) transactionJson
                 .get("transactions");
             transactionsJson.forEach(t -> t.remove("meta"));
+            transactionsJson.forEach(t -> t.remove("id"));
         }
     }
 

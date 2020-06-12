@@ -57,9 +57,9 @@ public class ListenerVertx extends ListenerBase implements Listener {
     /**
      * @param httpClient the http client instance.
      * @param url of the host
+     * @param namespaceRepository the namespace repository used to resolve alias.
      */
-    public ListenerVertx(HttpClient httpClient, String url,
-        NamespaceRepository namespaceRepository) {
+    public ListenerVertx(HttpClient httpClient, String url, NamespaceRepository namespaceRepository) {
         super(new JsonHelperJackson2(JsonHelperJackson2.configureMapper(Json.mapper)),
             namespaceRepository);
         try {

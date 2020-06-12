@@ -64,6 +64,7 @@ import io.nem.symbol.sdk.model.transaction.VrfKeyLinkTransaction;
 import io.nem.symbol.sdk.model.transaction.VrfKeyLinkTransactionFactory;
 import io.nem.symbol.sdk.openapi.vertx.model.Cosignature;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionMetaDTO;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.vertx.core.Handler;
@@ -109,7 +110,7 @@ public class ListenerVertxTest {
 
     private JsonHelper jsonHelper;
 
-    private String wsId = "TheWSid";
+    private final String wsId = "TheWSid";
 
     private NamespaceRepository namespaceRepository;
 
@@ -135,10 +136,8 @@ public class ListenerVertxTest {
 
         Assertions.assertNull(listener.getUid());
 
-        Assertions.assertEquals(
-            "Listener has not been opened yet. Please call the open method before subscribing.",
-            Assertions
-                .assertThrows(IllegalStateException.class, () -> listener.newBlock()).getMessage());
+        Assertions.assertEquals("Listener has not been opened yet. Please call the open method before subscribing.",
+            Assertions.assertThrows(IllegalStateException.class, () -> listener.newBlock()).getMessage());
 
         simulateWebSocketStartup();
 
@@ -151,10 +150,8 @@ public class ListenerVertxTest {
 
         Assertions.assertNull(listener.getUid());
 
-        Assertions.assertEquals(
-            "Listener has not been opened yet. Please call the open method before subscribing.",
-            Assertions
-                .assertThrows(IllegalStateException.class, () -> listener.newBlock()).getMessage());
+        Assertions.assertEquals("Listener has not been opened yet. Please call the open method before subscribing.",
+            Assertions.assertThrows(IllegalStateException.class, () -> listener.newBlock()).getMessage());
 
         Map<String, String> sendPayload = new HashMap<>();
         sendPayload.put("uid", wsId);
@@ -167,20 +164,16 @@ public class ListenerVertxTest {
 
 
     @Test
-    public void cosignatureAdded()
-        throws InterruptedException, ExecutionException, TimeoutException {
+    public void cosignatureAdded() throws InterruptedException, ExecutionException, TimeoutException {
         simulateWebSocketStartup();
         ListenerChannel consignature = ListenerChannel.COSIGNATURE;
         NetworkType networkType = NETWORK_TYPE;
-        Cosignature cosignature = new Cosignature().parentHash("aParentHash")
-            .signature("aSignature")
+        Cosignature cosignature = new Cosignature().parentHash("aParentHash").signature("aSignature")
             .signerPublicKey(Account.generateNewAccount(networkType).getPublicKey());
 
-        ObjectNode transactionInfoDtoJsonObject = jsonHelper
-            .convert(cosignature, ObjectNode.class);
+        ObjectNode transactionInfoDtoJsonObject = jsonHelper.convert(cosignature, ObjectNode.class);
 
-        Address address = Address.createFromPublicKey(cosignature.getSignerPublicKey(),
-            networkType);
+        Address address = Address.createFromPublicKey(cosignature.getSignerPublicKey(), networkType);
 
         String channelName = consignature.toString();
 
@@ -191,14 +184,12 @@ public class ListenerVertxTest {
 
         Assertions.assertEquals(1, transactions.size());
 
-        Assertions.assertEquals(cosignature.getSignerPublicKey(),
-            transactions.get(0).getSignerPublicKey());
+        Assertions.assertEquals(cosignature.getSignerPublicKey(), transactions.get(0).getSignerPublicKey());
         Assertions.assertEquals(cosignature.getParentHash(), transactions.get(0).getParentHash());
         Assertions.assertEquals(cosignature.getSignature(), transactions.get(0).getSignature());
         Mockito.verify(webSocketMock).handler(Mockito.any());
-        Mockito.verify(webSocketMock)
-            .writeTextMessage(jsonHelper.print(new ListenerSubscribeMessage(this.wsId,
-                channelName + "/" + address.plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
     }
 
     @ParameterizedTest
@@ -207,15 +198,14 @@ public class ListenerVertxTest {
         throws InterruptedException, ExecutionException, TimeoutException {
         simulateWebSocketStartup();
 
-        TransactionInfoDTO transactionInfo = TestHelperVertx.loadTransactionInfoDTO(
-            "aggregateMosaicCreationTransaction.json");
+        TransactionInfoDTO transactionInfo = TestHelperVertx
+            .loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json");
 
-        ObjectNode transactionInfoDtoJsonObject = jsonHelper
-            .convert(transactionInfo, ObjectNode.class);
+        ObjectNode transactionInfoDtoJsonObject = jsonHelper.convert(transactionInfo, ObjectNode.class);
 
-        Address address = Address.createFromPublicKey(
-            jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
-            NETWORK_TYPE);
+        Address address = Address
+            .createFromPublicKey(jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
+                NETWORK_TYPE);
 
         String channelName = channel.toString();
 
@@ -227,9 +217,8 @@ public class ListenerVertxTest {
             channel == ListenerChannel.CONFIRMED_ADDED ? listener::confirmedOrError
                 : listener::aggregateBondedAddedOrError;
 
-        subscriber.apply(address, transactionInfo.getMeta().getHash())
-            .doOnError(exceptions::add)
-            .forEach(transactions::add);
+        TransactionMetaDTO meta = jsonHelper.convert(transactionInfo.getMeta(), TransactionMetaDTO.class);
+        subscriber.apply(address, meta.getHash()).doOnError(exceptions::add).forEach(transactions::add);
 
         listener.handle(transactionInfoDtoJsonObject, null);
 
@@ -239,11 +228,10 @@ public class ListenerVertxTest {
         Assertions.assertEquals(address, transactions.get(0).getSigner().get().getAddress());
 
         Mockito.verify(webSocketMock).handler(Mockito.any());
-        Mockito.verify(webSocketMock)
-            .writeTextMessage(jsonHelper.print(new ListenerSubscribeMessage(this.wsId,
-                channelName + "/" + address.plain())));
-        Mockito.verify(webSocketMock).writeTextMessage(jsonHelper
-            .print(new ListenerSubscribeMessage(this.wsId, "status" + "/" + address.plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, "status" + "/" + address.plain())));
 
     }
 
@@ -253,20 +241,18 @@ public class ListenerVertxTest {
         throws InterruptedException, ExecutionException, TimeoutException {
         simulateWebSocketStartup();
 
-        TransactionInfoDTO transactionInfo = TestHelperVertx.loadTransactionInfoDTO(
-            "aggregateMosaicCreationTransaction.json");
+        TransactionInfoDTO transactionInfo = TestHelperVertx
+            .loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json");
 
-        ObjectNode transactionInfoDtoJsonObject = jsonHelper
-            .convert(transactionInfo, ObjectNode.class);
+        ObjectNode transactionInfoDtoJsonObject = jsonHelper.convert(transactionInfo, ObjectNode.class);
 
-        Address address = Address.createFromPublicKey(
-            jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
-            NETWORK_TYPE);
+        Address address = Address
+            .createFromPublicKey(jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
+                NETWORK_TYPE);
 
         String channelName = channel.toString();
 
-        ((ObjectNode) transactionInfoDtoJsonObject.get("meta"))
-            .put("channelName", channelName);
+        ((ObjectNode) transactionInfoDtoJsonObject.get("meta")).put("channelName", channelName);
 
         List<Transaction> transactions = new ArrayList<>();
         List<Throwable> exceptions = new ArrayList<>();
@@ -275,9 +261,8 @@ public class ListenerVertxTest {
             channel == ListenerChannel.CONFIRMED_ADDED ? listener::confirmedOrError
                 : listener::aggregateBondedAddedOrError;
 
-        subscriber.apply(address, transactionInfo.getMeta().getHash())
-            .doOnError(exceptions::add)
-            .forEach(transactions::add);
+        TransactionMetaDTO meta = jsonHelper.convert(transactionInfo.getMeta(), TransactionMetaDTO.class);
+        subscriber.apply(address, meta.getHash()).doOnError(exceptions::add).forEach(transactions::add);
 
         listener.handle(transactionInfoDtoJsonObject, null);
 
@@ -287,12 +272,11 @@ public class ListenerVertxTest {
         Assertions.assertEquals(address, transactions.get(0).getSigner().get().getAddress());
 
         Mockito.verify(webSocketMock).handler(Mockito.any());
-        Mockito.verify(webSocketMock)
-            .writeTextMessage(jsonHelper.print(new ListenerSubscribeMessage(this.wsId,
-                channelName + "/" + address.plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
 
-        Mockito.verify(webSocketMock).writeTextMessage(jsonHelper
-            .print(new ListenerSubscribeMessage(this.wsId, "status" + "/" + address.plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, "status" + "/" + address.plain())));
 
     }
 
@@ -302,29 +286,22 @@ public class ListenerVertxTest {
         throws InterruptedException, ExecutionException, TimeoutException {
         String channelName = channel.toString();
         simulateWebSocketStartup();
-        TransactionInfoDTO transactionInfo = TestHelperVertx.loadTransactionInfoDTO(
-            "transferEmptyMessage.json");
+        TransactionInfoDTO transactionInfo = TestHelperVertx.loadTransactionInfoDTO("transferEmptyMessage.json");
 
         NamespaceId namespaceId = NamespaceId.createFromName("alias");
 
-        ObjectNode transactionInfoDtoJsonObject = jsonHelper
-            .convert(transactionInfo, ObjectNode.class);
+        ObjectNode transactionInfoDtoJsonObject = jsonHelper.convert(transactionInfo, ObjectNode.class);
 
         ((ObjectNode) transactionInfoDtoJsonObject.get("meta")).put("channelName", channelName);
 
         ((ObjectNode) transactionInfoDtoJsonObject.get("transaction")).put("recipientAddress",
-            ConvertUtils.toHex(
-                SerializationUtils.toUnresolvedAddress(namespaceId, NETWORK_TYPE)
-                    .serialize()));
+            ConvertUtils.toHex(SerializationUtils.toUnresolvedAddress(namespaceId, NETWORK_TYPE).serialize()));
 
         Address address = Account.generateNewAccount(NETWORK_TYPE).getAddress();
 
-        Mockito.when(
-            namespaceRepository.getAccountsNames(Mockito.eq(Collections.singletonList(address))))
-            .thenReturn(
-                Observable.just(Collections.singletonList(new AccountNames(address,
-                    Collections.singletonList(new NamespaceName(namespaceId, "alias")))))
-            );
+        Mockito.when(namespaceRepository.getAccountsNames(Mockito.eq(Collections.singletonList(address)))).thenReturn(
+            Observable.just(Collections.singletonList(
+                new AccountNames(address, Collections.singletonList(new NamespaceName(namespaceId, "alias"))))));
 
         ((ObjectNode) transactionInfoDtoJsonObject.get("meta")).put("channelName", channelName);
 
@@ -335,22 +312,19 @@ public class ListenerVertxTest {
                 : channel == ListenerChannel.UNCONFIRMED_ADDED ? listener::unconfirmedAdded
                     : listener::aggregateBondedAdded;
 
-        subscriber.apply(address, transactionInfo.getMeta().getHash())
-            .forEach(transactions::add);
+        TransactionMetaDTO meta = jsonHelper.convert(transactionInfo.getMeta(), TransactionMetaDTO.class);
+        subscriber.apply(address, meta.getHash()).forEach(transactions::add);
 
         listener.handle(transactionInfoDtoJsonObject, null);
 
         Assertions.assertEquals(1, transactions.size());
 
         Mockito.verify(webSocketMock).handler(Mockito.any());
-        Mockito.verify(webSocketMock)
-            .writeTextMessage(jsonHelper.print(new ListenerSubscribeMessage(this.wsId,
-                channelName + "/" + address.plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
 
-        Mockito.verify(webSocketMock)
-            .writeTextMessage(jsonHelper
-                .print(
-                    new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
 
     }
 
@@ -383,14 +357,11 @@ public class ListenerVertxTest {
         Assertions.assertEquals(hash, hashes.get(0));
 
         Mockito.verify(webSocketMock).handler(Mockito.any());
-        Mockito.verify(webSocketMock)
-            .writeTextMessage(jsonHelper.print(new ListenerSubscribeMessage(this.wsId,
-                channelName + "/" + address.plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
 
-        Mockito.verify(webSocketMock)
-            .writeTextMessage(jsonHelper
-                .print(
-                    new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
 
     }
 
@@ -417,14 +388,11 @@ public class ListenerVertxTest {
         Assertions.assertEquals(0, hashes.size());
 
         Mockito.verify(webSocketMock).handler(Mockito.any());
-        Mockito.verify(webSocketMock)
-            .writeTextMessage(jsonHelper.print(new ListenerSubscribeMessage(this.wsId,
-                channelName + "/" + address.plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
 
-        Mockito.verify(webSocketMock)
-            .writeTextMessage(jsonHelper
-                .print(
-                    new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
 
     }
 
@@ -433,22 +401,22 @@ public class ListenerVertxTest {
     public void subscribeOnError(ListenerChannel channel)
         throws InterruptedException, ExecutionException, TimeoutException {
         simulateWebSocketStartup();
-        TransactionInfoDTO transactionInfo = TestHelperVertx.loadTransactionInfoDTO(
-            "aggregateMosaicCreationTransaction.json");
+        TransactionInfoDTO transactionInfo = TestHelperVertx
+            .loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json");
 
-        ObjectNode transactionInfoDtoJsonObject = jsonHelper
-            .convert(transactionInfo, ObjectNode.class);
+        ObjectNode transactionInfoDtoJsonObject = jsonHelper.convert(transactionInfo, ObjectNode.class);
 
-        Address address = Address.createFromPublicKey(
-            jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
-            NETWORK_TYPE);
+        Address address = Address
+            .createFromPublicKey(jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
+                NETWORK_TYPE);
 
         String channelName = channel.toString();
 
         Map<String, Object> transactionStatusError = new HashMap<>();
         transactionStatusError.put("address", address.encoded());
         transactionStatusError.put("code", "Fail 666");
-        transactionStatusError.put("hash", transactionInfo.getMeta().getHash());
+        TransactionMetaDTO meta = jsonHelper.convert(transactionInfo.getMeta(), TransactionMetaDTO.class);
+        transactionStatusError.put("hash", meta.getHash());
         transactionStatusError.put("deadline", 123);
 
         List<Transaction> transactions = new ArrayList<>();
@@ -458,32 +426,25 @@ public class ListenerVertxTest {
             channel == ListenerChannel.CONFIRMED_ADDED ? listener::confirmedOrError
                 : listener::aggregateBondedAddedOrError;
 
-        subscriber.apply(address, transactionInfo.getMeta().getHash())
-            .doOnError(exceptions::add)
-            .forEach(transactions::add);
+        subscriber.apply(address, meta.getHash()).doOnError(exceptions::add).forEach(transactions::add);
 
         listener.handle(transactionStatusError, null);
 
         Assertions.assertEquals(0, transactions.size());
         Assertions.assertEquals(1, exceptions.size());
         Assertions.assertEquals(TransactionStatusException.class, exceptions.get(0).getClass());
-        Assertions
-            .assertEquals("Fail 666 processing transaction " + transactionInfo.getMeta().getHash(),
-                exceptions.get(0).getMessage());
+        Assertions.assertEquals("Fail 666 processing transaction " + meta.getHash(), exceptions.get(0).getMessage());
 
         Mockito.verify(webSocketMock).handler(Mockito.any());
-        Mockito.verify(webSocketMock)
-            .writeTextMessage(jsonHelper.print(new ListenerSubscribeMessage(this.wsId,
-                channelName + "/" + address.plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
 
-        Mockito.verify(webSocketMock)
-            .writeTextMessage(jsonHelper
-                .print(new ListenerSubscribeMessage(this.wsId, "status" + "/" + address.plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, "status" + "/" + address.plain())));
 
     }
 
-    private void simulateWebSocketStartup()
-        throws InterruptedException, ExecutionException, TimeoutException {
+    private void simulateWebSocketStartup() throws InterruptedException, ExecutionException, TimeoutException {
 
         ArgumentCaptor<Handler> webSocketHandlerCapture = ArgumentCaptor.forClass(Handler.class);
         ArgumentCaptor<Handler> bufferHandlerCapture = ArgumentCaptor.forClass(Handler.class);
@@ -502,8 +463,7 @@ public class ListenerVertxTest {
         Handler<Buffer> bufferHandler = bufferHandlerCapture.getValue();
         Assertions.assertNotNull(bufferHandler);
 
-        Buffer event = new BufferFactoryImpl()
-            .buffer(jsonHelper.print(Collections.singletonMap("uid", wsId)));
+        Buffer event = new BufferFactoryImpl().buffer(jsonHelper.print(Collections.singletonMap("uid", wsId)));
         bufferHandler.handle(event);
 
         future.get(3, TimeUnit.SECONDS);
@@ -516,57 +476,45 @@ public class ListenerVertxTest {
         Account account3 = Account.generateNewAccount(NETWORK_TYPE);
 
         Assertions.assertTrue(
-            transactionFromAddress(listener,
-                transferTransaction(account1.getPublicAccount(), account3.getAddress()),
+            transactionFromAddress(listener, transferTransaction(account1.getPublicAccount(), account3.getAddress()),
                 account1.getAddress()));
-
-        Assertions.assertFalse(transactionFromAddress(listener,
-            transferTransaction(account2.getPublicAccount(), account3.getAddress()),
-            account1.getAddress()));
 
         Assertions.assertFalse(
-            transactionFromAddress(listener, transferTransaction(null, account3.getAddress()),
+            transactionFromAddress(listener, transferTransaction(account2.getPublicAccount(), account3.getAddress()),
                 account1.getAddress()));
 
-        Assertions.assertTrue(transactionFromAddress(listener,
-            transferTransaction(account1.getPublicAccount(), account3.getAddress()),
-            account3.getAddress()));
-
-        Assertions.assertTrue(transactionFromAddress(listener,
-            transferTransaction(account2.getPublicAccount(), account3.getAddress()),
-            account3.getAddress()));
+        Assertions.assertFalse(
+            transactionFromAddress(listener, transferTransaction(null, account3.getAddress()), account1.getAddress()));
 
         Assertions.assertTrue(
-            transactionFromAddress(listener, transferTransaction(null, account3.getAddress()),
+            transactionFromAddress(listener, transferTransaction(account1.getPublicAccount(), account3.getAddress()),
                 account3.getAddress()));
 
         Assertions.assertTrue(
-            transactionFromAddress(listener,
-                transferTransaction(account2.getPublicAccount(),
-                    NamespaceId.createFromName("alias")),
-                account3.getAddress(),
-                NamespaceId.createFromName("alias")));
+            transactionFromAddress(listener, transferTransaction(account2.getPublicAccount(), account3.getAddress()),
+                account3.getAddress()));
 
-        Assertions.assertFalse(
-            transactionFromAddress(listener,
-                transferTransaction(account2.getPublicAccount(),
-                    NamespaceId.createFromName("alias")),
-                account3.getAddress(),
-                NamespaceId.createFromName("alias2")));
+        Assertions.assertTrue(
+            transactionFromAddress(listener, transferTransaction(null, account3.getAddress()), account3.getAddress()));
+
+        Assertions.assertTrue(transactionFromAddress(listener,
+            transferTransaction(account2.getPublicAccount(), NamespaceId.createFromName("alias")),
+            account3.getAddress(), NamespaceId.createFromName("alias")));
+
+        Assertions.assertFalse(transactionFromAddress(listener,
+            transferTransaction(account2.getPublicAccount(), NamespaceId.createFromName("alias")),
+            account3.getAddress(), NamespaceId.createFromName("alias2")));
 
     }
 
 
-    private boolean transactionFromAddress(ListenerVertx listener, Transaction transferTransaction,
-        Address address, NamespaceId... aliases) {
+    private boolean transactionFromAddress(ListenerVertx listener, Transaction transferTransaction, Address address,
+        NamespaceId... aliases) {
         try {
             Callable<ObservableSource<? extends List<NamespaceId>>> restCall = () -> Observable
                 .just(Arrays.asList(aliases));
-            Observable<List<NamespaceId>> namespaceIdObservable = Observable
-                .defer(restCall).cache();
-            return listener
-                .transactionFromAddress(transferTransaction, address, namespaceIdObservable)
-                .toFuture()
+            Observable<List<NamespaceId>> namespaceIdObservable = Observable.defer(restCall).cache();
+            return listener.transactionFromAddress(transferTransaction, address, namespaceIdObservable).toFuture()
                 .get();
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage(), e);
@@ -581,42 +529,34 @@ public class ListenerVertxTest {
         Account account3 = Account.generateNewAccount(NETWORK_TYPE);
 
         Assertions.assertTrue(transactionFromAddress(listener,
-            multisigAccountModificationTransaction(account1.getPublicAccount(),
-                account3.getAddress()),
+            multisigAccountModificationTransaction(account1.getPublicAccount(), account3.getAddress()),
             account1.getAddress()));
 
         Assertions.assertFalse(
-            transactionFromAddress(listener,
-                multisigAccountModificationTransaction(account2.getPublicAccount(),
+            transactionFromAddress(listener, multisigAccountModificationTransaction(account2.getPublicAccount(),
 
-                    account3.getAddress()),
+                account3.getAddress()), account1.getAddress()));
+
+        Assertions.assertFalse(
+            transactionFromAddress(listener, multisigAccountModificationTransaction(null, account3.getAddress()),
                 account1.getAddress()));
 
-        Assertions.assertFalse(transactionFromAddress(listener,
-            multisigAccountModificationTransaction(null,
-                account3.getAddress()),
-            account1.getAddress()));
+        Assertions.assertTrue(
+            transactionFromAddress(listener, multisigAccountModificationTransaction(account1.getPublicAccount(),
+
+                account3.getAddress()), account3.getAddress()));
 
         Assertions.assertTrue(transactionFromAddress(listener,
-            multisigAccountModificationTransaction(account1.getPublicAccount(),
-
-                account3.getAddress()),
+            multisigAccountModificationTransaction(account2.getPublicAccount(), account3.getAddress()),
             account3.getAddress()));
 
-        Assertions.assertTrue(transactionFromAddress(listener,
-            multisigAccountModificationTransaction(account2.getPublicAccount(),
-                account3.getAddress()),
-            account3.getAddress()));
-
-        Assertions.assertTrue(transactionFromAddress(listener,
-            multisigAccountModificationTransaction(null,
-                account3.getAddress()),
-            account3.getAddress()));
+        Assertions.assertTrue(
+            transactionFromAddress(listener, multisigAccountModificationTransaction(null, account3.getAddress()),
+                account3.getAddress()));
     }
 
     @Test
-    public void shouldHandleStatus()
-        throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldHandleStatus() throws InterruptedException, ExecutionException, TimeoutException {
         Account account1 = Account.generateNewAccount(NETWORK_TYPE);
 
         AtomicReference<TransactionStatusError> reference = new AtomicReference<>();
@@ -640,14 +580,12 @@ public class ListenerVertxTest {
 
         Mockito.verify(webSocketMock).handler(Mockito.any());
 
-        Mockito.verify(webSocketMock).writeTextMessage(jsonHelper
-            .print(new ListenerSubscribeMessage(this.wsId,
-                "status" + "/" + account1.getAddress().plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, "status" + "/" + account1.getAddress().plain())));
     }
 
     @Test
-    public void shouldFilterOutHandleStatus()
-        throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldFilterOutHandleStatus() throws InterruptedException, ExecutionException, TimeoutException {
         Account account1 = Account.generateNewAccount(NETWORK_TYPE);
         Account account2 = Account.generateNewAccount(NETWORK_TYPE);
 
@@ -668,9 +606,8 @@ public class ListenerVertxTest {
 
         Mockito.verify(webSocketMock).handler(Mockito.any());
 
-        Mockito.verify(webSocketMock).writeTextMessage(jsonHelper
-            .print(new ListenerSubscribeMessage(this.wsId,
-                "status" + "/" + account2.getAddress().plain())));
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, "status" + "/" + account2.getAddress().plain())));
     }
 
     @Test
@@ -678,26 +615,18 @@ public class ListenerVertxTest {
         Account account1 = Account.generateNewAccount(NETWORK_TYPE);
         Account account2 = Account.generateNewAccount(NETWORK_TYPE);
         Assertions.assertTrue(
-            transactionFromAddress(listener, hashLockTransaction(account1.getPublicAccount()),
-                account1.getAddress()));
+            transactionFromAddress(listener, hashLockTransaction(account1.getPublicAccount()), account1.getAddress()));
 
         Assertions.assertFalse(
-            transactionFromAddress(listener, hashLockTransaction(account2.getPublicAccount()),
-                account1.getAddress()));
+            transactionFromAddress(listener, hashLockTransaction(account2.getPublicAccount()), account1.getAddress()));
 
-        Assertions.assertFalse(
-            transactionFromAddress(listener, hashLockTransaction(null),
-                account1.getAddress()));
+        Assertions.assertFalse(transactionFromAddress(listener, hashLockTransaction(null), account1.getAddress()));
 
     }
 
-    private TransferTransaction transferTransaction(PublicAccount signer,
-        UnresolvedAddress recipient) {
+    private TransferTransaction transferTransaction(PublicAccount signer, UnresolvedAddress recipient) {
         TransferTransactionFactory factory = TransferTransactionFactory
-            .create(NETWORK_TYPE,
-                recipient,
-                Collections.emptyList(),
-                PlainMessage.Empty);
+            .create(NETWORK_TYPE, recipient, Collections.emptyList(), PlainMessage.Empty);
         if (signer != null) {
             factory.signer(signer);
         }
@@ -708,22 +637,17 @@ public class ListenerVertxTest {
     public void shouldCheckVrfKeyLinkTransaction() {
         Account account1 = Account.generateNewAccount(NETWORK_TYPE);
         Account account2 = Account.generateNewAccount(NETWORK_TYPE);
-        Assertions.assertTrue(
-            transactionFromAddress(listener,
-                vrfKeyLinkTransaction(account2.getPublicAccount(),
-                    account1.getPublicAccount().getPublicKey()),
-                account1.getAddress()));
+        Assertions.assertTrue(transactionFromAddress(listener,
+            vrfKeyLinkTransaction(account2.getPublicAccount(), account1.getPublicAccount().getPublicKey()),
+            account1.getAddress()));
 
-        Assertions.assertFalse(
-            transactionFromAddress(listener,
-                vrfKeyLinkTransaction(account2.getPublicAccount(),
-                    account2.getPublicAccount().getPublicKey()),
-                account1.getAddress()));
+        Assertions.assertFalse(transactionFromAddress(listener,
+            vrfKeyLinkTransaction(account2.getPublicAccount(), account2.getPublicAccount().getPublicKey()),
+            account1.getAddress()));
 
     }
 
-    private VrfKeyLinkTransaction vrfKeyLinkTransaction(PublicAccount signer,
-        PublicKey linkedAccount) {
+    private VrfKeyLinkTransaction vrfKeyLinkTransaction(PublicAccount signer, PublicKey linkedAccount) {
         VrfKeyLinkTransactionFactory factory = VrfKeyLinkTransactionFactory
             .create(NETWORK_TYPE, linkedAccount, LinkAction.LINK);
         if (signer != null) {
@@ -736,21 +660,14 @@ public class ListenerVertxTest {
     public void shouldCheckAccountMetadataTransaction() {
         Account account1 = Account.generateNewAccount(NETWORK_TYPE);
         Account account2 = Account.generateNewAccount(NETWORK_TYPE);
-        Assertions.assertTrue(
-            transactionFromAddress(listener,
-                accountMetadataTransaction(account2.getPublicAccount(),
-                    account1.getAddress()),
-                account1.getAddress()));
+        Assertions.assertTrue(transactionFromAddress(listener,
+            accountMetadataTransaction(account2.getPublicAccount(), account1.getAddress()), account1.getAddress()));
 
-        Assertions.assertFalse(
-            transactionFromAddress(listener,
-                accountMetadataTransaction(account2.getPublicAccount(),
-                    account2.getAddress()),
-                account1.getAddress()));
+        Assertions.assertFalse(transactionFromAddress(listener,
+            accountMetadataTransaction(account2.getPublicAccount(), account2.getAddress()), account1.getAddress()));
     }
 
-    private AccountMetadataTransaction accountMetadataTransaction(PublicAccount signer,
-        Address targetAccount) {
+    private AccountMetadataTransaction accountMetadataTransaction(PublicAccount signer, Address targetAccount) {
         AccountMetadataTransactionFactory factory = AccountMetadataTransactionFactory
             .create(NETWORK_TYPE, targetAccount, BigInteger.ONE, "someValue");
         if (signer != null) {
@@ -759,8 +676,7 @@ public class ListenerVertxTest {
         return factory.build();
     }
 
-    private MultisigAccountModificationTransaction multisigAccountModificationTransaction(
-        PublicAccount signer,
+    private MultisigAccountModificationTransaction multisigAccountModificationTransaction(PublicAccount signer,
         UnresolvedAddress cosignatoryPublicAccount) {
         List<UnresolvedAddress> additions = Collections.singletonList(cosignatoryPublicAccount);
         List<UnresolvedAddress> deletions = Collections.singletonList(cosignatoryPublicAccount);
@@ -782,57 +698,40 @@ public class ListenerVertxTest {
         NamespaceId alias1 = NamespaceId.createFromName("alias1");
         NamespaceId alias2 = NamespaceId.createFromName("alias2");
 
-        Assertions.assertTrue(
-            transactionFromAddress(listener,
-                accountAddressRestrictionTransaction(account1.getPublicAccount(),
-                    account2.getAddress(), account3.getAddress()),
-                account1.getAddress()));
+        Assertions.assertTrue(transactionFromAddress(listener,
+            accountAddressRestrictionTransaction(account1.getPublicAccount(), account2.getAddress(),
+                account3.getAddress()), account1.getAddress()));
 
-        Assertions.assertTrue(
-            transactionFromAddress(listener,
-                accountAddressRestrictionTransaction(account1.getPublicAccount(),
-                    account2.getAddress(), account3.getAddress()),
-                account2.getAddress()));
+        Assertions.assertTrue(transactionFromAddress(listener,
+            accountAddressRestrictionTransaction(account1.getPublicAccount(), account2.getAddress(),
+                account3.getAddress()), account2.getAddress()));
 
-        Assertions.assertTrue(
-            transactionFromAddress(listener,
-                accountAddressRestrictionTransaction(account1.getPublicAccount(),
-                    account2.getAddress(), account3.getAddress()),
-                account3.getAddress()));
+        Assertions.assertTrue(transactionFromAddress(listener,
+            accountAddressRestrictionTransaction(account1.getPublicAccount(), account2.getAddress(),
+                account3.getAddress()), account3.getAddress()));
 
-        Assertions.assertFalse(
-            transactionFromAddress(listener,
-                accountAddressRestrictionTransaction(account1.getPublicAccount(),
-                    account2.getAddress(), account3.getAddress()),
-                account4.getAddress()));
+        Assertions.assertFalse(transactionFromAddress(listener,
+            accountAddressRestrictionTransaction(account1.getPublicAccount(), account2.getAddress(),
+                account3.getAddress()), account4.getAddress()));
 
-        Assertions.assertTrue(
-            transactionFromAddress(listener,
-                accountAddressRestrictionTransaction(account1.getPublicAccount(),
-                    alias1, account3.getAddress()),
-                account2.getAddress(), alias1));
+        Assertions.assertTrue(transactionFromAddress(listener,
+            accountAddressRestrictionTransaction(account1.getPublicAccount(), alias1, account3.getAddress()),
+            account2.getAddress(), alias1));
 
-        Assertions.assertTrue(
-            transactionFromAddress(listener,
-                accountAddressRestrictionTransaction(account1.getPublicAccount(),
-                    account2.getAddress(), alias1),
-                account3.getAddress(), alias1));
+        Assertions.assertTrue(transactionFromAddress(listener,
+            accountAddressRestrictionTransaction(account1.getPublicAccount(), account2.getAddress(), alias1),
+            account3.getAddress(), alias1));
 
-        Assertions.assertFalse(
-            transactionFromAddress(listener,
-                accountAddressRestrictionTransaction(account1.getPublicAccount(),
-                    alias1, account3.getAddress()),
-                account2.getAddress(), alias2));
+        Assertions.assertFalse(transactionFromAddress(listener,
+            accountAddressRestrictionTransaction(account1.getPublicAccount(), alias1, account3.getAddress()),
+            account2.getAddress(), alias2));
 
-        Assertions.assertFalse(
-            transactionFromAddress(listener,
-                accountAddressRestrictionTransaction(account1.getPublicAccount(),
-                    account2.getAddress(), alias1),
-                account3.getAddress(), alias2));
+        Assertions.assertFalse(transactionFromAddress(listener,
+            accountAddressRestrictionTransaction(account1.getPublicAccount(), account2.getAddress(), alias1),
+            account3.getAddress(), alias2));
     }
 
-    private AccountAddressRestrictionTransaction accountAddressRestrictionTransaction(
-        PublicAccount signer,
+    private AccountAddressRestrictionTransaction accountAddressRestrictionTransaction(PublicAccount signer,
         UnresolvedAddress addition, UnresolvedAddress deletion) {
         List<UnresolvedAddress> additions = Collections.singletonList(addition);
         List<UnresolvedAddress> deletions = Collections.singletonList(deletion);
@@ -859,134 +758,78 @@ public class ListenerVertxTest {
         Transaction transferTransaction2 = transferTransaction(account2.getPublicAccount(), alias2);
 
         Assertions.assertTrue(transactionFromAddress(listener,
-            aggregateTransaction(account1.getPublicAccount(),
-                account3.getPublicAccount(), hashLockTransaction),
+            aggregateTransaction(account1.getPublicAccount(), account3.getPublicAccount(), hashLockTransaction),
             account1.getAddress()));
 
         Assertions.assertFalse(transactionFromAddress(listener,
-            aggregateTransaction(account2.getPublicAccount(),
-                account3.getPublicAccount(), hashLockTransaction
-            ),
+            aggregateTransaction(account2.getPublicAccount(), account3.getPublicAccount(), hashLockTransaction),
             account1.getAddress()));
 
         Assertions.assertFalse(transactionFromAddress(listener,
-            aggregateTransaction(null, account3.getPublicAccount(), hashLockTransaction
-            ),
-            account1.getAddress()));
+            aggregateTransaction(null, account3.getPublicAccount(), hashLockTransaction), account1.getAddress()));
 
         Assertions.assertTrue(transactionFromAddress(listener,
-            aggregateTransaction(account1.getPublicAccount(),
-                account3.getPublicAccount(), hashLockTransaction
-            ),
+            aggregateTransaction(account1.getPublicAccount(), account3.getPublicAccount(), hashLockTransaction),
             account3.getAddress()));
 
         Assertions.assertTrue(transactionFromAddress(listener,
-            aggregateTransaction(account2.getPublicAccount(),
-                account3.getPublicAccount(), hashLockTransaction
-            ),
+            aggregateTransaction(account2.getPublicAccount(), account3.getPublicAccount(), hashLockTransaction),
             account3.getAddress()));
 
         Assertions.assertTrue(transactionFromAddress(listener,
-            aggregateTransaction(null, account3.getPublicAccount(), hashLockTransaction
-            ),
-            account3.getAddress()));
+            aggregateTransaction(null, account3.getPublicAccount(), hashLockTransaction), account3.getAddress()));
 
         Assertions.assertTrue(transactionFromAddress(listener,
-            aggregateTransaction(account1.getPublicAccount(),
-                account3.getPublicAccount(), hashLockTransaction
-            ),
+            aggregateTransaction(account1.getPublicAccount(), account3.getPublicAccount(), hashLockTransaction),
             account3.getAddress()));
 
         Assertions.assertFalse(transactionFromAddress(listener,
-            aggregateTransaction(account1.getPublicAccount(),
-                account2.getPublicAccount(), hashLockTransaction
-            ),
+            aggregateTransaction(account1.getPublicAccount(), account2.getPublicAccount(), hashLockTransaction),
             account3.getAddress()));
 
         Assertions.assertTrue(transactionFromAddress(listener,
-            aggregateTransaction(account2.getPublicAccount(),
-                account3.getPublicAccount(), hashLockTransaction
-            ),
+            aggregateTransaction(account2.getPublicAccount(), account3.getPublicAccount(), hashLockTransaction),
             account2.getAddress()));
 
         Assertions.assertFalse(transactionFromAddress(listener,
-            aggregateTransaction(null,
-                account2.getPublicAccount(), hashLockTransaction
-            ),
-            account3.getAddress()));
+            aggregateTransaction(null, account2.getPublicAccount(), hashLockTransaction), account3.getAddress()));
 
         Assertions.assertFalse(transactionFromAddress(listener,
-            aggregateTransaction(null,
-                account2.getPublicAccount(),
-                hashLockTransaction,
-                transferTransaction1,
-                transferTransaction2
-            ),
-            account3.getAddress()));
+            aggregateTransaction(null, account2.getPublicAccount(), hashLockTransaction, transferTransaction1,
+                transferTransaction2), account3.getAddress()));
 
         Assertions.assertTrue(transactionFromAddress(listener,
-            aggregateTransaction(null,
-                account2.getPublicAccount(),
-                hashLockTransaction,
-                transferTransaction1,
-                transferTransaction2
-            ),
-            account3.getAddress(), alias2));
+            aggregateTransaction(null, account2.getPublicAccount(), hashLockTransaction, transferTransaction1,
+                transferTransaction2), account3.getAddress(), alias2));
 
         Assertions.assertTrue(transactionFromAddress(listener,
-            aggregateTransaction(null,
-                account2.getPublicAccount(),
-                hashLockTransaction,
-                transferTransaction2
-            ),
+            aggregateTransaction(null, account2.getPublicAccount(), hashLockTransaction, transferTransaction2),
             account3.getAddress(), alias2));
 
         Assertions.assertFalse(transactionFromAddress(listener,
-            aggregateTransaction(null,
-                account2.getPublicAccount(),
-                hashLockTransaction,
-                transferTransaction1
-            ),
+            aggregateTransaction(null, account2.getPublicAccount(), hashLockTransaction, transferTransaction1),
             account3.getAddress(), alias2));
 
         Assertions.assertTrue(transactionFromAddress(listener,
-            aggregateTransaction(account2.getPublicAccount(), null,
-                transferTransaction2,
-                hashLockTransaction,
-                transferTransaction1
-            ),
-            account2.getAddress()));
+            aggregateTransaction(account2.getPublicAccount(), null, transferTransaction2, hashLockTransaction,
+                transferTransaction1), account2.getAddress()));
 
         Assertions.assertTrue(transactionFromAddress(listener,
-            aggregateTransaction(account1.getPublicAccount(), account1.getPublicAccount(),
-                transferTransaction2,
-                hashLockTransaction,
-                transferTransaction1
-            ),
-            account2.getAddress()));
+            aggregateTransaction(account1.getPublicAccount(), account1.getPublicAccount(), transferTransaction2,
+                hashLockTransaction, transferTransaction1), account2.getAddress()));
 
         Assertions.assertTrue(transactionFromAddress(listener,
-            aggregateTransaction(null,
-                account2.getPublicAccount(),
-                hashLockTransaction,
-                transferTransaction1,
-                transferTransaction1,
-                transferTransaction1,
-                transferTransaction2,
-                transferTransaction1
-            ),
+            aggregateTransaction(null, account2.getPublicAccount(), hashLockTransaction, transferTransaction1,
+                transferTransaction1, transferTransaction1, transferTransaction2, transferTransaction1),
             account3.getAddress(), alias2));
     }
 
-    private AggregateTransaction aggregateTransaction(PublicAccount signer,
-        PublicAccount consignauturePublicAccount, Transaction... anotherTransactions) {
+    private AggregateTransaction aggregateTransaction(PublicAccount signer, PublicAccount consignauturePublicAccount,
+        Transaction... anotherTransactions) {
         List<AggregateTransactionCosignature> cosignatures = new ArrayList<>();
-        cosignatures
-            .add(new AggregateTransactionCosignature("Signature", consignauturePublicAccount));
-        AggregateTransactionFactory factory = AggregateTransactionFactory.create(
-            TransactionType.AGGREGATE_COMPLETE, NETWORK_TYPE,
-            Arrays.asList(anotherTransactions),
-            cosignatures);
+        cosignatures.add(new AggregateTransactionCosignature("Signature", consignauturePublicAccount));
+        AggregateTransactionFactory factory = AggregateTransactionFactory
+            .create(TransactionType.AGGREGATE_COMPLETE, NETWORK_TYPE, Arrays.asList(anotherTransactions), cosignatures);
         if (signer != null) {
             factory.signer(signer);
         }
@@ -995,15 +838,12 @@ public class ListenerVertxTest {
 
 
     private HashLockTransaction hashLockTransaction(PublicAccount signer) {
-        SignedTransaction signedTransaction =
-            new SignedTransaction(signer, "payload",
-                "8498B38D89C1DC8A448EA5824938FF828926CD9F7747B1844B59B4B6807E878B",
-                TransactionType.AGGREGATE_BONDED);
+        SignedTransaction signedTransaction = new SignedTransaction(signer, "payload",
+            "8498B38D89C1DC8A448EA5824938FF828926CD9F7747B1844B59B4B6807E878B", TransactionType.AGGREGATE_BONDED);
         MosaicId mosaicId = MapperUtils.toMosaicId("123");
         Mosaic mosaic = new Mosaic(mosaicId, BigInteger.TEN);
-        HashLockTransactionFactory factory = HashLockTransactionFactory.create(
-            NETWORK_TYPE, mosaic,
-            BigInteger.TEN, signedTransaction.getHash());
+        HashLockTransactionFactory factory = HashLockTransactionFactory
+            .create(NETWORK_TYPE, mosaic, BigInteger.TEN, signedTransaction.getHash());
         if (signer != null) {
             factory.signer(signer);
         }

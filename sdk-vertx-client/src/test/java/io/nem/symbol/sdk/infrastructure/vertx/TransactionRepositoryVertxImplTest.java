@@ -128,7 +128,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
             .assertThrows(RepositoryCallException.class, () -> {
                 ExceptionUtils.propagateVoid(() -> {
                     repository
-                        .getTransaction(transactionInfoDTO.getMeta().getHash()).toFuture().get();
+                        .getTransaction(meta.getHash()).toFuture().get();
                 });
             });
 

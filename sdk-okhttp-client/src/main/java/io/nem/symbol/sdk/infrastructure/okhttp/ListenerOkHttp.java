@@ -59,9 +59,9 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
      * @param httpClient the ok http client
      * @param url nis host
      * @param gson gson's gson.
+     * @param namespaceRepository the namespace repository used to resolve alias.
      */
-    public ListenerOkHttp(OkHttpClient httpClient, String url, Gson gson,
-        NamespaceRepository namespaceRepository) {
+    public ListenerOkHttp(OkHttpClient httpClient, String url, Gson gson, NamespaceRepository namespaceRepository) {
         super(new JsonHelperGson(gson), namespaceRepository);
         try {
             this.url = new URL(url);

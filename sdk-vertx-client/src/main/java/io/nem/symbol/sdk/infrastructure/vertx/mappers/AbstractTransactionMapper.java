@@ -62,7 +62,7 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
         if (object instanceof EmbeddedTransactionInfoDTO) {
             EmbeddedTransactionInfoDTO transactionInfoDTO = (EmbeddedTransactionInfoDTO) object;
             TransactionInfo transactionInfo = createTransactionInfo(transactionInfoDTO.getMeta(),
-                transactionInfoDTO.getMeta().getId());
+                transactionInfoDTO.getId());
             return createModel(transactionInfo, transactionInfoDTO.getTransaction());
         }
         TransactionInfoDTO transactionInfoDTO = this.jsonHelper.convert(object, TransactionInfoDTO.class);
@@ -80,7 +80,7 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
             return TransactionInfo.createAggregate(
                 embedded.getHeight(),
                 embedded.getIndex(),
-                ObjectUtils.firstNonNull(embedded.getId(), id),
+                id,
                 embedded.getAggregateHash(),
                 embedded.getAggregateId());
         } else {
@@ -101,6 +101,7 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
             .equals(embedded)) {
             EmbeddedTransactionInfoDTO dto = new EmbeddedTransactionInfoDTO();
             dto.setMeta(createTransactionInfoEmbedded(transaction));
+            dto.setId(transaction.getRecordId().orElse(null));
             dto.setTransaction(mapTransaction(transaction, true));
             return dto;
         } else {
@@ -153,7 +154,6 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
             EmbeddedTransactionMetaDTO dto = new EmbeddedTransactionMetaDTO();
             dto.setHeight(i.getHeight());
             dto.setAggregateHash(i.getAggregateHash().orElse(null));
-            dto.setId(i.getId().orElse(null));
             dto.setIndex(i.getIndex().orElse(null));
             dto.setAggregateId(i.getAggregateId().orElse(null));
             return dto;

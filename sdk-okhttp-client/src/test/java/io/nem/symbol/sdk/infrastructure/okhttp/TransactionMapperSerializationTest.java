@@ -42,13 +42,11 @@ public class TransactionMapperSerializationTest {
 
     private final JsonHelper jsonHelper = new JsonHelperGson();
 
-    private final GeneralTransactionMapper transactionMapper = new GeneralTransactionMapper(
-        jsonHelper);
+    private final GeneralTransactionMapper transactionMapper = new GeneralTransactionMapper(jsonHelper);
 
     private static List<String> transactionJsonFiles() {
-        return Arrays.stream(getResourceFolderFiles("json"))
-            .filter(f -> f.getName().startsWith("transaction-")).map(File::getName)
-            .collect(Collectors.toList());
+        return Arrays.stream(getResourceFolderFiles("json")).filter(f -> f.getName().startsWith("transaction-"))
+            .map(File::getName).collect(Collectors.toList());
     }
 
     private static File[] getResourceFolderFiles(String folder) {
@@ -64,8 +62,7 @@ public class TransactionMapperSerializationTest {
 
         String json = TestHelperOkHttp.loadResource(jsonFilename);
 
-        TransactionInfoDTO originalTransactionInfo = jsonHelper
-            .parse(json, TransactionInfoDTO.class);
+        TransactionInfoDTO originalTransactionInfo = jsonHelper.parse(json, TransactionInfoDTO.class);
 
         Transaction transactionModel = transactionMapper.mapFromDto(originalTransactionInfo);
         Assertions.assertNotNull(transactionModel);
@@ -73,9 +70,8 @@ public class TransactionMapperSerializationTest {
         TransactionInfoDTO mappedTransactionInfo = (TransactionInfoDTO) transactionMapper.mapToDto(transactionModel);
 
         //Patching the sort
-        mappedTransactionInfo
-            .setTransaction(jsonHelper.convert(mappedTransactionInfo.getTransaction(),
-                Map.class));
+        mappedTransactionInfo.setTransaction(jsonHelper.convert(mappedTransactionInfo.getTransaction(), Map.class));
+        mappedTransactionInfo.setMeta(jsonHelper.convert(mappedTransactionInfo.getMeta(), Map.class));
 
         Assertions.assertEquals(jsonHelper.prettyPrint(originalTransactionInfo),
             jsonHelper.prettyPrint(mappedTransactionInfo));
@@ -85,8 +81,7 @@ public class TransactionMapperSerializationTest {
             ConvertUtils.toHex(serialization.serialize(transactionMapper.mapFromDto(mappedTransactionInfo))));
 
         originalTransactionInfo.setMeta(null);
-        Map<String, Object> transactionJson = (Map<String, Object>) originalTransactionInfo
-            .getTransaction();
+        Map<String, Object> transactionJson = (Map<String, Object>) originalTransactionInfo.getTransaction();
         if (transactionJson.containsKey("transactions")) {
             List<Map<String, Object>> transactionsJson = (List<Map<String, Object>>) transactionJson
                 .get("transactions");
