@@ -56,6 +56,7 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
      * @param networkType the network type of this transaction.
      * @param linkedPublicKey the voting key.
      * @param linkAction the link action.
+     * @return an instance of the factory.
      */
     public static VotingKeyLinkTransactionFactory create(final NetworkType networkType, final VotingKey linkedPublicKey,
         final LinkAction linkAction) {

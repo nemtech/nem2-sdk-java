@@ -57,6 +57,7 @@ public class NodeKeyLinkTransactionFactory extends TransactionFactory<NodeKeyLin
      * @param networkType the network type of this transaction.
      * @param linkedPublicKey the linked public key.
      * @param linkAction the link action.
+     * @return an instance of the factory.
      */
     public static NodeKeyLinkTransactionFactory create(final NetworkType networkType, final PublicKey linkedPublicKey,
         final LinkAction linkAction) {
