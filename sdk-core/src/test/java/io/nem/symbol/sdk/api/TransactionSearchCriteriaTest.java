@@ -19,6 +19,7 @@ package io.nem.symbol.sdk.api;
 import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import java.math.BigInteger;
 import java.util.Collections;
@@ -32,7 +33,7 @@ class TransactionSearchCriteriaTest {
 
     @Test
     void shouldCreate() {
-        TransactionSearchCriteria criteria = new TransactionSearchCriteria();
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.CONFIRMED);
         Assertions.assertNull(criteria.getId());
         Assertions.assertNull(criteria.getOrder());
         Assertions.assertNull(criteria.getPageSize());
@@ -40,7 +41,7 @@ class TransactionSearchCriteriaTest {
         Assertions.assertNull(criteria.getTransactionTypes());
         Assertions.assertNull(criteria.getAddress());
         Assertions.assertNull(criteria.getEmbedded());
-        Assertions.assertNull(criteria.getGroup());
+        Assertions.assertEquals(TransactionGroup.CONFIRMED, criteria.getGroup());
         Assertions.assertNull(criteria.getHeight());
         Assertions.assertNull(criteria.getOffset());
         Assertions.assertNull(criteria.getRecipientAddress());
@@ -54,18 +55,16 @@ class TransactionSearchCriteriaTest {
         Address address2 = Address.generateRandom(NetworkType.MIJIN_TEST);
         PublicKey signerPublicKey = PublicKey.fromHexString("227F");
 
-        TransactionSearchCriteria criteria = new TransactionSearchCriteria();
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED);
 
         criteria.setId("theId");
         criteria.setOrder(OrderBy.DESC);
         criteria.setPageSize(10);
-        criteria.setTransactionTypes(
-            Collections.singletonList(TransactionType.MOSAIC_GLOBAL_RESTRICTION));
+        criteria.setTransactionTypes(Collections.singletonList(TransactionType.MOSAIC_GLOBAL_RESTRICTION));
         criteria.setPageNumber(5);
         criteria.setAddress(address1);
         criteria.setRecipientAddress(address2);
         criteria.setEmbedded(true);
-        criteria.setGroup(TransactionSearchGroup.UNCONFIRMED);
         criteria.setHeight(BigInteger.ONE);
         criteria.setOffset("offset1");
         criteria.setSignerPublicKey(signerPublicKey);
@@ -74,9 +73,8 @@ class TransactionSearchCriteriaTest {
         Assertions.assertEquals(OrderBy.DESC, criteria.getOrder());
         Assertions.assertEquals(10, criteria.getPageSize());
         Assertions.assertEquals(5, criteria.getPageNumber());
-        Assertions
-            .assertEquals(Collections.singletonList(TransactionType.MOSAIC_GLOBAL_RESTRICTION),
-                criteria.getTransactionTypes());
+        Assertions.assertEquals(Collections.singletonList(TransactionType.MOSAIC_GLOBAL_RESTRICTION),
+            criteria.getTransactionTypes());
 
         Assertions.assertEquals(address1, criteria.getAddress());
         Assertions.assertEquals(address2, criteria.getRecipientAddress());
@@ -93,13 +91,12 @@ class TransactionSearchCriteriaTest {
         Address address2 = Address.generateRandom(NetworkType.MIJIN_TEST);
         PublicKey signerPublicKey = PublicKey.fromHexString("227F");
 
-        TransactionSearchCriteria criteria = new TransactionSearchCriteria().id("theId")
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED).id("theId")
             .order(OrderBy.ASC).pageSize(10).pageNumber(5)
             .transactionTypes(Collections.singletonList(TransactionType.MOSAIC_GLOBAL_RESTRICTION));
         criteria.address(address1);
         criteria.recipientAddress(address2);
         criteria.embedded(true);
-        criteria.group(TransactionSearchGroup.UNCONFIRMED);
         criteria.height(BigInteger.ONE);
         criteria.offset("offset1");
         criteria.setSignerPublicKey(signerPublicKey);
@@ -108,9 +105,8 @@ class TransactionSearchCriteriaTest {
         Assertions.assertEquals(OrderBy.ASC, criteria.getOrder());
         Assertions.assertEquals(10, criteria.getPageSize());
         Assertions.assertEquals(5, criteria.getPageNumber());
-        Assertions
-            .assertEquals(Collections.singletonList(TransactionType.MOSAIC_GLOBAL_RESTRICTION),
-                criteria.getTransactionTypes());
+        Assertions.assertEquals(Collections.singletonList(TransactionType.MOSAIC_GLOBAL_RESTRICTION),
+            criteria.getTransactionTypes());
 
         Assertions.assertEquals(address1, criteria.getAddress());
         Assertions.assertEquals(address2, criteria.getRecipientAddress());
@@ -127,29 +123,28 @@ class TransactionSearchCriteriaTest {
         Address address2 = Address.generateRandom(NetworkType.MIJIN_TEST);
         PublicKey signerPublicKey = PublicKey.fromHexString("227F");
 
-        TransactionSearchCriteria criteria1 = new TransactionSearchCriteria().id("theId")
+        TransactionSearchCriteria criteria1 = new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED).id("theId")
             .order(OrderBy.ASC).pageSize(10).pageNumber(5)
             .transactionTypes(Collections.singletonList(TransactionType.MOSAIC_GLOBAL_RESTRICTION));
         criteria1.address(address1);
         criteria1.recipientAddress(address2);
         criteria1.embedded(true);
-        criteria1.group(TransactionSearchGroup.UNCONFIRMED);
         criteria1.height(BigInteger.ONE);
         criteria1.offset("offset1");
         criteria1.setSignerPublicKey(signerPublicKey);
 
-        TransactionSearchCriteria criteria2 = new TransactionSearchCriteria().id("theId")
+        TransactionSearchCriteria criteria2 = new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED).id("theId")
             .order(OrderBy.ASC).pageSize(10).pageNumber(5)
             .transactionTypes(Collections.singletonList(TransactionType.MOSAIC_GLOBAL_RESTRICTION));
         criteria2.address(address1);
         criteria2.recipientAddress(address2);
         criteria2.embedded(true);
-        criteria2.group(TransactionSearchGroup.UNCONFIRMED);
         criteria2.height(BigInteger.ONE);
         criteria2.offset("offset1");
         criteria2.setSignerPublicKey(signerPublicKey);
 
-        Assertions.assertEquals(new TransactionSearchCriteria(), new TransactionSearchCriteria());
+        Assertions.assertEquals(new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED),
+            new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED));
         Assertions.assertEquals(criteria1, criteria2);
         Assertions.assertEquals(criteria1, criteria1);
         Assertions.assertEquals(criteria1.hashCode(), criteria2.hashCode());

@@ -34,6 +34,7 @@ import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.CosignatureTransaction;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransactionStatusError;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
@@ -194,7 +195,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
             .createTransactionRepository();
 
         List<Transaction> transactions = get(transactionRepository.search(
-            new TransactionSearchCriteria().transactionTypes(Collections.singletonList(
+            new TransactionSearchCriteria(TransactionGroup.CONFIRMED).transactionTypes(Collections.singletonList(
                 TransactionType.AGGREGATE_BONDED))
                 .signerPublicKey(this.cosignatoryAccount.getPublicAccount().getPublicKey())))
             .getData();

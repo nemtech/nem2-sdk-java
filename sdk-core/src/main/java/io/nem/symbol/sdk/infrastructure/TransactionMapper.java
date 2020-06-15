@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.model.transaction.Transaction;
+import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 
 /**
@@ -31,6 +32,14 @@ public interface TransactionMapper {
      * @return the {@link Transaction}
      */
     Transaction mapFromDto(Object transactionDto);
+
+    /**
+     * It maps an embedded or top level transaction to a factory.
+     *
+     * @param transactionDto the transaction
+     * @return the {@link TransactionFactory}
+     */
+    TransactionFactory<?> mapToFactoryFromDto(Object transactionDto);
 
     /**
      * It maps an transaction to an DTO transaction.

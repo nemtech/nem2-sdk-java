@@ -16,12 +16,11 @@
 
 package io.nem.symbol.sdk.api;
 
-import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionAnnounceResponse;
-import io.nem.symbol.sdk.model.transaction.TransactionStatus;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.reactivex.Observable;
 import java.util.List;
 
@@ -35,34 +34,20 @@ public interface TransactionRepository extends Searcher<Transaction, Transaction
     /**
      * Gets a transaction for a given hash.
      *
+     * @param group the group the transaction belongs.
      * @param transactionHash String
      * @return Observable of {@link Transaction}
      */
-    Observable<Transaction> getTransaction(String transactionHash);
+    Observable<Transaction> getTransaction(TransactionGroup group, String transactionHash);
 
     /**
      * Gets an list of transactions for different transaction hashes.
      *
+     * @param group the group the transaction belongs.
      * @param transactionHashes List of String
      * @return {@link Observable} of {@link Transaction} List
      */
-    Observable<List<Transaction>> getTransactions(List<String> transactionHashes);
-
-    /**
-     * Gets a transaction status for a transaction hash.
-     *
-     * @param transactionHash String
-     * @return Observable of {@link TransactionStatus}
-     */
-    Observable<TransactionStatus> getTransactionStatus(String transactionHash);
-
-    /**
-     * Gets an list of transaction status for different transaction hashes.
-     *
-     * @param transactionHashes List of String
-     * @return {@link Observable} of {@link TransactionStatus} List
-     */
-    Observable<List<TransactionStatus>> getTransactionStatuses(List<String> transactionHashes);
+    Observable<List<Transaction>> getTransactions(TransactionGroup group, List<String> transactionHashes);
 
     /**
      * Send a signed transaction.
@@ -78,8 +63,7 @@ public interface TransactionRepository extends Searcher<Transaction, Transaction
      * @param signedTransaction SignedTransaction
      * @return Observable of TransactionAnnounceResponse
      */
-    Observable<TransactionAnnounceResponse> announceAggregateBonded(
-        SignedTransaction signedTransaction);
+    Observable<TransactionAnnounceResponse> announceAggregateBonded(SignedTransaction signedTransaction);
 
     /**
      * Send a cosignature signed transaction of an already announced transaction.

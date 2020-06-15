@@ -48,6 +48,7 @@ public abstract class Transaction implements Stored {
     private final Integer version;
     private final Deadline deadline;
     private final BigInteger maxFee;
+    private final Optional<TransactionGroup> group;
     private final Optional<String> signature;
     private final Optional<TransactionInfo> transactionInfo;
     private Optional<PublicAccount> signer;
@@ -61,6 +62,7 @@ public abstract class Transaction implements Stored {
         this.version = factory.getVersion();
         this.deadline = factory.getDeadline();
         this.maxFee = factory.getMaxFee();
+        this.group = factory.getGroup();
         this.signature = factory.getSignature();
         this.signer = factory.getSigner();
         this.transactionInfo = factory.getTransactionInfo();
@@ -167,8 +169,7 @@ public abstract class Transaction implements Stored {
      * @param generationHashBytes the generation hash.
      * @return generated transaction hash.
      */
-    public String createTransactionHash(
-        String transactionPayload, final byte[] generationHashBytes) {
+    public String createTransactionHash(String transactionPayload, final byte[] generationHashBytes) {
         byte[] bytes = ConvertUtils.fromHexToBytes(transactionPayload);
         final byte[] dataBytes = getSignBytes(bytes, generationHashBytes);
         final int sizeOfSignatureAndSignerPublicKey = 96;
@@ -188,8 +189,7 @@ public abstract class Transaction implements Stored {
      */
     public byte[] getSignBytes(final byte[] payloadBytes, final byte[] generationHashBytes) {
         final short headerSize = 4 + 32 + 64 + 8;
-        final byte[] signingBytes = new byte[payloadBytes.length + generationHashBytes.length
-            - headerSize];
+        final byte[] signingBytes = new byte[payloadBytes.length + generationHashBytes.length - headerSize];
         System.arraycopy(generationHashBytes, 0, signingBytes, 0, generationHashBytes.length);
         System.arraycopy(payloadBytes, headerSize, signingBytes, generationHashBytes.length,
             payloadBytes.length - headerSize);
@@ -205,8 +205,7 @@ public abstract class Transaction implements Stored {
      * @return {@link SignedTransaction}
      */
     public SignedTransaction signWith(final Account account, final String generationHash) {
-        final DsaSigner theSigner = CryptoEngines.defaultEngine()
-            .createDsaSigner(account.getKeyPair());
+        final DsaSigner theSigner = CryptoEngines.defaultEngine().createDsaSigner(account.getKeyPair());
         final byte[] bytes = this.serialize();
         final byte[] generationHashBytes = ConvertUtils.getBytes(generationHash);
         final byte[] signingBytes = getSignBytes(bytes, generationHashBytes);
@@ -214,10 +213,8 @@ public abstract class Transaction implements Stored {
 
         final byte[] payload = new byte[bytes.length];
         System.arraycopy(bytes, 0, payload, 0, 8); // Size
-        System.arraycopy(theSignature.getBytes(), 0, payload, 8,
-            theSignature.getBytes().length); // Signature
-        System.arraycopy(
-            account.getKeyPair().getPublicKey().getBytes(), 0, payload, 64 + 8,
+        System.arraycopy(theSignature.getBytes(), 0, payload, 8, theSignature.getBytes().length); // Signature
+        System.arraycopy(account.getKeyPair().getPublicKey().getBytes(), 0, payload, 64 + 8,
             account.getKeyPair().getPublicKey().getBytes().length); // Signer
         System.arraycopy(bytes, 104, payload, 104, bytes.length - 104);
 
@@ -242,20 +239,9 @@ public abstract class Transaction implements Stored {
      * @return if a transaction is pending to be included in a block
      */
     public boolean isUnconfirmed() {
-        return getTransactionInfo().filter(info -> info.getHeight().equals(BigInteger.valueOf(0))
-            && StringUtils.equalsIgnoreCase(info.getHash(), info.getMerkleComponentHash()))
-            .isPresent();
+        return getTransactionInfo().filter(info -> info.getHeight().equals(BigInteger.valueOf(0)) && StringUtils
+            .equalsIgnoreCase(info.getHash(), info.getMerkleComponentHash())).isPresent();
 
-    }
-
-    /**
-     * Return if a transaction is included in a block.
-     *
-     * @return if a transaction is included in a block
-     */
-    public boolean isConfirmed() {
-        return this.getTransactionInfo().filter(info -> info.getHeight().intValue() > 0)
-            .isPresent();
     }
 
     /**
@@ -264,10 +250,8 @@ public abstract class Transaction implements Stored {
      * @return if a transaction has missing signatures
      */
     public boolean hasMissingSignatures() {
-        return this.getTransactionInfo()
-            .filter(info -> info.getHeight().equals(BigInteger.valueOf(0))
-                && !StringUtils.equalsIgnoreCase(info.getHash(), info.getMerkleComponentHash()))
-            .isPresent();
+        return this.getTransactionInfo().filter(info -> info.getHeight().equals(BigInteger.valueOf(0)) && !StringUtils
+            .equalsIgnoreCase(info.getHash(), info.getMerkleComponentHash())).isPresent();
     }
 
     /**
@@ -276,7 +260,23 @@ public abstract class Transaction implements Stored {
      * @return if a transaction is not known by the network
      */
     public boolean isUnannounced() {
-        return !this.getTransactionInfo().isPresent();
+        return !getGroup().isPresent();
+    }
+
+    /**
+     * Return if a transaction is known to be confirmed
+     *
+     * @return if a transaction is known to be confirmed
+     */
+    public boolean isConfirmed() {
+        return getGroup().filter(g -> g == TransactionGroup.CONFIRMED).isPresent();
+    }
+
+    /**
+     * @return the group of the transaction if known.
+     */
+    public Optional<TransactionGroup> getGroup() {
+        return group;
     }
 
     /**
@@ -284,7 +284,7 @@ public abstract class Transaction implements Stored {
      *
      * @return if the transaction has been fully loaded from rest.
      */
-    public boolean isTransactionFullyLoaded(){
+    public boolean isTransactionFullyLoaded() {
         return true;
     }
 

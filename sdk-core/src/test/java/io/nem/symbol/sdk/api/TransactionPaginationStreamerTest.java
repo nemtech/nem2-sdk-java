@@ -1,6 +1,7 @@
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.transaction.Transaction;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -34,7 +35,8 @@ public class TransactionPaginationStreamerTest {
     private PaginationStreamerTester<Transaction, TransactionSearchCriteria> tester() {
         TransactionRepository repository = Mockito.mock(TransactionRepository.class);
         TransactionPaginationStreamer streamer = new TransactionPaginationStreamer(repository);
-        return new PaginationStreamerTester<>(streamer, Transaction.class, repository, new TransactionSearchCriteria());
+        return new PaginationStreamerTester<>(streamer, Transaction.class, repository, new TransactionSearchCriteria(
+            TransactionGroup.UNCONFIRMED));
     }
 
 }

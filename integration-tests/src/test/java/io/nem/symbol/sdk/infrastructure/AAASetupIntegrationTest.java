@@ -21,9 +21,7 @@ import io.nem.symbol.sdk.api.MultisigRepository;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.AccountInfo;
-import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
@@ -33,6 +31,7 @@ import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransactio
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
@@ -145,7 +144,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
 
         sleep(1000);
         Transaction transaction = get(getRepositoryFactory(type).createTransactionRepository()
-            .getTransaction(signedAggregateTransaction.getHash()));
+            .getTransaction(TransactionGroup.CONFIRMED, signedAggregateTransaction.getHash()));
 
         System.out.println(toJson(transaction));
     }
@@ -191,7 +190,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
 
         sleep(1000);
         Transaction transaction = get(getRepositoryFactory(type).createTransactionRepository()
-            .getTransaction(signedAggregateTransaction.getHash()));
+            .getTransaction(TransactionGroup.CONFIRMED, signedAggregateTransaction.getHash()));
 
         System.out.println(toJson(transaction));
 

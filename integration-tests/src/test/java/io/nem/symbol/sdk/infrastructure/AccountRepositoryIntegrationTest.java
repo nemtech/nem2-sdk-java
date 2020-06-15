@@ -23,7 +23,7 @@ import io.nem.symbol.sdk.api.AccountRepository;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.api.TransactionRepository;
 import io.nem.symbol.sdk.api.TransactionSearchCriteria;
-import io.nem.symbol.sdk.api.TransactionSearchGroup;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountNames;
@@ -115,7 +115,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
             .asList(TransactionType.TRANSFER, TransactionType.AGGREGATE_COMPLETE,
                 TransactionType.NAMESPACE_METADATA);
         List<Transaction> transactions = get(transactionRepository.search(
-            new TransactionSearchCriteria()
+            new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
                 .signerPublicKey(account.getPublicAccount().getPublicKey()).transactionTypes(
                 transactionTypes))).getData();
         Assertions.assertFalse(transactions.isEmpty());
@@ -130,7 +130,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
             .createTransactionRepository();
         Account account = config().getDefaultAccount();
         List<Transaction> transactions = get(transactionRepository.search(
-            new TransactionSearchCriteria()
+            new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
                 .signerPublicKey(account.getPublicAccount().getPublicKey()).pageSize(10)))
             .getData();
         Assertions.assertTrue(transactions.size() > 0);
@@ -138,7 +138,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
         String lastOne = transactions.get(0).getTransactionInfo().get().getId().get();
         String id = transactions.get(1).getTransactionInfo().get().getId().get();
         List<Transaction> transactions2 = get(
-            transactionRepository.getTransactions(Arrays.asList(id)));
+            transactionRepository.getTransactions(TransactionGroup.CONFIRMED, Arrays.asList(id)));
 
         Assertions.assertEquals(1, transactions2.size());
         transactions2
@@ -154,7 +154,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
         Account account = config().getDefaultAccount();
 
         List<Transaction> transactions = get(transactionRepository.search(
-            new TransactionSearchCriteria()
+            new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
                 .signerPublicKey(account.getPublicAccount().getPublicKey()).pageSize(10)))
             .getData();
 
@@ -163,7 +163,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
         String lastOne = transactions.get(0).getTransactionInfo().get().getId().get();
         String id = transactions.get(1).getTransactionInfo().get().getId().get();
         List<Transaction> transactions2 = get(
-            transactionRepository.getTransactions(Arrays.asList(id)));
+            transactionRepository.getTransactions(TransactionGroup.CONFIRMED, Arrays.asList(id)));
 
         Assertions.assertEquals(1, transactions2.size());
         transactions2
@@ -179,7 +179,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
         Account account = config().getDefaultAccount();
         TransactionType transactionType = TransactionType.MOSAIC_GLOBAL_RESTRICTION;
         List<Transaction> transactions = get(transactionRepository.search(
-            new TransactionSearchCriteria()
+            new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
                 .transactionTypes(Collections.singletonList(transactionType))
                 .signerPublicKey(account.getPublicAccount().getPublicKey()).pageSize(10)))
             .getData();
@@ -215,7 +215,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
         TransactionRepository transactionRepository = getRepositoryFactory(type)
             .createTransactionRepository();
         List<Transaction> transactions = get(
-            transactionRepository.search(new TransactionSearchCriteria()
+            transactionRepository.search(new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
                 .recipientAddress((this.getTestPublicAccount()).getAddress()))).getData();
         System.out.println(transactions.size());
         transactions.forEach(transaction -> assertTransaction(transaction, true));
@@ -228,9 +228,8 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
         TransactionRepository transactionRepository = getRepositoryFactory(type)
             .createTransactionRepository();
         List<Transaction> transactions = get(
-            transactionRepository.search(new TransactionSearchCriteria()
-                .signerPublicKey((this.getTestPublicAccount()).getPublicKey()).group(
-                    TransactionSearchGroup.UNCONFIRMED))).getData();
+            transactionRepository.search(new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED)
+                .signerPublicKey((this.getTestPublicAccount()).getPublicKey()))).getData();
         System.out.println(transactions.size());
         transactions.forEach(transaction -> assertTransaction(transaction, true));
 

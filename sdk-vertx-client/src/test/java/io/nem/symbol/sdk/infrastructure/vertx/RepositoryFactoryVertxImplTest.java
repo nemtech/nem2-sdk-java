@@ -48,6 +48,7 @@ public class RepositoryFactoryVertxImplTest {
         Assertions.assertNotNull(factory.createNetworkRepository());
         Assertions.assertNotNull(factory.createNodeRepository());
         Assertions.assertNotNull(factory.createTransactionRepository());
+        Assertions.assertNotNull(factory.createTransactionStatusRepository());
         Assertions.assertNotNull(factory.createMetadataRepository());
         Assertions.assertNotNull(factory.createRestrictionAccountRepository());
         Assertions.assertNotNull(factory.createRestrictionMosaicRepository());

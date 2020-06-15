@@ -68,22 +68,25 @@ public abstract class TransactionFactory<T extends Transaction> {
     private BigInteger maxFee = BigInteger.ZERO;
 
     /**
-     * The signature of the new transaction. This is generally set when mapping transaction coming
-     * from the rest api.
+     * The signature of the new transaction. This is generally set when mapping transaction coming from the rest api.
      */
     private Optional<String> signature = Optional.empty();
 
     /**
-     * The signer of the new transaction. This is generally set when mapping transaction coming from
-     * the rest api.
+     * The signer of the new transaction. This is generally set when mapping transaction coming from the rest api.
      */
     private Optional<PublicAccount> signer = Optional.empty();
 
     /**
-     * The {@link TransactionInfo} of the new transaction. This is generally set when mapping
-     * transaction coming from the rest api.
+     * The {@link TransactionInfo} of the new transaction. This is generally set when mapping transaction coming from
+     * the rest api.
      */
     private Optional<TransactionInfo> transactionInfo = Optional.empty();
+
+    /**
+     * The the known group/state of transaction.
+     */
+    private Optional<TransactionGroup> group = Optional.empty();
 
 
     /**
@@ -136,8 +139,7 @@ public abstract class TransactionFactory<T extends Transaction> {
     }
 
     /**
-     * Builder method used to set the signature. This method is generally called from the rest api
-     * mappers.
+     * Builder method used to set the signature. This method is generally called from the rest api mappers.
      *
      * @param signature the signature.
      * @return this factory to continue building the transaction.
@@ -149,8 +151,7 @@ public abstract class TransactionFactory<T extends Transaction> {
     }
 
     /**
-     * Builder method used to set the signer.  This method is generally called from the rest api
-     * mappers.
+     * Builder method used to set the signer.  This method is generally called from the rest api mappers.
      *
      * @param signer the signer {@link PublicAccount}.
      * @return this factory to continue building the transaction.
@@ -162,8 +163,8 @@ public abstract class TransactionFactory<T extends Transaction> {
     }
 
     /**
-     * Builder method used to set the {@link TransactionInfo}.  This method is generally called from
-     * the rest api mappers.
+     * Builder method used to set the {@link TransactionInfo}.  This method is generally called from the rest api
+     * mappers.
      *
      * @param transactionInfo the {@link TransactionInfo}.
      * @return this factory to continue building the transaction.
@@ -175,8 +176,7 @@ public abstract class TransactionFactory<T extends Transaction> {
     }
 
     /**
-     * Builder method used to change the default version. This method is generally called from the
-     * rest api mapper.
+     * Builder method used to change the default version. This method is generally called from the rest api mapper.
      *
      * @param version a new version
      * @return this factory to continue building the transaction.
@@ -184,6 +184,19 @@ public abstract class TransactionFactory<T extends Transaction> {
     public TransactionFactory<T> version(Integer version) {
         Validate.notNull(signer, "Version must not be null");
         this.version = version;
+        return this;
+    }
+
+    /**
+     * Builder method used to change the known transaction group. This method is generally called from the rest api
+     * mapper.
+     *
+     * @param group a new group
+     * @return this factory to continue building the transaction.
+     */
+    public TransactionFactory<T> group(TransactionGroup group) {
+        Validate.notNull(signer, "Group must not be null");
+        this.group = Optional.of(group);
         return this;
     }
 
@@ -245,11 +258,18 @@ public abstract class TransactionFactory<T extends Transaction> {
 
 
     /**
-     * @return the size of the transaction that's going to be created. Useful when you want to
-     * update the maxFee of the transaction depending on its size.
+     * @return the size of the transaction that's going to be created. Useful when you want to update the maxFee of the
+     * transaction depending on its size.
      */
     public int getSize() {
         return build().getSize();
+    }
+
+    /**
+     * @return the set group.
+     */
+    public Optional<TransactionGroup> getGroup() {
+        return group;
     }
 
     /**

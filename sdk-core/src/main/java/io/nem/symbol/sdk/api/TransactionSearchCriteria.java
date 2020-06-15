@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import java.math.BigInteger;
 import java.util.List;
@@ -70,7 +71,7 @@ public class TransactionSearchCriteria extends SearchCriteria {
     /**
      * The group of transaction (optional, default is confirmed)
      */
-    private TransactionSearchGroup group;
+    private final TransactionGroup group;
 
     /**
      * Filter by transaction type. To filter by multiple transaction type.  (optional, default to
@@ -84,6 +85,13 @@ public class TransactionSearchCriteria extends SearchCriteria {
      * returned.  (optional, default to false)
      */
     private Boolean embedded;
+
+    /**
+     * @param group the group you are searching for.
+     */
+    public TransactionSearchCriteria(TransactionGroup group) {
+        this.group = group;
+    }
 
     public String getId() {
         return id;
@@ -109,7 +117,7 @@ public class TransactionSearchCriteria extends SearchCriteria {
         return offset;
     }
 
-    public TransactionSearchGroup getGroup() {
+    public TransactionGroup getGroup() {
         return group;
     }
 
@@ -144,10 +152,6 @@ public class TransactionSearchCriteria extends SearchCriteria {
 
     public void setOffset(String offset) {
         this.offset = offset;
-    }
-
-    public void setGroup(TransactionSearchGroup group) {
-        this.group = group;
     }
 
     public void setTransactionTypes(
@@ -191,11 +195,6 @@ public class TransactionSearchCriteria extends SearchCriteria {
 
     public TransactionSearchCriteria offset(String offset) {
         this.offset = offset;
-        return this;
-    }
-
-    public TransactionSearchCriteria group(TransactionSearchGroup group) {
-        this.group = group;
         return this;
     }
 

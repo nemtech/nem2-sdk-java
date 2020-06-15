@@ -20,12 +20,11 @@ import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.sdk.api.TransactionPaginationStreamer;
 import io.nem.symbol.sdk.api.TransactionRepository;
 import io.nem.symbol.sdk.api.TransactionSearchCriteria;
-import io.nem.symbol.sdk.api.TransactionSearchGroup;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.transaction.Transaction;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,7 +77,7 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
     void searchUsingOffset(RepositoryType type) {
         TransactionRepository transactionRepository = getTransactionRepository(type);
         TransactionPaginationStreamer streamer = new TransactionPaginationStreamer(transactionRepository);
-        TransactionSearchCriteria criteria = new TransactionSearchCriteria();
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.CONFIRMED);
         criteria.setPageSize(10);
         int offsetIndex = 2;
         List<Transaction> transactionsWithoutOffset = get(streamer.search(criteria).toList().toObservable());
@@ -94,13 +93,13 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
     void searchBySignerPublicKey(RepositoryType type) {
         TransactionRepository transactionRepository = getTransactionRepository(type);
         TransactionPaginationStreamer streamer = new TransactionPaginationStreamer(transactionRepository);
-        Transaction transaction1 = get(streamer.search(new TransactionSearchCriteria()).take(1));
-        TransactionSearchCriteria criteria = new TransactionSearchCriteria();
+        Transaction transaction1 = get(
+            streamer.search(new TransactionSearchCriteria(TransactionGroup.CONFIRMED)).take(1));
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.CONFIRMED);
         PublicKey expectedSignerPublicKey = transaction1.getSigner().get().getPublicKey();
         criteria.setSignerPublicKey(expectedSignerPublicKey);
         List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
-        transactions
-            .forEach(b -> Assertions.assertEquals(expectedSignerPublicKey, b.getSigner().get().getPublicKey()));
+        transactions.forEach(b -> Assertions.assertEquals(expectedSignerPublicKey, b.getSigner().get().getPublicKey()));
         Assertions.assertFalse(transactions.isEmpty());
     }
 
@@ -109,11 +108,10 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
     void searchByTransactionType(RepositoryType type) {
         TransactionRepository transactionRepository = getTransactionRepository(type);
         TransactionPaginationStreamer streamer = new TransactionPaginationStreamer(transactionRepository);
-        TransactionSearchCriteria criteria = new TransactionSearchCriteria();
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.CONFIRMED);
         criteria.transactionTypes(Collections.singletonList(TransactionType.TRANSFER));
         List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
-        transactions
-            .forEach(b -> Assertions.assertEquals(TransactionType.TRANSFER, b.getType()));
+        transactions.forEach(b -> Assertions.assertEquals(TransactionType.TRANSFER, b.getType()));
         Assertions.assertFalse(transactions.isEmpty());
     }
 
@@ -122,12 +120,11 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
     void searchByTransactionHeight(RepositoryType type) {
         TransactionRepository transactionRepository = getTransactionRepository(type);
         TransactionPaginationStreamer streamer = new TransactionPaginationStreamer(transactionRepository);
-        TransactionSearchCriteria criteria = new TransactionSearchCriteria();
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.CONFIRMED);
         criteria.height(BigInteger.ONE);
         criteria.embedded(true);
         List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
-        transactions
-            .forEach(b -> Assertions.assertEquals(BigInteger.ONE, b.getTransactionInfo().get().getHeight()));
+        transactions.forEach(b -> Assertions.assertEquals(BigInteger.ONE, b.getTransactionInfo().get().getHeight()));
         Assertions.assertFalse(transactions.isEmpty());
     }
 
@@ -137,11 +134,9 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
     void searchByGroup(RepositoryType type) {
         TransactionRepository transactionRepository = getTransactionRepository(type);
         TransactionPaginationStreamer streamer = new TransactionPaginationStreamer(transactionRepository);
-        TransactionSearchCriteria criteria = new TransactionSearchCriteria();
-        criteria.group(TransactionSearchGroup.CONFIRMED);
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.CONFIRMED);
         List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
-        transactions
-            .forEach(b -> Assertions.assertNotNull(b.getTransactionInfo().get().getHeight()));
+        transactions.forEach(b -> Assertions.assertNotNull(b.getTransactionInfo().get().getHeight()));
         Assertions.assertFalse(transactions.isEmpty());
     }
 
@@ -150,7 +145,7 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
     void searchBySignerPublicKeyInvalid(RepositoryType type) {
         TransactionRepository transactionRepository = getTransactionRepository(type);
         TransactionPaginationStreamer streamer = new TransactionPaginationStreamer(transactionRepository);
-        TransactionSearchCriteria criteria = new TransactionSearchCriteria();
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.CONFIRMED);
         PublicKey expectedSignerPublicKey = Account.generateNewAccount(getNetworkType()).getPublicAccount()
             .getPublicKey();
         criteria.setSignerPublicKey(expectedSignerPublicKey);
@@ -163,7 +158,7 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
     void searchEmbedded(RepositoryType type) {
         TransactionRepository transactionRepository = getTransactionRepository(type);
         TransactionPaginationStreamer streamer = new TransactionPaginationStreamer(transactionRepository);
-        TransactionSearchCriteria criteria = new TransactionSearchCriteria();
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.CONFIRMED);
         criteria.setEmbedded(true);
         List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
         Assertions.assertFalse(transactions.isEmpty());
@@ -202,27 +197,26 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
     void searchEmbeddedTransactionType(RepositoryType type) {
         TransactionRepository transactionRepository = getTransactionRepository(type);
         TransactionPaginationStreamer streamer = new TransactionPaginationStreamer(transactionRepository);
-        TransactionSearchCriteria criteria = new TransactionSearchCriteria();
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.CONFIRMED);
         criteria.setEmbedded(true);
         criteria.setTransactionTypes(Collections.singletonList(TransactionType.TRANSFER));
         List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
         Assertions.assertFalse(transactions.isEmpty());
 
         transactions.stream().forEach(t -> {
-            get(transactionRepository.getTransaction(t.getRecordId().get()));
-            get(transactionRepository.getTransaction(t.getTransactionInfo().get().getHash().get()));
+            get(transactionRepository.getTransaction(TransactionGroup.CONFIRMED, t.getRecordId().get()));
+            get(transactionRepository.getTransaction(TransactionGroup.CONFIRMED, t.getTransactionInfo().get().getHash().get()));
         });
     }
 
 
     private PaginationTester<Transaction, TransactionSearchCriteria> getPaginationTester(RepositoryType type) {
-        return new PaginationTester<>(
-            TransactionSearchCriteria::new, getTransactionRepository(type)::search);
+        return new PaginationTester<>(() -> new TransactionSearchCriteria(TransactionGroup.CONFIRMED),
+            getTransactionRepository(type)::search);
     }
 
 
-    private TransactionRepository getTransactionRepository(
-        RepositoryType type) {
+    private TransactionRepository getTransactionRepository(RepositoryType type) {
         return getRepositoryFactory(type).createTransactionRepository();
     }
 }

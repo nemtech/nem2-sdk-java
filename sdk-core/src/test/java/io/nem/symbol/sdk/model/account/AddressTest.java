@@ -47,6 +47,10 @@ class AddressTest {
             Arrays.stream(NetworkType.values()).filter(n -> n != networkType).findFirst().orElse(null)));
     }
 
+    @Test
+    void test(){
+        System.out.println(Address.createFromPublicKey("BDE86E53FC0CBDE08A27B059A86F92E2F99F85711E7615A74FDA8608683F8D5F", NetworkType.TEST_NET).plain());
+    }
 
     @Test
     void testAddressCreation() {

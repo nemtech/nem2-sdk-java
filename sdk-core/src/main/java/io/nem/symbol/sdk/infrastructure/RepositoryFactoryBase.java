@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.RepositoryFactoryConfiguration;
+import io.nem.symbol.sdk.api.TransactionStatusRepository;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNames;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
@@ -173,4 +174,5 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
     public Observable<NetworkCurrency> getHarvestCurrency() {
         return harvestCurrency;
     }
+
 }

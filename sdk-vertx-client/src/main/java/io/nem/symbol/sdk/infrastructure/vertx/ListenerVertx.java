@@ -26,6 +26,7 @@ import io.nem.symbol.sdk.infrastructure.TransactionMapper;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.openapi.vertx.model.BlockInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.Cosignature;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
@@ -109,9 +110,8 @@ public class ListenerVertx extends ListenerBase implements Listener {
     }
 
     @Override
-    protected Transaction toTransaction(Object transactionInfo) {
-        return transactionMapper
-            .mapFromDto(getJsonHelper().convert(transactionInfo, TransactionInfoDTO.class));
+    protected Transaction toTransaction(TransactionGroup group, Object transactionInfo) {
+        return transactionMapper.mapToFactoryFromDto(transactionInfo).group(group).build();
     }
 
     @Override

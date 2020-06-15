@@ -27,10 +27,9 @@ import io.nem.symbol.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
-import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.JSON;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.BlockInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Cosignature;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
@@ -107,8 +106,8 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
     }
 
     @Override
-    protected Transaction toTransaction(Object transactionInfo) {
-        return transactionMapper.mapFromDto(transactionInfo);
+    protected Transaction toTransaction(TransactionGroup group, Object transactionInfo) {
+        return transactionMapper.mapToFactoryFromDto(transactionInfo).group(group).build();
     }
 
     @Override

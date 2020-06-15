@@ -23,7 +23,6 @@ import io.nem.symbol.core.utils.ExceptionUtils;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.api.TransactionSearchCriteria;
-import io.nem.symbol.sdk.api.TransactionSearchGroup;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
@@ -35,20 +34,16 @@ import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionAnnounceResponse;
-import io.nem.symbol.sdk.model.transaction.TransactionStatus;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import io.nem.symbol.sdk.openapi.vertx.model.AnnounceTransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.Cosignature;
 import io.nem.symbol.sdk.openapi.vertx.model.Pagination;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionGroupEnum;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionMetaDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionPage;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionStatusDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionStatusEnum;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
@@ -76,19 +71,17 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     @Test
     public void shouldGetTransaction() throws Exception {
 
-        TransactionInfoDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
+        TransactionInfoDTO transactionInfoDTO = TestHelperVertx
+            .loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
         String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
 
         mockRemoteCall(transactionInfoDTO);
 
-        Transaction transaction = repository
-            .getTransaction(hash).toFuture().get();
+        Transaction transaction = repository.getTransaction(TransactionGroup.CONFIRMED, hash).toFuture().get();
 
         Assertions.assertNotNull(transaction);
 
-        Assertions.assertEquals(hash,
-            transaction.getTransactionInfo().get().getHash().get());
+        Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
     }
 
     @Test
@@ -102,16 +95,14 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
 
         mockRemoteCall(transactionInfoDTO);
 
-        RepositoryCallException exception = Assertions
-            .assertThrows(RepositoryCallException.class, () -> {
-                ExceptionUtils.propagateVoid(() -> {
-                    repository
-                        .getTransaction(hash).toFuture().get();
-                });
+        RepositoryCallException exception = Assertions.assertThrows(RepositoryCallException.class, () -> {
+            ExceptionUtils.propagateVoid(() -> {
+                repository.getTransaction(TransactionGroup.CONFIRMED, hash).toFuture().get();
             });
+        });
 
-        Assertions.assertTrue(exception.getMessage().contains(
-            "Transaction cannot be mapped, object does not not have transaction type."));
+        Assertions.assertTrue(exception.getMessage()
+            .contains("Transaction cannot be mapped, object does not not have transaction type."));
     }
 
     @Test
@@ -124,89 +115,32 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
 
         mockErrorCode(400, "The error message");
 
-        RepositoryCallException exception = Assertions
-            .assertThrows(RepositoryCallException.class, () -> {
-                ExceptionUtils.propagateVoid(() -> {
-                    repository
-                        .getTransaction(meta.getHash()).toFuture().get();
-                });
+        RepositoryCallException exception = Assertions.assertThrows(RepositoryCallException.class, () -> {
+            ExceptionUtils.propagateVoid(() -> {
+                repository.getTransaction(TransactionGroup.CONFIRMED, meta.getHash()).toFuture().get();
             });
+        });
 
-        Assertions.assertTrue(exception.getMessage().contains(
-            "The error message"));
+        Assertions.assertTrue(exception.getMessage().contains("The error message"));
     }
 
     @Test
     public void shouldGetTransactions() throws Exception {
 
-        TransactionInfoDTO transactionInfoDTO = TestHelperVertx.loadTransactionInfoDTO(
-            "aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
+        TransactionInfoDTO transactionInfoDTO = TestHelperVertx
+            .loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
 
         String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
 
         mockRemoteCall(Collections.singletonList(transactionInfoDTO));
 
-        Transaction transaction = repository
-            .getTransactions(Collections.singletonList(hash))
-            .toFuture().get().get(0);
+        Transaction transaction = repository.getTransactions(TransactionGroup.CONFIRMED, Collections.singletonList(hash)).toFuture().get().get(0);
 
         Assertions.assertNotNull(transaction);
 
-        Assertions.assertEquals(hash,
-            transaction.getTransactionInfo().get().getHash().get());
+        Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
     }
 
-    @Test
-    public void shouldGetTransactionStatus() throws Exception {
-
-        TransactionStatusDTO transactionStatusDTO = new TransactionStatusDTO();
-        transactionStatusDTO.setGroup(TransactionGroupEnum.FAILED);
-        transactionStatusDTO.setDeadline(BigInteger.valueOf(5));
-        transactionStatusDTO.setHeight(BigInteger.valueOf(6));
-        transactionStatusDTO
-            .setCode(TransactionStatusEnum.FAILURE_ACCOUNTLINK_LINK_ALREADY_EXISTS);
-        transactionStatusDTO.setHash("someHash");
-        mockRemoteCall(transactionStatusDTO);
-
-        TransactionStatus transaction = repository
-            .getTransactionStatus(transactionStatusDTO.getHash()).toFuture().get();
-
-        Assertions.assertNotNull(transaction);
-
-        Assertions.assertEquals(transactionStatusDTO.getHash(), transaction.getHash());
-        Assertions.assertEquals(5L, transaction.getDeadline().getInstant());
-        Assertions.assertEquals(BigInteger.valueOf(6L), transaction.getHeight());
-        Assertions.assertEquals("Failure_AccountLink_Link_Already_Exists", transaction.getCode());
-        Assertions.assertEquals(transaction.getGroup().getValue(),
-            transactionStatusDTO.getGroup().getValue());
-    }
-
-    @Test
-    public void shouldGetTransactionStatuses() throws Exception {
-
-        TransactionStatusDTO transactionStatusDTO = new TransactionStatusDTO();
-
-        transactionStatusDTO.setGroup(TransactionGroupEnum.FAILED);
-        transactionStatusDTO.setDeadline(BigInteger.valueOf(5));
-        transactionStatusDTO.setHeight(BigInteger.valueOf(6));
-        transactionStatusDTO
-            .setCode(TransactionStatusEnum.FAILURE_ACCOUNTLINK_LINK_ALREADY_EXISTS);
-        transactionStatusDTO.setHash("someHash");
-        mockRemoteCall(Collections.singletonList(transactionStatusDTO));
-
-        TransactionStatus transaction = repository
-            .getTransactionStatuses(Collections.singletonList(transactionStatusDTO.getHash()))
-            .toFuture().get().get(0);
-
-        Assertions.assertNotNull(transaction);
-
-        Assertions.assertEquals(transactionStatusDTO.getHash(), transaction.getHash());
-        Assertions.assertEquals(5L, transaction.getDeadline().getInstant());
-        Assertions.assertEquals(BigInteger.valueOf(6L), transaction.getHeight());
-        Assertions.assertEquals("Failure_AccountLink_Link_Already_Exists", transaction.getCode());
-        Assertions.assertEquals(transaction.getGroup().getValue(),
-            transactionStatusDTO.getGroup().getValue());
-    }
 
     @Test
     public void shouldAnnounce() throws Exception {
@@ -217,13 +151,11 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
         announceTransactionInfoDTO.setMessage("SomeMessage");
         mockRemoteCall(announceTransactionInfoDTO);
 
-        TransactionAnnounceResponse response = repository.announce(signedTransaction)
-            .toFuture().get();
+        TransactionAnnounceResponse response = repository.announce(signedTransaction).toFuture().get();
 
         Assertions.assertNotNull(response);
 
-        Assertions.assertEquals(announceTransactionInfoDTO.getMessage(),
-            announceTransactionInfoDTO.getMessage());
+        Assertions.assertEquals(announceTransactionInfoDTO.getMessage(), announceTransactionInfoDTO.getMessage());
     }
 
     @Test
@@ -235,40 +167,35 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
         announceTransactionInfoDTO.setMessage("SomeMessage");
         mockRemoteCall(announceTransactionInfoDTO);
 
-        TransactionAnnounceResponse response = repository.announceAggregateBonded(signedTransaction)
-            .toFuture().get();
+        TransactionAnnounceResponse response = repository.announceAggregateBonded(signedTransaction).toFuture().get();
 
         Assertions.assertNotNull(response);
 
-        Assertions.assertEquals(announceTransactionInfoDTO.getMessage(),
-            announceTransactionInfoDTO.getMessage());
+        Assertions.assertEquals(announceTransactionInfoDTO.getMessage(), announceTransactionInfoDTO.getMessage());
     }
 
     @Test
     public void announceAggregateBondedCosignature() throws Exception {
 
-        CosignatureSignedTransaction signedTransaction = new CosignatureSignedTransaction(
-            "aParentHash", "aSignature", "aSigner");
+        CosignatureSignedTransaction signedTransaction = new CosignatureSignedTransaction("aParentHash", "aSignature",
+            "aSigner");
 
         AnnounceTransactionInfoDTO announceTransactionInfoDTO = new AnnounceTransactionInfoDTO();
         announceTransactionInfoDTO.setMessage("SomeMessage");
         ArgumentCaptor<Object> parameter = mockRemoteCall(announceTransactionInfoDTO);
 
-        TransactionAnnounceResponse response = repository
-            .announceAggregateBondedCosignature(signedTransaction)
+        TransactionAnnounceResponse response = repository.announceAggregateBondedCosignature(signedTransaction)
             .toFuture().get();
 
         Assertions.assertNotNull(response);
 
-        Assertions.assertEquals(announceTransactionInfoDTO.getMessage(),
-            announceTransactionInfoDTO.getMessage());
+        Assertions.assertEquals(announceTransactionInfoDTO.getMessage(), announceTransactionInfoDTO.getMessage());
 
         Cosignature cosignature = (Cosignature) parameter.getValue();
 
         Assertions.assertEquals(signedTransaction.getParentHash(), cosignature.getParentHash());
         Assertions.assertEquals(signedTransaction.getSignature(), cosignature.getSignature());
-        Assertions
-            .assertEquals(signedTransaction.getSignerPublicKey(), cosignature.getSignerPublicKey());
+        Assertions.assertEquals(signedTransaction.getSignerPublicKey(), cosignature.getSignerPublicKey());
     }
 
 
@@ -276,22 +203,15 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
 
         String generationHash = "A94B1BE81F1D4C95D6D252AD7BA3FFFB1674991FD880B7A57DC3180AF8D69C32";
 
-        Account account = Account.createFromPrivateKey(
-            "063F36659A8BB01D5685826C19E2C2CA9D281465B642BD5E43CB69510408ECF7",
-            this.networkType);
+        Account account = Account
+            .createFromPrivateKey("063F36659A8BB01D5685826C19E2C2CA9D281465B642BD5E43CB69510408ECF7", this.networkType);
 
-        Address recipientAddress =
-            Address.createFromRawAddress(
-                "SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QX");
+        Address recipientAddress = Address.createFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QX");
 
-        TransferTransaction transferTransaction =
-            TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                recipientAddress,
-                Collections
-                    .singletonList(createAbsolute(BigInteger.valueOf(1))),
-                new PlainMessage("E2ETest:standaloneTransferTransaction:message")
-            ).build();
+        TransferTransaction transferTransaction = TransferTransactionFactory
+            .create(NetworkType.MIJIN_TEST, recipientAddress,
+                Collections.singletonList(createAbsolute(BigInteger.valueOf(1))),
+                new PlainMessage("E2ETest:standaloneTransferTransaction:message")).build();
 
         SignedTransaction signedTransaction = account.sign(transferTransaction, generationHash);
         String payload = signedTransaction.getPayload();
@@ -300,8 +220,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     }
 
     protected Mosaic createAbsolute(BigInteger amount) {
-        return new Mosaic(NamespaceId.createFromName("xem.currency"),
-            amount);
+        return new Mosaic(NamespaceId.createFromName("xem.currency"), amount);
     }
 
     @Test
@@ -314,10 +233,8 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
         mockRemoteCall(toPage(transferTransactionDTO));
 
         Page<Transaction> transactions = repository.search(
-            new TransactionSearchCriteria().signerPublicKey(publicAccount.getPublicKey()).group(
-                TransactionSearchGroup.UNCONFIRMED))
-            .toFuture()
-            .get();
+            new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED).signerPublicKey(publicAccount.getPublicKey()))
+            .toFuture().get();
         Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
         Assertions.assertEquals(1, transactions.getData().size());
         Assertions.assertEquals(1, transactions.getPageNumber());
@@ -330,18 +247,14 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     @Test
     public void searchTransactionsTransactionTypes() throws Exception {
 
-        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO(
-            "standaloneTransferTransaction.json");
+        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO("standaloneTransferTransaction.json");
 
         mockRemoteCall(toPage(transferTransactionDTO));
 
-        TransactionSearchCriteria criteria = new TransactionSearchCriteria().transactionTypes(
-            Arrays.asList(TransactionType.NAMESPACE_METADATA, TransactionType.AGGREGATE_COMPLETE));
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
+            .transactionTypes(Arrays.asList(TransactionType.NAMESPACE_METADATA, TransactionType.AGGREGATE_COMPLETE));
 
-        Page<Transaction> transactions = repository.search(
-            criteria)
-            .toFuture()
-            .get();
+        Page<Transaction> transactions = repository.search(criteria).toFuture().get();
         Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
         Assertions.assertEquals(1, transactions.getData().size());
         Assertions.assertEquals(1, transactions.getPageNumber());
@@ -353,8 +266,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
 
     private TransactionPage toPage(TransactionInfoDTO dto) {
         return new TransactionPage()
-            .data(Collections.singletonList(jsonHelper.parse(jsonHelper.print(dto),
-                TransactionInfoDTO.class)))
+            .data(Collections.singletonList(jsonHelper.parse(jsonHelper.print(dto), TransactionInfoDTO.class)))
             .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
     }
 

@@ -16,36 +16,25 @@
 
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
-import io.nem.symbol.core.crypto.PublicKey;
-import io.nem.symbol.sdk.api.OrderBy;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.TransactionRepository;
 import io.nem.symbol.sdk.api.TransactionSearchCriteria;
-import io.nem.symbol.sdk.api.TransactionSearchGroup;
 import io.nem.symbol.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
-import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
-import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionAnnounceResponse;
-import io.nem.symbol.sdk.model.transaction.TransactionState;
-import io.nem.symbol.sdk.model.transaction.TransactionStatus;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.TransactionRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
+import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiException;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AnnounceTransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Cosignature;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.Order;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.Pagination;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionGroupSubsetEnum;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionHashes;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionIds;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionPage;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionPayload;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionStatusDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionTypeEnum;
 import io.reactivex.Observable;
 import java.util.List;
@@ -57,8 +46,7 @@ import java.util.stream.Collectors;
  *
  * @since 1.0
  */
-public class TransactionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements
-    TransactionRepository {
+public class TransactionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements TransactionRepository {
 
     private final TransactionRoutesApi client;
 
@@ -70,114 +58,113 @@ public class TransactionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImp
         this.transactionMapper = new GeneralTransactionMapper(getJsonHelper());
     }
 
-
     public TransactionRoutesApi getClient() {
         return client;
     }
 
     @Override
-    public Observable<Transaction> getTransaction(String transactionHash) {
-        Callable<TransactionInfoDTO> callback = () -> getClient()
-            .getTransaction(transactionHash);
-        return exceptionHandling(call(callback).map(this.transactionMapper::mapFromDto));
+    public Observable<Transaction> getTransaction(TransactionGroup group, String transactionHash) {
+        Callable<TransactionInfoDTO> callback = () -> getBasicTransactions(group, transactionHash);
+        return exceptionHandling(call(callback).map(transactionInfoDTO -> mapTransaction(group, transactionInfoDTO)));
+    }
+
+    private Transaction mapTransaction(TransactionGroup group, TransactionInfoDTO transactionInfoDTO) {
+        return this.transactionMapper.mapToFactoryFromDto(transactionInfoDTO).group(group).build();
     }
 
     @Override
-    public Observable<List<Transaction>> getTransactions(List<String> transactionHashes) {
-        Callable<List<TransactionInfoDTO>> callback = () ->
-            getClient().getTransactionsById(new TransactionIds().transactionIds(transactionHashes));
+    public Observable<List<Transaction>> getTransactions(TransactionGroup group, List<String> transactionHashes) {
+        Callable<List<TransactionInfoDTO>> callback = () -> getBasicTransactions(group, transactionHashes);
         return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this.transactionMapper::mapFromDto).toList()
+            call(callback).flatMapIterable(item -> item).map(info -> mapTransaction(group, info)).toList()
                 .toObservable());
-
-
-    }
-
-    @Override
-    public Observable<TransactionStatus> getTransactionStatus(String transactionHash) {
-        Callable<TransactionStatusDTO> callback = () -> getClient()
-            .getTransactionStatus(transactionHash);
-        return exceptionHandling(call(callback).map(this::toTransactionStatus));
-    }
-
-    private TransactionStatus toTransactionStatus(TransactionStatusDTO transactionStatusDTO) {
-        return new TransactionStatus(
-            TransactionState.valueOf(transactionStatusDTO.getGroup().name()),
-            transactionStatusDTO.getCode() == null ? null
-                : transactionStatusDTO.getCode().getValue(),
-            transactionStatusDTO.getHash(),
-            new Deadline((transactionStatusDTO.getDeadline())),
-            (transactionStatusDTO.getHeight()));
-    }
-
-    @Override
-    public Observable<List<TransactionStatus>> getTransactionStatuses(
-        List<String> transactionHashes) {
-        Callable<List<TransactionStatusDTO>> callback = () ->
-            getClient().getTransactionsStatuses(new TransactionHashes().hashes(transactionHashes));
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toTransactionStatus).toList()
-                .toObservable());
-
     }
 
     @Override
     public Observable<TransactionAnnounceResponse> announce(SignedTransaction signedTransaction) {
 
         Callable<AnnounceTransactionInfoDTO> callback = () -> getClient()
-            .announceTransaction(
-                new TransactionPayload().payload(signedTransaction.getPayload()));
-        return exceptionHandling(
-            call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
+            .announceTransaction(new TransactionPayload().payload(signedTransaction.getPayload()));
+        return exceptionHandling(call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
     }
 
     @Override
-    public Observable<TransactionAnnounceResponse> announceAggregateBonded(
-        SignedTransaction signedTransaction) {
+    public Observable<TransactionAnnounceResponse> announceAggregateBonded(SignedTransaction signedTransaction) {
         Callable<AnnounceTransactionInfoDTO> callback = () -> getClient()
-            .announcePartialTransaction(
-                new TransactionPayload().payload(signedTransaction.getPayload()));
-        return exceptionHandling(
-            call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
+            .announcePartialTransaction(new TransactionPayload().payload(signedTransaction.getPayload()));
+        return exceptionHandling(call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
     }
 
     @Override
     public Observable<TransactionAnnounceResponse> announceAggregateBondedCosignature(
         CosignatureSignedTransaction cosignatureSignedTransaction) {
 
-        Callable<AnnounceTransactionInfoDTO> callback = () -> getClient()
-            .announceCosignatureTransaction(
-                new Cosignature().parentHash(cosignatureSignedTransaction.getParentHash())
-                    .signature(cosignatureSignedTransaction.getSignature())
-                    .signerPublicKey(cosignatureSignedTransaction.getSignerPublicKey()));
-        return exceptionHandling(
-            call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
+        Callable<AnnounceTransactionInfoDTO> callback = () -> getClient().announceCosignatureTransaction(
+            new Cosignature().parentHash(cosignatureSignedTransaction.getParentHash())
+                .signature(cosignatureSignedTransaction.getSignature())
+                .signerPublicKey(cosignatureSignedTransaction.getSignerPublicKey()));
+        return exceptionHandling(call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
 
     }
 
     @Override
     public Observable<Page<Transaction>> search(TransactionSearchCriteria criteria) {
-        Callable<TransactionPage> callback = () -> getClient()
-            .searchTransactions(toDto(criteria.getAddress()),
-                toDto(criteria.getRecipientAddress()),
-                toDto(criteria.getSignerPublicKey()), criteria.getHeight(),
-                criteria.getPageSize(),
-                criteria.getPageNumber(), criteria.getOffset(), toDto(criteria.getGroup()),
-                toDto(criteria.getOrder()), toDto(criteria.getTransactionTypes()),
-                criteria.getEmbedded());
+        Callable<TransactionPage> callback = () -> basicSearch(criteria);
+        return exceptionHandling(call(callback).map(p -> {
+            List<Transaction> data = p.getData().stream()
+                .map(transactionInfoDTO -> mapTransaction(criteria.getGroup(), transactionInfoDTO))
+                .collect(Collectors.toList());
+            return toPage(p.getPagination(), data);
+        }));
+    }
 
-        return exceptionHandling(call(callback)
-            .map(p -> {
-                List<Transaction> data = p.getData().stream().map(o -> (Object) o).map(transactionMapper::mapFromDto)
-                    .collect(Collectors.toList());
-                return toPage(p.getPagination(), data);
-            }));
+    private TransactionPage basicSearch(TransactionSearchCriteria criteria) throws ApiException {
+        switch (criteria.getGroup()) {
+            case CONFIRMED:
+                return getClient()
+                    .searchConfirmedTransactions(toDto(criteria.getAddress()), toDto(criteria.getRecipientAddress()),
+                        toDto(criteria.getSignerPublicKey()), criteria.getHeight(),
+                        toDto(criteria.getTransactionTypes()), criteria.getEmbedded(), criteria.getPageSize(),
+                        criteria.getPageNumber(), criteria.getOffset(), toDto(criteria.getOrder()));
+            case PARTIAL:
+                return getClient()
+                    .searchPartialTransactions(toDto(criteria.getAddress()), toDto(criteria.getRecipientAddress()),
+                        toDto(criteria.getSignerPublicKey()), criteria.getHeight(),
+                        toDto(criteria.getTransactionTypes()), criteria.getEmbedded(), criteria.getPageSize(),
+                        criteria.getPageNumber(), criteria.getOffset(), toDto(criteria.getOrder()));
+
+            case UNCONFIRMED:
+                return getClient()
+                    .searchUnconfirmedTransactions(toDto(criteria.getAddress()), toDto(criteria.getRecipientAddress()),
+                        toDto(criteria.getSignerPublicKey()), criteria.getHeight(),
+                        toDto(criteria.getTransactionTypes()), criteria.getEmbedded(), criteria.getPageSize(),
+                        criteria.getPageNumber(), criteria.getOffset(), toDto(criteria.getOrder()));
+        }
+        throw new IllegalArgumentException("Invalid group " + criteria.getGroup());
     }
 
 
+    private TransactionInfoDTO getBasicTransactions(TransactionGroup group, String transactionHash)
+        throws ApiException {
+        switch (group) {
+            case CONFIRMED:
+                return getClient().getConfirmedTransaction(transactionHash);
+            case PARTIAL:
+                return getClient().getPartialTransaction(transactionHash);
+            case UNCONFIRMED:
+                return getClient().getUnconfirmedTransaction(transactionHash);
+        }
+        throw new IllegalArgumentException("Invalid group " + group);
+    }
 
-    private TransactionGroupSubsetEnum toDto(TransactionSearchGroup group) {
-        return group == null ? null : TransactionGroupSubsetEnum.fromValue(group.getValue());
+    private List<TransactionInfoDTO> getBasicTransactions(TransactionGroup group, List<String> transactionHashes)
+        throws ApiException {
+        TransactionIds transactionIds = new TransactionIds().transactionIds(transactionHashes);
+        switch (group) {
+            case CONFIRMED:
+                return getClient().getTransactionsById(transactionIds);
+        }
+        throw new IllegalArgumentException("Invalid group " + group);
     }
 
     private List<TransactionTypeEnum> toDto(List<TransactionType> transactionTypes) {

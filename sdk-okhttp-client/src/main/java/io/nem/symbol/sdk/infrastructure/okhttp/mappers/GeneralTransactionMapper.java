@@ -19,6 +19,7 @@ package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 import io.nem.symbol.sdk.infrastructure.TransactionMapper;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.Transaction;
+import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import java.util.EnumMap;
 import java.util.Map;
@@ -75,15 +76,20 @@ public class GeneralTransactionMapper implements TransactionMapper {
 
 
     @Override
-    public Transaction mapFromDto(Object transactionInfoDTO) {
+    public TransactionFactory<?> mapToFactoryFromDto(Object transactionInfoDTO) {
         try {
             Validate.notNull(transactionInfoDTO, "transactionInfoDTO must not be null");
-            return resolveMapper(transactionInfoDTO).mapFromDto(transactionInfoDTO);
+            return resolveMapper(transactionInfoDTO).mapToFactoryFromDto(transactionInfoDTO);
         } catch (Exception e) {
             throw new IllegalArgumentException(
                 "Unknown error mapping transaction: " + ExceptionUtils.getMessage(e) + "\n" + jsonHelper
                     .prettyPrint(transactionInfoDTO), e);
         }
+    }
+
+    @Override
+    public Transaction mapFromDto(Object transactionInfoDTO) {
+        return this.mapToFactoryFromDto(transactionInfoDTO).build();
     }
 
     @Override

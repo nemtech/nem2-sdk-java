@@ -33,6 +33,7 @@ import io.nem.symbol.sdk.api.RepositoryFactoryConfiguration;
 import io.nem.symbol.sdk.api.RestrictionAccountRepository;
 import io.nem.symbol.sdk.api.RestrictionMosaicRepository;
 import io.nem.symbol.sdk.api.TransactionRepository;
+import io.nem.symbol.sdk.api.TransactionStatusRepository;
 import io.nem.symbol.sdk.infrastructure.RepositoryFactoryBase;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
 import io.vertx.core.Vertx;
@@ -122,6 +123,11 @@ public class RepositoryFactoryVertxImpl extends RepositoryFactoryBase {
     @Override
     public TransactionRepository createTransactionRepository() {
         return new TransactionRepositoryVertxImpl(apiClient);
+    }
+
+    @Override
+    public TransactionStatusRepository createTransactionStatusRepository() {
+        return new TransactionStatusRepositoryVertxImpl(apiClient);
     }
 
     @Override

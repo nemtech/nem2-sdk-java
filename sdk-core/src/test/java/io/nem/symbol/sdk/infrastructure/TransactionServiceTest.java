@@ -71,6 +71,7 @@ import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionAnnounceResponse;
 import io.nem.symbol.sdk.model.transaction.TransactionFactory;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransactionInfo;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
@@ -135,26 +136,20 @@ class TransactionServiceTest {
     void announce() throws ExecutionException, InterruptedException {
 
         TransferTransaction transferTransaction = TransferTransactionFactory
-            .create(networkType,
-                Address.generateRandom(networkType),
-                Collections.emptyList(),
-                PlainMessage.Empty
-            ).build();
+            .create(networkType, Address.generateRandom(networkType), Collections.emptyList(), PlainMessage.Empty)
+            .build();
 
         SignedTransaction signedTransaction = transferTransaction.signWith(account, "abc");
-        TransactionAnnounceResponse transactionAnnounceResponse = new TransactionAnnounceResponse(
-            "Some Message");
+        TransactionAnnounceResponse transactionAnnounceResponse = new TransactionAnnounceResponse("Some Message");
 
-        Mockito.when(transactionRepositoryMock.announce(Mockito.eq(signedTransaction))).thenReturn(
-            Observable.just(transactionAnnounceResponse));
+        Mockito.when(transactionRepositoryMock.announce(Mockito.eq(signedTransaction)))
+            .thenReturn(Observable.just(transactionAnnounceResponse));
 
         Mockito
-            .when(listener.confirmedOrError(Mockito.eq(account.getAddress()),
-                Mockito.eq(signedTransaction.getHash())))
+            .when(listener.confirmedOrError(Mockito.eq(account.getAddress()), Mockito.eq(signedTransaction.getHash())))
             .thenReturn(Observable.just(transferTransaction));
 
-        Observable<Transaction> announcedTransaction = service
-            .announce(listener, signedTransaction);
+        Observable<Transaction> announcedTransaction = service.announce(listener, signedTransaction);
 
         Assertions.assertEquals(transferTransaction, announcedTransaction.toFuture().get());
 
@@ -163,13 +158,9 @@ class TransactionServiceTest {
     @Test
     void announceAggregateBonded() throws ExecutionException, InterruptedException {
 
-        TransferTransaction transaction1 =
-            TransferTransactionFactory.create(
-                networkType,
-                Address.generateRandom(networkType),
-                Arrays.asList(
-                    new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
+        TransferTransaction transaction1 = TransferTransactionFactory
+            .create(networkType, Address.generateRandom(networkType),
+                Arrays.asList(new Mosaic(new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
                 new PlainMessage("Some Message")).signer(account.getPublicAccount()).build();
 
         AggregateTransaction aggregateTransaction = AggregateTransactionFactory
@@ -177,20 +168,16 @@ class TransactionServiceTest {
                 Collections.emptyList()).deadline(new FakeDeadline()).build();
 
         String generationHash = "abc";
-        SignedTransaction aggregateSignedTransaction = aggregateTransaction
-            .signWith(account, generationHash);
+        SignedTransaction aggregateSignedTransaction = aggregateTransaction.signWith(account, generationHash);
 
         TransactionAnnounceResponse aggregateTransactionAnnounceResponse = new TransactionAnnounceResponse(
             "Aggregate Some Message");
 
-        Mockito.when(transactionRepositoryMock
-            .announceAggregateBonded(Mockito.eq(aggregateSignedTransaction))).thenReturn(
-            Observable.just(aggregateTransactionAnnounceResponse));
+        Mockito.when(transactionRepositoryMock.announceAggregateBonded(Mockito.eq(aggregateSignedTransaction)))
+            .thenReturn(Observable.just(aggregateTransactionAnnounceResponse));
 
-        Mockito
-            .when(listener.aggregateBondedAddedOrError(Mockito.eq(account.getAddress()),
-                Mockito.eq(aggregateSignedTransaction.getHash())))
-            .thenReturn(Observable.just(aggregateTransaction));
+        Mockito.when(listener.aggregateBondedAddedOrError(Mockito.eq(account.getAddress()),
+            Mockito.eq(aggregateSignedTransaction.getHash()))).thenReturn(Observable.just(aggregateTransaction));
 
         Observable<AggregateTransaction> announcedTransaction = service
             .announceAggregateBonded(listener, aggregateSignedTransaction);
@@ -202,13 +189,9 @@ class TransactionServiceTest {
     @Test
     void announceHashLockAggregateBonded() throws ExecutionException, InterruptedException {
 
-        TransferTransaction transaction1 =
-            TransferTransactionFactory.create(
-                networkType,
-                Address.generateRandom(networkType),
-                Collections.singletonList(
-                    new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
+        TransferTransaction transaction1 = TransferTransactionFactory
+            .create(networkType, Address.generateRandom(networkType), Collections
+                    .singletonList(new Mosaic(new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
                 new PlainMessage("Some Message")).signer(account.getPublicAccount()).build();
 
         AggregateTransaction aggregateTransaction = AggregateTransactionFactory
@@ -216,19 +199,13 @@ class TransactionServiceTest {
                 Collections.emptyList()).deadline(new FakeDeadline()).build();
 
         String generationHash = "abc";
-        SignedTransaction aggregateSignedTransaction = aggregateTransaction
-            .signWith(account, generationHash);
+        SignedTransaction aggregateSignedTransaction = aggregateTransaction.signWith(account, generationHash);
 
-        HashLockTransaction hashLockTransaction =
-            HashLockTransactionFactory.create(
-                networkType,
-                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
-                BigInteger.valueOf(100),
-                aggregateSignedTransaction.getHash())
-                .build();
+        HashLockTransaction hashLockTransaction = HashLockTransactionFactory
+            .create(networkType, NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
+                BigInteger.valueOf(100), aggregateSignedTransaction.getHash()).build();
 
-        SignedTransaction hashLockSignedTranscation = hashLockTransaction
-            .signWith(account, generationHash);
+        SignedTransaction hashLockSignedTranscation = hashLockTransaction.signWith(account, generationHash);
 
         TransactionAnnounceResponse aggregateTransactionAnnounceResponse = new TransactionAnnounceResponse(
             "Aggregate Some Message");
@@ -236,27 +213,21 @@ class TransactionServiceTest {
         TransactionAnnounceResponse hashTransactionAnnounceResponse = new TransactionAnnounceResponse(
             "Hash Some Message");
 
-        Mockito.when(transactionRepositoryMock
-            .announceAggregateBonded(Mockito.eq(aggregateSignedTransaction))).thenReturn(
-            Observable.just(aggregateTransactionAnnounceResponse));
+        Mockito.when(transactionRepositoryMock.announceAggregateBonded(Mockito.eq(aggregateSignedTransaction)))
+            .thenReturn(Observable.just(aggregateTransactionAnnounceResponse));
 
         Mockito.when(transactionRepositoryMock.announce(Mockito.eq(hashLockSignedTranscation)))
-            .thenReturn(
-                Observable.just(hashTransactionAnnounceResponse));
+            .thenReturn(Observable.just(hashTransactionAnnounceResponse));
 
-        Mockito
-            .when(listener.confirmedOrError(Mockito.eq(account.getAddress()),
-                Mockito.eq(hashLockSignedTranscation.getHash())))
+        Mockito.when(listener
+            .confirmedOrError(Mockito.eq(account.getAddress()), Mockito.eq(hashLockSignedTranscation.getHash())))
             .thenReturn(Observable.just(hashLockTransaction));
 
-        Mockito
-            .when(listener.aggregateBondedAddedOrError(Mockito.eq(account.getAddress()),
-                Mockito.eq(aggregateSignedTransaction.getHash())))
-            .thenReturn(Observable.just(aggregateTransaction));
+        Mockito.when(listener.aggregateBondedAddedOrError(Mockito.eq(account.getAddress()),
+            Mockito.eq(aggregateSignedTransaction.getHash()))).thenReturn(Observable.just(aggregateTransaction));
 
         Observable<AggregateTransaction> announcedTransaction = service
-            .announceHashLockAggregateBonded(listener,
-                hashLockSignedTranscation, aggregateSignedTransaction);
+            .announceHashLockAggregateBonded(listener, hashLockSignedTranscation, aggregateSignedTransaction);
 
         Assertions.assertEquals(aggregateTransaction, announcedTransaction.toFuture().get());
 
@@ -275,12 +246,8 @@ class TransactionServiceTest {
         String transactionHash = "aaaa";
 
         TransactionFactory<TransferTransaction> factory = TransferTransactionFactory
-            .create(NetworkType.MIJIN_TEST,
-                recipient,
-                mosaics,
-                PlainMessage.Empty
-            ).transactionInfo(TransactionInfo.create(height, 0,
-                "ABC", transactionHash, ""));
+            .create(NetworkType.MIJIN_TEST, recipient, mosaics, PlainMessage.Empty)
+            .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
         simulateStatement(height, 1, 0);
 
@@ -288,33 +255,27 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(transaction)));
 
-        TransferTransaction resolvedTransaction = (TransferTransaction) service
-            .resolveAliases(hashes)
-            .toFuture().get().get(0);
+        TransferTransaction resolvedTransaction = (TransferTransaction) service.resolveAliases(hashes).toFuture().get()
+            .get(0);
 
-        Assertions.assertEquals(transaction.getMosaics().size(),
-            resolvedTransaction.getMosaics().size());
+        Assertions.assertEquals(transaction.getMosaics().size(), resolvedTransaction.getMosaics().size());
 
-        Assertions.assertEquals(transaction.getMosaics().get(0).getId(),
-            resolvedTransaction.getMosaics().get(0).getId());
+        Assertions
+            .assertEquals(transaction.getMosaics().get(0).getId(), resolvedTransaction.getMosaics().get(0).getId());
 
-        Assertions.assertEquals(BigInteger.valueOf(1),
-            resolvedTransaction.getMosaics().get(0).getAmount());
+        Assertions.assertEquals(BigInteger.valueOf(1), resolvedTransaction.getMosaics().get(0).getAmount());
 
-        Assertions.assertEquals(mosaicId2,
-            resolvedTransaction.getMosaics().get(1).getId());
+        Assertions.assertEquals(mosaicId2, resolvedTransaction.getMosaics().get(1).getId());
 
-        Assertions.assertEquals(BigInteger.valueOf(2),
-            resolvedTransaction.getMosaics().get(1).getAmount());
+        Assertions.assertEquals(BigInteger.valueOf(2), resolvedTransaction.getMosaics().get(1).getAmount());
 
-        Assertions.assertEquals(transaction.getMosaics().get(2).getId(),
-            resolvedTransaction.getMosaics().get(2).getId());
+        Assertions
+            .assertEquals(transaction.getMosaics().get(2).getId(), resolvedTransaction.getMosaics().get(2).getId());
 
-        Assertions.assertEquals(BigInteger.valueOf(3),
-            resolvedTransaction.getMosaics().get(2).getAmount());
+        Assertions.assertEquals(BigInteger.valueOf(3), resolvedTransaction.getMosaics().get(2).getAmount());
 
         Assertions.assertEquals(address1, resolvedTransaction.getRecipient());
 
@@ -333,12 +294,8 @@ class TransactionServiceTest {
         String transactionHash = "aaaa";
 
         TransactionFactory<TransferTransaction> factory = TransferTransactionFactory
-            .create(NetworkType.MIJIN_TEST,
-                recipient,
-                mosaics,
-                PlainMessage.Empty
-            ).transactionInfo(TransactionInfo.create(height, 0,
-                "ABC", transactionHash, ""));
+            .create(NetworkType.MIJIN_TEST, recipient, mosaics, PlainMessage.Empty)
+            .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
         simulateStatement(height, 0, 0);
 
@@ -346,17 +303,14 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(transaction)));
 
-        IllegalArgumentException exception = Assertions
-            .assertThrows(IllegalArgumentException.class, () ->
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () ->
 
-                ExceptionUtils.propagate(() -> service
-                    .resolveAliases(hashes)
-                    .toFuture().get()));
-        Assertions.assertEquals(
-            "Address could not be resolved for alias " + addressNamespace1.getIdAsHex(),
+            ExceptionUtils.propagate(() -> service.resolveAliases(hashes).toFuture().get()));
+        Assertions.assertEquals("Address could not be resolved for alias " + addressNamespace1.getIdAsHex(),
             exception.getMessage());
 
     }
@@ -375,11 +329,8 @@ class TransactionServiceTest {
         String transactionHash = "aaaa";
 
         TransactionFactory<TransferTransaction> factory = TransferTransactionFactory
-            .create(NetworkType.MIJIN_TEST,
-                recipient,
-                mosaics,
-                PlainMessage.Empty
-            ).transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
+            .create(NetworkType.MIJIN_TEST, recipient, mosaics, PlainMessage.Empty)
+            .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
         simulateStatement(height, 1, 0);
 
@@ -387,18 +338,15 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(transaction)));
 
-        IllegalArgumentException exception = Assertions
-            .assertThrows(IllegalArgumentException.class, () ->
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () ->
 
-                ExceptionUtils.propagate(() -> service
-                    .resolveAliases(hashes)
-                    .toFuture().get()));
-        Assertions
-            .assertEquals("MosaicId could not be resolved for alias " + idontexist.getIdAsHex(),
-                exception.getMessage());
+            ExceptionUtils.propagate(() -> service.resolveAliases(hashes).toFuture().get()));
+        Assertions.assertEquals("MosaicId could not be resolved for alias " + idontexist.getIdAsHex(),
+            exception.getMessage());
 
     }
 
@@ -413,9 +361,8 @@ class TransactionServiceTest {
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
 
         TransactionFactory<SecretLockTransaction> factory = SecretLockTransactionFactory
-            .create(NetworkType.MIJIN_TEST, unresolvedMosaicId, BigInteger.TEN,
-                LockHashAlgorithmType.SHA3_256, secret, recipient
-            ).transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
+            .create(NetworkType.MIJIN_TEST, unresolvedMosaicId, BigInteger.TEN, LockHashAlgorithmType.SHA3_256, secret,
+                recipient).transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
         simulateStatement(height, 1, 0);
 
@@ -423,18 +370,16 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(transaction)));
 
-        SecretLockTransaction resolvedTransaction = (SecretLockTransaction) service
-            .resolveAliases(hashes)
-            .toFuture().get().get(0);
+        SecretLockTransaction resolvedTransaction = (SecretLockTransaction) service.resolveAliases(hashes).toFuture()
+            .get().get(0);
 
-        Assertions.assertEquals(mosaicId2,
-            resolvedTransaction.getMosaic().getId());
+        Assertions.assertEquals(mosaicId2, resolvedTransaction.getMosaic().getId());
 
-        Assertions.assertEquals(address1,
-            resolvedTransaction.getRecipient());
+        Assertions.assertEquals(address1, resolvedTransaction.getRecipient());
 
     }
 
@@ -448,8 +393,8 @@ class TransactionServiceTest {
         String proof = "2228ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
 
         TransactionFactory<SecretProofTransaction> factory = SecretProofTransactionFactory
-            .create(NetworkType.MIJIN_TEST, LockHashAlgorithmType.SHA3_256, recipient, secret, proof
-            ).transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
+            .create(NetworkType.MIJIN_TEST, LockHashAlgorithmType.SHA3_256, recipient, secret, proof)
+            .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
         simulateStatement(height, 1, 0);
 
@@ -457,28 +402,24 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(transaction)));
 
-        SecretProofTransaction resolvedTransaction = (SecretProofTransaction) service
-            .resolveAliases(hashes)
-            .toFuture().get().get(0);
+        SecretProofTransaction resolvedTransaction = (SecretProofTransaction) service.resolveAliases(hashes).toFuture()
+            .get().get(0);
 
-        Assertions.assertEquals(address1,
-            resolvedTransaction.getRecipient());
+        Assertions.assertEquals(address1, resolvedTransaction.getRecipient());
 
     }
 
     @Test
-    void mosaicGlobalRestrictionTransactionResolveAlias()
-        throws ExecutionException, InterruptedException {
+    void mosaicGlobalRestrictionTransactionResolveAlias() throws ExecutionException, InterruptedException {
 
         String transactionHash = "aaaa";
 
         MosaicGlobalRestrictionTransactionFactory mosaicGlobalRestrictionTransactionFactory = MosaicGlobalRestrictionTransactionFactory
-            .create(NetworkType.MIJIN_TEST, mosaicNamespace2, BigInteger.TEN, BigInteger.ONE,
-                MosaicRestrictionType.GT
-            );
+            .create(NetworkType.MIJIN_TEST, mosaicNamespace2, BigInteger.TEN, BigInteger.ONE, MosaicRestrictionType.GT);
         mosaicGlobalRestrictionTransactionFactory.referenceMosaicId(mosaicNamespace3);
         mosaicGlobalRestrictionTransactionFactory.previousRestrictionType(MosaicRestrictionType.EQ);
         mosaicGlobalRestrictionTransactionFactory.previousRestrictionValue(BigInteger.valueOf(3));
@@ -491,12 +432,12 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(transaction)));
 
         MosaicGlobalRestrictionTransaction resolvedTransaction = (MosaicGlobalRestrictionTransaction) service
-            .resolveAliases(hashes)
-            .toFuture().get().get(0);
+            .resolveAliases(hashes).toFuture().get().get(0);
 
         Assertions.assertEquals(mosaicId2, resolvedTransaction.getMosaicId());
         Assertions.assertEquals(mosaicId3, resolvedTransaction.getReferenceMosaicId());
@@ -504,16 +445,13 @@ class TransactionServiceTest {
     }
 
     @Test
-    void mosaicAddressRestrictionTransactionResolveAlias()
-        throws ExecutionException, InterruptedException {
+    void mosaicAddressRestrictionTransactionResolveAlias() throws ExecutionException, InterruptedException {
 
         String transactionHash = "aaaa";
 
         TransactionFactory<MosaicAddressRestrictionTransaction> factory = MosaicAddressRestrictionTransactionFactory
-            .create(NetworkType.MIJIN_TEST, mosaicNamespace2, BigInteger.TEN,
-                addressNamespace3, BigInteger.ONE
-            ).previousRestrictionValue(BigInteger.valueOf(3))
-            .previousRestrictionValue(BigInteger.valueOf(3))
+            .create(NetworkType.MIJIN_TEST, mosaicNamespace2, BigInteger.TEN, addressNamespace3, BigInteger.ONE)
+            .previousRestrictionValue(BigInteger.valueOf(3)).previousRestrictionValue(BigInteger.valueOf(3))
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
         MosaicAddressRestrictionTransaction transaction = factory.build();
@@ -522,12 +460,12 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(transaction)));
 
         MosaicAddressRestrictionTransaction resolvedTransaction = (MosaicAddressRestrictionTransaction) service
-            .resolveAliases(hashes)
-            .toFuture().get().get(0);
+            .resolveAliases(hashes).toFuture().get().get(0);
 
         Assertions.assertEquals(mosaicId2, resolvedTransaction.getMosaicId());
         Assertions.assertEquals(address3, resolvedTransaction.getTargetAddress());
@@ -535,16 +473,15 @@ class TransactionServiceTest {
     }
 
     @Test
-    void accountMosaicRestrictionTransactionResolveAlias()
-        throws ExecutionException, InterruptedException {
+    void accountMosaicRestrictionTransactionResolveAlias() throws ExecutionException, InterruptedException {
 
         String transactionHash = "aaaa";
 
         TransactionFactory<AccountMosaicRestrictionTransaction> factory = AccountMosaicRestrictionTransactionFactory
             .create(NetworkType.MIJIN_TEST, AccountRestrictionFlags.ALLOW_INCOMING_MOSAIC,
                 Arrays.asList(mosaicNamespace1, mosaicId2, mosaicNamespace2),
-                Arrays.asList(mosaicNamespace2, mosaicNamespace3, mosaicId3)
-            ).transactionInfo(TransactionInfo.create(height, 4, "ABC", transactionHash, ""));
+                Arrays.asList(mosaicNamespace2, mosaicNamespace3, mosaicId3))
+            .transactionInfo(TransactionInfo.create(height, 4, "ABC", transactionHash, ""));
 
         AccountMosaicRestrictionTransaction transaction = factory.build();
 
@@ -552,12 +489,12 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(transaction)));
 
         AccountMosaicRestrictionTransaction resolvedTransaction = (AccountMosaicRestrictionTransaction) service
-            .resolveAliases(hashes)
-            .toFuture().get().get(0);
+            .resolveAliases(hashes).toFuture().get().get(0);
 
         Assertions.assertEquals(Arrays.asList(mosaicId1, mosaicId2, mosaicId2),
             resolvedTransaction.getRestrictionAdditions());
@@ -567,16 +504,13 @@ class TransactionServiceTest {
     }
 
     @Test
-    void mosaicMetadataTransactionResolveAlias()
-        throws ExecutionException, InterruptedException {
+    void mosaicMetadataTransactionResolveAlias() throws ExecutionException, InterruptedException {
 
         String transactionHash = "aaaa";
 
         TransactionFactory<MosaicMetadataTransaction> factory = MosaicMetadataTransactionFactory
-            .create(NetworkType.MIJIN_TEST,
-                Account.generateNewAccount(networkType).getAddress(), mosaicNamespace2,
-                BigInteger.TEN, "Value")
-            .transactionInfo(TransactionInfo.create(height, 4, "ABC", transactionHash, ""));
+            .create(NetworkType.MIJIN_TEST, Account.generateNewAccount(networkType).getAddress(), mosaicNamespace2,
+                BigInteger.TEN, "Value").transactionInfo(TransactionInfo.create(height, 4, "ABC", transactionHash, ""));
 
         MosaicMetadataTransaction transaction = factory.build();
 
@@ -584,11 +518,11 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(transaction)));
 
-        MosaicMetadataTransaction resolvedTransaction = (MosaicMetadataTransaction) service
-            .resolveAliases(hashes)
+        MosaicMetadataTransaction resolvedTransaction = (MosaicMetadataTransaction) service.resolveAliases(hashes)
             .toFuture().get().get(0);
 
         Assertions.assertEquals(mosaicId2, resolvedTransaction.getTargetMosaicId());
@@ -596,14 +530,12 @@ class TransactionServiceTest {
     }
 
     @Test
-    void mosaicSupplyChangeTransactionResolveAlias()
-        throws ExecutionException, InterruptedException {
+    void mosaicSupplyChangeTransactionResolveAlias() throws ExecutionException, InterruptedException {
 
         String transactionHash = "aaaa";
 
         TransactionFactory<MosaicSupplyChangeTransaction> factory = MosaicSupplyChangeTransactionFactory
-            .create(NetworkType.MIJIN_TEST,
-                mosaicNamespace2, MosaicSupplyChangeActionType.INCREASE, BigInteger.ONE)
+            .create(NetworkType.MIJIN_TEST, mosaicNamespace2, MosaicSupplyChangeActionType.INCREASE, BigInteger.ONE)
             .transactionInfo(TransactionInfo.create(height, 4, "ABC", transactionHash, ""));
 
         MosaicSupplyChangeTransaction transaction = factory.build();
@@ -612,28 +544,25 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(transaction)));
 
         MosaicSupplyChangeTransaction resolvedTransaction = (MosaicSupplyChangeTransaction) service
-            .resolveAliases(hashes)
-            .toFuture().get().get(0);
+            .resolveAliases(hashes).toFuture().get().get(0);
 
         Assertions.assertEquals(mosaicId2, resolvedTransaction.getMosaicId());
 
     }
 
     @Test
-    void mosaicDefinitionTransactionResolveAlias()
-        throws ExecutionException, InterruptedException {
+    void mosaicDefinitionTransactionResolveAlias() throws ExecutionException, InterruptedException {
 
         String transactionHash = "aaaa";
 
         TransactionFactory<MosaicDefinitionTransaction> factory = MosaicDefinitionTransactionFactory
-            .create(NetworkType.MIJIN_TEST, MosaicNonce.createFromBigInteger(new BigInteger("0")),
-                mosaicId2, MosaicFlags.create(true, true, true),
-                4, new BlockDuration(10000)
-            )
+            .create(NetworkType.MIJIN_TEST, MosaicNonce.createFromBigInteger(new BigInteger("0")), mosaicId2,
+                MosaicFlags.create(true, true, true), 4, new BlockDuration(10000))
             .transactionInfo(TransactionInfo.create(height, 4, "ABC", transactionHash, ""));
 
         MosaicDefinitionTransaction transaction = factory.build();
@@ -642,11 +571,11 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(transaction)));
 
-        MosaicDefinitionTransaction resolvedTransaction = (MosaicDefinitionTransaction) service
-            .resolveAliases(hashes)
+        MosaicDefinitionTransaction resolvedTransaction = (MosaicDefinitionTransaction) service.resolveAliases(hashes)
             .toFuture().get().get(0);
 
         Assertions.assertEquals(mosaicId2, resolvedTransaction.getMosaicId());
@@ -654,16 +583,15 @@ class TransactionServiceTest {
     }
 
     @Test
-    void accountAddressRestrictionTransactionResolveAlias()
-        throws ExecutionException, InterruptedException {
+    void accountAddressRestrictionTransactionResolveAlias() throws ExecutionException, InterruptedException {
 
         String transactionHash = "aaaa";
 
         TransactionFactory<AccountAddressRestrictionTransaction> factory = AccountAddressRestrictionTransactionFactory
             .create(NetworkType.MIJIN_TEST, AccountRestrictionFlags.ALLOW_INCOMING_MOSAIC,
                 Arrays.asList(addressNamespace1, address2, addressNamespace2),
-                Arrays.asList(addressNamespace2, addressNamespace3, address3)
-            ).transactionInfo(TransactionInfo.create(height, 4, "ABC", transactionHash, ""));
+                Arrays.asList(addressNamespace2, addressNamespace3, address3))
+            .transactionInfo(TransactionInfo.create(height, 4, "ABC", transactionHash, ""));
 
         AccountAddressRestrictionTransaction transaction = factory.build();
 
@@ -671,17 +599,17 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(transaction)));
 
         AccountAddressRestrictionTransaction resolvedTransaction = (AccountAddressRestrictionTransaction) service
-            .resolveAliases(hashes)
-            .toFuture().get().get(0);
+            .resolveAliases(hashes).toFuture().get().get(0);
 
-        Assertions.assertEquals(Arrays.asList(address1, address2, address2),
-            resolvedTransaction.getRestrictionAdditions());
-        Assertions.assertEquals(Arrays.asList(address2, address3, address3),
-            resolvedTransaction.getRestrictionDeletions());
+        Assertions
+            .assertEquals(Arrays.asList(address1, address2, address2), resolvedTransaction.getRestrictionAdditions());
+        Assertions
+            .assertEquals(Arrays.asList(address2, address3, address3), resolvedTransaction.getRestrictionDeletions());
     }
 
     @Test
@@ -692,10 +620,8 @@ class TransactionServiceTest {
         String transactionHash = "aaaa";
 
         TransactionFactory<HashLockTransaction> factory = HashLockTransactionFactory
-            .create(NetworkType.MIJIN_TEST,
-                unresolvedMosaicId, BigInteger.TEN,
-                "SomeHash"
-            ).transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
+            .create(NetworkType.MIJIN_TEST, unresolvedMosaicId, BigInteger.TEN, "SomeHash")
+            .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
         simulateStatement(height, 1, 0);
 
@@ -703,22 +629,20 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(transaction)));
 
-        HashLockTransaction resolvedTransaction = (HashLockTransaction) service
-            .resolveAliases(hashes)
-            .toFuture().get().get(0);
+        HashLockTransaction resolvedTransaction = (HashLockTransaction) service.resolveAliases(hashes).toFuture().get()
+            .get(0);
 
-        Assertions.assertEquals(mosaicId2,
-            resolvedTransaction.getMosaic().getId());
+        Assertions.assertEquals(mosaicId2, resolvedTransaction.getMosaic().getId());
 
     }
 
 
     @Test
-    void aggregateTransferTransactionResolveAlias()
-        throws ExecutionException, InterruptedException {
+    void aggregateTransferTransactionResolveAlias() throws ExecutionException, InterruptedException {
 
         ArrayList<Mosaic> mosaics = new ArrayList<>();
         mosaics.add(new Mosaic(mosaicId1, BigInteger.valueOf(1)));
@@ -730,29 +654,23 @@ class TransactionServiceTest {
         String transactionHash = "aaaa";
 
         TransactionFactory<TransferTransaction> factory = TransferTransactionFactory
-            .create(NetworkType.MIJIN_TEST,
-                recipient,
-                mosaics,
-                PlainMessage.Empty
-            ).transactionInfo(TransactionInfo.create(height, 0, "ABC", "BBBB", ""));
+            .create(NetworkType.MIJIN_TEST, recipient, mosaics, PlainMessage.Empty)
+            .transactionInfo(TransactionInfo.create(height, 0, "ABC", "BBBB", ""));
 
         //Extra transfer not aliases
         TransactionFactory<TransferTransaction> extraTransaction = TransferTransactionFactory
-            .create(NetworkType.MIJIN_TEST,
-                address2,
-                Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))),
-                PlainMessage.Empty
-            ).transactionInfo(TransactionInfo.create(height, 1, "ABC", "CCCC", ""));
+            .create(NetworkType.MIJIN_TEST, address2,
+                Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))), PlainMessage.Empty)
+            .transactionInfo(TransactionInfo.create(height, 1, "ABC", "CCCC", ""));
 
         TransferTransaction transferTransaction = factory.build();
 
         transferTransaction.toAggregate(Account.generateNewAccount(networkType).getPublicAccount());
 
         TransactionFactory<AggregateTransaction> aggregateTransactionFactory = AggregateTransactionFactory
-            .createComplete(NetworkType.MIJIN_TEST,
-                Arrays.asList(transferTransaction, extraTransaction.build()
-                    .toAggregate(Account.generateNewAccount(networkType).getPublicAccount()))
-            ).transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
+            .createComplete(NetworkType.MIJIN_TEST, Arrays.asList(transferTransaction,
+                extraTransaction.build().toAggregate(Account.generateNewAccount(networkType).getPublicAccount())))
+            .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
         AggregateTransaction aggregateTransaction = aggregateTransactionFactory.build();
 
@@ -760,36 +678,31 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(aggregateTransaction)));
 
-        AggregateTransaction aggregateResolvedTransaction = (AggregateTransaction) service
-            .resolveAliases(hashes)
+        AggregateTransaction aggregateResolvedTransaction = (AggregateTransaction) service.resolveAliases(hashes)
             .toFuture().get().get(0);
 
         TransferTransaction resolvedTransaction = (TransferTransaction) aggregateResolvedTransaction
             .getInnerTransactions().get(0);
 
-        Assertions.assertEquals(transferTransaction.getMosaics().size(),
-            resolvedTransaction.getMosaics().size());
+        Assertions.assertEquals(transferTransaction.getMosaics().size(), resolvedTransaction.getMosaics().size());
 
         Assertions.assertEquals(transferTransaction.getMosaics().get(0).getId(),
             resolvedTransaction.getMosaics().get(0).getId());
 
-        Assertions.assertEquals(BigInteger.valueOf(1),
-            resolvedTransaction.getMosaics().get(0).getAmount());
+        Assertions.assertEquals(BigInteger.valueOf(1), resolvedTransaction.getMosaics().get(0).getAmount());
 
-        Assertions.assertEquals(mosaicId2,
-            resolvedTransaction.getMosaics().get(1).getId());
+        Assertions.assertEquals(mosaicId2, resolvedTransaction.getMosaics().get(1).getId());
 
-        Assertions.assertEquals(BigInteger.valueOf(2),
-            resolvedTransaction.getMosaics().get(1).getAmount());
+        Assertions.assertEquals(BigInteger.valueOf(2), resolvedTransaction.getMosaics().get(1).getAmount());
 
         Assertions.assertEquals(transferTransaction.getMosaics().get(2).getId(),
             resolvedTransaction.getMosaics().get(2).getId());
 
-        Assertions.assertEquals(BigInteger.valueOf(3),
-            resolvedTransaction.getMosaics().get(2).getAmount());
+        Assertions.assertEquals(BigInteger.valueOf(3), resolvedTransaction.getMosaics().get(2).getAmount());
 
         Assertions.assertEquals(address1, resolvedTransaction.getRecipient());
 
@@ -808,29 +721,22 @@ class TransactionServiceTest {
         String transactionHash = "aaaa";
 
         TransactionFactory<TransferTransaction> factory = TransferTransactionFactory
-            .create(NetworkType.MIJIN_TEST,
-                recipient,
-                mosaics,
-                PlainMessage.Empty
-            ).transactionInfo(TransactionInfo.create(height, 0, "ABC", "BBBB", ""));
+            .create(NetworkType.MIJIN_TEST, recipient, mosaics, PlainMessage.Empty)
+            .transactionInfo(TransactionInfo.create(height, 0, "ABC", "BBBB", ""));
 
         //Extra transfer not aliases
         TransactionFactory<TransferTransaction> extraTransaction = TransferTransactionFactory
-            .create(NetworkType.MIJIN_TEST,
-                address2,
-                Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))),
-                PlainMessage.Empty
-            );
+            .create(NetworkType.MIJIN_TEST, address2,
+                Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))), PlainMessage.Empty);
 
         TransferTransaction transferTransaction = factory.build();
 
         transferTransaction.toAggregate(Account.generateNewAccount(networkType).getPublicAccount());
 
         TransactionFactory<AggregateTransaction> aggregateTransactionFactory = AggregateTransactionFactory
-            .createComplete(NetworkType.MIJIN_TEST,
-                Arrays.asList(transferTransaction, extraTransaction.build()
-                    .toAggregate(Account.generateNewAccount(networkType).getPublicAccount()))
-            ).transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
+            .createComplete(NetworkType.MIJIN_TEST, Arrays.asList(transferTransaction,
+                extraTransaction.build().toAggregate(Account.generateNewAccount(networkType).getPublicAccount())))
+            .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
         AggregateTransaction aggregateTransaction = aggregateTransactionFactory.build();
 
@@ -838,16 +744,15 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(aggregateTransaction)));
 
-        IllegalArgumentException exception = Assertions
-            .assertThrows(IllegalArgumentException.class, () -> {
-                ExceptionUtils.propagate(service.resolveAliases(hashes).toFuture()::get);
-            });
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            ExceptionUtils.propagate(service.resolveAliases(hashes).toFuture()::get);
+        });
 
-        Assertions.assertEquals("TransactionIndex cannot be loaded from Transaction TRANSFER",
-            exception.getMessage());
+        Assertions.assertEquals("TransactionIndex cannot be loaded from Transaction TRANSFER", exception.getMessage());
     }
 
 
@@ -864,29 +769,22 @@ class TransactionServiceTest {
         String transactionHash = "aaaa";
 
         TransactionFactory<TransferTransaction> factory = TransferTransactionFactory
-            .create(NetworkType.MIJIN_TEST,
-                recipient,
-                mosaics,
-                PlainMessage.Empty
-            ).transactionInfo(TransactionInfo.create(height, 0, "ABC", "BBBB", ""));
+            .create(NetworkType.MIJIN_TEST, recipient, mosaics, PlainMessage.Empty)
+            .transactionInfo(TransactionInfo.create(height, 0, "ABC", "BBBB", ""));
 
         //Extra transfer not aliases
         TransactionFactory<TransferTransaction> extraTransaction = TransferTransactionFactory
-            .create(NetworkType.MIJIN_TEST,
-                address2,
-                Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))),
-                PlainMessage.Empty
-            );
+            .create(NetworkType.MIJIN_TEST, address2,
+                Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))), PlainMessage.Empty);
 
         TransferTransaction transferTransaction = factory.build();
 
         transferTransaction.toAggregate(Account.generateNewAccount(networkType).getPublicAccount());
 
         TransactionFactory<AggregateTransaction> aggregateTransactionFactory = AggregateTransactionFactory
-            .createComplete(NetworkType.MIJIN_TEST,
-                Arrays.asList(transferTransaction, extraTransaction.build()
-                    .toAggregate(Account.generateNewAccount(networkType).getPublicAccount()))
-            ).transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
+            .createComplete(NetworkType.MIJIN_TEST, Arrays.asList(transferTransaction,
+                extraTransaction.build().toAggregate(Account.generateNewAccount(networkType).getPublicAccount())))
+            .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
         AggregateTransaction aggregateTransaction = aggregateTransactionFactory.build();
 
@@ -894,16 +792,15 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(aggregateTransaction)));
 
-        IllegalArgumentException exception = Assertions
-            .assertThrows(IllegalArgumentException.class, () -> {
-                ExceptionUtils.propagate(service.resolveAliases(hashes).toFuture()::get);
-            });
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            ExceptionUtils.propagate(service.resolveAliases(hashes).toFuture()::get);
+        });
 
-        Assertions.assertEquals("TransactionIndex cannot be loaded from Transaction TRANSFER",
-            exception.getMessage());
+        Assertions.assertEquals("TransactionIndex cannot be loaded from Transaction TRANSFER", exception.getMessage());
     }
 
     private void simulateStatement(BigInteger height, int primaryId, int secondaryId) {
@@ -919,25 +816,20 @@ class TransactionServiceTest {
         mosaicMap.put(mosaicNamespace2, mosaicId2);
         mosaicMap.put(mosaicNamespace3, mosaicId3);
 
-        List<AddressResolutionStatement> addressResolutionStatements = addressMap.entrySet()
-            .stream().map(e ->
-                new AddressResolutionStatement(height, e.getKey(), Collections.singletonList(
-                    ResolutionEntry.forAddress(e.getValue(), new ReceiptSource(primaryId,
-                        secondaryId))))
-            ).collect(Collectors.toList());
+        List<AddressResolutionStatement> addressResolutionStatements = addressMap.entrySet().stream().map(
+            e -> new AddressResolutionStatement(height, e.getKey(), Collections
+                .singletonList(ResolutionEntry.forAddress(e.getValue(), new ReceiptSource(primaryId, secondaryId)))))
+            .collect(Collectors.toList());
 
-        List<MosaicResolutionStatement> mosaicResolutionStatements = mosaicMap.entrySet()
-            .stream().map(e ->
-                new MosaicResolutionStatement(height, e.getKey(), Collections.singletonList(
-                    ResolutionEntry.forMosaicId(e.getValue(), new ReceiptSource(primaryId,
-                        secondaryId))))
-            ).collect(Collectors.toList());
+        List<MosaicResolutionStatement> mosaicResolutionStatements = mosaicMap.entrySet().stream().map(
+            e -> new MosaicResolutionStatement(height, e.getKey(), Collections
+                .singletonList(ResolutionEntry.forMosaicId(e.getValue(), new ReceiptSource(primaryId, secondaryId)))))
+            .collect(Collectors.toList());
 
         Statement statement = new Statement(transactionStatements, addressResolutionStatements,
             mosaicResolutionStatements);
 
-        Mockito.when(receiptRepositoryMock.getBlockReceipts(Mockito.eq(height)))
-            .thenReturn(Observable.just(statement));
+        Mockito.when(receiptRepositoryMock.getBlockReceipts(Mockito.eq(height))).thenReturn(Observable.just(statement));
 
     }
 

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package io.nem.symbol.sdk.api;
+package io.nem.symbol.sdk.model.transaction;
 
 import java.util.Arrays;
 
 /**
  * A stored transaction could be classified in the following groups:
 */
-public enum TransactionSearchGroup {
+public enum TransactionGroup {
 
     /**
      * The transaction reached * the P2P network. At this point, it is not guaranteed that the
@@ -43,9 +43,9 @@ public enum TransactionSearchGroup {
     /**
      * Refernce value.
      */
-    private String value;
+    private final String value;
 
-    TransactionSearchGroup(String value) {
+    TransactionGroup(String value) {
         this.value = value;
     }
 
@@ -53,7 +53,7 @@ public enum TransactionSearchGroup {
         return value;
     }
 
-    public static TransactionSearchGroup rawValueOf(String value) {
+    public static TransactionGroup rawValueOf(String value) {
         return Arrays.stream(values()).filter(e -> e.value.equals(value)).findFirst()
             .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
     }

@@ -34,6 +34,7 @@ import io.nem.symbol.sdk.api.RepositoryFactoryConfiguration;
 import io.nem.symbol.sdk.api.RestrictionAccountRepository;
 import io.nem.symbol.sdk.api.RestrictionMosaicRepository;
 import io.nem.symbol.sdk.api.TransactionRepository;
+import io.nem.symbol.sdk.api.TransactionStatusRepository;
 import io.nem.symbol.sdk.infrastructure.RepositoryFactoryBase;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import okhttp3.OkHttpClient;
@@ -112,6 +113,12 @@ public class RepositoryFactoryOkHttpImpl extends RepositoryFactoryBase {
     public TransactionRepository createTransactionRepository() {
         return new TransactionRepositoryOkHttpImpl(apiClient);
     }
+
+    @Override
+    public TransactionStatusRepository createTransactionStatusRepository() {
+        return new TransactionStatusRepositoryOkHttpImpl(apiClient);
+    }
+
 
     @Override
     public MetadataRepository createMetadataRepository() {

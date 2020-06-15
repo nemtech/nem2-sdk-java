@@ -53,6 +53,7 @@ import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionAnnounceResponse;
 import io.nem.symbol.sdk.model.transaction.TransactionFactory;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransactionInfo;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
@@ -128,7 +129,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Observable<List<Transaction>> resolveAliases(List<String> transactionHashes) {
-        return transactionRepository.getTransactions(transactionHashes).flatMapIterable(a -> a)
+        return transactionRepository.getTransactions(TransactionGroup.CONFIRMED, transactionHashes).flatMapIterable(a -> a)
             .flatMap(transaction -> resolveTransaction(transaction,
                 createExpectedReceiptSource(transaction))).toList().toObservable();
     }

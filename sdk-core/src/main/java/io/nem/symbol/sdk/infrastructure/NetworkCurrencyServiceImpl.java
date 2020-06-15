@@ -32,6 +32,7 @@ import io.nem.symbol.sdk.model.transaction.MosaicAliasTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransaction;
 import io.nem.symbol.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.reactivex.Observable;
 import java.math.BigInteger;
@@ -236,7 +237,7 @@ public class NetworkCurrencyServiceImpl implements NetworkCurrencyService {
      */
     private Observable<List<Transaction>> getBlockTransactions(BigInteger height, int pageNumber) {
         return this.transactionRepository.search(
-            new TransactionSearchCriteria().height(height).pageNumber(pageNumber))
+            new TransactionSearchCriteria(TransactionGroup.CONFIRMED).height(height).pageNumber(pageNumber))
             .flatMap(page -> {
                 if (page.getPageNumber() <= pageNumber) {
                     return Observable.just(page.getData());

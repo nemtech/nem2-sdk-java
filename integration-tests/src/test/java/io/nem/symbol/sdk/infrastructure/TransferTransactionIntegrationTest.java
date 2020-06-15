@@ -27,6 +27,7 @@ import io.nem.symbol.sdk.model.message.PersistentHarvestingDelegationMessage;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
@@ -107,7 +108,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
 
         TransferTransaction restTransaction = (TransferTransaction) get(
             getRepositoryFactory(type).createTransactionRepository()
-                .getTransaction(processed.getTransactionInfo().get().getHash().get()));
+                .getTransaction(TransactionGroup.CONFIRMED, processed.getTransactionInfo().get().getHash().get()));
 
         assertTransferTransactions(transferTransaction, restTransaction);
 
@@ -189,7 +190,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
 
         TransferTransaction restTransaction = (TransferTransaction) get(
             getRepositoryFactory(type).createTransactionRepository()
-                .getTransaction(processed.getTransactionInfo().get().getHash().get()));
+                .getTransaction(TransactionGroup.CONFIRMED, processed.getTransactionInfo().get().getHash().get()));
 
         assertPersistentDelegationTransaction(recipientKeyPair, restTransaction);
     }

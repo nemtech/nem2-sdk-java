@@ -15,6 +15,8 @@
  */
 package io.nem.symbol.sdk.model.transaction;
 
+import java.util.Arrays;
+
 /**
  * State of the transaction.
  */
@@ -28,7 +30,7 @@ public enum TransactionState {
 
     PARTIAL("partial");
 
-    private String value;
+    private final String value;
 
     TransactionState(String value) {
         this.value = value;
@@ -43,5 +45,9 @@ public enum TransactionState {
         return String.valueOf(value);
     }
 
+    public static TransactionState rawValueOf(String value) {
+        return Arrays.stream(values()).filter(e -> e.value.equals(value)).findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+    }
 }
 

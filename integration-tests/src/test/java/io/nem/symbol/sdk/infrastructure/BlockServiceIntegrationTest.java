@@ -21,6 +21,7 @@ import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.TransactionRepository;
 import io.nem.symbol.sdk.api.TransactionSearchCriteria;
 import io.nem.symbol.sdk.model.transaction.Transaction;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import java.math.BigInteger;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -43,7 +44,7 @@ class BlockServiceIntegrationTest extends BaseIntegrationTest {
 
         List<Transaction> transactions = get(transactionRepository
             .search(
-                new TransactionSearchCriteria().height(height).pageNumber(1))).getData();
+                new TransactionSearchCriteria(TransactionGroup.CONFIRMED).height(height).pageNumber(1))).getData();
 
         BlockService service = new BlockServiceImpl(repositoryFactory);
 

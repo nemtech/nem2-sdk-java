@@ -31,9 +31,7 @@ import io.nem.symbol.sdk.openapi.vertx.model.EmbeddedTransactionMetaDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NetworkTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionMetaDTO;
-import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * Abstract transaction mapper for the transaction mappers that support a specific type of transaction (Account Link,
@@ -41,8 +39,7 @@ import org.apache.commons.lang3.ObjectUtils;
  *
  * @param <T> the dto type of the transaction object.
  */
-public abstract class AbstractTransactionMapper<D, T extends Transaction> implements
-    TransactionMapper {
+public abstract class AbstractTransactionMapper<D, T extends Transaction> implements TransactionMapper {
 
     private final TransactionType transactionType;
 
@@ -59,16 +56,21 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
 
     @Override
     public Transaction mapFromDto(Object object) {
+        return mapToFactoryFromDto(object).build();
+    }
+
+    @Override
+    public TransactionFactory<T> mapToFactoryFromDto(Object object) {
         if (object instanceof EmbeddedTransactionInfoDTO) {
             EmbeddedTransactionInfoDTO transactionInfoDTO = (EmbeddedTransactionInfoDTO) object;
             TransactionInfo transactionInfo = createTransactionInfo(transactionInfoDTO.getMeta(),
                 transactionInfoDTO.getId());
-            return createModel(transactionInfo, transactionInfoDTO.getTransaction());
+            return createFactory(transactionInfo, transactionInfoDTO.getTransaction());
         }
         TransactionInfoDTO transactionInfoDTO = this.jsonHelper.convert(object, TransactionInfoDTO.class);
         TransactionInfo transactionInfo = createTransactionInfo(transactionInfoDTO.getMeta(),
             transactionInfoDTO.getId());
-        return createModel(transactionInfo, transactionInfoDTO.getTransaction());
+        return createFactory(transactionInfo, transactionInfoDTO.getTransaction());
     }
 
     protected TransactionInfo createTransactionInfo(Object meta, String id) {
@@ -77,19 +79,12 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
         }
         if (this.jsonHelper.contains(meta, "aggregateHash")) {
             EmbeddedTransactionMetaDTO embedded = this.jsonHelper.convert(meta, EmbeddedTransactionMetaDTO.class);
-            return TransactionInfo.createAggregate(
-                embedded.getHeight(),
-                embedded.getIndex(),
-                id,
-                embedded.getAggregateHash(),
-                embedded.getAggregateId());
+            return TransactionInfo
+                .createAggregate(embedded.getHeight(), embedded.getIndex(), id, embedded.getAggregateHash(),
+                    embedded.getAggregateId());
         } else {
             TransactionMetaDTO toplevel = this.jsonHelper.convert(meta, TransactionMetaDTO.class);
-            return TransactionInfo.create(
-                toplevel.getHeight(),
-                toplevel.getIndex(),
-                id,
-                toplevel.getHash(),
+            return TransactionInfo.create(toplevel.getHeight(), toplevel.getIndex(), id, toplevel.getHash(),
                 toplevel.getMerkleComponentHash());
         }
     }
@@ -113,10 +108,9 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
         }
     }
 
-    protected final T createModel(TransactionInfo transactionInfo, Object transactionDto) {
+    protected final TransactionFactory<T> createFactory(TransactionInfo transactionInfo, Object transactionDto) {
         D transaction = getJsonHelper().convert(transactionDto, transactionDtoClass);
-        TransactionDTO transactionDTO = getJsonHelper()
-            .convert(transactionDto, TransactionDTO.class);
+        TransactionDTO transactionDTO = getJsonHelper().convert(transactionDto, TransactionDTO.class);
         NetworkType networkType = NetworkType.rawValueOf(transactionDTO.getNetwork().getValue());
         TransactionFactory<T> factory = createFactory(networkType, transaction);
         factory.version(transactionDTO.getVersion());
@@ -124,9 +118,7 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
             factory.deadline(new Deadline(transactionDTO.getDeadline()));
         }
         if (transactionDTO.getSignerPublicKey() != null) {
-            factory.signer(
-                PublicAccount
-                    .createFromPublicKey(transactionDTO.getSignerPublicKey(), networkType));
+            factory.signer(PublicAccount.createFromPublicKey(transactionDTO.getSignerPublicKey(), networkType));
         }
         if (transactionDTO.getSignature() != null) {
             factory.signature(transactionDTO.getSignature());
@@ -137,13 +129,11 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
         if (transactionInfo != null) {
             factory.transactionInfo(transactionInfo);
         }
-        T transactionModel = factory.build();
-        if (transactionModel.getType() != getTransactionType()) {
+        if (factory.getType() != getTransactionType()) {
             throw new IllegalStateException(
-                "Expected transaction to be " + getTransactionType() + " but got "
-                    + transactionModel.getType());
+                "Expected transaction to be " + getTransactionType() + " but got " + factory.getType());
         }
-        return transactionModel;
+        return factory;
     }
 
     protected abstract TransactionFactory<T> createFactory(NetworkType networkType, D transaction);
@@ -175,8 +165,7 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
 
         TransactionDTO dto = new TransactionDTO();
         dto.setSignerPublicKey(
-            transaction.getSigner().map(PublicAccount::getPublicKey).map(PublicKey::toHex)
-                .orElse(null));
+            transaction.getSigner().map(PublicAccount::getPublicKey).map(PublicKey::toHex).orElse(null));
 
         dto.setVersion(transaction.getVersion());
         dto.setType(transaction.getType().getValue());

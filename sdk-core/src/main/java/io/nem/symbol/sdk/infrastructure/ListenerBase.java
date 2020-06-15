@@ -34,6 +34,7 @@ import io.nem.symbol.sdk.model.transaction.PublicKeyLinkTransaction;
 import io.nem.symbol.sdk.model.transaction.RecipientTransaction;
 import io.nem.symbol.sdk.model.transaction.TargetAddressTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransactionStatusError;
 import io.nem.symbol.sdk.model.transaction.TransactionStatusException;
 import io.reactivex.Observable;
@@ -60,15 +61,14 @@ public abstract class ListenerBase implements Listener {
 
     private String uid;
 
-    protected ListenerBase(JsonHelper jsonHelper,
-        NamespaceRepository namespaceRepository) {
+    protected ListenerBase(JsonHelper jsonHelper, NamespaceRepository namespaceRepository) {
         this.jsonHelper = jsonHelper;
         this.namespaceRepository = namespaceRepository;
     }
 
     /**
-     * It knows how to handle a ws message coming from the server. Each subclass is responsible of
-     * hooking the web socket implementation with this method.
+     * It knows how to handle a ws message coming from the server. Each subclass is responsible of hooking the web
+     * socket implementation with this method.
      *
      * @param message the generic json with the message.
      * @param future to tell the user that the connection to the ws has been stabilised.
@@ -78,31 +78,38 @@ public abstract class ListenerBase implements Listener {
             uid = jsonHelper.getString(message, "uid");
             future.complete(null);
         } else if (jsonHelper.contains(message, "transaction")) {
-            System.out.println(message);
-            Transaction messageObject = toTransaction(message);
-            ListenerChannel channel = ListenerChannel
-                .rawValueOf(jsonHelper.getString(message, "meta", "channelName"));
+            ListenerChannel channel = ListenerChannel.rawValueOf(jsonHelper.getString(message, "meta", "channelName"));
+            TransactionGroup group = toGroup(channel);
+            Transaction messageObject = toTransaction(group, message);
             onNext(channel, messageObject);
         } else if (jsonHelper.contains(message, "block")) {
             BlockInfo messageObject = toBlockInfo(message);
             onNext(ListenerChannel.BLOCK, messageObject);
         } else if (jsonHelper.contains(message, "code")) {
             TransactionStatusError messageObject = new TransactionStatusError(
-                MapperUtils
-                    .toAddress(jsonHelper.getString(message, "address")),
-                jsonHelper.getString(message, "hash"),
+                MapperUtils.toAddress(jsonHelper.getString(message, "address")), jsonHelper.getString(message, "hash"),
                 jsonHelper.getString(message, "code"),
-                new Deadline(
-                    new BigInteger(jsonHelper.getString(message, "deadline"))));
+                new Deadline(new BigInteger(jsonHelper.getString(message, "deadline"))));
             onNext(ListenerChannel.STATUS, messageObject);
         } else if (jsonHelper.contains(message, "parentHash")) {
             CosignatureSignedTransaction messageObject = toCosignatureSignedTransaction(message);
             onNext(ListenerChannel.COSIGNATURE, messageObject);
         } else if (jsonHelper.contains(message, "meta")) {
-            onNext(ListenerChannel.rawValueOf(
-                jsonHelper.getString(message, "meta", "channelName")),
+            onNext(ListenerChannel.rawValueOf(jsonHelper.getString(message, "meta", "channelName")),
                 jsonHelper.getString(message, "meta", "hash"));
         }
+    }
+
+    private TransactionGroup toGroup(ListenerChannel channel) {
+        switch (channel) {
+            case CONFIRMED_ADDED:
+                return TransactionGroup.CONFIRMED;
+            case AGGREGATE_BONDED_ADDED:
+                return TransactionGroup.PARTIAL;
+            case UNCONFIRMED_ADDED:
+                return TransactionGroup.UNCONFIRMED;
+        }
+        throw new IllegalArgumentException("Cannot map channel " + channel + " to a transaction group.");
     }
 
 
@@ -110,8 +117,7 @@ public abstract class ListenerBase implements Listener {
     public Observable<BlockInfo> newBlock() {
         validateOpen();
         this.subscribeTo(ListenerChannel.BLOCK.toString());
-        return getMessageSubject()
-            .filter(rawMessage -> rawMessage.getChannel().equals(ListenerChannel.BLOCK))
+        return getMessageSubject().filter(rawMessage -> rawMessage.getChannel().equals(ListenerChannel.BLOCK))
             .map(rawMessage -> (BlockInfo) rawMessage.getMessage());
     }
 
@@ -124,8 +130,7 @@ public abstract class ListenerBase implements Listener {
     public Observable<Transaction> confirmedOrError(Address address, String transactionHash) {
         // I may move this method to the Listener
         Validate.notNull(transactionHash, "TransactionHash is required");
-        return getTransactionOrRaiseError(address, transactionHash,
-            confirmed(address, transactionHash));
+        return getTransactionOrRaiseError(address, transactionHash, confirmed(address, transactionHash));
     }
 
     @Override
@@ -135,21 +140,17 @@ public abstract class ListenerBase implements Listener {
 
     @Override
     public Observable<String> unconfirmedRemoved(Address address, String transactionHash) {
-        return subscribeTransactionHash(ListenerChannel.UNCONFIRMED_REMOVED, address,
-            transactionHash);
+        return subscribeTransactionHash(ListenerChannel.UNCONFIRMED_REMOVED, address, transactionHash);
     }
 
     @Override
-    public Observable<AggregateTransaction> aggregateBondedAdded(Address address,
-        String transactionHash) {
-        return subscribeTransaction(ListenerChannel.AGGREGATE_BONDED_ADDED, address,
-            transactionHash);
+    public Observable<AggregateTransaction> aggregateBondedAdded(Address address, String transactionHash) {
+        return subscribeTransaction(ListenerChannel.AGGREGATE_BONDED_ADDED, address, transactionHash);
     }
 
     @Override
     public Observable<String> aggregateBondedRemoved(Address address, String transactionHash) {
-        return subscribeTransactionHash(ListenerChannel.AGGREGATE_BONDED_REMOVED, address,
-            transactionHash);
+        return subscribeTransactionHash(ListenerChannel.AGGREGATE_BONDED_REMOVED, address, transactionHash);
     }
 
     @Override
@@ -157,26 +158,22 @@ public abstract class ListenerBase implements Listener {
         Validate.notNull(address, "Address is required");
         validateOpen();
         this.subscribeTo(ListenerChannel.STATUS + "/" + address.plain());
-        return getMessageSubject()
-            .filter(rawMessage -> rawMessage.getChannel().equals(ListenerChannel.STATUS))
+        return getMessageSubject().filter(rawMessage -> rawMessage.getChannel().equals(ListenerChannel.STATUS))
             .map(rawMessage -> (TransactionStatusError) rawMessage.getMessage())
             .filter(status -> address.equals(status.getAddress()))
-            .filter(status -> transactionHash == null || transactionHash
-                .equalsIgnoreCase(status.getHash()));
+            .filter(status -> transactionHash == null || transactionHash.equalsIgnoreCase(status.getHash()));
     }
 
     @Override
-    public Observable<CosignatureSignedTransaction> cosignatureAdded(Address address,
-        String parentTransactionHash) {
+    public Observable<CosignatureSignedTransaction> cosignatureAdded(Address address, String parentTransactionHash) {
         Validate.notNull(address, "Address is required");
         validateOpen();
         ListenerChannel channel = ListenerChannel.COSIGNATURE;
         this.subscribeTo(channel + "/" + address.plain());
-        return getMessageSubject()
-            .filter(rawMessage -> rawMessage.getChannel().equals(channel))
-            .map(rawMessage -> (CosignatureSignedTransaction) rawMessage.getMessage())
-            .filter(status -> parentTransactionHash == null || parentTransactionHash
-                .equalsIgnoreCase(status.getParentHash()));
+        return getMessageSubject().filter(rawMessage -> rawMessage.getChannel().equals(channel))
+            .map(rawMessage -> (CosignatureSignedTransaction) rawMessage.getMessage()).filter(
+                status -> parentTransactionHash == null || parentTransactionHash
+                    .equalsIgnoreCase(status.getParentHash()));
     }
 
     private void validateOpen() {
@@ -187,24 +184,20 @@ public abstract class ListenerBase implements Listener {
     }
 
     @Override
-    public Observable<AggregateTransaction> aggregateBondedAddedOrError(Address address,
-        String transactionHash) {
-        return getTransactionOrRaiseError(address, transactionHash,
-            aggregateBondedAdded(address, transactionHash));
+    public Observable<AggregateTransaction> aggregateBondedAddedOrError(Address address, String transactionHash) {
+        return getTransactionOrRaiseError(address, transactionHash, aggregateBondedAdded(address, transactionHash));
     }
 
 
-    private <T extends Transaction> Observable<T> getTransactionOrRaiseError(Address address,
-        String transactionHash, Observable<T> transactionListener) {
+    private <T extends Transaction> Observable<T> getTransactionOrRaiseError(Address address, String transactionHash,
+        Observable<T> transactionListener) {
         // I may move this method to the Listener
         IllegalStateException caller = new IllegalStateException("The Caller");
         Observable<TransactionStatusError> errorListener = status(address, transactionHash);
-        Observable<Object> errorOrTransactionObservable = Observable
-            .merge(transactionListener, errorListener).take(1);
+        Observable<Object> errorOrTransactionObservable = Observable.merge(transactionListener, errorListener).take(1);
         return errorOrTransactionObservable.map(errorOrTransaction -> {
             if (errorOrTransaction instanceof TransactionStatusError) {
-                throw new TransactionStatusException(caller,
-                    (TransactionStatusError) errorOrTransaction);
+                throw new TransactionStatusException(caller, (TransactionStatusError) errorOrTransaction);
             } else {
                 return (T) errorOrTransaction;
             }
@@ -212,23 +205,17 @@ public abstract class ListenerBase implements Listener {
     }
 
 
-    private <T extends Transaction> Observable<T> subscribeTransaction(ListenerChannel channel,
-        Address address,
+    private <T extends Transaction> Observable<T> subscribeTransaction(ListenerChannel channel, Address address,
         String transactionHash) {
         Validate.notNull(address, "Address is required");
         validateOpen();
         this.subscribeTo(channel.toString() + "/" + address.plain());
-        return getMessageSubject()
-            .filter(rawMessage -> rawMessage.getChannel().equals(channel))
-            .map(rawMessage -> (T) rawMessage.getMessage())
-            .filter(t -> t.getTransactionInfo()
-                .filter(
-                    info -> transactionHash == null || info.getHash()
-                        .filter(transactionHash::equalsIgnoreCase).isPresent())
-                .isPresent())
-            .flatMap(transaction -> this.transactionFromAddress(transaction, address,
-                getNamespaceIds(address)).flatMap(
-                include -> include ? Observable.just(transaction) : Observable.empty()));
+        return getMessageSubject().filter(rawMessage -> rawMessage.getChannel().equals(channel))
+            .map(rawMessage -> (T) rawMessage.getMessage()).filter(t -> t.getTransactionInfo().filter(
+                info -> transactionHash == null || info.getHash().filter(transactionHash::equalsIgnoreCase).isPresent())
+                .isPresent()).flatMap(
+                transaction -> this.transactionFromAddress(transaction, address, getNamespaceIds(address))
+                    .flatMap(include -> include ? Observable.just(transaction) : Observable.empty()));
     }
 
     private Observable<String> subscribeTransactionHash(ListenerChannel channel, Address address,
@@ -236,21 +223,20 @@ public abstract class ListenerBase implements Listener {
         Validate.notNull(address, "Address is required");
         validateOpen();
         this.subscribeTo(channel + "/" + address.plain());
-        return getMessageSubject()
-            .filter(rawMessage -> rawMessage.getChannel().equals(channel))
+        return getMessageSubject().filter(rawMessage -> rawMessage.getChannel().equals(channel))
             .map(rawMessage -> (String) rawMessage.getMessage())
             .filter(hash -> transactionHash == null || transactionHash.equalsIgnoreCase(hash));
     }
 
-    public Observable<Boolean> transactionFromAddress(final Transaction transaction,
-        final Address address, final Observable<List<NamespaceId>> namespaceIdsObservable) {
+    public Observable<Boolean> transactionFromAddress(final Transaction transaction, final Address address,
+        final Observable<List<NamespaceId>> namespaceIdsObservable) {
         if (transaction.getSigner().filter(s -> s.getAddress().equals(address)).isPresent()) {
             return Observable.just(true);
         }
         if (transaction instanceof AggregateTransaction) {
             final AggregateTransaction aggregateTransaction = (AggregateTransaction) transaction;
-            if (aggregateTransaction.getCosignatures()
-                .stream().anyMatch(c -> c.getSigner().getAddress().equals(address))) {
+            if (aggregateTransaction.getCosignatures().stream()
+                .anyMatch(c -> c.getSigner().getAddress().equals(address))) {
                 return Observable.just(true);
             }
             //Recursion...
@@ -258,20 +244,18 @@ public abstract class ListenerBase implements Listener {
                 .fromIterable(aggregateTransaction.getInnerTransactions());
 
             return innerTransactionObservable
-                .flatMap(t -> this.transactionFromAddress(t, address, namespaceIdsObservable)
-                    .filter(a -> a))
+                .flatMap(t -> this.transactionFromAddress(t, address, namespaceIdsObservable).filter(a -> a))
                 .first(false).toObservable();
         }
         if (transaction instanceof PublicKeyLinkTransaction) {
-            return Observable.just(Address.createFromPublicKey(
-                ((PublicKeyLinkTransaction) transaction).getLinkedPublicKey().toHex(),
-                transaction.getNetworkType()).equals(address));
+            return Observable.just(Address
+                .createFromPublicKey(((PublicKeyLinkTransaction) transaction).getLinkedPublicKey().toHex(),
+                    transaction.getNetworkType()).equals(address));
         }
 
         if (transaction instanceof MetadataTransaction) {
             MetadataTransaction metadataTransaction = (MetadataTransaction) transaction;
-            return Observable.just(
-                metadataTransaction.getTargetAddress().equals(address));
+            return Observable.just(metadataTransaction.getTargetAddress().equals(address));
         }
 
         if (transaction instanceof TargetAddressTransaction) {
@@ -280,8 +264,7 @@ public abstract class ListenerBase implements Listener {
                 return Observable.just(targetAddressTransaction.getTargetAddress().equals(address));
             }
             return namespaceIdsObservable
-                .map(namespaceIds -> namespaceIds
-                    .contains(targetAddressTransaction.getTargetAddress()));
+                .map(namespaceIds -> namespaceIds.contains(targetAddressTransaction.getTargetAddress()));
         }
 
         if (transaction instanceof MultisigAccountModificationTransaction) {
@@ -291,9 +274,8 @@ public abstract class ListenerBase implements Listener {
                 return Observable.just(true);
             }
 
-            return Observable
-                .just(multisigAccountModificationTransaction.getAddressDeletions().stream()
-                    .anyMatch(a -> a.equals(address)));
+            return Observable.just(
+                multisigAccountModificationTransaction.getAddressDeletions().stream().anyMatch(a -> a.equals(address)));
 
         }
 
@@ -305,28 +287,26 @@ public abstract class ListenerBase implements Listener {
             if (accountAddressRestrictionTransaction.getRestrictionDeletions().contains(address)) {
                 return Observable.just(true);
             }
-            return namespaceIdsObservable
-                .flatMap(namespaceIds -> {
-                    if (namespaceIds.stream().anyMatch(
-                        namespaceId -> accountAddressRestrictionTransaction
-                            .getRestrictionAdditions().contains(namespaceId))) {
-                        return Observable.just(true);
-                    }
-                    if (namespaceIds.stream().anyMatch(
-                        namespaceId -> accountAddressRestrictionTransaction
-                            .getRestrictionDeletions().contains(namespaceId))) {
-                        return Observable.just(true);
-                    }
-                    return Observable.just(false);
-                });
+            return namespaceIdsObservable.flatMap(namespaceIds -> {
+                if (namespaceIds.stream().anyMatch(
+                    namespaceId -> accountAddressRestrictionTransaction.getRestrictionAdditions()
+                        .contains(namespaceId))) {
+                    return Observable.just(true);
+                }
+                if (namespaceIds.stream().anyMatch(
+                    namespaceId -> accountAddressRestrictionTransaction.getRestrictionDeletions()
+                        .contains(namespaceId))) {
+                    return Observable.just(true);
+                }
+                return Observable.just(false);
+            });
         }
 
         if (transaction instanceof RecipientTransaction) {
             RecipientTransaction recipientTransaction = (RecipientTransaction) transaction;
             if (recipientTransaction.getRecipient() instanceof NamespaceId) {
                 return namespaceIdsObservable
-                    .map(namespaceIds -> namespaceIds
-                        .contains(recipientTransaction.getRecipient()));
+                    .map(namespaceIds -> namespaceIds.contains(recipientTransaction.getRecipient()));
             }
             return Observable.just(recipientTransaction.getRecipient().equals(address));
 
@@ -342,11 +322,10 @@ public abstract class ListenerBase implements Listener {
      * @return observable of namespace ids.
      */
     private Observable<List<NamespaceId>> getNamespaceIds(Address address) {
-        return Observable.defer(() -> namespaceRepository
-            .getAccountsNames(Collections.singletonList(address)).map(
-                accountNames -> accountNames.stream()
-                    .flatMap(accountName -> accountName.getNames().stream().map(
-                        NamespaceName::getNamespaceId)).collect(Collectors.toList()))).cache();
+        return Observable.defer(() -> namespaceRepository.getAccountsNames(Collections.singletonList(address)).map(
+            accountNames -> accountNames.stream()
+                .flatMap(accountName -> accountName.getNames().stream().map(NamespaceName::getNamespaceId))
+                .collect(Collectors.toList()))).cache();
     }
 
 
@@ -361,8 +340,8 @@ public abstract class ListenerBase implements Listener {
     }
 
     /**
-     * Subclasses know how to map a generic blockInfoDTO json to a BlockInfo using the generated
-     * DTOs of the implementation.
+     * Subclasses know how to map a generic blockInfoDTO json to a BlockInfo using the generated DTOs of the
+     * implementation.
      *
      * @param blockInfoDTO the generic json
      * @return the model {@link BlockInfo}
@@ -370,23 +349,23 @@ public abstract class ListenerBase implements Listener {
     protected abstract BlockInfo toBlockInfo(Object blockInfoDTO);
 
     /**
-     * Subclasses know how to map a generic TransactionInfoDto json to a Transaction using the
-     * generated DTOs of the implementation.
+     * Subclasses know how to map a generic TransactionInfoDto json to a Transaction using the generated DTOs of the
+     * implementation.
      *
+     * @param group the group the transaction belongs
      * @param transactionInfo the generic json
      * @return the model {@link Transaction}
      */
-    protected abstract Transaction toTransaction(Object transactionInfo);
+    protected abstract Transaction toTransaction(TransactionGroup group, Object transactionInfo);
 
     /**
-     * Subclasses know how to map a generic Consignature DTO json to a CosignatureSignedTransaction
-     * using the generated DTOs of the implementation.
+     * Subclasses know how to map a generic Consignature DTO json to a CosignatureSignedTransaction using the generated
+     * DTOs of the implementation.
      *
      * @param cosignature the generic json
      * @return the model {@link CosignatureSignedTransaction}
      */
-    protected abstract CosignatureSignedTransaction toCosignatureSignedTransaction(
-        Object cosignature);
+    protected abstract CosignatureSignedTransaction toCosignatureSignedTransaction(Object cosignature);
 
     protected abstract void subscribeTo(String channel);
 
