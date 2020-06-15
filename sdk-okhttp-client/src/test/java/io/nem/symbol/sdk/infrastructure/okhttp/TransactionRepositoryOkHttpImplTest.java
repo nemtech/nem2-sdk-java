@@ -79,6 +79,41 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         Assertions.assertNotNull(transaction);
 
         Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
+        Assertions.assertEquals(TransactionGroup.CONFIRMED, transaction.getGroup().get());
+    }
+
+    @Test
+    public void shouldGetTransactionPartial() throws Exception {
+
+        TransactionInfoDTO transactionInfoDTO = loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json",
+            TransactionInfoDTO.class);
+
+        String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
+        mockRemoteCall(transactionInfoDTO);
+
+        Transaction transaction = repository.getTransaction(TransactionGroup.PARTIAL, hash).toFuture().get();
+
+        Assertions.assertNotNull(transaction);
+
+        Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
+        Assertions.assertEquals(TransactionGroup.PARTIAL, transaction.getGroup().get());
+    }
+
+    @Test
+    public void shouldGetTransactionUnconfirmed() throws Exception {
+
+        TransactionInfoDTO transactionInfoDTO = loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json",
+            TransactionInfoDTO.class);
+
+        String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
+        mockRemoteCall(transactionInfoDTO);
+
+        Transaction transaction = repository.getTransaction(TransactionGroup.UNCONFIRMED, hash).toFuture().get();
+
+        Assertions.assertNotNull(transaction);
+
+        Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
+        Assertions.assertEquals(TransactionGroup.UNCONFIRMED, transaction.getGroup().get());
     }
 
     @Test
@@ -91,6 +126,7 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         Transaction transaction = repository.getTransactions(TransactionGroup.CONFIRMED, Collections.singletonList(hash)).toFuture().get().get(0);
         Assertions.assertNotNull(transaction);
         Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
+        Assertions.assertEquals(TransactionGroup.CONFIRMED, transaction.getGroup().get());
     }
 
 
@@ -183,6 +219,7 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
             new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED).signerPublicKey(publicAccount.getPublicKey()))
             .toFuture().get();
         Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
+        Assertions.assertEquals(TransactionGroup.UNCONFIRMED, transactions.getData().get(0).getGroup().get());
         Assertions.assertEquals(1, transactions.getData().size());
         Assertions.assertEquals(1, transactions.getPageNumber());
         Assertions.assertEquals(2, transactions.getPageSize());
@@ -207,6 +244,32 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         Page<Transaction> transactions = repository.search(criteria.address(publicAccount.getAddress())).toFuture()
             .get();
         Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
+        Assertions.assertEquals(TransactionGroup.CONFIRMED, transactions.getData().get(0).getGroup().get());
+        Assertions.assertEquals(1, transactions.getData().size());
+        Assertions.assertEquals(1, transactions.getPageNumber());
+        Assertions.assertEquals(2, transactions.getPageSize());
+        Assertions.assertEquals(3, transactions.getTotalEntries());
+        Assertions.assertEquals(4, transactions.getTotalPages());
+
+    }
+
+    @Test
+    public void searchTransactionsTransactionTypesPartial() throws Exception {
+
+        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO("standaloneTransferTransaction.json",
+            TransactionInfoDTO.class);
+
+        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
+
+        mockRemoteCall(toPage(transferTransactionDTO));
+
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.PARTIAL)
+            .transactionTypes(Arrays.asList(TransactionType.NAMESPACE_METADATA, TransactionType.AGGREGATE_COMPLETE));
+
+        Page<Transaction> transactions = repository.search(criteria.address(publicAccount.getAddress())).toFuture()
+            .get();
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
+        Assertions.assertEquals(TransactionGroup.PARTIAL, transactions.getData().get(0).getGroup().get());
         Assertions.assertEquals(1, transactions.getData().size());
         Assertions.assertEquals(1, transactions.getPageNumber());
         Assertions.assertEquals(2, transactions.getPageSize());

@@ -69,7 +69,58 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     }
 
     @Test
-    public void shouldGetTransaction() throws Exception {
+    public void shouldGetTransactionParial() throws Exception {
+
+        TransactionInfoDTO transactionInfoDTO = TestHelperVertx
+            .loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
+        String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
+
+        mockRemoteCall(transactionInfoDTO);
+
+        Transaction transaction = repository.getTransaction(TransactionGroup.PARTIAL, hash).toFuture().get();
+
+        Assertions.assertNotNull(transaction);
+
+        Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
+        Assertions.assertEquals(TransactionGroup.PARTIAL, transaction.getGroup().get());
+    }
+
+    @Test
+    public void shouldGetTransactionPartial() throws Exception {
+
+        TransactionInfoDTO transactionInfoDTO = TestHelperVertx
+            .loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
+        String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
+
+        mockRemoteCall(transactionInfoDTO);
+
+        Transaction transaction = repository.getTransaction(TransactionGroup.PARTIAL, hash).toFuture().get();
+
+        Assertions.assertNotNull(transaction);
+
+        Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
+        Assertions.assertEquals(TransactionGroup.PARTIAL, transaction.getGroup().get());
+    }
+
+    @Test
+    public void shouldGetTransactionUnconfirmed() throws Exception {
+
+        TransactionInfoDTO transactionInfoDTO = TestHelperVertx
+            .loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
+        String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
+
+        mockRemoteCall(transactionInfoDTO);
+
+        Transaction transaction = repository.getTransaction(TransactionGroup.UNCONFIRMED, hash).toFuture().get();
+
+        Assertions.assertNotNull(transaction);
+
+        Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
+        Assertions.assertEquals(TransactionGroup.UNCONFIRMED, transaction.getGroup().get());
+    }
+
+    @Test
+    public void shouldGetTransactionConfirmed() throws Exception {
 
         TransactionInfoDTO transactionInfoDTO = TestHelperVertx
             .loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
@@ -82,6 +133,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
         Assertions.assertNotNull(transaction);
 
         Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
+        Assertions.assertEquals(TransactionGroup.CONFIRMED, transaction.getGroup().get());
     }
 
     @Test
@@ -125,7 +177,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     }
 
     @Test
-    public void shouldGetTransactions() throws Exception {
+    public void shouldGetTransactionsConfirmed() throws Exception {
 
         TransactionInfoDTO transactionInfoDTO = TestHelperVertx
             .loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
@@ -139,6 +191,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
         Assertions.assertNotNull(transaction);
 
         Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
+        Assertions.assertEquals(TransactionGroup.CONFIRMED, transaction.getGroup().get());
     }
 
 
@@ -236,6 +289,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
             new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED).signerPublicKey(publicAccount.getPublicKey()))
             .toFuture().get();
         Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
+        Assertions.assertEquals(TransactionGroup.UNCONFIRMED, transactions.getData().get(0).getGroup().get());
         Assertions.assertEquals(1, transactions.getData().size());
         Assertions.assertEquals(1, transactions.getPageNumber());
         Assertions.assertEquals(2, transactions.getPageSize());
@@ -256,6 +310,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
 
         Page<Transaction> transactions = repository.search(criteria).toFuture().get();
         Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
+        Assertions.assertEquals(TransactionGroup.CONFIRMED, transactions.getData().get(0).getGroup().get());
         Assertions.assertEquals(1, transactions.getData().size());
         Assertions.assertEquals(1, transactions.getPageNumber());
         Assertions.assertEquals(2, transactions.getPageSize());
@@ -264,6 +319,26 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
 
     }
 
+    @Test
+    public void searchTransactionsPartial() throws Exception {
+
+        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO("standaloneTransferTransaction.json");
+
+        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
+
+        mockRemoteCall(toPage(transferTransactionDTO));
+
+        Page<Transaction> transactions = repository.search(
+            new TransactionSearchCriteria(TransactionGroup.PARTIAL).signerPublicKey(publicAccount.getPublicKey()))
+            .toFuture().get();
+        Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
+        Assertions.assertEquals(TransactionGroup.PARTIAL, transactions.getData().get(0).getGroup().get());
+        Assertions.assertEquals(1, transactions.getData().size());
+        Assertions.assertEquals(1, transactions.getPageNumber());
+        Assertions.assertEquals(2, transactions.getPageSize());
+        Assertions.assertEquals(3, transactions.getTotalEntries());
+        Assertions.assertEquals(4, transactions.getTotalPages());
+    }
     private TransactionPage toPage(TransactionInfoDTO dto) {
         return new TransactionPage()
             .data(Collections.singletonList(jsonHelper.parse(jsonHelper.print(dto), TransactionInfoDTO.class)))
