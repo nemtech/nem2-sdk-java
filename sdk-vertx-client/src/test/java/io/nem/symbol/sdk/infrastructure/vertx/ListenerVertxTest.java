@@ -51,6 +51,8 @@ import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.LinkAction;
+import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransaction;
+import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
@@ -731,19 +733,6 @@ public class ListenerVertxTest {
             account3.getAddress(), alias2));
     }
 
-    private AccountAddressRestrictionTransaction accountAddressRestrictionTransaction(PublicAccount signer,
-        UnresolvedAddress addition, UnresolvedAddress deletion) {
-        List<UnresolvedAddress> additions = Collections.singletonList(addition);
-        List<UnresolvedAddress> deletions = Collections.singletonList(deletion);
-
-        AccountAddressRestrictionTransactionFactory factory = AccountAddressRestrictionTransactionFactory
-            .create(NETWORK_TYPE, AccountRestrictionFlags.BLOCK_ADDRESS, additions, deletions);
-        if (signer != null) {
-            factory.signer(signer);
-        }
-        return factory.build();
-    }
-
 
     @Test
     public void shouldCheckTransactionAggregateTransaction() {
@@ -849,5 +838,55 @@ public class ListenerVertxTest {
         }
         return factory.build();
     }
+
+
+    @Test
+    public void shouldMosaicAddressRestriction() {
+        Account account1 = Account.generateNewAccount(NETWORK_TYPE);
+        Account account2 = Account.generateNewAccount(NETWORK_TYPE);
+        Account account3 = Account.generateNewAccount(NETWORK_TYPE);
+        NamespaceId alias1 = NamespaceId.createFromName("alias1");
+        NamespaceId alias2 = NamespaceId.createFromName("alias2");
+
+        Assertions.assertTrue(transactionFromAddress(listener,
+            mosaicAddressRestriction(account1.getPublicAccount(), account2.getAddress()), account1.getAddress()));
+
+        Assertions.assertTrue(transactionFromAddress(listener,
+            mosaicAddressRestriction(account1.getPublicAccount(), account2.getAddress()), account2.getAddress()));
+        Assertions.assertFalse(transactionFromAddress(listener,
+            mosaicAddressRestriction(account1.getPublicAccount(), account2.getAddress()), account3.getAddress()));
+
+        Assertions.assertTrue(transactionFromAddress(listener,
+            mosaicAddressRestriction(account1.getPublicAccount(), alias2), account3.getAddress(), alias2));
+        Assertions.assertFalse(transactionFromAddress(listener,
+            mosaicAddressRestriction(account1.getPublicAccount(), alias2), account3.getAddress(), alias1));
+
+    }
+
+    private AccountAddressRestrictionTransaction accountAddressRestrictionTransaction(PublicAccount signer,
+        UnresolvedAddress addition, UnresolvedAddress deletion) {
+        List<UnresolvedAddress> additions = Collections.singletonList(addition);
+        List<UnresolvedAddress> deletions = Collections.singletonList(deletion);
+
+        AccountAddressRestrictionTransactionFactory factory = AccountAddressRestrictionTransactionFactory
+            .create(NETWORK_TYPE, AccountRestrictionFlags.BLOCK_ADDRESS, additions, deletions);
+        if (signer != null) {
+            factory.signer(signer);
+        }
+        return factory.build();
+    }
+
+
+    private MosaicAddressRestrictionTransaction mosaicAddressRestriction(PublicAccount signer,
+        UnresolvedAddress targetAddress) {
+
+        MosaicAddressRestrictionTransactionFactory factory = MosaicAddressRestrictionTransactionFactory
+            .create(NETWORK_TYPE, NamespaceId.createFromName("abc"), BigInteger.ONE, targetAddress, BigInteger.TEN);
+        if (signer != null) {
+            factory.signer(signer);
+        }
+        return factory.build();
+    }
+
 
 }
