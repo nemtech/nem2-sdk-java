@@ -42,10 +42,10 @@ public class MapperUtilsTest {
     void shouldMapToAddress() {
         Assertions.assertNull(MapperUtils.toAddressFromRawAddress(null));
         Address address = MapperUtils
-            .toAddressFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QX");
+            .toAddressFromRawAddress("TDGRZDZEHD4M5K3JIT64DU3PEKFYNF5VWFEYDQA");
         Assertions.assertNotNull(address);
-        Assertions.assertEquals("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QX", address.plain());
-        Assertions.assertEquals("SBCPGZ-3S2SCC-3YHBBT-YDCUZV-4ZZEPH-M2KGCP-4QX", address.pretty());
+        Assertions.assertEquals("TDGRZDZEHD4M5K3JIT64DU3PEKFYNF5VWFEYDQA", address.plain());
+        Assertions.assertEquals("TDGRZD-ZEHD4M-5K3JIT-64DU3P-EKFYNF-5VWFEY-DQA", address.pretty());
     }
 
     @Test

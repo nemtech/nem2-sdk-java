@@ -43,7 +43,7 @@ public class TransactionStatementTest {
                 NetworkType.MIJIN_TEST);
         MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
         Address recipientAddress =
-            new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR2", NetworkType.MIJIN_TEST);
+            new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", NetworkType.MIJIN_TEST);
         ArtifactExpiryReceipt<MosaicId> mosaicExpiryReceipt =
             new ArtifactExpiryReceipt(
                 mosaicId, ReceiptType.MOSAIC_EXPIRED, ReceiptVersion.ARTIFACT_EXPIRY);
@@ -86,6 +86,6 @@ public class TransactionStatementTest {
         String hash = transactionStatement.generateHash();
 
         assertTrue(!hash.isEmpty());
-        assertEquals("E3F417D18AD2F2BE4F217E9FAF9E4A1A131150D748F6F5A73F0AA09C6A1B9C50", hash);
+        assertEquals("E236746F9A803C764A115E9542DEB295D30E86B8ED62F5142B4F170B08BA22D5", hash);
     }
 }

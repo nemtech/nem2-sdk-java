@@ -74,19 +74,19 @@ public class MultisigRepositoryIntegrationTest extends BaseIntegrationTest {
             multisigAccountGraphInfos.getLevelsNumber().size());
 
         assertEquals(2,
-            multisigAccountGraphInfos.getMultisigAccounts().size());
+            multisigAccountGraphInfos.getMultisigEntries().size());
 
         assertEquals(1,
-            multisigAccountGraphInfos.getMultisigAccounts().get(0).size());
+            multisigAccountGraphInfos.getMultisigEntries().get(0).size());
 
         assertEquals(1,
-            multisigAccountGraphInfos.getMultisigAccounts().get(0).size());
+            multisigAccountGraphInfos.getMultisigEntries().get(0).size());
 
         assertEquals(2,
-            multisigAccountGraphInfos.getMultisigAccounts().get(1).size());
+            multisigAccountGraphInfos.getMultisigEntries().get(1).size());
 
         assertEquals(config().getMultisigAccount().getAddress(),
-            multisigAccountGraphInfos.getMultisigAccounts().get(0).get(0).getAccountAddress());
+            multisigAccountGraphInfos.getMultisigEntries().get(0).get(0).getAccountAddress());
 
     }
 

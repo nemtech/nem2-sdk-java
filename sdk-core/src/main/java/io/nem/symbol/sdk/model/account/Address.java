@@ -25,6 +25,7 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -198,6 +199,11 @@ public class Address implements UnresolvedAddress {
                 return Optional.of("Plain address '" + plainAddress + "' size is " + plainAddress.length() + " when "
                     + PLAIN_ADDRESS_SIZE + " is required");
             }
+
+            if ("AIQY".indexOf(plainAddress.charAt(plainAddress.toUpperCase().length() - 1)) < 0) {
+                return Optional.of("Plain address '" + plainAddress + "' doesn't end with A I, Q or Y");
+            }
+
             byte[] decodedArray = Base32Encoder.getBytes(plainAddress);
 
             if (decodedArray.length != RAW_ADDRESS_SIZE) {
@@ -216,8 +222,7 @@ public class Address implements UnresolvedAddress {
                         + CHECKSUM_SIZE + " is required");
             }
 
-            byte[] providedChecksum = Arrays
-                .copyOfRange(decodedArray, checksumBegin, decodedArray.length);
+            byte[] providedChecksum = Arrays.copyOfRange(decodedArray, checksumBegin, decodedArray.length);
             if (!Arrays.equals(expectedChecksum, providedChecksum)) {
                 return Optional.of("Plain address '" + plainAddress + "' checksum is incorrect. Address checksum is '"
                     + ConvertUtils.toHex(providedChecksum) + "' when '" + ConvertUtils.toHex(expectedChecksum)
@@ -232,6 +237,7 @@ public class Address implements UnresolvedAddress {
 
     /**
      * Generates a random address for the given network type.
+     *
      * @param networkType the network type
      * @return an random address.
      */
@@ -308,7 +314,7 @@ public class Address implements UnresolvedAddress {
     private static String fromEncodedToPlain(String encoded) {
         byte[] bytes = ConvertUtils.fromHexToBytes(encoded);
         String rawAddress = Base32Encoder.getString(bytes);
-        return rawAddress.substring(0, rawAddress.length() -1);
+        return rawAddress.substring(0, rawAddress.length() - 1);
     }
 
     /**
@@ -325,8 +331,7 @@ public class Address implements UnresolvedAddress {
             return false;
         }
         Address address1 = (Address) o;
-        return Objects.equals(plainAddress, address1.plainAddress)
-            && networkType == address1.networkType;
+        return Objects.equals(plainAddress, address1.plainAddress) && networkType == address1.networkType;
     }
 
     @Override

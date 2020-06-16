@@ -39,7 +39,7 @@ public class TransactionTest {
     @Test
     void generateHashFromTransferTransactionPayload() {
         TransferTransactionFactory factory = TransferTransactionFactory
-            .create(networkType, new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR6", networkType),
+            .create(networkType, new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.emptyList(), PlainMessage.Empty);
         TransferTransaction transaction = factory.build();
 
@@ -52,7 +52,7 @@ public class TransactionTest {
     @Test
     void generateHashFromAggregateTransactionPayload() {
         TransferTransactionFactory factory = TransferTransactionFactory
-            .create(networkType, new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR2", networkType),
+            .create(networkType, new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.emptyList(), PlainMessage.Empty);
         TransferTransaction transaction = factory.build();
 

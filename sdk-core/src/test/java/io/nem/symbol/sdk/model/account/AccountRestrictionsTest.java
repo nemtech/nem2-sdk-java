@@ -31,7 +31,7 @@ public class AccountRestrictionsTest {
         AccountRestriction accountRestriction =
             new AccountRestriction(
                 AccountRestrictionFlags.ALLOW_INCOMING_ADDRESS,
-                Arrays.asList("SDUP5PLHDXKBX3UU5Q52LAY4WYEKGEWC6IB3VBFM"));
+                Arrays.asList("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQM"));
         AccountRestrictions accountRestrictions =
             new AccountRestrictions(address, Arrays.asList(accountRestriction));
 

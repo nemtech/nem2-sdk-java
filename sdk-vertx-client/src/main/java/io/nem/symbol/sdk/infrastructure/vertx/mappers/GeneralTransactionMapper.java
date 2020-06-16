@@ -40,7 +40,6 @@ public class GeneralTransactionMapper implements TransactionMapper {
     public GeneralTransactionMapper(JsonHelper jsonHelper) {
         this.jsonHelper = jsonHelper;
         Validate.notNull(jsonHelper, "jsonHelper must not be null");
-        register(new AccountKeyLinkTransactionMapper(jsonHelper));
         register(new AddressAliasTransactionMapper(jsonHelper));
         register(new HashLockTransactionMapper(jsonHelper));
         register(new MosaicAddressRestrictionTransactionMapper(jsonHelper));
@@ -62,7 +61,7 @@ public class GeneralTransactionMapper implements TransactionMapper {
         register(new NodeKeyLinkTransactionMapper(jsonHelper));
         register(new VotingKeyLinkTransactionMapper(jsonHelper));
         register(new VrfKeyLinkTransactionMapper(jsonHelper));
-
+        register(new AccountKeyLinkTransactionMapper(jsonHelper));
         register(new AggregateTransactionMapper(jsonHelper, TransactionType.AGGREGATE_BONDED, this));
         register(new AggregateTransactionMapper(jsonHelper, TransactionType.AGGREGATE_COMPLETE, this));
     }

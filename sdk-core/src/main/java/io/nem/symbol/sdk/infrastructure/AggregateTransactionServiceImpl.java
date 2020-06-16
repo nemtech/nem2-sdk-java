@@ -16,7 +16,6 @@
 
 package io.nem.symbol.sdk.infrastructure;
 
-import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.api.AggregateTransactionService;
 import io.nem.symbol.sdk.api.MultisigRepository;
@@ -26,7 +25,6 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountGraphInfo;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.account.PublicAccount;
-import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionCosignature;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransaction;
@@ -96,7 +94,7 @@ public class AggregateTransactionServiceImpl implements AggregateTransactionServ
         return this.multisigRepository.getMultisigAccountGraphInfo(address)
             .map(multisigAccountGraphInfo -> {
                 Stream<Address> publicAccountStream = multisigAccountGraphInfo
-                    .getMultisigAccounts().values().stream().flatMap(
+                    .getMultisigEntries().values().stream().flatMap(
                         accounts -> accounts.stream()
                             .flatMap(account -> account.getCosignatoryAddresses().stream()));
                 return publicAccountStream.collect(Collectors.toSet()).size();
@@ -143,7 +141,7 @@ public class AggregateTransactionServiceImpl implements AggregateTransactionServ
                 .isEmpty();
 
         Map<Integer, List<MultisigAccountInfo>> storedMap = new TreeMap<>(graphInfo
-            .getMultisigAccounts());
+            .getMultisigEntries());
 
         return storedMap.values().stream()
             .anyMatch(entry -> entry.stream().allMatch(multisig -> {

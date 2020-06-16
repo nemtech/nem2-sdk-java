@@ -63,9 +63,9 @@ public class BalanceTransferReceiptTest {
         assertFalse(balanceTransferReceipt.getSize().isPresent());
         assertEquals(ReceiptVersion.BALANCE_TRANSFER, balanceTransferReceipt.getVersion());
         assertEquals(
-            balanceTransferReceipt.getSender(),
+            balanceTransferReceipt.getSenderAddress(),
             account.getAddress());
-        assertEquals(MapperUtils.toAddress(balanceTransferReceipt.getRecipient().encoded(
+        assertEquals(MapperUtils.toAddress(balanceTransferReceipt.getRecipientAddress().encoded(
             networkType)), address);
         assertEquals("85BBEA6CC462B244",
             balanceTransferReceipt.getMosaicId().getIdAsHex().toUpperCase());
@@ -114,9 +114,9 @@ public class BalanceTransferReceiptTest {
         assertFalse(balanceTransferReceipt.getSize().isPresent());
         assertEquals(ReceiptVersion.BALANCE_TRANSFER, balanceTransferReceipt.getVersion());
         assertEquals(
-            balanceTransferReceipt.getSender(),
+            balanceTransferReceipt.getSenderAddress(),
             account.getAddress());
-        assertEquals(MapperUtils.toAddress(balanceTransferReceipt.getRecipient().encoded(
+        assertEquals(MapperUtils.toAddress(balanceTransferReceipt.getRecipientAddress().encoded(
             networkType)), address);
         assertEquals("85BBEA6CC462B244",
             balanceTransferReceipt.getMosaicId().getIdAsHex().toUpperCase());
@@ -148,8 +148,8 @@ public class BalanceTransferReceiptTest {
         assertEquals(ReceiptType.NAMESPACE_RENTAL_FEE, balanceTransferReceipt.getType());
         assertFalse(balanceTransferReceipt.getSize().isPresent());
         assertEquals(ReceiptVersion.BALANCE_TRANSFER, balanceTransferReceipt.getVersion());
-        assertEquals(balanceTransferReceipt.getSender(), account.getAddress());
-        assertEquals(MapperUtils.toAddress(balanceTransferReceipt.getRecipient().encoded(
+        assertEquals(balanceTransferReceipt.getSenderAddress(), account.getAddress());
+        assertEquals(MapperUtils.toAddress(balanceTransferReceipt.getRecipientAddress().encoded(
             networkType)), address);
         assertEquals("85BBEA6CC462B244",
             balanceTransferReceipt.getMosaicId().getIdAsHex().toUpperCase());

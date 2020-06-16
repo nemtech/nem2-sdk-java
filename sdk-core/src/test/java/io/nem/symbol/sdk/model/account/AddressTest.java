@@ -48,29 +48,24 @@ class AddressTest {
     }
 
     @Test
-    void test(){
-        System.out.println(Address.createFromPublicKey("BDE86E53FC0CBDE08A27B059A86F92E2F99F85711E7615A74FDA8608683F8D5F", NetworkType.TEST_NET).plain());
-    }
-
-    @Test
     void testAddressCreation() {
         Address address =
-            new Address("SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR2", NetworkType.MIJIN_TEST);
-        assertEquals("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR2", address.plain());
+            new Address("TDGRZD-ZEHD4M-5K3JIT-64DU3P-EKFYNF-5VWFEY-DQA", NetworkType.TEST_NET);
+        assertEquals("TDGRZDZEHD4M5K3JIT64DU3PEKFYNF5VWFEYDQA", address.plain());
     }
 
     @Test
     void testAddressWithSpacesCreation() {
-        Address address =
-            new Address(" SDGLFW-DSHILT-IUHGIB-H5UGX2-VYF5VN-JEKCCD-BR2 ", NetworkType.MIJIN_TEST);
-        assertEquals("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR2", address.plain());
+         Address address =
+            new Address("TBBVTI-NGPSB3-NCNMUY-GYU74V-ZAUNRY-UBOTF7-7YI  ", NetworkType.TEST_NET);
+        assertEquals("TBBVTI-NGPSB3-NCNMUY-GYU74V-ZAUNRY-UBOTF7-7YI", address.pretty());
     }
 
     @Test
     void testLowerCaseAddressCreation() {
         Address address =
-            new Address("sdglfw-dshilt-iuhgib-h5ugx2-vyf5vn-jekccd-br2", NetworkType.MIJIN_TEST);
-        assertEquals("SDGLFWDSHILTIUHGIBH5UGX2VYF5VNJEKCCDBR2", address.plain());
+            new Address("TBBVTI-NGPSB3-NCNMUY-GYU74V-ZAUNRY-UBOTF7-7yi  ", NetworkType.TEST_NET);
+        assertEquals("TBBVTI-NGPSB3-NCNMUY-GYU74V-ZAUNRY-UBOTF7-7YI", address.pretty());
     }
 
     @Test
@@ -93,18 +88,10 @@ class AddressTest {
 
     @Test
     void addressInPrettyFormat() {
-        Address address =
-            new Address("SDRDGF-TDLLCB-67D4HP-GIMIHP-NSRYRJ-RT7DOB-GWZ", NetworkType.MIJIN_TEST);
-        assertEquals("SDRDGF-TDLLCB-67D4HP-GIMIHP-NSRYRJ-RT7DOB-GWZ", address.pretty());
-    }
 
-    @Test
-    void createFromEncodedSameResult() {
-        Address address2 = Address.createFromRawAddress("NAR3W7B4BCOZSZMFIZRYB3N5YGOUSWIYJCJ6HDF");
-        Address address1 = Address.createFromRawAddress("NAR3W7B4BCOZSZMFIZRYB3N5YGOUSWIYJCJ6HDA");
-        assertEquals(address1.encoded(), address2.encoded());
-        assertEquals(address1, Address.createFromEncoded(address1.encoded()));
-        assertNotEquals(address1.plain(), address2.plain());
+        Address address =
+            new Address("TBBVTI-NGPSB3-NCNMUY-GYU74V-ZAUNRY-UBOTF7-7YI", NetworkType.TEST_NET);
+        assertEquals("TBBVTI-NGPSB3-NCNMUY-GYU74V-ZAUNRY-UBOTF7-7YI", address.pretty());
     }
 
     @Test
@@ -116,19 +103,20 @@ class AddressTest {
 
     @Test
     void createFromEncodedDuplicated() {
-        Address address2 = Address.createFromRawAddress("NAR3W7B4BCOZSZMFIZRYB3N5YGOUSWIYJCJ6HDF");
+        Address address2 = Address.createFromRawAddress("NAR3W7B4BCOZSZMFIZRYB3N5YGOUSWIYJCJ6HDA");
         Address address1 = Address.createFromEncoded("6823BB7C3C089D996585466380EDBDC19D4959184893E38C");
-        assertEquals("NAR3W7B4BCOZSZMFIZRYB3N5YGOUSWIYJCJ6HDF", address2.plain());
+        assertEquals("NAR3W7B4BCOZSZMFIZRYB3N5YGOUSWIYJCJ6HDA", address2.plain());
         assertEquals("NAR3W7B4BCOZSZMFIZRYB3N5YGOUSWIYJCJ6HDA", address1.plain());
     }
 
 
     @Test
     void equality() {
+
         Address address1 =
-            new Address("SDRDGF-TDLLCB-67D4HP-GIMIHP-NSRYRJ-RT7DOB-GWZ", NetworkType.MIJIN_TEST);
+            new Address("TBBVTI-NGPSB3-NCNMUY-GYU74V-ZAUNRY-UBOTF7-7YI", NetworkType.TEST_NET);
         Address address2 =
-            new Address("SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZ", NetworkType.MIJIN_TEST);
+            new Address("tbbvtingpsb3ncnmuygyu74vzaunryubotf77yi", NetworkType.TEST_NET);
         assertEquals(address1, address2);
     }
 
@@ -171,7 +159,18 @@ class AddressTest {
     @Test
     void createFromRawAddressShouldFailWhenInvalidSuffix() {
         Assertions.assertEquals(
-            "Plain address 'ADRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZ' checksum is incorrect. Address checksum is 'DC135B' when '61DABF' is expected",
+            "Plain address 'ADRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWA' checksum is incorrect. Address checksum is 'DC1358' when '61DABF' is expected",
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> {
+                    Address.createFromRawAddress("ADRDGF-TDLLCB-67D4HP-GIMIHP-NSRYRJ-RT7DOB-GWA");
+                }).getMessage());
+    }
+
+    @Test
+    void createFromRawAddressShouldFailWhenInvalidEnd() {
+        Assertions.assertEquals(
+            "Plain address 'ADRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZ' doesn't end with A I, Q or Y",
             assertThrows(
                 IllegalArgumentException.class,
                 () -> {
@@ -223,11 +222,11 @@ class AddressTest {
         Assertions.assertEquals("Plain address 'ABC' size is 3 when 39 is required",
             Address.validatePlainAddress("ABC").get());
         Assertions.assertEquals(
-            "Plain address 'S111GFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGGZ' is invalid. Error: IllegalArgumentException: malformed base32 string passed to getBytes",
-            Address.validatePlainAddress("S111GFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGGZ").get());
+            "Plain address 'S111GFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGGA' is invalid. Error: IllegalArgumentException: malformed base32 string passed to getBytes",
+            Address.validatePlainAddress("S111GFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGGA").get());
         Assertions.assertEquals(
-            "Plain address 'SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGGZ' checksum is incorrect. Address checksum is 'DC131B' when 'DC135B' is expected",
-            Address.validatePlainAddress("SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGGZ").get());
+            "Plain address 'SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGGA' checksum is incorrect. Address checksum is 'DC1318' when 'DC135B' is expected",
+            Address.validatePlainAddress("SDRDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGGA").get());
     }
 
 }

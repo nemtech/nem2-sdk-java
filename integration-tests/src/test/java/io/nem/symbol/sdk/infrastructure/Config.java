@@ -38,9 +38,9 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 public class Config {
 
     private static final String CONFIG_JSON = "config.json";
-    private JsonObject config;
+    private final JsonObject config;
     private List<Account> nemesisAccounts;
-    private Map<String, Account> accountCache = new HashMap<>();
+    private final Map<String, Account> accountCache = new HashMap<>();
     private NetworkType networkType;
 
     public Config() {
@@ -51,8 +51,7 @@ public class Config {
             }
             this.config = new JsonObject(IOUtils.toString(inputStream));
         } catch (IOException e) {
-            throw new IllegalStateException(
-                "Config file could not be loaded. " + ExceptionUtils.getMessage(e), e);
+            throw new IllegalStateException("Config file could not be loaded. " + ExceptionUtils.getMessage(e), e);
         }
     }
 
@@ -62,45 +61,40 @@ public class Config {
     }
 
     private static List<Account> loadNemesisAccountsFromBootstrap(NetworkType networkType) {
-        String homeFolder = System.getProperty("user.home");
 
         String bootstrapFolder = System.getenv("CATAPULT_SERVICE_BOOTSTRAP");
-
-        if (StringUtils.isNotBlank(bootstrapFolder)) {
-            File generatedAddressesOption = new File(
-                StringUtils.removeEnd(bootstrapFolder, "/")
-                    + "/build/generated-addresses/addresses.yaml");
-            return loadNemesisAccountsFromBootstrap(networkType, generatedAddressesOption);
+        if (StringUtils.isBlank(bootstrapFolder)) {
+            bootstrapFolder = "../../catapult-service-bootstrap";
         }
         File generatedAddressesOption = new File(
-            homeFolder
-                + "/develop/workspace-nem/catapult-service-bootstrap/build/generated-addresses/addresses.yaml");
+            StringUtils.removeEnd(bootstrapFolder, "/") + "/build/generated-addresses/addresses.yaml");
+        if (!generatedAddressesOption.exists()) {
+            throw new IllegalArgumentException("File " + generatedAddressesOption.getAbsolutePath() + " doesn't exist");
+        }
+        if (generatedAddressesOption.isDirectory()) {
+            throw new IllegalArgumentException(
+                "File " + generatedAddressesOption.getAbsolutePath() + " is a directory!");
+        }
         return loadNemesisAccountsFromBootstrap(networkType, generatedAddressesOption);
+
     }
 
-    private static List<Account> loadNemesisAccountsFromBootstrap(NetworkType networkType,
-        File generatedAddresses) {
+    private static List<Account> loadNemesisAccountsFromBootstrap(NetworkType networkType, File generatedAddresses) {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         try {
             if (!generatedAddresses.exists()) {
-                System.out.println("Generated addresses could not be found in " + generatedAddresses
-                    .getAbsolutePath()
+                System.out.println("Generated addresses could not be found in " + generatedAddresses.getAbsolutePath()
                     + " Nemesis address must bue added manually");
                 return Collections.emptyList();
             }
             List<Map<String, String>> bootstrapAddresses = (List<Map<String, String>>) mapper
-                .readValue(
-                    generatedAddresses,
-                    Map.class).get("nemesis_addresses");
+                .readValue(generatedAddresses, Map.class).get("nemesis_addresses");
 
-            return bootstrapAddresses.stream()
-                .map(m -> Account.createFromPrivateKey(m.get("private"), networkType)).collect(
-                    Collectors.toList());
+            return bootstrapAddresses.stream().map(m -> Account.createFromPrivateKey(m.get("private"), networkType))
+                .collect(Collectors.toList());
 
         } catch (Exception e) {
-            System.err
-                .println("Nemesis account could not be loaded from Bootstrap: " + ExceptionUtils
-                    .getMessage(e));
+            System.err.println("Nemesis account could not be loaded from Bootstrap: " + ExceptionUtils.getMessage(e));
             e.printStackTrace();
             return Collections.emptyList();
         }
@@ -108,14 +102,13 @@ public class Config {
 
     private static InputStream getConfigInputStream() throws IOException {
         String cwd = System.getProperty("user.home");
-        File localConfiguration = new File(new File(cwd),
-            "nem-sdk-java-integration-test-config.json");
+        File localConfiguration = new File(new File(cwd), "nem-sdk-java-integration-test-config.json");
         if (localConfiguration.exists()) {
             System.out.println("Using local configuration " + localConfiguration);
             return new FileInputStream(localConfiguration);
         } else {
-            System.out.println("Local configuration " + localConfiguration.getPath()
-                + " not found. Using shared config.json");
+            System.out.println(
+                "Local configuration " + localConfiguration.getPath() + " not found. Using shared config.json");
             return BaseIntegrationTest.class.getClassLoader().getResourceAsStream(CONFIG_JSON);
         }
     }
@@ -155,10 +148,9 @@ public class Config {
 
 
     public Account getNemesisAccount(int index) {
-        return getOptionalAccount("nemesisAccount")
-            .orElseGet(() -> getNemesisAccounts().stream().skip(index).findFirst().orElseThrow(
-                () -> new IllegalArgumentException(
-                    "No nemesis account could not be found at index " + index)));
+        return getOptionalAccount("nemesisAccount").orElseGet(
+            () -> getNemesisAccounts().stream().skip(index).findFirst().orElseThrow(
+                () -> new IllegalArgumentException("No nemesis account could not be found at index " + index)));
     }
 
     public List<Account> getNemesisAccounts() {
@@ -242,15 +234,14 @@ public class Config {
     }
 
     private Account getAccount(String accountName) {
-        return getOptionalAccount(accountName).orElseThrow(
-            () -> new IllegalArgumentException(accountName + " account could not be found"));
+        return getOptionalAccount(accountName)
+            .orElseThrow(() -> new IllegalArgumentException(accountName + " account could not be found"));
     }
 
     private Optional<Account> getOptionalAccount(String accountName) {
         if (this.config.containsKey(accountName)) {
-            return Optional
-                .of(accountCache.computeIfAbsent(accountName, key -> Account.createFromPrivateKey(
-                    this.config.getJsonObject(accountName).getString("privateKey"),
+            return Optional.of(accountCache.computeIfAbsent(accountName, key -> Account
+                .createFromPrivateKey(this.config.getJsonObject(accountName).getString("privateKey"),
                     getNetworkType())));
         } else {
             return Optional.empty();

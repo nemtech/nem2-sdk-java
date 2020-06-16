@@ -102,8 +102,8 @@ public class MultisigRepositoryVertxImplTest extends AbstractVertxRespositoryTes
             .getMultisigAccountGraphInfo(account.getAddress())
             .toFuture().get();
 
-        Assertions.assertEquals(1, multisigAccountInfo.getMultisigAccounts().size());
-        List<MultisigAccountInfo> multisigAccountInfos = multisigAccountInfo.getMultisigAccounts()
+        Assertions.assertEquals(1, multisigAccountInfo.getMultisigEntries().size());
+        List<MultisigAccountInfo> multisigAccountInfos = multisigAccountInfo.getMultisigEntries()
             .get(10);
         Assertions.assertEquals(1, multisigAccountInfos.size());
 

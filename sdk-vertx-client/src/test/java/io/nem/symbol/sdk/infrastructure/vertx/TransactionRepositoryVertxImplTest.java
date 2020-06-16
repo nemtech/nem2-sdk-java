@@ -256,10 +256,9 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
 
         String generationHash = "A94B1BE81F1D4C95D6D252AD7BA3FFFB1674991FD880B7A57DC3180AF8D69C32";
 
-        Account account = Account
-            .createFromPrivateKey("063F36659A8BB01D5685826C19E2C2CA9D281465B642BD5E43CB69510408ECF7", this.networkType);
+        Account account = Account.generateNewAccount(this.networkType);
 
-        Address recipientAddress = Address.createFromRawAddress("SBCPGZ3S2SCC3YHBBTYDCUZV4ZZEPHM2KGCP4QX");
+        Address recipientAddress = Address.generateRandom(this.networkType);
 
         TransferTransaction transferTransaction = TransferTransactionFactory
             .create(NetworkType.MIJIN_TEST, recipientAddress,

@@ -28,10 +28,10 @@ import java.util.Set;
  */
 public class MultisigAccountGraphInfo {
 
-    private final Map<Integer, List<MultisigAccountInfo>> multisigAccounts;
+    private final Map<Integer, List<MultisigAccountInfo>> multisigEntries;
 
-    public MultisigAccountGraphInfo(Map<Integer, List<MultisigAccountInfo>> multisigAccounts) {
-        this.multisigAccounts = multisigAccounts;
+    public MultisigAccountGraphInfo(Map<Integer, List<MultisigAccountInfo>> multisigEntries) {
+        this.multisigEntries = multisigEntries;
     }
 
     /**
@@ -40,7 +40,7 @@ public class MultisigAccountGraphInfo {
      * @return {@link Set} of Integer
      */
     public Set<Integer> getLevelsNumber() {
-        return this.multisigAccounts.keySet();
+        return this.multisigEntries.keySet();
     }
 
     /**
@@ -48,7 +48,7 @@ public class MultisigAccountGraphInfo {
      *
      * @return a {@link Map} of {@link Integer} to {@link List} of {@link MultisigAccountInfo}
      */
-    public Map<Integer, List<MultisigAccountInfo>> getMultisigAccounts() {
-        return multisigAccounts;
+    public Map<Integer, List<MultisigAccountInfo>> getMultisigEntries() {
+        return multisigEntries;
     }
 }

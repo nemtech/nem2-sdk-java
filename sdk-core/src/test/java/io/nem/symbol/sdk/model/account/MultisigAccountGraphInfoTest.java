@@ -49,6 +49,6 @@ class MultisigAccountGraphInfoTest {
         assertEquals(
             Stream.of(-3).collect(Collectors.toSet()), multisigAccountGraphInfo.getLevelsNumber());
         assertEquals(
-            multisigAccountInfo, multisigAccountGraphInfo.getMultisigAccounts().get(-3).get(0));
+            multisigAccountInfo, multisigAccountGraphInfo.getMultisigEntries().get(-3).get(0));
     }
 }
