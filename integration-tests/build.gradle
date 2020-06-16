@@ -3,5 +3,15 @@ dependencies {
     compile project(':symbol-sdk-vertx-client')
     compile project(':symbol-sdk-okhttp-client')
     testCompile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jackson_version"
+
+    task integrationTest(type: Test) {
+        include '**/**IntegrationTest.class'
+        useJUnitPlatform {
+            includeEngines 'junit-jupiter'
+        }
+        testLogging {
+            events "skipped", "failed"
+        }
+    }
 }
 

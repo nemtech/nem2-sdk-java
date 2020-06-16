@@ -164,16 +164,6 @@ subprojects {
         }
     }
 
-    task integrationTest(type: Test) {
-        include '**/**IntegrationTest.class'
-        useJUnitPlatform {
-            includeEngines 'junit-jupiter'
-        }
-        testLogging {
-            events "skipped", "failed"
-        }
-    }
-
 
     jacocoTestReport {
         reports {

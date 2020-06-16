@@ -193,6 +193,42 @@ public class Config {
         return getNemesisAccount(5);
     }
 
+
+    public Account getNemesisAccount7() {
+        return getNemesisAccount(6);
+    }
+
+
+    public Account getNemesisAccount8() {
+        return getNemesisAccount(7);
+    }
+
+
+    public Account getNemesisAccount9() {
+        return getNemesisAccount(8);
+    }
+
+
+    public Account getNemesisAccount10() {
+        return getNemesisAccount(9);
+    }
+
+    public Account getNemesisAccount11() {
+        return getNemesisAccount(10);
+    }
+
+    public Account getNemesisAccount12() {
+        return getNemesisAccount(11);
+    }
+
+    public Account getNemesisAccount13() {
+        return getNemesisAccount(12);
+    }
+
+    public Account getNemesisAccount14() {
+        return getNemesisAccount(13);
+    }
+
     public Account getTestAccount() {
         return getAccount("testAccount");
     }

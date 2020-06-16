@@ -90,12 +90,29 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @Order(5)
-    void createMultisigAccount() {
+    void createMultisigAccountBonded() {
         sendMosaicFromNemesis(config().getMultisigAccount(), true);
         setAddressAlias(type, config().getMultisigAccount().getAddress(), "multisig-account");
         createMultisigAccountBonded(config().getMultisigAccount(), config().getCosignatoryAccount(),
             config().getCosignatory2Account());
     }
+
+    @Test
+    @Order(6)
+    void createMultisigAccountCompleteUsingNemesis() {
+        System.out.println(config().getNemesisAccount8().getAddress().encoded());
+        createMultisigAccountComplete(config().getNemesisAccount8(), config().getNemesisAccount9(),
+            config().getNemesisAccount10());
+    }
+
+    @Test
+    @Order(7)
+    void createMultisigAccountBondedUsingNemesis() {
+        System.out.println(config().getNemesisAccount7().getAddress().encoded());
+        createMultisigAccountBonded(config().getNemesisAccount8(), config().getNemesisAccount9(),
+            config().getNemesisAccount10());
+    }
+
 
     private void createMultisigAccountBonded(Account multisigAccount, Account... accounts) {
 
