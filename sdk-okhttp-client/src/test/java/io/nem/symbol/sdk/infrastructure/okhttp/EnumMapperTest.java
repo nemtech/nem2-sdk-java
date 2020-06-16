@@ -450,9 +450,10 @@ public class EnumMapperTest {
     @ParameterizedTest
     @EnumSource(TransactionState.class)
     void validFromTransactionState(TransactionState transactionState) {
+        assertNotNull(TransactionGroupEnum.fromValue(transactionState.getValue()));
         assertNotNull(TransactionGroupEnum.valueOf(transactionState.name()));
         Assertions
-            .assertEquals(TransactionGroupEnum.valueOf(transactionState.name()).getValue(),
+            .assertEquals(TransactionGroupEnum.fromValue(transactionState.getValue()).getValue(),
                 transactionState.getValue());
     }
 
@@ -460,8 +461,9 @@ public class EnumMapperTest {
     @EnumSource(TransactionGroupEnum.class)
     void validFromTransactionStateTypeEnum(TransactionGroupEnum transactionState) {
         assertNotNull(TransactionState.valueOf(transactionState.name()));
+        assertNotNull(TransactionState.rawValueOf(transactionState.getValue()));
         Assertions
-            .assertEquals(TransactionGroupEnum.valueOf(transactionState.name()).getValue(),
+            .assertEquals(TransactionState.rawValueOf(transactionState.getValue()).getValue(),
                 transactionState.getValue());
 
     }
@@ -576,5 +578,6 @@ public class EnumMapperTest {
         assertNotNull(BlockOrderByEnum.fromValue(enumValue.getValue()));
         assertEquals(BlockOrderByEnum.fromValue(enumValue.getValue()).getValue(), enumValue.getValue());
     }
+
 
 }

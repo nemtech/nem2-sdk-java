@@ -218,6 +218,7 @@ class AddressTest {
 
     @Test
     void validate() {
+        Assertions.assertEquals("Encoded Address it nos provided",Address.validateEncodedAddress(null).get());
         Assertions.assertEquals("Plain Address it nos provided", Address.validatePlainAddress(null).get());
         Assertions.assertEquals("Plain address 'ABC' size is 3 when 39 is required",
             Address.validatePlainAddress("ABC").get());

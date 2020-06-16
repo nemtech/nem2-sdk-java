@@ -62,41 +62,48 @@ public class TransactionTest {
         assertEquals("3BB1A0539B49194BFDCA34BFDB0CFE1748C7FE9062DF92EE38A90769E0957B75", hash);
     }
 
-    @Test
-    void shouldReturnTransactionIsUnannouncedWhenThereIsNoGroup() {
-        FakeTransferTransaction fakeTransaction = new FakeTransferTransactionFactory(networkType)
-            .deadline(new FakeDeadline()).build();
-        assertTrue(fakeTransaction.isUnannounced());
-    }
 
     @Test
-    void shouldReturnTransactionIsUnconfirmedWhenHeightIs0() {
-        TransactionInfo transactionInfo = TransactionInfo.create(BigInteger.valueOf(0), 1, "ABC", "hash", "hash");
+    void shouldReturnStateCONFIRMED() {
         FakeTransferTransaction fakeTransaction = new FakeTransferTransactionFactory(networkType)
-            .deadline(new FakeDeadline()).signature("signature").signer(signer).transactionInfo(transactionInfo)
             .group(TransactionGroup.CONFIRMED).build();
-
-        assertTrue(fakeTransaction.isUnconfirmed());
-    }
-
-    @Test
-    void shouldReturnTransactionIsNotUnconfirmedWhenHeightIsNot0() {
-        TransactionInfo transactionInfo = TransactionInfo.create(BigInteger.valueOf(100), 1, "ABC", "hash", "hash");
-        FakeTransferTransaction fakeTransaction = new FakeTransferTransactionFactory(networkType)
-            .deadline(new FakeDeadline()).signature("signature").signer(signer).transactionInfo(transactionInfo)
-            .build();
-
         assertFalse(fakeTransaction.isUnconfirmed());
+        assertTrue(fakeTransaction.isConfirmed());
+        assertFalse(fakeTransaction.isUnannounced());
+        assertFalse(fakeTransaction.isPartial());
+        assertEquals(TransactionGroup.CONFIRMED, fakeTransaction.getGroup().get());
+    }
+    
+    @Test
+    void shouldReturnStatePARTIAL() {
+        FakeTransferTransaction fakeTransaction = new FakeTransferTransactionFactory(networkType)
+            .group(TransactionGroup.PARTIAL).build();
+        assertFalse(fakeTransaction.isUnconfirmed());
+        assertFalse(fakeTransaction.isConfirmed());
+        assertFalse(fakeTransaction.isUnannounced());
+        assertTrue(fakeTransaction.isPartial());
+        assertEquals(TransactionGroup.PARTIAL, fakeTransaction.getGroup().get());
     }
 
     @Test
-    void shouldReturnTransactionIsConfirmedWhenHeightIsNot0() {
-        TransactionInfo transactionInfo = TransactionInfo.create(BigInteger.valueOf(100), 1, "ABC", "hash", "hash");
+    void shouldReturnStateUNCONFIRMED() {
         FakeTransferTransaction fakeTransaction = new FakeTransferTransactionFactory(networkType)
-            .deadline(new FakeDeadline()).signature("signature").signer(signer).transactionInfo(transactionInfo)
-            .group(TransactionGroup.CONFIRMED).build();
+            .group(TransactionGroup.UNCONFIRMED).build();
+        assertTrue(fakeTransaction.isUnconfirmed());
+        assertFalse(fakeTransaction.isConfirmed());
+        assertFalse(fakeTransaction.isUnannounced());
+        assertFalse(fakeTransaction.isPartial());
+        assertEquals(TransactionGroup.UNCONFIRMED, fakeTransaction.getGroup().get());
+    }
 
-        assertTrue(fakeTransaction.isConfirmed());
+    @Test
+    void shouldReturnStateNone() {
+        FakeTransferTransaction fakeTransaction = new FakeTransferTransactionFactory(networkType).build();
+        assertFalse(fakeTransaction.isUnconfirmed());
+        assertFalse(fakeTransaction.isConfirmed());
+        assertTrue(fakeTransaction.isUnannounced());
+        assertFalse(fakeTransaction.isPartial());
+        assertFalse(fakeTransaction.getGroup().isPresent());
     }
 
     @Test

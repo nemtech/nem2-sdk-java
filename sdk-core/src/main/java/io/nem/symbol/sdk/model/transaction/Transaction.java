@@ -238,10 +238,17 @@ public abstract class Transaction implements Stored {
      *
      * @return if a transaction is pending to be included in a block
      */
-    public boolean isUnconfirmed() {
-        return getTransactionInfo().filter(info -> info.getHeight().equals(BigInteger.valueOf(0)) && StringUtils
-            .equalsIgnoreCase(info.getHash(), info.getMerkleComponentHash())).isPresent();
+    public boolean isUnconfirmed()  {
+        return getGroup().filter(g -> g == TransactionGroup.UNCONFIRMED).isPresent();
+    }
 
+    /**
+     * Returns if a transaction is partial waiting for more cosignatures
+     *
+     * @return if a transaction is partial waiting for more cosignatures
+     */
+    public boolean isPartial()  {
+        return getGroup().filter(g -> g == TransactionGroup.PARTIAL).isPresent();
     }
 
     /**
