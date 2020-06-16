@@ -216,12 +216,6 @@ public class Address implements UnresolvedAddress {
             byte[] expectedChecksum = Arrays
                 .copyOf(Hashes.sha3_256(Arrays.copyOf(decodedArray, checksumBegin)), CHECKSUM_SIZE);
 
-            if (expectedChecksum.length != CHECKSUM_SIZE) {
-                return Optional
-                    .of("Plain address '" + plainAddress + "' checksum size is " + expectedChecksum.length + " when "
-                        + CHECKSUM_SIZE + " is required");
-            }
-
             byte[] providedChecksum = Arrays.copyOfRange(decodedArray, checksumBegin, decodedArray.length);
             if (!Arrays.equals(expectedChecksum, providedChecksum)) {
                 return Optional.of("Plain address '" + plainAddress + "' checksum is incorrect. Address checksum is '"
