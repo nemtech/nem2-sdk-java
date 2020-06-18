@@ -58,24 +58,24 @@ public class MetadataTransactionServiceImpl implements MetadataTransactionServic
     @Override
     public Observable<AccountMetadataTransactionFactory> createAccountMetadataTransactionFactory(
         Address targetAddress, BigInteger key, String value,
-        Address senderSource) {
+        Address sourceAddress) {
         BiFunction<String, NetworkType, AccountMetadataTransactionFactory> factory = (newValue, networkType) -> AccountMetadataTransactionFactory
             .create(networkType, targetAddress, key, newValue);
         return processMetadata(metadataRepository
-                .getAccountMetadataByKeyAndSender(targetAddress, key, senderSource), factory,
+                .getAccountMetadataByKeyAndSender(targetAddress, key, sourceAddress), factory,
             value);
     }
 
     @Override
     public Observable<MosaicMetadataTransactionFactory> createMosaicMetadataTransactionFactory(
         Address targetAddress, BigInteger key, String value,
-        Address senderSource, UnresolvedMosaicId unresolvedTargetId) {
+        Address sourceAddress, UnresolvedMosaicId unresolvedTargetId) {
 
         return aliasService.resolveMosaicId(unresolvedTargetId).flatMap(targetId -> {
             BiFunction<String, NetworkType, MosaicMetadataTransactionFactory> factory = (newValue, networkType) -> MosaicMetadataTransactionFactory
                 .create(networkType, targetAddress, unresolvedTargetId, key, newValue);
             return processMetadata(metadataRepository
-                    .getMosaicMetadataByKeyAndSender(targetId, key, senderSource), factory,
+                    .getMosaicMetadataByKeyAndSender(targetId, key, sourceAddress), factory,
                 value);
         });
     }
@@ -83,12 +83,12 @@ public class MetadataTransactionServiceImpl implements MetadataTransactionServic
     @Override
     public Observable<NamespaceMetadataTransactionFactory> createNamespaceMetadataTransactionFactory(
         Address targetAddress, BigInteger key, String value,
-        Address senderSource,
+        Address sourceAddress,
         NamespaceId targetId) {
         BiFunction<String, NetworkType, NamespaceMetadataTransactionFactory> factory = (newValue, networkType) -> NamespaceMetadataTransactionFactory
             .create(networkType, targetAddress, targetId, key, newValue);
         return processMetadata(metadataRepository
-                .getNamespaceMetadataByKeyAndSender(targetId, key, senderSource), factory,
+                .getNamespaceMetadataByKeyAndSender(targetId, key, sourceAddress), factory,
             value);
     }
 

@@ -816,7 +816,8 @@ public class ListenerVertxTest {
     private AggregateTransaction aggregateTransaction(PublicAccount signer, PublicAccount consignauturePublicAccount,
         Transaction... anotherTransactions) {
         List<AggregateTransactionCosignature> cosignatures = new ArrayList<>();
-        cosignatures.add(new AggregateTransactionCosignature("Signature", consignauturePublicAccount));
+        BigInteger version = AggregateTransactionCosignature.DEFAULT_VERSION;
+        cosignatures.add(new AggregateTransactionCosignature(version, "Signature", consignauturePublicAccount));
         AggregateTransactionFactory factory = AggregateTransactionFactory
             .create(TransactionType.AGGREGATE_COMPLETE, NETWORK_TYPE, Arrays.asList(anotherTransactions), cosignatures);
         if (signer != null) {

@@ -57,7 +57,7 @@ class MetadataTransactionServiceTest {
     private MetadataTransactionServiceImpl service;
     private MetadataRepository metadataRepositoryMock;
     private PublicAccount targetAccount;
-    private Address senderSource;
+    private Address sourceAddress;
     private MosaicId mosaicId;
     private NamespaceId namespaceId;
     private NamespaceId mosaicAlias = NamespaceId.createFromName("mosaicAlias1".toLowerCase());
@@ -65,7 +65,7 @@ class MetadataTransactionServiceTest {
     @BeforeEach
     void setup() {
         targetAccount = Account.generateNewAccount(networkType).getPublicAccount();
-        senderSource = Account.generateNewAccount(networkType).getAddress();
+        sourceAddress = Account.generateNewAccount(networkType).getAddress();
         mosaicId = MosaicId.createFromNonce(MosaicNonce.createRandom(), targetAccount);
         namespaceId = NamespaceId.createFromId(BigInteger.TEN);
         RepositoryFactory factory = Mockito.mock(RepositoryFactory.class);
@@ -101,7 +101,7 @@ class MetadataTransactionServiceTest {
         String newValue = "the new Message";
 
         Metadata metadata = new Metadata("someId",
-            new MetadataEntry("compositeHash", senderSource,
+            new MetadataEntry("compositeHash", sourceAddress,
                 targetAccount.getAddress(),
                 metadataKey, MetadataType.ACCOUNT,
                 oldValue, Optional.of(targetAccount.getAddress().encoded())));
@@ -110,14 +110,14 @@ class MetadataTransactionServiceTest {
             metadataRepositoryMock
                 .getAccountMetadataByKeyAndSender(Mockito.eq(targetAccount.getAddress()),
                     Mockito.eq(metadataKey),
-                    Mockito.eq(senderSource)))
+                    Mockito.eq(sourceAddress)))
             .thenReturn(Observable.just(metadata));
 
         AccountMetadataTransactionFactory result =
             service.createAccountMetadataTransactionFactory(
                 targetAccount.getAddress(),
                 metadataKey,
-                newValue, senderSource).toFuture().get();
+                newValue, sourceAddress).toFuture().get();
 
         Assertions.assertEquals(metadataKey, result.getScopedMetadataKey());
         Assertions.assertNotEquals(oldValue, result.getValue());
@@ -130,7 +130,7 @@ class MetadataTransactionServiceTest {
         Mockito.verify(metadataRepositoryMock)
             .getAccountMetadataByKeyAndSender(Mockito.eq(targetAccount.getAddress()),
                 Mockito.eq(metadataKey),
-                Mockito.eq(senderSource));
+                Mockito.eq(sourceAddress));
     }
 
     @Test
@@ -143,7 +143,7 @@ class MetadataTransactionServiceTest {
             metadataRepositoryMock
                 .getAccountMetadataByKeyAndSender(Mockito.eq(targetAccount.getAddress()),
                     Mockito.eq(metadataKey),
-                    Mockito.eq(senderSource)))
+                    Mockito.eq(sourceAddress)))
             .thenReturn(Observable.error(new RepositoryCallException("Not Found", 404,
                 null)));
 
@@ -151,7 +151,7 @@ class MetadataTransactionServiceTest {
             service.createAccountMetadataTransactionFactory(
                 targetAccount.getAddress(),
                 metadataKey,
-                newValue, senderSource).toFuture().get();
+                newValue, sourceAddress).toFuture().get();
 
         Assertions.assertEquals(metadataKey, result.getScopedMetadataKey());
         Assertions.assertEquals(newValue, result.getValue());
@@ -162,7 +162,7 @@ class MetadataTransactionServiceTest {
         Mockito.verify(metadataRepositoryMock)
             .getAccountMetadataByKeyAndSender(Mockito.eq(targetAccount.getAddress()),
                 Mockito.eq(metadataKey),
-                Mockito.eq(senderSource));
+                Mockito.eq(sourceAddress));
     }
 
     @Test
@@ -179,7 +179,7 @@ class MetadataTransactionServiceTest {
             metadataRepositoryMock
                 .getAccountMetadataByKeyAndSender(Mockito.eq(targetAccount.getAddress()),
                     Mockito.eq(metadataKey),
-                    Mockito.eq(senderSource)))
+                    Mockito.eq(sourceAddress)))
             .thenReturn(Observable.error(expectedException));
 
         RepositoryCallException exception = Assertions
@@ -187,14 +187,14 @@ class MetadataTransactionServiceTest {
                 service.createAccountMetadataTransactionFactory(
                     targetAccount.getAddress(),
                     metadataKey,
-                    newValue, senderSource).toFuture().get()));
+                    newValue, sourceAddress).toFuture().get()));
 
         Assertions.assertEquals(expectedException, exception);
 
         Mockito.verify(metadataRepositoryMock)
             .getAccountMetadataByKeyAndSender(Mockito.eq(targetAccount.getAddress()),
                 Mockito.eq(metadataKey),
-                Mockito.eq(senderSource));
+                Mockito.eq(sourceAddress));
     }
 
     @Test
@@ -209,7 +209,7 @@ class MetadataTransactionServiceTest {
             metadataRepositoryMock
                 .getAccountMetadataByKeyAndSender(Mockito.eq(targetAccount.getAddress()),
                     Mockito.eq(metadataKey),
-                    Mockito.eq(senderSource)))
+                    Mockito.eq(sourceAddress)))
             .thenReturn(Observable.error(expectedException));
 
         IllegalArgumentException exception = Assertions
@@ -217,14 +217,14 @@ class MetadataTransactionServiceTest {
                 service.createAccountMetadataTransactionFactory(
                     targetAccount.getAddress(),
                     metadataKey,
-                    newValue, senderSource).toFuture().get()));
+                    newValue, sourceAddress).toFuture().get()));
 
         Assertions.assertEquals(expectedException, exception);
 
         Mockito.verify(metadataRepositoryMock)
             .getAccountMetadataByKeyAndSender(Mockito.eq(targetAccount.getAddress()),
                 Mockito.eq(metadataKey),
-                Mockito.eq(senderSource));
+                Mockito.eq(sourceAddress));
     }
 
     @Test
@@ -235,7 +235,7 @@ class MetadataTransactionServiceTest {
         String newValue = "the new Message";
 
         Metadata metadata = new Metadata("someId",
-            new MetadataEntry("compositeHash", senderSource,
+            new MetadataEntry("compositeHash", sourceAddress,
                 targetAccount.getAddress(),
                 metadataKey, MetadataType.MOSAIC,
                 oldValue, Optional.of(targetAccount.getAddress().encoded())));
@@ -244,14 +244,14 @@ class MetadataTransactionServiceTest {
             metadataRepositoryMock
                 .getMosaicMetadataByKeyAndSender(Mockito.eq(mosaicId),
                     Mockito.eq(metadataKey),
-                    Mockito.eq(senderSource)))
+                    Mockito.eq(sourceAddress)))
             .thenReturn(Observable.just(metadata));
 
         MosaicMetadataTransactionFactory result =
             service.createMosaicMetadataTransactionFactory(
                 targetAccount.getAddress(),
                 metadataKey,
-                newValue, senderSource,
+                newValue, sourceAddress,
                 mosaicId).toFuture().get();
 
         Assertions.assertEquals(metadataKey, result.getScopedMetadataKey());
@@ -266,7 +266,7 @@ class MetadataTransactionServiceTest {
         Mockito.verify(metadataRepositoryMock)
             .getMosaicMetadataByKeyAndSender(Mockito.eq(mosaicId),
                 Mockito.eq(metadataKey),
-                Mockito.eq(senderSource));
+                Mockito.eq(sourceAddress));
     }
 
     @Test
@@ -277,7 +277,7 @@ class MetadataTransactionServiceTest {
         String newValue = "the new Message";
 
         Metadata metadata = new Metadata("someId",
-            new MetadataEntry("compositeHash", senderSource,
+            new MetadataEntry("compositeHash", sourceAddress,
                 targetAccount.getAddress(),
                 metadataKey, MetadataType.MOSAIC,
                 oldValue, Optional.of(targetAccount.getAddress().encoded())));
@@ -286,14 +286,14 @@ class MetadataTransactionServiceTest {
             metadataRepositoryMock
                 .getMosaicMetadataByKeyAndSender(Mockito.eq(mosaicId),
                     Mockito.eq(metadataKey),
-                    Mockito.eq(senderSource)))
+                    Mockito.eq(sourceAddress)))
             .thenReturn(Observable.just(metadata));
 
         MosaicMetadataTransactionFactory result =
             service.createMosaicMetadataTransactionFactory(
                 targetAccount.getAddress(),
                 metadataKey,
-                newValue, senderSource,
+                newValue, sourceAddress,
                 mosaicAlias).toFuture().get();
 
         Assertions.assertEquals(metadataKey, result.getScopedMetadataKey());
@@ -308,7 +308,7 @@ class MetadataTransactionServiceTest {
         Mockito.verify(metadataRepositoryMock)
             .getMosaicMetadataByKeyAndSender(Mockito.eq(mosaicId),
                 Mockito.eq(metadataKey),
-                Mockito.eq(senderSource));
+                Mockito.eq(sourceAddress));
     }
 
     @Test
@@ -321,7 +321,7 @@ class MetadataTransactionServiceTest {
             metadataRepositoryMock
                 .getMosaicMetadataByKeyAndSender(Mockito.eq(mosaicId),
                     Mockito.eq(metadataKey),
-                    Mockito.eq(senderSource)))
+                    Mockito.eq(sourceAddress)))
             .thenReturn(Observable.error(new RepositoryCallException("Not Found", 404,
                 null)));
 
@@ -329,7 +329,7 @@ class MetadataTransactionServiceTest {
             service.createMosaicMetadataTransactionFactory(
                 targetAccount.getAddress(),
                 metadataKey,
-                newValue, senderSource,
+                newValue, sourceAddress,
                 mosaicId).toFuture().get();
 
         Assertions.assertEquals(metadataKey, result.getScopedMetadataKey());
@@ -342,7 +342,7 @@ class MetadataTransactionServiceTest {
         Mockito.verify(metadataRepositoryMock)
             .getMosaicMetadataByKeyAndSender(Mockito.eq(mosaicId),
                 Mockito.eq(metadataKey),
-                Mockito.eq(senderSource));
+                Mockito.eq(sourceAddress));
     }
 
     @Test
@@ -359,7 +359,7 @@ class MetadataTransactionServiceTest {
             metadataRepositoryMock
                 .getMosaicMetadataByKeyAndSender(Mockito.eq(mosaicId),
                     Mockito.eq(metadataKey),
-                    Mockito.eq(senderSource)))
+                    Mockito.eq(sourceAddress)))
             .thenReturn(Observable.error(expectedException));
 
         RepositoryCallException exception = Assertions
@@ -367,14 +367,14 @@ class MetadataTransactionServiceTest {
                 service.createMosaicMetadataTransactionFactory(
                     targetAccount.getAddress(),
                     metadataKey,
-                    newValue, senderSource, mosaicId).toFuture().get()));
+                    newValue, sourceAddress, mosaicId).toFuture().get()));
 
         Assertions.assertEquals(expectedException, exception);
 
         Mockito.verify(metadataRepositoryMock)
             .getMosaicMetadataByKeyAndSender(Mockito.eq(mosaicId),
                 Mockito.eq(metadataKey),
-                Mockito.eq(senderSource));
+                Mockito.eq(sourceAddress));
     }
 
     @Test
@@ -389,7 +389,7 @@ class MetadataTransactionServiceTest {
             metadataRepositoryMock
                 .getMosaicMetadataByKeyAndSender(Mockito.eq(mosaicId),
                     Mockito.eq(metadataKey),
-                    Mockito.eq(senderSource)))
+                    Mockito.eq(sourceAddress)))
             .thenReturn(Observable.error(expectedException));
 
         IllegalArgumentException exception = Assertions
@@ -397,14 +397,14 @@ class MetadataTransactionServiceTest {
                 service.createMosaicMetadataTransactionFactory(
                     targetAccount.getAddress(),
                     metadataKey,
-                    newValue, senderSource, mosaicId).toFuture().get()));
+                    newValue, sourceAddress, mosaicId).toFuture().get()));
 
         Assertions.assertEquals(expectedException, exception);
 
         Mockito.verify(metadataRepositoryMock)
             .getMosaicMetadataByKeyAndSender(Mockito.eq(mosaicId),
                 Mockito.eq(metadataKey),
-                Mockito.eq(senderSource));
+                Mockito.eq(sourceAddress));
     }
 
     @Test
@@ -415,7 +415,7 @@ class MetadataTransactionServiceTest {
         String newValue = "the new Message";
 
         Metadata metadata = new Metadata("someId",
-            new MetadataEntry("compositeHash", senderSource,
+            new MetadataEntry("compositeHash", sourceAddress,
                 targetAccount.getAddress(),
                 metadataKey, MetadataType.NAMESPACE,
                 oldValue, Optional.of(targetAccount.getAddress().encoded())));
@@ -424,14 +424,14 @@ class MetadataTransactionServiceTest {
             metadataRepositoryMock
                 .getNamespaceMetadataByKeyAndSender(Mockito.eq(namespaceId),
                     Mockito.eq(metadataKey),
-                    Mockito.eq(senderSource)))
+                    Mockito.eq(sourceAddress)))
             .thenReturn(Observable.just(metadata));
 
         NamespaceMetadataTransactionFactory result =
             service.createNamespaceMetadataTransactionFactory(
                 targetAccount.getAddress(),
                 metadataKey,
-                newValue, senderSource, namespaceId).toFuture().get();
+                newValue, sourceAddress, namespaceId).toFuture().get();
 
         Assertions.assertEquals(metadataKey, result.getScopedMetadataKey());
         Assertions.assertNotEquals(oldValue, result.getValue());
@@ -445,7 +445,7 @@ class MetadataTransactionServiceTest {
         Mockito.verify(metadataRepositoryMock)
             .getNamespaceMetadataByKeyAndSender(Mockito.eq(namespaceId),
                 Mockito.eq(metadataKey),
-                Mockito.eq(senderSource));
+                Mockito.eq(sourceAddress));
     }
 
     @Test
@@ -458,7 +458,7 @@ class MetadataTransactionServiceTest {
             metadataRepositoryMock
                 .getNamespaceMetadataByKeyAndSender(Mockito.eq(namespaceId),
                     Mockito.eq(metadataKey),
-                    Mockito.eq(senderSource)))
+                    Mockito.eq(sourceAddress)))
             .thenReturn(Observable.error(new RepositoryCallException("Not Found", 404,
                 null)));
 
@@ -466,7 +466,7 @@ class MetadataTransactionServiceTest {
             service.createNamespaceMetadataTransactionFactory(
                 targetAccount.getAddress(),
                 metadataKey,
-                newValue, senderSource, namespaceId).toFuture().get();
+                newValue, sourceAddress, namespaceId).toFuture().get();
 
         Assertions.assertEquals(metadataKey, result.getScopedMetadataKey());
         Assertions.assertEquals(newValue, result.getValue());
@@ -478,7 +478,7 @@ class MetadataTransactionServiceTest {
         Mockito.verify(metadataRepositoryMock)
             .getNamespaceMetadataByKeyAndSender(Mockito.eq(namespaceId),
                 Mockito.eq(metadataKey),
-                Mockito.eq(senderSource));
+                Mockito.eq(sourceAddress));
     }
 
     @Test
@@ -495,7 +495,7 @@ class MetadataTransactionServiceTest {
             metadataRepositoryMock
                 .getNamespaceMetadataByKeyAndSender(Mockito.eq(namespaceId),
                     Mockito.eq(metadataKey),
-                    Mockito.eq(senderSource)))
+                    Mockito.eq(sourceAddress)))
             .thenReturn(Observable.error(expectedException));
 
         RepositoryCallException exception = Assertions
@@ -503,14 +503,14 @@ class MetadataTransactionServiceTest {
                 service.createNamespaceMetadataTransactionFactory(
                     targetAccount.getAddress(),
                     metadataKey,
-                    newValue, senderSource, namespaceId).toFuture().get()));
+                    newValue, sourceAddress, namespaceId).toFuture().get()));
 
         Assertions.assertEquals(expectedException, exception);
 
         Mockito.verify(metadataRepositoryMock)
             .getNamespaceMetadataByKeyAndSender(Mockito.eq(namespaceId),
                 Mockito.eq(metadataKey),
-                Mockito.eq(senderSource));
+                Mockito.eq(sourceAddress));
     }
 
     @Test
@@ -525,7 +525,7 @@ class MetadataTransactionServiceTest {
             metadataRepositoryMock
                 .getNamespaceMetadataByKeyAndSender(Mockito.eq(namespaceId),
                     Mockito.eq(metadataKey),
-                    Mockito.eq(senderSource)))
+                    Mockito.eq(sourceAddress)))
             .thenReturn(Observable.error(expectedException));
 
         IllegalArgumentException exception = Assertions
@@ -533,14 +533,14 @@ class MetadataTransactionServiceTest {
                 service.createNamespaceMetadataTransactionFactory(
                     targetAccount.getAddress(),
                     metadataKey,
-                    newValue, senderSource, namespaceId).toFuture().get()));
+                    newValue, sourceAddress, namespaceId).toFuture().get()));
 
         Assertions.assertEquals(expectedException, exception);
 
         Mockito.verify(metadataRepositoryMock)
             .getNamespaceMetadataByKeyAndSender(Mockito.eq(namespaceId),
                 Mockito.eq(metadataKey),
-                Mockito.eq(senderSource));
+                Mockito.eq(sourceAddress));
     }
 
 }

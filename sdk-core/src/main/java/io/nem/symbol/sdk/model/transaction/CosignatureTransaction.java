@@ -73,7 +73,7 @@ public class CosignatureTransaction {
         DsaSigner signer = CryptoEngines.defaultEngine().createDsaSigner(account.getKeyPair());
         byte[] bytes = ConvertUtils.fromHexToBytes(transactionHash);
         byte[] signatureBytes = signer.sign(bytes).getBytes();
-        return new CosignatureSignedTransaction(transactionHash, ConvertUtils.toHex(signatureBytes),
+        return new CosignatureSignedTransaction(AggregateTransactionCosignature.DEFAULT_VERSION, transactionHash, ConvertUtils.toHex(signatureBytes),
             account.getPublicKey());
     }
 }

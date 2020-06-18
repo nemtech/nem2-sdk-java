@@ -38,14 +38,14 @@ public interface MetadataTransactionService {
      * @param targetAddress the target address
      * @param key the key of the metadata
      * @param value the value of the metadata.
-     * @param senderSource the address of the account creating the metadata.
+     * @param sourceAddress the address of the account creating the metadata.
      * @return an observable of AccountMetadataTransactionFactory of a transaction that can be announced.
      */
     Observable<AccountMetadataTransactionFactory> createAccountMetadataTransactionFactory(
         Address targetAddress,
         BigInteger key,
         String value,
-        Address senderSource);
+        Address sourceAddress);
 
     /**
      * Create an Mosaic Metadata Transaction that knows how to set or update a value.
@@ -53,7 +53,7 @@ public interface MetadataTransactionService {
      * @param targetAddress the target public account
      * @param key the key of the metadata
      * @param value the value of the metadata.
-     * @param senderSource the address of the account creating the metadata.
+     * @param sourceAddress the address of the account creating the metadata.
      * @param targetId the mosaic id of the attached metadata.
      * @return an observable of AccountMetadataTransactionFactory of a transaction that can be announced.
      */
@@ -61,7 +61,7 @@ public interface MetadataTransactionService {
         Address targetAddress,
         BigInteger key,
         String value,
-        Address senderSource,
+        Address sourceAddress,
         UnresolvedMosaicId targetId);
 
     /**
@@ -70,7 +70,7 @@ public interface MetadataTransactionService {
      * @param targetAddress the target address
      * @param key the key of the metadata
      * @param value the value of the metadata.
-     * @param senderSource the address of the account creating the metadata.
+     * @param sourceAddress the address of the account creating the metadata.
      * @param targetId the namespace id of the attached metadata.
      * @return an observable of AccountMetadataTransactionFactory of a transaction that can be announced.
      */
@@ -78,6 +78,6 @@ public interface MetadataTransactionService {
         Address targetAddress,
         BigInteger key,
         String value,
-        Address senderSource,
+        Address sourceAddress,
         NamespaceId targetId);
 }

@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import java.math.BigInteger;
 
 /**
  * The model representing cosignature of an aggregate transaction.
@@ -25,11 +26,13 @@ import io.nem.symbol.sdk.model.account.PublicAccount;
  */
 public class AggregateTransactionCosignature {
 
-    public static final long VERSION = 0;
+    public static final BigInteger DEFAULT_VERSION = BigInteger.ZERO;
+    private final BigInteger version;
     private final String signature;
     private final PublicAccount signer;
 
-    public AggregateTransactionCosignature(String signature, PublicAccount signer) {
+    public AggregateTransactionCosignature(BigInteger version, String signature, PublicAccount signer) {
+        this.version = version;
         this.signature = signature;
         this.signer = signer;
     }
@@ -50,5 +53,12 @@ public class AggregateTransactionCosignature {
      */
     public PublicAccount getSigner() {
         return signer;
+    }
+
+    /**
+     * @return the vers
+     */
+    public BigInteger getVersion() {
+        return version;
     }
 }

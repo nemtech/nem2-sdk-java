@@ -120,6 +120,7 @@ public class TransactionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
 
         Consumer<Handler<AsyncResult<AnnounceTransactionInfoDTO>>> callback = handler -> getClient()
             .announceCosignatureTransaction(new Cosignature().parentHash(cosignatureSignedTransaction.getParentHash())
+                .version(cosignatureSignedTransaction.getVersion())
                 .signature(cosignatureSignedTransaction.getSignature())
                 .signerPublicKey(cosignatureSignedTransaction.getSignerPublicKey()), handler);
         return exceptionHandling(call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));

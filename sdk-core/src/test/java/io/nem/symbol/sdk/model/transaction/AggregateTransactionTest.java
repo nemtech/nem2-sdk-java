@@ -147,23 +147,24 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
 
     @Test
     void maxFeeThreeCosignature() {
+        BigInteger version = AggregateTransactionCosignature.DEFAULT_VERSION;
         NetworkType networkType = NetworkType.MIJIN_TEST;
         AggregateTransactionCosignature cosignature1 =
-            new AggregateTransactionCosignature(
+            new AggregateTransactionCosignature(version,
                 "AAA9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456111AAA9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456111",
                 new PublicAccount(
                     "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456111",
                     networkType));
 
         AggregateTransactionCosignature cosignature2 =
-            new AggregateTransactionCosignature(
+            new AggregateTransactionCosignature(version,
                 "BBB9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222BBB9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222",
                 new PublicAccount(
                     "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222",
                     networkType));
 
         AggregateTransactionCosignature cosignature3 =
-            new AggregateTransactionCosignature(
+            new AggregateTransactionCosignature(version,
                 "CCC9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222BBB9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222",
                 new PublicAccount(
                     "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456333",
@@ -217,22 +218,23 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
     @Test
     void serializeThreeCosignature() {
         NetworkType networkType = NetworkType.MIJIN_TEST;
+        BigInteger version = AggregateTransactionCosignature.DEFAULT_VERSION;
         AggregateTransactionCosignature cosignature1 =
-            new AggregateTransactionCosignature(
+            new AggregateTransactionCosignature(version,
                 "AAA9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456111AAA9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456111",
                 new PublicAccount(
                     "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456111",
                     networkType));
 
         AggregateTransactionCosignature cosignature2 =
-            new AggregateTransactionCosignature(
+            new AggregateTransactionCosignature(version,
                 "BBB9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222BBB9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222",
                 new PublicAccount(
                     "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222",
                     networkType));
 
         AggregateTransactionCosignature cosignature3 =
-            new AggregateTransactionCosignature(
+            new AggregateTransactionCosignature(version,
                 "CCC9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222BBB9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222",
                 new PublicAccount(
                     "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456333",
@@ -271,16 +273,17 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
 
     @Test
     void serializeTwoTransactionTwoCosignature() {
+        BigInteger version = AggregateTransactionCosignature.DEFAULT_VERSION;
         NetworkType networkType = NetworkType.MIJIN_TEST;
         AggregateTransactionCosignature cosignature1 =
-            new AggregateTransactionCosignature(
+            new AggregateTransactionCosignature(version,
                 "AAA9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456111AAA9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456111",
                 new PublicAccount(
                     "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456111",
                     networkType));
 
         AggregateTransactionCosignature cosignature2 =
-            new AggregateTransactionCosignature(
+            new AggregateTransactionCosignature(version,
                 "BBB9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222BBB9366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222",
                 new PublicAccount(
                     "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456222",

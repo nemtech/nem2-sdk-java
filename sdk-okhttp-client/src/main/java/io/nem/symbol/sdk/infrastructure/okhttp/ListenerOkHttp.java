@@ -82,8 +82,7 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
         if (this.webSocket != null) {
             return CompletableFuture.completedFuture(null);
         }
-        Request webSocketRequest = new Request.Builder()
-            .url(checkTrailingSlash(url.toString()) + "ws").build();
+        Request webSocketRequest = new Request.Builder().url(checkTrailingSlash(url.toString()) + "ws").build();
         WebSocketListener webSocketListener = new WebSocketListener() {
             @Override
             public void onMessage(WebSocket webSocket, String text) {
@@ -101,8 +100,7 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
 
     @Override
     protected BlockInfo toBlockInfo(Object blockInfoDTO) {
-        return BlockRepositoryOkHttpImpl
-            .toBlockInfo(getJsonHelper().convert(blockInfoDTO, BlockInfoDTO.class));
+        return BlockRepositoryOkHttpImpl.toBlockInfo(getJsonHelper().convert(blockInfoDTO, BlockInfoDTO.class));
     }
 
     @Override
@@ -111,10 +109,9 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
     }
 
     @Override
-    protected CosignatureSignedTransaction toCosignatureSignedTransaction(
-        Object cosignatureJson) {
+    protected CosignatureSignedTransaction toCosignatureSignedTransaction(Object cosignatureJson) {
         Cosignature cosignature = getJsonHelper().convert(cosignatureJson, Cosignature.class);
-        return new CosignatureSignedTransaction(cosignature.getParentHash(),
+        return new CosignatureSignedTransaction(cosignature.getVersion(), cosignature.getParentHash(),
             cosignature.getSignature(), cosignature.getSignerPublicKey());
     }
 
@@ -132,8 +129,7 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
     }
 
     protected void subscribeTo(String channel) {
-        final ListenerSubscribeMessage subscribeMessage = new ListenerSubscribeMessage(
-            this.getUid(), channel);
+        final ListenerSubscribeMessage subscribeMessage = new ListenerSubscribeMessage(this.getUid(), channel);
         this.webSocket.send(getJsonHelper().print(subscribeMessage));
     }
 

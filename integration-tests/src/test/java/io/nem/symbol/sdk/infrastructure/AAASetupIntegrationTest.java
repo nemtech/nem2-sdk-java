@@ -159,11 +159,6 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
                 .announceHashLockAggregateBonded(getListener(type), signedHashLockTransaction, signedAggregateTransaction),
             aggregateTransaction);
 
-        sleep(1000);
-        Transaction transaction = get(getRepositoryFactory(type).createTransactionRepository()
-            .getTransaction(TransactionGroup.CONFIRMED, signedAggregateTransaction.getHash()));
-
-        System.out.println(toJson(transaction));
     }
 
     private void createMultisigAccountComplete(Account multisigAccount, Account... accounts) {
@@ -206,10 +201,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
             getTransactionService(type).announce(getListener(type), signedAggregateTransaction));
 
         sleep(1000);
-        Transaction transaction = get(getRepositoryFactory(type).createTransactionRepository()
-            .getTransaction(TransactionGroup.CONFIRMED, signedAggregateTransaction.getHash()));
 
-        System.out.println(toJson(transaction));
 
         Assertions.assertEquals(aggregateTransaciton.getTransactionInfo().get().getHash().get(),
             signedAggregateTransaction.getHash());

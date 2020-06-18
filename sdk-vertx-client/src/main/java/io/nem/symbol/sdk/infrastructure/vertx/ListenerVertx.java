@@ -29,7 +29,6 @@ import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.openapi.vertx.model.BlockInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.Cosignature;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.RequestOptions;
 import io.vertx.core.http.WebSocket;
@@ -118,7 +117,7 @@ public class ListenerVertx extends ListenerBase implements Listener {
     protected CosignatureSignedTransaction toCosignatureSignedTransaction(
         Object cosignatureJson) {
         Cosignature cosignature = getJsonHelper().convert(cosignatureJson, Cosignature.class);
-        return new CosignatureSignedTransaction(cosignature.getParentHash(),
+        return new CosignatureSignedTransaction(cosignature.getVersion(), cosignature.getParentHash(),
             cosignature.getSignature(), cosignature.getSignerPublicKey());
     }
 

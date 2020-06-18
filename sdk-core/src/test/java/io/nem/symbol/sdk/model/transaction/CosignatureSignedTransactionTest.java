@@ -25,8 +25,9 @@ public class CosignatureSignedTransactionTest {
     @Test
     void createACosignatureSignedTransactionViaConstructor() {
         CosignatureSignedTransaction cosignatureSignedTransaction =
-            new CosignatureSignedTransaction("parentHash", "signature", "signer");
+            new CosignatureSignedTransaction(AggregateTransactionCosignature.DEFAULT_VERSION, "parentHash", "signature", "signer");
 
+        assertEquals(AggregateTransactionCosignature.DEFAULT_VERSION, cosignatureSignedTransaction.getVersion());
         assertEquals("parentHash", cosignatureSignedTransaction.getParentHash());
         assertEquals("signature", cosignatureSignedTransaction.getSignature());
         assertEquals("signer", cosignatureSignedTransaction.getSignerPublicKey());

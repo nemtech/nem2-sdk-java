@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package io.nem.symbol.sdk.infrastructure.okhttp;
+package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.api.BinarySerialization;
 import io.nem.symbol.sdk.infrastructure.BinarySerializationImpl;
-import io.nem.symbol.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
+import io.nem.symbol.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.Transaction;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
+import io.vertx.core.json.Json;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
@@ -38,15 +39,20 @@ import org.junit.jupiter.params.provider.MethodSource;
  * This class tests how open api json transactions are serialized from and to models.
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class TransactionMapperSerializationTest {
+public class TransactionMapperSerializationVertxTest {
 
-    private final JsonHelper jsonHelper = new JsonHelperGson();
 
-    private final GeneralTransactionMapper transactionMapper = new GeneralTransactionMapper(jsonHelper);
+    private final JsonHelper jsonHelper = new JsonHelperJackson2(
+        JsonHelperJackson2.configureMapper(Json.mapper));
+
+    private final GeneralTransactionMapper transactionMapper = new GeneralTransactionMapper(
+        jsonHelper);
+
 
     private static List<String> transactionJsonFiles() {
-        return Arrays.stream(getResourceFolderFiles("json")).filter(f -> f.getName().startsWith("transaction-"))
-            .map(File::getName).collect(Collectors.toList());
+        return Arrays.stream(getResourceFolderFiles("json"))
+            .filter(f -> f.getName().startsWith("transaction-")).map(File::getName)
+            .collect(Collectors.toList());
     }
 
     private static File[] getResourceFolderFiles(String folder) {
@@ -60,35 +66,57 @@ public class TransactionMapperSerializationTest {
     @MethodSource("transactionJsonFiles")
     void testDtoToModelMapping(String jsonFilename) {
 
-        String json = TestHelperOkHttp.loadResource(jsonFilename);
+        String json = TestHelperVertx.loadResource(jsonFilename);
 
-        TransactionInfoDTO originalTransactionInfo = jsonHelper.parse(json, TransactionInfoDTO.class);
+        TransactionInfoDTO originalTransactionInfo = jsonHelper
+            .parse(json, TransactionInfoDTO.class);
 
         Transaction transactionModel = transactionMapper.mapFromDto(originalTransactionInfo);
         Assertions.assertNotNull(transactionModel);
 
-        TransactionInfoDTO mappedTransactionInfo = (TransactionInfoDTO) transactionMapper.mapToDto(transactionModel);
+        TransactionInfoDTO mappedTransactionInfo = (TransactionInfoDTO) transactionMapper.mapToDto(transactionModel, false);
 
         //Patching the sort
-        mappedTransactionInfo.setTransaction(jsonHelper.convert(mappedTransactionInfo.getTransaction(), Map.class));
-        mappedTransactionInfo.setMeta(jsonHelper.convert(mappedTransactionInfo.getMeta(), Map.class));
+        mappedTransactionInfo
+            .setTransaction(jsonHelper.convert(mappedTransactionInfo.getTransaction(), Map.class));
+
+        mappedTransactionInfo
+            .setMeta(jsonHelper.convert(mappedTransactionInfo.getMeta(), Map.class));
 
         Assertions.assertEquals(jsonHelper.prettyPrint(originalTransactionInfo),
             jsonHelper.prettyPrint(mappedTransactionInfo));
 
         BinarySerialization serialization = new BinarySerializationImpl();
         Assertions.assertEquals(ConvertUtils.toHex(serialization.serialize(transactionModel)),
-            ConvertUtils.toHex(serialization.serialize(transactionMapper.mapFromDto(mappedTransactionInfo))));
+            ConvertUtils
+                .toHex(serialization.serialize(transactionMapper.mapFromDto(mappedTransactionInfo))));
 
+        removeMeta(originalTransactionInfo);
+
+        TransactionInfoDTO deserializedTransaction = (TransactionInfoDTO) transactionMapper
+            .mapToDto(serialization.deserialize(serialization.serialize(transactionModel)),false);
+
+        deserializedTransaction.setTransaction(
+            jsonHelper.convert(deserializedTransaction.getTransaction(), Map.class));
+
+        removeMeta(deserializedTransaction);
+        Assertions.assertEquals(jsonHelper.prettyPrint(originalTransactionInfo),
+            jsonHelper.prettyPrint(deserializedTransaction));
+
+    }
+
+    private void removeMeta(TransactionInfoDTO originalTransactionInfo) {
         originalTransactionInfo.setMeta(null);
-        Map<String, Object> transactionJson = (Map<String, Object>) originalTransactionInfo.getTransaction();
+        originalTransactionInfo.setId(null);
+        Map<String, Object> transactionJson = (Map<String, Object>) originalTransactionInfo
+            .getTransaction();
         if (transactionJson.containsKey("transactions")) {
             List<Map<String, Object>> transactionsJson = (List<Map<String, Object>>) transactionJson
                 .get("transactions");
             transactionsJson.forEach(t -> t.remove("meta"));
+            transactionsJson.forEach(t -> t.remove("id"));
         }
-
-
     }
+
 
 }

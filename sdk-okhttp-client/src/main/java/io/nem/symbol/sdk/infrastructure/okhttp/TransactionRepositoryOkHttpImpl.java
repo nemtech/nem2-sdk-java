@@ -102,6 +102,7 @@ public class TransactionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImp
         Callable<AnnounceTransactionInfoDTO> callback = () -> getClient().announceCosignatureTransaction(
             new Cosignature().parentHash(cosignatureSignedTransaction.getParentHash())
                 .signature(cosignatureSignedTransaction.getSignature())
+                .version(cosignatureSignedTransaction.getVersion())
                 .signerPublicKey(cosignatureSignedTransaction.getSignerPublicKey()));
         return exceptionHandling(call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
 

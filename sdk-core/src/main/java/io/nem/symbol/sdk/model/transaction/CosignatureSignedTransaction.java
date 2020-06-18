@@ -16,6 +16,8 @@
 
 package io.nem.symbol.sdk.model.transaction;
 
+import java.math.BigInteger;
+
 /**
  * The co-signature signed transaction.
  *
@@ -23,11 +25,13 @@ package io.nem.symbol.sdk.model.transaction;
  */
 public class CosignatureSignedTransaction {
 
+    private final BigInteger version;
     private final String parentHash;
     private final String signature;
     private final String signerPublicKey;
 
-    public CosignatureSignedTransaction(String parentHash, String signature, String signerPublicKey) {
+    public CosignatureSignedTransaction(BigInteger version, String parentHash, String signature, String signerPublicKey) {
+        this.version = version;
         this.parentHash = parentHash;
         this.signature = signature;
         this.signerPublicKey = signerPublicKey;
@@ -59,5 +63,13 @@ public class CosignatureSignedTransaction {
      */
     public String getSignerPublicKey() {
         return signerPublicKey;
+    }
+
+    /**
+     *
+     * @return the version of the cosignature
+     */
+    public BigInteger getVersion() {
+        return version;
     }
 }

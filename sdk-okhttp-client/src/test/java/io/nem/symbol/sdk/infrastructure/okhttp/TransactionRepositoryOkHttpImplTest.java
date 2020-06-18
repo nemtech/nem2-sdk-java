@@ -28,6 +28,7 @@ import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.AggregateTransactionCosignature;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
@@ -183,7 +184,8 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
     @Test
     public void announceAggregateBondedCosignature() throws Exception {
 
-        CosignatureSignedTransaction signedTransaction = new CosignatureSignedTransaction("aParentHash", "aSignature",
+        BigInteger version = AggregateTransactionCosignature.DEFAULT_VERSION;
+        CosignatureSignedTransaction signedTransaction = new CosignatureSignedTransaction(version, "aParentHash", "aSignature",
             "aSigner");
 
         AnnounceTransactionInfoDTO announceTransactionInfoDTO = new AnnounceTransactionInfoDTO();
@@ -208,6 +210,7 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
     @Test
     public void searchTransactions() throws Exception {
 
+        BigInteger version = AggregateTransactionCosignature.DEFAULT_VERSION;
         TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO("standaloneTransferTransaction.json",
             TransactionInfoDTO.class);
 

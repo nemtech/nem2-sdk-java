@@ -41,8 +41,7 @@ class AggregateTransactionMapper extends
 
     private final TransactionMapper transactionMapper;
 
-    public AggregateTransactionMapper(JsonHelper jsonHelper,
-        TransactionType transactionType,
+    public AggregateTransactionMapper(JsonHelper jsonHelper, TransactionType transactionType,
         TransactionMapper transactionMapper) {
         super(jsonHelper, transactionType, AggregateTransactionExtendedDTO.class);
         this.transactionMapper = transactionMapper;
@@ -52,64 +51,54 @@ class AggregateTransactionMapper extends
     protected AggregateTransactionFactory createFactory(NetworkType networkType,
         AggregateTransactionExtendedDTO transaction) {
 
-        List<Transaction> transactions = transaction.getTransactions().stream()
-            .map(embeddedTransactionInfoDTO -> {
+        List<Transaction> transactions = transaction.getTransactions().stream().map(embeddedTransactionInfoDTO -> {
 
-                Map<String, Object> innerTransaction = (Map<String, Object>) embeddedTransactionInfoDTO
-                    .getTransaction();
+            Map<String, Object> innerTransaction = (Map<String, Object>) embeddedTransactionInfoDTO.getTransaction();
 
-                innerTransaction.put("deadline", transaction.getDeadline());
-                innerTransaction.put("maxFee", transaction.getMaxFee());
-                innerTransaction.put("signature", transaction.getSignature());
-                return transactionMapper.mapFromDto(embeddedTransactionInfoDTO);
+            innerTransaction.put("deadline", transaction.getDeadline());
+            innerTransaction.put("maxFee", transaction.getMaxFee());
+            innerTransaction.put("signature", transaction.getSignature());
+            return transactionMapper.mapFromDto(embeddedTransactionInfoDTO);
 
-            }).collect(Collectors.toList());
+        }).collect(Collectors.toList());
 
         List<AggregateTransactionCosignature> cosignatures = new ArrayList<>();
         if (transaction.getCosignatures() != null) {
-            cosignatures =
-                transaction.getCosignatures().stream()
-                    .map(aggregateCosignature -> toCosignature(networkType, aggregateCosignature))
-                    .collect(Collectors.toList());
+            cosignatures = transaction.getCosignatures().stream()
+                .map(aggregateCosignature -> toCosignature(networkType, aggregateCosignature))
+                .collect(Collectors.toList());
         }
 
         return AggregateTransactionFactory
-            .create(getTransactionType(), networkType, transaction.getTransactionsHash(),
-                transactions,
-                cosignatures);
+            .create(getTransactionType(), networkType, transaction.getTransactionsHash(), transactions, cosignatures);
     }
 
     private AggregateTransactionCosignature toCosignature(NetworkType networkType,
         CosignatureDTO aggregateCosignature) {
-        return new AggregateTransactionCosignature(
+        return new AggregateTransactionCosignature(aggregateCosignature.getVersion(),
             aggregateCosignature.getSignature(),
-            PublicAccount
-                .createFromPublicKey(aggregateCosignature.getSignerPublicKey(),
-                    networkType));
+            PublicAccount.createFromPublicKey(aggregateCosignature.getSignerPublicKey(), networkType));
     }
 
     @Override
     protected void copyToDto(AggregateTransaction transaction, AggregateTransactionExtendedDTO dto) {
-        List<EmbeddedTransactionInfoDTO> transactions = transaction.getInnerTransactions().stream()
-            .map(embeddedTransactionInfoDTO -> (EmbeddedTransactionInfoDTO) transactionMapper
+        List<EmbeddedTransactionInfoDTO> transactions = transaction.getInnerTransactions().stream().map(
+            embeddedTransactionInfoDTO -> (EmbeddedTransactionInfoDTO) transactionMapper
                 .mapToDto(embeddedTransactionInfoDTO, true)).collect(Collectors.toList());
         List<CosignatureDTO> cosignatures = new ArrayList<>();
         if (transaction.getCosignatures() != null) {
-            cosignatures =
-                transaction.getCosignatures().stream().map(this::toCosignature)
-                    .collect(Collectors.toList());
+            cosignatures = transaction.getCosignatures().stream().map(this::toCosignature).collect(Collectors.toList());
         }
         dto.setTransactionsHash(transaction.getTransactionsHash());
         dto.setCosignatures(cosignatures);
         dto.setTransactions(transactions);
     }
 
-    private CosignatureDTO toCosignature(
-        AggregateTransactionCosignature aggregateCosignature) {
+    private CosignatureDTO toCosignature(AggregateTransactionCosignature aggregateCosignature) {
         CosignatureDTO cosignatureDTO = new CosignatureDTO();
-        cosignatureDTO
-            .setSignerPublicKey(aggregateCosignature.getSigner().getPublicKey().toHex());
+        cosignatureDTO.setSignerPublicKey(aggregateCosignature.getSigner().getPublicKey().toHex());
         cosignatureDTO.setSignature(aggregateCosignature.getSignature());
+        cosignatureDTO.setVersion(aggregateCosignature.getVersion());
         return cosignatureDTO;
     }
 
