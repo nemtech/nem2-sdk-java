@@ -3,6 +3,54 @@ All notable changes to this project will be documented in this file.
 
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.20.0] - 18-Jun-2020    
+
+**Milestone**: Gorilla.1(0.9.6.1)
+
+ Package  | Version  | Link
+---|---|---
+SDK OkHttp| v0.20.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-okhttp-client
+SDK Vertx| v0.20.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-vertx-client
+Catbuffer Library| v0.0.20 | https://repo.maven.apache.org/maven2/io/nem/catbuffer-java
+Client OkHttp | v0.9.2  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-okhttp-gson-client
+Client Vertx | v0.9.2  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-vertx-client/
+
+- **[BREAKING CHANGE]** Model property name changes:
+    1. **MetadataEntry**: senderPublicKey: string => sourceAddress: Address; targetPublicKey: string => targetAddress: Address
+    2. **MultisigAccountGraphInfo**: multisigAccounts => multisigEntries
+    3. **MultisigAccountInfo**: account: PublicAccount => accountAddress: Address; cosignatories: PublicAccount[] => cosignatoryAddresses: Address; multisigAccounts: PublicAccount[] => multisigAddresses: Address[]
+    4. **BlockInfo**: beneficiaryPublicKey: PublicAccount | undefined => beneficiaryAddress: Address | undefined
+    5. **MosaicId**: owner: PublicAccount => ownerAddress: Address
+    6. **MosaicInfo**: owner: PublicAccount => ownerAddress: Address; height => startHeight.
+    7. **NamespaceInfo**: owner: PublicAccount => ownerAddress: Address
+    8. **ChainProperties**: harvestNetworkFeeSinkPublicKey => harvestNetworkFeeSinkAddress
+    9. **MosaicNetworkProperties**: mosaicRentalFeeSinkPublicKey => mosaicRentalFeeSinkAddress
+    10. **NamespaceNetworkProperties**: namespaceRentalFeeSinkPublicKey => namespaceRentalFeeSinkAddress
+    11. **NetworkProperties**: publicKey => nemesisSignerPublicKey
+    12. **BalanceChangeReceipt**: targetPublicAccount: PublicAccount => targetAddress: Address
+    13. **BalanceTransferReceipt**: sender: PublicAccount => senderAddress: Address
+- **[BREAKING CHANGE]** Transaction property name changes:
+    1. **AccountMetadataTransaction**: targetPublicKey: string => targetAddress: UnresolvedAddress
+    2. **MosaicMetadataTransaction**: targetPublicKey: string => targetAddress: UnresolvedAddress
+    3. **NamespaceMetadataTransaction**: targetPublicKey: string => targetAddress: UnresolvedAddress
+    4. **MultisigAccountModificationTransaction**: publicKeyAdditions: PublicAccount[] => addressAdditions: UnresolvedAddress[]; publicKeyDeletions: PublicAccount[] => addressDeletions: UnresolvedAddress[]
+    5. **AggregateTransactionService**: cosignatories: string[] => cosignatories: Address[]
+- **[BREAKING CHANGE]** **Address** format changed from 25 bytes to 24 bytes. See new address test vector [here](https://github.com/nemtech/test-vectors/blob/master/1.test-address.json).
+- **[BREAKING CHANGE]** MosaicId creation (from Nonce) changed from using **PublicKey** to **Address**. See new mosaicId test vector [here](https://github.com/nemtech/test-vectors/blob/master/5.test-mosaic-id.json).
+- **[BREAKING CHANGE]** `BigInteger` **version** field in `CosignatureSignedTransaction` and `AggregateTransactionCosignature` with default value `0` when they are created for the first time.
+- **[BREAKING CHANGE]** Removed all transaction get endpoints from **AccountRepository** and **BlockRepository**.
+- **[BREAKING CHANGE]** Added `TransactionGroup (required)` parameter in `getTransaction` endpoint in `TransactionRepository`.
+- Added `Search` endpoints to `TransactionRepository`, `BlockRepository`, and `MosaicRepository`.
+
+    **Note:**
+
+    1. Search endpoints returns pagination payload (`Page<t>`) rather than raw list.
+    2. For **AggregateTransaction**, transaction search endpoint only returns the aggregate wrapper transaction **WITHOUT** embedded transactions. `complete` aggregate payload can be get from `getTransaction` or `getTransactionByIds` endpoints.
+- Added SearchCriteria interfaces for the new search endpoints.
+- **group** filter in `TransactionSearchCriteria` to be mandatory due to rest endpoint changes.
+- Added **PaginationStreamer** for the 3 new search endpoints (`BlockPaginationStreamer`, `MosaicPaginationStreamer`, `TransactionPaginationStreamer`) to improve pagination querying.
+- Added `size` in `BlockInfo` model.
+
 ## [0.19.0] - 18-May-2020    
 
 **Milestone**: Gorilla.1(0.9.5.1)
