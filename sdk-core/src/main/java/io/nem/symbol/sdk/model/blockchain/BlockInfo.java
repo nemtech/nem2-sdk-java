@@ -30,6 +30,7 @@ import java.util.Optional;
 public class BlockInfo implements Stored {
 
     private final String recordId;
+    private final Integer size;
     private final String hash;
     private final String generationHash;
     private final BigInteger totalFee;
@@ -55,32 +56,14 @@ public class BlockInfo implements Stored {
     private final Address beneficiaryAddress;
 
     @SuppressWarnings("squid:S00107")
-    public BlockInfo(
-        String recordId,
-        String hash,
-        String generationHash,
-        BigInteger totalFee,
-        Integer numTransactions,
-        Optional<Integer> numStatements,
-        List<String> subCacheMerkleRoots,
-        String signature,
-        PublicAccount signerPublicAccount,
-        NetworkType networkType,
-        Integer version,
-        int type,
-        BigInteger height,
-        BigInteger timestamp,
-        BigInteger difficulty,
-        Integer feeMultiplier,
-        String previousBlockHash,
-        String blockTransactionsHash,
-        String blockReceiptsHash,
-        String stateHash,
-        String proofGamma,
-        String proofScalar,
-        String proofVerificationHash,
-        Address beneficiaryAddress) {
+    public BlockInfo(String recordId, Integer size, String hash, String generationHash, BigInteger totalFee,
+        Integer numTransactions, Optional<Integer> numStatements, List<String> subCacheMerkleRoots, String signature,
+        PublicAccount signerPublicAccount, NetworkType networkType, Integer version, int type, BigInteger height,
+        BigInteger timestamp, BigInteger difficulty, Integer feeMultiplier, String previousBlockHash,
+        String blockTransactionsHash, String blockReceiptsHash, String stateHash, String proofGamma, String proofScalar,
+        String proofVerificationHash, Address beneficiaryAddress) {
         this.recordId = recordId;
+        this.size = size;
         this.hash = hash;
         this.generationHash = generationHash;
         this.totalFee = totalFee;
@@ -104,6 +87,15 @@ public class BlockInfo implements Stored {
         this.proofScalar = proofScalar;
         this.proofVerificationHash = proofVerificationHash;
         this.beneficiaryAddress = beneficiaryAddress;
+    }
+
+    /**
+     * Returns the size of the block
+     *
+     * @return the size
+     */
+    public Integer getSize() {
+        return size;
     }
 
     /**
@@ -152,9 +144,8 @@ public class BlockInfo implements Stored {
     }
 
     /**
-     * Gets a list of transactions.
      *
-     * @return List of transactions.
+     * @return list of SubCache Merkle Root.
      */
     public List<String> getSubCacheMerkleRoots() {
         return subCacheMerkleRoots;

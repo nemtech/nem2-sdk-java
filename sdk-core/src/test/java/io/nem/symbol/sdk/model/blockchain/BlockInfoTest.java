@@ -69,8 +69,7 @@ class BlockInfoTest {
         id = "abc";
         blockInfo =
             new BlockInfo(
-                id,
-                hash,
+                id, 10, hash,
                 generationHash,
                 BigInteger.ZERO,
                 25,
@@ -100,6 +99,7 @@ class BlockInfoTest {
         assertEquals(hash, blockInfo.getHash());
         assertEquals(generationHash, blockInfo.getGenerationHash());
         assertEquals(BigInteger.valueOf(0), blockInfo.getTotalFee());
+        assertEquals(10, blockInfo.getSize());
         assertEquals(25, blockInfo.getNumTransactions());
         assertEquals(35, blockInfo.getNumStatements().get());
         assertEquals(signature, blockInfo.getSignature());

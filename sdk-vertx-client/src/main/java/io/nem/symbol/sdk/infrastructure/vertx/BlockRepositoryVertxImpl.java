@@ -48,8 +48,7 @@ import java.util.stream.Collectors;
  *
  * @since 1.0
  */
-public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements
-    BlockRepository {
+public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements BlockRepository {
 
     private final BlockRoutesApi client;
 
@@ -68,16 +67,12 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
     @Override
     public Observable<Page<BlockInfo>> search(BlockSearchCriteria criteria) {
         Consumer<Handler<AsyncResult<BlockPage>>> callback = handler -> getClient()
-            .searchBlocks(toDto(criteria.getSignerPublicKey()),
-                toDto(criteria.getBeneficiaryAddress()),
-                criteria.getPageSize(),
-                criteria.getPageNumber(), criteria.getOffset(),
-                toDto(criteria.getOrder()), toDto(criteria.getOrderBy()), handler);
+            .searchBlocks(toDto(criteria.getSignerPublicKey()), toDto(criteria.getBeneficiaryAddress()),
+                criteria.getPageSize(), criteria.getPageNumber(), criteria.getOffset(), toDto(criteria.getOrder()),
+                toDto(criteria.getOrderBy()), handler);
 
-        return exceptionHandling(
-            call(callback).map(mosaicPage -> this.toPage(mosaicPage.getPagination(),
-                mosaicPage.getData().stream().map(BlockRepositoryVertxImpl::toBlockInfo).collect(
-                    Collectors.toList()))));
+        return exceptionHandling(call(callback).map(mosaicPage -> this.toPage(mosaicPage.getPagination(),
+            mosaicPage.getData().stream().map(BlockRepositoryVertxImpl::toBlockInfo).collect(Collectors.toList()))));
     }
 
     private BlockOrderByEnum toDto(BlockOrderBy orderBy) {
@@ -86,49 +81,33 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
 
     @Override
     public Observable<MerkleProofInfo> getMerkleTransaction(BigInteger height, String hash) {
-        Consumer<Handler<AsyncResult<MerkleProofInfoDTO>>> callback = handler ->
-            client.getMerkleTransaction(height, hash, handler);
+        Consumer<Handler<AsyncResult<MerkleProofInfoDTO>>> callback = handler -> client
+            .getMerkleTransaction(height, hash, handler);
         return exceptionHandling(call(callback).map(this::toMerkleProofInfo));
 
     }
 
     private MerkleProofInfo toMerkleProofInfo(MerkleProofInfoDTO dto) {
-        List<MerklePathItem> pathItems =
-            dto.getMerklePath().stream()
-                .map(
-                    pathItem ->
-                        new MerklePathItem(pathItem.getPosition() == null ? null
-                            : Position.rawValueOf(pathItem.getPosition().getValue()),
-                            pathItem.getHash()))
-                .collect(Collectors.toList());
+        List<MerklePathItem> pathItems = dto.getMerklePath().stream().map(pathItem -> new MerklePathItem(
+            pathItem.getPosition() == null ? null : Position.rawValueOf(pathItem.getPosition().getValue()),
+            pathItem.getHash())).collect(Collectors.toList());
         return new MerkleProofInfo(pathItems);
     }
 
 
     public static BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO) {
         NetworkType networkType = NetworkType.rawValueOf(blockInfoDTO.getBlock().getNetwork().getValue());
-        return new BlockInfo(
-            blockInfoDTO.getId(), blockInfoDTO.getMeta().getHash(),
-            blockInfoDTO.getMeta().getGenerationHash(),
-            blockInfoDTO.getMeta().getTotalFee(),
-            blockInfoDTO.getMeta().getNumTransactions(),
-            Optional.ofNullable(blockInfoDTO.getMeta().getNumStatements()),
-            blockInfoDTO.getMeta().getStateHashSubCacheMerkleRoots(),
-            blockInfoDTO.getBlock().getSignature(),
-            PublicAccount.createFromPublicKey(blockInfoDTO.getBlock().getSignerPublicKey(), networkType),
-            networkType,
-            blockInfoDTO.getBlock().getVersion(),
-            blockInfoDTO.getBlock().getType(),
-            blockInfoDTO.getBlock().getHeight(),
-            blockInfoDTO.getBlock().getTimestamp(),
-            blockInfoDTO.getBlock().getDifficulty(),
-            blockInfoDTO.getBlock().getFeeMultiplier(),
-            blockInfoDTO.getBlock().getPreviousBlockHash(),
-            blockInfoDTO.getBlock().getTransactionsHash(),
-            blockInfoDTO.getBlock().getReceiptsHash(),
-            blockInfoDTO.getBlock().getStateHash(),
-            blockInfoDTO.getBlock().getProofGamma(),
-            blockInfoDTO.getBlock().getProofScalar(),
+        return new BlockInfo(blockInfoDTO.getId(), blockInfoDTO.getBlock().getSize(), blockInfoDTO.getMeta().getHash(),
+            blockInfoDTO.getMeta().getGenerationHash(), blockInfoDTO.getMeta().getTotalFee(),
+            blockInfoDTO.getMeta().getNumTransactions(), Optional.ofNullable(blockInfoDTO.getMeta().getNumStatements()),
+            blockInfoDTO.getMeta().getStateHashSubCacheMerkleRoots(), blockInfoDTO.getBlock().getSignature(),
+            PublicAccount.createFromPublicKey(blockInfoDTO.getBlock().getSignerPublicKey(), networkType), networkType,
+            blockInfoDTO.getBlock().getVersion(), blockInfoDTO.getBlock().getType(),
+            blockInfoDTO.getBlock().getHeight(), blockInfoDTO.getBlock().getTimestamp(),
+            blockInfoDTO.getBlock().getDifficulty(), blockInfoDTO.getBlock().getFeeMultiplier(),
+            blockInfoDTO.getBlock().getPreviousBlockHash(), blockInfoDTO.getBlock().getTransactionsHash(),
+            blockInfoDTO.getBlock().getReceiptsHash(), blockInfoDTO.getBlock().getStateHash(),
+            blockInfoDTO.getBlock().getProofGamma(), blockInfoDTO.getBlock().getProofScalar(),
             blockInfoDTO.getBlock().getProofVerificationHash(),
             Address.createFromEncoded(blockInfoDTO.getBlock().getBeneficiaryAddress()));
     }
