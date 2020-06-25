@@ -52,7 +52,7 @@ class AccountMetadataTransactionMapper extends
             scopedMetaDataKey,
             value);
         factory.valueSizeDelta(valueSizeDelta);
-        Integer valueSize = transaction.getValueSize();
+        Long valueSize = transaction.getValueSize();
         if (valueSize != null) {
             factory.valueSize(valueSize);
         }

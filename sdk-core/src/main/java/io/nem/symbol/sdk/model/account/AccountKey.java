@@ -24,19 +24,19 @@ public class AccountKey {
     /**
      * The key type.
      */
-    private final KeyType keyType;
+    private final AccountKeyType keyType;
 
     /**
      * The public key in hex.
      */
     private final String key;
 
-    public AccountKey(KeyType keyType, String key) {
-        this.keyType = keyType;
+    public AccountKey(AccountKeyType accountKeyType, String key) {
+        this.keyType = accountKeyType;
         this.key = key;
     }
 
-    public KeyType getKeyType() {
+    public AccountKeyType getKeyType() {
         return keyType;
     }
 

@@ -60,7 +60,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
 
         mosaicDto.setOwnerAddress(address.encoded());
         mosaicDto.setId("481110499AAA");
-        mosaicDto.setRevision(123);
+        mosaicDto.setRevision(123L);
 
         mosaicDto.setFlags(5);
         mosaicDto.setDivisibility(6);
@@ -97,7 +97,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
 
         mosaicDto.setOwnerAddress(address.encoded());
         mosaicDto.setId("481110499AAA");
-        mosaicDto.setRevision(123);
+        mosaicDto.setRevision(123L);
 
         mosaicDto.setFlags(5);
         mosaicDto.setDivisibility(6);
@@ -139,7 +139,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
 
         mosaicDto.setOwnerAddress(address.encoded());
         mosaicDto.setId("481110499");
-        mosaicDto.setRevision(123);
+        mosaicDto.setRevision(123L);
 
         mosaicDto.setFlags(5);
         mosaicDto.setDivisibility(6);

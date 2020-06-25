@@ -112,7 +112,7 @@ public class ResolutionEntry<T> {
      */
     public byte[] serialize() {
         ReceiptSourceBuilder receiptSourceBuilder = ReceiptSourceBuilder
-            .create(getReceiptSource().getPrimaryId(), getReceiptSource().getSecondaryId());
+            .create((int) getReceiptSource().getPrimaryId(), (int) getReceiptSource().getSecondaryId());
         Class<?> resolutionClass = this.resolved.getClass();
         if (Address.class.isAssignableFrom(resolutionClass)) {
             AddressDto addressBuilder = new AddressDto(

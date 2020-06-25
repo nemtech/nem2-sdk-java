@@ -118,8 +118,8 @@ public class MultisigRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
 
         MultisigDTO multisigDto = new MultisigDTO();
         multisigDto.setAccountAddress(account.getAddress().encoded());
-        multisigDto.setMinApproval(1);
-        multisigDto.setMinRemoval(2);
+        multisigDto.setMinApproval(1L);
+        multisigDto.setMinRemoval(2L);
         multisigDto.setCosignatoryAddresses(
             Arrays.asList(account1.getAddress().encoded(), account2.getAddress().encoded()));
         multisigDto

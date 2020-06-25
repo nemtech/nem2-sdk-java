@@ -84,8 +84,8 @@ public class Statement {
      * @return the {@link Optional} of the resolved {@link MosaicId}
      */
     public Optional<MosaicId> getResolvedMosaicId(BigInteger height,
-        UnresolvedMosaicId mosaicAlias, int primaryId,
-        int secondaryId) {
+        UnresolvedMosaicId mosaicAlias, long primaryId,
+        long secondaryId) {
         if (mosaicAlias instanceof MosaicId) {
             return Optional.of((MosaicId) mosaicAlias);
         }
@@ -106,8 +106,8 @@ public class Statement {
      * @return the {@link Optional} of the resolved {@link Address}
      */
     public Optional<Address> getResolvedAddress(BigInteger height,
-        UnresolvedAddress unresolvedAddress, int primaryId,
-        int secondaryId) {
+        UnresolvedAddress unresolvedAddress, long primaryId,
+        long secondaryId) {
         if (unresolvedAddress instanceof Address) {
             return Optional.of((Address) unresolvedAddress);
         }

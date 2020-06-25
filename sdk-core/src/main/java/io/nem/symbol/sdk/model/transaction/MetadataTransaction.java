@@ -17,7 +17,6 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.core.utils.StringEncoder;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import java.math.BigInteger;
 
@@ -43,7 +42,7 @@ public abstract class MetadataTransaction extends Transaction {
     /**
      * The value size.
      */
-    private final int valueSize;
+    private final long valueSize;
 
 
     /**
@@ -84,7 +83,7 @@ public abstract class MetadataTransaction extends Transaction {
         return value;
     }
 
-    public int getValueSize() {
+    public long getValueSize() {
         return valueSize;
     }
 

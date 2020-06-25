@@ -27,45 +27,45 @@ public class TransactionFees {
     /**
      * Average fee multiplier over the last "numBlocksTransactionFeeStats".
      */
-    private final Integer averageFeeMultiplier;
+    private final Long averageFeeMultiplier;
 
     /**
      * Median fee multiplier over the last "numBlocksTransactionFeeStats".
      **/
-    private final Integer medianFeeMultiplier;
+    private final Long medianFeeMultiplier;
 
 
     /**
      * Lowest fee multiplier over the last "numBlocksTransactionFeeStats".
      **/
-    private final Integer lowestFeeMultiplier;
+    private final Long lowestFeeMultiplier;
 
     /**
      * Highest fee multiplier over the last "numBlocksTransactionFeeStats".
      **/
-    private final Integer highestFeeMultiplier;
+    private final Long highestFeeMultiplier;
 
-    public TransactionFees(Integer averageFeeMultiplier, Integer medianFeeMultiplier,
-        Integer lowestFeeMultiplier, Integer highestFeeMultiplier) {
+    public TransactionFees(Long averageFeeMultiplier, Long medianFeeMultiplier,
+        Long lowestFeeMultiplier, Long highestFeeMultiplier) {
         this.averageFeeMultiplier = averageFeeMultiplier;
         this.medianFeeMultiplier = medianFeeMultiplier;
         this.lowestFeeMultiplier = lowestFeeMultiplier;
         this.highestFeeMultiplier = highestFeeMultiplier;
     }
 
-    public Integer getAverageFeeMultiplier() {
+    public Long getAverageFeeMultiplier() {
         return averageFeeMultiplier;
     }
 
-    public Integer getMedianFeeMultiplier() {
+    public Long getMedianFeeMultiplier() {
         return medianFeeMultiplier;
     }
 
-    public Integer getLowestFeeMultiplier() {
+    public Long getLowestFeeMultiplier() {
         return lowestFeeMultiplier;
     }
 
-    public Integer getHighestFeeMultiplier() {
+    public Long getHighestFeeMultiplier() {
         return highestFeeMultiplier;
     }
 }

@@ -56,8 +56,7 @@ public abstract class ResolutionStatement<U, R> {
      * UnresolvedMosaicId}).
      * @param resolutionEntries Array of resolution entries ({@link Address}, or {@link MosaicId}).
      */
-    public ResolutionStatement(
-        ResolutionType resolutionType, BigInteger height, U unresolved,
+    public ResolutionStatement(ResolutionType resolutionType, BigInteger height, U unresolved,
         List<ResolutionEntry<R>> resolutionEntries) {
         this.height = height;
         this.unresolved = unresolved;
@@ -110,13 +109,10 @@ public abstract class ResolutionStatement<U, R> {
     private void validateType() {
         validateType(ResolutionType.ADDRESS, UnresolvedAddress.class);
         validateType(ResolutionType.MOSAIC, UnresolvedMosaicId.class);
-        this.resolutionEntries.forEach(
-            entry -> {
-                validateType(ResolutionType.ADDRESS, ReceiptType.ADDRESS_ALIAS_RESOLUTION,
-                    entry.getType());
-                validateType(ResolutionType.MOSAIC, ReceiptType.MOSAIC_ALIAS_RESOLUTION,
-                    entry.getType());
-            });
+        this.resolutionEntries.forEach(entry -> {
+            validateType(ResolutionType.ADDRESS, ReceiptType.ADDRESS_ALIAS_RESOLUTION, entry.getType());
+            validateType(ResolutionType.MOSAIC, ReceiptType.MOSAIC_ALIAS_RESOLUTION, entry.getType());
+        });
     }
 
 
@@ -124,27 +120,20 @@ public abstract class ResolutionStatement<U, R> {
      * Validate resolved type ({@link UnresolvedMosaicId} | {@link UnresolvedAddress})
      */
     private void validateType(ResolutionType givenResolutionType, Class<?> expectedType) {
-        if (!expectedType.isAssignableFrom(this.unresolved.getClass())
-            && getResolutionType() == givenResolutionType) {
+        if (!expectedType.isAssignableFrom(this.unresolved.getClass()) && getResolutionType() == givenResolutionType) {
             throw new IllegalArgumentException(
-                "Unresolved Type: ["
-                    + expectedType.getName()
-                    + "] is not valid for this ResolutionEntry type " + getResolutionType());
+                "Unresolved Type: [" + expectedType.getName() + "] is not valid for this ResolutionEntry type "
+                    + getResolutionType());
         }
     }
 
 
     private void validateType(ResolutionType givenResolutionType, ReceiptType expectedReceiptType,
-        ReceiptType currentRecipientType
-    ) {
-        if (getResolutionType() == givenResolutionType
-            && currentRecipientType != expectedReceiptType) {
+        ReceiptType currentRecipientType) {
+        if (getResolutionType() == givenResolutionType && currentRecipientType != expectedReceiptType) {
             throw new IllegalArgumentException(
-                "Resolution Type: ["
-                    + getResolutionType()
-                    + "] does not match ResolutionEntry's type: ["
-                    + currentRecipientType
-                    + "] for this ResolutionStatement");
+                "Resolution Type: [" + getResolutionType() + "] does not match ResolutionEntry's type: ["
+                    + currentRecipientType + "] for this ResolutionStatement");
         }
     }
 
@@ -156,7 +145,7 @@ public abstract class ResolutionStatement<U, R> {
      * @param secondaryId Secondary id
      * @return Optional of {@link ResolutionEntry}
      */
-    public Optional<ResolutionEntry<R>> getResolutionEntryById(int primaryId, int secondaryId) {
+    public Optional<ResolutionEntry<R>> getResolutionEntryById(long primaryId, long secondaryId) {
         /*
         Primary id and secondary id do not specifically map to the exact transaction index on the same block.
         The ids are just the order of the resolution reflecting on the order of transactions (ordered by index).
@@ -165,7 +154,7 @@ public abstract class ResolutionStatement<U, R> {
         Based on above example, 2 transactions (index 0 & 1) are created on the same block, however, only 1
         resolution entry get generated for both.
         */
-        int resolvedPrimaryId = getMaxAvailablePrimaryId(primaryId);
+        long resolvedPrimaryId = getMaxAvailablePrimaryId(primaryId);
 
         /*
         If no primaryId found, it means there's no resolution entry available for the process. Invalid entry.
@@ -192,15 +181,14 @@ public abstract class ResolutionStatement<U, R> {
             Transaction: [Inx:3(2+1), AggInx:0]
             It should return Entry: {P:2, S:0}
             */
-            return this.resolutionEntries.stream()
-                .filter(entry -> entry.getReceiptSource().getPrimaryId() == resolvedPrimaryId &&
-                    entry.getReceiptSource().getSecondaryId() == this
-                        .getMaxSecondaryIdByPrimaryId(resolvedPrimaryId)).findFirst();
+            return this.resolutionEntries.stream().filter(
+                entry -> entry.getReceiptSource().getPrimaryId() == resolvedPrimaryId
+                    && entry.getReceiptSource().getSecondaryId() == this
+                    .getMaxSecondaryIdByPrimaryId(resolvedPrimaryId)).findFirst();
         }
 
         // When transaction index matches a primaryId, get the most recent secondaryId (resolvedPrimaryId can only <= primaryId)
-        int resolvedSecondaryId = this
-            .getMaxSecondaryIdByPrimaryIdAndSecondaryId(resolvedPrimaryId, secondaryId);
+        long resolvedSecondaryId = this.getMaxSecondaryIdByPrimaryIdAndSecondaryId(resolvedPrimaryId, secondaryId);
 
         /*
         If no most recent secondaryId matched transaction index, find previous resolution entry (most recent).
@@ -213,12 +201,11 @@ public abstract class ResolutionStatement<U, R> {
         It should return Entry: {P:2, S:0}
         */
         if (resolvedSecondaryId == 0 && resolvedSecondaryId != secondaryId) {
-            int lastPrimaryId = this.getMaxAvailablePrimaryId(resolvedPrimaryId - 1);
-            return
-                this.resolutionEntries.stream()
-                    .filter(entry -> entry.getReceiptSource().getPrimaryId() == lastPrimaryId &&
-                        entry.getReceiptSource().getSecondaryId() == this
-                            .getMaxSecondaryIdByPrimaryId(lastPrimaryId)).findFirst();
+            long lastPrimaryId = this.getMaxAvailablePrimaryId(resolvedPrimaryId - 1);
+            return this.resolutionEntries.stream().filter(
+                entry -> entry.getReceiptSource().getPrimaryId() == lastPrimaryId
+                    && entry.getReceiptSource().getSecondaryId() == this.getMaxSecondaryIdByPrimaryId(lastPrimaryId))
+                .findFirst();
         }
 
         /*
@@ -231,8 +218,7 @@ public abstract class ResolutionStatement<U, R> {
         */
         return this.resolutionEntries.stream()
             .filter(entry -> entry.getReceiptSource().getPrimaryId() == resolvedPrimaryId)
-            .filter(entry -> entry.getReceiptSource().getSecondaryId() == resolvedSecondaryId)
-            .findFirst();
+            .filter(entry -> entry.getReceiptSource().getSecondaryId() == resolvedSecondaryId).findFirst();
     }
 
     /**
@@ -241,11 +227,10 @@ public abstract class ResolutionStatement<U, R> {
      * @param primaryId Primary source id
      * @return Get max secondary id by a given primaryId
      */
-    private int getMaxSecondaryIdByPrimaryId(int primaryId) {
-        return this.resolutionEntries.stream()
-            .filter(entry -> entry.getReceiptSource().getPrimaryId() == primaryId)
-            .mapToInt(entry -> entry.getReceiptSource().getSecondaryId()).max().orElseThrow(() ->
-                new IllegalArgumentException(
+    private long getMaxSecondaryIdByPrimaryId(long primaryId) {
+        return this.resolutionEntries.stream().filter(entry -> entry.getReceiptSource().getPrimaryId() == primaryId)
+            .mapToLong(entry -> entry.getReceiptSource().getSecondaryId()).max().orElseThrow(
+                () -> new IllegalArgumentException(
                     "resolutionEntries is empty when calculating getMaxSecondaryIdByPrimaryId"));
     }
 
@@ -257,14 +242,12 @@ public abstract class ResolutionStatement<U, R> {
      * @param secondaryId Secondary source id
      * @return the expected max available.
      */
-    private int getMaxSecondaryIdByPrimaryIdAndSecondaryId(int primaryId, int secondaryId) {
+    private long getMaxSecondaryIdByPrimaryIdAndSecondaryId(long primaryId, long secondaryId) {
 
-        return this.resolutionEntries.stream()
-            .filter(entry -> entry.getReceiptSource().getPrimaryId() == primaryId).mapToInt(
-                entry -> secondaryId >= entry.getReceiptSource().getSecondaryId()
-                    ? entry.getReceiptSource().getSecondaryId() : 0).max().orElseThrow(() ->
-                new IllegalArgumentException(
-                    "resolutionEntries is empty when calculating getMaxSecondaryIdByPrimaryIdAndSecondaryId"));
+        return this.resolutionEntries.stream().filter(entry -> entry.getReceiptSource().getPrimaryId() == primaryId)
+            .mapToLong(entry -> secondaryId >= entry.getReceiptSource().getSecondaryId() ? entry.getReceiptSource()
+                .getSecondaryId() : 0).max().orElseThrow(() -> new IllegalArgumentException(
+                "resolutionEntries is empty when calculating getMaxSecondaryIdByPrimaryIdAndSecondaryId"));
     }
 
     /**
@@ -274,12 +257,11 @@ public abstract class ResolutionStatement<U, R> {
      * @param primaryId Primary source id
      * @return the expected max available.
      */
-    private int getMaxAvailablePrimaryId(int primaryId) {
+    private long getMaxAvailablePrimaryId(long primaryId) {
 
-        return this.resolutionEntries.stream().mapToInt(
-            entry -> primaryId >= entry.getReceiptSource().getPrimaryId()
-                ? entry.getReceiptSource().getPrimaryId() : 0).max().orElseThrow(() ->
-            new IllegalArgumentException(
+        return this.resolutionEntries.stream().mapToLong(
+            entry -> primaryId >= entry.getReceiptSource().getPrimaryId() ? entry.getReceiptSource().getPrimaryId() : 0)
+            .max().orElseThrow(() -> new IllegalArgumentException(
                 "resolutionEntries is empty when calculating getMaxAvailablePrimaryId"));
     }
 
@@ -302,35 +284,23 @@ public abstract class ResolutionStatement<U, R> {
      * @return the serialized content.
      */
     private byte[] serialize(NetworkType networkType) {
-        ReceiptType type =
-            this.resolutionType == ResolutionType.ADDRESS ? ReceiptType.ADDRESS_ALIAS_RESOLUTION
-                : ReceiptType.MOSAIC_ALIAS_RESOLUTION;
+        ReceiptType type = this.resolutionType == ResolutionType.ADDRESS ? ReceiptType.ADDRESS_ALIAS_RESOLUTION
+            : ReceiptType.MOSAIC_ALIAS_RESOLUTION;
         ReceiptTypeDto recipientTypeDto = ReceiptTypeDto.rawValueOf((short) type.getValue());
         short version = (short) ReceiptVersion.RESOLUTION_STATEMENT.getValue();
-        Serializer serializer = this.resolutionType == ResolutionType.ADDRESS
-            ? AddressResolutionStatementBuilder.create(
-            version, recipientTypeDto,
-            SerializationUtils.toUnresolvedAddress((UnresolvedAddress) this.unresolved, networkType),
-            this.resolutionEntries.stream().map(
-                (entry) ->
-                    AddressResolutionEntryBuilder.create(
-                        ReceiptSourceBuilder.create(entry.getReceiptSource().getPrimaryId(),
-                            entry.getReceiptSource().getSecondaryId()),
-                        SerializationUtils.toAddressDto((Address) entry.getResolved()))
-            ).collect(Collectors.toList()))
+        Serializer serializer = this.resolutionType == ResolutionType.ADDRESS ? AddressResolutionStatementBuilder
+            .create(version, recipientTypeDto,
+                SerializationUtils.toUnresolvedAddress((UnresolvedAddress) this.unresolved, networkType),
+                this.resolutionEntries.stream().map((entry) -> AddressResolutionEntryBuilder.create(ReceiptSourceBuilder
+                        .create((int) entry.getReceiptSource().getPrimaryId(),
+                            (int) entry.getReceiptSource().getSecondaryId()),
+                    SerializationUtils.toAddressDto((Address) entry.getResolved()))).collect(Collectors.toList()))
 
-            : MosaicResolutionStatementBuilder.create(
-                version, recipientTypeDto,
+            : MosaicResolutionStatementBuilder.create(version, recipientTypeDto,
                 SerializationUtils.toUnresolvedMosaicIdDto((UnresolvedMosaicId) this.unresolved),
-                this.resolutionEntries.stream().map(
-                    (entry) ->
-                        MosaicResolutionEntryBuilder.create(
-                            ReceiptSourceBuilder.create(entry.getReceiptSource().getPrimaryId(),
-                                entry.getReceiptSource().getSecondaryId()),
-                            SerializationUtils.toMosaicIdDto((MosaicId) entry.getResolved())
-                        )
-                ).collect(Collectors.toList())
-            );
+                this.resolutionEntries.stream().map((entry) -> MosaicResolutionEntryBuilder.create(ReceiptSourceBuilder
+                        .create((int) entry.getReceiptSource().getPrimaryId(),(int)  entry.getReceiptSource().getSecondaryId()),
+                    SerializationUtils.toMosaicIdDto((MosaicId) entry.getResolved()))).collect(Collectors.toList()));
         return serializer.serialize();
     }
 

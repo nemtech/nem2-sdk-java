@@ -26,8 +26,8 @@ public class AccountKeyTest {
 
     @Test
     void constructor(){
-        AccountKey accountKey = new AccountKey(KeyType.LINKED,"ABC");
-        Assertions.assertEquals(KeyType.LINKED, accountKey.getKeyType());
+        AccountKey accountKey = new AccountKey(AccountKeyType.LINKED,"ABC");
+        Assertions.assertEquals(AccountKeyType.LINKED, accountKey.getKeyType());
         Assertions.assertEquals("ABC", accountKey.getKey());
     }
 }

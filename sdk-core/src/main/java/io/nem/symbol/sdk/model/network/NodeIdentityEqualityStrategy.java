@@ -17,7 +17,6 @@
 
 package io.nem.symbol.sdk.model.network;
 
-import io.nem.symbol.sdk.model.account.KeyType;
 import java.util.Arrays;
 
 /**

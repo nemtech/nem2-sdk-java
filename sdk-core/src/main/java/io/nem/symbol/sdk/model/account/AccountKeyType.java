@@ -18,26 +18,36 @@ package io.nem.symbol.sdk.model.account;
 
 import java.util.Arrays;
 
-/**
- * The type of a public key.
- */
-public enum KeyType {
 
+/**
+ * Type of account key: * 0 - Unset. * 1 - Linked account public key. * 2 - Node public key on which remote is allowed
+ * to harvest. * 4 - VRF public key.
+ */
+public enum AccountKeyType {
+
+    /**
+     * unset key.
+     */
     UNSET(0),
 
+    /**
+     * linked account public key \note this can be either a remote or main account public key depending on context.
+     */
     LINKED(1),
 
-    VRF(2),
+    /**
+     * node public key on which remote is allowed to harvest.
+     */
+    NODE(2),
 
-    VOTING(4),
+    /**
+     * VRF public key.
+     */
+    VRF(4);
 
-    NODE(8),
+    private final int value;
 
-    ALL(15);
-
-    private int value;
-
-    KeyType(int value) {
+    AccountKeyType(int value) {
         this.value = value;
     }
 
@@ -50,7 +60,7 @@ public enum KeyType {
         return String.valueOf(value);
     }
 
-    public static KeyType rawValueOf(int value) {
+    public static AccountKeyType rawValueOf(int value) {
         return Arrays.stream(values()).filter(e -> e.value == value).findFirst()
             .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
     }

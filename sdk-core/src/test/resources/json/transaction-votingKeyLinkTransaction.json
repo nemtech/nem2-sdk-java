@@ -15,6 +15,8 @@
     "maxFee": "10000000",
     "deadline": "4604134480",
     "linkedPublicKey": "12340000000000000000000000000000AAAAECD5D1080D4E1BF1BF6D577CE53EB55696C4C1F6EC1F3ACB2D1281661EFD",
+    "startPoint": "2",
+    "endPoint": "3",
     "linkAction": 1
   }
 }

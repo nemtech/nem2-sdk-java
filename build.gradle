@@ -44,8 +44,8 @@ ext {
     vertxVersion = "3.5.0"
     rxjavaVersion = "2.1.7"
     junitVersion = "5.4.0"
-    catbufferVersion = "0.0.20"
-    restApiVersion = "0.9.2"
+    catbufferVersion = "0.0.21-SNAPSHOT"
+    restApiVersion = "0.9.3-SNAPSHOT"
     jackson_version = "2.9.9"
     jackson_databind_version = "2.9.9"
 }

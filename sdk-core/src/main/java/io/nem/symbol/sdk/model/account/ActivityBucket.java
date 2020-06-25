@@ -36,7 +36,7 @@ public class ActivityBucket {
     /**
      * Beneficiary count.
      */
-    private final int beneficiaryCount;
+    private final long beneficiaryCount;
 
     /**
      * Raw score.
@@ -52,7 +52,7 @@ public class ActivityBucket {
      * @param beneficiaryCount Beneficiary count.
      * @param rawScore Raw score.
      */
-    public ActivityBucket(BigInteger startHeight, BigInteger totalFeesPaid, int beneficiaryCount,
+    public ActivityBucket(BigInteger startHeight, BigInteger totalFeesPaid, long beneficiaryCount,
         BigInteger rawScore) {
         this.startHeight = startHeight;
         this.totalFeesPaid = totalFeesPaid;
@@ -68,7 +68,7 @@ public class ActivityBucket {
         return totalFeesPaid;
     }
 
-    public int getBeneficiaryCount() {
+    public long getBeneficiaryCount() {
         return beneficiaryCount;
     }
 

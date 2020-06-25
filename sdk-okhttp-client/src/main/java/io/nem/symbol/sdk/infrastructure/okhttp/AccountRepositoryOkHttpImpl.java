@@ -22,10 +22,10 @@ import static io.nem.symbol.core.utils.MapperUtils.toMosaicId;
 import io.nem.symbol.sdk.api.AccountRepository;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountKey;
+import io.nem.symbol.sdk.model.account.AccountKeyType;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.ActivityBucket;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.account.KeyType;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.AccountRoutesApi;
@@ -94,7 +94,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
                 .collect(Collectors.toList()),
             AccountType.rawValueOf(accountDTO.getAccountType().getValue()),
             accountDTO.getSupplementalAccountKeys().stream().map(dto -> new AccountKey(
-                KeyType.rawValueOf(dto.getKeyType().getValue()), dto.getKey()))
+                AccountKeyType.rawValueOf(dto.getKeyType().getValue()), dto.getKey()))
                 .collect(Collectors.toList()),
             accountDTO.getActivityBuckets().stream()
                 .map(dto -> new ActivityBucket(dto.getStartHeight(),

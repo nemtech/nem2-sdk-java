@@ -30,10 +30,11 @@ import java.util.Optional;
 public class BlockInfo implements Stored {
 
     private final String recordId;
-    private final Integer size;
+    private final Long size;
     private final String hash;
     private final String generationHash;
     private final BigInteger totalFee;
+    private final List<String> stateHashSubCacheMerkleRoots;
     private final Integer numTransactions;
     private final Optional<Integer> numStatements;
     private final List<String> subCacheMerkleRoots;
@@ -45,7 +46,7 @@ public class BlockInfo implements Stored {
     private final BigInteger height;
     private final BigInteger timestamp;
     private final BigInteger difficulty;
-    private final Integer feeMultiplier;
+    private final Long feeMultiplier;
     private final String previousBlockHash;
     private final String blockTransactionsHash;
     private final String blockReceiptsHash;
@@ -56,10 +57,10 @@ public class BlockInfo implements Stored {
     private final Address beneficiaryAddress;
 
     @SuppressWarnings("squid:S00107")
-    public BlockInfo(String recordId, Integer size, String hash, String generationHash, BigInteger totalFee,
-        Integer numTransactions, Optional<Integer> numStatements, List<String> subCacheMerkleRoots, String signature,
+    public BlockInfo(String recordId, Long size, String hash, String generationHash, BigInteger totalFee,
+        List<String> stateHashSubCacheMerkleRoots, Integer numTransactions, Optional<Integer> numStatements, List<String> subCacheMerkleRoots, String signature,
         PublicAccount signerPublicAccount, NetworkType networkType, Integer version, int type, BigInteger height,
-        BigInteger timestamp, BigInteger difficulty, Integer feeMultiplier, String previousBlockHash,
+        BigInteger timestamp, BigInteger difficulty, Long feeMultiplier, String previousBlockHash,
         String blockTransactionsHash, String blockReceiptsHash, String stateHash, String proofGamma, String proofScalar,
         String proofVerificationHash, Address beneficiaryAddress) {
         this.recordId = recordId;
@@ -67,6 +68,7 @@ public class BlockInfo implements Stored {
         this.hash = hash;
         this.generationHash = generationHash;
         this.totalFee = totalFee;
+        this.stateHashSubCacheMerkleRoots = stateHashSubCacheMerkleRoots;
         this.numTransactions = numTransactions;
         this.numStatements = numStatements;
         this.subCacheMerkleRoots = subCacheMerkleRoots;
@@ -94,7 +96,7 @@ public class BlockInfo implements Stored {
      *
      * @return the size
      */
-    public Integer getSize() {
+    public Long getSize() {
         return size;
     }
 
@@ -228,9 +230,9 @@ public class BlockInfo implements Stored {
     /**
      * Returns the feeMultiplier defined by the harvester.
      *
-     * @return Integer
+     * @return Long
      */
-    public Integer getFeeMultiplier() {
+    public Long getFeeMultiplier() {
         return feeMultiplier;
     }
 
@@ -313,5 +315,13 @@ public class BlockInfo implements Stored {
      */
     public Optional<String> getRecordId() {
         return Optional.ofNullable(recordId);
+    }
+
+    /**
+     *
+     * @return state Hash Sub Cache Merkle Roots ahses
+     */
+    public List<String> getStateHashSubCacheMerkleRoots() {
+        return stateHashSubCacheMerkleRoots;
     }
 }

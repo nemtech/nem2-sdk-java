@@ -42,13 +42,16 @@ public class VotingKeyLinkTransactionMapper extends
         VotingKeyLinkTransactionDTO transaction) {
         VotingKey linkedPublicKey = VotingKey.fromHexString(transaction.getLinkedPublicKey());
         LinkAction linkAction = LinkAction.rawValueOf(transaction.getLinkAction().getValue());
-        return VotingKeyLinkTransactionFactory.create(networkType, linkedPublicKey, linkAction);
+        return VotingKeyLinkTransactionFactory
+            .create(networkType, linkedPublicKey, transaction.getStartPoint(), transaction.getEndPoint(), linkAction);
     }
 
     @Override
     protected void copyToDto(VotingKeyLinkTransaction transaction, VotingKeyLinkTransactionDTO dto) {
         dto.setLinkAction(LinkActionEnum.fromValue((int) transaction.getLinkAction().getValue()));
         dto.setLinkedPublicKey(transaction.getLinkedPublicKey().toHex());
+        dto.setStartPoint(transaction.getStartPoint());
+        dto.setEndPoint(transaction.getEndPoint());
     }
 
 }

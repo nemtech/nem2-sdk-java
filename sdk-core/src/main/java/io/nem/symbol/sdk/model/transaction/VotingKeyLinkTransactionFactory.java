@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.core.crypto.VotingKey;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import java.math.BigInteger;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -29,6 +30,15 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
      * The voting key.
      */
     private final VotingKey linkedPublicKey;
+    /**
+     * Start finalization point.
+     */
+    private final BigInteger startPoint;
+
+    /**
+     * End finalization point.
+     */
+    private final BigInteger endPoint;
 
     /**
      * The link action.
@@ -40,27 +50,35 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
      *
      * @param networkType the network type of this transaction.
      * @param linkedPublicKey the voting key.
+     * @param startPoint Start finalization point.
+     * @param endPoint End finalization point.
      * @param linkAction the link action.
      */
     private VotingKeyLinkTransactionFactory(final NetworkType networkType, final VotingKey linkedPublicKey,
-        final LinkAction linkAction) {
+        BigInteger startPoint, BigInteger endPoint, final LinkAction linkAction) {
         super(TransactionType.VOTING_KEY_LINK, networkType);
         Validate.notNull(linkedPublicKey, "linkedPublicKey must not be null");
+        Validate.notNull(startPoint, "startPoint must not be null");
+        Validate.notNull(endPoint, "endPoint must not be null");
         Validate.notNull(linkAction, "linkAction must not be null");
         this.linkedPublicKey = linkedPublicKey;
+        this.startPoint = startPoint;
+        this.endPoint = endPoint;
         this.linkAction = linkAction;
     }
+
     /**
-     * The factory constructor for {@link VotingKeyLinkTransactionFactory}
+     * Create method factory for {@link VotingKeyLinkTransactionFactory}
      *
      * @param networkType the network type of this transaction.
      * @param linkedPublicKey the voting key.
+     * @param startPoint Start finalization point.
+     * @param endPoint End finalization point.
      * @param linkAction the link action.
-     * @return an instance of the factory.
      */
     public static VotingKeyLinkTransactionFactory create(final NetworkType networkType, final VotingKey linkedPublicKey,
-        final LinkAction linkAction) {
-        return new VotingKeyLinkTransactionFactory(networkType, linkedPublicKey, linkAction);
+        BigInteger startPoint, BigInteger endPoint, final LinkAction linkAction) {
+        return new VotingKeyLinkTransactionFactory(networkType, linkedPublicKey, startPoint, endPoint, linkAction);
     }
 
 
@@ -75,5 +93,13 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
 
     public LinkAction getLinkAction() {
         return linkAction;
+    }
+
+    public BigInteger getStartPoint() {
+        return startPoint;
+    }
+
+    public BigInteger getEndPoint() {
+        return endPoint;
     }
 }

@@ -26,15 +26,15 @@ import java.util.List;
 public class MultisigAccountInfo {
 
     private final Address accountAddress;
-    private final int minApproval;
-    private final int minRemoval;
+    private final long minApproval;
+    private final long minRemoval;
     private final List<Address> cosignatoryAddresses;
     private final List<Address> multisigAddresses;
 
     public MultisigAccountInfo(
         Address accountAddress,
-        int minApproval,
-        int minRemoval,
+        long minApproval,
+        long minRemoval,
         List<Address> cosignatories,
         List<Address> multisigAddresses) {
         this.accountAddress = accountAddress;
@@ -58,7 +58,7 @@ public class MultisigAccountInfo {
      *
      * @return int
      */
-    public int getMinApproval() {
+    public long getMinApproval() {
         return minApproval;
     }
 
@@ -67,7 +67,7 @@ public class MultisigAccountInfo {
      *
      * @return int
      */
-    public int getMinRemoval() {
+    public long getMinRemoval() {
         return minRemoval;
     }
 

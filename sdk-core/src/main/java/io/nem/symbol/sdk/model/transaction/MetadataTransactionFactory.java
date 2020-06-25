@@ -16,7 +16,6 @@
 
 package io.nem.symbol.sdk.model.transaction;
 
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
@@ -51,7 +50,7 @@ public abstract class MetadataTransactionFactory<T extends MetadataTransaction> 
     /**
      * The value size. Defaulted to the size of the encoded value.
      */
-    private int valueSize;
+    private long valueSize;
 
     MetadataTransactionFactory(
         TransactionType transactionType,
@@ -97,11 +96,11 @@ public abstract class MetadataTransactionFactory<T extends MetadataTransaction> 
         return this;
     }
 
-    public int getValueSize() {
+    public long getValueSize() {
         return valueSize;
     }
 
-    public MetadataTransactionFactory<T> valueSize(int valueSize) {
+    public MetadataTransactionFactory<T> valueSize(long valueSize) {
         this.valueSize = valueSize;
         return this;
     }

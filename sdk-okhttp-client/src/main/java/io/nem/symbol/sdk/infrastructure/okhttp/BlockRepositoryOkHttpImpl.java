@@ -59,6 +59,7 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
         NetworkType networkType = NetworkType.rawValueOf(blockInfoDTO.getBlock().getNetwork().getValue());
         return new BlockInfo(blockInfoDTO.getId(), blockInfoDTO.getBlock().getSize(), blockInfoDTO.getMeta().getHash(),
             blockInfoDTO.getMeta().getGenerationHash(), blockInfoDTO.getMeta().getTotalFee(),
+            blockInfoDTO.getMeta().getStateHashSubCacheMerkleRoots(),
             blockInfoDTO.getMeta().getNumTransactions(), Optional.ofNullable(blockInfoDTO.getMeta().getNumStatements()),
             blockInfoDTO.getMeta().getStateHashSubCacheMerkleRoots(), blockInfoDTO.getBlock().getSignature(),
             PublicAccount.createFromPublicKey(blockInfoDTO.getBlock().getSignerPublicKey(), networkType), networkType,

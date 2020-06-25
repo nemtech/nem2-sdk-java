@@ -31,6 +31,7 @@ import io.nem.symbol.catapult.builders.BlockDurationDto;
 import io.nem.symbol.catapult.builders.CosignatureBuilder;
 import io.nem.symbol.catapult.builders.EmbeddedTransactionBuilder;
 import io.nem.symbol.catapult.builders.EntityTypeDto;
+import io.nem.symbol.catapult.builders.FinalizationPointDto;
 import io.nem.symbol.catapult.builders.Hash256Dto;
 import io.nem.symbol.catapult.builders.HashLockTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.KeyDto;
@@ -875,11 +876,11 @@ public class BinarySerializationImpl implements BinarySerialization {
             UnresolvedMosaicIdDto mosaicId = new UnresolvedMosaicIdDto(transaction.getMosaic().getId().getIdAsLong());
             AmountDto amount = new AmountDto(transaction.getMosaic().getAmount().longValue());
             UnresolvedMosaicBuilder unresolvedMosaicBuilder = UnresolvedMosaicBuilder.create(mosaicId, amount);
-            return SecretLockTransactionBodyBuilder
-                .create(new Hash256Dto(getSecretBuffer(transaction)), unresolvedMosaicBuilder,
-                    new BlockDurationDto(transaction.getDuration().longValue()),
-                    LockHashAlgorithmDto.rawValueOf((byte) transaction.getHashAlgorithm().getValue()),
-                    SerializationUtils.toUnresolvedAddress(transaction.getRecipient(), transaction.getNetworkType()));
+            return SecretLockTransactionBodyBuilder.create(
+                SerializationUtils.toUnresolvedAddress(transaction.getRecipient(), transaction.getNetworkType()),
+                new Hash256Dto(getSecretBuffer(transaction)), unresolvedMosaicBuilder,
+                new BlockDurationDto(transaction.getDuration().longValue()),
+                LockHashAlgorithmDto.rawValueOf((byte) transaction.getHashAlgorithm().getValue()));
         }
 
         /**
@@ -922,9 +923,10 @@ public class BinarySerializationImpl implements BinarySerialization {
 
         @Override
         public Serializer toBodyBuilder(SecretProofTransaction transaction) {
-            return SecretProofTransactionBodyBuilder.create(new Hash256Dto(getSecretBuffer(transaction)),
-                LockHashAlgorithmDto.rawValueOf((byte) transaction.getHashType().getValue()),
+            return SecretProofTransactionBodyBuilder.create(
                 SerializationUtils.toUnresolvedAddress(transaction.getRecipient(), transaction.getNetworkType()),
+                new Hash256Dto(getSecretBuffer(transaction)),
+                LockHashAlgorithmDto.rawValueOf((byte) transaction.getHashType().getValue()),
                 getProofBuffer(transaction));
         }
 
@@ -1507,15 +1509,21 @@ public class BinarySerializationImpl implements BinarySerialization {
         public TransactionFactory fromBodyBuilder(NetworkType networkType, Serializer transactionBuilder) {
             VotingKeyLinkTransactionBodyBuilder builder = (VotingKeyLinkTransactionBodyBuilder) transactionBuilder;
             VotingKey linkedPublicKey = SerializationUtils.toVotingKey(builder.getLinkedPublicKey());
+            BigInteger startPoint = SerializationUtils
+                .toUnsignedBigInteger(builder.getStartPoint().getFinalizationPoint());
+            BigInteger endPoint = SerializationUtils.toUnsignedBigInteger(builder.getEndPoint().getFinalizationPoint());
             LinkAction linkAction = LinkAction.rawValueOf(builder.getLinkAction().getValue());
-            return VotingKeyLinkTransactionFactory.create(networkType, linkedPublicKey, linkAction);
+            return VotingKeyLinkTransactionFactory
+                .create(networkType, linkedPublicKey, startPoint, endPoint, linkAction);
         }
 
         @Override
         public Serializer toBodyBuilder(VotingKeyLinkTransaction transaction) {
             VotingKeyDto linkedPublicKey = SerializationUtils.toVotingKeyDto(transaction.getLinkedPublicKey());
+            FinalizationPointDto startPoint = SerializationUtils.toFinalizationPointDto(transaction.getStartPoint());
+            FinalizationPointDto endPoint = SerializationUtils.toFinalizationPointDto(transaction.getEndPoint());
             LinkActionDto linkAction = LinkActionDto.rawValueOf(transaction.getLinkAction().getValue());
-            return VotingKeyLinkTransactionBodyBuilder.create(linkedPublicKey, linkAction);
+            return VotingKeyLinkTransactionBodyBuilder.create(linkedPublicKey, startPoint, endPoint, linkAction);
         }
 
     }

@@ -28,14 +28,14 @@ class TransactionFeesTest {
     @Test
     void createTransactionFees() {
 
-        TransactionFees info = new TransactionFees(1, 2, 3, 4);
+        TransactionFees info = new TransactionFees(1L, 2L, 3L, 4L);
 
         Assertions.assertNotNull(info);
 
-        Assertions.assertEquals(1, info.getAverageFeeMultiplier());
-        Assertions.assertEquals(2, info.getMedianFeeMultiplier());
-        Assertions.assertEquals(3, info.getLowestFeeMultiplier());
-        Assertions.assertEquals(4, info.getHighestFeeMultiplier());
+        Assertions.assertEquals(1L, info.getAverageFeeMultiplier());
+        Assertions.assertEquals(2L, info.getMedianFeeMultiplier());
+        Assertions.assertEquals(3L, info.getLowestFeeMultiplier());
+        Assertions.assertEquals(4L, info.getHighestFeeMultiplier());
 
     }
 }

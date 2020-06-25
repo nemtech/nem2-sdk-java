@@ -58,7 +58,7 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
 
         mosaicDto.setOwnerAddress(ownerAddress.encoded());
         mosaicDto.setId("481110499AAA");
-        mosaicDto.setRevision(123);
+        mosaicDto.setRevision(123L);
 
         mosaicDto.setFlags(5);
         mosaicDto.setDivisibility(6);
@@ -95,7 +95,7 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
         MosaicInfoDTO mosaicInfoDto = new MosaicInfoDTO();
         mosaicDto.setOwnerAddress(ownerAddress.encoded());
         mosaicDto.setId("481110499AAA");
-        mosaicDto.setRevision(123);
+        mosaicDto.setRevision(123L);
 
         mosaicDto.setFlags(5);
         mosaicDto.setDivisibility(6);
@@ -129,7 +129,7 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
         MosaicDTO mosaicDto = new MosaicDTO();
         mosaicDto.setOwnerAddress(ownerAddress.encoded());
         mosaicDto.setId("481110499AAA");
-        mosaicDto.setRevision(123);
+        mosaicDto.setRevision(123L);
 
         mosaicDto.setFlags(5);
         mosaicDto.setDivisibility(6);

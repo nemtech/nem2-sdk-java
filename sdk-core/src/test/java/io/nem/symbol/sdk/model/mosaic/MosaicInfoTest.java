@@ -42,7 +42,7 @@ class MosaicInfoTest {
                 new BigInteger("100"),
                 new BigInteger("0"),
                 address,
-                1,
+                1L,
                 mosaicFlags,
                 3,
                 BigInteger.valueOf(10));
@@ -53,6 +53,8 @@ class MosaicInfoTest {
         assertEquals(address, mosaicInfo.getOwnerAddress());
         assertTrue(mosaicInfo.isSupplyMutable());
         assertTrue(mosaicInfo.isTransferable());
+        assertTrue(mosaicInfo.isTransferable());
+        assertEquals(1L, mosaicInfo.getRevision());
         assertEquals(3, mosaicInfo.getDivisibility());
         assertEquals(BigInteger.valueOf(10), mosaicInfo.getDuration());
         assertEquals("abc", mosaicInfo.getRecordId().get());
@@ -69,7 +71,7 @@ class MosaicInfoTest {
                 new BigInteger("100"),
                 new BigInteger("0"),
                 Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress(),
-                1,
+                1L,
                 mosaicFlags,
                 3,
                 BigInteger.valueOf(10));
@@ -88,7 +90,7 @@ class MosaicInfoTest {
                 new BigInteger("100"),
                 new BigInteger("0"),
                 Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress(),
-                1,
+                1L,
                 mosaicFlags,
                 3,
                 BigInteger.valueOf(10));
@@ -107,7 +109,7 @@ class MosaicInfoTest {
                 new BigInteger("100"),
                 new BigInteger("0"),
                 Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress(),
-                1,
+                1L,
                 mosaicFlags,
                 3,
                 BigInteger.valueOf(10));
@@ -126,7 +128,7 @@ class MosaicInfoTest {
                 new BigInteger("100"),
                 new BigInteger("0"),
                 Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress(),
-                1,
+                1L,
                 mosaicFlags,
                 3,
                 BigInteger.valueOf(10));
@@ -145,7 +147,7 @@ class MosaicInfoTest {
                 new BigInteger("100"),
                 new BigInteger("0"),
                 Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress(),
-                1,
+                1L,
                 mosaicFlags,
                 3,
                 BigInteger.valueOf(10));
@@ -164,7 +166,7 @@ class MosaicInfoTest {
                 new BigInteger("100"),
                 new BigInteger("0"),
                 Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress(),
-                1,
+                1L,
                 mosaicFlags,
                 3,
                 BigInteger.valueOf(10));

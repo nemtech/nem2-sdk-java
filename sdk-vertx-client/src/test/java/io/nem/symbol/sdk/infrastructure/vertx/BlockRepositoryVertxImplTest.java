@@ -87,7 +87,7 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
         BlockDTO blockDto = new BlockDTO();
         blockDto.setType(16716);
         blockDto.setVersion(3);
-        blockDto.setSize(10);
+        blockDto.setSize(10L);
         blockDto.setNetwork(NetworkTypeEnum.NUMBER_144);
         blockDto.setSignerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
         blockDto.setBeneficiaryAddress(address.encoded());

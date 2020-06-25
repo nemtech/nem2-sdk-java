@@ -87,7 +87,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
 
         BlockDTO blockDto = new BlockDTO();
         blockDto.setType(16716);
-        blockDto.setSize(10);
+        blockDto.setSize(10L);
         blockDto.setVersion(3);
         blockDto.setSignerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
         blockDto.setBeneficiaryAddress(address.encoded());
@@ -121,6 +121,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
 
         Assertions.assertEquals(blockDto.getHeight(), info.getHeight());
         Assertions.assertEquals(address, info.getBeneficiaryAddress());
+        Assertions.assertEquals(10L, info.getSize());
 
     }
 

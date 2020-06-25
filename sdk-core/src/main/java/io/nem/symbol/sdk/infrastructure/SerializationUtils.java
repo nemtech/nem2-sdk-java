@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.catapult.builders.AddressDto;
 import io.nem.symbol.catapult.builders.AmountDto;
+import io.nem.symbol.catapult.builders.FinalizationPointDto;
 import io.nem.symbol.catapult.builders.GeneratorUtils;
 import io.nem.symbol.catapult.builders.Hash256Dto;
 import io.nem.symbol.catapult.builders.KeyDto;
@@ -69,8 +70,7 @@ public class SerializationUtils {
      * @return the model {@link PublicAccount}
      */
     public static PublicAccount toPublicAccount(KeyDto keyDto, NetworkType networkType) {
-        return PublicAccount
-            .createFromPublicKey(ConvertUtils.toHex(keyDto.getKey().array()), networkType);
+        return PublicAccount.createFromPublicKey(ConvertUtils.toHex(keyDto.getKey().array()), networkType);
     }
 
     /**
@@ -80,8 +80,7 @@ public class SerializationUtils {
      * @return the model {@link Mosaic}
      */
     public static Mosaic toMosaic(UnresolvedMosaicBuilder builder) {
-        return new Mosaic(
-            new MosaicId(toUnsignedBigInteger(builder.getMosaicId().getUnresolvedMosaicId())),
+        return new Mosaic(new MosaicId(toUnsignedBigInteger(builder.getMosaicId().getUnresolvedMosaicId())),
             toUnsignedBigInteger(builder.getAmount().getAmount()));
     }
 
@@ -139,8 +138,7 @@ public class SerializationUtils {
         if (unresolvedAddress instanceof Address) {
             return fromAddressToByteBuffer((Address) unresolvedAddress);
         }
-        throw new IllegalArgumentException(
-            "Unexpected UnresolvedAddress type " + unresolvedAddress.getClass());
+        throw new IllegalArgumentException("Unexpected UnresolvedAddress type " + unresolvedAddress.getClass());
     }
 
     /**
@@ -196,8 +194,7 @@ public class SerializationUtils {
      * @return the model {@link UnresolvedAddress}
      */
     public static UnresolvedAddress toUnresolvedAddress(UnresolvedAddressDto dto) {
-        return MapperUtils
-            .toUnresolvedAddress(ConvertUtils.toHex(dto.getUnresolvedAddress().array()));
+        return MapperUtils.toUnresolvedAddress(ConvertUtils.toHex(dto.getUnresolvedAddress().array()));
     }
 
 
@@ -282,8 +279,8 @@ public class SerializationUtils {
     }
 
     /**
-     * It concats the 2 byte arrays patching the int size at the beginning of the first byte array
-     * setting up the sum of both lengths.
+     * It concats the 2 byte arrays patching the int size at the beginning of the first byte array setting up the sum of
+     * both lengths.
      *
      * @param commonBytes the common transaction byte array
      * @param transactionBytes the specific transaction byte array.
@@ -291,8 +288,7 @@ public class SerializationUtils {
      */
     public static byte[] concat(byte[] commonBytes, byte[] transactionBytes) {
         return GeneratorUtils.serialize(dataOutputStream -> {
-            dataOutputStream
-                .writeInt(Integer.reverseBytes(commonBytes.length + transactionBytes.length));
+            dataOutputStream.writeInt(Integer.reverseBytes(commonBytes.length + transactionBytes.length));
             dataOutputStream.write(commonBytes, 4, commonBytes.length - 4);
             dataOutputStream.write(transactionBytes);
         });
@@ -370,8 +366,7 @@ public class SerializationUtils {
     }
 
     /**
-     * Converts an a model {@link UnresolvedMosaicId} into an {@link UnresolvedMosaicIdDto} from
-     * catbuffer.
+     * Converts an a model {@link UnresolvedMosaicId} into an {@link UnresolvedMosaicIdDto} from catbuffer.
      *
      * @param mosaicId the model
      * @return the dto
@@ -390,4 +385,11 @@ public class SerializationUtils {
         return new MosaicIdDto(mosaicId.getId().longValue());
     }
 
+    /**
+     * @param finalizationPoint the big int finalization point
+     * @return a new FinalizationPointDto from the big integer.
+     */
+    public static FinalizationPointDto toFinalizationPointDto(BigInteger finalizationPoint) {
+        return new FinalizationPointDto(finalizationPoint.longValue());
+    }
 }

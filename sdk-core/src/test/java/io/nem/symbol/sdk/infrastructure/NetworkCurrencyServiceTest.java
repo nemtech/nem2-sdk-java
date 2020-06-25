@@ -72,7 +72,7 @@ class NetworkCurrencyServiceTest {
         BigInteger supply = BigInteger.valueOf(12);
 
         MosaicInfo mosaicInfo = new MosaicInfo("abc",mosaicId, supply, BigInteger.ONE,
-            account.getAddress(), 4, MosaicFlags.create(true, true, true), 10,
+            account.getAddress(), 4L, MosaicFlags.create(true, true, true), 10,
             BigInteger.TEN);
 
         Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
@@ -100,7 +100,7 @@ class NetworkCurrencyServiceTest {
         BigInteger supply = BigInteger.valueOf(12);
 
         MosaicInfo mosaicInfo = new MosaicInfo("abc",mosaicId, supply, BigInteger.ONE,
-            account.getAddress(), 4, MosaicFlags.create(true, true, true), 10,
+            account.getAddress(), 4L, MosaicFlags.create(true, true, true), 10,
             BigInteger.TEN);
 
         Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
@@ -128,7 +128,7 @@ class NetworkCurrencyServiceTest {
         BigInteger supply = BigInteger.valueOf(12);
 
         MosaicInfo mosaicInfo = new MosaicInfo("abc",mosaicId, supply, BigInteger.ONE,
-            account.getAddress(), 4, MosaicFlags.create(true, true, true), 10,
+            account.getAddress(), 4L, MosaicFlags.create(true, true, true), 10,
             BigInteger.TEN);
 
         Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
@@ -157,7 +157,7 @@ class NetworkCurrencyServiceTest {
         BigInteger supply = BigInteger.valueOf(12);
 
         MosaicInfo mosaicInfo = new MosaicInfo("abc",mosaicId, supply, BigInteger.ONE,
-            account.getAddress(), 4, MosaicFlags.create(true, true, true), 10,
+            account.getAddress(), 4L, MosaicFlags.create(true, true, true), 10,
             BigInteger.TEN);
 
         Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
@@ -195,7 +195,7 @@ class NetworkCurrencyServiceTest {
         BigInteger supply = BigInteger.valueOf(12);
 
         MosaicInfo mosaicInfo = new MosaicInfo("abc",mosaicId, supply, BigInteger.ONE,
-            account.getAddress(), 4, MosaicFlags.create(true, true, true), 10,
+            account.getAddress(), 4L, MosaicFlags.create(true, true, true), 10,
             BigInteger.TEN);
 
         Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))

@@ -85,10 +85,10 @@ public class NetworkRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     void getTransactionFees() throws Exception {
 
         TransactionFeesDTO dto = new TransactionFeesDTO();
-        dto.setAverageFeeMultiplier(1);
-        dto.setMedianFeeMultiplier(2);
-        dto.setLowestFeeMultiplier(3);
-        dto.setHighestFeeMultiplier(4);
+        dto.setAverageFeeMultiplier(1L);
+        dto.setMedianFeeMultiplier(2L);
+        dto.setLowestFeeMultiplier(3L);
+        dto.setHighestFeeMultiplier(4L);
 
         mockRemoteCall(dto);
 

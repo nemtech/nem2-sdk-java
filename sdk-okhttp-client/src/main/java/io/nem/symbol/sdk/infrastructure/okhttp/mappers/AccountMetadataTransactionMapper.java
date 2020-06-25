@@ -18,7 +18,6 @@ package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransaction;
@@ -53,7 +52,7 @@ class AccountMetadataTransactionMapper extends
             scopedMetaDataKey,
             value);
         factory.valueSizeDelta(valueSizeDelta);
-        Integer valueSize = transaction.getValueSize();
+        Long valueSize = transaction.getValueSize();
         if (valueSize != null) {
             factory.valueSize(valueSize);
         }

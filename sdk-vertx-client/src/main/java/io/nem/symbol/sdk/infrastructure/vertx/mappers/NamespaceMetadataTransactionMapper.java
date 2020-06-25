@@ -18,7 +18,6 @@ package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
@@ -55,7 +54,7 @@ class NamespaceMetadataTransactionMapper extends
             scopedMetaDataKey,
             value);
         factory.valueSizeDelta(valueSizeDelta);
-        Integer valueSize = transaction.getValueSize();
+        Long valueSize = transaction.getValueSize();
         if (valueSize != null) {
             factory.valueSize(valueSize);
         }

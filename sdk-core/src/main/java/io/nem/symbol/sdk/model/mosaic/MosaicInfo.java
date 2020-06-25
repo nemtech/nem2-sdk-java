@@ -18,7 +18,6 @@ package io.nem.symbol.sdk.model.mosaic;
 
 import io.nem.symbol.sdk.model.Stored;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import java.math.BigInteger;
 import java.util.Optional;
@@ -37,14 +36,14 @@ public class MosaicInfo implements Stored {
     private final BigInteger supply;
     private final BigInteger startHeight;
     private final Address ownerAddress;
-    private final Integer revision;
+    private final Long revision;
     private final MosaicFlags mosaicFlags;
     private final int divisibility;
     private final BigInteger duration;
 
     @SuppressWarnings("squid:S00107")
     public MosaicInfo(final String recordId, final MosaicId mosaicId, final BigInteger supply,
-        final BigInteger startHeight, final Address ownerAddress, final Integer revision,
+        final BigInteger startHeight, final Address ownerAddress, final Long revision,
         final MosaicFlags mosaicFlags, final int divisibility, final BigInteger duration) {
         this.recordId = recordId;
         this.mosaicId = mosaicId;
@@ -98,7 +97,7 @@ public class MosaicInfo implements Stored {
      *
      * @return revision
      */
-    public Integer getRevision() {
+    public Long getRevision() {
         return revision;
     }
 

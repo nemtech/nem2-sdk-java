@@ -33,7 +33,7 @@ class AccountInfoTest {
     void shouldCreateAccountInfoViaConstructor() {
         List<Mosaic> mosaics =
             Collections.singletonList(NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)));
-        List<AccountKey> supplementalAccountKeys = Collections.singletonList(new AccountKey(KeyType.NODE,"abc"));
+        List<AccountKey> supplementalAccountKeys = Collections.singletonList(new AccountKey(AccountKeyType.NODE,"abc"));
         BigInteger startHeight = BigInteger.ONE;
         BigInteger totalFeesPaid = BigInteger.valueOf(2);
         int beneficiaryCount = 3;

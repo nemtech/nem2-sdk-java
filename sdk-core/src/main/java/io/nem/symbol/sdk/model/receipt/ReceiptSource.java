@@ -23,8 +23,8 @@ import io.nem.symbol.catapult.builders.ReceiptSourceBuilder;
  */
 public class ReceiptSource {
 
-    private final int primaryId;
-    private final int secondaryId;
+    private final long primaryId;
+    private final long secondaryId;
 
     /**
      * Constructor
@@ -32,7 +32,7 @@ public class ReceiptSource {
      * @param primaryId Receipt source primary id
      * @param secondaryId Receipt source secondary id
      */
-    public ReceiptSource(int primaryId, int secondaryId) {
+    public ReceiptSource(long primaryId, long secondaryId) {
         this.primaryId = primaryId;
         this.secondaryId = secondaryId;
     }
@@ -42,7 +42,7 @@ public class ReceiptSource {
      *
      * @return Receipt source primary id
      */
-    public int getPrimaryId() {
+    public long getPrimaryId() {
         return this.primaryId;
     }
 
@@ -51,7 +51,7 @@ public class ReceiptSource {
      *
      * @return Receipt source secondary id
      */
-    public int getSecondaryId() {
+    public long getSecondaryId() {
         return this.secondaryId;
     }
 
@@ -61,6 +61,6 @@ public class ReceiptSource {
      * @return receipt bytes
      */
     public byte[] serialize() {
-        return ReceiptSourceBuilder.create(getPrimaryId(), getSecondaryId()).serialize();
+        return ReceiptSourceBuilder.create((int) getPrimaryId(), (int) getSecondaryId()).serialize();
     }
 }

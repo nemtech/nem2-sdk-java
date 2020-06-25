@@ -19,19 +19,15 @@ package io.nem.symbol.sdk.infrastructure.vertx;
 import io.nem.symbol.core.utils.ExceptionUtils;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.AccountInfo;
+import io.nem.symbol.sdk.model.account.AccountKeyType;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.account.KeyType;
-import io.nem.symbol.sdk.model.account.PublicAccount;
-import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
-import io.nem.symbol.sdk.model.transaction.Transaction;
-import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountKeyDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.AccountKeyTypeFlagsEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.ActivityBucketDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.KeyTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.Mosaic;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -91,14 +87,14 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
         accountDTO.setAddress(encodeAddress(address));
-        accountDTO.setSupplementalAccountKeys(Collections.singletonList(new AccountKeyDTO().key("abc").keyType(KeyTypeEnum.NUMBER_2)));
+        accountDTO.setSupplementalAccountKeys(Collections.singletonList(new AccountKeyDTO().key("abc").keyType(AccountKeyTypeFlagsEnum.NUMBER_2)));
 
         AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
         accountInfoDTO.setAccount(accountDTO);
 
         BigInteger startHeight = BigInteger.ONE;
         BigInteger totalFeesPaid = BigInteger.valueOf(2);
-        int beneficiaryCount = 3;
+        long beneficiaryCount = 3;
         BigInteger rawScore = BigInteger.valueOf(4);
         accountDTO.addActivityBucketsItem(new ActivityBucketDTO().startHeight(startHeight).totalFeesPaid(totalFeesPaid)
             .beneficiaryCount(beneficiaryCount).rawScore(rawScore));
@@ -116,7 +112,7 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
         Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
         Assertions.assertEquals("abc", resolvedAccountInfo.getSupplementalAccountKeys().get(0).getKey());
         Assertions.assertEquals(
-            KeyType.VRF, resolvedAccountInfo.getSupplementalAccountKeys().get(0).getKeyType());
+            AccountKeyType.NODE, resolvedAccountInfo.getSupplementalAccountKeys().get(0).getKeyType());
 
         Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
         Assertions.assertEquals(startHeight, resolvedAccountInfo.getActivityBuckets().get(0).getStartHeight());
