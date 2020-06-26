@@ -26,16 +26,14 @@ import org.apache.commons.lang3.Validate;
 public class AccountMosaicRestrictionTransactionFactory extends
     TransactionFactory<AccountMosaicRestrictionTransaction> {
 
-    private final AccountRestrictionFlags restrictionFlags;
+    private final AccountMosaicRestrictionFlags restrictionFlags;
 
     private final List<UnresolvedMosaicId> restrictionAdditions;
 
     private final List<UnresolvedMosaicId> restrictionDeletions;
 
-    private AccountMosaicRestrictionTransactionFactory(
-        final NetworkType networkType,
-        final AccountRestrictionFlags restrictionFlags,
-        final List<UnresolvedMosaicId> restrictionAdditions,
+    private AccountMosaicRestrictionTransactionFactory(final NetworkType networkType,
+        final AccountMosaicRestrictionFlags restrictionFlags, final List<UnresolvedMosaicId> restrictionAdditions,
         final List<UnresolvedMosaicId> restrictionDeletions) {
         super(TransactionType.ACCOUNT_MOSAIC_RESTRICTION, networkType);
         Validate.notNull(restrictionFlags, "RestrictionType must not be null");
@@ -56,7 +54,7 @@ public class AccountMosaicRestrictionTransactionFactory extends
      * @return Account mosaic restriction transaction.
      */
     public static AccountMosaicRestrictionTransactionFactory create(NetworkType networkType,
-        AccountRestrictionFlags restrictionFlags, final List<UnresolvedMosaicId> restrictionAdditions,
+        AccountMosaicRestrictionFlags restrictionFlags, final List<UnresolvedMosaicId> restrictionAdditions,
         final List<UnresolvedMosaicId> restrictionDeletions) {
         return new AccountMosaicRestrictionTransactionFactory(networkType, restrictionFlags,
             restrictionAdditions, restrictionDeletions);
@@ -65,9 +63,9 @@ public class AccountMosaicRestrictionTransactionFactory extends
     /**
      * Get account restriction type
      *
-     * @return {@link AccountRestrictionFlags}
+     * @return {@link AccountMosaicRestrictionFlags}
      */
-    public AccountRestrictionFlags getRestrictionFlags() {
+    public AccountMosaicRestrictionFlags getRestrictionFlags() {
         return this.restrictionFlags;
     }
 

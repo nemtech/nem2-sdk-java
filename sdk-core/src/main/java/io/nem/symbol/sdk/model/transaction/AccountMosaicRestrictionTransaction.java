@@ -20,7 +20,7 @@ import java.util.List;
 
 public class AccountMosaicRestrictionTransaction extends Transaction {
 
-    private final AccountRestrictionFlags restrictionFlags;
+    private final AccountMosaicRestrictionFlags restrictionFlags;
 
     private final List<UnresolvedMosaicId> restrictionAdditions;
 
@@ -37,9 +37,9 @@ public class AccountMosaicRestrictionTransaction extends Transaction {
     /**
      * Get account restriction flags
      *
-     * @return {@link AccountRestrictionFlags}
+     * @return {@link AccountMosaicRestrictionFlags}
      */
-    public AccountRestrictionFlags getRestrictionFlags() {
+    public AccountMosaicRestrictionFlags getRestrictionFlags() {
         return this.restrictionFlags;
     }
 

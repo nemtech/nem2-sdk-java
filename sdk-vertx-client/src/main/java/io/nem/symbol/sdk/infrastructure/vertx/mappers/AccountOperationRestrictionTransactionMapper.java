@@ -17,9 +17,9 @@
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountOperationRestrictionTransactionDTO;
@@ -43,7 +43,7 @@ public class AccountOperationRestrictionTransactionMapper extends
     @Override
     protected AccountOperationRestrictionTransactionFactory createFactory(
         NetworkType networkType, AccountOperationRestrictionTransactionDTO transaction) {
-        AccountRestrictionFlags restrictionFlags = AccountRestrictionFlags
+        AccountOperationRestrictionFlags restrictionFlags = AccountOperationRestrictionFlags
             .rawValueOf(transaction.getRestrictionFlags().getValue());
 
         List<TransactionType> additions = transaction.getRestrictionAdditions().stream()

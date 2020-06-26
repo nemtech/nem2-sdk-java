@@ -17,9 +17,9 @@
 package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountOperationRestrictionTransactionDTO;
@@ -34,42 +34,40 @@ import java.util.stream.Collectors;
 public class AccountOperationRestrictionTransactionMapper extends
     AbstractTransactionMapper<AccountOperationRestrictionTransactionDTO, AccountOperationRestrictionTransaction> {
 
-    public AccountOperationRestrictionTransactionMapper(
-        JsonHelper jsonHelper) {
+    public AccountOperationRestrictionTransactionMapper(JsonHelper jsonHelper) {
         super(jsonHelper, TransactionType.ACCOUNT_OPERATION_RESTRICTION,
             AccountOperationRestrictionTransactionDTO.class);
     }
 
     @Override
-    protected AccountOperationRestrictionTransactionFactory createFactory(
-        NetworkType networkType, AccountOperationRestrictionTransactionDTO transaction) {
-        AccountRestrictionFlags restrictionFlags = AccountRestrictionFlags
+    protected AccountOperationRestrictionTransactionFactory createFactory(NetworkType networkType,
+        AccountOperationRestrictionTransactionDTO transaction) {
+        AccountOperationRestrictionFlags restrictionFlags = AccountOperationRestrictionFlags
             .rawValueOf(transaction.getRestrictionFlags().getValue());
 
         List<TransactionType> additions = transaction.getRestrictionAdditions().stream()
-            .map(transactionTypeEnum -> TransactionType.rawValueOf(transactionTypeEnum.getValue())).collect(
-                Collectors.toList());
+            .map(transactionTypeEnum -> TransactionType.rawValueOf(transactionTypeEnum.getValue()))
+            .collect(Collectors.toList());
 
         List<TransactionType> deletions = transaction.getRestrictionDeletions().stream()
-            .map(transactionTypeEnum -> TransactionType.rawValueOf(transactionTypeEnum.getValue())).collect(
-                Collectors.toList());
-        return AccountOperationRestrictionTransactionFactory.create(networkType, restrictionFlags,
-            additions, deletions);
+            .map(transactionTypeEnum -> TransactionType.rawValueOf(transactionTypeEnum.getValue()))
+            .collect(Collectors.toList());
+        return AccountOperationRestrictionTransactionFactory
+            .create(networkType, restrictionFlags, additions, deletions);
     }
 
     @Override
     protected void copyToDto(AccountOperationRestrictionTransaction transaction,
         AccountOperationRestrictionTransactionDTO dto) {
-        dto.setRestrictionFlags(
-            AccountRestrictionFlagsEnum.fromValue(transaction.getRestrictionFlags().getValue()));
+        dto.setRestrictionFlags(AccountRestrictionFlagsEnum.fromValue(transaction.getRestrictionFlags().getValue()));
 
         List<TransactionTypeEnum> additions = transaction.getRestrictionAdditions().stream()
-            .map(transactionType -> TransactionTypeEnum.fromValue(transactionType.getValue())).collect(
-                Collectors.toList());
+            .map(transactionType -> TransactionTypeEnum.fromValue(transactionType.getValue()))
+            .collect(Collectors.toList());
 
         List<TransactionTypeEnum> deletions = transaction.getRestrictionDeletions().stream()
-            .map(transactionType -> TransactionTypeEnum.fromValue(transactionType.getValue())).collect(
-                Collectors.toList());
+            .map(transactionType -> TransactionTypeEnum.fromValue(transactionType.getValue()))
+            .collect(Collectors.toList());
 
         dto.setRestrictionAdditions(additions);
         dto.setRestrictionDeletions(deletions);

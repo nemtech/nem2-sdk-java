@@ -44,12 +44,9 @@ public class AccountMosaicRestrictionTransactionTest extends AbstractTransaction
         List<UnresolvedMosaicId> deletions = Collections.singletonList(mosaicId2);
 
         AccountMosaicRestrictionTransaction transaction =
-            AccountMosaicRestrictionTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                AccountRestrictionFlags.ALLOW_INCOMING_MOSAIC,
-                additions, deletions).deadline(new FakeDeadline()).build();
-        Assertions.assertEquals(AccountRestrictionFlags.ALLOW_INCOMING_MOSAIC,
-            transaction.getRestrictionFlags());
+            AccountMosaicRestrictionTransactionFactory.create(NetworkType.MIJIN_TEST,
+                AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC, additions, deletions).deadline(new FakeDeadline()).build();
+        Assertions.assertEquals(AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC, transaction.getRestrictionFlags());
         Assertions.assertEquals(additions, transaction.getRestrictionAdditions());
         Assertions.assertEquals(deletions, transaction.getRestrictionDeletions());
     }
@@ -60,10 +57,8 @@ public class AccountMosaicRestrictionTransactionTest extends AbstractTransaction
         List<UnresolvedMosaicId> additions = Collections.singletonList(mosaicId);
         List<UnresolvedMosaicId> deletions = Collections.singletonList(mosaicId2);
         AccountMosaicRestrictionTransaction transaction =
-            AccountMosaicRestrictionTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                AccountRestrictionFlags.ALLOW_INCOMING_MOSAIC,
-                additions, deletions).deadline(new FakeDeadline())
+            AccountMosaicRestrictionTransactionFactory.create(NetworkType.MIJIN_TEST,
+                AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC, additions, deletions).deadline(new FakeDeadline())
                 .signer(account.getPublicAccount())
                 .build();
 

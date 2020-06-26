@@ -89,17 +89,19 @@ import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AccountKeyLinkTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountKeyLinkTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AddressAliasTransaction;
 import io.nem.symbol.sdk.model.transaction.AddressAliasTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
@@ -1086,7 +1088,8 @@ public class BinarySerializationImpl implements BinarySerialization {
             long restrictionFlagsValue = builder.getRestrictionFlags().stream()
                 .mapToLong(AccountRestrictionFlagsDto::getValue).sum();
 
-            AccountRestrictionFlags restrictionFlags = AccountRestrictionFlags.rawValueOf((int) restrictionFlagsValue);
+            AccountAddressRestrictionFlags restrictionFlags = AccountAddressRestrictionFlags
+                .rawValueOf((int) restrictionFlagsValue);
 
             List<UnresolvedAddress> restrictionAdditions = builder.getRestrictionAdditions().stream()
                 .map(SerializationUtils::toUnresolvedAddress).collect(Collectors.toList());
@@ -1140,7 +1143,8 @@ public class BinarySerializationImpl implements BinarySerialization {
             long restrictionFlagsValues = builder.getRestrictionFlags().stream()
                 .mapToLong(AccountRestrictionFlagsDto::getValue).sum();
 
-            AccountRestrictionFlags restrictionFlags = AccountRestrictionFlags.rawValueOf((int) restrictionFlagsValues);
+            AccountMosaicRestrictionFlags restrictionFlags = AccountMosaicRestrictionFlags
+                .rawValueOf((int) restrictionFlagsValues);
 
             List<UnresolvedMosaicId> restrictionAdditions = builder.getRestrictionAdditions().stream()
                 .map(SerializationUtils::toUnresolvedMosaicId).collect(Collectors.toList());
@@ -1192,7 +1196,8 @@ public class BinarySerializationImpl implements BinarySerialization {
             long restrictionFlagsValue = builder.getRestrictionFlags().stream()
                 .mapToLong(AccountRestrictionFlagsDto::getValue).sum();
 
-            AccountRestrictionFlags restrictionFlags = AccountRestrictionFlags.rawValueOf((int) restrictionFlagsValue);
+            AccountOperationRestrictionFlags restrictionFlags = AccountOperationRestrictionFlags
+                .rawValueOf((int) restrictionFlagsValue);
 
             List<TransactionType> restrictionAdditions = builder.getRestrictionAdditions().stream()
                 .map(op -> TransactionType.rawValueOf(op.getValue())).collect(Collectors.toList());

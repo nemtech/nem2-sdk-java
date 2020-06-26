@@ -19,7 +19,8 @@ package io.nem.symbol.sdk.infrastructure.vertx;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.account.AccountRestrictions;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
+import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionFlags;
+import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionFlags;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountRestrictionDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountRestrictionFlagsEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountRestrictionsDTO;
@@ -67,7 +68,7 @@ public class RestrictionAccountRepositoryVertxImplTest extends AbstractVertxResp
 
         Assertions.assertEquals(address, accountRestrictions.getAddress());
         Assertions.assertEquals(1, accountRestrictions.getRestrictions().size());
-        Assertions.assertEquals(AccountRestrictionFlags.BLOCK_MOSAIC,
+        Assertions.assertEquals(AccountMosaicRestrictionFlags.BLOCK_MOSAIC,
             accountRestrictions.getRestrictions().get(0).getRestrictionFlags());
         Assertions.assertEquals(
             Arrays.asList(MapperUtils.toMosaicId("9636553580561478212")),
@@ -98,7 +99,7 @@ public class RestrictionAccountRepositoryVertxImplTest extends AbstractVertxResp
 
         Assertions.assertEquals(address, accountRestrictions.getAddress());
         Assertions.assertEquals(1, accountRestrictions.getRestrictions().size());
-        Assertions.assertEquals(AccountRestrictionFlags.ALLOW_INCOMING_ADDRESS,
+        Assertions.assertEquals(AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
             accountRestrictions.getRestrictions().get(0).getRestrictionFlags());
         Assertions.assertEquals(Collections.singletonList(MapperUtils
                 .toUnresolvedAddress("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1")),

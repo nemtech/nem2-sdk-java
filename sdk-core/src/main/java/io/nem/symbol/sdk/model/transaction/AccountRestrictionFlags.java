@@ -18,10 +18,11 @@ package io.nem.symbol.sdk.model.transaction;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * The valid combinations of {@link AccountRestrictionFlag} that creates a {@link
- * AccountRestrictionFlags}.
+ * The valid combinations of {@link AccountRestrictionFlag} that creates any {@link AccountRestrictionFlags}.
  *
  * Type of account restriction types:
  *
@@ -41,123 +42,49 @@ import java.util.List;
  *
  * 0xC004 (49156 decimal) - Block outgoing transactions with a given transaction type.
  */
+public interface AccountRestrictionFlags {
 
-public enum AccountRestrictionFlags {
-    /**
-     * Allow only incoming transactions from a given address.
-     */
-    ALLOW_INCOMING_ADDRESS(AccountRestrictionTargetType.ADDRESS,
-        AccountRestrictionFlag.ADDRESS_VALUE
-    ),
-
-    /**
-     * Allow only incoming transactions containing a a given mosaic identifier.
-     */
-    ALLOW_INCOMING_MOSAIC(AccountRestrictionTargetType.MOSAIC_ID,
-        AccountRestrictionFlag.MOSAIC_VALUE
-    ),
-
-    /**
-     * Allow only outgoing transactions from a given address.
-     */
-    ALLOW_OUTGOING_ADDRESS(AccountRestrictionTargetType.ADDRESS,
-        AccountRestrictionFlag.ADDRESS_VALUE
-        , AccountRestrictionFlag.OUTGOING_VALUE),
-
-    /**
-     * Allow only outgoing transactions of a given type.
-     */
-    ALLOW_OUTGOING_TRANSACTION_TYPE(AccountRestrictionTargetType.TRANSACTION_TYPE,
-        AccountRestrictionFlag.TRANSACTION_TYPE_VALUE
-        , AccountRestrictionFlag.OUTGOING_VALUE
-    ),
-
-    /**
-     * Account restriction is interpreted as blocking address operation.
-     */
-    BLOCK_ADDRESS(AccountRestrictionTargetType.ADDRESS, AccountRestrictionFlag.ADDRESS_VALUE
-        , AccountRestrictionFlag.BLOCK_VALUE),
-
-    /**
-     * Account restriction is interpreted as blocking mosaicId operation.
-     */
-    BLOCK_MOSAIC(AccountRestrictionTargetType.MOSAIC_ID, AccountRestrictionFlag.MOSAIC_VALUE
-        , AccountRestrictionFlag.BLOCK_VALUE),
-
-    /**
-     * Block outgoing transactions for a given address.
-     */
-    BLOCK_OUTGOING_ADDRESS(AccountRestrictionTargetType.ADDRESS,
-        AccountRestrictionFlag.ADDRESS_VALUE
-        , AccountRestrictionFlag.BLOCK_VALUE
-        , AccountRestrictionFlag.OUTGOING_VALUE),
-
-    /**
-     * Block outgoing transactions for a given transactionType.
-     */
-    BLOCK_OUTGOING_TRANSACTION_TYPE(
-        AccountRestrictionTargetType.TRANSACTION_TYPE, AccountRestrictionFlag.TRANSACTION_TYPE_VALUE
-        , AccountRestrictionFlag.BLOCK_VALUE
-        , AccountRestrictionFlag.OUTGOING_VALUE
-    );
-
-    private List<AccountRestrictionFlag> flags;
-    /**
-     * Enum value.
-     */
-    private final int value;
-
-
-    /**
-     * The target type.
-     */
-    private final AccountRestrictionTargetType targetType;
-
-    /**
-     * Constructor.
-     *
-     * @param targetType the target type
-     * @param flags the values this type is composed of.
-     */
-    AccountRestrictionFlags(AccountRestrictionTargetType targetType,
-        AccountRestrictionFlag... flags) {
-        this.flags = Arrays.asList(flags);
-        this.value = this.flags.stream().mapToInt(AccountRestrictionFlag::getValue).sum();
-        this.targetType = targetType;
-    }
-
-    /**
-     * Gets enum value.
-     *
-     * @param value Raw value of the enum.
-     * @return Enum value.
-     */
-    public static AccountRestrictionFlags rawValueOf(final int value) {
-        return Arrays.stream(values()).filter(e -> e.value == value).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
 
     /**
      * Returns enum value.
      *
      * @return byte
      */
-    public int getValue() {
-        return value;
-    }
+    int getValue();
 
+    /**
+     * @return the enum name.
+     */
+    String name();
 
     /**
      * @return a list with the individual flags.
      */
-    public List<AccountRestrictionFlag> getFlags() {
-        return flags;
-    }
+    List<AccountRestrictionFlag> getFlags();
 
     /**
      * @return the target type.
      */
-    public AccountRestrictionTargetType getTargetType() {
-        return targetType;
+    AccountRestrictionTargetType getTargetType();
+
+    /**
+     * Search for all the possible AccountRestrictionFlags
+     *
+     * @param value Raw value of the enum.
+     * @return Enum value.
+     */
+    static AccountRestrictionFlags rawValueOf(final int value) {
+        return values().stream().filter(e -> e.getValue() == value).findFirst()
+            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+    }
+
+    /**
+     * @return all the possible AccountRestrictionFlags values.
+     */
+    static List<? extends AccountRestrictionFlags> values() {
+        Stream<AccountAddressRestrictionFlags> stream1 = Arrays.stream(AccountAddressRestrictionFlags.values());
+        Stream<AccountOperationRestrictionFlags> stream2 = Arrays.stream(AccountOperationRestrictionFlags.values());
+        Stream<AccountMosaicRestrictionFlags> stream3 = Arrays.stream(AccountMosaicRestrictionFlags.values());
+        return Stream.of(stream1, stream2, stream3).flatMap(i -> i).collect(Collectors.toList());
     }
 }

@@ -35,11 +35,9 @@ public class AccountOperationRestrictionTransactionTest extends AbstractTransact
         List<TransactionType> deletions = Collections.singletonList(TransactionType.TRANSFER);
 
         AccountOperationRestrictionTransaction transaction =
-            AccountOperationRestrictionTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                AccountRestrictionFlags.ALLOW_OUTGOING_TRANSACTION_TYPE,
-                additions, deletions).deadline(new FakeDeadline()).build();
-        Assertions.assertEquals(AccountRestrictionFlags.ALLOW_OUTGOING_TRANSACTION_TYPE,
+            AccountOperationRestrictionTransactionFactory.create(NetworkType.MIJIN_TEST,
+                AccountOperationRestrictionFlags.ALLOW_OUTGOING_TRANSACTION_TYPE, additions, deletions).deadline(new FakeDeadline()).build();
+        Assertions.assertEquals(AccountOperationRestrictionFlags.ALLOW_OUTGOING_TRANSACTION_TYPE,
             transaction.getRestrictionFlags());
         Assertions.assertEquals(additions, transaction.getRestrictionAdditions());
         Assertions.assertEquals(deletions, transaction.getRestrictionDeletions());
@@ -51,17 +49,15 @@ public class AccountOperationRestrictionTransactionTest extends AbstractTransact
         List<TransactionType> additions = Collections.singletonList(TransactionType.SECRET_PROOF);
         List<TransactionType> deletions = Collections.singletonList(TransactionType.TRANSFER);
         AccountOperationRestrictionTransaction transaction =
-            AccountOperationRestrictionTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                AccountRestrictionFlags.ALLOW_INCOMING_MOSAIC,
-                additions, deletions).signer(account.getPublicAccount())
+            AccountOperationRestrictionTransactionFactory.create(NetworkType.MIJIN_TEST,
+                AccountOperationRestrictionFlags.ALLOW_OUTGOING_TRANSACTION_TYPE, additions, deletions).signer(account.getPublicAccount())
                 .deadline(new FakeDeadline())
                 .build();
 
-        String expected = "8c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e6000000000190504300000000000000000100000000000000020001010000000052425441";
+        String expected = "8C0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E6000000000190504300000000000000000100000000000000044001010000000052425441";
         assertSerialization(expected, transaction);
 
-        String expectedEmbeddedHash = "3c00000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001905043020001010000000052425441";
+        String expectedEmbeddedHash = "3C00000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E60000000001905043044001010000000052425441";
         assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
     }
 }

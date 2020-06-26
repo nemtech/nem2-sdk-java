@@ -26,16 +26,14 @@ import org.apache.commons.lang3.Validate;
 public class AccountAddressRestrictionTransactionFactory extends
     TransactionFactory<AccountAddressRestrictionTransaction> {
 
-    private final AccountRestrictionFlags restrictionFlags;
+    private final AccountAddressRestrictionFlags restrictionFlags;
 
     private final List<UnresolvedAddress> restrictionAdditions;
 
     private final List<UnresolvedAddress> restrictionDeletions;
 
-    private AccountAddressRestrictionTransactionFactory(
-        final NetworkType networkType,
-        final AccountRestrictionFlags restrictionFlags,
-        List<UnresolvedAddress> restrictionAdditions,
+    private AccountAddressRestrictionTransactionFactory(final NetworkType networkType,
+        final AccountAddressRestrictionFlags restrictionFlags, List<UnresolvedAddress> restrictionAdditions,
         List<UnresolvedAddress> restrictionDeletions) {
         super(TransactionType.ACCOUNT_ADDRESS_RESTRICTION, networkType);
 
@@ -59,8 +57,7 @@ public class AccountAddressRestrictionTransactionFactory extends
      * @return Account address restriction transaction.
      */
     public static AccountAddressRestrictionTransactionFactory create(NetworkType networkType,
-        AccountRestrictionFlags restrictionFlags,
-        List<UnresolvedAddress> restrictionAdditions,
+        AccountAddressRestrictionFlags restrictionFlags, List<UnresolvedAddress> restrictionAdditions,
         List<UnresolvedAddress> restrictionDeletions) {
         return new AccountAddressRestrictionTransactionFactory(networkType, restrictionFlags,
             restrictionAdditions, restrictionDeletions);
@@ -69,9 +66,9 @@ public class AccountAddressRestrictionTransactionFactory extends
     /**
      * Get account restriction flags.
      *
-     * @return {@link AccountRestrictionFlags}
+     * @return {@link AccountAddressRestrictionFlags}
      */
-    public AccountRestrictionFlags getRestrictionFlags() {
+    public AccountAddressRestrictionFlags getRestrictionFlags() {
         return this.restrictionFlags;
     }
 

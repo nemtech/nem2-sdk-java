@@ -25,16 +25,14 @@ import org.apache.commons.lang3.Validate;
 public class AccountOperationRestrictionTransactionFactory extends
     TransactionFactory<AccountOperationRestrictionTransaction> {
 
-    private final AccountRestrictionFlags restrictionFlags;
+    private final AccountOperationRestrictionFlags restrictionFlags;
 
     private final List<TransactionType> restrictionAdditions;
 
     private final List<TransactionType> restrictionDeletions;
 
-    private AccountOperationRestrictionTransactionFactory(
-        final NetworkType networkType,
-        final AccountRestrictionFlags restrictionFlags,
-        List<TransactionType> restrictionAdditions,
+    private AccountOperationRestrictionTransactionFactory(final NetworkType networkType,
+        final AccountOperationRestrictionFlags restrictionFlags, List<TransactionType> restrictionAdditions,
         List<TransactionType> restrictionDeletions) {
         super(TransactionType.ACCOUNT_OPERATION_RESTRICTION, networkType);
         Validate.notNull(restrictionFlags, "RestrictionType must not be null");
@@ -57,8 +55,7 @@ public class AccountOperationRestrictionTransactionFactory extends
      * @return Account operation restriction transaction.
      */
     public static AccountOperationRestrictionTransactionFactory create(NetworkType networkType,
-        AccountRestrictionFlags restrictionFlags,
-        List<TransactionType> restrictionAdditions,
+        AccountOperationRestrictionFlags restrictionFlags, List<TransactionType> restrictionAdditions,
         List<TransactionType> restrictionDeletions) {
         return new AccountOperationRestrictionTransactionFactory(networkType, restrictionFlags,
             restrictionAdditions, restrictionDeletions);
@@ -67,9 +64,9 @@ public class AccountOperationRestrictionTransactionFactory extends
     /**
      * Get account restriction falgs.
      *
-     * @return {@link AccountRestrictionFlags}
+     * @return {@link AccountOperationRestrictionFlags}
      */
-    public AccountRestrictionFlags getRestrictionFlags() {
+    public AccountOperationRestrictionFlags getRestrictionFlags() {
         return this.restrictionFlags;
     }
 

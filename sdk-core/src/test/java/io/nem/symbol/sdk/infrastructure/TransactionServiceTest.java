@@ -41,11 +41,12 @@ import io.nem.symbol.sdk.model.receipt.ReceiptSource;
 import io.nem.symbol.sdk.model.receipt.ResolutionEntry;
 import io.nem.symbol.sdk.model.receipt.Statement;
 import io.nem.symbol.sdk.model.receipt.TransactionStatement;
+import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.FakeDeadline;
@@ -478,7 +479,7 @@ class TransactionServiceTest {
         String transactionHash = "aaaa";
 
         TransactionFactory<AccountMosaicRestrictionTransaction> factory = AccountMosaicRestrictionTransactionFactory
-            .create(NetworkType.MIJIN_TEST, AccountRestrictionFlags.ALLOW_INCOMING_MOSAIC,
+            .create(NetworkType.MIJIN_TEST, AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC,
                 Arrays.asList(mosaicNamespace1, mosaicId2, mosaicNamespace2),
                 Arrays.asList(mosaicNamespace2, mosaicNamespace3, mosaicId3))
             .transactionInfo(TransactionInfo.create(height, 4, "ABC", transactionHash, ""));
@@ -588,7 +589,7 @@ class TransactionServiceTest {
         String transactionHash = "aaaa";
 
         TransactionFactory<AccountAddressRestrictionTransaction> factory = AccountAddressRestrictionTransactionFactory
-            .create(NetworkType.MIJIN_TEST, AccountRestrictionFlags.ALLOW_INCOMING_MOSAIC,
+            .create(NetworkType.MIJIN_TEST, AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
                 Arrays.asList(addressNamespace1, address2, addressNamespace2),
                 Arrays.asList(addressNamespace2, addressNamespace3, address3))
             .transactionInfo(TransactionInfo.create(height, 4, "ABC", transactionHash, ""));

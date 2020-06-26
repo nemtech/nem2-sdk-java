@@ -38,11 +38,11 @@ import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.namespace.NamespaceName;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionCosignature;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
@@ -870,7 +870,7 @@ public class ListenerVertxTest {
         List<UnresolvedAddress> deletions = Collections.singletonList(deletion);
 
         AccountAddressRestrictionTransactionFactory factory = AccountAddressRestrictionTransactionFactory
-            .create(NETWORK_TYPE, AccountRestrictionFlags.BLOCK_ADDRESS, additions, deletions);
+            .create(NETWORK_TYPE, AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS, additions, deletions);
         if (signer != null) {
             factory.signer(signer);
         }

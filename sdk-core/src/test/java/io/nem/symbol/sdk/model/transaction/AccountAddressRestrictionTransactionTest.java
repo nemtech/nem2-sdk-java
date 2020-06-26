@@ -43,12 +43,10 @@ public class AccountAddressRestrictionTransactionTest extends AbstractTransactio
         List<UnresolvedAddress> deletions = Collections.singletonList(account2.getAddress());
 
         AccountAddressRestrictionTransaction transaction =
-            AccountAddressRestrictionTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                AccountRestrictionFlags.ALLOW_INCOMING_ADDRESS,
-                additions, deletions).deadline(new FakeDeadline()).build();
-        Assertions.assertEquals(AccountRestrictionFlags.ALLOW_INCOMING_ADDRESS,
-            transaction.getRestrictionFlags());
+            AccountAddressRestrictionTransactionFactory.create(NetworkType.MIJIN_TEST,
+                AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS, additions, deletions).deadline(new FakeDeadline()).build();
+        Assertions
+            .assertEquals(AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS, transaction.getRestrictionFlags());
         Assertions.assertEquals(additions, transaction.getRestrictionAdditions());
         Assertions.assertEquals(deletions, transaction.getRestrictionDeletions());
     }
@@ -60,14 +58,12 @@ public class AccountAddressRestrictionTransactionTest extends AbstractTransactio
         List<UnresolvedAddress> deletions = Collections.singletonList(account2.getAddress());
 
         AccountAddressRestrictionTransaction transaction =
-            AccountAddressRestrictionTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                AccountRestrictionFlags.ALLOW_INCOMING_ADDRESS,
-                additions, deletions).deadline(new FakeDeadline())
+            AccountAddressRestrictionTransactionFactory.create(NetworkType.MIJIN_TEST,
+                AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS, additions, deletions).deadline(new FakeDeadline())
                 .signer(account.getPublicAccount())
                 .build();
-        Assertions.assertEquals(AccountRestrictionFlags.ALLOW_INCOMING_ADDRESS,
-            transaction.getRestrictionFlags());
+        Assertions
+            .assertEquals(AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS, transaction.getRestrictionFlags());
 
         System.out.println(transaction.getSize());
         String expected = "B80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E600000000019050410000000000000000010000000000000001000101000000009083025FF3A8AB5AD104631FB370F290004952CD1FDDC4C990B387A39C0E4607DB7056EEAAF0A0EF43B45C667EB790FF";

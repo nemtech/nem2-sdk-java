@@ -19,7 +19,7 @@ import java.util.List;
 
 public class AccountOperationRestrictionTransaction extends Transaction {
 
-    private final AccountRestrictionFlags restrictionFlags;
+    private final AccountOperationRestrictionFlags restrictionFlags;
     private final List<TransactionType> restrictionAdditions;
     private final List<TransactionType> restrictionDeletions;
 
@@ -34,9 +34,9 @@ public class AccountOperationRestrictionTransaction extends Transaction {
     /**
      * Get account restriction flags
      *
-     * @return {@link AccountRestrictionFlags}
+     * @return {@link AccountOperationRestrictionFlags}
      */
-    public AccountRestrictionFlags getRestrictionFlags() {
+    public AccountOperationRestrictionFlags getRestrictionFlags() {
         return this.restrictionFlags;
     }
 

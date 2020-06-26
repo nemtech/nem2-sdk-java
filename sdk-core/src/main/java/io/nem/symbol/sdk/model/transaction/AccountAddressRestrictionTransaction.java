@@ -20,7 +20,7 @@ import java.util.List;
 
 public class AccountAddressRestrictionTransaction extends Transaction {
 
-    private final AccountRestrictionFlags restrictionFlags;
+    private final AccountAddressRestrictionFlags restrictionFlags;
 
     private final List<UnresolvedAddress> restrictionAdditions;
 
@@ -37,9 +37,9 @@ public class AccountAddressRestrictionTransaction extends Transaction {
     /**
      * Get account restriction flags
      *
-     * @return {@link AccountRestrictionFlags}
+     * @return {@link AccountAddressRestrictionFlags}
      */
-    public AccountRestrictionFlags getRestrictionFlags() {
+    public AccountAddressRestrictionFlags getRestrictionFlags() {
         return this.restrictionFlags;
     }
 

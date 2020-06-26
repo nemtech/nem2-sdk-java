@@ -27,13 +27,14 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
-import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountKeyLinkTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransaction;
+import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransaction;
+import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransaction;
-import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AddressAliasTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
@@ -518,7 +519,8 @@ public class TransactionMapperVertxTest {
 
         validateStandaloneTransaction(transaction, transactionInfoDTO);
 
-        Assertions.assertEquals(AccountRestrictionFlags.ALLOW_INCOMING_ADDRESS, transaction.getRestrictionFlags());
+        Assertions
+            .assertEquals(AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS, transaction.getRestrictionFlags());
         Assertions.assertEquals(1, transaction.getRestrictionAdditions().size());
         Assertions.assertEquals(MapperUtils.toAddress("90DD539FC43C3703715A7445EA9188544F9086BC93A22465"),
             transaction.getRestrictionAdditions().get(0));
@@ -538,7 +540,7 @@ public class TransactionMapperVertxTest {
 
         validateStandaloneTransaction(transaction, transactionInfoDTO);
 
-        Assertions.assertEquals(AccountRestrictionFlags.ALLOW_INCOMING_MOSAIC, transaction.getRestrictionFlags());
+        Assertions.assertEquals(AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC, transaction.getRestrictionFlags());
         Assertions.assertEquals(1, transaction.getRestrictionAdditions().size());
         Assertions.assertEquals("00003646934825AA", transaction.getRestrictionAdditions().get(0).getIdAsHex());
     }
@@ -554,7 +556,8 @@ public class TransactionMapperVertxTest {
 
         validateStandaloneTransaction(transaction, transactionInfoDTO);
 
-        Assertions.assertEquals(AccountRestrictionFlags.ALLOW_INCOMING_MOSAIC, transaction.getRestrictionFlags());
+        Assertions.assertEquals(AccountOperationRestrictionFlags.ALLOW_OUTGOING_TRANSACTION_TYPE,
+            transaction.getRestrictionFlags());
         Assertions.assertEquals(1, transaction.getRestrictionAdditions().size());
         Assertions.assertEquals(TransactionType.MOSAIC_METADATA, transaction.getRestrictionAdditions().get(0));
     }

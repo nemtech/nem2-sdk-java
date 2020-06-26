@@ -19,9 +19,9 @@ package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountMosaicRestrictionTransactionDTO;
@@ -44,7 +44,7 @@ public class AccountMosaicRestrictionTransactionMapper extends
     @Override
     protected AccountMosaicRestrictionTransactionFactory createFactory(
         NetworkType networkType, AccountMosaicRestrictionTransactionDTO transaction) {
-        AccountRestrictionFlags restrictionFlags = AccountRestrictionFlags
+        AccountMosaicRestrictionFlags restrictionFlags = AccountMosaicRestrictionFlags
             .rawValueOf(transaction.getRestrictionFlags().getValue());
 
         List<UnresolvedMosaicId> additions = transaction.getRestrictionAdditions().stream()

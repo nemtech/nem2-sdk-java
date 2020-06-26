@@ -18,7 +18,7 @@ package io.nem.symbol.sdk.model.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
+import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionFlags;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
@@ -27,11 +27,9 @@ public class AccountRestrictionTest {
     @Test
     void shouldCreateAccountRestrictionViaConstructor() {
         AccountRestriction accountRestriction =
-            new AccountRestriction(
-                AccountRestrictionFlags.ALLOW_INCOMING_ADDRESS,
+            new AccountRestriction(AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
                 Arrays.asList("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQM"));
-        assertEquals(AccountRestrictionFlags.ALLOW_INCOMING_ADDRESS,
-            accountRestriction.getRestrictionFlags());
+        assertEquals(AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS, accountRestriction.getRestrictionFlags());
         assertEquals(1, accountRestriction.getValues().size());
     }
 }

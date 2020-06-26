@@ -18,7 +18,6 @@ package io.nem.symbol.sdk.model.transaction;
 
 
 import io.nem.symbol.catapult.builders.AccountRestrictionFlagsDto;
-import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +29,7 @@ public class AccountRestrictionFlagsTest {
 
     @Test
     public void shouldMatchCatbufferValues() {
-        Arrays.stream(AccountRestrictionFlags.values()).forEach(a -> {
+        AccountRestrictionFlags.values().stream().forEach(a -> {
             //Testing that all possible values are handled.
             Assertions.assertNotNull(AccountRestrictionFlagsDto.rawValueOf((byte) a.getValue()));
         });
