@@ -18,7 +18,6 @@ package io.nem.symbol.sdk.model.transaction;
 
 import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.lang3.Validate;
 
 /**
  * The valid combinations of {@link AccountRestrictionFlag} that creates a {@link AccountAddressRestrictionFlags}.
@@ -38,25 +37,23 @@ public enum AccountAddressRestrictionFlags implements AccountRestrictionFlags {
     /**
      * Allow only incoming transactions from a given address.
      */
-    ALLOW_INCOMING_ADDRESS(AccountRestrictionTargetType.ADDRESS, AccountRestrictionFlag.ADDRESS_VALUE),
+    ALLOW_INCOMING_ADDRESS(AccountRestrictionFlag.ADDRESS_VALUE),
 
     /**
      * Allow only outgoing transactions from a given address.
      */
-    ALLOW_OUTGOING_ADDRESS(AccountRestrictionTargetType.ADDRESS, AccountRestrictionFlag.ADDRESS_VALUE,
-        AccountRestrictionFlag.OUTGOING_VALUE),
+    ALLOW_OUTGOING_ADDRESS(AccountRestrictionFlag.ADDRESS_VALUE, AccountRestrictionFlag.OUTGOING_VALUE),
 
     /**
      * Account restriction is interpreted as blocking address operation.
      */
-    BLOCK_ADDRESS(AccountRestrictionTargetType.ADDRESS, AccountRestrictionFlag.ADDRESS_VALUE,
-        AccountRestrictionFlag.BLOCK_VALUE),
+    BLOCK_ADDRESS(AccountRestrictionFlag.ADDRESS_VALUE, AccountRestrictionFlag.BLOCK_VALUE),
 
     /**
      * Block outgoing transactions for a given address.
      */
-    BLOCK_OUTGOING_ADDRESS(AccountRestrictionTargetType.ADDRESS, AccountRestrictionFlag.ADDRESS_VALUE,
-        AccountRestrictionFlag.BLOCK_VALUE, AccountRestrictionFlag.OUTGOING_VALUE);
+    BLOCK_OUTGOING_ADDRESS(AccountRestrictionFlag.ADDRESS_VALUE, AccountRestrictionFlag.BLOCK_VALUE,
+        AccountRestrictionFlag.OUTGOING_VALUE);
 
     private final List<AccountRestrictionFlag> flags;
     /**
@@ -64,23 +61,14 @@ public enum AccountAddressRestrictionFlags implements AccountRestrictionFlags {
      */
     private final int value;
 
-
-    /**
-     * The target type.
-     */
-    private final AccountRestrictionTargetType targetType;
-
     /**
      * Constructor.
      *
-     * @param targetType the target type
      * @param flags the values this type is composed of.
      */
-    AccountAddressRestrictionFlags(AccountRestrictionTargetType targetType, AccountRestrictionFlag... flags) {
-        Validate.isTrue(targetType == AccountRestrictionTargetType.ADDRESS);
+    AccountAddressRestrictionFlags(AccountRestrictionFlag... flags) {
         this.flags = Arrays.asList(flags);
         this.value = this.flags.stream().mapToInt(AccountRestrictionFlag::getValue).sum();
-        this.targetType = targetType;
     }
 
     /**
@@ -115,6 +103,6 @@ public enum AccountAddressRestrictionFlags implements AccountRestrictionFlags {
      * @return the target type.
      */
     public AccountRestrictionTargetType getTargetType() {
-        return targetType;
+        return AccountRestrictionTargetType.ADDRESS;
     }
 }

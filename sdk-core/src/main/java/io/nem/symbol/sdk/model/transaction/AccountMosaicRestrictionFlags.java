@@ -18,7 +18,6 @@ package io.nem.symbol.sdk.model.transaction;
 
 import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.lang3.Validate;
 
 /**
  * The valid combinations of {@link AccountRestrictionFlag} that creates a {@link AccountMosaicRestrictionFlags}.
@@ -35,13 +34,12 @@ public enum AccountMosaicRestrictionFlags implements AccountRestrictionFlags {
     /**
      * Allow only incoming transactions containing a a given mosaic identifier.
      */
-    ALLOW_INCOMING_MOSAIC(AccountRestrictionTargetType.MOSAIC_ID, AccountRestrictionFlag.MOSAIC_VALUE),
+    ALLOW_INCOMING_MOSAIC(AccountRestrictionFlag.MOSAIC_VALUE),
 
     /**
      * Account restriction is interpreted as blocking mosaicId operation.
      */
-    BLOCK_MOSAIC(AccountRestrictionTargetType.MOSAIC_ID, AccountRestrictionFlag.MOSAIC_VALUE,
-        AccountRestrictionFlag.BLOCK_VALUE);
+    BLOCK_MOSAIC(AccountRestrictionFlag.MOSAIC_VALUE, AccountRestrictionFlag.BLOCK_VALUE);
 
     private final List<AccountRestrictionFlag> flags;
     /**
@@ -51,21 +49,13 @@ public enum AccountMosaicRestrictionFlags implements AccountRestrictionFlags {
 
 
     /**
-     * The target type.
-     */
-    private final AccountRestrictionTargetType targetType;
-
-    /**
      * Constructor.
      *
-     * @param targetType the target type
      * @param flags the values this type is composed of.
      */
-    AccountMosaicRestrictionFlags(AccountRestrictionTargetType targetType, AccountRestrictionFlag... flags) {
-        Validate.isTrue(targetType == AccountRestrictionTargetType.MOSAIC_ID);
+    AccountMosaicRestrictionFlags(AccountRestrictionFlag... flags) {
         this.flags = Arrays.asList(flags);
         this.value = this.flags.stream().mapToInt(AccountRestrictionFlag::getValue).sum();
-        this.targetType = targetType;
     }
 
     /**
@@ -100,6 +90,6 @@ public enum AccountMosaicRestrictionFlags implements AccountRestrictionFlags {
      * @return the target type.
      */
     public AccountRestrictionTargetType getTargetType() {
-        return targetType;
+        return AccountRestrictionTargetType.MOSAIC_ID;
     }
 }

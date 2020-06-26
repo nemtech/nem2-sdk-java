@@ -18,7 +18,6 @@ package io.nem.symbol.sdk.model.transaction;
 
 import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.lang3.Validate;
 
 /**
  * The valid combinations of {@link AccountRestrictionFlag} that creates a {@link AccountOperationRestrictionFlags}.
@@ -35,14 +34,13 @@ public enum AccountOperationRestrictionFlags implements AccountRestrictionFlags 
     /**
      * Allow only outgoing transactions of a given type.
      */
-    ALLOW_OUTGOING_TRANSACTION_TYPE(AccountRestrictionTargetType.TRANSACTION_TYPE,
-        AccountRestrictionFlag.TRANSACTION_TYPE_VALUE, AccountRestrictionFlag.OUTGOING_VALUE),
+    ALLOW_OUTGOING_TRANSACTION_TYPE(AccountRestrictionFlag.TRANSACTION_TYPE_VALUE,
+        AccountRestrictionFlag.OUTGOING_VALUE),
 
     /**
      * Block outgoing transactions for a given transactionType.
      */
-    BLOCK_OUTGOING_TRANSACTION_TYPE(AccountRestrictionTargetType.TRANSACTION_TYPE,
-        AccountRestrictionFlag.TRANSACTION_TYPE_VALUE, AccountRestrictionFlag.BLOCK_VALUE,
+    BLOCK_OUTGOING_TRANSACTION_TYPE(AccountRestrictionFlag.TRANSACTION_TYPE_VALUE, AccountRestrictionFlag.BLOCK_VALUE,
         AccountRestrictionFlag.OUTGOING_VALUE);
 
     private final List<AccountRestrictionFlag> flags;
@@ -53,21 +51,13 @@ public enum AccountOperationRestrictionFlags implements AccountRestrictionFlags 
 
 
     /**
-     * The target type.
-     */
-    private final AccountRestrictionTargetType targetType;
-
-    /**
      * Constructor.
      *
-     * @param targetType the target type
      * @param flags the values this type is composed of.
      */
-    AccountOperationRestrictionFlags(AccountRestrictionTargetType targetType, AccountRestrictionFlag... flags) {
-        Validate.isTrue(targetType == AccountRestrictionTargetType.TRANSACTION_TYPE);
+    AccountOperationRestrictionFlags(AccountRestrictionFlag... flags) {
         this.flags = Arrays.asList(flags);
         this.value = this.flags.stream().mapToInt(AccountRestrictionFlag::getValue).sum();
-        this.targetType = targetType;
     }
 
     /**
@@ -102,6 +92,6 @@ public enum AccountOperationRestrictionFlags implements AccountRestrictionFlags 
      * @return the target type.
      */
     public AccountRestrictionTargetType getTargetType() {
-        return targetType;
+        return AccountRestrictionTargetType.TRANSACTION_TYPE;
     }
 }
