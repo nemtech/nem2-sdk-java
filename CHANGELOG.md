@@ -3,6 +3,23 @@ All notable changes to this project will be documented in this file.
 
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.20.1] - 29-Jun-2020
+
+**Milestone**: Gorilla.1(0.9.6.2)
+
+ Package  | Version  | Link
+---|---|---
+SDK OkHttp| v0.20.1 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-okhttp-client
+SDK Vertx| v0.20.1 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-vertx-client
+Catbuffer Library| v0.0.22 | https://repo.maven.apache.org/maven2/io/nem/catbuffer-java
+Client OkHttp | v0.9.3  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-okhttp-gson-client
+Client Vertx | v0.9.3  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-vertx-client/
+
+- **[BREAKING CHANGE]** Added `startPoint` and `endPoint` in `VotingKeyLinkTransaction`.
+- **[BREAKING CHANGE]** Renamed `SupplementalAccountKeys` to `SupplementalPublicKeys`. The new `SupplementalPublicKeys` has been changed from `List` type to an `object` containing: `linked`, `node`, `vrf` and `voting` key(s).
+- **[BREAKING CHANGE]** `AccountRestrictionFlags` enum has been split into 3 different enum (`AccountAddressRestrictionFlags`, `AccountMosaicRestrictionFlags` and `AccountOperationRestrictionFlags`).
+- **[BREAKING CHANGE]**  Incorrect `int` types have been updated to `long` when catbuffer attribute type is `uint32` (e.g. `feeMultiplier`).
+
 ## [0.20.0] - 18-Jun-2020    
 
 **Milestone**: Gorilla.1(0.9.6.1)
