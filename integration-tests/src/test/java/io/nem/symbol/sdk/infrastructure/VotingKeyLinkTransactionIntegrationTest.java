@@ -21,13 +21,15 @@ public class VotingKeyLinkTransactionIntegrationTest extends BaseIntegrationTest
         VotingKey linkedPublicKey = VotingKey.fromHexString("AAAAA");
 
         VotingKeyLinkTransaction linkTransaction = VotingKeyLinkTransactionFactory
-            .create(getNetworkType(), linkedPublicKey, BigInteger.valueOf(1), BigInteger.valueOf(3), LinkAction.LINK)
+            .create(getNetworkType(), linkedPublicKey, BigInteger.valueOf(72), BigInteger.valueOf(26280),
+                LinkAction.LINK)
             .maxFee(this.maxFee).build();
 
         announceAndValidate(type, account, linkTransaction);
 
         VotingKeyLinkTransaction unlinkTransaction = VotingKeyLinkTransactionFactory
-            .create(getNetworkType(), linkedPublicKey, BigInteger.valueOf(1), BigInteger.valueOf(3), LinkAction.UNLINK)
+            .create(getNetworkType(), linkedPublicKey, BigInteger.valueOf(72), BigInteger.valueOf(26280),
+                LinkAction.UNLINK)
             .maxFee(this.maxFee).build();
 
         announceAndValidate(type, account, unlinkTransaction);

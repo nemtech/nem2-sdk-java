@@ -19,15 +19,14 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 import io.nem.symbol.core.utils.ExceptionUtils;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.AccountInfo;
-import io.nem.symbol.sdk.model.account.AccountKeyType;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountInfoDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountKeyDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountKeyTypeFlagsEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountLinkPublicKeyDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.ActivityBucketDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.SupplementalPublicKeysDTO;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
@@ -58,8 +57,8 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
         accountDTO.setAddress(encodeAddress(address));
-        accountDTO.setSupplementalAccountKeys(
-            Collections.singletonList(new AccountKeyDTO().key("abc").keyType(AccountKeyTypeFlagsEnum.NUMBER_2)));
+        accountDTO.setSupplementalPublicKeys(
+            new SupplementalPublicKeysDTO().linked(new AccountLinkPublicKeyDTO().publicKey("abc")));
 
         AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
         accountInfoDTO.setAccount(accountDTO);
@@ -82,8 +81,7 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
 
         Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
         Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
-        Assertions.assertEquals("abc", resolvedAccountInfo.getSupplementalAccountKeys().get(0).getKey());
-        Assertions.assertEquals(AccountKeyType.NODE, resolvedAccountInfo.getSupplementalAccountKeys().get(0).getKeyType());
+        Assertions.assertEquals("abc", resolvedAccountInfo.getSupplementalAccountKeys().getLinked().get());
 
         Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
         Assertions.assertEquals(startHeight, resolvedAccountInfo.getActivityBuckets().get(0).getStartHeight());
@@ -102,8 +100,8 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
         accountDTO.setAddress(encodeAddress(address));
-        accountDTO.setSupplementalAccountKeys(
-            Collections.singletonList(new AccountKeyDTO().key("abc").keyType(AccountKeyTypeFlagsEnum.NUMBER_2)));
+        accountDTO.setSupplementalPublicKeys(
+            new SupplementalPublicKeysDTO().node(new AccountLinkPublicKeyDTO().publicKey("abc")));
 
         AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
         accountInfoDTO.setAccount(accountDTO);
@@ -126,8 +124,7 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
 
         Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
         Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
-        Assertions.assertEquals("abc", resolvedAccountInfo.getSupplementalAccountKeys().get(0).getKey());
-        Assertions.assertEquals(AccountKeyType.NODE, resolvedAccountInfo.getSupplementalAccountKeys().get(0).getKeyType());
+        Assertions.assertEquals("abc", resolvedAccountInfo.getSupplementalAccountKeys().getNode().get());
 
         Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
         Assertions.assertEquals(startHeight, resolvedAccountInfo.getActivityBuckets().get(0).getStartHeight());

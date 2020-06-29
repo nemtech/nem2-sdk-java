@@ -163,7 +163,11 @@ public class TransactionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImp
         TransactionIds transactionIds = new TransactionIds().transactionIds(transactionHashes);
         switch (group) {
             case CONFIRMED:
-                return getClient().getTransactionsById(transactionIds);
+                return getClient().getConfirmedTransactions(transactionIds);
+            case PARTIAL:
+                return getClient().getPartialTransactions(transactionIds);
+            case UNCONFIRMED:
+                return getClient().getUnconfirmedTransactions(transactionIds);
         }
         throw new IllegalArgumentException("Invalid group " + group);
     }

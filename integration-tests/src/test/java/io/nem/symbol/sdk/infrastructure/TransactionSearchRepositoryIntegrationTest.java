@@ -21,9 +21,14 @@ import io.nem.symbol.sdk.api.TransactionPaginationStreamer;
 import io.nem.symbol.sdk.api.TransactionRepository;
 import io.nem.symbol.sdk.api.TransactionSearchCriteria;
 import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.message.PlainMessage;
+import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
+import io.nem.symbol.sdk.model.transaction.TransferTransaction;
+import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
@@ -86,6 +91,9 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
         PaginationTester
             .sameEntities(transactionsWithoutOffset.stream().skip(offsetIndex + 1).collect(Collectors.toList()),
                 transactionFromOffsets);
+
+        helper.assertById(transactionRepository, TransactionGroup.CONFIRMED, transactionFromOffsets);
+        helper.assertById(transactionRepository, TransactionGroup.CONFIRMED, transactionsWithoutOffset);
     }
 
     @ParameterizedTest
@@ -101,6 +109,8 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
         List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
         transactions.forEach(b -> Assertions.assertEquals(expectedSignerPublicKey, b.getSigner().get().getPublicKey()));
         Assertions.assertFalse(transactions.isEmpty());
+
+        helper.assertById(transactionRepository, TransactionGroup.CONFIRMED, transactions);
     }
 
     @ParameterizedTest
@@ -113,6 +123,39 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
         List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
         transactions.forEach(b -> Assertions.assertEquals(TransactionType.TRANSFER, b.getType()));
         Assertions.assertFalse(transactions.isEmpty());
+
+        helper.assertById(transactionRepository, TransactionGroup.CONFIRMED, transactions);
+    }
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void searchUnconfirmed(RepositoryType type) {
+        TransactionRepository transactionRepository = getTransactionRepository(type);
+        Address recipient = getRecipient();
+
+        TransferTransaction transferTransaction = TransferTransactionFactory.create(getNetworkType(), recipient,
+            Collections.singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))), PlainMessage.Empty)
+            .maxFee(maxFee).build();
+
+        Account signer = config().getDefaultAccount();
+        SignedTransaction signedTransaction = transferTransaction.signWith(signer, getGenerationHash());
+        get(transactionRepository.announce(signedTransaction));
+
+        get(getListener(type).unconfirmedAdded(signer.getAddress(), signedTransaction.getHash()).take(1));
+
+        TransactionPaginationStreamer streamer = new TransactionPaginationStreamer(transactionRepository);
+        TransactionGroup group = TransactionGroup.UNCONFIRMED;
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria(group);
+        criteria.transactionTypes(Collections.singletonList(TransactionType.TRANSFER));
+        List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
+        transactions.forEach(b -> Assertions.assertEquals(TransactionType.TRANSFER, b.getType()));
+        Assertions.assertTrue(transactions.stream()
+            .filter(t -> t.getTransactionInfo().get().getHash().get().equals(signedTransaction.getHash())).findAny()
+            .isPresent());
+
+        System.out.println("http://localhost:3000/transactions/unconfirmed/" + signedTransaction.getHash());
+
+        helper.assertById(transactionRepository, group, transactions);
     }
 
     @ParameterizedTest
@@ -126,6 +169,7 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
         List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
         transactions.forEach(b -> Assertions.assertEquals(BigInteger.ONE, b.getTransactionInfo().get().getHeight()));
         Assertions.assertFalse(transactions.isEmpty());
+        helper.assertById(transactionRepository, TransactionGroup.CONFIRMED, transactions);
     }
 
 
@@ -138,6 +182,7 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
         List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
         transactions.forEach(b -> Assertions.assertNotNull(b.getTransactionInfo().get().getHeight()));
         Assertions.assertFalse(transactions.isEmpty());
+        helper.assertById(transactionRepository, TransactionGroup.CONFIRMED, transactions);
     }
 
     @ParameterizedTest
@@ -151,6 +196,7 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
         criteria.setSignerPublicKey(expectedSignerPublicKey);
         List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
         Assertions.assertTrue(transactions.isEmpty());
+        helper.assertById(transactionRepository, TransactionGroup.CONFIRMED, transactions);
     }
 
     @ParameterizedTest
@@ -205,7 +251,8 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
 
         transactions.stream().forEach(t -> {
             get(transactionRepository.getTransaction(TransactionGroup.CONFIRMED, t.getRecordId().get()));
-            get(transactionRepository.getTransaction(TransactionGroup.CONFIRMED, t.getTransactionInfo().get().getHash().get()));
+            get(transactionRepository
+                .getTransaction(TransactionGroup.CONFIRMED, t.getTransactionInfo().get().getHash().get()));
         });
     }
 

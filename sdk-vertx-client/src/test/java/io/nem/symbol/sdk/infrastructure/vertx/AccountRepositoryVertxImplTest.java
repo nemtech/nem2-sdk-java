@@ -19,16 +19,15 @@ package io.nem.symbol.sdk.infrastructure.vertx;
 import io.nem.symbol.core.utils.ExceptionUtils;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.AccountInfo;
-import io.nem.symbol.sdk.model.account.AccountKeyType;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountInfoDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.AccountKeyDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.AccountKeyTypeFlagsEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.AccountLinkPublicKeyDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.ActivityBucketDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.Mosaic;
+import io.nem.symbol.sdk.openapi.vertx.model.SupplementalPublicKeysDTO;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +45,6 @@ import org.junit.jupiter.api.Test;
 public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
 
     private AccountRepositoryVertxImpl repository;
-
 
     @BeforeEach
     public void setUp() {
@@ -87,7 +85,8 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
         accountDTO.setAddress(encodeAddress(address));
-        accountDTO.setSupplementalAccountKeys(Collections.singletonList(new AccountKeyDTO().key("abc").keyType(AccountKeyTypeFlagsEnum.NUMBER_2)));
+        accountDTO.setSupplementalPublicKeys(
+            new SupplementalPublicKeysDTO().node(new AccountLinkPublicKeyDTO().publicKey("abc")));
 
         AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
         accountInfoDTO.setAccount(accountDTO);
@@ -101,8 +100,8 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
 
         mockRemoteCall(Collections.singletonList(accountInfoDTO));
 
-        List<AccountInfo> resolvedAccountInfos = repository
-            .getAccountsInfo(Collections.singletonList(address)).toFuture().get();
+        List<AccountInfo> resolvedAccountInfos = repository.getAccountsInfo(Collections.singletonList(address))
+            .toFuture().get();
 
         Assertions.assertEquals(1, resolvedAccountInfos.size());
 
@@ -110,14 +109,13 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
 
         Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
         Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
-        Assertions.assertEquals("abc", resolvedAccountInfo.getSupplementalAccountKeys().get(0).getKey());
-        Assertions.assertEquals(
-            AccountKeyType.NODE, resolvedAccountInfo.getSupplementalAccountKeys().get(0).getKeyType());
+        Assertions.assertEquals("abc", resolvedAccountInfo.getSupplementalAccountKeys().getNode().get());
 
         Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
         Assertions.assertEquals(startHeight, resolvedAccountInfo.getActivityBuckets().get(0).getStartHeight());
         Assertions.assertEquals(totalFeesPaid, resolvedAccountInfo.getActivityBuckets().get(0).getTotalFeesPaid());
-        Assertions.assertEquals(beneficiaryCount, resolvedAccountInfo.getActivityBuckets().get(0).getBeneficiaryCount());
+        Assertions
+            .assertEquals(beneficiaryCount, resolvedAccountInfo.getActivityBuckets().get(0).getBeneficiaryCount());
         Assertions.assertEquals(rawScore, resolvedAccountInfo.getActivityBuckets().get(0).getRawScore());
 
     }

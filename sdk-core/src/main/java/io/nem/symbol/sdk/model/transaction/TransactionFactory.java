@@ -134,7 +134,7 @@ public abstract class TransactionFactory<T extends Transaction> {
      * @param feeMultiplier the fee multiplier greater than 1
      * @return this factory to continue building the transaction.
      */
-    public TransactionFactory<T> calculateMaxFeeFromMultiplier(int feeMultiplier) {
+    public TransactionFactory<T> calculateMaxFeeFromMultiplier(long feeMultiplier) {
         return maxFee(BigInteger.valueOf(getSize()).multiply(BigInteger.valueOf(feeMultiplier)));
     }
 

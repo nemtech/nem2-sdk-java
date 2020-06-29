@@ -25,15 +25,20 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class AccountInfoTest {
 
     @Test
     void shouldCreateAccountInfoViaConstructor() {
-        List<Mosaic> mosaics =
-            Collections.singletonList(NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)));
-        List<AccountKey> supplementalAccountKeys = Collections.singletonList(new AccountKey(AccountKeyType.NODE,"abc"));
+        List<Mosaic> mosaics = Collections
+            .singletonList(NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)));
+
+        SupplementalAccountKeys supplementalAccountKeys = new SupplementalAccountKeys(Optional.of("linkedKey"),
+            Optional.of("nodeKey"), Optional.of("vrfKey"), Collections
+            .singletonList(new AccountLinkVotingKey("votingKey", BigInteger.valueOf(10), BigInteger.valueOf(20))));
+
         BigInteger startHeight = BigInteger.ONE;
         BigInteger totalFeesPaid = BigInteger.valueOf(2);
         int beneficiaryCount = 3;
@@ -42,37 +47,30 @@ class AccountInfoTest {
         List<ActivityBucket> activityBuckets = Collections.singletonList(bucket);
         Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
         String publicKey = PublicKey.generateRandom().toHex();
-        AccountInfo accountInfo =
-            new AccountInfo(
-                address,
-                new BigInteger("964"),
-                publicKey,
-                new BigInteger("966"),
-                new BigInteger("777"),
-                new BigInteger("0"),
-                mosaics, AccountType.REMOTE_UNLINKED, supplementalAccountKeys, activityBuckets);
+        AccountInfo accountInfo = new AccountInfo(address, new BigInteger("964"), publicKey, new BigInteger("966"),
+            new BigInteger("777"), new BigInteger("0"), mosaics, AccountType.REMOTE_UNLINKED, supplementalAccountKeys,
+            activityBuckets);
 
-        assertEquals(
-            address,
-            accountInfo.getAddress());
+        assertEquals(address, accountInfo.getAddress());
         assertEquals(new BigInteger("964"), accountInfo.getAddressHeight());
-        assertEquals(
-            publicKey,
-            accountInfo.getPublicKey());
+        assertEquals(publicKey, accountInfo.getPublicKey());
         assertEquals(new BigInteger("966"), accountInfo.getPublicKeyHeight());
         assertEquals(new BigInteger("777"), accountInfo.getImportances().get(0).getValue());
         assertEquals(new BigInteger("0"), accountInfo.getImportances().get(0).getHeight());
         assertEquals(mosaics, accountInfo.getMosaics());
-        assertEquals(
-            PublicAccount.createFromPublicKey(
-                publicKey,
-                NetworkType.MIJIN_TEST),
+        assertEquals(PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST),
             accountInfo.getPublicAccount());
 
-        assertEquals(AccountType.REMOTE_UNLINKED,
-            accountInfo.getAccountType());
+        assertEquals(AccountType.REMOTE_UNLINKED, accountInfo.getAccountType());
 
         assertEquals(supplementalAccountKeys, accountInfo.getSupplementalAccountKeys());
         assertEquals(activityBuckets, accountInfo.getActivityBuckets());
+
+        assertEquals("linkedKey", supplementalAccountKeys.getLinked().get());
+        assertEquals("nodeKey", supplementalAccountKeys.getNode().get());
+        assertEquals("vrfKey", supplementalAccountKeys.getVrf().get());
+        assertEquals("votingKey", supplementalAccountKeys.getVoting().get(0).getPublicKey());
+        assertEquals(BigInteger.valueOf(10), supplementalAccountKeys.getVoting().get(0).getStartPoint());
+        assertEquals(BigInteger.valueOf(20), supplementalAccountKeys.getVoting().get(0).getEndPoint());
     }
 }

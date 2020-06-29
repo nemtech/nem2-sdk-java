@@ -39,7 +39,6 @@ import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
-import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -85,7 +84,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
     @Test
     void createATransferTransactionViaStaticConstructorSetMaxFee() {
 
-        int feeMultiplier = 10;
+        long feeMultiplier = 10;
         TransactionFactory<TransferTransaction> factory = TransferTransactionFactory
             .create(networkType, new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.emptyList(), PlainMessage.Empty).calculateMaxFeeFromMultiplier(feeMultiplier);

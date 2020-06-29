@@ -79,7 +79,7 @@ public abstract class BaseIntegrationTest {
      */
     protected static final RepositoryType DEFAULT_REPOSITORY_TYPE = RepositoryType.VERTX;
 
-    private final TestHelper helper;
+    protected final TestHelper helper;
     private final Map<RepositoryType, RepositoryFactory> repositoryFactoryMap = new HashMap<>();
     private final Map<RepositoryType, Listener> listenerMap = new HashMap<>();
     private final JsonHelper jsonHelper = new JsonHelperJackson2(

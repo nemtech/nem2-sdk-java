@@ -114,13 +114,13 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
     /**
      * Builder method used to to re-calculate the max fee based on the configured feeMultiplier.
      *
-     * Because the factory creates an aggregate transcation, an {@link IllegalArgumentException} is
-     * raised. users should not use this method.
+     * Because the factory creates an aggregate transcation, an {@link IllegalArgumentException} is raised. users should
+     * not use this method.
      *
      * @param feeMultiplier the fee multiplier greater than 1
      * @return raises a IllegalArgumentException
      */
-    public AggregateTransactionFactory calculateMaxFeeFromMultiplier(int feeMultiplier) {
+    public AggregateTransactionFactory calculateMaxFeeFromMultiplier(long feeMultiplier) {
         throw new IllegalArgumentException(
             "calculateMaxFeeFromMultiplier can only be used for non-aggregate transactions.");
     }
@@ -128,20 +128,17 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
     /**
      * Set transaction maxFee using fee multiplier for only aggregate transactions.
      *
-     * Use this method once all the current transcation consignatures has been added to the
-     * factory.
+     * Use this method once all the current transcation consignatures has been added to the factory.
      *
      * @param feeMultiplier The fee multiplier
      * @param requiredCosignatures Required number of cosignatures
      * @return The aggregate transaction factory
      */
-    public AggregateTransactionFactory calculateMaxFeeForAggregate(int feeMultiplier,
-        int requiredCosignatures) {
+    public AggregateTransactionFactory calculateMaxFeeForAggregate(long feeMultiplier, int requiredCosignatures) {
         // Check if current cosignature count is greater than requiredCosignatures.
         int calculatedCosignatures = Math.max(this.cosignatures.size(), requiredCosignatures);
         // Remove current cosignature length and use the calculated one.
-        int calculatedSize =
-            this.getSize() + (calculatedCosignatures - this.cosignatures.size()) * COSIGNATURE_SIZE;
+        int calculatedSize = this.getSize() + (calculatedCosignatures - this.cosignatures.size()) * COSIGNATURE_SIZE;
         return (AggregateTransactionFactory) maxFee(
             BigInteger.valueOf(calculatedSize).multiply(BigInteger.valueOf(feeMultiplier)));
     }

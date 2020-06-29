@@ -132,7 +132,11 @@ public class TransactionRepositoryVertxImpl extends AbstractRepositoryVertxImpl 
         TransactionIds transactionIds = new TransactionIds().transactionIds(transactionHashes);
         switch (group) {
             case CONFIRMED:
-                return handler -> client.getTransactionsById(transactionIds, handler);
+                return handler -> client.getConfirmedTransactions(transactionIds, handler);
+            case PARTIAL:
+                return handler -> client.getPartialTransactions(transactionIds, handler);
+            case UNCONFIRMED:
+                return handler -> client.getUnconfirmedTransactions(transactionIds, handler);
         }
         throw new IllegalArgumentException("Invalid group " + group);
     }
