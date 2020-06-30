@@ -122,11 +122,19 @@ public class ChainProperties {
      */
     private final String minVoterBalance;
 
-
+    /**
+     * Maximum number of voting keys that can be registered at once per account.
+     */
     private final String maxVotingKeysPerAccount;
 
+    /**
+     * Minimum number of finalization rounds for which voting key can be registered.
+     */
     private final String minVotingKeyLifetime;
 
+    /**
+     * Maximum number of finalization rounds for which voting key can be registered.
+     */
     private final String maxVotingKeyLifetime;
 
     /**
