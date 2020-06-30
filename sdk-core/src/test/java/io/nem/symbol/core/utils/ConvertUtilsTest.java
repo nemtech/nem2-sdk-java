@@ -47,8 +47,7 @@ public class ConvertUtilsTest {
     @Test
     void getBytesCannotConvertMalformedStringToByteArray() {
         // Act:
-        Assertions.assertThrows(IllegalArgumentException.class,
-            () -> ConvertUtils.getBytes("4e454g465457"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ConvertUtils.getBytes("4e454g465457"));
     }
 
     @Test
@@ -96,10 +95,8 @@ public class ConvertUtilsTest {
     void tryGetBytesCannotConvertMalformedStringToByteArray() {
         // Assert:
         IllegalArgumentException exception = Assertions
-            .assertThrows(IllegalArgumentException.class, () ->
-                assertGetBytesConversion("4e454g465457", null));
-        Assertions.assertEquals(
-            "org.apache.commons.codec.DecoderException: Illegal hexadecimal character g at index 5",
+            .assertThrows(IllegalArgumentException.class, () -> assertGetBytesConversion("4e454g465457", null));
+        Assertions.assertEquals("org.apache.commons.codec.DecoderException: Illegal hexadecimal character g at index 5",
             exception.getMessage());
     }
 
@@ -126,8 +123,7 @@ public class ConvertUtilsTest {
         // Assert:
         String message = "Some message 汉字";
 
-        Assertions.assertEquals(message,
-            ConvertUtils.fromHexToString(ConvertUtils.fromStringToHex(message)));
+        Assertions.assertEquals(message, ConvertUtils.fromHexToString(ConvertUtils.fromStringToHex(message)));
 
         Assertions.assertNull(ConvertUtils.fromHexToString(null));
         Assertions.assertNull(ConvertUtils.fromStringToHex(null));
@@ -138,25 +134,28 @@ public class ConvertUtilsTest {
         // Assert:
         String message = "This is the message for this account! 汉字89664";
 
-        Assertions.assertEquals(message,
-            ConvertUtils.fromHexToString(
-                "5468697320697320746865206D65737361676520666F722074686973206163636F756E742120E6B189E5AD973839363634"));
+        Assertions.assertEquals(message, ConvertUtils.fromHexToString(
+            "5468697320697320746865206D65737361676520666F722074686973206163636F756E742120E6B189E5AD973839363634"));
 
     }
 
     @Test
     void toSize16Hex() {
-        Assertions.assertEquals("000000000000000a",
-            ConvertUtils.toSize16Hex(BigInteger.TEN));
+        Assertions.assertEquals("000000000000000a", ConvertUtils.toSize16Hex(BigInteger.TEN));
 
-        Assertions.assertEquals("00000000000186a0",
-            ConvertUtils.toSize16Hex(BigInteger.valueOf(100000)));
+        Assertions.assertEquals("00000000000186a0", ConvertUtils.toSize16Hex(BigInteger.valueOf(100000)));
+
+        Assertions.assertEquals("0000000000000000", ConvertUtils.toSize16Hex(BigInteger.ZERO));
+
+        IllegalArgumentException error = Assertions
+            .assertThrows(IllegalArgumentException.class, () -> ConvertUtils.toSize16Hex(BigInteger.valueOf(-5)));
+        Assertions.assertEquals("BigInteger '-5' must not be negative", error.getMessage());
+
     }
 
     @Test
     void reverseHexString() {
-        Assertions.assertEquals("FF75",
-            ConvertUtils.reverseHexString("75FF"));
+        Assertions.assertEquals("FF75", ConvertUtils.reverseHexString("75FF"));
 
         Assertions.assertEquals("FF66FF66FF66FF66FF66FF66FF66FF75FF75FF75FF75FF75FF75",
             ConvertUtils.reverseHexString("75FF75FF75FF75FF75FF75FF66FF66FF66FF66FF66FF66FF66FF"));
@@ -174,8 +173,8 @@ public class ConvertUtilsTest {
         Assertions.assertEquals(-9223372036854775799L, biggerThanLongInteger.longValue());
 
         //Then, BigInteger is negative.
-        Assertions.assertEquals("-9223372036854775799",
-            BigInteger.valueOf(biggerThanLongInteger.longValue()).toString());
+        Assertions
+            .assertEquals("-9223372036854775799", BigInteger.valueOf(biggerThanLongInteger.longValue()).toString());
 
         //It doesn't overflow.
         Assertions.assertEquals("9223372036854775817",
@@ -201,8 +200,7 @@ public class ConvertUtilsTest {
         assertIsHexString("abcdef0123456789ABCDEF", 22, null);
 
         assertIsHexString("026ee415fc15", 4, "026ee415fc15 is not an hex of size 4");
-        assertIsHexString("abcdef0123456789ABCDEF", 4,
-            "abcdef0123456789ABCDEF is not an hex of size 4");
+        assertIsHexString("abcdef0123456789ABCDEF", 4, "abcdef0123456789ABCDEF is not an hex of size 4");
 
         assertIsHexString("abcdef012345G789ABCDEF", null, "abcdef012345G789ABCDEF is not a valid hex");
         assertIsHexString("026ee415fc1", null, "026ee415fc1 is not a valid hex");
@@ -218,8 +216,8 @@ public class ConvertUtilsTest {
     void reverseHex() {
         String hex = "D9E338F78767ED95";
         String reverseHex = ConvertUtils.reverseHexString(hex);
-        Assertions.assertEquals("95ED6787F738E3D9",reverseHex);
-        Assertions.assertEquals(hex,ConvertUtils.reverseHexString(reverseHex));
+        Assertions.assertEquals("95ED6787F738E3D9", reverseHex);
+        Assertions.assertEquals(hex, ConvertUtils.reverseHexString(reverseHex));
     }
 
     private void assertIsHexString(String input, Integer size, String errorMessage) {

@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
@@ -30,9 +31,7 @@ public class ConvertUtils {
     /**
      * Mask used to fix overflowed longs when they are converted to BigInteger.
      */
-    private static final BigInteger UNSIGNED_LONG_MASK = BigInteger.ONE.shiftLeft(Long.SIZE)
-        .subtract(BigInteger.ONE);
-
+    private static final BigInteger UNSIGNED_LONG_MASK = BigInteger.ONE.shiftLeft(Long.SIZE).subtract(BigInteger.ONE);
 
 
     /**
@@ -86,9 +85,7 @@ public class ConvertUtils {
         try {
             return codec.decode(StringEncoder.getBytes(hexString));
         } catch (DecoderException e) {
-            throw new IllegalArgumentException(
-                hexString + " could not be decoded. " + ExceptionUtils
-                    .getMessage(e), e);
+            throw new IllegalArgumentException(hexString + " could not be decoded. " + ExceptionUtils.getMessage(e), e);
         }
     }
 
@@ -126,6 +123,7 @@ public class ConvertUtils {
      * @return the hex 16 characters
      */
     public static String toSize16Hex(final BigInteger number) {
+        Validate.isTrue(number.compareTo(BigInteger.ZERO) > -1, "BigInteger '" + number + "' must not be negative");
         return String.format("%016x", number);
     }
 
@@ -141,8 +139,8 @@ public class ConvertUtils {
 
 
     /**
-     * It converts a signed long into an unsigned BigInteger. It fixes overflow problems that could
-     * happen when working with unsigned int 64.
+     * It converts a signed long into an unsigned BigInteger. It fixes overflow problems that could happen when working
+     * with unsigned int 64.
      *
      * @param value the value, positive or negative.
      * @return the positive {@link BigInteger}.
@@ -152,8 +150,8 @@ public class ConvertUtils {
     }
 
     /**
-     * It converts a signed BigInteger into an unsigned BigInteger. It fixes overflow problems that
-     * could happen when working with unsigned int 64.
+     * It converts a signed BigInteger into an unsigned BigInteger. It fixes overflow problems that could happen when
+     * working with unsigned int 64.
      *
      * @param value the value, positive or negative.
      * @return the positive {@link BigInteger}.
@@ -184,8 +182,7 @@ public class ConvertUtils {
     }
 
     /**
-     * Validates that an input is a valid hex . If not, it raises a {@link
-     * IllegalArgumentException}
+     * Validates that an input is a valid hex . If not, it raises a {@link IllegalArgumentException}
      *
      * @param input the string input
      * @throws IllegalArgumentException if the input is null or  not an hex.
@@ -206,8 +203,7 @@ public class ConvertUtils {
      *
      * @param input the string input
      * @param size the expected hex size.
-     * @throws IllegalArgumentException if the input is null,  not an hex or it has an invalid
-     * size.
+     * @throws IllegalArgumentException if the input is null,  not an hex or it has an invalid size.
      */
     public static void validateIsHexString(String input, Integer size) {
         validateIsHexString(input);
@@ -224,8 +220,9 @@ public class ConvertUtils {
      */
     public static String reverseHexString(String hex) {
         final StringBuilder builder = new StringBuilder(hex.length());
-        for(int i = hex.length(); i > 1; i-=2)
-            builder.append(hex, i-2, i);
+        for (int i = hex.length(); i > 1; i -= 2) {
+            builder.append(hex, i - 2, i);
+        }
         return builder.toString();
     }
 

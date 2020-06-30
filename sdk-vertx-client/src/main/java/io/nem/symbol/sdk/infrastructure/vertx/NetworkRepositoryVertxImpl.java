@@ -137,20 +137,16 @@ public class NetworkRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
     }
 
     private ChainProperties toChainProperties(ChainPropertiesDTO dto) {
-        return new ChainProperties(dto.getEnableVerifiableState(),
-            dto.getEnableVerifiableReceipts(), dto.getCurrencyMosaicId(),
-            dto.getHarvestingMosaicId(), dto.getBlockGenerationTargetTime(),
-            dto.getBlockTimeSmoothingFactor(), dto.getBlockFinalizationInterval(),
-            dto.getImportanceGrouping(),
-            dto.getImportanceActivityPercentage(), dto.getMaxRollbackBlocks(),
-            dto.getMaxDifficultyBlocks(), dto.getDefaultDynamicFeeMultiplier(),
-            dto.getMaxTransactionLifetime(), dto.getMaxBlockFutureTime(),
-            dto.getInitialCurrencyAtomicUnits(), dto.getMaxMosaicAtomicUnits(),
-            dto.getTotalChainImportance(), dto.getMinHarvesterBalance(),
-            dto.getMaxHarvesterBalance(), dto.getMinVoterBalance(),
-            dto.getHarvestBeneficiaryPercentage(),
-            dto.getHarvestNetworkPercentage(), dto.getHarvestNetworkFeeSinkAddress(),
-            dto.getBlockPruneInterval(), dto.getMaxTransactionsPerBlock());
+        return new ChainProperties(dto.getEnableVerifiableState(), dto.getEnableVerifiableReceipts(),
+            dto.getCurrencyMosaicId(), dto.getHarvestingMosaicId(), dto.getBlockGenerationTargetTime(),
+            dto.getBlockTimeSmoothingFactor(), dto.getBlockFinalizationInterval(), dto.getImportanceGrouping(),
+            dto.getImportanceActivityPercentage(), dto.getMaxRollbackBlocks(), dto.getMaxDifficultyBlocks(),
+            dto.getDefaultDynamicFeeMultiplier(), dto.getMaxTransactionLifetime(), dto.getMaxBlockFutureTime(),
+            dto.getInitialCurrencyAtomicUnits(), dto.getMaxMosaicAtomicUnits(), dto.getTotalChainImportance(),
+            dto.getMinHarvesterBalance(), dto.getMaxHarvesterBalance(), dto.getMinVoterBalance(),
+            dto.getMaxVotingKeysPerAccount(), dto.getMinVotingKeyLifetime(), dto.getMaxVotingKeyLifetime(),
+            dto.getHarvestBeneficiaryPercentage(), dto.getHarvestNetworkPercentage(),
+            dto.getHarvestNetworkFeeSinkAddress(), dto.getBlockPruneInterval(), dto.getMaxTransactionsPerBlock());
     }
 
     private PluginsProperties toPluginsProperties(PluginsPropertiesDTO dto) {

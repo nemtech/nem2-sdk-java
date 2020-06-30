@@ -15,8 +15,6 @@
  */
 
 
-
-
 package io.nem.symbol.sdk.model.network;
 
 /**
@@ -25,14 +23,12 @@ package io.nem.symbol.sdk.model.network;
 public class ChainProperties {
 
     /**
-     * Set to true if block chain should calculate state hashes so that state is fully verifiable at
-     * each block.
+     * Set to true if block chain should calculate state hashes so that state is fully verifiable at each block.
      */
     private final Boolean enableVerifiableState;
 
     /**
-     * Set to true if block chain should calculate receipts so that state changes are fully
-     * verifiable at each block.
+     * Set to true if block chain should calculate receipts so that state changes are fully verifiable at each block.
      */
     private final Boolean enableVerifiableReceipts;
 
@@ -112,14 +108,12 @@ public class ChainProperties {
     private final String totalChainImportance;
 
     /**
-     * Minimum number of harvesting mosaic atomic units needed for an account to be eligible for
-     * harvesting.
+     * Minimum number of harvesting mosaic atomic units needed for an account to be eligible for harvesting.
      */
     private final String minHarvesterBalance;
 
     /**
-     * Maximum number of harvesting mosaic atomic units needed for an account to be eligible for
-     * harvesting.
+     * Maximum number of harvesting mosaic atomic units needed for an account to be eligible for harvesting.
      */
     private final String maxHarvesterBalance;
 
@@ -127,6 +121,14 @@ public class ChainProperties {
      * Minimum number of harvesting mosaic atomic units needed for an account to be eligible for voting.
      */
     private final String minVoterBalance;
+
+
+    private final String maxVotingKeysPerAccount;
+
+    private final String minVotingKeyLifetime;
+
+    private final String maxVotingKeyLifetime;
+
     /**
      * Percentage of the harvested fee that is collected by the beneficiary account.
      */
@@ -152,18 +154,15 @@ public class ChainProperties {
     private final String maxTransactionsPerBlock;
 
 
-    public ChainProperties(Boolean enableVerifiableState, Boolean enableVerifiableReceipts,
-        String currencyMosaicId, String harvestingMosaicId, String blockGenerationTargetTime,
-        String blockTimeSmoothingFactor, String blockFinalizationInterval,
-        String importanceGrouping, String importanceActivityPercentage,
-        String maxRollbackBlocks, String maxDifficultyBlocks,
-        String defaultDynamicFeeMultiplier, String maxTransactionLifetime,
-        String maxBlockFutureTime, String initialCurrencyAtomicUnits,
+    public ChainProperties(Boolean enableVerifiableState, Boolean enableVerifiableReceipts, String currencyMosaicId,
+        String harvestingMosaicId, String blockGenerationTargetTime, String blockTimeSmoothingFactor,
+        String blockFinalizationInterval, String importanceGrouping, String importanceActivityPercentage,
+        String maxRollbackBlocks, String maxDifficultyBlocks, String defaultDynamicFeeMultiplier,
+        String maxTransactionLifetime, String maxBlockFutureTime, String initialCurrencyAtomicUnits,
         String maxMosaicAtomicUnits, String totalChainImportance, String minHarvesterBalance,
-        String maxHarvesterBalance, String minVoterBalance,
-        String harvestBeneficiaryPercentage, String harvestNetworkPercentage,
-        String harvestNetworkFeeSinkAddress, String blockPruneInterval,
-        String maxTransactionsPerBlock) {
+        String maxHarvesterBalance, String minVoterBalance, String maxVotingKeysPerAccount, String minVotingKeyLifetime,
+        String maxVotingKeyLifetime, String harvestBeneficiaryPercentage, String harvestNetworkPercentage,
+        String harvestNetworkFeeSinkAddress, String blockPruneInterval, String maxTransactionsPerBlock) {
         this.enableVerifiableState = enableVerifiableState;
         this.enableVerifiableReceipts = enableVerifiableReceipts;
         this.currencyMosaicId = currencyMosaicId;
@@ -184,6 +183,9 @@ public class ChainProperties {
         this.minHarvesterBalance = minHarvesterBalance;
         this.maxHarvesterBalance = maxHarvesterBalance;
         this.minVoterBalance = minVoterBalance;
+        this.maxVotingKeysPerAccount = maxVotingKeysPerAccount;
+        this.minVotingKeyLifetime = minVotingKeyLifetime;
+        this.maxVotingKeyLifetime = maxVotingKeyLifetime;
         this.harvestBeneficiaryPercentage = harvestBeneficiaryPercentage;
         this.harvestNetworkPercentage = harvestNetworkPercentage;
         this.harvestNetworkFeeSinkAddress = harvestNetworkFeeSinkAddress;
@@ -261,6 +263,18 @@ public class ChainProperties {
 
     public String getMinHarvesterBalance() {
         return minHarvesterBalance;
+    }
+
+    public String getMaxVotingKeysPerAccount() {
+        return maxVotingKeysPerAccount;
+    }
+
+    public String getMinVotingKeyLifetime() {
+        return minVotingKeyLifetime;
+    }
+
+    public String getMaxVotingKeyLifetime() {
+        return maxVotingKeyLifetime;
     }
 
     public String getMaxHarvesterBalance() {

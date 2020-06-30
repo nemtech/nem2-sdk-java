@@ -1,18 +1,19 @@
 {
   "network": {
     "identifier": "public-test",
-    "nodeEqualityStrategy": "public-key",
-    "nemesisSignerPublicKey": "E3F04CA92250B49679EBEF98FAC87C1CECAC7E7491ECBB2307DF1AD65BED57FD",
-    "generationHashSeed": "AE6488282F9C09457F017BE5EE26387B21EB15CF32D6DA1E9846C25E00828329",
+    "nemesisSignerPublicKey": "DBE033BDC980CE57C531A961A775AA2327C7D655BF4F8B8DCBF4CDCD698BABC2",
+    "nodeEqualityStrategy": "host",
+    "generationHashSeed": "5C72925DA9479FD0B83A53589D1AD5E1CBCCDBA4410EE01580AAD3333293BE6C",
     "epochAdjustment": "1573430400s"
   },
   "chain": {
     "enableVerifiableState": true,
     "enableVerifiableReceipts": true,
-    "currencyMosaicId": "0x62EF'46FD'6555'A1B9",
-    "harvestingMosaicId": "0x567D'9154'316B'C2AF",
+    "currencyMosaicId": "0x1635'288A'73EA'D58F",
+    "harvestingMosaicId": "0x7D57'68E8'441F'3557",
     "blockGenerationTargetTime": "15s",
     "blockTimeSmoothingFactor": "3000",
+    "blockFinalizationInterval": "30",
     "importanceGrouping": "1433",
     "importanceActivityPercentage": "5",
     "maxRollbackBlocks": "1433",
@@ -25,9 +26,13 @@
     "totalChainImportance": "15'000'000",
     "minHarvesterBalance": "500",
     "maxHarvesterBalance": "50'000'000'000'000",
+    "minVoterBalance": "50'000",
+    "maxVotingKeysPerAccount": "3",
+    "minVotingKeyLifetime": "72",
+    "maxVotingKeyLifetime": "26280",
     "harvestBeneficiaryPercentage": "10",
     "harvestNetworkPercentage": "5",
-    "harvestNetworkFeeSinkAddress": "FF5563F1C5824EE0CD868799FBE8744B46D5549973FDA499939C952D951494E4",
+    "harvestNetworkFeeSinkAddress": "TDGY4DD2U4YQQGERFMDQYHPYS6M7LHIF6XUCJ4Q",
     "blockPruneInterval": "360",
     "maxTransactionsPerBlock": "6'000"
   },
@@ -58,7 +63,7 @@
       "maxMosaicsPerAccount": "1'000",
       "maxMosaicDuration": "3650d",
       "maxMosaicDivisibility": "6",
-      "mosaicRentalFeeSinkAddress": "53E140B5947F104CABC2D6FE8BAEDBC30EF9A0609C717D9613DE593EC2A266D3",
+      "mosaicRentalFeeSinkAddress": "TDGY4DD2U4YQQGERFMDQYHPYS6M7LHIF6XUCJ4Q",
       "mosaicRentalFee": "500"
     },
     "multisig": {
@@ -74,7 +79,7 @@
       "maxNamespaceDuration": "365d",
       "namespaceGracePeriodDuration": "30d",
       "reservedRootNamespaceNames": "xem, nem, user, account, org, com, biz, net, edu, mil, gov, info",
-      "namespaceRentalFeeSinkAddress": "3E82E1C1E4A75ADAA3CBA8C101C3CD31D9817A2EB966EB3B511FB2ED45B8E262",
+      "namespaceRentalFeeSinkAddress": "TDGY4DD2U4YQQGERFMDQYHPYS6M7LHIF6XUCJ4Q",
       "rootNamespaceRentalFeePerBlock": "1",
       "childNamespaceRentalFee": "100"
     },
