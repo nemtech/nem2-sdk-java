@@ -88,6 +88,11 @@ public abstract class TransactionFactory<T extends Transaction> {
      */
     private Optional<TransactionGroup> group = Optional.empty();
 
+    /**
+     * The size provided by rest if known. Otherwise it will be calculated from the serialization size.
+     */
+    private Optional<Long> size = Optional.empty();
+
 
     /**
      * The constructor that sets the required and default attributes.
@@ -188,6 +193,17 @@ public abstract class TransactionFactory<T extends Transaction> {
     }
 
     /**
+     * Builder method used to change the default size. This method is generally called from the rest api mapper.
+     *
+     * @param size the known size
+     * @return this factory to continue building the transaction.
+     */
+    public TransactionFactory<T> size(long size) {
+        this.size = Optional.of(size);
+        return this;
+    }
+
+    /**
      * Builder method used to change the known transaction group. This method is generally called from the rest api
      * mapper.
      *
@@ -256,13 +272,19 @@ public abstract class TransactionFactory<T extends Transaction> {
         return signer;
     }
 
+    /**
+     * @return the size from rest.
+     */
+    protected Optional<Long> getProvidedSize() {
+        return this.size;
+    }
 
     /**
      * @return the size of the transaction that's going to be created. Useful when you want to update the maxFee of the
      * transaction depending on its size.
      */
-    public int getSize() {
-        return build().getSize();
+    public long getSize() {
+        return this.size.orElseGet(() -> build().getSize());
     }
 
     /**
@@ -271,6 +293,7 @@ public abstract class TransactionFactory<T extends Transaction> {
     public Optional<TransactionGroup> getGroup() {
         return group;
     }
+
 
     /**
      * @return the new transaction immutable based on the configured factory.

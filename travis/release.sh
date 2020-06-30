@@ -26,11 +26,11 @@ if [ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]; then
 
   if [ "$SKIP_RELEASE_PUBLISH" = "true" ]; then
     echo "Skipping publishing of sdk artifacts"
-    ./gradlew release
+    ./gradlew release gitPublishPush
     echo ""
   else
     echo "Releasing sdk jars and javadocs"
-    ./gradlew release publish gitPublishPush
+    ./gradlew release gitPublishPush publish
     ./gradlew closeAndReleaseRepository
     echo ""
   fi

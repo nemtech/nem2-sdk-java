@@ -323,9 +323,7 @@ public class BinarySerializationImpl implements BinarySerialization {
      * @return the size of the transaction.
      */
     @Override
-    public <T extends Transaction> int getSize(T transaction) {
-        Validate.isTrue(transaction.isTransactionFullyLoaded(),
-            "Size cannot be resolved from partially loaded or incomplete transactions.");
+    public <T extends Transaction> long getSize(T transaction) {
         return getTransactionBuilder(transaction).getSize() + resolveSerializer(transaction.getType())
             .toBodyBuilder(transaction).getSize();
     }

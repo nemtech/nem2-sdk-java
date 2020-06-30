@@ -69,8 +69,15 @@ public class TransactionMapperSerializationOkHttpTest {
 
         TransactionInfoDTO mappedTransactionInfo = (TransactionInfoDTO) transactionMapper.mapToDto(transactionModel);
 
+        Map<String, Object> transactionMap = jsonHelper.convert(mappedTransactionInfo.getTransaction(), Map.class);
+
+        Map<String, Object> originalTransactionMap = jsonHelper
+            .convert(originalTransactionInfo.getTransaction(), Map.class);
+        originalTransactionMap.put("size", transactionModel.getSize());
+        originalTransactionInfo.setTransaction(originalTransactionMap);
+
         //Patching the sort
-        mappedTransactionInfo.setTransaction(jsonHelper.convert(mappedTransactionInfo.getTransaction(), Map.class));
+        mappedTransactionInfo.setTransaction(transactionMap);
         mappedTransactionInfo.setMeta(jsonHelper.convert(mappedTransactionInfo.getMeta(), Map.class));
 
         Assertions.assertEquals(jsonHelper.prettyPrint(originalTransactionInfo),

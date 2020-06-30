@@ -127,9 +127,7 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
             factory.deadline(new Deadline(transactionDTO.getDeadline()));
         }
         if (transactionDTO.getSignerPublicKey() != null) {
-            factory.signer(
-                PublicAccount
-                    .createFromPublicKey(transactionDTO.getSignerPublicKey(), networkType));
+            factory.signer(PublicAccount.createFromPublicKey(transactionDTO.getSignerPublicKey(), networkType));
         }
         if (transactionDTO.getSignature() != null) {
             factory.signature(transactionDTO.getSignature());
@@ -137,13 +135,15 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
         if (transactionDTO.getMaxFee() != null) {
             factory.maxFee(transactionDTO.getMaxFee());
         }
+        if (transactionDTO.getSize() != null) {
+            factory.size(transactionDTO.getSize());
+        }
         if (transactionInfo != null) {
             factory.transactionInfo(transactionInfo);
         }
         if (factory.getType() != getTransactionType()) {
             throw new IllegalStateException(
-                "Expected transaction to be " + getTransactionType() + " but got "
-                    + factory.getType());
+                "Expected transaction to be " + getTransactionType() + " but got " + factory.getType());
         }
         return factory;
     }
@@ -186,6 +186,7 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
         dto.setType(transaction.getType().getValue());
 
         if (!embedded) {
+            dto.setSize(transaction.getSize());
             dto.setMaxFee(transaction.getMaxFee());
             dto.setDeadline(transaction.getDeadline().toBigInteger());
             dto.setSignature(transaction.getSignature().orElse(null));

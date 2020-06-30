@@ -48,6 +48,7 @@ public abstract class Transaction implements Stored {
     private final Integer version;
     private final Deadline deadline;
     private final BigInteger maxFee;
+    private final Optional<Long> size;
     private final Optional<TransactionGroup> group;
     private final Optional<String> signature;
     private final Optional<TransactionInfo> transactionInfo;
@@ -66,6 +67,7 @@ public abstract class Transaction implements Stored {
         this.signature = factory.getSignature();
         this.signer = factory.getSigner();
         this.transactionInfo = factory.getTransactionInfo();
+        this.size = factory.getProvidedSize();
     }
 
 
@@ -157,8 +159,8 @@ public abstract class Transaction implements Stored {
      *
      * @return the size of the transaction.
      */
-    public int getSize() {
-        return BINARY_SERIALIZATION.getSize(this);
+    public long getSize() {
+        return this.size.orElseGet(() -> BinarySerializationImpl.INSTANCE.getSize(this));
     }
 
 
@@ -238,7 +240,7 @@ public abstract class Transaction implements Stored {
      *
      * @return if a transaction is pending to be included in a block
      */
-    public boolean isUnconfirmed()  {
+    public boolean isUnconfirmed() {
         return getGroup().filter(g -> g == TransactionGroup.UNCONFIRMED).isPresent();
     }
 
@@ -247,7 +249,7 @@ public abstract class Transaction implements Stored {
      *
      * @return if a transaction is partial waiting for more cosignatures
      */
-    public boolean isPartial()  {
+    public boolean isPartial() {
         return getGroup().filter(g -> g == TransactionGroup.PARTIAL).isPresent();
     }
 

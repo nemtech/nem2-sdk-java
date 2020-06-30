@@ -42,17 +42,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 public class TransactionMapperSerializationVertxTest {
 
 
-    private final JsonHelper jsonHelper = new JsonHelperJackson2(
-        JsonHelperJackson2.configureMapper(Json.mapper));
+    private final JsonHelper jsonHelper = new JsonHelperJackson2(JsonHelperJackson2.configureMapper(Json.mapper));
 
-    private final GeneralTransactionMapper transactionMapper = new GeneralTransactionMapper(
-        jsonHelper);
+    private final GeneralTransactionMapper transactionMapper = new GeneralTransactionMapper(jsonHelper);
 
 
     private static List<String> transactionJsonFiles() {
-        return Arrays.stream(getResourceFolderFiles("json"))
-            .filter(f -> f.getName().startsWith("transaction-")).map(File::getName)
-            .collect(Collectors.toList());
+        return Arrays.stream(getResourceFolderFiles("json")).filter(f -> f.getName().startsWith("transaction-"))
+            .map(File::getName).collect(Collectors.toList());
     }
 
     private static File[] getResourceFolderFiles(String folder) {
@@ -68,36 +65,38 @@ public class TransactionMapperSerializationVertxTest {
 
         String json = TestHelperVertx.loadResource(jsonFilename);
 
-        TransactionInfoDTO originalTransactionInfo = jsonHelper
-            .parse(json, TransactionInfoDTO.class);
+        TransactionInfoDTO originalTransactionInfo = jsonHelper.parse(json, TransactionInfoDTO.class);
 
         Transaction transactionModel = transactionMapper.mapFromDto(originalTransactionInfo);
         Assertions.assertNotNull(transactionModel);
 
-        TransactionInfoDTO mappedTransactionInfo = (TransactionInfoDTO) transactionMapper.mapToDto(transactionModel, false);
+        TransactionInfoDTO mappedTransactionInfo = (TransactionInfoDTO) transactionMapper.mapToDto(transactionModel);
+
+        Map<String, Object> transactionMap = jsonHelper.convert(mappedTransactionInfo.getTransaction(), Map.class);
+
+        Map<String, Object> originalTransactionMap = jsonHelper
+            .convert(originalTransactionInfo.getTransaction(), Map.class);
+        originalTransactionMap.put("size", transactionModel.getSize());
+        originalTransactionInfo.setTransaction(originalTransactionMap);
 
         //Patching the sort
-        mappedTransactionInfo
-            .setTransaction(jsonHelper.convert(mappedTransactionInfo.getTransaction(), Map.class));
+        mappedTransactionInfo.setTransaction(transactionMap);
 
-        mappedTransactionInfo
-            .setMeta(jsonHelper.convert(mappedTransactionInfo.getMeta(), Map.class));
+        mappedTransactionInfo.setMeta(jsonHelper.convert(mappedTransactionInfo.getMeta(), Map.class));
 
         Assertions.assertEquals(jsonHelper.prettyPrint(originalTransactionInfo),
             jsonHelper.prettyPrint(mappedTransactionInfo));
 
         BinarySerialization serialization = new BinarySerializationImpl();
         Assertions.assertEquals(ConvertUtils.toHex(serialization.serialize(transactionModel)),
-            ConvertUtils
-                .toHex(serialization.serialize(transactionMapper.mapFromDto(mappedTransactionInfo))));
+            ConvertUtils.toHex(serialization.serialize(transactionMapper.mapFromDto(mappedTransactionInfo))));
 
         removeMeta(originalTransactionInfo);
 
         TransactionInfoDTO deserializedTransaction = (TransactionInfoDTO) transactionMapper
-            .mapToDto(serialization.deserialize(serialization.serialize(transactionModel)),false);
+            .mapToDto(serialization.deserialize(serialization.serialize(transactionModel)), false);
 
-        deserializedTransaction.setTransaction(
-            jsonHelper.convert(deserializedTransaction.getTransaction(), Map.class));
+        deserializedTransaction.setTransaction(jsonHelper.convert(deserializedTransaction.getTransaction(), Map.class));
 
         removeMeta(deserializedTransaction);
         Assertions.assertEquals(jsonHelper.prettyPrint(originalTransactionInfo),
@@ -108,8 +107,7 @@ public class TransactionMapperSerializationVertxTest {
     private void removeMeta(TransactionInfoDTO originalTransactionInfo) {
         originalTransactionInfo.setMeta(null);
         originalTransactionInfo.setId(null);
-        Map<String, Object> transactionJson = (Map<String, Object>) originalTransactionInfo
-            .getTransaction();
+        Map<String, Object> transactionJson = (Map<String, Object>) originalTransactionInfo.getTransaction();
         if (transactionJson.containsKey("transactions")) {
             List<Map<String, Object>> transactionsJson = (List<Map<String, Object>>) transactionJson
                 .get("transactions");
