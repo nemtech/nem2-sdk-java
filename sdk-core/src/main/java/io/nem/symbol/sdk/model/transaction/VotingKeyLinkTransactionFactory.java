@@ -75,6 +75,7 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
      * @param startPoint Start finalization point.
      * @param endPoint End finalization point.
      * @param linkAction the link action.
+     * @return a new factory for {@link VotingKeyLinkTransactionFactory}
      */
     public static VotingKeyLinkTransactionFactory create(final NetworkType networkType, final VotingKey linkedPublicKey,
         BigInteger startPoint, BigInteger endPoint, final LinkAction linkAction) {

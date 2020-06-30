@@ -1,8 +1,8 @@
 {
   "network": {
     "identifier": "public-test",
+    "nodeEqualityStrategy": "public-key",
     "nemesisSignerPublicKey": "DBE033BDC980CE57C531A961A775AA2327C7D655BF4F8B8DCBF4CDCD698BABC2",
-    "nodeEqualityStrategy": "host",
     "generationHashSeed": "5C72925DA9479FD0B83A53589D1AD5E1CBCCDBA4410EE01580AAD3333293BE6C",
     "epochAdjustment": "1573430400s"
   },
