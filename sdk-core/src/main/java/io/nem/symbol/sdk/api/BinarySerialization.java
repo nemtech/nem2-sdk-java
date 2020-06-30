@@ -60,6 +60,6 @@ public interface BinarySerialization {
      * @param transaction the transaction
      * @return the size of the transaction.
      */
-    <T extends Transaction> int getSize(T transaction);
+    <T extends Transaction> long getSize(T transaction);
 
 }

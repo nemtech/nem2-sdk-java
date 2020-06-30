@@ -138,7 +138,7 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
         // Check if current cosignature count is greater than requiredCosignatures.
         int calculatedCosignatures = Math.max(this.cosignatures.size(), requiredCosignatures);
         // Remove current cosignature length and use the calculated one.
-        int calculatedSize = this.getSize() + (calculatedCosignatures - this.cosignatures.size()) * COSIGNATURE_SIZE;
+        long calculatedSize = this.getSize() + (calculatedCosignatures - this.cosignatures.size()) * COSIGNATURE_SIZE;
         return (AggregateTransactionFactory) maxFee(
             BigInteger.valueOf(calculatedSize).multiply(BigInteger.valueOf(feeMultiplier)));
     }

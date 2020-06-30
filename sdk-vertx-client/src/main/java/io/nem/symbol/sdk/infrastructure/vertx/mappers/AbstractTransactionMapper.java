@@ -126,6 +126,9 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
         if (transactionDTO.getMaxFee() != null) {
             factory.maxFee(transactionDTO.getMaxFee());
         }
+        if (transactionDTO.getSize() != null) {
+            factory.size(transactionDTO.getSize());
+        }
         if (transactionInfo != null) {
             factory.transactionInfo(transactionInfo);
         }
@@ -171,6 +174,7 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction> implem
         dto.setType(transaction.getType().getValue());
         dto.setNetwork(NetworkTypeEnum.fromValue(transaction.getNetworkType().getValue()));
         if (!embedded) {
+            dto.setSize(transaction.getSize());
             dto.setMaxFee(transaction.getMaxFee());
             dto.setDeadline(transaction.getDeadline().toBigInteger());
             dto.setSignature(transaction.getSignature().orElse(null));
