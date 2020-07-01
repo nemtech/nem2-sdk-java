@@ -3,6 +3,20 @@ All notable changes to this project will be documented in this file.
 
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.20.2] - 1-Jul-2020
+
+**Milestone**: Gorilla.1(0.9.6.2)
+ Package  | Version  | Link
+---|---|---
+SDK OkHttp| v0.20.2 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-okhttp-client
+SDK Vertx| v0.20.2 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-vertx-client
+Catbuffer Library| v0.0.22 | https://repo.maven.apache.org/maven2/io/nem/catbuffer-java
+Client OkHttp | v0.9.4  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-okhttp-gson-client
+Client Vertx | v0.9.4  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-vertx-client/
+
+- Added `maxVotingKeysPerAccount`, `minVotingKeyLifetime` and `maxVotingKeyLifetime` in **ChainProperties**.
+- Updated rest clients to `0.9.4`.
+
 ## [0.20.1] - 29-Jun-2020
 
 **Milestone**: Gorilla.1(0.9.6.2)
