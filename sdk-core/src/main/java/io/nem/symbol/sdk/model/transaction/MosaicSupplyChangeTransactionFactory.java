@@ -16,6 +16,7 @@
 
 package io.nem.symbol.sdk.model.transaction;
 
+import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.mosaic.MosaicSupplyChangeActionType;
 import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.symbol.sdk.model.network.NetworkType;
@@ -40,6 +41,7 @@ public class MosaicSupplyChangeTransactionFactory extends
         Validate.notNull(mosaicId, "UnresolvedMosaicId must not be null");
         Validate.notNull(action, "Action must not be null");
         Validate.notNull(delta, "Delta must not be null");
+        ConvertUtils.validateNotNegative(delta);
         this.mosaicId = mosaicId;
         this.action = action;
         this.delta = delta;

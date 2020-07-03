@@ -16,6 +16,7 @@
 
 package io.nem.symbol.sdk.model.transaction;
 
+import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.symbol.sdk.model.network.NetworkType;
@@ -56,6 +57,8 @@ public class MosaicAddressRestrictionTransactionFactory
         Validate.notNull(restrictionKey, "RestrictionKey must not be null");
         Validate.notNull(targetAddress, "TargetAddress must not be null");
         Validate.notNull(newRestrictionValue, "NewRestrictionValue must not be null");
+        ConvertUtils.validateNotNegative(restrictionKey);
+        ConvertUtils.validateNotNegative(newRestrictionValue);
         this.mosaicId = mosaicId;
         this.restrictionKey = restrictionKey;
         this.targetAddress = targetAddress;

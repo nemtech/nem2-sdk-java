@@ -16,6 +16,7 @@
 
 package io.nem.symbol.sdk.model.transaction;
 
+import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
@@ -63,6 +64,8 @@ public abstract class MetadataTransactionFactory<T extends MetadataTransaction> 
         Validate.notNull(targetAddress, "TargetAddress must not be null");
         Validate.notNull(scopedMetadataKey, "ScopedMetadataKey must not be null");
         Validate.notNull(value, "Value must not be null");
+
+        ConvertUtils.validateNotNegative(scopedMetadataKey);
 
         this.targetAddress = targetAddress;
         this.scopedMetadataKey = scopedMetadataKey;

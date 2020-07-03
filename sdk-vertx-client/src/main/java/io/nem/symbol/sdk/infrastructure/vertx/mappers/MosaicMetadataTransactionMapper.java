@@ -46,7 +46,7 @@ class MosaicMetadataTransactionMapper extends
         MosaicMetadataTransactionDTO transaction) {
         UnresolvedAddress targetAddress = toUnresolvedAddress(transaction.getTargetAddress());
         Integer valueSizeDelta = transaction.getValueSizeDelta();
-        BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey(), 16);
+        BigInteger scopedMetaDataKey = MapperUtils.fromHexToBigInteger(transaction.getScopedMetadataKey());
         String value = ConvertUtils.fromHexToString(transaction.getValue());
         UnresolvedMosaicId targetMosaic = MapperUtils
             .toUnresolvedMosaicId(transaction.getTargetMosaicId());
@@ -69,7 +69,7 @@ class MosaicMetadataTransactionMapper extends
         MosaicMetadataTransactionDTO dto) {
         dto.setTargetAddress(transaction.getTargetAddress().encoded(transaction.getNetworkType()));
         dto.setTargetMosaicId(MapperUtils.getIdAsHex(transaction.getTargetMosaicId()));
-        dto.setScopedMetadataKey(transaction.getScopedMetadataKey().toString());
+        dto.setScopedMetadataKey(MapperUtils.fromBigIntegerToHex(transaction.getScopedMetadataKey()));
         dto.setValue(ConvertUtils.fromStringToHex(transaction.getValue()));
         dto.setValueSizeDelta(transaction.getValueSizeDelta());
         dto.setValueSize(transaction.getValueSize());

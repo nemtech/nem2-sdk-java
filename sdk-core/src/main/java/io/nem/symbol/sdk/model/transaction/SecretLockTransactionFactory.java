@@ -16,6 +16,7 @@
 
 package io.nem.symbol.sdk.model.transaction;
 
+import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.network.NetworkType;
@@ -49,6 +50,7 @@ public class SecretLockTransactionFactory extends TransactionFactory<SecretLockT
             throw new IllegalArgumentException(
                 "HashType and Secret have incompatible length or not hexadecimal string");
         }
+        ConvertUtils.validateNotNegative(duration);
         this.mosaic = mosaic;
         this.duration = duration;
         this.hashAlgorithm = hashAlgorithm;

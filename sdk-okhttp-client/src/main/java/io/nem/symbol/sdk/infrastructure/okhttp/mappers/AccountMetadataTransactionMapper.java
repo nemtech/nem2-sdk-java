@@ -44,7 +44,7 @@ class AccountMetadataTransactionMapper extends
         UnresolvedAddress targetAddress = MapperUtils.toUnresolvedAddress(transaction.getTargetAddress());
         Integer valueSizeDelta = transaction.getValueSizeDelta();
 
-        BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey(), 16);
+        BigInteger scopedMetaDataKey = MapperUtils.fromHexToBigInteger(transaction.getScopedMetadataKey());
         String value = ConvertUtils.fromHexToString(transaction.getValue());
         AccountMetadataTransactionFactory factory = AccountMetadataTransactionFactory.create(
             networkType,
@@ -64,7 +64,7 @@ class AccountMetadataTransactionMapper extends
         AccountMetadataTransactionDTO dto) {
         dto.setTargetAddress(transaction.getTargetAddress().encoded(transaction.getNetworkType()));
         dto.setValueSizeDelta(transaction.getValueSizeDelta());
-        dto.setScopedMetadataKey(transaction.getScopedMetadataKey().toString(16));
+        dto.setScopedMetadataKey(MapperUtils.fromBigIntegerToHex(transaction.getScopedMetadataKey()));
         dto.setValue(ConvertUtils.fromStringToHex(transaction.getValue()));
         dto.setValueSize(transaction.getValueSize());
 

@@ -116,6 +116,16 @@ public class MapperUtils {
     }
 
     /**
+     * Creates a hex string form {@link BigInteger}. The value must not be negative
+     *
+     * @param value the not negative {@link BigInteger} to be converted to hex
+     * @return the hex of the value.
+     */
+    public static String fromBigIntegerToHex(BigInteger value) {
+        return ConvertUtils.toSize16Hex(value);
+    }
+
+    /**
      * Creates a {@link Address} from an encoded address.
      *
      * @param encodedAddress the encodedAddress

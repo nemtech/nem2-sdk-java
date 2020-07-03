@@ -74,9 +74,7 @@ import org.junit.jupiter.api.Test;
 
 public class TransactionMapperVertxTest {
 
-
     private final JsonHelper jsonHelper = new JsonHelperJackson2(JsonHelperJackson2.configureMapper(Json.mapper));
-
 
     @Test
     void shouldFailWhenNotTransactionType() {
@@ -461,7 +459,7 @@ public class TransactionMapperVertxTest {
             transaction.getTargetAddress().encoded(transaction.getNetworkType()));
 
         Assertions.assertEquals(1, transaction.getValueSizeDelta());
-        Assertions.assertEquals(BigInteger.valueOf(3), transaction.getScopedMetadataKey());
+        Assertions.assertEquals(new BigInteger("11529215046069664444"), transaction.getScopedMetadataKey());
         Assertions.assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
         Assertions.assertEquals("0003070467832AAA", transaction.getTargetMosaicId().getIdAsHex());
     }
@@ -482,7 +480,7 @@ public class TransactionMapperVertxTest {
             transaction.getTargetAddress().encoded(transaction.getNetworkType()));
 
         Assertions.assertEquals(1, transaction.getValueSizeDelta());
-        Assertions.assertEquals(BigInteger.valueOf(3), transaction.getScopedMetadataKey());
+        Assertions.assertEquals(new BigInteger("11529215046069664444"), transaction.getScopedMetadataKey());
         Assertions.assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
         Assertions.assertEquals("0003070467832AAA", transaction.getTargetNamespaceId().getIdAsHex());
     }
@@ -503,7 +501,7 @@ public class TransactionMapperVertxTest {
             transaction.getTargetAddress().encoded(transaction.getNetworkType()));
 
         Assertions.assertEquals(1, transaction.getValueSizeDelta());
-        Assertions.assertEquals(BigInteger.valueOf(3), transaction.getScopedMetadataKey());
+        Assertions.assertEquals(new BigInteger("11529215046069664444"), transaction.getScopedMetadataKey());
         Assertions.assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
     }
 

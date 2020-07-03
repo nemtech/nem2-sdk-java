@@ -35,8 +35,7 @@ class NamespaceMetadataTransactionMapper extends
     AbstractTransactionMapper<NamespaceMetadataTransactionDTO, NamespaceMetadataTransaction> {
 
     public NamespaceMetadataTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.NAMESPACE_METADATA,
-            NamespaceMetadataTransactionDTO.class);
+        super(jsonHelper, TransactionType.NAMESPACE_METADATA, NamespaceMetadataTransactionDTO.class);
     }
 
     @Override
@@ -44,15 +43,11 @@ class NamespaceMetadataTransactionMapper extends
         NamespaceMetadataTransactionDTO transaction) {
         UnresolvedAddress targetAddress = MapperUtils.toUnresolvedAddress(transaction.getTargetAddress());
         Integer valueSizeDelta = transaction.getValueSizeDelta();
-        BigInteger scopedMetaDataKey = new BigInteger(transaction.getScopedMetadataKey(), 16);
+        BigInteger scopedMetaDataKey = MapperUtils.fromHexToBigInteger(transaction.getScopedMetadataKey());
         String value = ConvertUtils.fromHexToString(transaction.getValue());
         NamespaceId targetNamespace = MapperUtils.toNamespaceId(transaction.getTargetNamespaceId());
-        NamespaceMetadataTransactionFactory factory = NamespaceMetadataTransactionFactory.create(
-            networkType,
-            targetAddress,
-            targetNamespace,
-            scopedMetaDataKey,
-            value);
+        NamespaceMetadataTransactionFactory factory = NamespaceMetadataTransactionFactory
+            .create(networkType, targetAddress, targetNamespace, scopedMetaDataKey, value);
         factory.valueSizeDelta(valueSizeDelta);
         Long valueSize = transaction.getValueSize();
         if (valueSize != null) {
@@ -62,11 +57,10 @@ class NamespaceMetadataTransactionMapper extends
     }
 
     @Override
-    protected void copyToDto(NamespaceMetadataTransaction transaction,
-        NamespaceMetadataTransactionDTO dto) {
+    protected void copyToDto(NamespaceMetadataTransaction transaction, NamespaceMetadataTransactionDTO dto) {
         dto.setTargetAddress(transaction.getTargetAddress().encoded(transaction.getNetworkType()));
         dto.setTargetNamespaceId(MapperUtils.getIdAsHex(transaction.getTargetNamespaceId()));
-        dto.setScopedMetadataKey(transaction.getScopedMetadataKey().toString());
+        dto.setScopedMetadataKey(MapperUtils.fromBigIntegerToHex(transaction.getScopedMetadataKey()));
         dto.setValue(ConvertUtils.fromStringToHex(transaction.getValue()));
         dto.setValueSizeDelta(transaction.getValueSizeDelta());
         dto.setValueSize(transaction.getValueSize());

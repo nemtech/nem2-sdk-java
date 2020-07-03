@@ -119,12 +119,33 @@ public class ConvertUtils {
     /**
      * Converts a number to hex padding zeros up to size 16.
      *
-     * @param number The input string.
+     * @param number The input number.
      * @return the hex 16 characters
      */
     public static String toSize16Hex(final BigInteger number) {
+        validateNotNegative(number);
+        return String.format("%016x", number).toUpperCase();
+    }
+
+    /**
+     * Validates that the provided number is not negative
+     *
+     * @param number the number to be tested.
+     * @throws IllegalArgumentException if the number is null or negative
+     */
+    public static void validateNotNegative(final BigInteger number) {
+        Validate.notNull(number, "Number must not be null");
         Validate.isTrue(number.compareTo(BigInteger.ZERO) > -1, "BigInteger '" + number + "' must not be negative");
-        return String.format("%016x", number);
+    }
+
+    /**
+     * Validates that the provided number is not negative
+     *
+     * @param number the number to be tested.
+     * @throws IllegalArgumentException if the number is negative
+     */
+    public static void validateNotNegative(final byte number) {
+        Validate.isTrue(number > -1, "BigInteger '" + number + "' must not be negative");
     }
 
     /**

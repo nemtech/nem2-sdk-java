@@ -15,6 +15,7 @@
  */
 package io.nem.symbol.sdk.model.transaction;
 
+import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
@@ -38,6 +39,7 @@ public class HashLockTransactionFactory extends TransactionFactory<HashLockTrans
         Validate.notNull(mosaic, "Mosaic must not be null");
         Validate.notNull(duration, "Duration must not be null");
         Validate.notNull(hash, "Hash must not be null");
+        ConvertUtils.validateNotNegative(duration);
         this.mosaic = mosaic;
         this.duration = duration;
         this.hash = hash;

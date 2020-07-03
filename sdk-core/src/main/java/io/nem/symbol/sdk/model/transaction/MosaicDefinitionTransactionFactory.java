@@ -42,7 +42,6 @@ public class MosaicDefinitionTransactionFactory extends
         Validate.notNull(mosaicNonce, "MosaicNonce must not be null");
         Validate.notNull(mosaicId, "MosaicId must not be null");
         Validate.notNull(mosaicFlags, "MosaicFlags must not be null");
-        Validate.notNull(divisibility, "Divisibility must not be null");
         Validate.notNull(blockDuration, "BlockDuration must not be null");
         this.mosaicNonce = mosaicNonce;
         this.mosaicId = mosaicId;

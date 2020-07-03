@@ -69,7 +69,7 @@ class MosaicGlobalRestrictionTransactionMapper extends
         MosaicGlobalRestrictionTransactionDTO dto) {
 
         dto.setMosaicId(getIdAsHex(transaction.getMosaicId()));
-        dto.setRestrictionKey(transaction.getRestrictionKey().toString(16));
+        dto.setRestrictionKey(MapperUtils.fromBigIntegerToHex(transaction.getRestrictionKey()));
         dto.setNewRestrictionValue(transaction.getNewRestrictionValue());
         dto.setPreviousRestrictionValue(transaction.getPreviousRestrictionValue());
         dto.setPreviousRestrictionType(MosaicRestrictionTypeEnum.fromValue(

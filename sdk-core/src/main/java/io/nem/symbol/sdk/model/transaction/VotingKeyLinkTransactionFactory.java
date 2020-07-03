@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.core.crypto.VotingKey;
+import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import org.apache.commons.lang3.Validate;
@@ -61,6 +62,8 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
         Validate.notNull(startPoint, "startPoint must not be null");
         Validate.notNull(endPoint, "endPoint must not be null");
         Validate.notNull(linkAction, "linkAction must not be null");
+        ConvertUtils.validateNotNegative(startPoint);
+        ConvertUtils.validateNotNegative(endPoint);
         this.linkedPublicKey = linkedPublicKey;
         this.startPoint = startPoint;
         this.endPoint = endPoint;

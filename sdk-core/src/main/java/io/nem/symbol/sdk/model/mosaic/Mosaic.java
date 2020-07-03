@@ -16,7 +16,9 @@
 
 package io.nem.symbol.sdk.model.mosaic;
 
+import io.nem.symbol.core.utils.ConvertUtils;
 import java.math.BigInteger;
+import org.apache.commons.lang3.Validate;
 
 /**
  * A mosaic describes an instance of a mosaic definition. Mosaics can be transferred by means of a
@@ -31,6 +33,9 @@ public class Mosaic {
     private final BigInteger amount;
 
     public Mosaic(UnresolvedMosaicId id, BigInteger amount) {
+        Validate.notNull(id, "Id must not be null");
+        Validate.notNull(amount, "Amount must not be null");
+        ConvertUtils.validateNotNegative(amount);
         this.id = id;
         this.amount = amount;
     }

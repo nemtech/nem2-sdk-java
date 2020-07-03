@@ -443,7 +443,7 @@ public class TransactionMapperOkHttpTest {
             transaction.getTargetAddress().encoded(transaction.getNetworkType()));
 
         Assertions.assertEquals(1, transaction.getValueSizeDelta());
-        Assertions.assertEquals(BigInteger.valueOf(3), transaction.getScopedMetadataKey());
+        Assertions.assertEquals(new BigInteger("11529215046069664444"), transaction.getScopedMetadataKey());
         Assertions.assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
         Assertions.assertEquals("0003070467832AAA", transaction.getTargetMosaicId().getIdAsHex());
     }
@@ -464,7 +464,7 @@ public class TransactionMapperOkHttpTest {
             transaction.getTargetAddress().encoded(transaction.getNetworkType()));
 
         Assertions.assertEquals(1, transaction.getValueSizeDelta());
-        Assertions.assertEquals(BigInteger.valueOf(3), transaction.getScopedMetadataKey());
+        Assertions.assertEquals(new BigInteger("11529215046069664444"), transaction.getScopedMetadataKey());
         Assertions.assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
         Assertions.assertEquals("0003070467832AAA", transaction.getTargetNamespaceId().getIdAsHex());
     }
@@ -485,7 +485,7 @@ public class TransactionMapperOkHttpTest {
             transaction.getTargetAddress().encoded(transaction.getNetworkType()));
 
         Assertions.assertEquals(1, transaction.getValueSizeDelta());
-        Assertions.assertEquals(BigInteger.valueOf(3), transaction.getScopedMetadataKey());
+        Assertions.assertEquals(new BigInteger("11529215046069664444"), transaction.getScopedMetadataKey());
         Assertions.assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
     }
 

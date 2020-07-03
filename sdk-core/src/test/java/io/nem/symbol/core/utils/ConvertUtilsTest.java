@@ -141,9 +141,9 @@ public class ConvertUtilsTest {
 
     @Test
     void toSize16Hex() {
-        Assertions.assertEquals("000000000000000a", ConvertUtils.toSize16Hex(BigInteger.TEN));
+        Assertions.assertEquals("000000000000000A", ConvertUtils.toSize16Hex(BigInteger.TEN));
 
-        Assertions.assertEquals("00000000000186a0", ConvertUtils.toSize16Hex(BigInteger.valueOf(100000)));
+        Assertions.assertEquals("00000000000186A0", ConvertUtils.toSize16Hex(BigInteger.valueOf(100000)));
 
         Assertions.assertEquals("0000000000000000", ConvertUtils.toSize16Hex(BigInteger.ZERO));
 

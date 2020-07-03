@@ -55,7 +55,7 @@ class MosaicAddressRestrictionTransactionMapper extends
     protected void copyToDto(MosaicAddressRestrictionTransaction transaction,
         MosaicAddressRestrictionTransactionDTO dto) {
         dto.setMosaicId(getIdAsHex(transaction.getMosaicId()));
-        dto.setRestrictionKey(transaction.getRestrictionKey().toString(16));
+        dto.setRestrictionKey(MapperUtils.fromBigIntegerToHex(transaction.getRestrictionKey()));
         dto.setTargetAddress(transaction.getTargetAddress().encoded(transaction.getNetworkType()));
         dto.setPreviousRestrictionValue(transaction.getPreviousRestrictionValue());
         dto.setNewRestrictionValue(transaction.getNewRestrictionValue());

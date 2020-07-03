@@ -259,6 +259,17 @@ public class SerializationUtils {
     }
 
     /**
+     * Converts and valida a big integer value to "unsigned long".
+     *
+     * @param number The input string.
+     * @return the long.
+     */
+    public static long toUnsignedLong(final BigInteger number) {
+        ConvertUtils.validateNotNegative(number);
+        return number.longValue();
+    }
+
+    /**
      * It extracts the hex string from the {@link ByteBuffer}
      *
      * @param buffer the {@link ByteBuffer}

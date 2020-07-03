@@ -293,7 +293,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         return TransactionBuilder.create(signatureDto, new KeyDto(signerBuffer), transaction.getVersion().byteValue(),
             NetworkTypeDto.rawValueOf((byte) transaction.getNetworkType().getValue()),
             EntityTypeDto.rawValueOf((short) transaction.getType().getValue()),
-            new AmountDto(transaction.getMaxFee().longValue()),
+            new AmountDto(SerializationUtils.toUnsignedLong(transaction.getMaxFee())),
             new TimestampDto(transaction.getDeadline().getInstant()));
     }
 
@@ -531,7 +531,7 @@ public class BinarySerializationImpl implements BinarySerialization {
             for (final Mosaic mosaic : sortedMosaics) {
                 final UnresolvedMosaicBuilder mosaicBuilder = UnresolvedMosaicBuilder
                     .create(new UnresolvedMosaicIdDto(mosaic.getId().getIdAsLong()),
-                        new AmountDto(mosaic.getAmount().longValue()));
+                        new AmountDto(SerializationUtils.toUnsignedLong(mosaic.getAmount())));
                 unresolvedMosaicList.add(mosaicBuilder);
             }
             return unresolvedMosaicList;
@@ -580,8 +580,8 @@ public class BinarySerializationImpl implements BinarySerialization {
         @Override
         public Serializer toBodyBuilder(MosaicSupplyChangeTransaction transaction) {
             return MosaicSupplyChangeTransactionBodyBuilder
-                .create(new UnresolvedMosaicIdDto(transaction.getMosaicId().getId().longValue()),
-                    new AmountDto(transaction.getDelta().longValue()),
+                .create(new UnresolvedMosaicIdDto(SerializationUtils.toUnsignedLong(transaction.getMosaicId().getId())),
+                    new AmountDto(SerializationUtils.toUnsignedLong(transaction.getDelta())),
                     MosaicSupplyChangeActionDto.rawValueOf((byte) transaction.getAction().getValue()));
 
         }
@@ -618,7 +618,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         @Override
         public Serializer toBodyBuilder(MosaicDefinitionTransaction transaction) {
             return MosaicDefinitionTransactionBodyBuilder
-                .create(new MosaicIdDto(transaction.getMosaicId().getId().longValue()),
+                .create(new MosaicIdDto(SerializationUtils.toUnsignedLong(transaction.getMosaicId().getId())),
                     new BlockDurationDto(transaction.getBlockDuration().getDuration()),
                     new MosaicNonceDto(transaction.getMosaicNonce().getNonceAsInt()),
                     getMosaicFlagsEnumSet(transaction), (byte) transaction.getDivisibility());
@@ -701,7 +701,8 @@ public class BinarySerializationImpl implements BinarySerialization {
         public Serializer toBodyBuilder(AccountMetadataTransaction transaction) {
             return AccountMetadataTransactionBodyBuilder.create(
                 SerializationUtils.toUnresolvedAddress(transaction.getTargetAddress(), transaction.getNetworkType()),
-                transaction.getScopedMetadataKey().longValue(), (short) transaction.getValueSizeDelta(),
+                SerializationUtils.toUnsignedLong(transaction.getScopedMetadataKey()),
+                (short) transaction.getValueSizeDelta(),
                 ByteBuffer.wrap(MetadataTransaction.toByteArray(transaction.getValue())));
 
         }
@@ -737,7 +738,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         public Serializer toBodyBuilder(MosaicMetadataTransaction transaction) {
             return MosaicMetadataTransactionBodyBuilder.create(
                 SerializationUtils.toUnresolvedAddress(transaction.getTargetAddress(), transaction.getNetworkType()),
-                transaction.getScopedMetadataKey().longValue(),
+                SerializationUtils.toUnsignedLong(transaction.getScopedMetadataKey()),
                 SerializationUtils.toUnresolvedMosaicIdDto(transaction.getTargetMosaicId()),
                 (short) transaction.getValueSizeDelta(),
                 ByteBuffer.wrap(MetadataTransaction.toByteArray(transaction.getValue())));
@@ -776,8 +777,8 @@ public class BinarySerializationImpl implements BinarySerialization {
         public Serializer toBodyBuilder(NamespaceMetadataTransaction transaction) {
             return NamespaceMetadataTransactionBodyBuilder.create(
                 SerializationUtils.toUnresolvedAddress(transaction.getTargetAddress(), transaction.getNetworkType()),
-                transaction.getScopedMetadataKey().longValue(),
-                new NamespaceIdDto(transaction.getTargetNamespaceId().getId().longValue()),
+                SerializationUtils.toUnsignedLong(transaction.getScopedMetadataKey()),
+                new NamespaceIdDto(SerializationUtils.toUnsignedLong(transaction.getTargetNamespaceId().getId())),
                 (short) transaction.getValueSizeDelta(),
                 ByteBuffer.wrap(MetadataTransaction.toByteArray(transaction.getValue())));
 
@@ -826,17 +827,20 @@ public class BinarySerializationImpl implements BinarySerialization {
             NamespaceRegistrationTransactionBodyBuilder txBuilder;
             ByteBuffer namespaceNameByteBuffer = ByteBuffer
                 .wrap(StringEncoder.getBytes(transaction.getNamespaceName()));
-            NamespaceIdDto namespaceIdDto = new NamespaceIdDto(transaction.getNamespaceId().getId().longValue());
+            NamespaceIdDto namespaceIdDto = new NamespaceIdDto(
+                SerializationUtils.toUnsignedLong(transaction.getNamespaceId().getId()));
 
             if (transaction.getNamespaceRegistrationType() == NamespaceRegistrationType.ROOT_NAMESPACE) {
                 txBuilder = NamespaceRegistrationTransactionBodyBuilder.createRoot(new BlockDurationDto(
-                    transaction.getDuration().orElseThrow(() -> new IllegalStateException("Duration is required"))
-                        .longValue()), namespaceIdDto, namespaceNameByteBuffer);
+                        SerializationUtils.toUnsignedLong(transaction.getDuration()
+                            .orElseThrow(() -> new IllegalStateException("Duration is required")))), namespaceIdDto,
+                    namespaceNameByteBuffer);
 
             } else {
                 txBuilder = NamespaceRegistrationTransactionBodyBuilder.createChild(new NamespaceIdDto(
-                    transaction.getParentId().orElseThrow(() -> new IllegalStateException("ParentId is required"))
-                        .getId().longValue()), namespaceIdDto, namespaceNameByteBuffer);
+                    SerializationUtils.toUnsignedLong(
+                        transaction.getParentId().orElseThrow(() -> new IllegalStateException("ParentId is required"))
+                            .getId())), namespaceIdDto, namespaceNameByteBuffer);
             }
             return txBuilder;
         }
@@ -872,12 +876,12 @@ public class BinarySerializationImpl implements BinarySerialization {
         @Override
         public Serializer toBodyBuilder(SecretLockTransaction transaction) {
             UnresolvedMosaicIdDto mosaicId = new UnresolvedMosaicIdDto(transaction.getMosaic().getId().getIdAsLong());
-            AmountDto amount = new AmountDto(transaction.getMosaic().getAmount().longValue());
+            AmountDto amount = new AmountDto(SerializationUtils.toUnsignedLong(transaction.getMosaic().getAmount()));
             UnresolvedMosaicBuilder unresolvedMosaicBuilder = UnresolvedMosaicBuilder.create(mosaicId, amount);
             return SecretLockTransactionBodyBuilder.create(
                 SerializationUtils.toUnresolvedAddress(transaction.getRecipient(), transaction.getNetworkType()),
                 new Hash256Dto(getSecretBuffer(transaction)), unresolvedMosaicBuilder,
-                new BlockDurationDto(transaction.getDuration().longValue()),
+                new BlockDurationDto(SerializationUtils.toUnsignedLong(transaction.getDuration())),
                 LockHashAlgorithmDto.rawValueOf((byte) transaction.getHashAlgorithm().getValue()));
         }
 
@@ -1049,8 +1053,8 @@ public class BinarySerializationImpl implements BinarySerialization {
         public Serializer toBodyBuilder(HashLockTransaction transaction) {
             return HashLockTransactionBodyBuilder.create(UnresolvedMosaicBuilder
                     .create(new UnresolvedMosaicIdDto(transaction.getMosaic().getId().getIdAsLong()),
-                        new AmountDto(transaction.getMosaic().getAmount().longValue())),
-                new BlockDurationDto(transaction.getDuration().longValue()),
+                        new AmountDto(SerializationUtils.toUnsignedLong(transaction.getMosaic().getAmount()))),
+                new BlockDurationDto(SerializationUtils.toUnsignedLong(transaction.getDuration())),
                 new Hash256Dto(getHashBuffer(transaction)));
         }
 
@@ -1263,8 +1267,9 @@ public class BinarySerializationImpl implements BinarySerialization {
                 .toUnresolvedAddress(transaction.getTargetAddress(), transaction.getNetworkType());
             return MosaicAddressRestrictionTransactionBodyBuilder
                 .create(new UnresolvedMosaicIdDto(transaction.getMosaicId().getIdAsLong()),
-                    transaction.getRestrictionKey().longValue(), transaction.getPreviousRestrictionValue().longValue(),
-                    transaction.getNewRestrictionValue().longValue(), unresolvedAddressDto);
+                    SerializationUtils.toUnsignedLong(transaction.getRestrictionKey()),
+                    SerializationUtils.toUnsignedLong(transaction.getPreviousRestrictionValue()),
+                    SerializationUtils.toUnsignedLong(transaction.getNewRestrictionValue()), unresolvedAddressDto);
         }
 
     }
@@ -1305,8 +1310,9 @@ public class BinarySerializationImpl implements BinarySerialization {
             return MosaicGlobalRestrictionTransactionBodyBuilder
                 .create(new UnresolvedMosaicIdDto(transaction.getMosaicId().getIdAsLong()),
                     new UnresolvedMosaicIdDto(transaction.getReferenceMosaicId().getIdAsLong()),
-                    transaction.getRestrictionKey().longValue(), transaction.getPreviousRestrictionValue().longValue(),
-                    transaction.getNewRestrictionValue().longValue(),
+                    SerializationUtils.toUnsignedLong(transaction.getRestrictionKey()),
+                    SerializationUtils.toUnsignedLong(transaction.getPreviousRestrictionValue()),
+                    SerializationUtils.toUnsignedLong(transaction.getNewRestrictionValue()),
                     MosaicRestrictionTypeDto.rawValueOf(transaction.getPreviousRestrictionType().getValue()),
                     MosaicRestrictionTypeDto.rawValueOf(transaction.getNewRestrictionType().getValue()));
         }
@@ -1423,9 +1429,9 @@ public class BinarySerializationImpl implements BinarySerialization {
         }
 
         private CosignatureBuilder getCosignatureBuilder(AggregateTransactionCosignature c) {
-            return CosignatureBuilder
-                .create(c.getVersion().longValue(), SerializationUtils.toKeyDto(c.getSigner().getPublicKey()),
-                    SerializationUtils.toSignatureDto(c.getSignature()));
+            return CosignatureBuilder.create(SerializationUtils.toUnsignedLong(c.getVersion()),
+                SerializationUtils.toKeyDto(c.getSigner().getPublicKey()),
+                SerializationUtils.toSignatureDto(c.getSignature()));
         }
     }
 
