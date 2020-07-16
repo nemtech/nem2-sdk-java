@@ -97,16 +97,14 @@ public class AliasServiceTest {
 
     private NamespaceInfo createAlias(Address address) {
 
-        return new NamespaceInfo(true, 0, "metadaId", NamespaceRegistrationType.ROOT_NAMESPACE, 1,
-            Collections.emptyList(), null, null, BigInteger.ONE, BigInteger.TEN,
-            new AddressAlias(address));
+        return new NamespaceInfo("abc", true, 0, "metadaId", NamespaceRegistrationType.ROOT_NAMESPACE, 1,
+            Collections.emptyList(), null, null, BigInteger.ONE, BigInteger.TEN, new AddressAlias(address));
     }
 
     private NamespaceInfo createAlias(MosaicId mosaicId) {
 
-        return new NamespaceInfo(true, 0, "metadaId", NamespaceRegistrationType.ROOT_NAMESPACE, 1,
-            Collections.emptyList(), null, null, BigInteger.ONE, BigInteger.TEN,
-            new MosaicAlias(mosaicId));
+        return new NamespaceInfo("abc", true, 0, "metadaId", NamespaceRegistrationType.ROOT_NAMESPACE, 1,
+            Collections.emptyList(), null, null, BigInteger.ONE, BigInteger.TEN, new MosaicAlias(mosaicId));
     }
 
     @Test

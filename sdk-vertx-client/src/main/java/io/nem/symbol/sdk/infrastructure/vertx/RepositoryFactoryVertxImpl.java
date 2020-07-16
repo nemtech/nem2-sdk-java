@@ -107,7 +107,7 @@ public class RepositoryFactoryVertxImpl extends RepositoryFactoryBase {
 
     @Override
     public NamespaceRepository createNamespaceRepository() {
-        return new NamespaceRepositoryVertxImpl(apiClient, getNetworkType());
+        return new NamespaceRepositoryVertxImpl(apiClient);
     }
 
     @Override

@@ -20,7 +20,8 @@ import static io.nem.symbol.core.utils.MapperUtils.toNamespaceId;
 
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.NamespaceRepository;
-import io.nem.symbol.sdk.api.QueryParams;
+import io.nem.symbol.sdk.api.NamespaceSearchCriteria;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.model.account.AccountNames;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -34,12 +35,12 @@ import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.namespace.NamespaceInfo;
 import io.nem.symbol.sdk.model.namespace.NamespaceName;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
-import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.NamespaceRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountIds;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountNamesDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountsNamesDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.Addresses;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.AliasTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicIds;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicNamesDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicsNamesDTO;
@@ -47,7 +48,9 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.NamespaceDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NamespaceIds;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NamespaceInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NamespaceNameDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.NamespacesInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.NamespacePage;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.NamespaceRegistrationTypeEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.Order;
 import io.reactivex.Observable;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,18 +63,14 @@ import java.util.stream.Collectors;
  *
  * @since 1.0
  */
-public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements
-    NamespaceRepository {
+public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements NamespaceRepository {
 
     private final NamespaceRoutesApi client;
 
-    private final Observable<NetworkType> networkTypeObservable;
 
-    public NamespaceRepositoryOkHttpImpl(ApiClient apiClient,
-        Observable<NetworkType> networkTypeObservable) {
+    public NamespaceRepositoryOkHttpImpl(ApiClient apiClient) {
         super(apiClient);
         this.client = new NamespaceRoutesApi(apiClient);
-        this.networkTypeObservable = networkTypeObservable;
     }
 
     public NamespaceRoutesApi getClient() {
@@ -80,75 +79,45 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
 
     @Override
     public Observable<NamespaceInfo> getNamespace(NamespaceId namespaceId) {
-        Callable<NamespaceInfoDTO> callback = () -> getClient()
-            .getNamespace(namespaceId.getIdAsHex());
-        return exceptionHandling(networkTypeObservable.flatMap(networkType -> call(callback).map(
-            namespaceInfoDTO -> toNamespaceInfo(namespaceInfoDTO))));
+        Callable<NamespaceInfoDTO> callback = () -> getClient().getNamespace(namespaceId.getIdAsHex());
+        return exceptionHandling(call(callback).map(this::toNamespaceInfo));
     }
 
     @Override
-    public Observable<List<NamespaceInfo>> getNamespacesFromAccount(
-        Address address, QueryParams queryParams) {
-        return this.getNamespacesFromAccount(address, Optional.of(queryParams));
+    public Observable<Page<NamespaceInfo>> search(NamespaceSearchCriteria criteria) {
+
+        String ownerAddress = toDto(criteria.getOwnerAddress());
+        NamespaceRegistrationTypeEnum registrationType = criteria.getRegistrationType() == null ? null
+            : NamespaceRegistrationTypeEnum.fromValue(criteria.getRegistrationType().getValue());
+        String level0 = criteria.getLevel0();
+        AliasTypeEnum aliasType =
+            criteria.getAliasType() == null ? null : AliasTypeEnum.fromValue(criteria.getAliasType().getValue());
+        Integer pageSize = criteria.getPageSize();
+        Integer pageNumber = criteria.getPageNumber();
+        String offset = criteria.getOffset();
+        Order order = toDto(criteria.getOrder());
+        Callable<NamespacePage> callback = () -> getClient()
+            .searchNamespaces(ownerAddress, registrationType, level0, aliasType, pageSize, pageNumber, offset, order);
+
+        return exceptionHandling(call(callback).map(page -> this.toPage(page.getPagination(),
+            page.getData().stream().map(this::toNamespaceInfo).collect(Collectors.toList()))));
     }
-
-    @Override
-    public Observable<List<NamespaceInfo>> getNamespacesFromAccount(Address address) {
-        return this.getNamespacesFromAccount(address, Optional.empty());
-    }
-
-    private Observable<List<NamespaceInfo>> getNamespacesFromAccount(
-        Address address, Optional<QueryParams> queryParams) {
-
-        Callable<NamespacesInfoDTO> callback = () ->
-            getClient().getNamespacesFromAccount(address.plain(),
-                getPageSize(queryParams),
-                getId(queryParams)
-            );
-
-        return exceptionHandling(networkTypeObservable.flatMap(networkType ->
-            call(callback).flatMapIterable(NamespacesInfoDTO::getNamespaces)
-                .map(namespaceInfoDTO -> toNamespaceInfo(namespaceInfoDTO)).toList()
-                .toObservable()));
-    }
-
-    @Override
-    public Observable<List<NamespaceInfo>> getNamespacesFromAccounts(List<Address> addresses) {
-
-        AccountIds accounts = new AccountIds()
-            .addresses(addresses.stream().map(Address::plain).collect(
-                Collectors.toList()));
-
-        Callable<NamespacesInfoDTO> callback = () ->
-            getClient()
-                .getNamespacesFromAccounts(accounts);
-
-        return exceptionHandling(networkTypeObservable.flatMap(networkType ->
-            call(callback).flatMapIterable(NamespacesInfoDTO::getNamespaces)
-                .map(namespaceInfoDTO -> toNamespaceInfo(namespaceInfoDTO)).toList()
-                .toObservable()));
-    }
-
 
     @Override
     public Observable<List<NamespaceName>> getNamespaceNames(List<NamespaceId> namespaceIds) {
 
         NamespaceIds ids = new NamespaceIds()
-            .namespaceIds(namespaceIds.stream().map(NamespaceId::getIdAsHex)
-                .collect(Collectors.toList()));
+            .namespaceIds(namespaceIds.stream().map(NamespaceId::getIdAsHex).collect(Collectors.toList()));
 
-        Callable<List<NamespaceNameDTO>> callback = () ->
-            getClient().getNamespacesNames(ids);
+        Callable<List<NamespaceNameDTO>> callback = () -> getClient().getNamespacesNames(ids);
 
         return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toNamespaceName).toList()
-                .toObservable());
+            call(callback).flatMapIterable(item -> item).map(this::toNamespaceName).toList().toObservable());
     }
 
     private NamespaceName toNamespaceName(NamespaceNameDTO dto) {
-        return new NamespaceName(
-            toNamespaceId(dto.getId()),
-            dto.getName(), Optional.ofNullable(toNamespaceId(dto.getParentId())));
+        return new NamespaceName(toNamespaceId(dto.getId()), dto.getName(),
+            Optional.ofNullable(toNamespaceId(dto.getParentId())));
     }
 
 
@@ -160,10 +129,9 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
      */
     @Override
     public Observable<MosaicId> getLinkedMosaicId(NamespaceId namespaceId) {
-        Callable<NamespaceInfoDTO> callback = () -> getClient()
-            .getNamespace(namespaceId.getIdAsHex());
-        return exceptionHandling(call(callback).map(namespaceInfoDTO -> this
-            .toMosaicId(namespaceInfoDTO.getNamespace())));
+        Callable<NamespaceInfoDTO> callback = () -> getClient().getNamespace(namespaceId.getIdAsHex());
+        return exceptionHandling(
+            call(callback).map(namespaceInfoDTO -> this.toMosaicId(namespaceInfoDTO.getNamespace())));
     }
 
     /**
@@ -174,26 +142,23 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
      */
     @Override
     public Observable<Address> getLinkedAddress(NamespaceId namespaceId) {
-        Callable<NamespaceInfoDTO> callback = () -> getClient()
-            .getNamespace(namespaceId.getIdAsHex());
-        return exceptionHandling(call(callback).map(namespaceInfoDTO -> this
-            .toAddress(namespaceInfoDTO.getNamespace())));
+        Callable<NamespaceInfoDTO> callback = () -> getClient().getNamespace(namespaceId.getIdAsHex());
+        return exceptionHandling(
+            call(callback).map(namespaceInfoDTO -> this.toAddress(namespaceInfoDTO.getNamespace())));
     }
 
 
     @Override
     public Observable<List<AccountNames>> getAccountsNames(List<Address> addresses) {
-        AccountIds accountIds = new AccountIds()
+        Addresses addressesDto = new Addresses()
             .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-        return getAccountNames(accountIds);
+        return getAccountNames(addressesDto);
     }
 
-    private Observable<List<AccountNames>> getAccountNames(AccountIds accountIds) {
-        Callable<AccountsNamesDTO> callback = () -> getClient()
-            .getAccountsNames(accountIds);
-        return exceptionHandling(
-            call(callback).map(AccountsNamesDTO::getAccountNames).flatMapIterable(item -> item)
-                .map(this::toAccountNames).toList().toObservable());
+    private Observable<List<AccountNames>> getAccountNames(Addresses accountIds) {
+        Callable<AccountsNamesDTO> callback = () -> getClient().getAccountsNames(accountIds);
+        return exceptionHandling(call(callback).map(AccountsNamesDTO::getAccountNames).flatMapIterable(item -> item)
+            .map(this::toAccountNames).toList().toObservable());
     }
 
     /**
@@ -211,15 +176,11 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
     @Override
     public Observable<List<MosaicNames>> getMosaicsNames(List<MosaicId> ids) {
         MosaicIds mosaicIds = new MosaicIds();
-        mosaicIds.mosaicIds(ids.stream()
-            .map(MosaicId::getIdAsHex)
-            .collect(Collectors.toList()));
-        Callable<MosaicsNamesDTO> callback = () -> getClient()
-            .getMosaicsNames(mosaicIds);
+        mosaicIds.mosaicIds(ids.stream().map(MosaicId::getIdAsHex).collect(Collectors.toList()));
+        Callable<MosaicsNamesDTO> callback = () -> getClient().getMosaicsNames(mosaicIds);
         return exceptionHandling(
-            call(callback).map(MosaicsNamesDTO::getMosaicNames).flatMapIterable(item -> item)
-                .map(this::toMosaicNames).toList()
-                .toObservable());
+            call(callback).map(MosaicsNamesDTO::getMosaicNames).flatMapIterable(item -> item).map(this::toMosaicNames)
+                .toList().toObservable());
     }
 
     /**
@@ -229,8 +190,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
      * @return {@link MosaicNames}
      */
     private MosaicNames toMosaicNames(MosaicNamesDTO dto) {
-        return new MosaicNames(
-            MapperUtils.toMosaicId(dto.getMosaicId()),
+        return new MosaicNames(MapperUtils.toMosaicId(dto.getMosaicId()),
             dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
     }
 
@@ -240,18 +200,13 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
      * @param namespaceInfoDTO, networkType
      */
     private NamespaceInfo toNamespaceInfo(NamespaceInfoDTO namespaceInfoDTO) {
-        return new NamespaceInfo(
-            namespaceInfoDTO.getMeta().getActive(),
-            namespaceInfoDTO.getMeta().getIndex(),
-            namespaceInfoDTO.getMeta().getId(),
-            NamespaceRegistrationType
-                .rawValueOf(namespaceInfoDTO.getNamespace().getRegistrationType().getValue()),
-            namespaceInfoDTO.getNamespace().getDepth(),
-            this.extractLevels(namespaceInfoDTO),
+        return new NamespaceInfo(namespaceInfoDTO.getId(), namespaceInfoDTO.getMeta().getActive(),
+            namespaceInfoDTO.getMeta().getIndex(), namespaceInfoDTO.getMeta().getId(),
+            NamespaceRegistrationType.rawValueOf(namespaceInfoDTO.getNamespace().getRegistrationType().getValue()),
+            namespaceInfoDTO.getNamespace().getDepth(), this.extractLevels(namespaceInfoDTO),
             toNamespaceId(namespaceInfoDTO.getNamespace().getParentId()),
-           MapperUtils.toAddress(namespaceInfoDTO.getNamespace().getOwnerAddress()),
-            namespaceInfoDTO.getNamespace().getStartHeight(),
-            namespaceInfoDTO.getNamespace().getEndHeight(),
+            MapperUtils.toAddress(namespaceInfoDTO.getNamespace().getOwnerAddress()),
+            namespaceInfoDTO.getNamespace().getStartHeight(), namespaceInfoDTO.getNamespace().getEndHeight(),
             this.extractAlias(namespaceInfoDTO.getNamespace()));
     }
 
@@ -285,8 +240,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
         if (namespaceDTO.getAlias() != null) {
             if (namespaceDTO.getAlias().getType().getValue().equals(AliasType.MOSAIC.getValue())) {
                 return new MosaicAlias(toMosaicId(namespaceDTO));
-            } else if (namespaceDTO.getAlias().getType().getValue().equals(AliasType.ADDRESS
-                .getValue())) {
+            } else if (namespaceDTO.getAlias().getType().getValue().equals(AliasType.ADDRESS.getValue())) {
                 return new AddressAlias(toAddress(namespaceDTO));
             }
         }
@@ -316,4 +270,5 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl 
             return null;
         }
     }
+
 }

@@ -20,19 +20,24 @@ import static io.nem.symbol.core.utils.MapperUtils.toAddress;
 import static io.nem.symbol.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.symbol.sdk.api.AccountRepository;
+import io.nem.symbol.sdk.api.AccountSearchCriteria;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountLinkVotingKey;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.ActivityBucket;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.SupplementalAccountKeys;
-import io.nem.symbol.sdk.model.mosaic.Mosaic;
+import io.nem.symbol.sdk.model.mosaic.ResolvedMosaic;
 import io.nem.symbol.sdk.openapi.vertx.api.AccountRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.AccountRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountIds;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.AccountOrderByEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.AccountPage;
+import io.nem.symbol.sdk.openapi.vertx.model.Order;
 import io.nem.symbol.sdk.openapi.vertx.model.SupplementalPublicKeysDTO;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
@@ -65,7 +70,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
 
         Consumer<Handler<AsyncResult<AccountInfoDTO>>> callback = handler -> getClient()
             .getAccountInfo(address.plain(), handler);
-        return exceptionHandling(call(callback).map(AccountInfoDTO::getAccount).map(this::toAccountInfo));
+        return exceptionHandling(call(callback).map(this::toAccountInfo));
     }
 
     @Override
@@ -75,20 +80,38 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         Consumer<Handler<AsyncResult<List<AccountInfoDTO>>>> callback = handler -> getClient()
             .getAccountsInfo(accountIds, handler);
         return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(AccountInfoDTO::getAccount).map(this::toAccountInfo)
-                .toList().toObservable());
+            call(callback).flatMapIterable(item -> item).map(this::toAccountInfo).toList().toObservable());
     }
 
 
-    private AccountInfo toAccountInfo(AccountDTO accountDTO) {
-        return new AccountInfo(toAddress(accountDTO.getAddress()), accountDTO.getAddressHeight(),
-            accountDTO.getPublicKey(), accountDTO.getPublicKeyHeight(), accountDTO.getImportance(),
-            accountDTO.getImportanceHeight(), accountDTO.getMosaics().stream()
-            .map(mosaicDTO -> new Mosaic(toMosaicId(mosaicDTO.getId()), mosaicDTO.getAmount()))
+    private AccountInfo toAccountInfo(AccountInfoDTO accountInfoDTO) {
+        AccountDTO accountDTO = accountInfoDTO.getAccount();
+        return new AccountInfo(accountInfoDTO.getId(), toAddress(accountDTO.getAddress()),
+            accountDTO.getAddressHeight(), accountDTO.getPublicKey(), accountDTO.getPublicKeyHeight(),
+            accountDTO.getImportance(), accountDTO.getImportanceHeight(), accountDTO.getMosaics().stream()
+            .map(mosaicDTO -> new ResolvedMosaic(toMosaicId(mosaicDTO.getId()), mosaicDTO.getAmount()))
             .collect(Collectors.toList()), AccountType.rawValueOf(accountDTO.getAccountType().getValue()),
             toDto(accountDTO.getSupplementalPublicKeys()), accountDTO.getActivityBuckets().stream().map(
             dto -> new ActivityBucket(dto.getStartHeight(), dto.getTotalFeesPaid(), dto.getBeneficiaryCount(),
                 dto.getRawScore())).collect(Collectors.toList()));
+    }
+
+    @Override
+    public Observable<Page<AccountInfo>> search(AccountSearchCriteria criteria) {
+
+        Integer pageSize = criteria.getPageSize();
+        Integer pageNumber = criteria.getPageNumber();
+        String offset = criteria.getOffset();
+        Order order = toDto(criteria.getOrder());
+        AccountOrderByEnum orderBy =
+            criteria.getOrderBy() == null ? null : AccountOrderByEnum.fromValue(criteria.getOrderBy().getValue());
+        String mosaicId = criteria.getMosaicId() == null ? null : criteria.getMosaicId().getIdAsHex();
+
+        Consumer<Handler<AsyncResult<AccountPage>>> callback = (handler) -> getClient()
+            .searchAccounts(pageSize, pageNumber, offset, order, orderBy, mosaicId, handler);
+
+        return exceptionHandling(call(callback).map(page -> this.toPage(page.getPagination(),
+            page.getData().stream().map(this::toAccountInfo).collect(Collectors.toList()))));
     }
 
     private SupplementalAccountKeys toDto(SupplementalPublicKeysDTO dto) {

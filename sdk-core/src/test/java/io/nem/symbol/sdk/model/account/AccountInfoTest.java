@@ -19,8 +19,8 @@ package io.nem.symbol.sdk.model.account;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.symbol.core.crypto.PublicKey;
-import io.nem.symbol.sdk.model.mosaic.Mosaic;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
+import io.nem.symbol.sdk.model.mosaic.MosaicId;
+import io.nem.symbol.sdk.model.mosaic.ResolvedMosaic;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import java.util.Collections;
@@ -32,8 +32,8 @@ class AccountInfoTest {
 
     @Test
     void shouldCreateAccountInfoViaConstructor() {
-        List<Mosaic> mosaics = Collections
-            .singletonList(NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)));
+        List<ResolvedMosaic> mosaics = Collections
+            .singletonList(new ResolvedMosaic(new MosaicId(BigInteger.TEN), BigInteger.valueOf(10000)));
 
         SupplementalAccountKeys supplementalAccountKeys = new SupplementalAccountKeys(Optional.of("linkedKey"),
             Optional.of("nodeKey"), Optional.of("vrfKey"), Collections
@@ -47,10 +47,11 @@ class AccountInfoTest {
         List<ActivityBucket> activityBuckets = Collections.singletonList(bucket);
         Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
         String publicKey = PublicKey.generateRandom().toHex();
-        AccountInfo accountInfo = new AccountInfo(address, new BigInteger("964"), publicKey, new BigInteger("966"),
-            new BigInteger("777"), new BigInteger("0"), mosaics, AccountType.REMOTE_UNLINKED, supplementalAccountKeys,
-            activityBuckets);
+        AccountInfo accountInfo = new AccountInfo("abc", address, new BigInteger("964"), publicKey,
+            new BigInteger("966"), new BigInteger("777"), new BigInteger("0"), mosaics, AccountType.REMOTE_UNLINKED,
+            supplementalAccountKeys, activityBuckets);
 
+        assertEquals("abc", accountInfo.getRecordId().get());
         assertEquals(address, accountInfo.getAddress());
         assertEquals(new BigInteger("964"), accountInfo.getAddressHeight());
         assertEquals(publicKey, accountInfo.getPublicKey());

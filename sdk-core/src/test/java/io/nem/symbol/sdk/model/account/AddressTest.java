@@ -72,6 +72,9 @@ class AddressTest {
 
     @Test
     void testAddressCreation() {
+
+        Assertions
+            .assertEquals("", Address.createFromEncoded("98A18EB203BB0CFFA548D8F64E644A4A91109F8BBEBFD4FE").plain());
         Address address = new Address("TDGRZD-ZEHD4M-5K3JIT-64DU3P-EKFYNF-5VWFEY-DQA", NetworkType.TEST_NET);
         assertEquals("TDGRZDZEHD4M5K3JIT64DU3PEKFYNF5VWFEYDQA", address.plain());
     }
@@ -222,7 +225,9 @@ class AddressTest {
     @Test
     void validate() {
         Assertions.assertEquals("Encoded Address it nos provided", Address.validateEncodedAddress(null).get());
-        Assertions.assertEquals("Encoded address zzz is invalid. Error: IllegalArgumentException: zzz could not be decoded. DecoderException: Odd number of characters.", Address.validateEncodedAddress("zzz").get());
+        Assertions.assertEquals(
+            "Encoded address zzz is invalid. Error: IllegalArgumentException: zzz could not be decoded. DecoderException: Odd number of characters.",
+            Address.validateEncodedAddress("zzz").get());
         Assertions.assertEquals("Plain Address it nos provided", Address.validatePlainAddress(null).get());
         Assertions.assertEquals("Plain address 'ABC' size is 3 when 39 is required",
             Address.validatePlainAddress("ABC").get());

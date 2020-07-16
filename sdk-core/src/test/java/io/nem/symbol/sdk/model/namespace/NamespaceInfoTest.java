@@ -39,19 +39,11 @@ class NamespaceInfoTest {
         NamespaceId namespaceId = NamespaceId.createFromId(new BigInteger("-8884663987180930485"));
         Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
         NamespaceInfo namespaceInfo =
-            new NamespaceInfo(
-                true,
-                0,
-                "5A3CD9B09CD1E8000159249B",
-                NamespaceRegistrationType.ROOT_NAMESPACE,
-                1,
-                Arrays.asList(namespaceId),
-                NamespaceId.createFromId(new BigInteger("0")),
-                address,
-                new BigInteger("1"),
+            new NamespaceInfo("abc", true, 0, "5A3CD9B09CD1E8000159249B", NamespaceRegistrationType.ROOT_NAMESPACE, 1,
+                Arrays.asList(namespaceId), NamespaceId.createFromId(new BigInteger("0")), address, new BigInteger("1"),
                 new BigInteger("-1"),
                 new MosaicAlias(new MosaicId(new BigInteger("100"))));
-
+        assertEquals("abc", namespaceInfo.getRecordId().get());
         assertTrue(namespaceInfo.isActive());
         assertEquals(0, (int) namespaceInfo.getIndex());
         assertEquals("5A3CD9B09CD1E8000159249B", namespaceInfo.getMetaId());
@@ -120,17 +112,10 @@ class NamespaceInfoTest {
     }
 
     NamespaceInfo createRootNamespaceInfo() {
-        return new NamespaceInfo(
-            true,
-            0,
-            "5A3CD9B09CD1E8000159249B",
-            NamespaceRegistrationType.ROOT_NAMESPACE,
-            1,
-            Collections
-                .singletonList(NamespaceId.createFromId(new BigInteger("-8884663987180930485"))),
+        return new NamespaceInfo("abc", true, 0, "5A3CD9B09CD1E8000159249B", NamespaceRegistrationType.ROOT_NAMESPACE,
+            1, Collections.singletonList(NamespaceId.createFromId(new BigInteger("-8884663987180930485"))),
             NamespaceId.createFromId(new BigInteger("0")),
-            new PublicAccount(
-                "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
+            new PublicAccount("B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
                 NetworkType.MIJIN_TEST).getAddress(),
             new BigInteger("1"),
             new BigInteger("-1"),
@@ -138,17 +123,10 @@ class NamespaceInfoTest {
     }
 
     NamespaceInfo createSubNamespaceInfo() {
-        return new NamespaceInfo(
-            true,
-            0,
-            "5A3CD9B09CD1E8000159249B",
-            NamespaceRegistrationType.SUB_NAMESPACE,
-            1,
-            Arrays.asList(
-                NamespaceId.createFromId(new BigInteger("17358872602548358953")),
+        return new NamespaceInfo("bcd", true, 0, "5A3CD9B09CD1E8000159249B", NamespaceRegistrationType.SUB_NAMESPACE, 1,
+            Arrays.asList(NamespaceId.createFromId(new BigInteger("17358872602548358953")),
                 NamespaceId.createFromId(new BigInteger("-1087871471161192663"))),
-            NamespaceId.createFromId(new BigInteger("-3087871471161192663")),
-            new PublicAccount(
+            NamespaceId.createFromId(new BigInteger("-3087871471161192663")), new PublicAccount(
                 "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
                 NetworkType.MIJIN_TEST).getAddress(),
             new BigInteger("1"),

@@ -16,32 +16,37 @@
 
 package io.nem.symbol.sdk.model.account;
 
-import io.nem.symbol.sdk.model.mosaic.Mosaic;
+import io.nem.symbol.sdk.model.Stored;
+import io.nem.symbol.sdk.model.mosaic.ResolvedMosaic;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The account info structure describes basic information for an account.
  *
  * @since 1.0
  */
-public class AccountInfo {
+public class AccountInfo implements Stored {
 
+    private final Optional<String> recordId;
     private final Address address;
     private final BigInteger addressHeight;
     private final String publicKey;
     private final BigInteger publicKeyHeight;
     private final List<Importances> importances;
-    private final List<Mosaic> mosaics;
+    private final List<ResolvedMosaic> mosaics;
     private final AccountType accountType;
     private final SupplementalAccountKeys supplementalAccountKeys;
     private final List<ActivityBucket> activityBuckets;
 
     @SuppressWarnings("squid:S00107")
-    public AccountInfo(Address address, BigInteger addressHeight, String publicKey, BigInteger publicKeyHeight,
-        BigInteger importance, BigInteger importanceHeight, List<Mosaic> mosaics, AccountType accountType,
-        SupplementalAccountKeys supplementalAccountKeys, List<ActivityBucket> activityBuckets) {
+    public AccountInfo(String recordId, Address address, BigInteger addressHeight, String publicKey,
+        BigInteger publicKeyHeight, BigInteger importance, BigInteger importanceHeight, List<ResolvedMosaic> mosaics,
+        AccountType accountType, SupplementalAccountKeys supplementalAccountKeys,
+        List<ActivityBucket> activityBuckets) {
+        this.recordId = Optional.ofNullable(recordId);
         this.address = address;
         this.addressHeight = addressHeight;
         this.publicKey = publicKey;
@@ -52,6 +57,14 @@ public class AccountInfo {
         this.importances = new ArrayList<>();
         this.importances.add(new Importances(importance, importanceHeight));
         this.mosaics = mosaics;
+    }
+
+    /**
+     * @return the record id if known.
+     */
+    @Override
+    public Optional<String> getRecordId() {
+        return recordId;
     }
 
     /**
@@ -102,9 +115,9 @@ public class AccountInfo {
     /**
      * Returns mosaics hold by the account.
      *
-     * @return List of {@link Mosaic}
+     * @return List of {@link ResolvedMosaic}
      */
-    public List<Mosaic> getMosaics() {
+    public List<ResolvedMosaic> getMosaics() {
         return mosaics;
     }
 

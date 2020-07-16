@@ -96,7 +96,7 @@ public class RepositoryFactoryOkHttpImpl extends RepositoryFactoryBase {
 
     @Override
     public NamespaceRepository createNamespaceRepository() {
-        return new NamespaceRepositoryOkHttpImpl(apiClient, getNetworkType());
+        return new NamespaceRepositoryOkHttpImpl(apiClient);
     }
 
     @Override

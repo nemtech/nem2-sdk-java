@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.core.utils.MapperUtils;
+import io.nem.symbol.sdk.api.NamespaceSearchCriteria;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.AccountNames;
 import io.nem.symbol.sdk.model.account.Address;
@@ -26,6 +27,7 @@ import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.namespace.NamespaceInfo;
 import io.nem.symbol.sdk.model.namespace.NamespaceName;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountNamesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountsNamesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AliasDTO;
@@ -36,8 +38,9 @@ import io.nem.symbol.sdk.openapi.vertx.model.NamespaceDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NamespaceInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NamespaceMetaDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NamespaceNameDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.NamespacePage;
 import io.nem.symbol.sdk.openapi.vertx.model.NamespaceRegistrationTypeEnum;
-import io.nem.symbol.sdk.openapi.vertx.model.NamespacesInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.Pagination;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
@@ -58,7 +61,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new NamespaceRepositoryVertxImpl(apiClientMock, networkTypeObservable);
+        repository = new NamespaceRepositoryVertxImpl(apiClientMock);
     }
 
     @Test
@@ -106,10 +109,9 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
     }
 
     @Test
-    public void shouldGetNamespacesFromAccount() throws Exception {
-
-        Address address = Address.generateRandom(this.networkType);
-        Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
+    public void search() throws Exception {
+        Address address = Address.generateRandom(networkType);
+        Address ownerAccount = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
 
         NamespaceInfoDTO dto = new NamespaceInfoDTO();
         NamespaceMetaDTO meta = new NamespaceMetaDTO();
@@ -123,7 +125,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
         namespace.setStartHeight(BigInteger.valueOf(4));
         namespace.setEndHeight(BigInteger.valueOf(5));
         namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
-        namespace.setOwnerAddress(ownerAddress.encoded());
+        namespace.setOwnerAddress(ownerAccount.encoded());
 
         AliasDTO alias = new AliasDTO();
         alias.setType(AliasTypeEnum.NUMBER_2);
@@ -132,14 +134,14 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
         dto.setNamespace(namespace);
 
-        mockRemoteCall(new NamespacesInfoDTO().addNamespacesItem(dto));
+        mockRemoteCall(toPage(dto));
 
-        NamespaceInfo info = repository.getNamespacesFromAccount(address).toFuture().get().get(0);
+        NamespaceInfo info = repository.search(new NamespaceSearchCriteria().ownerAddress(address)).toFuture().get()
+            .getData().get(0);
 
         Assertions.assertNotNull(info);
 
-        Assertions
-            .assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
+        Assertions.assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
 
         Assertions.assertEquals(meta.getId(), info.getMetaId());
         Assertions.assertEquals(meta.getIndex(), info.getIndex());
@@ -149,49 +151,10 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
         Assertions.assertEquals(BigInteger.valueOf(5), info.getEndHeight());
     }
 
-    @Test
-    public void shouldGetNamespacesFromAccounts() throws Exception {
 
-        Address address = Address.generateRandom(this.networkType);
-        Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
-
-        NamespaceInfoDTO dto = new NamespaceInfoDTO();
-        NamespaceMetaDTO meta = new NamespaceMetaDTO();
-        meta.setActive(true);
-        meta.setId("SomeId");
-        meta.setIndex(123);
-        dto.setMeta(meta);
-
-        NamespaceDTO namespace = new NamespaceDTO();
-        namespace.setDepth(111);
-        namespace.setStartHeight(BigInteger.valueOf(4));
-        namespace.setEndHeight(BigInteger.valueOf(5));
-        namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
-        namespace.setOwnerAddress(ownerAddress.encoded());
-
-        AliasDTO alias = new AliasDTO();
-        alias.setType(AliasTypeEnum.NUMBER_2);
-        alias.setAddress(address.encoded());
-        namespace.setAlias(alias);
-
-        dto.setNamespace(namespace);
-
-        mockRemoteCall(new NamespacesInfoDTO().addNamespacesItem(dto));
-
-        NamespaceInfo info = repository
-            .getNamespacesFromAccounts(Collections.singletonList(address)).toFuture().get().get(0);
-
-        Assertions.assertNotNull(info);
-
-        Assertions
-            .assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
-
-        Assertions.assertEquals(meta.getId(), info.getMetaId());
-        Assertions.assertEquals(meta.getIndex(), info.getIndex());
-        Assertions.assertEquals(meta.getActive(), info.isActive());
-
-        Assertions.assertEquals(BigInteger.valueOf(4), info.getStartHeight());
-        Assertions.assertEquals(BigInteger.valueOf(5), info.getEndHeight());
+    private NamespacePage toPage(NamespaceInfoDTO dto) {
+        return new NamespacePage().data(Collections.singletonList(dto))
+            .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
     }
 
     @Test

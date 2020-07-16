@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @since 1.0
  */
-public interface NamespaceRepository {
+public interface NamespaceRepository extends Searcher<NamespaceInfo, NamespaceSearchCriteria> {
 
     /**
      * Gets the NamespaceInfo for a given namespaceId.
@@ -40,33 +40,6 @@ public interface NamespaceRepository {
      * @return {@link Observable} of {@link NamespaceInfo}
      */
     Observable<NamespaceInfo> getNamespace(NamespaceId namespaceId);
-
-    /**
-     * Gets list of NamespaceInfo for an account. With pagination.
-     *
-     * @param address Address
-     * @param queryParams QueryParans
-     * @return {@link Observable} of {@link NamespaceInfo} List
-     */
-    Observable<List<NamespaceInfo>> getNamespacesFromAccount(
-        Address address, QueryParams queryParams);
-
-    /**
-     * Gets list of NamespaceInfo for an account.
-     *
-     * @param address Address
-     * @return {@link Observable} of {@link NamespaceInfo} List
-     */
-    Observable<List<NamespaceInfo>> getNamespacesFromAccount(Address address);
-
-
-    /**
-     * Gets list of NamespaceInfo for different account.
-     *
-     * @param addresses List of Address
-     * @return {@link Observable} of {@link NamespaceInfo} List
-     */
-    Observable<List<NamespaceInfo>> getNamespacesFromAccounts(List<Address> addresses);
 
     /**
      * Gets list of NamespaceName for different namespaceIds.

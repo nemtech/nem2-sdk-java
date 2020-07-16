@@ -19,6 +19,7 @@ package io.nem.symbol.sdk.infrastructure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.symbol.sdk.api.NamespaceRepository;
+import io.nem.symbol.sdk.api.NamespaceSearchCriteria;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
@@ -50,7 +51,7 @@ class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
     void getNamespace(RepositoryType type) {
         NamespaceInfo namespaceInfo = get(getNamespaceRepository(type).getNamespace(namespaceId));
         assertEquals(new BigInteger("1"), namespaceInfo.getStartHeight());
-        assertEquals(namespaceId, namespaceInfo.getId());
+        assertEquals(namespaceId, namespaceInfo.getRecordId());
         assertEquals(namespaceId, namespaceInfo.getLevels().get(1));
     }
 
@@ -58,27 +59,13 @@ class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
     @EnumSource(RepositoryType.class)
     void getNamespacesFromAccount(RepositoryType type) {
         Account account = config().getDefaultAccount();
-        List<NamespaceInfo> namespacesInfo =
-            get(getNamespaceRepository(type).getNamespacesFromAccount(account.getAddress()));
+        List<NamespaceInfo> namespacesInfo = get(
+            getNamespaceRepository(type).search(new NamespaceSearchCriteria().ownerAddress(account.getAddress())))
+            .getData();
 
         namespacesInfo.forEach(n -> {
             Assertions.assertEquals(account.getAddress(), n.getOwnerAddress());
         });
-    }
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getNamespacesFromAccounts(RepositoryType type) {
-        Account account = config().getDefaultAccount();
-        List<NamespaceInfo> namespacesInfo = get(getNamespaceRepository(type)
-            .getNamespacesFromAccounts(
-                Collections.singletonList(
-                    account.getAddress())));
-
-        namespacesInfo.forEach(n -> {
-            Assertions.assertEquals(account.getAddress(), n.getOwnerAddress());
-        });
-
     }
 
     @ParameterizedTest

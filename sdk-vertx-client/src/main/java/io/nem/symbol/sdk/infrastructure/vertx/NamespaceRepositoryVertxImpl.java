@@ -20,7 +20,8 @@ import static io.nem.symbol.core.utils.MapperUtils.toNamespaceId;
 
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.NamespaceRepository;
-import io.nem.symbol.sdk.api.QueryParams;
+import io.nem.symbol.sdk.api.NamespaceSearchCriteria;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.model.account.AccountNames;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -34,13 +35,13 @@ import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.namespace.NamespaceInfo;
 import io.nem.symbol.sdk.model.namespace.NamespaceName;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
-import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.openapi.vertx.api.NamespaceRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.NamespaceRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
-import io.nem.symbol.sdk.openapi.vertx.model.AccountIds;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountNamesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountsNamesDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.Addresses;
+import io.nem.symbol.sdk.openapi.vertx.model.AliasTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicIds;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicNamesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicsNamesDTO;
@@ -48,7 +49,9 @@ import io.nem.symbol.sdk.openapi.vertx.model.NamespaceDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NamespaceIds;
 import io.nem.symbol.sdk.openapi.vertx.model.NamespaceInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NamespaceNameDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.NamespacesInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.NamespacePage;
+import io.nem.symbol.sdk.openapi.vertx.model.NamespaceRegistrationTypeEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.Order;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -63,18 +66,14 @@ import java.util.stream.Collectors;
  *
  * @since 1.0
  */
-public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements
-    NamespaceRepository {
+public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements NamespaceRepository {
 
     private final NamespaceRoutesApi client;
 
-    private final Observable<NetworkType> networkTypeObservable;
 
-    public NamespaceRepositoryVertxImpl(ApiClient apiClient,
-        Observable<NetworkType> networkTypeObservable) {
+    public NamespaceRepositoryVertxImpl(ApiClient apiClient) {
         super(apiClient);
         this.client = new NamespaceRoutesApiImpl(apiClient);
-        this.networkTypeObservable = networkTypeObservable;
     }
 
     public NamespaceRoutesApi getClient() {
@@ -86,52 +85,30 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
     public Observable<NamespaceInfo> getNamespace(NamespaceId namespaceId) {
         Consumer<Handler<AsyncResult<NamespaceInfoDTO>>> callback = handler -> getClient()
             .getNamespace(namespaceId.getIdAsHex(), handler);
-        return exceptionHandling(networkTypeObservable.flatMap(networkType -> call(callback).map(
-            namespaceInfoDTO -> toNamespaceInfo(namespaceInfoDTO, networkType))));
+        return exceptionHandling(call(callback).map(this::toNamespaceInfo));
+
     }
 
     @Override
-    public Observable<List<NamespaceInfo>> getNamespacesFromAccount(
-        Address address, QueryParams queryParams) {
-        return this.getNamespacesFromAccount(address, Optional.of(queryParams));
-    }
+    public Observable<Page<NamespaceInfo>> search(NamespaceSearchCriteria criteria) {
 
-    @Override
-    public Observable<List<NamespaceInfo>> getNamespacesFromAccount(Address address) {
-        return this.getNamespacesFromAccount(address, Optional.empty());
-    }
+        String ownerAddress = toDto(criteria.getOwnerAddress());
+        NamespaceRegistrationTypeEnum registrationType = criteria.getRegistrationType() == null ? null
+            : NamespaceRegistrationTypeEnum.fromValue(criteria.getRegistrationType().getValue());
+        String level0 = criteria.getLevel0();
+        AliasTypeEnum aliasType =
+            criteria.getAliasType() == null ? null : AliasTypeEnum.fromValue(criteria.getAliasType().getValue());
+        Integer pageSize = criteria.getPageSize();
+        Integer pageNumber = criteria.getPageNumber();
+        String offset = criteria.getOffset();
+        Order order = toDto(criteria.getOrder());
 
-    private Observable<List<NamespaceInfo>> getNamespacesFromAccount(
-        Address address, Optional<QueryParams> queryParams) {
-
-        Consumer<Handler<AsyncResult<NamespacesInfoDTO>>> callback = handler ->
-            client.getNamespacesFromAccount(address.plain(),
-                getPageSize(queryParams),
-                getId(queryParams),
+        Consumer<Handler<AsyncResult<NamespacePage>>> callback = handler -> getClient()
+            .searchNamespaces(ownerAddress, registrationType, level0, aliasType, pageSize, pageNumber, offset, order,
                 handler);
 
-        return exceptionHandling(networkTypeObservable.flatMap(networkType ->
-            call(callback).flatMapIterable(NamespacesInfoDTO::getNamespaces)
-                .map(namespaceInfoDTO -> toNamespaceInfo(namespaceInfoDTO, networkType)).toList()
-                .toObservable()));
-    }
-
-
-    @Override
-    public Observable<List<NamespaceInfo>> getNamespacesFromAccounts(List<Address> addresses) {
-
-        AccountIds accounts = new AccountIds()
-            .addresses(addresses.stream().map(Address::plain).collect(
-                Collectors.toList()));
-
-        Consumer<Handler<AsyncResult<NamespacesInfoDTO>>> callback = handler -> client
-            .getNamespacesFromAccounts(accounts, handler);
-
-        return exceptionHandling(networkTypeObservable.flatMap(networkType ->
-            call(callback).flatMapIterable(NamespacesInfoDTO::getNamespaces)
-                .map(namespaceInfoDTO -> toNamespaceInfo(namespaceInfoDTO, networkType))
-                .toList()
-                .toObservable()));
+        return exceptionHandling(call(callback).map(page -> this.toPage(page.getPagination(),
+            page.getData().stream().map(this::toNamespaceInfo).collect(Collectors.toList()))));
     }
 
 
@@ -139,32 +116,25 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
     public Observable<List<NamespaceName>> getNamespaceNames(List<NamespaceId> namespaceIds) {
 
         NamespaceIds ids = new NamespaceIds()
-            .namespaceIds(namespaceIds.stream()
-                .map(NamespaceId::getIdAsHex)
-                .collect(Collectors.toList()));
+            .namespaceIds(namespaceIds.stream().map(NamespaceId::getIdAsHex).collect(Collectors.toList()));
 
-        Consumer<Handler<AsyncResult<List<NamespaceNameDTO>>>> callback = handler ->
-            client.getNamespacesNames(ids,
-                handler);
+        Consumer<Handler<AsyncResult<List<NamespaceNameDTO>>>> callback = handler -> client
+            .getNamespacesNames(ids, handler);
 
         return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toNamespaceName).toList()
-                .toObservable());
+            call(callback).flatMapIterable(item -> item).map(this::toNamespaceName).toList().toObservable());
     }
 
 
     @Override
     public Observable<List<MosaicNames>> getMosaicsNames(List<MosaicId> ids) {
         MosaicIds mosaicIds = new MosaicIds();
-        mosaicIds.mosaicIds(ids.stream()
-            .map(MosaicId::getIdAsHex)
-            .collect(Collectors.toList()));
+        mosaicIds.mosaicIds(ids.stream().map(MosaicId::getIdAsHex).collect(Collectors.toList()));
         Consumer<Handler<AsyncResult<MosaicsNamesDTO>>> callback = handler -> getClient()
             .getMosaicsNames(mosaicIds, handler);
         return exceptionHandling(
-            call(callback).map(MosaicsNamesDTO::getMosaicNames).flatMapIterable(item -> item)
-                .map(this::toMosaicNames).toList()
-                .toObservable());
+            call(callback).map(MosaicsNamesDTO::getMosaicNames).flatMapIterable(item -> item).map(this::toMosaicNames)
+                .toList().toObservable());
     }
 
     /**
@@ -174,8 +144,7 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
      * @return {@link MosaicNames}
      */
     private MosaicNames toMosaicNames(MosaicNamesDTO dto) {
-        return new MosaicNames(
-            MapperUtils.toMosaicId(dto.getMosaicId()),
+        return new MosaicNames(MapperUtils.toMosaicId(dto.getMosaicId()),
             dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
     }
 
@@ -189,8 +158,8 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
     public Observable<MosaicId> getLinkedMosaicId(NamespaceId namespaceId) {
         Consumer<Handler<AsyncResult<NamespaceInfoDTO>>> callback = handler -> getClient()
             .getNamespace(namespaceId.getIdAsHex(), handler);
-        return exceptionHandling(call(callback).map(namespaceInfoDTO -> this
-            .toMosaicId(namespaceInfoDTO.getNamespace())));
+        return exceptionHandling(
+            call(callback).map(namespaceInfoDTO -> this.toMosaicId(namespaceInfoDTO.getNamespace())));
     }
 
     /**
@@ -203,14 +172,13 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
     public Observable<Address> getLinkedAddress(NamespaceId namespaceId) {
         Consumer<Handler<AsyncResult<NamespaceInfoDTO>>> callback = handler -> getClient()
             .getNamespace(namespaceId.getIdAsHex(), handler);
-        return exceptionHandling(call(callback).map(namespaceInfoDTO -> this
-            .toAddress(namespaceInfoDTO.getNamespace())));
+        return exceptionHandling(
+            call(callback).map(namespaceInfoDTO -> this.toAddress(namespaceInfoDTO.getNamespace())));
     }
 
     private NamespaceName toNamespaceName(NamespaceNameDTO dto) {
-        return new NamespaceName(
-            toNamespaceId(dto.getId()),
-            dto.getName(), Optional.ofNullable(toNamespaceId(dto.getParentId())));
+        return new NamespaceName(toNamespaceId(dto.getId()), dto.getName(),
+            Optional.ofNullable(toNamespaceId(dto.getParentId())));
     }
 
 
@@ -218,22 +186,15 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
      * Create a NamespaceInfo from a NamespaceInfoDTO and a NetworkType
      *
      * @param namespaceInfoDTO namespaceInfo
-     * @param networkType the resolved networkType
      */
-    private NamespaceInfo toNamespaceInfo(
-        NamespaceInfoDTO namespaceInfoDTO, NetworkType networkType) {
-        return new NamespaceInfo(
-            namespaceInfoDTO.getMeta().getActive(),
-            namespaceInfoDTO.getMeta().getIndex(),
-            namespaceInfoDTO.getMeta().getId(),
-            NamespaceRegistrationType
-                .rawValueOf(namespaceInfoDTO.getNamespace().getRegistrationType().getValue()),
-            namespaceInfoDTO.getNamespace().getDepth(),
-            this.extractLevels(namespaceInfoDTO),
+    private NamespaceInfo toNamespaceInfo(NamespaceInfoDTO namespaceInfoDTO) {
+        return new NamespaceInfo(namespaceInfoDTO.getId(), namespaceInfoDTO.getMeta().getActive(),
+            namespaceInfoDTO.getMeta().getIndex(), namespaceInfoDTO.getMeta().getId(),
+            NamespaceRegistrationType.rawValueOf(namespaceInfoDTO.getNamespace().getRegistrationType().getValue()),
+            namespaceInfoDTO.getNamespace().getDepth(), this.extractLevels(namespaceInfoDTO),
             toNamespaceId(namespaceInfoDTO.getNamespace().getParentId()),
             MapperUtils.toUnresolvedAddress(namespaceInfoDTO.getNamespace().getOwnerAddress()),
-            namespaceInfoDTO.getNamespace().getStartHeight(),
-            namespaceInfoDTO.getNamespace().getEndHeight(),
+            namespaceInfoDTO.getNamespace().getStartHeight(), namespaceInfoDTO.getNamespace().getEndHeight(),
             this.extractAlias(namespaceInfoDTO.getNamespace()));
     }
 
@@ -267,18 +228,16 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
 
     @Override
     public Observable<List<AccountNames>> getAccountsNames(List<Address> addresses) {
-        AccountIds accountIds = new AccountIds()
+        Addresses accountIds = new Addresses()
             .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
         return getAccountsNames(accountIds);
     }
 
-    private Observable<List<AccountNames>> getAccountsNames(AccountIds accountIds) {
+    private Observable<List<AccountNames>> getAccountsNames(Addresses accountIds) {
         Consumer<Handler<AsyncResult<AccountsNamesDTO>>> callback = handler -> getClient()
             .getAccountsNames(accountIds, handler);
-        return exceptionHandling(
-            call(callback).map(AccountsNamesDTO::getAccountNames).flatMapIterable(item -> item)
-                .map(this::toAccountNames).toList()
-                .toObservable());
+        return exceptionHandling(call(callback).map(AccountsNamesDTO::getAccountNames).flatMapIterable(item -> item)
+            .map(this::toAccountNames).toList().toObservable());
     }
 
     /**
@@ -288,8 +247,7 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
      * @return {@link AccountNames}
      */
     private AccountNames toAccountNames(AccountNamesDTO dto) {
-        return new AccountNames(
-            MapperUtils.toAddress(dto.getAddress()),
+        return new AccountNames(MapperUtils.toAddress(dto.getAddress()),
             dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
     }
 
@@ -326,8 +284,7 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl im
         if (namespaceDTO.getAlias() != null) {
             if (namespaceDTO.getAlias().getType().getValue().equals(AliasType.MOSAIC.getValue())) {
                 return new MosaicAlias(toMosaicId(namespaceDTO));
-            } else if (namespaceDTO.getAlias().getType().getValue().equals(AliasType.ADDRESS
-                .getValue())) {
+            } else if (namespaceDTO.getAlias().getType().getValue().equals(AliasType.ADDRESS.getValue())) {
                 return new AddressAlias(toAddress(namespaceDTO));
             }
         }

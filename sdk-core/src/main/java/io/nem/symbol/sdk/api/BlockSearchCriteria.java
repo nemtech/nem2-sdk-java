@@ -2,6 +2,7 @@ package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.sdk.model.account.Address;
+import java.util.Objects;
 
 /**
  * Criteria used to search blocks
@@ -62,6 +63,17 @@ public class BlockSearchCriteria extends SearchCriteria {
     }
 
     /**
+     * Sets the offset builder style.
+     *
+     * @param offset the offset.
+     * @return this object.
+     */
+    public BlockSearchCriteria offset(String offset) {
+        this.offset = offset;
+        return this;
+    }
+
+    /**
      * Sets the signerPublicKey builder style.
      *
      * @param signerPublicKey the signerPublicKey.
@@ -91,17 +103,6 @@ public class BlockSearchCriteria extends SearchCriteria {
      */
     public BlockSearchCriteria orderBy(BlockOrderBy orderBy) {
         this.orderBy = orderBy;
-        return this;
-    }
-
-    /**
-     * Sets the offset builder style.
-     *
-     * @param offset the offset.
-     * @return this object.
-     */
-    public BlockSearchCriteria offset(String offset) {
-        this.offset = offset;
         return this;
     }
 
@@ -137,4 +138,25 @@ public class BlockSearchCriteria extends SearchCriteria {
         return (BlockSearchCriteria) super.pageNumber(pageNumber);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        BlockSearchCriteria criteria = (BlockSearchCriteria) o;
+        return Objects.equals(signerPublicKey, criteria.signerPublicKey) && Objects
+            .equals(beneficiaryAddress, criteria.beneficiaryAddress) && Objects.equals(offset, criteria.offset)
+            && orderBy == criteria.orderBy;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), signerPublicKey, beneficiaryAddress, offset, orderBy);
+    }
 }

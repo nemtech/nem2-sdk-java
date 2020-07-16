@@ -55,7 +55,7 @@ public class NamespaceRegistrationIntegrationTest extends BaseIntegrationTest {
         NamespaceInfo namespaceInfo = get(getRepositoryFactory(type).createNamespaceRepository()
             .getNamespace(namespaceRegistrationTransaction.getNamespaceId()));
         Assertions.assertEquals(this.account.getAddress(), namespaceInfo.getOwnerAddress());
-        Assertions.assertEquals(namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getId());
+        Assertions.assertEquals(namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getRecordId());
     }
 
     @ParameterizedTest
@@ -77,7 +77,7 @@ public class NamespaceRegistrationIntegrationTest extends BaseIntegrationTest {
         NamespaceInfo namespaceInfo = get(getRepositoryFactory(type).createNamespaceRepository()
             .getNamespace(namespaceRegistrationTransaction.getNamespaceId()));
         Assertions.assertEquals(this.account.getAddress(), namespaceInfo.getOwnerAddress());
-        Assertions.assertEquals(namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getId());
+        Assertions.assertEquals(namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getRecordId());
     }
 
 
@@ -102,7 +102,7 @@ public class NamespaceRegistrationIntegrationTest extends BaseIntegrationTest {
         NamespaceInfo namespaceInfo = get(getRepositoryFactory(type).createNamespaceRepository()
             .getNamespace(namespaceRegistrationTransaction.getNamespaceId()));
         Assertions.assertEquals(this.account.getAddress(), namespaceInfo.getOwnerAddress());
-        Assertions.assertEquals(namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getId());
+        Assertions.assertEquals(namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getRecordId());
     }
 
     @ParameterizedTest
@@ -126,6 +126,6 @@ public class NamespaceRegistrationIntegrationTest extends BaseIntegrationTest {
         NamespaceInfo namespaceInfo = get(getRepositoryFactory(type).createNamespaceRepository()
             .getNamespace(namespaceRegistrationTransaction.getNamespaceId()));
         Assertions.assertEquals(this.account.getAddress(), namespaceInfo.getOwnerAddress());
-        Assertions.assertEquals(namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getId());
+        Assertions.assertEquals(namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getRecordId());
     }
 }

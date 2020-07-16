@@ -16,18 +16,20 @@
 
 package io.nem.symbol.sdk.model.namespace;
 
-import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.Stored;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * NamespaceInfo contains the state information of a namespace.
  *
  * @since 1.0
  */
-public class NamespaceInfo {
+public class NamespaceInfo implements Stored {
 
+    private final Optional<String> recordId;
     private final boolean active;
     private final Integer index;
     private final String metaId;
@@ -41,18 +43,11 @@ public class NamespaceInfo {
     private final Alias alias;
 
     @SuppressWarnings("squid:S00107")
-    public NamespaceInfo(
-        boolean active,
-        Integer index,
-        String metaId,
-        NamespaceRegistrationType registrationType,
-        Integer depth,
-        List<NamespaceId> levels,
-        NamespaceId parentId,
-        UnresolvedAddress ownerAddress,
-        BigInteger startHeight,
-        BigInteger endHeight,
+    public NamespaceInfo(String recordId, boolean active, Integer index, String metaId,
+        NamespaceRegistrationType registrationType, Integer depth, List<NamespaceId> levels, NamespaceId parentId,
+        UnresolvedAddress ownerAddress, BigInteger startHeight, BigInteger endHeight,
         Alias alias) {
+        this.recordId = Optional.ofNullable(recordId);
         this.active = active;
         this.index = index;
         this.metaId = metaId;
@@ -64,6 +59,15 @@ public class NamespaceInfo {
         this.startHeight = startHeight;
         this.endHeight = endHeight;
         this.alias = alias;
+    }
+
+    /**
+     * The record database id.
+     *
+     * @return the parent id.
+     */
+    public Optional<String> getRecordId() {
+        return recordId;
     }
 
     /**

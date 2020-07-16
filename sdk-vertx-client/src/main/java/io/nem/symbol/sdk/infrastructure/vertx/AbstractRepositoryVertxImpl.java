@@ -48,6 +48,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  */
 public abstract class AbstractRepositoryVertxImpl {
 
+
     private final JsonHelper jsonHelper;
 
     public AbstractRepositoryVertxImpl(ApiClient apiClient) {
