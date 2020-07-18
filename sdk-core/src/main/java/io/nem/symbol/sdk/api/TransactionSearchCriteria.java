@@ -28,7 +28,7 @@ import java.util.Objects;
  * Defines the params used to search transactions. With this criteria, you can sort and filter
  * transactions queries using rest.
  */
-public class TransactionSearchCriteria extends SearchCriteria {
+public class TransactionSearchCriteria extends SearchCriteria<TransactionSearchCriteria> {
 
     /**
      * Transaction identifier up to which transactions are returned. (optional)
@@ -60,13 +60,6 @@ public class TransactionSearchCriteria extends SearchCriteria {
      * Filter by block height. (optional, default to null)
      */
     private BigInteger height;
-
-    /**
-     * Entry id at which to start pagination. If the ordering parameter is set to -id, the elements
-     * returned precede the identifier. Otherwise, newer elements with respect to the id are
-     * returned.  (optional)
-     */
-    private String offset;
 
     /**
      * The group of transaction (optional, default is confirmed)
@@ -113,10 +106,6 @@ public class TransactionSearchCriteria extends SearchCriteria {
         return height;
     }
 
-    public String getOffset() {
-        return offset;
-    }
-
     public TransactionGroup getGroup() {
         return group;
     }
@@ -128,7 +117,6 @@ public class TransactionSearchCriteria extends SearchCriteria {
     public Boolean getEmbedded() {
         return embedded;
     }
-
 
     public void setId(String id) {
         this.id = id;
@@ -148,10 +136,6 @@ public class TransactionSearchCriteria extends SearchCriteria {
 
     public void setHeight(BigInteger height) {
         this.height = height;
-    }
-
-    public void setOffset(String offset) {
-        this.offset = offset;
     }
 
     public void setTransactionTypes(
@@ -193,29 +177,9 @@ public class TransactionSearchCriteria extends SearchCriteria {
         return this;
     }
 
-    public TransactionSearchCriteria offset(String offset) {
-        this.offset = offset;
-        return this;
-    }
-
     public TransactionSearchCriteria embedded(Boolean embedded) {
         this.embedded = embedded;
         return this;
-    }
-
-
-    public TransactionSearchCriteria pageSize(Integer pageSize) {
-        return (TransactionSearchCriteria) super.pageSize(pageSize);
-    }
-
-    @Override
-    public TransactionSearchCriteria order(OrderBy order) {
-        return (TransactionSearchCriteria) super.order(order);
-    }
-
-    @Override
-    public TransactionSearchCriteria pageNumber(Integer pageNumber) {
-        return (TransactionSearchCriteria) super.pageNumber(pageNumber);
     }
 
     @Override
@@ -235,7 +199,6 @@ public class TransactionSearchCriteria extends SearchCriteria {
             Objects.equals(recipientAddress, that.recipientAddress) &&
             Objects.equals(signerPublicKey, that.signerPublicKey) &&
             Objects.equals(height, that.height) &&
-            Objects.equals(offset, that.offset) &&
             group == that.group &&
             Objects.equals(transactionTypes, that.transactionTypes) &&
             Objects.equals(embedded, that.embedded);
@@ -244,7 +207,7 @@ public class TransactionSearchCriteria extends SearchCriteria {
     @Override
     public int hashCode() {
         return Objects
-            .hash(super.hashCode(), id, address, recipientAddress, signerPublicKey, height, offset,
+            .hash(super.hashCode(), id, address, recipientAddress, signerPublicKey, height,
                 group, transactionTypes, embedded);
     }
 }

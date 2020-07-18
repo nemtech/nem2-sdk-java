@@ -16,25 +16,39 @@
 
 package io.nem.symbol.sdk.api;
 
-import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
-import io.nem.symbol.sdk.model.receipt.Statement;
+import io.nem.symbol.sdk.model.receipt.AddressResolutionStatement;
+import io.nem.symbol.sdk.model.receipt.MosaicResolutionStatement;
+import io.nem.symbol.sdk.model.receipt.TransactionStatement;
 import io.reactivex.Observable;
-import java.math.BigInteger;
 
 public interface ReceiptRepository {
 
     /**
-     * Get receipts from a block
+     * Returns a transaction statements page based on the criteria.
      *
-     * @param height the height
-     * @return {@link Observable} of Statement
+     * @param criteria the criteria
+     * @return a page of {@link TransactionStatement}
      */
-    Observable<Statement> getBlockReceipts(BigInteger height);
+    Observable<Page<TransactionStatement>> searchReceipts(TransactionStatementSearchCriteria criteria);
 
     /**
-     * @param height the height
-     * @param hash the hash.
-     * @return {@link Observable} of MerkleProofInfo
+     * Returns an addresses resolution statements page based on the criteria.
+     *
+     * @param criteria the criteria
+     * @return a page of {@link AddressResolutionStatement}
      */
-    Observable<MerkleProofInfo> getMerkleReceipts(BigInteger height, String hash);
+    Observable<Page<AddressResolutionStatement>> searchAddressResolutionStatements(
+        ResolutionStatementSearchCriteria criteria);
+
+    /**
+     * Returns an mosaic resoslution statements page based on the criteria.
+     *
+     * @param criteria the criteria
+     * @return a page of {@link MosaicResolutionStatement}
+     */
+    Observable<Page<MosaicResolutionStatement>> searchMosaicResolutionStatements(
+        ResolutionStatementSearchCriteria criteria);
+
+
+
 }

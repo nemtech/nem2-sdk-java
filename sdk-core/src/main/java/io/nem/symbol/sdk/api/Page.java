@@ -59,13 +59,21 @@ public class Page<E> {
      * @param totalEntries the total entries.
      * @param totalPages the total pages for the given criteria.
      */
-    public Page(List<E> data, Integer pageNumber, Integer pageSize, Integer totalEntries,
-        Integer totalPages) {
+    public Page(List<E> data, Integer pageNumber, Integer pageSize, Integer totalEntries, Integer totalPages) {
         this.data = data;
         this.pageNumber = pageNumber;
         this.pageSize = pageSize;
         this.totalEntries = totalEntries;
         this.totalPages = totalPages;
+    }
+
+    /**
+     * Constructor single page
+     *
+     * @param data the page data
+     */
+    public Page(List<E> data) {
+        this(data, 1, data.size(), data.size(), 1);
     }
 
     /**

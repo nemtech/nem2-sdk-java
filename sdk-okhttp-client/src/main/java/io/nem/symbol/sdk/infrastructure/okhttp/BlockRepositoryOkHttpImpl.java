@@ -101,6 +101,12 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
 
     }
 
+
+    public Observable<MerkleProofInfo> getMerkleReceipts(BigInteger height, String hash) {
+        Callable<MerkleProofInfoDTO> callback = () -> getClient().getMerkleReceipts(height, hash);
+        return exceptionHandling(call(callback).map(this::toMerkleProofInfo));
+    }
+
     private MerkleProofInfo toMerkleProofInfo(MerkleProofInfoDTO dto) {
         List<MerklePathItem> pathItems = dto.getMerklePath().stream().map(pathItem -> new MerklePathItem(
             pathItem.getPosition() == null ? null : Position.rawValueOf(pathItem.getPosition().getValue()),

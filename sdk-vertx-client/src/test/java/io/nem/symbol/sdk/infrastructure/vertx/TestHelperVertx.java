@@ -19,12 +19,12 @@ package io.nem.symbol.sdk.infrastructure.vertx;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.junit.jupiter.api.Assertions;
 
 /**
  * Helper class for the vertx tests.
@@ -55,15 +55,13 @@ public class TestHelperVertx {
 
     public static String loadResource(String resourceName) {
 
-        String resName = "json/" + resourceName;
-        Assertions.assertNotNull(TestHelperVertx.class.getClassLoader()
-            .getResourceAsStream(resName), resName + " not found in classpath");
-        try (InputStream resourceAsStream = TestHelperVertx.class.getClassLoader()
-            .getResourceAsStream(resName)) {
+        String resName = "../sdk-core/src/test/resources/json/" + resourceName;
+        File file = new File(resName);
+        try (InputStream resourceAsStream = new FileInputStream(file)) {
             return IOUtils.toString(resourceAsStream, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new IllegalStateException(
-                "Cannot open resource " + resName + ". Error: " + ExceptionUtils.getMessage(e),
+                "Cannot open resource " + resourceName + ". Error: " + ExceptionUtils.getMessage(e),
                 e);
         }
     }

@@ -24,41 +24,49 @@ import org.junit.jupiter.api.Test;
  */
 class SearchCriteriaTest {
 
+    private static class TestSearchCriteria extends SearchCriteria<TestSearchCriteria>{
+
+    }
+
     @Test
     void shouldCreate() {
-        SearchCriteria criteria = new SearchCriteria();
+        TestSearchCriteria criteria = new TestSearchCriteria();
         Assertions.assertNull(criteria.getOrder());
         Assertions.assertNull(criteria.getPageSize());
         Assertions.assertNull(criteria.getPageNumber());
+        Assertions.assertNull(criteria.getOffset());
     }
 
     @Test
     void shouldSetValues() {
-        SearchCriteria criteria = new SearchCriteria();
+        TestSearchCriteria criteria = new TestSearchCriteria();
         criteria.setOrder(OrderBy.DESC);
         criteria.setPageSize(10);
         criteria.setPageNumber(5);
+        criteria.setOffset("ABC");
         Assertions.assertEquals(OrderBy.DESC, criteria.getOrder());
         Assertions.assertEquals(10, criteria.getPageSize());
         Assertions.assertEquals(5, criteria.getPageNumber());
+        Assertions.assertEquals("ABC", criteria.getOffset());
     }
 
     @Test
     void shouldUseBuilderMethods() {
-        SearchCriteria criteria = new SearchCriteria();
+        TestSearchCriteria criteria = new TestSearchCriteria().offset("ABC");
         criteria.order(OrderBy.ASC).pageSize(10).pageNumber(5);
         Assertions.assertEquals(OrderBy.ASC, criteria.getOrder());
         Assertions.assertEquals(10, criteria.getPageSize());
         Assertions.assertEquals(5, criteria.getPageNumber());
+        Assertions.assertEquals("ABC", criteria.getOffset());
     }
 
     @Test
     void shouldBeEquals() {
-        SearchCriteria criteria1 = new SearchCriteria();
-        criteria1.order(OrderBy.ASC).pageSize(10).pageNumber(5);
-        SearchCriteria criteria2 = new SearchCriteria();
-        criteria2.order(OrderBy.ASC).pageSize(10).pageNumber(5);
-        Assertions.assertEquals(new SearchCriteria(), new SearchCriteria());
+        TestSearchCriteria criteria1 = new TestSearchCriteria();
+        criteria1.order(OrderBy.ASC).pageSize(10).pageNumber(5).offset("ABC");
+        TestSearchCriteria criteria2 = new TestSearchCriteria();
+        criteria2.order(OrderBy.ASC).pageSize(10).pageNumber(5).offset("ABC");
+        Assertions.assertEquals(new TestSearchCriteria(), new TestSearchCriteria());
         Assertions.assertEquals(criteria1, criteria1);
         Assertions.assertEquals(criteria1.hashCode(), criteria1.hashCode());
         Assertions.assertEquals(criteria1, criteria2);

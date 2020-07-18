@@ -23,62 +23,21 @@ import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Metadata interface repository.
  */
-public interface MetadataRepository {
-
-    /**
-     * Returns the account metadata given an account id.
-     *
-     * @param targetAddress the address that holds the medata values.
-     * @param queryParams Optional query parameters
-     * @return Observable of {@link Metadata} {@link List}
-     */
-    Observable<List<Metadata>> getAccountMetadata(Address targetAddress,
-        Optional<QueryParams> queryParams);
+public interface MetadataRepository extends Searcher<Metadata, MetadataSearchCriteria> {
 
     /**
      * Returns the account metadata given an account id and a key
      *
-     * @param targetAddress the address that holds the medata values with the given key.
-     * @param key Metadata key
-     * @return Observable of {@link Metadata} {@link List}
-     */
-    Observable<List<Metadata>> getAccountMetadataByKey(Address targetAddress, BigInteger key);
-
-    /**
-     * Returns the account metadata given an account id and a key
-     *
-     * @param targetAddress the address that holds the medata values with the given key sent by the
-     * given public key.
+     * @param targetAddress the address that holds the medata values with the given key sent by the given public key.
      * @param key - Metadata key
      * @param sourceAddress The address of the account that created the metadata.
      * @return Observable of {@link Metadata}
      */
-    Observable<Metadata> getAccountMetadataByKeyAndSender(Address targetAddress, BigInteger key,
-        Address sourceAddress);
-
-    /**
-     * Returns the mosaic metadata given a mosaic id.
-     *
-     * @param targetMosaicId The mosaic id that holds the metadata values.
-     * @param queryParams Optional query parameters
-     * @return Observable of {@link Metadata} {@link List}
-     */
-    Observable<List<Metadata>> getMosaicMetadata(MosaicId targetMosaicId,
-        Optional<QueryParams> queryParams);
-
-    /**
-     * Returns the mosaic metadata given a mosaic id and metadata key.
-     *
-     * @param targetMosaicId The mosaic id that holds the metadata values.
-     * @param key Metadata key.
-     * @return Observable of {@link Metadata} {@link List}
-     */
-    Observable<List<Metadata>> getMosaicMetadataByKey(MosaicId targetMosaicId, BigInteger key);
+    Observable<Metadata> getAccountMetadataByKeyAndSender(Address targetAddress, BigInteger key, Address sourceAddress);
 
     /**
      * Returns the mosaic metadata given a mosaic id and metadata key.
@@ -92,26 +51,6 @@ public interface MetadataRepository {
         Address sourceAddress);
 
     /**
-     * Returns the mosaic metadata given a mosaic id.
-     *
-     * @param targetNamespaceId The namespace id that holds the metadata values.
-     * @param queryParams Optional query parameters
-     * @return Observable of {@link Metadata} {@link List}
-     */
-    Observable<List<Metadata>> getNamespaceMetadata(NamespaceId targetNamespaceId,
-        Optional<QueryParams> queryParams);
-
-    /**
-     * Returns the mosaic metadata given a mosaic id and metadata key.
-     *
-     * @param targetNamespaceId The namespace id that holds the metadata values.
-     * @param key Metadata key.
-     * @return Observable of {@link Metadata} {@link List}
-     */
-    Observable<List<Metadata>> getNamespaceMetadataByKey(NamespaceId targetNamespaceId,
-        BigInteger key);
-
-    /**
      * Returns the namespace metadata given a mosaic id and metadata key.
      *
      * @param targetNamespaceId The namespace id that holds the metadata values.
@@ -119,7 +58,7 @@ public interface MetadataRepository {
      * @param sourceAddress The address of the account that created the metadata.
      * @return Observable of {@link Metadata}
      */
-    Observable<Metadata> getNamespaceMetadataByKeyAndSender(NamespaceId targetNamespaceId,
-        BigInteger key, Address sourceAddress);
+    Observable<Metadata> getNamespaceMetadataByKeyAndSender(NamespaceId targetNamespaceId, BigInteger key,
+        Address sourceAddress);
 
 }

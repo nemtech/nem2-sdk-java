@@ -22,7 +22,7 @@ import java.util.Objects;
 /**
  * Defines the params used to search accounts. With this criteria, you can sort and filter accounts queries using rest.
  */
-public class AccountSearchCriteria extends SearchCriteria {
+public class AccountSearchCriteria extends SearchCriteria<AccountSearchCriteria> {
 
     /**
      * Filer accounts that have balance of this given mosaic id.
@@ -33,31 +33,6 @@ public class AccountSearchCriteria extends SearchCriteria {
      * How accounts are going to be order. If BALANCE is used, mosaic id must be provided.
      */
     private AccountOrderBy orderBy;
-
-    /**
-     * Entry id at which to start pagination. If the ordering parameter is set to DESC, the elements returned precede
-     * the identifier. Otherwise, newer elements with respect to the id are returned.  (optional)
-     */
-    private String offset;
-
-    public String getOffset() {
-        return offset;
-    }
-
-    public void setOffset(String offset) {
-        this.offset = offset;
-    }
-
-    /**
-     * Sets the offset builder style.
-     *
-     * @param offset the new offset
-     * @return this criteria.
-     */
-    public AccountSearchCriteria offset(String offset) {
-        this.offset = offset;
-        return this;
-    }
 
     public MosaicId getMosaicId() {
         return mosaicId;
@@ -98,12 +73,11 @@ public class AccountSearchCriteria extends SearchCriteria {
             return false;
         }
         AccountSearchCriteria that = (AccountSearchCriteria) o;
-        return Objects.equals(mosaicId, that.mosaicId) && orderBy == that.orderBy && Objects
-            .equals(offset, that.offset);
+        return Objects.equals(mosaicId, that.mosaicId) && orderBy == that.orderBy;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), mosaicId, orderBy, offset);
+        return Objects.hash(super.hashCode(), mosaicId, orderBy);
     }
 }

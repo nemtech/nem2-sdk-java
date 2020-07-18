@@ -24,6 +24,7 @@ import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.message.PlainMessage;
+import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
@@ -31,7 +32,6 @@ import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransactio
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
-import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
@@ -65,6 +65,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
     void createTestAccount() {
         sendMosaicFromNemesis(config().getTestAccount(), false);
         setAddressAlias(type, config().getTestAccount().getAddress(), "testaccount");
+        basicSendMosaicToNemesis(NamespaceId.createFromName("testaccount"));
     }
 
     @Test
@@ -202,10 +203,10 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
 
         sleep(1000);
 
-
         Assertions.assertEquals(aggregateTransaciton.getTransactionInfo().get().getHash().get(),
             signedAggregateTransaction.getHash());
     }
+
 
     private void sendMosaicFromNemesis(Account recipient, boolean force) {
         if (hasMosaic(recipient) && !force) {
@@ -213,16 +214,19 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
             printAccount(recipient);
             return;
         }
-
-        Account nemesisAccount = config().getNemesisAccount();
         System.out.println("Sending " + AMOUNT_PER_TRANSFER + " Mosaic to: ");
         printAccount(recipient);
+        basicSendMosaicToNemesis(recipient.getAddress());
+    }
 
+    private void basicSendMosaicToNemesis(UnresolvedAddress recipient) {
+
+        Account nemesisAccount = config().getNemesisAccount();
         BigInteger amount = BigInteger.valueOf(AMOUNT_PER_TRANSFER);
 
-        TransferTransactionFactory factory = TransferTransactionFactory.create(getNetworkType(), recipient.getAddress(),
-            Collections.singletonList(getNetworkCurrency().createAbsolute(amount)),
-            new PlainMessage("E2ETest:SetUpAccountsTool"));
+        TransferTransactionFactory factory = TransferTransactionFactory
+            .create(getNetworkType(), recipient, Collections.singletonList(getNetworkCurrency().createAbsolute(amount)),
+                new PlainMessage("E2ETest:SetUpAccountsTool"));
 
         factory.maxFee(this.maxFee);
         TransferTransaction transferTransaction = factory.build();

@@ -31,6 +31,8 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Collections;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -72,6 +74,20 @@ public class JsonHelperJackson2 implements JsonHelper {
     public Object parse(String string) {
         return parse(string, ObjectNode.class);
     }
+
+    @Override
+    public <T> List<T> parseList(final String string, final Class<T> clazz) {
+        try {
+            if (StringUtils.isEmpty(string)) {
+                return Collections.emptyList();
+            }
+            return objectMapper
+                .readValue(string, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
+        } catch (Exception e) {
+            throw handleException(e, "Json payload: " + string);
+        }
+    }
+
 
     @Override
     public <T> T parse(final String string, final Class<T> clazz) {
@@ -231,8 +247,7 @@ public class JsonHelperJackson2 implements JsonHelper {
 
 
         @Override
-        public void serialize(BigInteger value, JsonGenerator gen, SerializerProvider provider)
-            throws IOException {
+        public void serialize(BigInteger value, JsonGenerator gen, SerializerProvider provider) throws IOException {
             if (value == null) {
                 gen.writeNull();
             } else {

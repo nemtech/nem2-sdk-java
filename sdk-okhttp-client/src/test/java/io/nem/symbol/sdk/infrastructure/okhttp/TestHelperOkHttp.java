@@ -18,7 +18,8 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
@@ -55,9 +56,9 @@ public class TestHelperOkHttp {
 
     public static String loadResource(String resourceName) {
 
-        String resName = "json/" + resourceName;
-        try (InputStream resourceAsStream = TestHelperOkHttp.class.getClassLoader()
-            .getResourceAsStream(resName)) {
+        String resName = "../sdk-core/src/test/resources/json/" + resourceName;
+        File file = new File(resName);
+        try (InputStream resourceAsStream = new FileInputStream(file)) {
             return IOUtils.toString(resourceAsStream, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new IllegalStateException(
@@ -65,5 +66,4 @@ public class TestHelperOkHttp {
                 e);
         }
     }
-
 }

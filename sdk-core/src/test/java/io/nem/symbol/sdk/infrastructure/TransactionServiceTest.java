@@ -18,8 +18,10 @@ package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.core.utils.ExceptionUtils;
 import io.nem.symbol.sdk.api.Listener;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.ReceiptRepository;
 import io.nem.symbol.sdk.api.RepositoryFactory;
+import io.nem.symbol.sdk.api.ResolutionStatementSearchCriteria;
 import io.nem.symbol.sdk.api.TransactionRepository;
 import io.nem.symbol.sdk.api.TransactionService;
 import io.nem.symbol.sdk.model.account.Account;
@@ -39,8 +41,6 @@ import io.nem.symbol.sdk.model.receipt.AddressResolutionStatement;
 import io.nem.symbol.sdk.model.receipt.MosaicResolutionStatement;
 import io.nem.symbol.sdk.model.receipt.ReceiptSource;
 import io.nem.symbol.sdk.model.receipt.ResolutionEntry;
-import io.nem.symbol.sdk.model.receipt.Statement;
-import io.nem.symbol.sdk.model.receipt.TransactionStatement;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
@@ -87,6 +87,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -131,6 +132,16 @@ class TransactionServiceTest {
 
         listener = Mockito.mock(Listener.class);
         service = new TransactionServiceImpl(factory);
+    }
+
+    @AfterEach
+    void lastAssert() {
+
+        Mockito.verify(receiptRepositoryMock, Mockito.atMost(1))
+            .searchAddressResolutionStatements(Mockito.eq(new ResolutionStatementSearchCriteria().height(height)));
+
+        Mockito.verify(receiptRepositoryMock, Mockito.atMost(1))
+            .searchMosaicResolutionStatements(Mockito.eq(new ResolutionStatementSearchCriteria().height(height)));
     }
 
     @Test
@@ -256,7 +267,8 @@ class TransactionServiceTest {
 
         List<String> hashes = Collections.singletonList(transactionHash);
 
-        Mockito.when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
+        Mockito
+            .when(transactionRepositoryMock.getTransactions(Mockito.eq(TransactionGroup.CONFIRMED), Mockito.eq(hashes)))
             .thenReturn(Observable.just(Collections.singletonList(transaction)));
 
         TransferTransaction resolvedTransaction = (TransferTransaction) service.resolveAliases(hashes).toFuture().get()
@@ -805,7 +817,6 @@ class TransactionServiceTest {
     }
 
     private void simulateStatement(BigInteger height, int primaryId, int secondaryId) {
-        List<TransactionStatement> transactionStatements = Collections.emptyList();
 
         Map<NamespaceId, Address> addressMap = new HashMap<>();
         addressMap.put(addressNamespace1, address1);
@@ -818,19 +829,22 @@ class TransactionServiceTest {
         mosaicMap.put(mosaicNamespace3, mosaicId3);
 
         List<AddressResolutionStatement> addressResolutionStatements = addressMap.entrySet().stream().map(
-            e -> new AddressResolutionStatement(height, e.getKey(), Collections
+            e -> new AddressResolutionStatement("abc", height, e.getKey(), Collections
                 .singletonList(ResolutionEntry.forAddress(e.getValue(), new ReceiptSource(primaryId, secondaryId)))))
             .collect(Collectors.toList());
 
         List<MosaicResolutionStatement> mosaicResolutionStatements = mosaicMap.entrySet().stream().map(
-            e -> new MosaicResolutionStatement(height, e.getKey(), Collections
+            e -> new MosaicResolutionStatement("abc", height, e.getKey(), Collections
                 .singletonList(ResolutionEntry.forMosaicId(e.getValue(), new ReceiptSource(primaryId, secondaryId)))))
             .collect(Collectors.toList());
 
-        Statement statement = new Statement(transactionStatements, addressResolutionStatements,
-            mosaicResolutionStatements);
+        Mockito.when(receiptRepositoryMock
+            .searchAddressResolutionStatements(Mockito.eq(new ResolutionStatementSearchCriteria().height(height))))
+            .thenReturn(Observable.just(new Page<>(addressResolutionStatements)));
 
-        Mockito.when(receiptRepositoryMock.getBlockReceipts(Mockito.eq(height))).thenReturn(Observable.just(statement));
+        Mockito.when(receiptRepositoryMock
+            .searchMosaicResolutionStatements(Mockito.eq(new ResolutionStatementSearchCriteria().height(height))))
+            .thenReturn(Observable.just(new Page<>(mosaicResolutionStatements)));
 
     }
 

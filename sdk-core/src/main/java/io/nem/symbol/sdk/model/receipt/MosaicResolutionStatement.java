@@ -20,6 +20,8 @@ import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * {@link ResolutionStatement} specific for Mosaic Ids.
@@ -29,12 +31,34 @@ public class MosaicResolutionStatement extends ResolutionStatement<UnresolvedMos
     /**
      * Constructor
      *
+     * @param recordId the database id if known.
      * @param height Height
      * @param unresolved An {@link UnresolvedMosaicId}
      * @param resolutionEntries Array of {@link MosaicId} resolution entries.
      */
-    public MosaicResolutionStatement(BigInteger height, UnresolvedMosaicId unresolved,
+    public MosaicResolutionStatement(String recordId, BigInteger height, UnresolvedMosaicId unresolved,
         List<ResolutionEntry<MosaicId>> resolutionEntries) {
-        super(ResolutionType.MOSAIC, height, unresolved, resolutionEntries);
+        super(recordId, ResolutionType.MOSAIC, height, unresolved, resolutionEntries);
+    }
+
+    /**
+     * This method tries to resolve the unresolved mosaic id using the the resolution entries.
+     *
+     * @param statements the statements.
+     * @param height the height of the transaction.
+     * @param mosaicAlias the {@link UnresolvedMosaicId}
+     * @param primaryId the primary id
+     * @param secondaryId the secondary id
+     * @return the {@link Optional} of the resolved {@link MosaicId}
+     */
+    public static Optional<MosaicId> getResolvedMosaicId(List<MosaicResolutionStatement> statements, BigInteger height,
+        UnresolvedMosaicId mosaicAlias, long primaryId, long secondaryId) {
+        if (mosaicAlias instanceof MosaicId) {
+            return Optional.of((MosaicId) mosaicAlias);
+        }
+        return statements.stream().filter(s -> height.equals(s.getHeight()))
+            .filter(r -> r.getUnresolved().equals(mosaicAlias))
+            .map(r -> r.getResolutionEntryById(primaryId, secondaryId).map(ResolutionEntry::getResolved)).findFirst()
+            .flatMap(Function.identity());
     }
 }

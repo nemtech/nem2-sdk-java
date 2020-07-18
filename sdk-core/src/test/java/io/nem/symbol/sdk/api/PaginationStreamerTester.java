@@ -17,7 +17,7 @@ import org.mockito.internal.stubbing.answers.ReturnsElementsOf;
  * @param <E> the entity type
  * @param <C> the criteria type.
  */
-public class PaginationStreamerTester<E, C extends SearchCriteria> {
+public class PaginationStreamerTester<E, C extends SearchCriteria<C>> {
 
     private final PaginationStreamer<E, C> streamer;
     private final Class<E> entityClass;

@@ -62,8 +62,9 @@ class MosaicSearchCriteriaTest {
         Address address1 = Address.generateRandom(NetworkType.MIJIN_TEST);
 
         MosaicSearchCriteria criteria = new MosaicSearchCriteria()
-            .order(OrderBy.ASC).pageSize(10).pageNumber(5).ownerAddress(address1).offset("abc");
+            .order(OrderBy.ASC).pageSize(10).pageNumber(5).ownerAddress(address1);
 
+        criteria.offset("abc");
         Assertions.assertEquals(OrderBy.ASC, criteria.getOrder());
         Assertions.assertEquals(10, criteria.getPageSize());
         Assertions.assertEquals(5, criteria.getPageNumber());
@@ -77,10 +78,12 @@ class MosaicSearchCriteriaTest {
         Address address1 = Address.generateRandom(NetworkType.MIJIN_TEST);
 
         MosaicSearchCriteria criteria1 = new MosaicSearchCriteria()
-            .order(OrderBy.ASC).pageSize(10).pageNumber(5).ownerAddress(address1).offset("abc");
+            .order(OrderBy.ASC).pageSize(10).pageNumber(5).ownerAddress(address1);
+        criteria1.offset("abc");
 
         MosaicSearchCriteria criteria2 = new MosaicSearchCriteria()
-            .order(OrderBy.ASC).pageSize(10).pageNumber(5).ownerAddress(address1).offset("abc");
+            .order(OrderBy.ASC).pageSize(10).pageNumber(5).ownerAddress(address1);
+        criteria2.offset("abc");
 
         Assertions.assertEquals(new MosaicSearchCriteria(), new MosaicSearchCriteria());
         Assertions.assertEquals(criteria1, criteria2);

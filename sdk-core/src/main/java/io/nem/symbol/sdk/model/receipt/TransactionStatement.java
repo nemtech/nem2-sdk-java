@@ -20,11 +20,14 @@ import io.nem.symbol.core.crypto.Hashes;
 import io.nem.symbol.core.utils.ArrayUtils;
 import io.nem.symbol.core.utils.ByteUtils;
 import io.nem.symbol.core.utils.ConvertUtils;
+import io.nem.symbol.sdk.model.Stored;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
-public class TransactionStatement {
+public class TransactionStatement implements Stored {
 
+    private final Optional<String> recordId;
     private final BigInteger height;
     private final ReceiptSource receiptSource;
     private final List<Receipt> receipts;
@@ -32,12 +35,13 @@ public class TransactionStatement {
     /**
      * Constructor
      *
+     * @param recordId the database record id if known.
      * @param height Block height
      * @param receiptSource The receipt source.
      * @param receipts Array of receipts.
      */
-    public TransactionStatement(
-        BigInteger height, ReceiptSource receiptSource, List<Receipt> receipts) {
+    public TransactionStatement(String recordId, BigInteger height, ReceiptSource receiptSource, List<Receipt> receipts) {
+        this.recordId = Optional.ofNullable(recordId);
         this.height = height;
         this.receiptSource = receiptSource;
         this.receipts = receipts;
@@ -91,5 +95,10 @@ public class TransactionStatement {
 
         byte[] hash = Hashes.sha3_256(results);
         return ConvertUtils.toHex(hash);
+    }
+
+    @Override
+    public Optional<String> getRecordId() {
+        return recordId;
     }
 }

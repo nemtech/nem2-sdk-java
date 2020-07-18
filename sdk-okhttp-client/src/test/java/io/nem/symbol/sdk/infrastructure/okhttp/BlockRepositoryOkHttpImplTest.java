@@ -158,8 +158,9 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
 
         mockRemoteCall(toPage(dto));
 
-        List<BlockInfo> resolvedList = repository.search(new BlockSearchCriteria().offset("abc")).toFuture().get()
-            .getData();
+        BlockSearchCriteria criteria = new BlockSearchCriteria();
+        criteria.offset("abc");
+        List<BlockInfo> resolvedList = repository.search(criteria).toFuture().get().getData();
 
         BlockInfo info = resolvedList.get(0);
         Assertions.assertNotNull(info);
@@ -186,6 +187,26 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
         Assertions.assertEquals(address, info.getBeneficiaryAddress());
     }
 
+
+    @Test
+    public void shouldGetMerkleReceipts() throws Exception {
+        MerkleProofInfoDTO merkleProofInfoDTO = new MerkleProofInfoDTO();
+        MerklePathItemDTO marklePathItem = new MerklePathItemDTO();
+        marklePathItem.setHash("SomeHash");
+        marklePathItem.setPosition(PositionEnum.LEFT);
+        merkleProofInfoDTO.setMerklePath(Collections.singletonList(marklePathItem));
+
+        mockRemoteCall(merkleProofInfoDTO);
+
+        BigInteger height = BigInteger.valueOf(10L);
+        MerkleProofInfo info = repository.getMerkleReceipts(height, "AnotherHash").toFuture().get();
+
+        Assertions.assertNotNull(info);
+
+        Assertions.assertEquals(1, info.getMerklePath().size());
+        Assertions.assertEquals(marklePathItem.getHash(), info.getMerklePath().get(0).getHash());
+        Assertions.assertEquals(Position.LEFT, info.getMerklePath().get(0).getPosition());
+    }
 
     private BlockPage toPage(BlockInfoDTO dto) {
         return new BlockPage().data(Collections.singletonList(dto))

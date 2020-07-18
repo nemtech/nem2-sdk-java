@@ -7,7 +7,7 @@ import io.reactivex.Observable;
  *
  * A streamer will help users to walk through searches without knowing the underlying pagination implementation.
  */
-public class PaginationStreamer<E, C extends SearchCriteria> {
+public class PaginationStreamer<E, C extends SearchCriteria<C>> {
 
     /**
      * The search method, likely to be the search method of entity's repository

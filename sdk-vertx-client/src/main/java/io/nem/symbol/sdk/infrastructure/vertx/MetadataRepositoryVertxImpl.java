@@ -19,34 +19,36 @@ package io.nem.symbol.sdk.infrastructure.vertx;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.MetadataRepository;
-import io.nem.symbol.sdk.api.QueryParams;
+import io.nem.symbol.sdk.api.MetadataSearchCriteria;
+import io.nem.symbol.sdk.api.Page;
+import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.metadata.Metadata;
-import io.nem.symbol.sdk.model.metadata.MetadataEntry;
 import io.nem.symbol.sdk.model.metadata.MetadataType;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.openapi.vertx.api.MetadataRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.MetadataRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
-import io.nem.symbol.sdk.openapi.vertx.model.MetadataDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.MetadataEntriesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MetadataEntryDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.MetadataInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.MetadataPage;
+import io.nem.symbol.sdk.openapi.vertx.model.MetadataTypeEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.Order;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 
 /**
  * Implementation of {@link MetadataRepository}
  */
-public class MetadataRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements
-    MetadataRepository {
+public class MetadataRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements MetadataRepository {
 
     private final MetadataRoutesApi client;
 
@@ -55,90 +57,51 @@ public class MetadataRepositoryVertxImpl extends AbstractRepositoryVertxImpl imp
         client = new MetadataRoutesApiImpl(apiClient);
     }
 
+
     @Override
-    public Observable<List<Metadata>> getAccountMetadata(Address targetAddress,
-        Optional<QueryParams> queryParams) {
-        Consumer<Handler<AsyncResult<MetadataEntriesDTO>>> callback = handler -> getClient()
-            .getAccountMetadata(targetAddress.plain(), getPageSize(queryParams),
-                getOrder(queryParams), getId(queryParams),
-                handler);
-        return handleList(callback);
+    public Observable<Page<Metadata>> search(MetadataSearchCriteria criteria) {
+
+        String sourceAddress = toDto(criteria.getSourceAddress());
+        String targetAddress = toDto(criteria.getTargetAddress());
+        String scopedMetadataKey = toDto(criteria.getScopedMetadataKey());
+        String targetId = criteria.getTargetId();
+        MetadataTypeEnum metadataType = criteria.getMetadataType() == null ? null
+            : MetadataTypeEnum.fromValue(criteria.getMetadataType().getValue());
+        String offset = criteria.getOffset();
+        Integer pageSize = criteria.getPageSize();
+        Integer pageNumber = criteria.getPageNumber();
+        Order order = toDto(criteria.getOrder());
+
+        Consumer<Handler<AsyncResult<MetadataPage>>> callback = handler -> getClient()
+            .searchMetadataEntries(sourceAddress, targetAddress, scopedMetadataKey, targetId, metadataType, pageSize,
+                pageNumber, offset, order, handler);
+
+        return exceptionHandling(call(callback).map(page -> this
+            .toPage(page.getPagination(), page.getData().stream().map(this::toMetadata).collect(Collectors.toList()))));
+    }
+
+    @Override
+    public Observable<Metadata> getAccountMetadataByKeyAndSender(Address targetAddress, BigInteger key,
+        Address sourceAddress) {
+        return handleOne(new MetadataSearchCriteria().targetAddress(targetAddress).scopedMetadataKey(key)
+            .sourceAddress(sourceAddress).metadataType(MetadataType.ACCOUNT));
     }
 
 
     @Override
-    public Observable<List<Metadata>> getAccountMetadataByKey(Address targetAddress,
-        BigInteger key) {
-        Consumer<Handler<AsyncResult<MetadataEntriesDTO>>> callback = handler -> getClient()
-            .getAccountMetadataByKey(targetAddress.plain(), toHex(key), handler);
-        return handleList(callback);
-    }
-
-
-    @Override
-    public Observable<List<Metadata>> getMosaicMetadata(MosaicId targetMosaicId,
-        Optional<QueryParams> queryParams) {
-        Consumer<Handler<AsyncResult<MetadataEntriesDTO>>> callback = handler -> getClient()
-            .getMosaicMetadata(targetMosaicId.getIdAsHex(), getPageSize(queryParams),
-                getId(queryParams),
-                getOrder(queryParams),
-                handler);
-        return handleList(callback);
+    public Observable<Metadata> getMosaicMetadataByKeyAndSender(MosaicId targetMosaicId, BigInteger key,
+        Address sourceAddress) {
+        return handleOne(
+            new MetadataSearchCriteria().targetId(targetMosaicId).scopedMetadataKey(key).sourceAddress(sourceAddress)
+                .metadataType(MetadataType.MOSAIC));
     }
 
     @Override
-    public Observable<List<Metadata>> getMosaicMetadataByKey(MosaicId targetMosaicId,
-        BigInteger key) {
-        Consumer<Handler<AsyncResult<MetadataEntriesDTO>>> callback = handler -> getClient()
-            .getMosaicMetadataByKey(targetMosaicId.getIdAsHex(), toHex(key), handler);
-        return handleList(callback);
-    }
-
-    @Override
-    public Observable<Metadata> getAccountMetadataByKeyAndSender(Address targetAddress,
-        BigInteger key, Address sourceAddress) {
-        Consumer<Handler<AsyncResult<MetadataDTO>>> callback = handler -> getClient()
-            .getAccountMetadataByKeyAndSender(targetAddress.plain(), toHex(key), sourceAddress.plain(),
-                handler);
-        return handleOne(callback);
-    }
-
-
-    @Override
-    public Observable<Metadata> getMosaicMetadataByKeyAndSender(MosaicId targetMosaicId,
-        BigInteger key, Address sourceAddress) {
-        Consumer<Handler<AsyncResult<MetadataDTO>>> callback = handler -> getClient()
-            .getMosaicMetadataByKeyAndSender(targetMosaicId.getIdAsHex(), toHex(key),
-                sourceAddress.plain(), handler);
-        return handleOne(callback);
-    }
-
-    @Override
-    public Observable<List<Metadata>> getNamespaceMetadata(NamespaceId targetNamespaceId,
-        Optional<QueryParams> queryParams) {
-        Consumer<Handler<AsyncResult<MetadataEntriesDTO>>> callback = handler -> getClient()
-            .getNamespaceMetadata(targetNamespaceId.getIdAsHex(), getPageSize(queryParams),
-                getId(queryParams),
-                getOrder(queryParams),
-                handler);
-        return handleList(callback);
-    }
-
-    @Override
-    public Observable<List<Metadata>> getNamespaceMetadataByKey(NamespaceId targetNamespaceId,
-        BigInteger key) {
-        Consumer<Handler<AsyncResult<MetadataEntriesDTO>>> callback = handler -> getClient()
-            .getNamespaceMetadataByKey(targetNamespaceId.getIdAsHex(), toHex(key), handler);
-        return handleList(callback);
-    }
-
-    @Override
-    public Observable<Metadata> getNamespaceMetadataByKeyAndSender(NamespaceId targetNamespaceId,
-        BigInteger key, Address sourceAddress) {
-        Consumer<Handler<AsyncResult<MetadataDTO>>> callback = handler -> getClient()
-            .getNamespaceMetadataByKeyAndSender(targetNamespaceId.getIdAsHex(), toHex(key),
-                sourceAddress.plain(), handler);
-        return handleOne(callback);
+    public Observable<Metadata> getNamespaceMetadataByKeyAndSender(NamespaceId targetNamespaceId, BigInteger key,
+        Address sourceAddress) {
+        return handleOne(
+            new MetadataSearchCriteria().targetId(targetNamespaceId).scopedMetadataKey(key).sourceAddress(sourceAddress)
+                .metadataType(MetadataType.NAMESPACE));
     }
 
 
@@ -146,55 +109,42 @@ public class MetadataRepositoryVertxImpl extends AbstractRepositoryVertxImpl imp
         return client;
     }
 
+
     /**
-     * It handles an async call result of a list of {@link MetadataEntriesDTO} converting it into a {@link Observable}
-     * list of {@link Metadata}.
+     * It search a metadata looking for the only result that should be available at most.
      *
-     * @param callback the callback
-     * @return the {@link Observable} list of {@link Metadata}.
+     * @param criteria the criteria
+     * @return the Observable of the single metadata raising an error if it's not found.
      */
-    private Observable<List<Metadata>> handleList(
-        Consumer<Handler<AsyncResult<MetadataEntriesDTO>>> callback) {
-        return exceptionHandling(
-            call(callback).map(MetadataEntriesDTO::getMetadataEntries).flatMapIterable(item -> item)
-                .map(this::toMetadata).toList()
-                .toObservable());
+    private Observable<Metadata> handleOne(MetadataSearchCriteria criteria) {
+        Observable<Page<Metadata>> pageObservable = search(criteria);
+        return pageObservable.map(p -> {
+            if (p.getData().size() > 1) {
+                throw new RepositoryCallException("Metadata should be 1 at most", 0, null);
+            }
+            if (p.getData().size() == 1) {
+                return p.getData().get(0);
+            }
+            throw new RepositoryCallException("Metadata with key " + criteria.getScopedMetadataKey() + " not found",
+                404, null);
+        });
     }
 
     /**
-     * It handles an async call result of a {@link MetadataEntriesDTO} converting it into a {@link Observable} of {@link
-     * Metadata}.
+     * It converts the {@link MetadataInfoDTO} into a model {@link Metadata}.
      *
-     * @param callback the callback
-     * @return the {@link Observable} of {@link Metadata}.
-     */
-    private Observable<Metadata> handleOne(
-        Consumer<Handler<AsyncResult<MetadataDTO>>> callback) {
-        return exceptionHandling(call(callback)
-            .map(this::toMetadata));
-    }
-
-    /**
-     * It converts the {@link MetadataDTO} into a model {@link Metadata}.
-     *
-     * @param dto the {@link MetadataDTO}
+     * @param dto the {@link MetadataInfoDTO}
      * @return the {@link Metadata}
      */
-    private Metadata toMetadata(MetadataDTO dto) {
+    private Metadata toMetadata(MetadataInfoDTO dto) {
 
         MetadataEntryDTO entryDto = dto.getMetadataEntry();
-        MetadataEntry metadataEntry = new MetadataEntry(entryDto.getCompositeHash(),
-            MapperUtils.toAddress(entryDto.getSourceAddress()),
-            MapperUtils.toAddress(entryDto.getTargetAddress()),
+       return new Metadata(dto.getId(), entryDto.getCompositeHash(),
+            MapperUtils.toAddress(entryDto.getSourceAddress()), MapperUtils.toAddress(entryDto.getTargetAddress()),
             new BigInteger(entryDto.getScopedMetadataKey(), 16),
             MetadataType.rawValueOf(entryDto.getMetadataType().getValue()),
             ConvertUtils.fromHexToString(entryDto.getValue()),
             Optional.ofNullable(Objects.toString(entryDto.getTargetId(), null)));
-        return new Metadata(dto.getId(), metadataEntry);
     }
 
-
-    protected String toHex(BigInteger key) {
-        return ConvertUtils.toSize16Hex(key);
-    }
 }

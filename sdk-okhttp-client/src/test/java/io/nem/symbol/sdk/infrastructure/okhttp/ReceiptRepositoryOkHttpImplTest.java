@@ -16,19 +16,17 @@
 
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
-import io.nem.symbol.core.utils.MapperUtils;
-import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
-import io.nem.symbol.sdk.model.blockchain.Position;
-import io.nem.symbol.sdk.model.namespace.NamespaceId;
-import io.nem.symbol.sdk.model.receipt.Statement;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.MerklePathItemDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.MerkleProofInfoDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.PositionEnum;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.ResolutionStatementBodyDTO;
+import io.nem.symbol.sdk.api.ResolutionStatementSearchCriteria;
+import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.receipt.AddressResolutionStatement;
+import io.nem.symbol.sdk.model.receipt.MosaicResolutionStatement;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.Pagination;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.ResolutionStatementDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.StatementsDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.ResolutionStatementInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.ResolutionStatementPage;
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,71 +43,59 @@ public class ReceiptRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new ReceiptRepositoryOkHttpImpl(apiClientMock, networkTypeObservable);
+        repository = new ReceiptRepositoryOkHttpImpl(apiClientMock);
     }
 
     @Test
-    public void shouldGetReceiptReceipts() throws Exception {
+    public void searchAddressResolutionStatements() throws Exception {
 
-        StatementsDTO dto = new StatementsDTO();
-        ResolutionStatementDTO addressResolutionStatement = new ResolutionStatementDTO();
-
-        NamespaceId unresolved = NamespaceId.createFromName("some.alias");
-
-        ResolutionStatementBodyDTO statement1 = new ResolutionStatementBodyDTO();
+        ResolutionStatementInfoDTO addressResolutionStatement = new ResolutionStatementInfoDTO();
+        Address address = Address.generateRandom(this.networkType);
+        ResolutionStatementDTO statement1 = new ResolutionStatementDTO();
         addressResolutionStatement.setStatement(statement1);
-        statement1.setUnresolved(unresolved.encoded(networkType));
+        statement1.setUnresolved(address.encoded());
         statement1.setHeight(BigInteger.valueOf(6L));
-        dto.setAddressResolutionStatements(Collections.singletonList(addressResolutionStatement));
 
-        ResolutionStatementBodyDTO statement2 = new ResolutionStatementBodyDTO();
-        ResolutionStatementDTO mosaicResolutionStatement = new ResolutionStatementDTO();
+        mockRemoteCall(toPage(addressResolutionStatement));
+
+        BigInteger height = BigInteger.valueOf(10L);
+        List<AddressResolutionStatement> addressResolutionStatements = repository
+            .searchAddressResolutionStatements(new ResolutionStatementSearchCriteria().height(height)).toFuture().get()
+            .getData();
+
+        Assertions.assertEquals(1, addressResolutionStatements.size());
+        Assertions.assertEquals(BigInteger.valueOf(6L), addressResolutionStatements.get(0).getHeight());
+        Assertions.assertEquals(address, addressResolutionStatements.get(0).getUnresolved());
+    }
+
+    @Test
+    public void searchMosaicResolutionStatements() throws Exception {
+
+        ResolutionStatementDTO statement2 = new ResolutionStatementDTO();
+        ResolutionStatementInfoDTO mosaicResolutionStatement = new ResolutionStatementInfoDTO();
         mosaicResolutionStatement.setStatement(statement2);
         statement2.setUnresolved("9");
         statement2.setHeight(BigInteger.valueOf(7L));
-        dto.setMosaicResolutionStatements(Collections.singletonList(mosaicResolutionStatement));
 
-        mockRemoteCall(dto);
+        mockRemoteCall(toPage(mosaicResolutionStatement));
 
         BigInteger height = BigInteger.valueOf(10L);
-        Statement info = repository.getBlockReceipts(height).toFuture().get();
+        List<MosaicResolutionStatement> mosaicResolutionStatements = repository
+            .searchMosaicResolutionStatements(new ResolutionStatementSearchCriteria().height(height)).toFuture().get()
+            .getData();
 
-        Assertions.assertNotNull(info);
-
-        Assertions.assertEquals(1, info.getAddressResolutionStatements().size());
-        Assertions.assertEquals(BigInteger.valueOf(6L), info.getAddressResolutionStatements().get(0).getHeight());
-        Assertions.assertEquals(unresolved, info.getAddressResolutionStatements().get(0).getUnresolved());
-
-        Assertions.assertEquals(1, info.getMosaicResolutionStatement().size());
-        Assertions.assertEquals(BigInteger.valueOf(7L),
-            info.getMosaicResolutionStatement().get(0).getHeight());
-        Assertions.assertEquals(BigInteger.valueOf(9L),
-            info.getMosaicResolutionStatement().get(0).getUnresolved().getId());
+        Assertions.assertEquals(1, mosaicResolutionStatements.size());
+        Assertions.assertEquals(BigInteger.valueOf(7L), mosaicResolutionStatements.get(0).getHeight());
+        Assertions.assertEquals(BigInteger.valueOf(9L), mosaicResolutionStatements.get(0).getUnresolved().getId());
 
     }
 
 
-    @Test
-    public void shouldGetMerkleReceipts() throws Exception {
-        MerkleProofInfoDTO merkleProofInfoDTO = new MerkleProofInfoDTO();
-        MerklePathItemDTO marklePathItem = new MerklePathItemDTO();
-        marklePathItem.setHash("SomeHash");
-        marklePathItem.setPosition(PositionEnum.LEFT);
-        merkleProofInfoDTO.setMerklePath(Collections.singletonList(marklePathItem));
-
-        mockRemoteCall(merkleProofInfoDTO);
-
-        BigInteger height = BigInteger.valueOf(10L);
-        MerkleProofInfo info = repository.getMerkleReceipts(height, "AnotherHash").toFuture()
-            .get();
-
-        Assertions.assertNotNull(info);
-
-        Assertions.assertEquals(1, info.getMerklePath().size());
-        Assertions.assertEquals(marklePathItem.getHash(), info.getMerklePath().get(0).getHash());
-        Assertions.assertEquals(Position.LEFT, info.getMerklePath().get(0).getPosition());
-
+    private ResolutionStatementPage toPage(ResolutionStatementInfoDTO dto) {
+        return new ResolutionStatementPage().data(Collections.singletonList(dto))
+            .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
     }
+
 
     @Override
     public ReceiptRepositoryOkHttpImpl getRepository() {

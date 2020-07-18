@@ -17,20 +17,20 @@
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.core.utils.ConvertUtils;
-import io.nem.symbol.core.utils.MapperUtils;
+import io.nem.symbol.sdk.api.MetadataSearchCriteria;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.metadata.Metadata;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.MetadataDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.MetadataEntriesDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MetadataEntryDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.MetadataInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.MetadataPage;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MetadataTypeEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.Pagination;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,179 +51,76 @@ public class MetadataRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
     }
 
     @Test
-    public void shouldGetAccountMetadata() throws Exception {
+    public void search() throws Exception {
         Address address = Address.generateRandom(networkType);
-        MetadataEntriesDTO dto = getMetadataEntriesDTO();
+        MetadataPage dto = getMetadataEntriesDTO();
         mockRemoteCall(dto);
-        List<Metadata> resultList = repository.getAccountMetadata(address, Optional.empty())
-            .toFuture().get();
+        List<Metadata> resultList = repository.search(new MetadataSearchCriteria().sourceAddress(address)).toFuture()
+            .get().getData();
         assertMetadataList(dto, resultList);
     }
 
-    @Test
-    public void shouldGetAccountMetadataByKey() throws Exception {
-        Address address = Address.generateRandom(networkType);
-        MetadataEntriesDTO dto = getMetadataEntriesDTO();
-        mockRemoteCall(dto);
-        List<Metadata> resultList = repository.getAccountMetadataByKey(address, BigInteger.TEN)
-            .toFuture().get();
-        assertMetadataList(dto, resultList);
-    }
 
-    @Test
-    public void shouldGetAccountMetadataByKeyAndSender() throws Exception {
-        Address address = Address.generateRandom(networkType);
-        Address sourceAddress = Account.generateNewAccount(networkType).getAddress();
-        MetadataDTO expected = createMetadataDto(ConvertUtils.toSize16Hex(BigInteger.TEN),
-            MetadataTypeEnum.NUMBER_1, "11111");
-        mockRemoteCall(expected);
-        Metadata result = repository
-            .getAccountMetadataByKeyAndSender(address, BigInteger.TEN, sourceAddress)
-            .toFuture().get();
-        assertMetadata(expected, result);
-    }
-
-    @Test
-    public void shouldGetMosaicMetadata() throws Exception {
-        MosaicId mosaicId = new MosaicId(BigInteger.valueOf(1234));
-        MetadataEntriesDTO dto = getMetadataEntriesDTO();
-        mockRemoteCall(dto);
-        List<Metadata> resultList = repository.getMosaicMetadata(mosaicId, Optional.empty())
-            .toFuture().get();
-        assertMetadataList(dto, resultList);
-    }
-
-    @Test
-    public void shouldGetMosaicMetadataByKey() throws Exception {
-        MosaicId mosaicId = new MosaicId(BigInteger.valueOf(1234));
-        MetadataEntriesDTO dto = getMetadataEntriesDTO();
-        mockRemoteCall(dto);
-        List<Metadata> resultList = repository.getMosaicMetadataByKey(mosaicId, BigInteger.TEN)
-            .toFuture().get();
-        assertMetadataList(dto, resultList);
-    }
-
-    @Test
-    public void shouldGetMosaicMetadataByKeyAndSender() throws Exception {
-        MosaicId mosaicId = new MosaicId(BigInteger.valueOf(1234));
-        Address sourceAddress = Account.generateNewAccount(networkType).getAddress();
-        MetadataDTO expected = createMetadataDto(ConvertUtils.toSize16Hex(BigInteger.valueOf(20)),
-            MetadataTypeEnum.NUMBER_1, "11111");
-        mockRemoteCall(expected);
-        Metadata result = repository
-            .getMosaicMetadataByKeyAndSender(mosaicId, BigInteger.TEN, sourceAddress)
-            .toFuture().get();
-        assertMetadata(expected, result);
-    }
-
-
-    @Test
-    public void shouldGetNamespaceMetadata() throws Exception {
-        NamespaceId namespaceId = NamespaceId.createFromName("mynamespace");
-        MetadataEntriesDTO dto = getMetadataEntriesDTO();
-        mockRemoteCall(dto);
-        List<Metadata> resultList = repository.getNamespaceMetadata(namespaceId, Optional.empty())
-            .toFuture().get();
-        assertMetadataList(dto, resultList);
-    }
-
-    @Test
-    public void shouldGetNamespaceMetadataByKey() throws Exception {
-        NamespaceId namespaceId = NamespaceId.createFromName("mynamespace");
-        MetadataEntriesDTO dto = getMetadataEntriesDTO();
-        mockRemoteCall(dto);
-        List<Metadata> resultList = repository
-            .getNamespaceMetadataByKey(namespaceId, BigInteger.TEN)
-            .toFuture().get();
-        assertMetadataList(dto, resultList);
-    }
-
-    @Test
-    public void shouldGetNamespaceMetadataByKeyAndSender() throws Exception {
-        NamespaceId namespaceId = NamespaceId.createFromName("mynamespace");
-        Address sourceAddress = Account.generateNewAccount(networkType).getAddress();
-        MetadataDTO expected = createMetadataDto(ConvertUtils.toSize16Hex(BigInteger.TEN),
-            MetadataTypeEnum.NUMBER_1,
-            "11111");
-        mockRemoteCall(expected);
-        Metadata result = repository
-            .getNamespaceMetadataByKeyAndSender(namespaceId, BigInteger.TEN, sourceAddress)
-            .toFuture().get();
-        assertMetadata(expected, result);
-    }
-
-
-    private void assertMetadataList(MetadataEntriesDTO expected, List<Metadata> resultList) {
+    private void assertMetadataList(MetadataPage expected, List<Metadata> resultList) {
         int index = 0;
-        Assertions.assertEquals(expected.getMetadataEntries().size(), resultList.size());
+        Assertions.assertEquals(expected.getData().size(), resultList.size());
 
         Assertions.assertEquals(3, resultList.size());
 
         for (Metadata metadata : resultList) {
-            MetadataDTO metadataDTO = expected.getMetadataEntries().get(index++);
+            MetadataInfoDTO metadataDTO = expected.getData().get(index++);
             assertMetadata(metadataDTO, metadata);
         }
     }
 
-    private void assertMetadata(MetadataDTO expected, Metadata result) {
-        Assertions.assertEquals(expected.getId(), result.getId());
-        Assertions.assertEquals(expected.getMetadataEntry().getCompositeHash(),
-            result.getMetadataEntry().getCompositeHash());
-        Assertions.assertEquals(expected.getMetadataEntry().getSourceAddress(),
-            result.getMetadataEntry().getSourceAddress().encoded());
-        Assertions.assertEquals(expected.getMetadataEntry().getTargetAddress(),
-            result.getMetadataEntry().getTargetAddress().encoded());
-        Assertions.assertEquals(expected.getMetadataEntry().getMetadataType(),
-            MetadataTypeEnum
-                .fromValue(result.getMetadataEntry().getMetadataType().getValue()));
-
+    private void assertMetadata(MetadataInfoDTO expected, Metadata result) {
+        Assertions.assertEquals(expected.getId(), result.getRecordId().get());
         Assertions
-            .assertEquals(ConvertUtils.fromHexToString(expected.getMetadataEntry().getValue()),
-                result.getMetadataEntry().getValue());
+            .assertEquals(expected.getMetadataEntry().getCompositeHash(), result.getCompositeHash());
+        Assertions.assertEquals(expected.getMetadataEntry().getSourceAddress(),
+            result.getSourceAddress().encoded());
+        Assertions.assertEquals(expected.getMetadataEntry().getTargetAddress(),
+            result.getTargetAddress().encoded());
+        Assertions.assertEquals(expected.getMetadataEntry().getMetadataType(),
+            MetadataTypeEnum.fromValue(result.getMetadataType().getValue()));
+
+        Assertions.assertEquals(ConvertUtils.fromHexToString(expected.getMetadataEntry().getValue()),
+            result.getValue());
 
         if (expected.getMetadataEntry().getTargetId() != null) {
-            Assertions
-                .assertTrue(result.getMetadataEntry().getTargetId().isPresent());
-            BigInteger expectedTargetId = new BigInteger(
-                expected.getMetadataEntry().getTargetId().toString(), 16);
+            Assertions.assertTrue(result.getTargetId().isPresent());
+            BigInteger expectedTargetId = new BigInteger(expected.getMetadataEntry().getTargetId(), 16);
             if (expected.getMetadataEntry().getMetadataType() == MetadataTypeEnum.NUMBER_1) {
-                Assertions.assertEquals(expectedTargetId,
-                    ((MosaicId) result.getMetadataEntry().getTargetId().get()).getId());
+                Assertions
+                    .assertEquals(expectedTargetId, ((MosaicId) result.getTargetId().get()).getId());
             }
 
             if (expected.getMetadataEntry().getMetadataType() == MetadataTypeEnum.NUMBER_2) {
                 Assertions.assertEquals(expectedTargetId,
-                    ((NamespaceId) result.getMetadataEntry().getTargetId().get()).getId());
+                    ((NamespaceId) result.getTargetId().get()).getId());
             }
         } else {
-            Assertions
-                .assertFalse(result.getMetadataEntry().getTargetId().isPresent());
+            Assertions.assertFalse(result.getTargetId().isPresent());
         }
 
     }
 
-    private MetadataEntriesDTO getMetadataEntriesDTO() {
-        MetadataEntriesDTO dto = new MetadataEntriesDTO();
-        List<MetadataDTO> medataEntryDtos = new ArrayList<>();
-        medataEntryDtos.add(
-            createMetadataDto(ConvertUtils.toSize16Hex(BigInteger.valueOf(10)),
-                MetadataTypeEnum.NUMBER_0,
-                null));
-        medataEntryDtos.add(
-            createMetadataDto(ConvertUtils.toSize16Hex(BigInteger.valueOf(20)),
-                MetadataTypeEnum.NUMBER_1,
-                "11111"));
-        medataEntryDtos.add(
-            createMetadataDto(ConvertUtils.toSize16Hex(BigInteger.valueOf(30)),
-                MetadataTypeEnum.NUMBER_2,
-                "22222"));
-        dto.setMetadataEntries(medataEntryDtos);
-        return dto;
+    private MetadataPage getMetadataEntriesDTO() {
+        MetadataPage metadataPage = new MetadataPage();
+        metadataPage.setPagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
+
+        List<MetadataInfoDTO> data = new ArrayList<>();
+        data.add(createMetadataDto(ConvertUtils.toSize16Hex(BigInteger.valueOf(10)), MetadataTypeEnum.NUMBER_0, null));
+        data.add(
+            createMetadataDto(ConvertUtils.toSize16Hex(BigInteger.valueOf(20)), MetadataTypeEnum.NUMBER_1, "11111"));
+        data.add(
+            createMetadataDto(ConvertUtils.toSize16Hex(BigInteger.valueOf(30)), MetadataTypeEnum.NUMBER_2, "22222"));
+        metadataPage.setData(data);
+        return metadataPage;
     }
 
-    private MetadataDTO createMetadataDto(String name,
-        MetadataTypeEnum type, String targetId) {
-        MetadataDTO dto = new MetadataDTO();
+    private MetadataInfoDTO createMetadataDto(String name, MetadataTypeEnum type, String targetId) {
+        MetadataInfoDTO dto = new MetadataInfoDTO();
         dto.setId(name);
 
         Address sourceAddress = Account.generateNewAccount(networkType).getAddress();

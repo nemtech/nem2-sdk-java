@@ -18,30 +18,23 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.TypeAdapter;
 import com.google.gson.internal.LinkedTreeMap;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.reflect.TypeToken;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.JSON;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.JSON.ByteArrayAdapter;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.JSON.DateTypeAdapter;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.JSON.SqlDateTypeAdapter;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.TreeSet;
 import net.dongliu.gson.GsonJava8TypeAdapterFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -106,6 +99,19 @@ public class JsonHelperGson implements JsonHelper {
     @Override
     public Object parse(String string) {
         return parse(string, JsonObject.class);
+    }
+
+    @Override
+    public <T> List<T> parseList(String string, Class<T> clazz) {
+        try {
+            if (StringUtils.isEmpty(string)) {
+                return null;
+            }
+            Type listType = TypeToken.getParameterized(List.class, clazz).getType();
+            return objectMapper.fromJson(string, listType);
+        } catch (Exception e) {
+            throw handleException(e, "Json payload: " + string);
+        }
     }
 
     @Override

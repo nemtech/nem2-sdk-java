@@ -18,7 +18,6 @@ package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.BlockService;
-import io.nem.symbol.sdk.api.ReceiptRepository;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerklePathItem;
@@ -42,7 +41,6 @@ class BlockServiceTest {
 
     private BlockServiceImpl service;
     private BlockRepository blockRepositoryMock;
-    private ReceiptRepository receiptRepositoryMock;
 
     @BeforeEach
     void setup() {
@@ -50,10 +48,7 @@ class BlockServiceTest {
         RepositoryFactory factory = Mockito.mock(RepositoryFactory.class);
         blockRepositoryMock = Mockito.mock(BlockRepository.class);
         Mockito.when(factory.createBlockRepository()).thenReturn(blockRepositoryMock);
-
-        receiptRepositoryMock = Mockito.mock(ReceiptRepository.class);
-        Mockito.when(factory.createReceiptRepository()).thenReturn(receiptRepositoryMock);
-
+        
         service = new BlockServiceImpl(factory);
     }
 
@@ -195,7 +190,7 @@ class BlockServiceTest {
 
         List<MerklePathItem> merklePath = new ArrayList<>();
         MerkleProofInfo merkleProofInfo = new MerkleProofInfo(merklePath);
-        Mockito.when(receiptRepositoryMock.getMerkleReceipts(height, leaf))
+        Mockito.when(blockRepositoryMock.getMerkleReceipts(height, leaf))
             .thenReturn(Observable.just(merkleProofInfo));
 
         Assertions.assertFalse(service.isValidStatementInBlock(height, leaf).toFuture().get());
@@ -217,7 +212,7 @@ class BlockServiceTest {
 
         List<MerklePathItem> merklePath = new ArrayList<>();
         MerkleProofInfo merkleProofInfo = new MerkleProofInfo(merklePath);
-        Mockito.when(receiptRepositoryMock.getMerkleReceipts(height, leaf))
+        Mockito.when(blockRepositoryMock.getMerkleReceipts(height, leaf))
             .thenReturn(Observable.just(merkleProofInfo));
 
         Assertions.assertTrue(service.isValidStatementInBlock(height, leaf).toFuture().get());
@@ -243,7 +238,7 @@ class BlockServiceTest {
         merklePath.add(new MerklePathItem(Position.LEFT, "33"));
         merklePath.add(new MerklePathItem(Position.RIGHT, "44"));
         MerkleProofInfo merkleProofInfo = new MerkleProofInfo(merklePath);
-        Mockito.when(receiptRepositoryMock.getMerkleReceipts(height, hash))
+        Mockito.when(blockRepositoryMock.getMerkleReceipts(height, hash))
             .thenReturn(Observable.just(merkleProofInfo));
 
         Assertions.assertTrue(service.isValidStatementInBlock(height, hash).toFuture().get());
@@ -262,7 +257,7 @@ class BlockServiceTest {
 
         Mockito.when(blockRepositoryMock.getBlockByHeight(height))
             .thenReturn(Observable.just(blockInfo));
-        Mockito.when(receiptRepositoryMock.getMerkleReceipts(height, hash))
+        Mockito.when(blockRepositoryMock.getMerkleReceipts(height, hash))
             .thenReturn(
                 Observable.error(new RuntimeException("Some Error When getMerkleReceipts")));
         Assertions.assertFalse(service.isValidStatementInBlock(height, hash).toFuture().get());
@@ -289,7 +284,7 @@ class BlockServiceTest {
         merklePath.add(new MerklePathItem(Position.LEFT, "33"));
         merklePath.add(new MerklePathItem(Position.RIGHT, "44"));
         MerkleProofInfo merkleProofInfo = new MerkleProofInfo(merklePath);
-        Mockito.when(receiptRepositoryMock.getMerkleReceipts(height, leaf))
+        Mockito.when(blockRepositoryMock.getMerkleReceipts(height, leaf))
             .thenReturn(Observable.just(merkleProofInfo));
 
         Assertions.assertFalse(service.isValidStatementInBlock(height, leaf).toFuture().get());

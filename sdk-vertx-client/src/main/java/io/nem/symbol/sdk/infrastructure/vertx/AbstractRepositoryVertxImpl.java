@@ -17,9 +17,10 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.core.crypto.PublicKey;
+import io.nem.symbol.core.utils.ConvertUtils;
+import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.OrderBy;
 import io.nem.symbol.sdk.api.Page;
-import io.nem.symbol.sdk.api.QueryParams;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
@@ -33,9 +34,9 @@ import io.reactivex.functions.Function;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.reactivex.core.impl.AsyncResultSingle;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -110,18 +111,6 @@ public abstract class AbstractRepositoryVertxImpl {
         return observable.onErrorResumeNext(resumeFunction);
     }
 
-    protected Integer getPageSize(Optional<QueryParams> queryParams) {
-        return queryParams.map(QueryParams::getPageSize).orElse(null);
-    }
-
-    protected String getId(Optional<QueryParams> queryParams) {
-        return queryParams.map(QueryParams::getId).orElse(null);
-    }
-
-    protected Order getOrder(Optional<QueryParams> queryParams) {
-        return queryParams.map(QueryParams::getOrderBy).map(o -> Order.fromValue(o.getValue())).orElse(null);
-    }
-
     protected Order toDto(OrderBy order) {
         return order == null ? null : Order.fromValue(order.getValue());
     }
@@ -132,6 +121,14 @@ public abstract class AbstractRepositoryVertxImpl {
 
     protected String toDto(Address address) {
         return address == null ? null : address.plain();
+    }
+
+    protected String toDto(BigInteger number) {
+        if (number == null) {
+            return null;
+        }
+        ConvertUtils.validateNotNegative(number);
+        return MapperUtils.fromBigIntegerToHex(number);
     }
 
     protected <T> Page<T> toPage(Pagination pagination, List<T> data) {

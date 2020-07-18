@@ -80,7 +80,7 @@ class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
             .getAccountMetadataByKeyAndSender(targetAccount.getAddress(), key,
                 signerAccount.getAddress()));
 
-        Assertions.assertEquals(value, originalMetadata.getMetadataEntry().getValue());
+        Assertions.assertEquals(value, originalMetadata.getValue());
     }
 
 }

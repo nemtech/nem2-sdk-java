@@ -1,0 +1,60 @@
+[
+  {
+    "statement": {
+      "height": "52",
+      "source": {
+        "primaryId": 0,
+        "secondaryId": 0
+      },
+      "receipts": [
+        {
+          "version": 1,
+          "type": 8515,
+          "targetAddress": "90E6FF7755A80B6AA935A5C31B6D3D0CFAF82E06BF2B9CC9",
+          "mosaicId": "85BBEA6CC462B244",
+          "amount": "1000"
+        }
+      ]
+    }
+  },
+  {
+    "statement": {
+      "height": "53",
+      "source": {
+        "primaryId": 0,
+        "secondaryId": 0
+      },
+      "receipts": [
+        {
+          "version": 1,
+          "type": 4942,
+          "senderAddress": "90E6FF7755A80B6AA935A5C31B6D3D0CFAF82E06BF2B9CC9",
+          "mosaicId": "85BBEA6CC462B244",
+          "recipientAddress": "903CC58E8C242DCFC33DE4E2F8B434C77F93A48BA13BC3E3",
+          "amount": "1000"
+        },
+        {
+          "version": 1,
+          "type": 16717,
+          "artifactId": "2FC3872A792933617D70E02AFF8FBDE152821A0DF0CA5FB04CB56FC3D21C8863"
+        },
+        {
+          "version": 1,
+          "type": 16718,
+          "artifactId": "2FC3872A792933617D70E02AFF8FBDE152821A0DF0CA5FB04CB56FC3D21C8863"
+        },
+        {
+          "version": 1,
+          "type": 16974,
+          "artifactId": "2FC3872A792933617D70E02AFF8FBDE152821A0DF0CA5FB04CB56FC3D21C8863"
+        },
+        {
+          "version": 1,
+          "type": 20803,
+          "mosaicId": "85BBEA6CC462B244",
+          "amount": "333"
+        }
+      ]
+    }
+  }
+]

@@ -25,7 +25,7 @@ import java.util.Objects;
  * Defines the params used to search namespaces. With this criteria, you can sort and filter namespaces queries using
  * rest.
  */
-public class NamespaceSearchCriteria extends SearchCriteria {
+public class NamespaceSearchCriteria extends SearchCriteria<NamespaceSearchCriteria> {
 
     /**
      * Namespace identifier up to which transactions are returned. (optional)
@@ -51,13 +51,6 @@ public class NamespaceSearchCriteria extends SearchCriteria {
      * Filter by alias type. (optional)
      */
     private AliasType aliasType;
-
-
-    /**
-     * Entry id at which to start pagination. If the ordering parameter is set to DESC, the elements returned precede
-     * the identifier. Otherwise, newer elements with respect to the id are returned.  (optional)
-     */
-    private String offset;
 
     public String getId() {
         return id;
@@ -99,26 +92,6 @@ public class NamespaceSearchCriteria extends SearchCriteria {
         this.ownerAddress = ownerAddress;
     }
 
-    public String getOffset() {
-        return offset;
-    }
-
-    public void setOffset(String offset) {
-        this.offset = offset;
-    }
-
-    /**
-     * Sets the offset builder style.
-     *
-     * @param offset the new offset
-     * @return this criteria.
-     */
-    public NamespaceSearchCriteria offset(String offset) {
-        this.offset = offset;
-        return this;
-    }
-
-
     public NamespaceSearchCriteria id(String id) {
         this.id = id;
         return this;
@@ -158,11 +131,11 @@ public class NamespaceSearchCriteria extends SearchCriteria {
         NamespaceSearchCriteria that = (NamespaceSearchCriteria) o;
         return Objects.equals(id, that.id) && Objects.equals(ownerAddress, that.ownerAddress)
             && registrationType == that.registrationType && Objects.equals(level0, that.level0)
-            && aliasType == that.aliasType && Objects.equals(offset, that.offset);
+            && aliasType == that.aliasType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), id, ownerAddress, registrationType, level0, aliasType, offset);
+        return Objects.hash(super.hashCode(), id, ownerAddress, registrationType, level0, aliasType);
     }
 }

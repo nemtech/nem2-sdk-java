@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * JSON Helper interface used by the mappers to process json objects.
@@ -30,7 +31,6 @@ import java.math.BigInteger;
  * @author Fernando Boucquez
  */
 public interface JsonHelper {
-
 
     /**
      * It serializes an object into json.
@@ -49,13 +49,23 @@ public interface JsonHelper {
     String prettyPrint(Object object);
 
     /**
-     * It parse a json string into a an object of the underlying implementation (e.g. gson
+     * It parse a json string into an object of the underlying implementation (e.g. gson
      * JsonObject or jackson ObjectNode)
      *
      * @param string the json string
      * @return the object or null if the string is null.
      */
     Object parse(String string);
+
+    /**
+     * It parse a json string into an object list of the given class.
+     *
+     * @param string the json string
+     * @param clazz the class of the parsed object
+     * @param <T> the type of the parsed object
+     * @return the object or null if the string is null.
+     */
+    <T> List<T> parseList(String string, Class<T> clazz);
 
     /**
      * It parse a json string into a an object of the given class.

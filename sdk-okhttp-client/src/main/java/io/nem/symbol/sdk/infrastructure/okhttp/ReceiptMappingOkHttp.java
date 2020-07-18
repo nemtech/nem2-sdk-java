@@ -23,7 +23,6 @@ import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
-import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.receipt.AddressResolutionStatement;
 import io.nem.symbol.sdk.model.receipt.ArtifactExpiryReceipt;
 import io.nem.symbol.sdk.model.receipt.BalanceChangeReceipt;
@@ -35,7 +34,6 @@ import io.nem.symbol.sdk.model.receipt.ReceiptSource;
 import io.nem.symbol.sdk.model.receipt.ReceiptType;
 import io.nem.symbol.sdk.model.receipt.ReceiptVersion;
 import io.nem.symbol.sdk.model.receipt.ResolutionEntry;
-import io.nem.symbol.sdk.model.receipt.Statement;
 import io.nem.symbol.sdk.model.receipt.TransactionStatement;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.BalanceChangeReceiptDTO;
@@ -43,11 +41,9 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.BalanceTransferReceiptDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.InflationReceiptDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicExpiryReceiptDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NamespaceExpiryReceiptDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.ResolutionStatementBodyDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.ResolutionStatementDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.StatementsDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionStatementDTO;
-import java.util.List;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.ResolutionStatementInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionStatementInfoDTO;
 import java.util.stream.Collectors;
 
 
@@ -59,28 +55,11 @@ public class ReceiptMappingOkHttp {
         this.jsonHelper = jsonHelper;
     }
 
-    public Statement createStatementFromDto(StatementsDTO input, NetworkType networkType) {
-        List<TransactionStatement> transactionStatements =
-            input.getTransactionStatements().stream()
-                .map(receiptDto -> createTransactionStatement(receiptDto, networkType))
-                .collect(Collectors.toList());
-        List<AddressResolutionStatement> addressResolutionStatements =
-            input.getAddressResolutionStatements().stream()
-                .map(this::createAddressResolutionStatementFromDto)
-                .collect(Collectors.toList());
-        List<MosaicResolutionStatement> mosaicResolutionStatements =
-            input.getMosaicResolutionStatements().stream()
-                .map(this::createMosaicResolutionStatementFromDto)
-                .collect(Collectors.toList());
-        return new Statement(
-            transactionStatements, addressResolutionStatements, mosaicResolutionStatements);
-    }
-
-
     public AddressResolutionStatement createAddressResolutionStatementFromDto(
-        ResolutionStatementDTO receiptDto) {
-        ResolutionStatementBodyDTO statement = receiptDto.getStatement();
+        ResolutionStatementInfoDTO receiptDto) {
+        ResolutionStatementDTO statement = receiptDto.getStatement();
         return new AddressResolutionStatement(
+            receiptDto.getId(),
             statement.getHeight(),
             MapperUtils.toUnresolvedAddress(statement.getUnresolved()),
             statement.getResolutionEntries().stream()
@@ -93,10 +72,10 @@ public class ReceiptMappingOkHttp {
                 .collect(Collectors.toList()));
     }
 
-    public MosaicResolutionStatement createMosaicResolutionStatementFromDto(
-        ResolutionStatementDTO receiptDto) {
-        ResolutionStatementBodyDTO statement = receiptDto.getStatement();
+    public MosaicResolutionStatement createMosaicResolutionStatementFromDto(ResolutionStatementInfoDTO receiptDto) {
+        ResolutionStatementDTO statement = receiptDto.getStatement();
         return new MosaicResolutionStatement(
+            receiptDto.getId(),
             statement.getHeight(),
             MapperUtils.toUnresolvedMosaicId(statement.getUnresolved()),
             statement.getResolutionEntries().stream()
@@ -111,10 +90,8 @@ public class ReceiptMappingOkHttp {
     }
 
 
-    public TransactionStatement createTransactionStatement(
-        TransactionStatementDTO input, NetworkType networkType) {
-        return new TransactionStatement(
-            input.getStatement().getHeight(),
+    public TransactionStatement createTransactionStatement(TransactionStatementInfoDTO input) {
+        return new TransactionStatement(input.getId(), input.getStatement().getHeight(),
             new ReceiptSource(
                 input.getStatement().getSource().getPrimaryId(),
                 input.getStatement().getSource().getSecondaryId()),

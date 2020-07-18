@@ -16,19 +16,21 @@
 
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.ReceiptRepository;
-import io.nem.symbol.sdk.model.blockchain.MerklePathItem;
-import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
-import io.nem.symbol.sdk.model.blockchain.Position;
-import io.nem.symbol.sdk.model.network.NetworkType;
-import io.nem.symbol.sdk.model.receipt.Statement;
+import io.nem.symbol.sdk.api.ResolutionStatementSearchCriteria;
+import io.nem.symbol.sdk.api.TransactionStatementSearchCriteria;
+import io.nem.symbol.sdk.model.receipt.AddressResolutionStatement;
+import io.nem.symbol.sdk.model.receipt.MosaicResolutionStatement;
+import io.nem.symbol.sdk.model.receipt.TransactionStatement;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.ReceiptRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.MerkleProofInfoDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.StatementsDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.Order;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.ReceiptTypeEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.ResolutionStatementPage;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionStatementPage;
 import io.reactivex.Observable;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -36,49 +38,69 @@ import java.util.stream.Collectors;
 /**
  * OkHttp implementation of {@link ReceiptRepository}.
  */
-public class ReceiptRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements
-    ReceiptRepository {
+public class ReceiptRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements ReceiptRepository {
 
     private final ReceiptRoutesApi client;
 
-    private final Observable<NetworkType> networkTypeObservable;
+    private final ReceiptMappingOkHttp mapper;
 
-    public ReceiptRepositoryOkHttpImpl(ApiClient apiClient,
-        Observable<NetworkType> networkTypeObservable) {
+    public ReceiptRepositoryOkHttpImpl(ApiClient apiClient) {
         super(apiClient);
         this.client = new ReceiptRoutesApi(apiClient);
-        this.networkTypeObservable = networkTypeObservable;
+        this.mapper = new ReceiptMappingOkHttp(getJsonHelper());
     }
 
     @Override
-    public Observable<Statement> getBlockReceipts(BigInteger height) {
-        Callable<StatementsDTO> callback = () ->
-            getClient().getBlockReceipts(height);
-        return exceptionHandling(
-            networkTypeObservable.flatMap(networkType -> call(callback).map(statementsDTO ->
-                new ReceiptMappingOkHttp(getJsonHelper())
-                    .createStatementFromDto(statementsDTO, networkType))));
+    public Observable<Page<TransactionStatement>> searchReceipts(TransactionStatementSearchCriteria criteria) {
+
+        BigInteger height = criteria.getHeight();
+        ReceiptTypeEnum receiptType =
+            criteria.getReceiptType() == null ? null : ReceiptTypeEnum.fromValue(criteria.getReceiptType().getValue());
+        String recipientAddress = toDto(criteria.getRecipientAddress());
+        String senderAddress = toDto(criteria.getSenderAddress());
+        String targetAddress = toDto(criteria.getTargetAddress());
+        String artifactId = criteria.getArtifactId();
+        Integer pageSize = criteria.getPageSize();
+        Integer pageNumber = criteria.getPageNumber();
+        String offset = criteria.getOffset();
+        Order order = toDto(criteria.getOrder());
+
+        Callable<TransactionStatementPage> callback = () -> getClient()
+            .searchReceipts(height, receiptType, recipientAddress, senderAddress, targetAddress, artifactId, pageSize,
+                pageNumber, offset, order);
+
+        return exceptionHandling(call(callback).map(page -> this.toPage(page.getPagination(),
+            page.getData().stream().map(mapper::createTransactionStatement).collect(Collectors.toList()))));
+
+    }
+
+    @Override
+    public Observable<Page<AddressResolutionStatement>> searchAddressResolutionStatements(
+        ResolutionStatementSearchCriteria criteria) {
+        BigInteger height = criteria.getHeight();
+        Integer pageSize = criteria.getPageSize();
+        Integer pageNumber = criteria.getPageNumber();
+        String offset = criteria.getOffset();
+        Order order = toDto(criteria.getOrder());
+        Callable<ResolutionStatementPage> callback = () -> getClient().searchAddressResolutionStatements(height, pageSize, pageNumber, offset, order);
+        return exceptionHandling(call(callback).map(page -> this.toPage(page.getPagination(),
+            page.getData().stream().map(mapper::createAddressResolutionStatementFromDto).collect(Collectors.toList()))));
+
     }
 
 
-    public Observable<MerkleProofInfo> getMerkleReceipts(BigInteger height, String hash) {
+    @Override
+    public Observable<Page<MosaicResolutionStatement>> searchMosaicResolutionStatements(
+        ResolutionStatementSearchCriteria criteria) {
+        BigInteger height = criteria.getHeight();
+        Integer pageSize = criteria.getPageSize();
+        Integer pageNumber = criteria.getPageNumber();
+        String offset = criteria.getOffset();
+        Order order = toDto(criteria.getOrder());
+        Callable<ResolutionStatementPage> callback = () -> getClient().searchMosaicResolutionStatements(height, pageSize, pageNumber, offset, order);
+        return exceptionHandling(call(callback).map(page -> this.toPage(page.getPagination(),
+            page.getData().stream().map(mapper::createMosaicResolutionStatementFromDto).collect(Collectors.toList()))));
 
-        Callable<MerkleProofInfoDTO> callback = () ->
-            getClient().getMerkleReceipts(height, hash);
-        return exceptionHandling(call(callback).map(this::toMerkleProofInfo));
-    }
-
-
-    private MerkleProofInfo toMerkleProofInfo(MerkleProofInfoDTO dto) {
-        List<MerklePathItem> pathItems =
-            dto.getMerklePath().stream()
-                .map(
-                    pathItem ->
-                        new MerklePathItem(pathItem.getPosition() == null ? null
-                            : Position.rawValueOf(pathItem.getPosition().getValue()),
-                            pathItem.getHash()))
-                .collect(Collectors.toList());
-        return new MerkleProofInfo(pathItems);
     }
 
     public ReceiptRoutesApi getClient() {

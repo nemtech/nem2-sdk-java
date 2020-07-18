@@ -95,6 +95,13 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl implem
     }
 
 
+    public Observable<MerkleProofInfo> getMerkleReceipts(BigInteger height, String hash) {
+        Consumer<Handler<AsyncResult<MerkleProofInfoDTO>>> callback = (handler) -> getClient()
+            .getMerkleReceipts(height, hash, handler);
+        return exceptionHandling(call(callback).map(this::toMerkleProofInfo));
+    }
+
+
     public static BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO) {
         NetworkType networkType = NetworkType.rawValueOf(blockInfoDTO.getBlock().getNetwork().getValue());
         return new BlockInfo(blockInfoDTO.getId(), blockInfoDTO.getBlock().getSize(), blockInfoDTO.getMeta().getHash(),

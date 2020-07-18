@@ -21,7 +21,6 @@ import io.nem.symbol.core.crypto.Hashes;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.BlockService;
-import io.nem.symbol.sdk.api.ReceiptRepository;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerklePathItem;
@@ -44,16 +43,10 @@ public class BlockServiceImpl implements BlockService {
     private final BlockRepository blockRepository;
 
     /**
-     * The recipient repository.
-     */
-    private final ReceiptRepository receiptRepository;
-
-    /**
      * @param repositoryFactory the repository factory.
      */
     public BlockServiceImpl(RepositoryFactory repositoryFactory) {
         this.blockRepository = repositoryFactory.createBlockRepository();
-        this.receiptRepository = repositoryFactory.createReceiptRepository();
     }
 
     @Override
@@ -73,7 +66,7 @@ public class BlockServiceImpl implements BlockService {
         Validate.notNull(statementHash, "statementHash is required");
         return getBooleanObservable(
             blockRepository.getBlockByHeight(height).map(BlockInfo::getBlockReceiptsHash),
-            statementHash, receiptRepository
+            statementHash, blockRepository
                 .getMerkleReceipts(height, statementHash));
     }
 

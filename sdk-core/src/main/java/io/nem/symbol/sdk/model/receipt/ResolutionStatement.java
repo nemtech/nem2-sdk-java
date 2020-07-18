@@ -26,6 +26,7 @@ import io.nem.symbol.catapult.builders.Serializer;
 import io.nem.symbol.core.crypto.Hashes;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.infrastructure.SerializationUtils;
+import io.nem.symbol.sdk.model.Stored;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -40,8 +41,9 @@ import java.util.stream.Collectors;
  * @param <U> the unresolved type {@link UnresolvedAddress} or  {@link UnresolvedMosaicId}
  * @param <R> the resolved type {@link Address} or {@link MosaicId}
  */
-public abstract class ResolutionStatement<U, R> {
+public abstract class ResolutionStatement<U, R> implements Stored {
 
+    private final Optional<String> recordId;
     private final ResolutionType resolutionType;
     private final BigInteger height;
     private final U unresolved;
@@ -50,14 +52,15 @@ public abstract class ResolutionStatement<U, R> {
     /**
      * Constructor
      *
+     * @param recordId the stored database id if known
      * @param resolutionType the ResolutionType
      * @param height Height
      * @param unresolved An unresolved address or unresolved mosaicId ({@link UnresolvedAddress} | {@link
-     * UnresolvedMosaicId}).
+* UnresolvedMosaicId}).
      * @param resolutionEntries Array of resolution entries ({@link Address}, or {@link MosaicId}).
      */
-    public ResolutionStatement(ResolutionType resolutionType, BigInteger height, U unresolved,
-        List<ResolutionEntry<R>> resolutionEntries) {
+    public ResolutionStatement(String recordId, ResolutionType resolutionType, BigInteger height, U unresolved, List<ResolutionEntry<R>> resolutionEntries) {
+        this.recordId = Optional.ofNullable(recordId);
         this.height = height;
         this.unresolved = unresolved;
         this.resolutionEntries = resolutionEntries;
@@ -304,4 +307,8 @@ public abstract class ResolutionStatement<U, R> {
         return serializer.serialize();
     }
 
+    @Override
+    public Optional<String> getRecordId() {
+        return recordId;
+    }
 }

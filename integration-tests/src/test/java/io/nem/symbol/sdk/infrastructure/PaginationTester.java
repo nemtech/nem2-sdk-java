@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.Assertions;
 
-public class PaginationTester<E extends Stored, C extends SearchCriteria> {
+public class PaginationTester<E extends Stored, C extends SearchCriteria<C>> {
 
     private final Supplier<C> criteriaFactory;
     private final Searcher<E, C> searcher;

@@ -86,7 +86,7 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
             .getMosaicMetadataByKeyAndSender(targetMosaicId, key,
                 signerAccount.getPublicAccount().getAddress()));
 
-        Assertions.assertEquals(value, originalMetadata.getMetadataEntry().getValue());
+        Assertions.assertEquals(value, originalMetadata.getValue());
     }
 
 }

@@ -91,7 +91,7 @@ class NamespaceMetadataServiceIntegrationTest extends BaseIntegrationTest {
             .getNamespaceMetadataByKeyAndSender(targetNamespaceId, key,
                 signerAccount.getAddress()));
 
-        Assertions.assertEquals(value, originalMetadata.getMetadataEntry().getValue());
+        Assertions.assertEquals(value, originalMetadata.getValue());
     }
 
 }

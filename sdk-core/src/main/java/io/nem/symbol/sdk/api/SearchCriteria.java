@@ -16,12 +16,13 @@
 
 package io.nem.symbol.sdk.api;
 
+
 import java.util.Objects;
 
 /**
  * Basic option used to search pages of entities.
  */
-public class SearchCriteria {
+public class SearchCriteria<T extends SearchCriteria<T>> {
 
     /**
      * Sort responses in ascending or descending order based on the collection property set on the
@@ -39,6 +40,12 @@ public class SearchCriteria {
      * Filter by page number. (optional, default to 1)
      */
     private Integer pageNumber;
+
+    /**
+     * Entry id at which to start pagination. If the ordering parameter is set to DESC, the elements returned precede
+     * the identifier. Otherwise, newer elements with respect to the id are returned.  (optional)
+     */
+    private String offset;
 
     /**
      * @return the order.
@@ -73,15 +80,22 @@ public class SearchCriteria {
         this.pageNumber = pageNumber;
     }
 
+    public String getOffset() {
+        return offset;
+    }
+
+    public void setOffset(String offset) {
+        this.offset = offset;
+    }
     /**
      * Sets the order builder style.
      *
      * @param order the order.
      * @return this object.
      */
-    public SearchCriteria order(OrderBy order) {
+    public final T order(OrderBy order) {
         this.order = order;
-        return this;
+        return getThisBuilder();
     }
 
     /**
@@ -90,9 +104,9 @@ public class SearchCriteria {
      * @param pageSize the page size.
      * @return this object.
      */
-    public SearchCriteria pageSize(Integer pageSize) {
+    public final  T pageSize(Integer pageSize) {
         this.pageSize = pageSize;
-        return this;
+        return getThisBuilder();
     }
 
     /**
@@ -101,9 +115,20 @@ public class SearchCriteria {
      * @param pageNumber the page number.
      * @return this objects.
      */
-    public SearchCriteria pageNumber(Integer pageNumber) {
+    public final T pageNumber(Integer pageNumber) {
         this.pageNumber = pageNumber;
-        return this;
+        return getThisBuilder();
+    }
+
+    /**
+     * Sets the offset builder style.
+     *
+     * @param offset the offset.
+     * @return this object.
+     */
+    public final T offset(String offset) {
+        this.offset = offset;
+        return getThisBuilder();
     }
 
     @Override
@@ -114,14 +139,21 @@ public class SearchCriteria {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SearchCriteria that = (SearchCriteria) o;
-        return order == that.order &&
-            Objects.equals(pageSize, that.pageSize) &&
-            Objects.equals(pageNumber, that.pageNumber);
+        SearchCriteria<?> that = (SearchCriteria<?>) o;
+        return order == that.order && Objects.equals(pageSize, that.pageSize) && Objects
+            .equals(pageNumber, that.pageNumber) && Objects.equals(offset, that.offset);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(order, pageSize, pageNumber);
+        return Objects.hash(order, pageSize, pageNumber, offset);
     }
+
+    /**
+     * @return downcast returning this builder subclass
+     */
+    private T getThisBuilder() {
+        return (T) this;
+    }
+
 }

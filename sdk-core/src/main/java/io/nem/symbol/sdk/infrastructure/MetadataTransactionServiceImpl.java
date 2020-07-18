@@ -107,7 +107,7 @@ public class MetadataTransactionServiceImpl implements MetadataTransactionServic
         BiFunction<String, NetworkType, T> transactionFactory, String newValue) {
         return networkTypeObservable.flatMap(networkType -> metadataObservable.map(metadata -> {
             byte[] currentValueBytes = StringEncoder
-                .getBytes(metadata.getMetadataEntry().getValue());
+                .getBytes(metadata.getValue());
             byte[] newValueBytes = StringEncoder.getBytes(newValue);
             String xorValue = StringEncoder
                 .getString(ConvertUtils.xor(currentValueBytes, newValueBytes));

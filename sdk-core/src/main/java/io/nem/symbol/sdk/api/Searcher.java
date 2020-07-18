@@ -7,7 +7,7 @@ import io.reactivex.Observable;
  * @param <E> The entity model type
  * @param <C> The type of the criteria with the search filter
  */
-public interface Searcher<E, C extends SearchCriteria> {
+public interface Searcher<E, C extends SearchCriteria<C>> {
 
     /**
      * It searches entities of a type based on a criteria.

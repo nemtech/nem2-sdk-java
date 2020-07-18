@@ -72,9 +72,6 @@ class AddressTest {
 
     @Test
     void testAddressCreation() {
-
-        Assertions
-            .assertEquals("", Address.createFromEncoded("98A18EB203BB0CFFA548D8F64E644A4A91109F8BBEBFD4FE").plain());
         Address address = new Address("TDGRZD-ZEHD4M-5K3JIT-64DU3P-EKFYNF-5VWFEY-DQA", NetworkType.TEST_NET);
         assertEquals("TDGRZDZEHD4M5K3JIT64DU3PEKFYNF5VWFEYDQA", address.plain());
     }

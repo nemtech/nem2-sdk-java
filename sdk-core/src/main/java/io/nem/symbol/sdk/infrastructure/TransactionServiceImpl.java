@@ -17,8 +17,10 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.Listener;
+import io.nem.symbol.sdk.api.ReceiptPaginationStreamer;
 import io.nem.symbol.sdk.api.ReceiptRepository;
 import io.nem.symbol.sdk.api.RepositoryFactory;
+import io.nem.symbol.sdk.api.ResolutionStatementSearchCriteria;
 import io.nem.symbol.sdk.api.TransactionRepository;
 import io.nem.symbol.sdk.api.TransactionService;
 import io.nem.symbol.sdk.model.account.Address;
@@ -27,8 +29,9 @@ import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.receipt.AddressResolutionStatement;
+import io.nem.symbol.sdk.model.receipt.MosaicResolutionStatement;
 import io.nem.symbol.sdk.model.receipt.ReceiptSource;
-import io.nem.symbol.sdk.model.receipt.Statement;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransaction;
@@ -60,12 +63,13 @@ import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import io.reactivex.Observable;
 import io.reactivex.functions.BiFunction;
+import java.math.BigInteger;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 
 /**
- * Implementation of {@link TransactionService}. It  uses the repository interfaces. It works for
- * the different low level implementations like Vertx and Okhttp.
+ * Implementation of {@link TransactionService}. It  uses the repository interfaces. It works for the different low
+ * level implementations like Vertx and Okhttp.
  */
 public class TransactionServiceImpl implements TransactionService {
 
@@ -90,33 +94,29 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Observable<Transaction> announce(Listener listener,
-        SignedTransaction signedTransaction) {
+    public Observable<Transaction> announce(Listener listener, SignedTransaction signedTransaction) {
         Validate.notNull(signedTransaction, "signedTransaction is required");
-        Observable<TransactionAnnounceResponse> announce = transactionRepository
-            .announce(signedTransaction);
+        Observable<TransactionAnnounceResponse> announce = transactionRepository.announce(signedTransaction);
         return announce.flatMap(
-            r -> listener.confirmedOrError(signedTransaction.getSigner().getAddress(),
-                signedTransaction.getHash()));
+            r -> listener.confirmedOrError(signedTransaction.getSigner().getAddress(), signedTransaction.getHash()));
     }
 
     @Override
-    public Observable<AggregateTransaction> announceAggregateBonded(
-        Listener listener, SignedTransaction signedAggregateTransaction) {
+    public Observable<AggregateTransaction> announceAggregateBonded(Listener listener,
+        SignedTransaction signedAggregateTransaction) {
         Validate.notNull(signedAggregateTransaction, "signedAggregateTransaction is required");
         Validate.isTrue(signedAggregateTransaction.getType() == TransactionType.AGGREGATE_BONDED,
             "signedAggregateTransaction type must be AGGREGATE_BONDED");
         Observable<TransactionAnnounceResponse> announce = transactionRepository
             .announceAggregateBonded(signedAggregateTransaction);
-        return announce.flatMap(
-            r -> listener.aggregateBondedAddedOrError(signedAggregateTransaction.getSigner().getAddress(),
+        return announce.flatMap(r -> listener
+            .aggregateBondedAddedOrError(signedAggregateTransaction.getSigner().getAddress(),
                 signedAggregateTransaction.getHash()));
     }
 
     @Override
-    public Observable<AggregateTransaction> announceHashLockAggregateBonded(
-        Listener listener, SignedTransaction signedHashLockTransaction,
-        SignedTransaction signedAggregateTransaction) {
+    public Observable<AggregateTransaction> announceHashLockAggregateBonded(Listener listener,
+        SignedTransaction signedHashLockTransaction, SignedTransaction signedAggregateTransaction) {
         Validate.notNull(signedHashLockTransaction, "signedHashLockTransaction is required");
         Validate.notNull(signedAggregateTransaction, "signedAggregateTransaction is required");
         Validate.isTrue(signedAggregateTransaction.getType() == TransactionType.AGGREGATE_BONDED,
@@ -129,235 +129,227 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Observable<List<Transaction>> resolveAliases(List<String> transactionHashes) {
-        return transactionRepository.getTransactions(TransactionGroup.CONFIRMED, transactionHashes).flatMapIterable(a -> a)
-            .flatMap(transaction -> resolveTransaction(transaction,
-                createExpectedReceiptSource(transaction))).toList().toObservable();
+        return transactionRepository.getTransactions(TransactionGroup.CONFIRMED, transactionHashes)
+            .flatMapIterable(a -> a)
+            .flatMap(transaction -> resolveTransaction(transaction, createExpectedReceiptSource(transaction))).toList()
+            .toObservable();
+    }
+
+    private Observable<Transaction> resolveTransaction(Transaction transaction, ReceiptSource expectedSource) {
+
+        Observable<List<AddressResolutionStatement>> addressResolutionStatements = getAddressResolutionStatements(
+            transaction);
+        Observable<List<MosaicResolutionStatement>> mosaicResolutionStatements = getMosaicResolutionStatements(
+            transaction);
+
+        return resolveTransaction(transaction, expectedSource, addressResolutionStatements, mosaicResolutionStatements);
     }
 
 
-    private Observable<Transaction> resolveTransaction(Transaction transaction,
-        ReceiptSource expectedSource) {
-        return basicTransactionFactory(transaction, expectedSource).map(
-            transactionTransactionFactory -> completeAndBuild(transactionTransactionFactory,
-                transaction));
+    private Observable<Transaction> resolveTransaction(Transaction transaction, ReceiptSource expectedSource,
+        Observable<List<AddressResolutionStatement>> addressResolutionStatements,
+        Observable<List<MosaicResolutionStatement>> mosaicResolutionStatements) {
+
+        return basicTransactionFactory(transaction, expectedSource, addressResolutionStatements,
+            mosaicResolutionStatements)
+            .map(transactionTransactionFactory -> completeAndBuild(transactionTransactionFactory, transaction));
     }
 
-    private Observable<TransactionFactory<? extends Transaction>> basicTransactionFactory(
-        Transaction transaction, ReceiptSource expectedReceiptSource) {
+    private Observable<TransactionFactory<? extends Transaction>> basicTransactionFactory(Transaction transaction,
+        ReceiptSource expectedReceiptSource, Observable<List<AddressResolutionStatement>> addressResolutionStatements,
+        Observable<List<MosaicResolutionStatement>> mosaicResolutionStatements) {
 
         if (transaction.getType() == TransactionType.TRANSFER) {
-            return resolveTransactionFactory((TransferTransaction) transaction,
-                expectedReceiptSource);
+            return resolveTransactionFactory((TransferTransaction) transaction, expectedReceiptSource,
+                addressResolutionStatements, mosaicResolutionStatements);
         }
 
         if (transaction.getType() == TransactionType.HASH_LOCK) {
-            return resolveTransactionFactory((HashLockTransaction) transaction,
-                expectedReceiptSource);
+            return resolveTransactionFactory((HashLockTransaction) transaction, expectedReceiptSource,
+                mosaicResolutionStatements);
         }
 
         if (transaction.getType() == TransactionType.SECRET_LOCK) {
-            return resolveTransactionFactory((SecretLockTransaction) transaction,
-                expectedReceiptSource);
+            return resolveTransactionFactory((SecretLockTransaction) transaction, expectedReceiptSource,
+                addressResolutionStatements, mosaicResolutionStatements);
         }
 
         if (transaction.getType() == TransactionType.SECRET_PROOF) {
-            return resolveTransactionFactory((SecretProofTransaction) transaction,
-                expectedReceiptSource);
+            return resolveTransactionFactory((SecretProofTransaction) transaction, expectedReceiptSource,
+                addressResolutionStatements);
         }
 
         if (transaction.getType() == TransactionType.MOSAIC_GLOBAL_RESTRICTION) {
-            return resolveTransactionFactory((MosaicGlobalRestrictionTransaction) transaction,
-                expectedReceiptSource);
+            return resolveTransactionFactory((MosaicGlobalRestrictionTransaction) transaction, expectedReceiptSource,
+                mosaicResolutionStatements);
         }
 
         if (transaction.getType() == TransactionType.MOSAIC_ADDRESS_RESTRICTION) {
-            return resolveTransactionFactory((MosaicAddressRestrictionTransaction) transaction,
-                expectedReceiptSource);
+            return resolveTransactionFactory((MosaicAddressRestrictionTransaction) transaction, expectedReceiptSource,
+                addressResolutionStatements, mosaicResolutionStatements);
         }
 
         if (transaction.getType() == TransactionType.ACCOUNT_MOSAIC_RESTRICTION) {
-            return resolveTransactionFactory((AccountMosaicRestrictionTransaction) transaction,
-                expectedReceiptSource);
+            return resolveTransactionFactory((AccountMosaicRestrictionTransaction) transaction, expectedReceiptSource,
+                mosaicResolutionStatements);
         }
 
         if (transaction.getType() == TransactionType.MOSAIC_METADATA) {
-            return resolveTransactionFactory((MosaicMetadataTransaction) transaction,
-                expectedReceiptSource);
+            return resolveTransactionFactory((MosaicMetadataTransaction) transaction, expectedReceiptSource,
+                mosaicResolutionStatements);
         }
 
         if (transaction.getType() == TransactionType.ACCOUNT_ADDRESS_RESTRICTION) {
-            return resolveTransactionFactory((AccountAddressRestrictionTransaction) transaction,
-                expectedReceiptSource);
+            return resolveTransactionFactory((AccountAddressRestrictionTransaction) transaction, expectedReceiptSource,
+                addressResolutionStatements);
         }
 
         if (transaction.getType() == TransactionType.MOSAIC_SUPPLY_CHANGE) {
-            return resolveTransactionFactory((MosaicSupplyChangeTransaction) transaction,
-                expectedReceiptSource);
+            return resolveTransactionFactory((MosaicSupplyChangeTransaction) transaction, expectedReceiptSource,
+                mosaicResolutionStatements);
         }
 
         if (transaction.getType() == TransactionType.AGGREGATE_COMPLETE
             || transaction.getType() == TransactionType.AGGREGATE_BONDED) {
-            return resolveTransactionFactory((AggregateTransaction) transaction,
-                expectedReceiptSource);
+            return resolveTransactionFactory((AggregateTransaction) transaction, expectedReceiptSource,
+                addressResolutionStatements, mosaicResolutionStatements);
         }
 
-        return Observable.just(new TransactionFactory<Transaction>(transaction.getType(),
-            transaction.getNetworkType()) {
-            @Override
-            public Transaction build() {
-                return transaction;
-            }
-        });
-    }
-
-    private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
-        HashLockTransaction transaction, ReceiptSource expectedReceiptSource) {
-        Observable<Statement> statementObservable = getStatement(transaction);
-
-        Observable<Mosaic> resolvedMosaic = getResolvedMosaic(transaction, transaction.getMosaic(),
-            statementObservable, expectedReceiptSource
-        );
-
-        return resolvedMosaic.map(mosaic -> HashLockTransactionFactory
-            .create(transaction.getNetworkType(), mosaic, transaction.getDuration(),
-                transaction.getHash()));
-    }
-
-    private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
-        SecretLockTransaction transaction, ReceiptSource expectedReceiptSource) {
-        Observable<Statement> statementObservable = getStatement(transaction);
-        Observable<Address> resolvedAddress = getResolvedAddress(transaction,
-            transaction.getRecipient(), statementObservable, expectedReceiptSource);
-        Observable<Mosaic> resolvedMosaic = getResolvedMosaic(transaction, transaction.getMosaic(),
-            statementObservable, expectedReceiptSource
-        );
-        return Observable.combineLatest(resolvedAddress, resolvedMosaic,
-            (address, mosaic) -> SecretLockTransactionFactory
-                .create(transaction.getNetworkType(),
-                    mosaic,
-                    transaction.getDuration(),
-                    transaction.getHashAlgorithm(),
-                    transaction.getSecret(),
-                    address));
-    }
-
-    private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
-        SecretProofTransaction transaction, ReceiptSource expectedReceiptSource) {
-        Observable<Statement> statementObservable = getStatement(transaction);
-        Observable<Address> resolvedAddress = getResolvedAddress(transaction,
-            transaction.getRecipient(), statementObservable, expectedReceiptSource);
-        return resolvedAddress.map(address -> SecretProofTransactionFactory
-            .create(transaction.getNetworkType(), transaction.getHashType(), address,
-                transaction.getSecret(), transaction.getProof()));
-    }
-
-    private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
-        TransferTransaction transaction, ReceiptSource expectedReceiptSource) {
-        Observable<Statement> statementObservable = getStatement(transaction);
-        Observable<List<Mosaic>> resolvedMosaics = Observable
-            .fromIterable(transaction.getMosaics()).flatMap(
-                m -> getResolvedMosaic(transaction, m, statementObservable, expectedReceiptSource))
-            .toList().toObservable();
-
-        Observable<Address> resolvedRecipient = getResolvedAddress(transaction,
-            transaction.getRecipient(),
-            statementObservable, expectedReceiptSource);
-
-        BiFunction<Address, List<Mosaic>, TransferTransactionFactory> mergeFunction = (address, mosaics) ->
-            TransferTransactionFactory
-                .create(transaction.getNetworkType(), address, mosaics, transaction.getMessage());
-        return Observable.combineLatest(resolvedRecipient, resolvedMosaics, mergeFunction);
-    }
-
-    private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
-        MosaicGlobalRestrictionTransaction transaction, ReceiptSource expectedReceiptSource) {
-        Observable<Statement> statementObservable = getStatement(transaction);
-        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(transaction,
-            transaction.getMosaicId(),
-            statementObservable, expectedReceiptSource);
-
-        Observable<MosaicId> resolvedReferenceMosaicId = getResolvedMosaicId(transaction,
-            transaction.getReferenceMosaicId(),
-            statementObservable, expectedReceiptSource);
-
-        return Observable.combineLatest(resolvedMosaicId, resolvedReferenceMosaicId,
-            (mosaicId, referenceMosaicId) ->
-            {
-                MosaicGlobalRestrictionTransactionFactory factory = MosaicGlobalRestrictionTransactionFactory
-                    .create(transaction.getNetworkType(), mosaicId,
-                        transaction.getRestrictionKey(), transaction.getNewRestrictionValue(),
-                        transaction.getNewRestrictionType());
-                if (referenceMosaicId != null) {
-                    factory.referenceMosaicId(referenceMosaicId);
+        return Observable
+            .just(new TransactionFactory<Transaction>(transaction.getType(), transaction.getNetworkType()) {
+                @Override
+                public Transaction build() {
+                    return transaction;
                 }
-                return factory.previousRestrictionValue(transaction.getPreviousRestrictionValue())
-                    .previousRestrictionType(transaction.getPreviousRestrictionType());
             });
     }
 
     private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
-        MosaicAddressRestrictionTransaction transaction,
-        ReceiptSource expectedReceiptSource) {
-        Observable<Statement> statementObservable = getStatement(transaction);
-        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(transaction,
-            transaction.getMosaicId(),
-            statementObservable, expectedReceiptSource);
+        HashLockTransaction transaction, ReceiptSource expectedReceiptSource,
+        Observable<List<MosaicResolutionStatement>> mosaicResolutionStatements) {
 
-        Observable<Address> resolvedTargetAddress = Observable
-            .just(transaction.getTargetAddress())
-            .flatMap(m -> getResolvedAddress(transaction, m, statementObservable,
-                expectedReceiptSource));
+        Observable<Mosaic> resolvedMosaic = getResolvedMosaic(transaction, transaction.getMosaic(),
+            mosaicResolutionStatements, expectedReceiptSource);
 
-        BiFunction<? super MosaicId, ? super Address, MosaicAddressRestrictionTransactionFactory> mapper = (mosaicId, targetAddress) ->
-            MosaicAddressRestrictionTransactionFactory
-                .create(transaction.getNetworkType(), mosaicId,
-                    transaction.getRestrictionKey(), targetAddress,
-                    transaction.getNewRestrictionValue())
-                .previousRestrictionValue(transaction.getPreviousRestrictionValue());
+        return resolvedMosaic.map(mosaic -> HashLockTransactionFactory
+            .create(transaction.getNetworkType(), mosaic, transaction.getDuration(), transaction.getHash()));
+    }
+
+    private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
+        SecretLockTransaction transaction, ReceiptSource expectedReceiptSource,
+        Observable<List<AddressResolutionStatement>> addressResolutionStatements,
+        Observable<List<MosaicResolutionStatement>> mosaicResolutionStatements) {
+        Observable<Address> resolvedAddress = getResolvedAddress(transaction, transaction.getRecipient(),
+            addressResolutionStatements, expectedReceiptSource);
+        Observable<Mosaic> resolvedMosaic = getResolvedMosaic(transaction, transaction.getMosaic(),
+            mosaicResolutionStatements, expectedReceiptSource);
+        return Observable.combineLatest(resolvedAddress, resolvedMosaic,
+            (address, mosaic) -> SecretLockTransactionFactory
+                .create(transaction.getNetworkType(), mosaic, transaction.getDuration(), transaction.getHashAlgorithm(),
+                    transaction.getSecret(), address));
+    }
+
+    private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
+        SecretProofTransaction transaction, ReceiptSource expectedReceiptSource,
+        Observable<List<AddressResolutionStatement>> addressResolutionStatements) {
+
+        Observable<Address> resolvedAddress = getResolvedAddress(transaction, transaction.getRecipient(),
+            addressResolutionStatements, expectedReceiptSource);
+        return resolvedAddress.map(address -> SecretProofTransactionFactory
+            .create(transaction.getNetworkType(), transaction.getHashType(), address, transaction.getSecret(),
+                transaction.getProof()));
+    }
+
+    private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
+        TransferTransaction transaction, ReceiptSource expectedReceiptSource,
+        Observable<List<AddressResolutionStatement>> addressResolutionStatements,
+        Observable<List<MosaicResolutionStatement>> mosaicResolutionStatements) {
+
+        Observable<List<Mosaic>> resolvedMosaics = Observable.fromIterable(transaction.getMosaics())
+            .flatMap(m -> getResolvedMosaic(transaction, m, mosaicResolutionStatements, expectedReceiptSource)).toList()
+            .toObservable();
+
+        Observable<Address> resolvedRecipient = getResolvedAddress(transaction, transaction.getRecipient(),
+            addressResolutionStatements, expectedReceiptSource);
+
+        BiFunction<Address, List<Mosaic>, TransferTransactionFactory> mergeFunction = (address, mosaics) -> TransferTransactionFactory
+            .create(transaction.getNetworkType(), address, mosaics, transaction.getMessage());
+        return Observable.combineLatest(resolvedRecipient, resolvedMosaics, mergeFunction);
+    }
+
+    private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
+        MosaicGlobalRestrictionTransaction transaction, ReceiptSource expectedReceiptSource,
+        Observable<List<MosaicResolutionStatement>> mosaicResolutionStatements) {
+        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(transaction, transaction.getMosaicId(),
+            mosaicResolutionStatements, expectedReceiptSource);
+
+        Observable<MosaicId> resolvedReferenceMosaicId = getResolvedMosaicId(transaction,
+            transaction.getReferenceMosaicId(), mosaicResolutionStatements, expectedReceiptSource);
+
+        return Observable.combineLatest(resolvedMosaicId, resolvedReferenceMosaicId, (mosaicId, referenceMosaicId) -> {
+            MosaicGlobalRestrictionTransactionFactory factory = MosaicGlobalRestrictionTransactionFactory
+                .create(transaction.getNetworkType(), mosaicId, transaction.getRestrictionKey(),
+                    transaction.getNewRestrictionValue(), transaction.getNewRestrictionType());
+            if (referenceMosaicId != null) {
+                factory.referenceMosaicId(referenceMosaicId);
+            }
+            return factory.previousRestrictionValue(transaction.getPreviousRestrictionValue())
+                .previousRestrictionType(transaction.getPreviousRestrictionType());
+        });
+    }
+
+    private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
+        MosaicAddressRestrictionTransaction transaction, ReceiptSource expectedReceiptSource,
+        Observable<List<AddressResolutionStatement>> addressResolutionStatements,
+        Observable<List<MosaicResolutionStatement>> mosaicResolutionStatements) {
+        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(transaction, transaction.getMosaicId(),
+            mosaicResolutionStatements, expectedReceiptSource);
+
+        Observable<Address> resolvedTargetAddress = Observable.just(transaction.getTargetAddress())
+            .flatMap(m -> getResolvedAddress(transaction, m, addressResolutionStatements, expectedReceiptSource));
+
+        BiFunction<? super MosaicId, ? super Address, MosaicAddressRestrictionTransactionFactory> mapper = (mosaicId, targetAddress) -> MosaicAddressRestrictionTransactionFactory
+            .create(transaction.getNetworkType(), mosaicId, transaction.getRestrictionKey(), targetAddress,
+                transaction.getNewRestrictionValue())
+            .previousRestrictionValue(transaction.getPreviousRestrictionValue());
         return Observable.combineLatest(resolvedMosaicId, resolvedTargetAddress, mapper);
     }
 
     private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
-        AccountMosaicRestrictionTransaction transaction,
-        ReceiptSource expectedReceiptSource) {
-        Observable<Statement> statementObservable = getStatement(transaction);
+        AccountMosaicRestrictionTransaction transaction, ReceiptSource expectedReceiptSource,
+        Observable<List<MosaicResolutionStatement>> mosaicResolutionStatements) {
         Observable<List<UnresolvedMosaicId>> unresolvedAdditions = getResolvedMosaicIds(transaction,
-            transaction.getRestrictionAdditions(), statementObservable, expectedReceiptSource);
+            transaction.getRestrictionAdditions(), mosaicResolutionStatements, expectedReceiptSource);
 
         Observable<List<UnresolvedMosaicId>> unresolvedDeletions = getResolvedMosaicIds(transaction,
-            transaction.getRestrictionDeletions(), statementObservable, expectedReceiptSource);
+            transaction.getRestrictionDeletions(), mosaicResolutionStatements, expectedReceiptSource);
 
-        BiFunction<List<UnresolvedMosaicId>, List<UnresolvedMosaicId>, TransactionFactory<AccountMosaicRestrictionTransaction>> mapper =
-            (additions, deletions) -> AccountMosaicRestrictionTransactionFactory
-                .create(transaction.getNetworkType(), transaction.getRestrictionFlags(), additions,
-                    deletions);
+        BiFunction<List<UnresolvedMosaicId>, List<UnresolvedMosaicId>, TransactionFactory<AccountMosaicRestrictionTransaction>> mapper = (additions, deletions) -> AccountMosaicRestrictionTransactionFactory
+            .create(transaction.getNetworkType(), transaction.getRestrictionFlags(), additions, deletions);
         return Observable.combineLatest(unresolvedAdditions, unresolvedDeletions, mapper);
     }
 
     private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
-        AccountAddressRestrictionTransaction transaction,
-        ReceiptSource expectedReceiptSource) {
-        Observable<Statement> statementObservable = getStatement(transaction);
+        AccountAddressRestrictionTransaction transaction, ReceiptSource expectedReceiptSource,
+        Observable<List<AddressResolutionStatement>> addressResolutionStatements) {
         Observable<List<UnresolvedAddress>> unresolvedAdditions = getResolvedAddresses(transaction,
-            transaction.getRestrictionAdditions(), statementObservable, expectedReceiptSource);
+            transaction.getRestrictionAdditions(), addressResolutionStatements, expectedReceiptSource);
 
         Observable<List<UnresolvedAddress>> unresolvedDeletions = getResolvedAddresses(transaction,
-            transaction.getRestrictionDeletions(), statementObservable, expectedReceiptSource);
+            transaction.getRestrictionDeletions(), addressResolutionStatements, expectedReceiptSource);
 
-        BiFunction<List<UnresolvedAddress>, List<UnresolvedAddress>, AccountAddressRestrictionTransactionFactory> mapper =
-            (additions, deletions) -> AccountAddressRestrictionTransactionFactory
-                .create(transaction.getNetworkType(), transaction.getRestrictionFlags(), additions,
-                    deletions);
+        BiFunction<List<UnresolvedAddress>, List<UnresolvedAddress>, AccountAddressRestrictionTransactionFactory> mapper = (additions, deletions) -> AccountAddressRestrictionTransactionFactory
+            .create(transaction.getNetworkType(), transaction.getRestrictionFlags(), additions, deletions);
         return Observable.combineLatest(unresolvedAdditions, unresolvedDeletions, mapper);
     }
 
 
     private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
-        MosaicMetadataTransaction transaction, ReceiptSource expectedReceiptSource) {
-        Observable<Statement> statementObservable = getStatement(transaction);
+        MosaicMetadataTransaction transaction, ReceiptSource expectedReceiptSource,
+        Observable<List<MosaicResolutionStatement>> mosaicResolutionStatements) {
 
-        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(transaction,
-            transaction.getTargetMosaicId(), statementObservable, expectedReceiptSource);
+        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(transaction, transaction.getTargetMosaicId(),
+            mosaicResolutionStatements, expectedReceiptSource);
 
         return resolvedMosaicId.map(mosaicId -> MosaicMetadataTransactionFactory
             .create(transaction.getNetworkType(), transaction.getTargetAddress(), mosaicId,
@@ -366,33 +358,35 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
-        MosaicSupplyChangeTransaction transaction, ReceiptSource expectedReceiptSource) {
-        Observable<Statement> statementObservable = getStatement(transaction);
+        MosaicSupplyChangeTransaction transaction, ReceiptSource expectedReceiptSource,
+        Observable<List<MosaicResolutionStatement>> mosaicResolutionStatements) {
 
-        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(transaction,
-            transaction.getMosaicId(), statementObservable, expectedReceiptSource);
+        Observable<MosaicId> resolvedMosaicId = getResolvedMosaicId(transaction, transaction.getMosaicId(),
+            mosaicResolutionStatements, expectedReceiptSource);
 
         return resolvedMosaicId.map(mosaicId -> MosaicSupplyChangeTransactionFactory
-            .create(transaction.getNetworkType(), mosaicId,
-                transaction.getAction(), transaction.getDelta()));
+            .create(transaction.getNetworkType(), mosaicId, transaction.getAction(), transaction.getDelta()));
     }
 
 
     private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
-        AggregateTransaction transaction, ReceiptSource aggregateTransactionReceiptSource) {
-        Observable<List<Transaction>> innerTransactions = Observable
-            .just(transaction.getInnerTransactions()).flatMapIterable(m -> m)
-            .flatMap(innerTransaction -> resolveTransaction(innerTransaction,
-                createExpectedReceiptSource(aggregateTransactionReceiptSource, innerTransaction)))
-            .toList().toObservable();
+        AggregateTransaction transaction, ReceiptSource aggregateTransactionReceiptSource,
+        Observable<List<AddressResolutionStatement>> addressResolutionStatements,
+        Observable<List<MosaicResolutionStatement>> mosaicResolutionStatements) {
+        Observable<List<Transaction>> innerTransactions = Observable.just(transaction.getInnerTransactions())
+            .flatMapIterable(m -> m).flatMap(innerTransaction -> {
+                ReceiptSource expectedReceiptSource = createExpectedReceiptSource(aggregateTransactionReceiptSource,
+                    innerTransaction);
+                return resolveTransaction(innerTransaction, expectedReceiptSource, addressResolutionStatements,
+                    mosaicResolutionStatements);
+            }).toList().toObservable();
 
         return innerTransactions.map(txs -> AggregateTransactionFactory
-            .create(transaction.getType(), transaction.getNetworkType(), txs,
-                transaction.getCosignatures()));
+            .create(transaction.getType(), transaction.getNetworkType(), txs, transaction.getCosignatures()));
     }
 
-    private Transaction completeAndBuild(
-        TransactionFactory<? extends Transaction> transactionFactory, Transaction transaction) {
+    private Transaction completeAndBuild(TransactionFactory<? extends Transaction> transactionFactory,
+        Transaction transaction) {
         transactionFactory.maxFee(transaction.getMaxFee());
         transactionFactory.deadline(transaction.getDeadline());
         transactionFactory.version(transaction.getVersion());
@@ -402,89 +396,79 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionFactory.build();
     }
 
-    private Observable<Statement> getStatement(Transaction transaction) {
-        return receiptRepository.getBlockReceipts(getTransactionInfo(transaction)
-            .getHeight()).cache();
+    private Observable<List<MosaicResolutionStatement>> getMosaicResolutionStatements(Transaction transaction) {
+        BigInteger height = getTransactionInfo(transaction).getHeight();
+        return ReceiptPaginationStreamer.mosaics(receiptRepository)
+            .search(new ResolutionStatementSearchCriteria().height(height)).toList().toObservable().cache();
+    }
+
+    private Observable<List<AddressResolutionStatement>> getAddressResolutionStatements(Transaction transaction) {
+        BigInteger height = getTransactionInfo(transaction).getHeight();
+        return ReceiptPaginationStreamer.addresses(receiptRepository)
+            .search(new ResolutionStatementSearchCriteria().height(height)).toList().toObservable().cache();
     }
 
 
     private Observable<List<UnresolvedMosaicId>> getResolvedMosaicIds(Transaction transaction,
-        List<UnresolvedMosaicId> unresolvedMosaicIds, Observable<Statement> statementObservable,
+        List<UnresolvedMosaicId> unresolvedMosaicIds, Observable<List<MosaicResolutionStatement>> statementObservable,
         ReceiptSource expectedReceiptSource) {
-        return Observable.fromIterable(unresolvedMosaicIds)
-            .flatMap(unresolved -> getResolvedMosaicId(transaction, unresolved, statementObservable,
-                expectedReceiptSource)).map(m -> (UnresolvedMosaicId) m).toList().toObservable();
+        return Observable.fromIterable(unresolvedMosaicIds).flatMap(
+            unresolved -> getResolvedMosaicId(transaction, unresolved, statementObservable, expectedReceiptSource))
+            .map(m -> (UnresolvedMosaicId) m).toList().toObservable();
     }
 
     private Observable<List<UnresolvedAddress>> getResolvedAddresses(Transaction transaction,
-        List<UnresolvedAddress> unresolvedMosaicIds, Observable<Statement> statementObservable,
+        List<UnresolvedAddress> unresolvedMosaicIds, Observable<List<AddressResolutionStatement>> statementObservable,
         ReceiptSource expectedReceiptSource) {
-        return Observable.fromIterable(unresolvedMosaicIds)
-            .flatMap(unresolved -> getResolvedAddress(transaction, unresolved, statementObservable,
-                expectedReceiptSource)).map(m -> (UnresolvedAddress) m).toList().toObservable();
+        return Observable.fromIterable(unresolvedMosaicIds).flatMap(
+            unresolved -> getResolvedAddress(transaction, unresolved, statementObservable, expectedReceiptSource))
+            .map(m -> (UnresolvedAddress) m).toList().toObservable();
 
     }
 
     private Observable<Mosaic> getResolvedMosaic(Transaction transaction, Mosaic unresolvedMosaic,
-        Observable<Statement> statementObservable, ReceiptSource expectedReceiptSource) {
-        return Observable.just(unresolvedMosaic)
-            .flatMap(m -> getResolvedMosaicId(transaction, m.getId(), statementObservable,
-                expectedReceiptSource).map(mId -> new Mosaic(mId, m.getAmount())));
+        Observable<List<MosaicResolutionStatement>> statementObservable, ReceiptSource expectedReceiptSource) {
+        return getResolvedMosaicId(transaction, unresolvedMosaic.getId(), statementObservable, expectedReceiptSource)
+            .map(mId -> new Mosaic(mId, unresolvedMosaic.getAmount()));
     }
 
-    private Observable<MosaicId> getResolvedMosaicId(
-        Transaction transaction,
-        UnresolvedMosaicId unresolvedMosaicId,
-        Observable<Statement> statementObservable, ReceiptSource expectedReceiptSource) {
-        if (unresolvedMosaicId instanceof MosaicId) {
-            return Observable.just((MosaicId) unresolvedMosaicId);
-        }
-        return statementObservable.map(statement -> statement
-            .getResolvedMosaicId(getTransactionInfo(transaction).getHeight(), unresolvedMosaicId,
-                expectedReceiptSource.getPrimaryId(),
-                expectedReceiptSource.getSecondaryId())
-            .orElseThrow(() -> new IllegalArgumentException(
-                "MosaicId could not be resolved for alias "
-                    + unresolvedMosaicId.getIdAsHex())));
+    private Observable<MosaicId> getResolvedMosaicId(Transaction transaction, UnresolvedMosaicId unresolvedMosaicId,
+        Observable<List<MosaicResolutionStatement>> statementObservable, ReceiptSource expectedReceiptSource) {
+        BigInteger height = getTransactionInfo(transaction).getHeight();
+        return statementObservable.map(statements -> MosaicResolutionStatement
+            .getResolvedMosaicId(statements, height, unresolvedMosaicId, expectedReceiptSource.getPrimaryId(),
+                expectedReceiptSource.getSecondaryId()).orElseThrow(() -> new IllegalArgumentException(
+                "MosaicId could not be resolved for alias " + unresolvedMosaicId.getIdAsHex())));
     }
 
 
-    private Observable<Address> getResolvedAddress(Transaction transaction,
-        UnresolvedAddress unresolvedAddress,
-        Observable<Statement> statementObservable, ReceiptSource expectedReceiptSource) {
-        if (unresolvedAddress instanceof Address) {
-            return Observable.just((Address) unresolvedAddress);
-        }
-        return statementObservable.map(statement -> statement
-            .getResolvedAddress(getTransactionInfo(transaction).getHeight(), unresolvedAddress,
-                expectedReceiptSource.getPrimaryId(),
-                expectedReceiptSource.getSecondaryId())
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Address could not be resolved for alias "
-                    + ((NamespaceId) unresolvedAddress).getIdAsHex())));
+    private Observable<Address> getResolvedAddress(Transaction transaction, UnresolvedAddress unresolvedAddress,
+        Observable<List<AddressResolutionStatement>> statementObservable, ReceiptSource expectedReceiptSource) {
+        BigInteger height = getTransactionInfo(transaction).getHeight();
+        return statementObservable.map(statements -> AddressResolutionStatement
+            .getResolvedAddress(statements, height, unresolvedAddress, expectedReceiptSource.getPrimaryId(),
+                expectedReceiptSource.getSecondaryId()).orElseThrow(() -> new IllegalArgumentException(
+                "Address could not be resolved for alias " + ((NamespaceId) unresolvedAddress).getIdAsHex())));
     }
 
     private ReceiptSource createExpectedReceiptSource(Transaction transaction) {
-        int transactionIndex = transaction.getTransactionInfo().flatMap(TransactionInfo::getIndex)
-            .orElseThrow(() -> new IllegalArgumentException(
+        int transactionIndex = transaction.getTransactionInfo().flatMap(TransactionInfo::getIndex).orElseThrow(
+            () -> new IllegalArgumentException(
                 "TransactionIndex cannot be loaded from Transaction " + transaction.getType()));
         return new ReceiptSource(transactionIndex + 1, 0);
     }
 
-    private ReceiptSource createExpectedReceiptSource(
-        ReceiptSource aggregateTransactionReceiptSource,
+    private ReceiptSource createExpectedReceiptSource(ReceiptSource aggregateTransactionReceiptSource,
         Transaction transaction) {
-        int transactionIndex = transaction.getTransactionInfo().flatMap(TransactionInfo::getIndex)
-            .orElseThrow(() -> new IllegalArgumentException(
+        int transactionIndex = transaction.getTransactionInfo().flatMap(TransactionInfo::getIndex).orElseThrow(
+            () -> new IllegalArgumentException(
                 "TransactionIndex cannot be loaded from Transaction " + transaction.getType()));
-        return new ReceiptSource(aggregateTransactionReceiptSource.getPrimaryId(),
-            transactionIndex + 1);
+        return new ReceiptSource(aggregateTransactionReceiptSource.getPrimaryId(), transactionIndex + 1);
     }
 
     private TransactionInfo getTransactionInfo(Transaction transaction) {
-        return transaction.getTransactionInfo().orElseThrow(() ->
-            new IllegalArgumentException(
-                "Transaction Info is required in " + transaction.getType() + " transaction"));
+        return transaction.getTransactionInfo().orElseThrow(() -> new IllegalArgumentException(
+            "Transaction Info is required in " + transaction.getType() + " transaction"));
     }
 
 }

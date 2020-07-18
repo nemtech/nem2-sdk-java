@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 class BlockSearchCriteriaTest {
     private final Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
     private final Account account2 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
-    private final PublicKey publicKey1 = account1.getKeyPair().getPublicKey();
     private final PublicKey publicKey2 = account2.getKeyPair().getPublicKey();
 
     @Test
@@ -68,9 +67,10 @@ class BlockSearchCriteriaTest {
     void shouldUseBuilderMethods() {
 
         BlockSearchCriteria criteria = new BlockSearchCriteria()
-            .order(OrderBy.ASC).pageSize(10).pageNumber(5).offset("abc").beneficiaryAddress(account1.getAddress())
+            .order(OrderBy.ASC).pageSize(10).pageNumber(5).beneficiaryAddress(account1.getAddress())
             .signerPublicKey(publicKey2).orderBy(BlockOrderBy.HEIGHT);
 
+        criteria.offset("abc");
         Assertions.assertEquals(OrderBy.ASC, criteria.getOrder());
         Assertions.assertEquals(10, criteria.getPageSize());
         Assertions.assertEquals(5, criteria.getPageNumber());
@@ -84,12 +84,14 @@ class BlockSearchCriteriaTest {
     void shouldBeEquals() {
 
         BlockSearchCriteria criteria1 = new BlockSearchCriteria()
-            .order(OrderBy.ASC).pageSize(10).pageNumber(5).offset("abc").beneficiaryAddress(account1.getAddress())
+            .order(OrderBy.ASC).pageSize(10).pageNumber(5).beneficiaryAddress(account1.getAddress())
             .signerPublicKey(publicKey2).orderBy(BlockOrderBy.HEIGHT);
+        criteria1.offset("abc");
 
         BlockSearchCriteria criteria2 = new BlockSearchCriteria()
-            .order(OrderBy.ASC).pageSize(10).pageNumber(5).offset("abc").beneficiaryAddress(account1.getAddress())
+            .order(OrderBy.ASC).pageSize(10).pageNumber(5).beneficiaryAddress(account1.getAddress())
             .signerPublicKey(publicKey2).orderBy(BlockOrderBy.HEIGHT);
+        criteria2.offset("abc");
 
         Assertions.assertEquals(new BlockSearchCriteria(), new BlockSearchCriteria());
         Assertions.assertEquals(criteria1, criteria2);

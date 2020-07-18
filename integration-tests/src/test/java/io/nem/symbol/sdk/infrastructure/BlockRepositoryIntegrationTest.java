@@ -25,10 +25,14 @@ import io.nem.symbol.sdk.api.BlockPaginationStreamer;
 import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.BlockSearchCriteria;
 import io.nem.symbol.sdk.api.OrderBy;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RepositoryCallException;
+import io.nem.symbol.sdk.api.TransactionStatementSearchCriteria;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
+import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
+import io.nem.symbol.sdk.model.receipt.TransactionStatement;
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.List;
@@ -178,6 +182,7 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
         BlockPaginationStreamer streamer = new BlockPaginationStreamer(blockRepository);
         BlockSearchCriteria criteria = new BlockSearchCriteria();
         criteria.setPageSize(10);
+        criteria.setOrderBy(BlockOrderBy.HEIGHT);
         int offsetIndex = 2;
         List<BlockInfo> blocksWithoutOffset = get(streamer.search(criteria).toList().toObservable());
         criteria.setOffset(blocksWithoutOffset.get(offsetIndex).getRecordId().get());
@@ -193,19 +198,33 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
     }
 
     private PaginationTester<BlockInfo, BlockSearchCriteria> getPaginationTester(RepositoryType type) {
-        return new PaginationTester<>(
-            BlockSearchCriteria::new, getBlockRepository(type)::search);
+        return new PaginationTester<>(BlockSearchCriteria::new, getBlockRepository(type)::search);
     }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void throwExceptionWhenBlockDoesNotExists(RepositoryType type) {
-        RepositoryCallException exception = Assertions
-            .assertThrows(RepositoryCallException.class, () -> get(getBlockRepository(type)
-                .getBlockByHeight(BigInteger.valueOf(0))));
+        RepositoryCallException exception = Assertions.assertThrows(RepositoryCallException.class,
+            () -> get(getBlockRepository(type).getBlockByHeight(BigInteger.valueOf(0))));
 
-        Assertions.assertEquals(
-            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '0'",
+        Assertions.assertEquals("ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '0'",
             exception.getMessage());
+    }
+
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void getMerkleReceipts(RepositoryType type) {
+        BigInteger height = BigInteger.ONE;
+        BlockRepository blockRepository = getBlockRepository(type);
+
+        Page<TransactionStatement> transactionStatementPage = get(getRepositoryFactory(type).createReceiptRepository()
+            .searchReceipts(new TransactionStatementSearchCriteria().height(height)));
+
+        transactionStatementPage.getData().forEach(s -> {
+            MerkleProofInfo merkleProofInfo = get(blockRepository.getMerkleReceipts(s.getHeight(), s.generateHash()));
+            toJson(merkleProofInfo);
+        });
+
     }
 }

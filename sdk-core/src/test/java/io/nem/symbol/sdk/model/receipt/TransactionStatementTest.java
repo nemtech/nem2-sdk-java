@@ -37,31 +37,17 @@ public class TransactionStatementTest {
     @BeforeAll
     public static void setup() {
         receiptSource = new ReceiptSource(1, 1);
-        Account account =
-            new Account(
-                "787225aaff3d2c71f4ffa32d4f19ec4922f3cd869747f267378f81f8e3fcb12d",
-                NetworkType.MIJIN_TEST);
+        Account account = new Account("787225aaff3d2c71f4ffa32d4f19ec4922f3cd869747f267378f81f8e3fcb12d",
+            NetworkType.MIJIN_TEST);
         MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
-        Address recipientAddress =
-            new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", NetworkType.MIJIN_TEST);
-        ArtifactExpiryReceipt<MosaicId> mosaicExpiryReceipt =
-            new ArtifactExpiryReceipt(
-                mosaicId, ReceiptType.MOSAIC_EXPIRED, ReceiptVersion.ARTIFACT_EXPIRY);
-        BalanceChangeReceipt balanceChangeReceipt =
-            new BalanceChangeReceipt(
-                account.getAddress(),
-                mosaicId,
-                BigInteger.valueOf(10),
-                ReceiptType.LOCK_SECRET_EXPIRED,
-                ReceiptVersion.BALANCE_CHANGE);
-        BalanceTransferReceipt balanceTransferReceipt =
-            new BalanceTransferReceipt(
-                account.getAddress(),
-                recipientAddress,
-                mosaicId,
-                BigInteger.valueOf(10),
-                ReceiptType.MOSAIC_RENTAL_FEE,
-                ReceiptVersion.BALANCE_TRANSFER);
+        Address recipientAddress = new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", NetworkType.MIJIN_TEST);
+        ArtifactExpiryReceipt<MosaicId> mosaicExpiryReceipt = new ArtifactExpiryReceipt(mosaicId,
+            ReceiptType.MOSAIC_EXPIRED, ReceiptVersion.ARTIFACT_EXPIRY);
+        BalanceChangeReceipt balanceChangeReceipt = new BalanceChangeReceipt(account.getAddress(), mosaicId,
+            BigInteger.valueOf(10), ReceiptType.LOCK_SECRET_EXPIRED, ReceiptVersion.BALANCE_CHANGE);
+        BalanceTransferReceipt balanceTransferReceipt = new BalanceTransferReceipt(account.getAddress(),
+            recipientAddress, mosaicId, BigInteger.valueOf(10), ReceiptType.MOSAIC_RENTAL_FEE,
+            ReceiptVersion.BALANCE_TRANSFER);
         List<Receipt> list = new ArrayList<>();
         list.add(mosaicExpiryReceipt);
         list.add(balanceChangeReceipt);
@@ -71,8 +57,8 @@ public class TransactionStatementTest {
 
     @Test
     void shouldCreateTransactionStatement() {
-        TransactionStatement transactionStatement =
-            new TransactionStatement(BigInteger.TEN, receiptSource, receipts);
+        TransactionStatement transactionStatement = new TransactionStatement("abc", BigInteger.TEN, receiptSource,
+            receipts);
         assertEquals(BigInteger.TEN, transactionStatement.getHeight());
         assertEquals(transactionStatement.getReceiptSource(), receiptSource);
         assertEquals(transactionStatement.getReceipts(), receipts);
@@ -80,8 +66,8 @@ public class TransactionStatementTest {
 
     @Test
     void shouldGenerateHash() {
-        TransactionStatement transactionStatement =
-            new TransactionStatement(BigInteger.TEN, receiptSource, receipts);
+        TransactionStatement transactionStatement = new TransactionStatement("abc", BigInteger.TEN, receiptSource,
+            receipts);
 
         String hash = transactionStatement.generateHash();
 
