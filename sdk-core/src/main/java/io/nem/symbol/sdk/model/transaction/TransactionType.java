@@ -154,7 +154,7 @@ public enum TransactionType {
      * <p>In [catapult-server](https://github.com/nemtech/catapult-server), the
      * `DEFINE_TRANSACTION_CONSTANTS` macro is used to define the `TYPE` and `VERSION` of the transaction format.
      *
-     * @see <a href="https://github.com/nemtech/catapult-server/blob/master/plugins/txes/transfer/src/model/TransferTransaction.h#L37"/>
+     * @see <a href="https://github.com/nemtech/catapult-server/blob/main/plugins/txes/transfer/src/model/TransferTransaction.h#L37"/>
      */
     private final int currentVersion;
 

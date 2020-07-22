@@ -30,8 +30,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.provider.Arguments;
 
 /**
- * Abstract class for all the vector tests. Tests that take their input from
- * https://raw.githubusercontent.com/nemtech/test-vectors/master/
+ * Abstract class for all the vector tests. Tests that take their input from https://raw.githubusercontent.com/nemtech/test-vectors/main/
  */
 public class AbstractVectorTester {
 

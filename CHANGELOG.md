@@ -66,8 +66,8 @@ Client Vertx | v0.9.2  | https://repo.maven.apache.org/maven2/io/nem/symbol-ope
     3. **NamespaceMetadataTransaction**: targetPublicKey: string => targetAddress: UnresolvedAddress
     4. **MultisigAccountModificationTransaction**: publicKeyAdditions: PublicAccount[] => addressAdditions: UnresolvedAddress[]; publicKeyDeletions: PublicAccount[] => addressDeletions: UnresolvedAddress[]
     5. **AggregateTransactionService**: cosignatories: string[] => cosignatories: Address[]
-- **[BREAKING CHANGE]** **Address** format changed from 25 bytes to 24 bytes. See new address test vector [here](https://github.com/nemtech/test-vectors/blob/master/1.test-address.json).
-- **[BREAKING CHANGE]** MosaicId creation (from Nonce) changed from using **PublicKey** to **Address**. See new mosaicId test vector [here](https://github.com/nemtech/test-vectors/blob/master/5.test-mosaic-id.json).
+- **[BREAKING CHANGE]** **Address** format changed from 25 bytes to 24 bytes. See new address test vector [here](https://github.com/nemtech/test-vectors/blob/main/1.test-address.json).
+- **[BREAKING CHANGE]** MosaicId creation (from Nonce) changed from using **PublicKey** to **Address**. See new mosaicId test vector [here](https://github.com/nemtech/test-vectors/blob/main/5.test-mosaic-id.json).
 - **[BREAKING CHANGE]** `BigInteger` **version** field in `CosignatureSignedTransaction` and `AggregateTransactionCosignature` with default value `0` when they are created for the first time.
 - **[BREAKING CHANGE]** Removed all transaction get endpoints from **AccountRepository** and **BlockRepository**.
 - **[BREAKING CHANGE]** Added `TransactionGroup (required)` parameter in `getTransaction` endpoint in `TransactionRepository`.

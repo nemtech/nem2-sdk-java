@@ -24,8 +24,8 @@ import java.util.Set;
 /**
  * Enum containing receipt type constants.
  *
- * @see <a href="https://github.com/nemtech/catapult-server/blob/master/src/catapult/model/ReceiptType.h"></a>
- * @see <a href="https://github.com/nemtech/catapult-server/blob/master/src/catapult/model/ReceiptType.cpp"></a>
+ * @see <a href="https://github.com/nemtech/catapult-server/blob/main/src/catapult/model/ReceiptType.h"></a>
+ * @see <a href="https://github.com/nemtech/catapult-server/blob/main/src/catapult/model/ReceiptType.cpp"></a>
  */
 public enum ReceiptType {
 
