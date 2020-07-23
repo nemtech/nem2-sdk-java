@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.core.utils.ExceptionUtils;
+import io.nem.symbol.sdk.api.AccountOrderBy;
 import io.nem.symbol.sdk.api.AccountSearchCriteria;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.AccountInfo;
@@ -184,8 +185,8 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
 
         mockRemoteCall(toPage(accountInfoDTO));
 
-        List<AccountInfo> resolvedAccountInfos = repository.search(new AccountSearchCriteria()).toFuture().get()
-            .getData();
+        List<AccountInfo> resolvedAccountInfos = repository
+            .search(new AccountSearchCriteria().orderBy(AccountOrderBy.BALANCE)).toFuture().get().getData();
 
         Assertions.assertEquals(1, resolvedAccountInfos.size());
 

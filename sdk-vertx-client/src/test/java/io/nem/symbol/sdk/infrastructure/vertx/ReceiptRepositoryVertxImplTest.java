@@ -17,13 +17,17 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.sdk.api.ResolutionStatementSearchCriteria;
+import io.nem.symbol.sdk.api.TransactionStatementSearchCriteria;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.receipt.AddressResolutionStatement;
 import io.nem.symbol.sdk.model.receipt.MosaicResolutionStatement;
+import io.nem.symbol.sdk.model.receipt.TransactionStatement;
 import io.nem.symbol.sdk.openapi.vertx.model.Pagination;
 import io.nem.symbol.sdk.openapi.vertx.model.ResolutionStatementDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.ResolutionStatementInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.ResolutionStatementPage;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionStatementInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.TransactionStatementPage;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
@@ -44,6 +48,31 @@ public class ReceiptRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     public void setUp() {
         super.setUp();
         repository = new ReceiptRepositoryVertxImpl(apiClientMock);
+    }
+
+
+    @Test
+    public void searchReceipts() throws Exception {
+
+        List<TransactionStatementInfoDTO> transactionStatementInfoDTOS = jsonHelper
+            .parseList(TestHelperVertx.loadResource("Recipient-TransactionResolutionStatement.json"),
+                TransactionStatementInfoDTO.class);
+
+        mockRemoteCall(toPage(transactionStatementInfoDTOS));
+
+        BigInteger height = BigInteger.valueOf(10L);
+        List<TransactionStatement> transactionStatements = repository
+            .searchReceipts(new TransactionStatementSearchCriteria().height(height)).toFuture().get().getData();
+
+        Assertions.assertEquals(transactionStatementInfoDTOS.size(), transactionStatements.size());
+        Assertions.assertEquals("82FEFFC329618ECF56B8A6FDBCFCF1BF0A4B6747AB6A5746B195CEEB810F335C",
+            transactionStatements.get(0).generateHash().toUpperCase());
+    }
+
+
+    private TransactionStatementPage toPage(List<TransactionStatementInfoDTO> dtos) {
+        return new TransactionStatementPage().data(dtos)
+            .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
     }
 
     @Test

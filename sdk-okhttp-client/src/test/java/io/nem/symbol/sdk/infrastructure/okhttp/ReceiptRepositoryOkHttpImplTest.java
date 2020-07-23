@@ -17,13 +17,17 @@
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.sdk.api.ResolutionStatementSearchCriteria;
+import io.nem.symbol.sdk.api.TransactionStatementSearchCriteria;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.receipt.AddressResolutionStatement;
 import io.nem.symbol.sdk.model.receipt.MosaicResolutionStatement;
+import io.nem.symbol.sdk.model.receipt.TransactionStatement;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Pagination;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.ResolutionStatementDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.ResolutionStatementInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.ResolutionStatementPage;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionStatementInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionStatementPage;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +49,25 @@ public class ReceiptRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         super.setUp();
         repository = new ReceiptRepositoryOkHttpImpl(apiClientMock);
     }
+
+    @Test
+    public void searchReceipts() throws Exception {
+
+        List<TransactionStatementInfoDTO> transactionStatementInfoDTOS = jsonHelper
+            .parseList(TestHelperOkHttp.loadResource("Recipient-TransactionResolutionStatement.json"),
+                TransactionStatementInfoDTO.class);
+
+        mockRemoteCall(toPage(transactionStatementInfoDTOS));
+
+        BigInteger height = BigInteger.valueOf(10L);
+        List<TransactionStatement> transactionStatements = repository
+            .searchReceipts(new TransactionStatementSearchCriteria().height(height)).toFuture().get().getData();
+
+        Assertions.assertEquals(transactionStatementInfoDTOS.size(), transactionStatements.size());
+        Assertions.assertEquals("82FEFFC329618ECF56B8A6FDBCFCF1BF0A4B6747AB6A5746B195CEEB810F335C",
+            transactionStatements.get(0).generateHash().toUpperCase());
+    }
+
 
     @Test
     public void searchAddressResolutionStatements() throws Exception {
@@ -90,9 +113,13 @@ public class ReceiptRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
 
     }
 
-
     private ResolutionStatementPage toPage(ResolutionStatementInfoDTO dto) {
         return new ResolutionStatementPage().data(Collections.singletonList(dto))
+            .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
+    }
+
+    private TransactionStatementPage toPage(List<TransactionStatementInfoDTO> dtos) {
+        return new TransactionStatementPage().data(dtos)
             .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
     }
 

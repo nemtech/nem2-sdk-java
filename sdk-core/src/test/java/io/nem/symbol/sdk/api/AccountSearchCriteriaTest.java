@@ -64,8 +64,8 @@ class AccountSearchCriteriaTest {
         criteria.pageSize(10);
         criteria.pageNumber(5);
         criteria.offset("abc");
-        criteria.setOrderBy(AccountOrderBy.BALANCE);
-        criteria.setMosaicId(new MosaicId(BigInteger.TEN));
+        criteria.orderBy(AccountOrderBy.BALANCE);
+        criteria.mosaicId(new MosaicId(BigInteger.TEN));
 
         Assertions.assertEquals(OrderBy.DESC, criteria.getOrder());
         Assertions.assertEquals(10, criteria.getPageSize());
@@ -108,6 +108,7 @@ class AccountSearchCriteriaTest {
         Assertions.assertNotEquals(criteria1.hashCode(), criteria2.hashCode());
 
         Assertions.assertNotEquals("ABC", criteria2);
+        Assertions.assertNotEquals(criteria2, "ABC");
     }
 
 

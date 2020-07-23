@@ -1,19 +1,19 @@
 package io.nem.symbol.sdk.api;
 
 
-import org.bouncycastle.asn1.cms.MetaData;
+import io.nem.symbol.sdk.model.metadata.Metadata;
 
 /**
- * A helper object that streams {@link MetaData} objects using the search.
+ * A helper object that streams {@link Metadata} objects using the search.
  */
-public class MetadataPaginationStreamer extends PaginationStreamer<MetaData, MetadataSearchCriteria> {
+public class MetadataPaginationStreamer extends PaginationStreamer<Metadata, MetadataSearchCriteria> {
 
     /**
      * Constructor
      *
      * @param searcher the Account repository that will perform the searches
      */
-    public MetadataPaginationStreamer(Searcher<MetaData, MetadataSearchCriteria> searcher) {
+    public MetadataPaginationStreamer(Searcher<Metadata, MetadataSearchCriteria> searcher) {
         super(searcher);
     }
 }

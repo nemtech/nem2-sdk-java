@@ -17,7 +17,9 @@
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.core.utils.ConvertUtils;
+import io.nem.symbol.core.utils.ExceptionUtils;
 import io.nem.symbol.sdk.api.MetadataSearchCriteria;
+import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.metadata.Metadata;
@@ -60,6 +62,48 @@ public class MetadataRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
         assertMetadataList(dto, resultList);
     }
 
+    @Test
+    public void getAccountMetadataByKeyAndSender() throws Exception {
+        Address target = Address.generateRandom(networkType);
+        Address source = Address.generateRandom(networkType);
+        MetadataPage dto = getMetadataEntriesDTO();
+        mockRemoteCall(dto);
+        RepositoryCallException exception = Assertions.assertThrows(RepositoryCallException.class, () -> ExceptionUtils
+            .propagate(
+                () -> repository.getAccountMetadataByKeyAndSender(target, BigInteger.TEN, source).toFuture().get()));
+        Assertions.assertEquals("Metadata should be 1 at most", exception.getMessage());
+    }
+
+    @Test
+    public void getNamespaceMetadataByKeyAndSender() throws Exception {
+        NamespaceId targetId = NamespaceId.createFromId(BigInteger.TEN);
+        Address source = Address.generateRandom(networkType);
+        MetadataPage metadataPage = new MetadataPage();
+        metadataPage.setPagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
+
+        mockRemoteCall(metadataPage);
+        RepositoryCallException exception = Assertions.assertThrows(RepositoryCallException.class, () -> ExceptionUtils
+            .propagate(() -> repository.getNamespaceMetadataByKeyAndSender(targetId, BigInteger.TEN, source).toFuture()
+                .get()));
+        Assertions.assertEquals("Metadata with key 10 not found", exception.getMessage());
+    }
+
+
+    @Test
+    public void getMosaicMetadataByKeyAndSender() throws Exception {
+        MosaicId targetId = new MosaicId(BigInteger.TEN);
+        Address source = Address.generateRandom(networkType);
+        MetadataPage metadataPage = new MetadataPage();
+        metadataPage.setPagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
+        metadataPage.addDataItem(
+            createMetadataDto(ConvertUtils.toSize16Hex(BigInteger.valueOf(30)), MetadataTypeEnum.NUMBER_1,
+                targetId.getIdAsHex()));
+        mockRemoteCall(metadataPage);
+        Metadata metadata = repository.getMosaicMetadataByKeyAndSender(targetId, BigInteger.TEN, source).toFuture()
+            .get();
+        Assertions.assertEquals(targetId, metadata.getTargetId().get());
+    }
+
 
     private void assertMetadataList(MetadataPage expected, List<Metadata> resultList) {
         int index = 0;
@@ -75,29 +119,24 @@ public class MetadataRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
 
     private void assertMetadata(MetadataInfoDTO expected, Metadata result) {
         Assertions.assertEquals(expected.getId(), result.getRecordId().get());
-        Assertions
-            .assertEquals(expected.getMetadataEntry().getCompositeHash(), result.getCompositeHash());
-        Assertions.assertEquals(expected.getMetadataEntry().getSourceAddress(),
-            result.getSourceAddress().encoded());
-        Assertions.assertEquals(expected.getMetadataEntry().getTargetAddress(),
-            result.getTargetAddress().encoded());
+        Assertions.assertEquals(expected.getMetadataEntry().getCompositeHash(), result.getCompositeHash());
+        Assertions.assertEquals(expected.getMetadataEntry().getSourceAddress(), result.getSourceAddress().encoded());
+        Assertions.assertEquals(expected.getMetadataEntry().getTargetAddress(), result.getTargetAddress().encoded());
         Assertions.assertEquals(expected.getMetadataEntry().getMetadataType(),
             MetadataTypeEnum.fromValue(result.getMetadataType().getValue()));
 
-        Assertions.assertEquals(ConvertUtils.fromHexToString(expected.getMetadataEntry().getValue()),
-            result.getValue());
+        Assertions
+            .assertEquals(ConvertUtils.fromHexToString(expected.getMetadataEntry().getValue()), result.getValue());
 
         if (expected.getMetadataEntry().getTargetId() != null) {
             Assertions.assertTrue(result.getTargetId().isPresent());
             BigInteger expectedTargetId = new BigInteger(expected.getMetadataEntry().getTargetId(), 16);
             if (expected.getMetadataEntry().getMetadataType() == MetadataTypeEnum.NUMBER_1) {
-                Assertions
-                    .assertEquals(expectedTargetId, ((MosaicId) result.getTargetId().get()).getId());
+                Assertions.assertEquals(expectedTargetId, ((MosaicId) result.getTargetId().get()).getId());
             }
 
             if (expected.getMetadataEntry().getMetadataType() == MetadataTypeEnum.NUMBER_2) {
-                Assertions.assertEquals(expectedTargetId,
-                    ((NamespaceId) result.getTargetId().get()).getId());
+                Assertions.assertEquals(expectedTargetId, ((NamespaceId) result.getTargetId().get()).getId());
             }
         } else {
             Assertions.assertFalse(result.getTargetId().isPresent());

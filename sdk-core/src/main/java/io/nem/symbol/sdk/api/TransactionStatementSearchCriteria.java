@@ -103,6 +103,10 @@ public class TransactionStatementSearchCriteria extends SearchCriteria<Transacti
         return this;
     }
 
+    public void setTargetAddress(Address targetAddress) {
+        this.targetAddress = targetAddress;
+    }
+
     public String getArtifactId() {
         return artifactId;
     }
