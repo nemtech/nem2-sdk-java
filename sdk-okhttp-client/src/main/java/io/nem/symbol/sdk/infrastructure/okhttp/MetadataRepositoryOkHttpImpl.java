@@ -21,12 +21,8 @@ import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.MetadataRepository;
 import io.nem.symbol.sdk.api.MetadataSearchCriteria;
 import io.nem.symbol.sdk.api.Page;
-import io.nem.symbol.sdk.api.RepositoryCallException;
-import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.metadata.Metadata;
 import io.nem.symbol.sdk.model.metadata.MetadataType;
-import io.nem.symbol.sdk.model.mosaic.MosaicId;
-import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.MetadataRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MetadataEntryDTO;
@@ -76,52 +72,8 @@ public class MetadataRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl i
             .toPage(page.getPagination(), page.getData().stream().map(this::toMetadata).collect(Collectors.toList()))));
     }
 
-    @Override
-    public Observable<Metadata> getAccountMetadataByKeyAndSender(Address targetAddress, BigInteger key,
-        Address sourceAddress) {
-        return handleOne(new MetadataSearchCriteria().targetAddress(targetAddress).scopedMetadataKey(key)
-            .sourceAddress(sourceAddress).metadataType(MetadataType.ACCOUNT));
-    }
-
-
-    @Override
-    public Observable<Metadata> getMosaicMetadataByKeyAndSender(MosaicId targetMosaicId, BigInteger key,
-        Address sourceAddress) {
-        return handleOne(
-            new MetadataSearchCriteria().targetId(targetMosaicId).scopedMetadataKey(key).sourceAddress(sourceAddress)
-                .metadataType(MetadataType.MOSAIC));
-    }
-
-    @Override
-    public Observable<Metadata> getNamespaceMetadataByKeyAndSender(NamespaceId targetNamespaceId, BigInteger key,
-        Address sourceAddress) {
-        return handleOne(
-            new MetadataSearchCriteria().targetId(targetNamespaceId).scopedMetadataKey(key).sourceAddress(sourceAddress)
-                .metadataType(MetadataType.NAMESPACE));
-    }
-
     public MetadataRoutesApi getClient() {
         return client;
-    }
-
-    /**
-     * It search a metadata looking for the only result that should be available at most.
-     *
-     * @param criteria the criteria
-     * @return the Observable of the single metadata raising an error if it's not found.
-     */
-    private Observable<Metadata> handleOne(MetadataSearchCriteria criteria) {
-        Observable<Page<Metadata>> pageObservable = search(criteria);
-        return pageObservable.map(p -> {
-            if (p.getData().size() > 1) {
-                throw new RepositoryCallException("Metadata should be 1 at most", 0, null);
-            }
-            if (p.getData().size() == 1) {
-                return p.getData().get(0);
-            }
-            throw new RepositoryCallException("Metadata with key " + criteria.getScopedMetadataKey() + " not found",
-                404, null);
-        });
     }
 
 

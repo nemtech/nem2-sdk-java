@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.MetadataRepository;
+import io.nem.symbol.sdk.api.MetadataSearchCriteria;
 import io.nem.symbol.sdk.api.MetadataTransactionService;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.model.account.Account;
@@ -63,24 +64,19 @@ class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
         assertMetadata(key, originalMessage, metadataRepository);
 
         AccountMetadataTransaction updateTransaction = get(service
-            .createAccountMetadataTransactionFactory(
-                targetAccount.getAddress(), key, newMessage,
+            .createAccountMetadataTransactionFactory(targetAccount.getAddress(), key, newMessage,
                 signerAccount.getAddress())).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, updateTransaction, signerAccount);
         sleep(1000);
-
         assertMetadata(key, newMessage, metadataRepository);
-
     }
 
-    private void assertMetadata(BigInteger key, String value,
-        MetadataRepository metadataRepository) {
-        Metadata originalMetadata = get(metadataRepository
-            .getAccountMetadataByKeyAndSender(targetAccount.getAddress(), key,
-                signerAccount.getAddress()));
 
+    private void assertMetadata(BigInteger key, String value, MetadataRepository metadataRepository) {
+        MetadataSearchCriteria criteria = new MetadataSearchCriteria().scopedMetadataKey(key)
+            .sourceAddress(signerAccount.getAddress());
+        Metadata originalMetadata = get(metadataRepository.search(criteria)).getData().get(0);
         Assertions.assertEquals(value, originalMetadata.getValue());
     }
-
 }

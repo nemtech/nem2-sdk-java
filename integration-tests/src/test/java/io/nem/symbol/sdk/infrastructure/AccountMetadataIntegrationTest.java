@@ -17,14 +17,12 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.MetadataSearchCriteria;
-import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.metadata.Metadata;
 import io.nem.symbol.sdk.model.metadata.MetadataType;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransactionFactory;
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
@@ -71,34 +69,19 @@ public class AccountMetadataIntegrationTest extends BaseIntegrationTest {
             new MetadataSearchCriteria().metadataType(MetadataType.ACCOUNT).sourceAddress(testAccount.getAddress())
                 .scopedMetadataKey(metadata.getScopedMetadataKey()))).getData());
 
-        assertMetadata(transaction, Collections.singletonList(get(getRepositoryFactory(type).createMetadataRepository()
-            .getAccountMetadataByKeyAndSender(testAccount.getAddress(), key, testAccount.getAddress()))));
+        assertMetadata(transaction, get(getRepositoryFactory(type).createMetadataRepository().search(
+            new MetadataSearchCriteria().metadataType(MetadataType.ACCOUNT).sourceAddress(testAccount.getAddress())
+                .targetAddress(testAccount.getAddress()).scopedMetadataKey(metadata.getScopedMetadataKey())))
+            .getData());
 
         Assertions.assertEquals(message, processedTransaction.getValue());
     }
 
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void raisesMetadataError(RepositoryType type) {
-        BigInteger key = SerializationUtils
-            .toUnsignedBigInteger(RandomUtils.generateRandomInt(100000) + Long.MAX_VALUE);
-
-        RepositoryCallException exception = Assertions.assertThrows(RepositoryCallException.class, () -> get(
-            getRepositoryFactory(type).createMetadataRepository()
-                .getAccountMetadataByKeyAndSender(testAccount.getAddress(), key, testAccount.getAddress())));
-        Assertions.assertEquals("Metadata with key " + key + " not found", exception.getMessage());
-    }
-
-
-
-
     private Metadata assertMetadata(AccountMetadataTransaction transaction, List<Metadata> metadata) {
 
         Optional<Metadata> endpointMetadata = metadata.stream().filter(
-            m -> m.getScopedMetadataKey().equals(transaction.getScopedMetadataKey()) && m
-                .getMetadataType().equals(MetadataType.ACCOUNT) && m
-                .getTargetAddress().equals(testAccount.getAddress())).findFirst();
+            m -> m.getScopedMetadataKey().equals(transaction.getScopedMetadataKey()) && m.getMetadataType()
+                .equals(MetadataType.ACCOUNT) && m.getTargetAddress().equals(testAccount.getAddress())).findFirst();
 
         Assertions.assertTrue(endpointMetadata.isPresent());
         Assertions.assertEquals(transaction.getValue(), endpointMetadata.get().getValue());

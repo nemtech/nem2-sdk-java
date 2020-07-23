@@ -54,8 +54,6 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
         NamespaceId alias = setMosaicAlias(type, targetMosaicId,
             "mosaicalias" + targetMosaicId.getIdAsHex().toLowerCase());
 
-
-
         String message = "This is the message in the mosaic!";
         BigInteger key = BigInteger.TEN;
         MosaicMetadataTransaction transaction = MosaicMetadataTransactionFactory
@@ -93,9 +91,9 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
             new MetadataSearchCriteria().targetId(targetMosaicId).metadataType(MetadataType.MOSAIC)
                 .scopedMetadataKey(key))).getData());
 
-        assertMetadata(targetMosaicId, transaction, Collections.singletonList(
-            get(getRepositoryFactory(type).createMetadataRepository()
-                .getMosaicMetadataByKeyAndSender(targetMosaicId, key, testAccount.getAddress()))));
+        assertMetadata(targetMosaicId, transaction, get(getRepositoryFactory(type).createMetadataRepository().search(
+            new MetadataSearchCriteria().sourceAddress(testAccount.getAddress()).targetId(targetMosaicId)
+                .metadataType(MetadataType.MOSAIC).scopedMetadataKey(key))).getData());
 
         assertMetadata(targetMosaicId, transaction, metadata);
         Assertions.assertEquals(message, processedTransaction.getValue());
@@ -106,9 +104,8 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
         List<Metadata> metadata) {
 
         Optional<Metadata> endpointMetadata = metadata.stream().filter(
-            m -> m.getScopedMetadataKey().equals(transaction.getScopedMetadataKey()) && m
-                .getMetadataType().equals(MetadataType.MOSAIC) && m
-                .getTargetAddress().equals(testAccount.getAddress())).findFirst();
+            m -> m.getScopedMetadataKey().equals(transaction.getScopedMetadataKey()) && m.getMetadataType()
+                .equals(MetadataType.MOSAIC) && m.getTargetAddress().equals(testAccount.getAddress())).findFirst();
 
         Assertions.assertTrue(endpointMetadata.isPresent());
 

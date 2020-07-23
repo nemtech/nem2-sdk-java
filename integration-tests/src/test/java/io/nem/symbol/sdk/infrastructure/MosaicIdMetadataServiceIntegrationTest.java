@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.MetadataRepository;
+import io.nem.symbol.sdk.api.MetadataSearchCriteria;
 import io.nem.symbol.sdk.api.MetadataTransactionService;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.model.account.Account;
@@ -35,9 +36,9 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
-    private Account signerAccount = config().getTestAccount();
+    private final Account signerAccount = config().getTestAccount();
 
-    private Account targetAccount = config().getTestAccount();
+    private final Account targetAccount = config().getTestAccount();
 
 
     @ParameterizedTest
@@ -54,24 +55,19 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
         RepositoryFactory repositoryFactory = getRepositoryFactory(type);
         MetadataRepository metadataRepository = repositoryFactory.createMetadataRepository();
 
-        MetadataTransactionService service = new MetadataTransactionServiceImpl(
-            repositoryFactory);
+        MetadataTransactionService service = new MetadataTransactionServiceImpl(repositoryFactory);
 
         MosaicMetadataTransaction originalTransaction = get(service
-            .createMosaicMetadataTransactionFactory(
-                targetAccount.getAddress(), key, originalMessage,
-                signerAccount.getAddress(), targetMosaicId))
-            .maxFee(this.maxFee).build();
+            .createMosaicMetadataTransactionFactory(targetAccount.getAddress(), key, originalMessage,
+                signerAccount.getAddress(), targetMosaicId)).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, originalTransaction, signerAccount);
 
         assertMetadata(targetMosaicId, key, originalMessage, metadataRepository);
 
         MosaicMetadataTransaction updateTransaction = get(service
-            .createMosaicMetadataTransactionFactory(
-                targetAccount.getAddress(), key, newMessage,
-                signerAccount.getAddress(), targetMosaicId))
-            .maxFee(this.maxFee).build();
+            .createMosaicMetadataTransactionFactory(targetAccount.getAddress(), key, newMessage,
+                signerAccount.getAddress(), targetMosaicId)).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, updateTransaction, signerAccount);
 
@@ -79,13 +75,11 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
     }
 
-    private void assertMetadata(MosaicId targetMosaicId, BigInteger key,
-        String value,
+    private void assertMetadata(MosaicId targetMosaicId, BigInteger key, String value,
         MetadataRepository metadataRepository) {
-        Metadata originalMetadata = get(metadataRepository
-            .getMosaicMetadataByKeyAndSender(targetMosaicId, key,
-                signerAccount.getPublicAccount().getAddress()));
-
+        MetadataSearchCriteria criteria = new MetadataSearchCriteria().targetId(targetMosaicId).scopedMetadataKey(key)
+            .sourceAddress(signerAccount.getAddress());
+        Metadata originalMetadata = get(metadataRepository.search(criteria)).getData().get(0);
         Assertions.assertEquals(value, originalMetadata.getValue());
     }
 

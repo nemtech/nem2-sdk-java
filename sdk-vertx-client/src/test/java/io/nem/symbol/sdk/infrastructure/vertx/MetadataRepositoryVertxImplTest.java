@@ -17,9 +17,7 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.core.utils.ConvertUtils;
-import io.nem.symbol.core.utils.ExceptionUtils;
 import io.nem.symbol.sdk.api.MetadataSearchCriteria;
-import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.metadata.Metadata;
@@ -60,49 +58,6 @@ public class MetadataRepositoryVertxImplTest extends AbstractVertxRespositoryTes
         List<Metadata> resultList = repository.search(new MetadataSearchCriteria().sourceAddress(address)).toFuture()
             .get().getData();
         assertMetadataList(dto, resultList);
-    }
-
-
-    @Test
-    public void getAccountMetadataByKeyAndSender() throws Exception {
-        Address target = Address.generateRandom(networkType);
-        Address source = Address.generateRandom(networkType);
-        MetadataPage dto = getMetadataEntriesDTO();
-        mockRemoteCall(dto);
-        RepositoryCallException exception = Assertions.assertThrows(RepositoryCallException.class, () -> ExceptionUtils
-            .propagate(
-                () -> repository.getAccountMetadataByKeyAndSender(target, BigInteger.TEN, source).toFuture().get()));
-        Assertions.assertEquals("Metadata should be 1 at most", exception.getMessage());
-    }
-
-    @Test
-    public void getNamespaceMetadataByKeyAndSender() throws Exception {
-        NamespaceId targetId = NamespaceId.createFromId(BigInteger.TEN);
-        Address source = Address.generateRandom(networkType);
-        MetadataPage metadataPage = new MetadataPage();
-        metadataPage.setPagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
-
-        mockRemoteCall(metadataPage);
-        RepositoryCallException exception = Assertions.assertThrows(RepositoryCallException.class, () -> ExceptionUtils
-            .propagate(() -> repository.getNamespaceMetadataByKeyAndSender(targetId, BigInteger.TEN, source).toFuture()
-                .get()));
-        Assertions.assertEquals("Metadata with key 10 not found", exception.getMessage());
-    }
-
-
-    @Test
-    public void getMosaicMetadataByKeyAndSender() throws Exception {
-        MosaicId targetId = new MosaicId(BigInteger.TEN);
-        Address source = Address.generateRandom(networkType);
-        MetadataPage metadataPage = new MetadataPage();
-        metadataPage.setPagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
-        metadataPage.addDataItem(
-            createMetadataDto(ConvertUtils.toSize16Hex(BigInteger.valueOf(30)), MetadataTypeEnum.NUMBER_1,
-                targetId.getIdAsHex()));
-        mockRemoteCall(metadataPage);
-        Metadata metadata = repository.getMosaicMetadataByKeyAndSender(targetId, BigInteger.TEN, source).toFuture()
-            .get();
-        Assertions.assertEquals(targetId, metadata.getTargetId().get());
     }
 
 

@@ -98,11 +98,11 @@ public class NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
             new MetadataSearchCriteria().targetId(targetNamespaceId).metadataType(MetadataType.NAMESPACE)
                 .scopedMetadataKey(key))).getData());
 
-        assertMetadata(transaction, Collections.singletonList(get(getRepositoryFactory(type).createMetadataRepository()
-            .getNamespaceMetadataByKeyAndSender(targetNamespaceId, key, targetAddress))));
+        assertMetadata(transaction, get(getRepositoryFactory(type).createMetadataRepository().search(
+            new MetadataSearchCriteria().targetId(targetNamespaceId).metadataType(MetadataType.NAMESPACE)
+                .targetAddress(targetAddress).scopedMetadataKey(key))).getData());
 
         Assertions.assertEquals(message, processedTransaction.getValue());
-
 
     }
 

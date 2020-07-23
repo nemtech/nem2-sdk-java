@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.MetadataRepository;
+import io.nem.symbol.sdk.api.MetadataSearchCriteria;
 import io.nem.symbol.sdk.api.MetadataTransactionService;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.model.account.Account;
@@ -84,13 +85,11 @@ class NamespaceMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
     }
 
-    private void assertMetadata(NamespaceId targetNamespaceId, BigInteger key,
-        String value,
+    private void assertMetadata(NamespaceId targetNamespaceId, BigInteger key, String value,
         MetadataRepository metadataRepository) {
-        Metadata originalMetadata = get(metadataRepository
-            .getNamespaceMetadataByKeyAndSender(targetNamespaceId, key,
-                signerAccount.getAddress()));
-
+        MetadataSearchCriteria criteria = new MetadataSearchCriteria().targetId(targetNamespaceId)
+            .scopedMetadataKey(key).sourceAddress(signerAccount.getAddress());
+        Metadata originalMetadata = get(metadataRepository.search(criteria)).getData().get(0);
         Assertions.assertEquals(value, originalMetadata.getValue());
     }
 
