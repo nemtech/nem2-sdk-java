@@ -16,7 +16,6 @@
 
 package io.nem.symbol.sdk.model.transaction;
 
-import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.util.List;
@@ -42,8 +41,6 @@ public class MultisigAccountModificationTransactionFactory extends
         super(TransactionType.MULTISIG_ACCOUNT_MODIFICATION, networkType);
         Validate.notNull(addressAdditions, "AddressAdditions must not be null");
         Validate.notNull(addressDeletions, "AddressDeletions must not be null");
-        ConvertUtils.validateNotNegative(minApprovalDelta);
-        ConvertUtils.validateNotNegative(minApprovalDelta);
         this.minApprovalDelta = minApprovalDelta;
         this.minRemovalDelta = minRemovalDelta;
         this.addressAdditions = addressAdditions;

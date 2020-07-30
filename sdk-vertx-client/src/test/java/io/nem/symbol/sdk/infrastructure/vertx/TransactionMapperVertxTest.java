@@ -479,7 +479,7 @@ public class TransactionMapperVertxTest {
         Assertions.assertEquals("90E6FF7755A80B6AA935A5C31B6D3D0CFAF82E06BF2B9CC9",
             transaction.getTargetAddress().encoded(transaction.getNetworkType()));
 
-        Assertions.assertEquals(1, transaction.getValueSizeDelta());
+        Assertions.assertEquals(-1, transaction.getValueSizeDelta());
         Assertions.assertEquals(new BigInteger("11529215046069664444"), transaction.getScopedMetadataKey());
         Assertions.assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
         Assertions.assertEquals("0003070467832AAA", transaction.getTargetNamespaceId().getIdAsHex());
@@ -500,7 +500,7 @@ public class TransactionMapperVertxTest {
         Assertions.assertEquals("90E6FF7755A80B6AA935A5C31B6D3D0CFAF82E06BF2B9CC9",
             transaction.getTargetAddress().encoded(transaction.getNetworkType()));
 
-        Assertions.assertEquals(1, transaction.getValueSizeDelta());
+        Assertions.assertEquals(-1, transaction.getValueSizeDelta());
         Assertions.assertEquals(new BigInteger("11529215046069664444"), transaction.getScopedMetadataKey());
         Assertions.assertEquals("This is the message for this account! 汉字89664", transaction.getValue());
     }

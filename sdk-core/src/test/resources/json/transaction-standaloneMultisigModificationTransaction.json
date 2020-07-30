@@ -9,7 +9,7 @@
   "transaction": {
     "deadline": "1",
     "maxFee": "0",
-    "minApprovalDelta": 1,
+    "minApprovalDelta": -1,
     "minRemovalDelta": 1,
     "addressAdditions": [
       "903CC58E8C242DCFC33DE4E2F8B434C77F93A48BA13BC3E3"

@@ -33,7 +33,7 @@
           "version": 1,
           "network": 144,
           "type": 16708,
-          "valueSizeDelta": 1,
+          "valueSizeDelta": -1,
           "valueSize": 49,
           "scopedMetadataKey": "A000000000123ABC",
           "value": "5468697320697320746865206D65737361676520666F722074686973206163636F756E742120E6B189E5AD973839363634",

@@ -694,7 +694,7 @@ public class BinarySerializationImpl implements BinarySerialization {
             BigInteger scopedMetadataKey = SerializationUtils.toUnsignedBigInteger(builder.getScopedMetadataKey());
             String value = SerializationUtils.toString(builder.getValue());
             return AccountMetadataTransactionFactory.create(networkType, targetAccount, scopedMetadataKey, value)
-                .valueSizeDelta(SerializationUtils.shortToUnsignedInt(builder.getValueSizeDelta()));
+                .valueSizeDelta(builder.getValueSizeDelta());
         }
 
         @Override
@@ -731,7 +731,7 @@ public class BinarySerializationImpl implements BinarySerialization {
             UnresolvedMosaicId targetMosaicId = SerializationUtils.toUnresolvedMosaicId(builder.getTargetMosaicId());
             return MosaicMetadataTransactionFactory
                 .create(networkType, targetAccount, targetMosaicId, scopedMetadataKey, value)
-                .valueSizeDelta(SerializationUtils.shortToUnsignedInt(builder.getValueSizeDelta()));
+                .valueSizeDelta(builder.getValueSizeDelta());
         }
 
         @Override
@@ -770,7 +770,7 @@ public class BinarySerializationImpl implements BinarySerialization {
             NamespaceId targetNamespaceId = SerializationUtils.toNamespaceId(builder.getTargetNamespaceId());
             return NamespaceMetadataTransactionFactory
                 .create(networkType, targetAddress, targetNamespaceId, scopedMetadataKey, value)
-                .valueSizeDelta(SerializationUtils.shortToUnsignedInt(builder.getValueSizeDelta()));
+                .valueSizeDelta(builder.getValueSizeDelta());
         }
 
         @Override
