@@ -17,9 +17,16 @@
 package io.nem.symbol.sdk.infrastructure;
 
 
+import io.nem.symbol.sdk.api.PaginationStreamer;
+import io.nem.symbol.sdk.api.ReceiptPaginationStreamer;
 import io.nem.symbol.sdk.api.ReceiptRepository;
 import io.nem.symbol.sdk.api.TransactionStatementSearchCriteria;
+import io.nem.symbol.sdk.model.receipt.ReceiptType;
 import io.nem.symbol.sdk.model.receipt.TransactionStatement;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -61,6 +68,38 @@ class ReceiptRepositoryTransactionSearchIntegrationTest extends BaseIntegrationT
     @EnumSource(RepositoryType.class)
     void searchOrderByIdDesc(RepositoryType type) {
         getPaginationTester(type).searchOrderByIdDesc();
+    }
+
+
+    @ParameterizedTest
+    @EnumSource(RepositoryType.class)
+    void searchUsingRecipientTypes(RepositoryType type) {
+
+        assertRecipientType(type, Collections.singletonList(ReceiptType.HARVEST_FEE), false);
+        assertRecipientType(type, Collections.singletonList(ReceiptType.NAMESPACE_RENTAL_FEE), false);
+        assertRecipientType(type, Arrays.asList(ReceiptType.HARVEST_FEE, ReceiptType.NAMESPACE_RENTAL_FEE), false);
+        assertRecipientType(type, Arrays.asList(ReceiptType.TRANSACTION_GROUP, ReceiptType.NAMESPACE_RENTAL_FEE),
+            false);
+        assertRecipientType(type, Collections.singletonList(ReceiptType.TRANSACTION_GROUP), true);
+    }
+
+    List<TransactionStatement> assertRecipientType(RepositoryType type, List<ReceiptType> receiptTypes, boolean empty) {
+
+        ReceiptRepository receiptRepository = getReceiptRepository(type);
+        PaginationStreamer<TransactionStatement, TransactionStatementSearchCriteria> streamer = ReceiptPaginationStreamer
+            .transactions(receiptRepository);
+        List<TransactionStatement> transactionStatements = get(
+            streamer.search(new TransactionStatementSearchCriteria().receiptTypes(receiptTypes)).toList()
+                .toObservable());
+
+        transactionStatements.forEach(s -> {
+            s.getReceipts().forEach(r -> {
+                Assertions.assertTrue(receiptTypes.contains(r.getType()));
+            });
+
+        });
+        Assertions.assertEquals(empty, transactionStatements.isEmpty());
+        return transactionStatements;
     }
 
 

@@ -4,6 +4,7 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.receipt.ReceiptType;
 import java.math.BigInteger;
+import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +18,7 @@ public class TransactionStatementSearchCriteriaTest {
         Assertions.assertNull(criteria.getPageNumber());
         Assertions.assertNull(criteria.getOffset());
         Assertions.assertNull(criteria.getHeight());
-        Assertions.assertNull(criteria.getReceiptType());
+        Assertions.assertNull(criteria.getReceiptTypes());
         Assertions.assertNull(criteria.getArtifactId());
         Assertions.assertNull(criteria.getTargetAddress());
         Assertions.assertNull(criteria.getRecipientAddress());
@@ -37,7 +38,7 @@ public class TransactionStatementSearchCriteriaTest {
         criteria.setPageNumber(5);
         criteria.setOffset("abc");
         criteria.setHeight(BigInteger.ONE);
-        criteria.setReceiptType(ReceiptType.MOSAIC_ALIAS_RESOLUTION);
+        criteria.setReceiptTypes(Collections.singletonList(ReceiptType.MOSAIC_ALIAS_RESOLUTION));
         criteria.setRecipientAddress(recipientAddress);
         criteria.setTargetAddress(targetAddress);
         criteria.setSenderAddress(senderAddress);
@@ -49,7 +50,8 @@ public class TransactionStatementSearchCriteriaTest {
         Assertions.assertEquals(BigInteger.ONE, criteria.getHeight());
         Assertions.assertEquals("abc", criteria.getOffset());
 
-        Assertions.assertEquals(ReceiptType.MOSAIC_ALIAS_RESOLUTION, criteria.getReceiptType());
+        Assertions
+            .assertEquals(Collections.singletonList(ReceiptType.MOSAIC_ALIAS_RESOLUTION), criteria.getReceiptTypes());
         Assertions.assertEquals("artifactid", criteria.getArtifactId());
         Assertions.assertEquals(recipientAddress, criteria.getRecipientAddress());
         Assertions.assertEquals(targetAddress, criteria.getTargetAddress());
@@ -65,7 +67,7 @@ public class TransactionStatementSearchCriteriaTest {
 
         TransactionStatementSearchCriteria criteria = new TransactionStatementSearchCriteria().height(BigInteger.ONE);
         criteria.order(OrderBy.ASC).pageSize(10).pageNumber(5);
-        criteria.receiptType(ReceiptType.MOSAIC_ALIAS_RESOLUTION);
+        criteria.receiptTypes(Collections.singletonList(ReceiptType.MOSAIC_ALIAS_RESOLUTION));
         criteria.recipientAddress(recipientAddress);
         criteria.targetAddress(targetAddress);
         criteria.senderAddress(senderAddress);
@@ -78,7 +80,8 @@ public class TransactionStatementSearchCriteriaTest {
         Assertions.assertEquals(BigInteger.ONE, criteria.getHeight());
         Assertions.assertEquals("abc", criteria.getOffset());
 
-        Assertions.assertEquals(ReceiptType.MOSAIC_ALIAS_RESOLUTION, criteria.getReceiptType());
+        Assertions
+            .assertEquals(Collections.singletonList(ReceiptType.MOSAIC_ALIAS_RESOLUTION), criteria.getReceiptTypes());
         Assertions.assertEquals("artifactid", criteria.getArtifactId());
         Assertions.assertEquals(recipientAddress, criteria.getRecipientAddress());
         Assertions.assertEquals(targetAddress, criteria.getTargetAddress());
@@ -96,7 +99,7 @@ public class TransactionStatementSearchCriteriaTest {
         TransactionStatementSearchCriteria criteria1 = new TransactionStatementSearchCriteria().order(OrderBy.ASC)
             .pageSize(10).pageNumber(5).height(BigInteger.ONE);
         criteria1.offset("abc");
-        criteria1.receiptType(ReceiptType.MOSAIC_ALIAS_RESOLUTION);
+        criteria1.receiptTypes(Collections.singletonList(ReceiptType.MOSAIC_ALIAS_RESOLUTION));
         criteria1.recipientAddress(recipientAddress);
         criteria1.targetAddress(targetAddress);
         criteria1.senderAddress(senderAddress);
@@ -105,7 +108,7 @@ public class TransactionStatementSearchCriteriaTest {
         TransactionStatementSearchCriteria criteria2 = new TransactionStatementSearchCriteria().order(OrderBy.ASC)
             .pageSize(10).pageNumber(5).height(BigInteger.ONE);
         criteria2.offset("abc");
-        criteria2.receiptType(ReceiptType.MOSAIC_ALIAS_RESOLUTION);
+        criteria2.receiptTypes(Collections.singletonList(ReceiptType.MOSAIC_ALIAS_RESOLUTION));
         criteria2.recipientAddress(recipientAddress);
         criteria2.targetAddress(targetAddress);
         criteria2.senderAddress(senderAddress);

@@ -3,6 +3,7 @@ package io.nem.symbol.sdk.api;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.receipt.ReceiptType;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -16,9 +17,9 @@ public class TransactionStatementSearchCriteria extends SearchCriteria<Transacti
     private BigInteger height;
 
     /**
-     * Filter the transaction receipts by type height.
+     * Filter the transaction receipts by type
      */
-    private ReceiptType receiptType;
+    private List<ReceiptType> receiptTypes;
 
     /**
      * Filter the transaction receipts by receipt address.
@@ -54,17 +55,17 @@ public class TransactionStatementSearchCriteria extends SearchCriteria<Transacti
         return this;
     }
 
-    public ReceiptType getReceiptType() {
-        return receiptType;
+    public List<ReceiptType> getReceiptTypes() {
+        return receiptTypes;
     }
 
-    public void setReceiptType(ReceiptType receiptType) {
-        this.receiptType = receiptType;
+    public void setReceiptTypes(List<ReceiptType> receiptTypes) {
+        this.receiptTypes = receiptTypes;
     }
 
 
-    public TransactionStatementSearchCriteria receiptType(ReceiptType receiptType) {
-        this.receiptType = receiptType;
+    public TransactionStatementSearchCriteria receiptTypes(List<ReceiptType> receiptType) {
+        this.receiptTypes = receiptType;
         return this;
     }
 
@@ -120,6 +121,7 @@ public class TransactionStatementSearchCriteria extends SearchCriteria<Transacti
         return this;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -128,14 +130,18 @@ public class TransactionStatementSearchCriteria extends SearchCriteria<Transacti
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        if (!super.equals(o)) {
+            return false;
+        }
         TransactionStatementSearchCriteria that = (TransactionStatementSearchCriteria) o;
-        return Objects.equals(height, that.height) && receiptType == that.receiptType && Objects
+        return Objects.equals(height, that.height) && Objects.equals(receiptTypes, that.receiptTypes) && Objects
             .equals(recipientAddress, that.recipientAddress) && Objects.equals(senderAddress, that.senderAddress)
             && Objects.equals(targetAddress, that.targetAddress) && Objects.equals(artifactId, that.artifactId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(height, receiptType, recipientAddress, senderAddress, targetAddress, artifactId);
+        return Objects
+            .hash(super.hashCode(), height, receiptTypes, recipientAddress, senderAddress, targetAddress, artifactId);
     }
 }

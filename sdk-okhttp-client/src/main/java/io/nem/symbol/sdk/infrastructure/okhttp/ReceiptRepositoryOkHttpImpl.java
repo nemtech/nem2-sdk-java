@@ -22,6 +22,7 @@ import io.nem.symbol.sdk.api.ResolutionStatementSearchCriteria;
 import io.nem.symbol.sdk.api.TransactionStatementSearchCriteria;
 import io.nem.symbol.sdk.model.receipt.AddressResolutionStatement;
 import io.nem.symbol.sdk.model.receipt.MosaicResolutionStatement;
+import io.nem.symbol.sdk.model.receipt.ReceiptType;
 import io.nem.symbol.sdk.model.receipt.TransactionStatement;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.ReceiptRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
@@ -31,6 +32,7 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.ResolutionStatementPage;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionStatementPage;
 import io.reactivex.Observable;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -54,8 +56,7 @@ public class ReceiptRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
     public Observable<Page<TransactionStatement>> searchReceipts(TransactionStatementSearchCriteria criteria) {
 
         BigInteger height = criteria.getHeight();
-        ReceiptTypeEnum receiptType =
-            criteria.getReceiptType() == null ? null : ReceiptTypeEnum.fromValue(criteria.getReceiptType().getValue());
+        List<ReceiptTypeEnum> receiptTypes = toDto(criteria.getReceiptTypes());
         String recipientAddress = toDto(criteria.getRecipientAddress());
         String senderAddress = toDto(criteria.getSenderAddress());
         String targetAddress = toDto(criteria.getTargetAddress());
@@ -66,7 +67,7 @@ public class ReceiptRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         Order order = toDto(criteria.getOrder());
 
         Callable<TransactionStatementPage> callback = () -> getClient()
-            .searchReceipts(height, receiptType, recipientAddress, senderAddress, targetAddress, artifactId, pageSize,
+            .searchReceipts(height, receiptTypes, recipientAddress, senderAddress, targetAddress, artifactId, pageSize,
                 pageNumber, offset, order);
 
         return exceptionHandling(call(callback).map(page -> this.toPage(page.getPagination(),
@@ -82,9 +83,11 @@ public class ReceiptRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         Integer pageNumber = criteria.getPageNumber();
         String offset = criteria.getOffset();
         Order order = toDto(criteria.getOrder());
-        Callable<ResolutionStatementPage> callback = () -> getClient().searchAddressResolutionStatements(height, pageSize, pageNumber, offset, order);
+        Callable<ResolutionStatementPage> callback = () -> getClient()
+            .searchAddressResolutionStatements(height, pageSize, pageNumber, offset, order);
         return exceptionHandling(call(callback).map(page -> this.toPage(page.getPagination(),
-            page.getData().stream().map(mapper::createAddressResolutionStatementFromDto).collect(Collectors.toList()))));
+            page.getData().stream().map(mapper::createAddressResolutionStatementFromDto)
+                .collect(Collectors.toList()))));
 
     }
 
@@ -97,10 +100,16 @@ public class ReceiptRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl im
         Integer pageNumber = criteria.getPageNumber();
         String offset = criteria.getOffset();
         Order order = toDto(criteria.getOrder());
-        Callable<ResolutionStatementPage> callback = () -> getClient().searchMosaicResolutionStatements(height, pageSize, pageNumber, offset, order);
+        Callable<ResolutionStatementPage> callback = () -> getClient()
+            .searchMosaicResolutionStatements(height, pageSize, pageNumber, offset, order);
         return exceptionHandling(call(callback).map(page -> this.toPage(page.getPagination(),
             page.getData().stream().map(mapper::createMosaicResolutionStatementFromDto).collect(Collectors.toList()))));
 
+    }
+
+    private List<ReceiptTypeEnum> toDto(List<ReceiptType> values) {
+        return values == null ? null
+            : values.stream().map(e -> ReceiptTypeEnum.fromValue(e.getValue())).collect(Collectors.toList());
     }
 
     public ReceiptRoutesApi getClient() {

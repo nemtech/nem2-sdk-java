@@ -22,6 +22,7 @@ import io.nem.symbol.sdk.api.ResolutionStatementSearchCriteria;
 import io.nem.symbol.sdk.api.TransactionStatementSearchCriteria;
 import io.nem.symbol.sdk.model.receipt.AddressResolutionStatement;
 import io.nem.symbol.sdk.model.receipt.MosaicResolutionStatement;
+import io.nem.symbol.sdk.model.receipt.ReceiptType;
 import io.nem.symbol.sdk.model.receipt.TransactionStatement;
 import io.nem.symbol.sdk.openapi.vertx.api.ReceiptRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.ReceiptRoutesApiImpl;
@@ -34,6 +35,7 @@ import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -58,8 +60,7 @@ public class ReceiptRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
     public Observable<Page<TransactionStatement>> searchReceipts(TransactionStatementSearchCriteria criteria) {
 
         BigInteger height = criteria.getHeight();
-        ReceiptTypeEnum receiptType =
-            criteria.getReceiptType() == null ? null : ReceiptTypeEnum.fromValue(criteria.getReceiptType().getValue());
+        List<ReceiptTypeEnum> receiptTypes = toDto(criteria.getReceiptTypes());
         String recipientAddress = toDto(criteria.getRecipientAddress());
         String senderAddress = toDto(criteria.getSenderAddress());
         String targetAddress = toDto(criteria.getTargetAddress());
@@ -70,7 +71,7 @@ public class ReceiptRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
         Order order = toDto(criteria.getOrder());
 
         Consumer<Handler<AsyncResult<TransactionStatementPage>>> callback = (handler) -> getClient()
-            .searchReceipts(height, receiptType, recipientAddress, senderAddress, targetAddress, artifactId, pageSize,
+            .searchReceipts(height, receiptTypes, recipientAddress, senderAddress, targetAddress, artifactId, pageSize,
                 pageNumber, offset, order, handler);
 
         return exceptionHandling(call(callback).map(page -> this.toPage(page.getPagination(),
@@ -106,6 +107,11 @@ public class ReceiptRepositoryVertxImpl extends AbstractRepositoryVertxImpl impl
             .searchMosaicResolutionStatements(height, pageSize, pageNumber, offset, order, handler);
         return exceptionHandling(call(callback).map(page -> this.toPage(page.getPagination(),
             page.getData().stream().map(mapper::createMosaicResolutionStatementFromDto).collect(Collectors.toList()))));
+    }
+
+    private List<ReceiptTypeEnum> toDto(List<ReceiptType> values) {
+        return values == null ? null
+            : values.stream().map(e -> ReceiptTypeEnum.fromValue(e.getValue())).collect(Collectors.toList());
     }
 
     public ReceiptRoutesApi getClient() {

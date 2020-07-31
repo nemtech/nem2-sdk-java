@@ -21,6 +21,7 @@ import io.nem.symbol.sdk.api.TransactionStatementSearchCriteria;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.receipt.AddressResolutionStatement;
 import io.nem.symbol.sdk.model.receipt.MosaicResolutionStatement;
+import io.nem.symbol.sdk.model.receipt.ReceiptType;
 import io.nem.symbol.sdk.model.receipt.TransactionStatement;
 import io.nem.symbol.sdk.openapi.vertx.model.Pagination;
 import io.nem.symbol.sdk.openapi.vertx.model.ResolutionStatementDTO;
@@ -61,8 +62,10 @@ public class ReceiptRepositoryVertxImplTest extends AbstractVertxRespositoryTest
         mockRemoteCall(toPage(transactionStatementInfoDTOS));
 
         BigInteger height = BigInteger.valueOf(10L);
-        List<TransactionStatement> transactionStatements = repository
-            .searchReceipts(new TransactionStatementSearchCriteria().height(height)).toFuture().get().getData();
+        List<TransactionStatement> transactionStatements = repository.searchReceipts(
+            new TransactionStatementSearchCriteria().height(height)
+                .receiptTypes(Collections.singletonList(ReceiptType.MOSAIC_ALIAS_RESOLUTION))).toFuture().get()
+            .getData();
 
         Assertions.assertEquals(transactionStatementInfoDTOS.size(), transactionStatements.size());
         Assertions.assertEquals("82FEFFC329618ECF56B8A6FDBCFCF1BF0A4B6747AB6A5746B195CEEB810F335C",

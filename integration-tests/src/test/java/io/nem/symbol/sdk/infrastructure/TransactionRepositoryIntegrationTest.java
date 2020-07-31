@@ -19,6 +19,7 @@ package io.nem.symbol.sdk.infrastructure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.symbol.sdk.api.OrderBy;
 import io.nem.symbol.sdk.api.RepositoryCallException;
@@ -163,7 +164,7 @@ public class TransactionRepositoryIntegrationTest extends BaseIntegrationTest {
         List<Transaction> nextTransactions = get(transactionRepository
             .search(new TransactionSearchCriteria(TransactionGroup.CONFIRMED).height(BigInteger.ONE).pageNumber(2)))
             .getData();
-        assertEquals(12, nextTransactions.size());
+        assertTrue(nextTransactions.size() > 0);
         assertNotEquals(transactions.get(1).getTransactionInfo().get().getHash(),
             nextTransactions.get(0).getTransactionInfo().get().getHash());
     }
