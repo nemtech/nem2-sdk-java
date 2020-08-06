@@ -41,40 +41,33 @@ public class EncryptedMessage extends Message {
     }
 
     /**
-     * Helper constructor that allow users to easily encrypt a message using the SDK provided {@link
-     * CryptoEngine} and {@link BlockCipher}.
+     * Helper constructor that allow users to easily encrypt a message using the SDK provided {@link CryptoEngine} and
+     * {@link BlockCipher}.
      *
-     * Note, the strategy to encrypt and decrypt should be shared between the different SDKs. A
-     * client may send a transaction using a sdk and the recipient may be using a different one.
+     * Note, the strategy to encrypt and decrypt should be shared between the different SDKs. A client may send a
+     * transaction using a sdk and the recipient may be using a different one.
      *
      * The strategy is:
      *
-     * "plain text" string - utf8 byte array - encrypted byte array - hex string (the encrypted
-     * message string)
+     * "plain text" string - utf8 byte array - encrypted byte array - hex string (the encrypted message string)
      *
      * @param plainTextMessage Plain message to be encrypted
      * @param senderPrivateKey Sender private key
      * @param recipientPublicKey Recipient public key
      * @return EncryptedMessage
      */
-    public static EncryptedMessage create(String plainTextMessage,
-        PrivateKey senderPrivateKey,
+    public static EncryptedMessage create(String plainTextMessage, PrivateKey senderPrivateKey,
         PublicKey recipientPublicKey) {
         CryptoEngine engine = CryptoEngines.defaultEngine();
         KeyPair sender = KeyPair.fromPrivate(senderPrivateKey);
         KeyPair recipient = KeyPair.onlyPublic(recipientPublicKey, engine);
-        BlockCipher blockCipher = engine
-            .createBlockCipher(sender,
-                recipient);
-        return new EncryptedMessage(
-            ConvertUtils.toHex(blockCipher.encrypt(StringEncoder.getBytes(plainTextMessage)))
-        );
+        BlockCipher blockCipher = engine.createBlockCipher(sender, recipient);
+        return new EncryptedMessage(ConvertUtils.toHex(blockCipher.encrypt(StringEncoder.getBytes(plainTextMessage))));
     }
 
 
     /**
-     * Utility method that allow users to decrypt a message if it was created using the Java SDK or
-     * the Typescript SDK.
+     * Utility method that allow users to decrypt a message if it was created using the Java SDK or the Typescript SDK.
      *
      * @param senderPublicKey Sender public key.
      * @param recipientPrivateKey Recipient private key
@@ -84,10 +77,8 @@ public class EncryptedMessage extends Message {
         CryptoEngine engine = CryptoEngines.defaultEngine();
         KeyPair sender = KeyPair.onlyPublic(senderPublicKey, engine);
         KeyPair recipient = KeyPair.fromPrivate(recipientPrivateKey);
-        BlockCipher blockCipher = engine
-            .createBlockCipher(sender, recipient);
-        return StringEncoder
-            .getString(blockCipher.decrypt(ConvertUtils.fromHexToBytes(getPayload())));
+        BlockCipher blockCipher = engine.createBlockCipher(sender, recipient);
+        return StringEncoder.getString(blockCipher.decrypt(ConvertUtils.fromHexToBytes(getPayload())));
     }
 
 }

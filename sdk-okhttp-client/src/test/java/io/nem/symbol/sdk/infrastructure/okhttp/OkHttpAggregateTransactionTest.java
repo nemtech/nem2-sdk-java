@@ -35,7 +35,6 @@ import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
-import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;

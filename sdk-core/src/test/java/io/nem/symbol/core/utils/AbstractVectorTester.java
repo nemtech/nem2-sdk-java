@@ -38,8 +38,8 @@ public class AbstractVectorTester {
         Function<Map<String, String>, List<Arguments>> extractArguments, int limit) {
         try {
             //The files loaded here are a trimmed down version of the vectors tests https://github.com/nemtech/test-vectors
-            String resourceName = "vectors/" + fileName;
-            URL url = AbstractVectorTester.class.getClassLoader().getResource(resourceName);
+            String resourceName = "file:src/test/resources/vectors/" + fileName;
+            URL url = new URL(resourceName);
             Assertions.assertNotNull(url, "Vector test not found: " + resourceName);
             ObjectMapper objectMapper = new ObjectMapper();
             // Change this to just load the first 'limit' objects from the json array file.
@@ -48,8 +48,7 @@ public class AbstractVectorTester {
                 });
             //Not all the tests can be run every time as it would be slow.
             //It may be good to shuffle the list so different vectors are tested each run.
-            return list.stream().limit(limit).map(extractArguments::apply)
-                .flatMap(List::stream)
+            return list.stream().limit(limit).map(extractArguments::apply).flatMap(List::stream)
                 .filter(Objects::nonNull);
 
         } catch (Exception e) {

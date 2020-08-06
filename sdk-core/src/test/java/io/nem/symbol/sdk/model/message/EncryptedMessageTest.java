@@ -16,6 +16,7 @@
 
 package io.nem.symbol.sdk.model.message;
 
+import io.nem.symbol.core.crypto.CryptoException;
 import io.nem.symbol.core.crypto.KeyPair;
 import io.nem.symbol.core.crypto.PrivateKey;
 import io.nem.symbol.core.utils.ConvertUtils;
@@ -39,10 +40,23 @@ public class EncryptedMessageTest {
 
         Assertions.assertEquals(MessageType.ENCRYPTED_MESSAGE, encryptedMessage.getType());
 
-        String plainMessage = encryptedMessage
-            .decryptPayload(sender.getPublicKey(), recipient.getPrivateKey());
+        String plainMessage = encryptedMessage.decryptPayload(sender.getPublicKey(), recipient.getPrivateKey());
 
         Assertions.assertEquals(message, plainMessage);
+    }
+
+    @Test
+    public void testDecryptWrong() {
+
+        String wrongEncrypted = "ABCD";
+        KeyPair sender = KeyPair.random();
+        KeyPair recipient = KeyPair.random();
+        EncryptedMessage encryptedMessage = new EncryptedMessage(wrongEncrypted);
+        Assertions.assertEquals(MessageType.ENCRYPTED_MESSAGE, encryptedMessage.getType());
+        CryptoException e = Assertions.assertThrows(CryptoException.class,
+            () -> encryptedMessage.decryptPayload(sender.getPublicKey(), recipient.getPrivateKey()));
+        Assertions.assertEquals("Cannot decrypt input. Size is 2 when at least 28 is expected.", e.getMessage());
+
     }
 
 
@@ -55,16 +69,15 @@ public class EncryptedMessageTest {
         // Although using the same encryption algorithm, outcome may be different if the encoding
         // process is different. Both TS and Java are using utf-8 and hex encodings,
 
-        KeyPair sender = KeyPair.fromPrivate(PrivateKey
-            .fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C108"));
-        KeyPair recipient = KeyPair.fromPrivate(PrivateKey
-            .fromHexString("B72F2950498111BADF276D6D9D5E345F04E0D5C9B8342DA983C3395B4CF18F08"));
+        KeyPair sender = KeyPair
+            .fromPrivate(PrivateKey.fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C108"));
+        KeyPair recipient = KeyPair
+            .fromPrivate(PrivateKey.fromHexString("B72F2950498111BADF276D6D9D5E345F04E0D5C9B8342DA983C3395B4CF18F08"));
 
-        String typescriptEncryptedKey = "DA5E78D71024C49567855E83C0420855976FCF6CCDD68173A408FA31207DC92AB993348AC02411673E5602DAF994601A";
+        String typescriptEncryptedKey = "079A490A7F68CC42F7156D12F082AF1ADC193FD8E3DA93CF67FA1D3F880D5DCEF2A9734EFE39646501023D1A9B63A44E57AEDE";
 
         EncryptedMessage encryptedMessage = new EncryptedMessage(typescriptEncryptedKey);
-        String plainMessage = encryptedMessage
-            .decryptPayload(sender.getPublicKey(), recipient.getPrivateKey());
+        String plainMessage = encryptedMessage.decryptPayload(sender.getPublicKey(), recipient.getPrivateKey());
 
         Assertions.assertEquals("test transaction 漢字", plainMessage);
 
@@ -80,18 +93,16 @@ public class EncryptedMessageTest {
         // Although using the same encryption algorithm, outcome may be different if the encoding
         // process is different. Both TS and Java are using utf-8 and hex encodings,
 
-        KeyPair sender = KeyPair.fromPrivate(PrivateKey
-            .fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C108"));
-        KeyPair recipient = KeyPair.fromPrivate(PrivateKey
-            .fromHexString("B72F2950498111BADF276D6D9D5E345F04E0D5C9B8342DA983C3395B4CF18F08"));
+        KeyPair sender = KeyPair
+            .fromPrivate(PrivateKey.fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C108"));
+        KeyPair recipient = KeyPair
+            .fromPrivate(PrivateKey.fromHexString("B72F2950498111BADF276D6D9D5E345F04E0D5C9B8342DA983C3395B4CF18F08"));
 
-        String typescriptEncryptedKey = "DA5E78D71024C49567855E83C0420855976FCF6CCDD68173A408FA31207DC92AB993348AC02411673E5602DAF994601A";
+        String typescriptEncryptedKey = "079A490A7F68CC42F7156D12F082AF1ADC193FD8E3DA93CF67FA1D3F880D5DCEF2A9734EFE39646501023D1A9B63A44E57AEDE";
 
         EncryptedMessage encryptedMessage = (EncryptedMessage) Message
-            .createFromPayload(MessageType.ENCRYPTED_MESSAGE,
-                ConvertUtils.fromStringToHex(typescriptEncryptedKey));
-        String plainMessage = encryptedMessage
-            .decryptPayload(sender.getPublicKey(), recipient.getPrivateKey());
+            .createFromPayload(MessageType.ENCRYPTED_MESSAGE, ConvertUtils.fromStringToHex(typescriptEncryptedKey));
+        String plainMessage = encryptedMessage.decryptPayload(sender.getPublicKey(), recipient.getPrivateKey());
 
         Assertions.assertEquals("test transaction 漢字", plainMessage);
 

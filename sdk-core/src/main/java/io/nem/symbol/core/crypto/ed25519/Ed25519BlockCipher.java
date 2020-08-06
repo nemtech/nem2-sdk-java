@@ -16,34 +16,27 @@
 
 package io.nem.symbol.core.crypto.ed25519;
 
+import static io.nem.symbol.core.crypto.ed25519.AESGCM.IV_LENGTH;
+import static io.nem.symbol.core.crypto.ed25519.AESGCM.TAG_LENGTH;
+
 import io.nem.symbol.core.crypto.BlockCipher;
+import io.nem.symbol.core.crypto.CryptoException;
 import io.nem.symbol.core.crypto.Hashes;
 import io.nem.symbol.core.crypto.KeyPair;
 import io.nem.symbol.core.crypto.PrivateKey;
 import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.core.crypto.ed25519.arithmetic.Ed25519EncodedGroupElement;
 import io.nem.symbol.core.crypto.ed25519.arithmetic.Ed25519GroupElement;
-import io.nem.symbol.sdk.infrastructure.RandomUtils;
+import io.nem.symbol.core.utils.ArrayUtils;
 import java.util.Arrays;
-import org.bouncycastle.crypto.BufferedBlockCipher;
-import org.bouncycastle.crypto.CipherParameters;
-import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.bouncycastle.crypto.engines.AESEngine;
-import org.bouncycastle.crypto.modes.CBCBlockCipher;
-import org.bouncycastle.crypto.paddings.BlockCipherPadding;
-import org.bouncycastle.crypto.paddings.PKCS7Padding;
-import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
-import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.crypto.params.ParametersWithIV;
 
 /**
  * Implementation of the block cipher for Ed25519.
  */
 public class Ed25519BlockCipher implements BlockCipher {
 
-    private static final int IV_LENGTH = 16;
-
     private final KeyPair senderKeyPair;
+
     private final KeyPair recipientKeyPair;
 
     public Ed25519BlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
@@ -52,92 +45,53 @@ public class Ed25519BlockCipher implements BlockCipher {
     }
 
     @Override
-    @SuppressWarnings("squid:S1168")
-    public byte[] encrypt(final byte[] input) {
-        // Setup salt.
+    public byte[] encrypt(final byte[] plainText) {
+        return encrypt(plainText, AESGCM.generateIV());
+    }
 
+    public byte[] encrypt(final byte[] plainText, final byte[] ivData) {
+        AuthenticatedCipherText encryptResult = encode(plainText, ivData);
+        byte[] authTag = encryptResult.getAuthenticationTag();
+        byte[] cipherText = encryptResult.getCipherText();
+        return ArrayUtils.concat(authTag, encryptResult.getIv(), cipherText);
+    }
+
+    public AuthenticatedCipherText encode(final byte[] plainText, final byte[] ivData) {
         // Derive shared key.
-        final byte[] sharedKey = getSharedKey(this.senderKeyPair.getPrivateKey(),
-            this.recipientKeyPair.getPublicKey());
-
-        // Setup IV.
-        final byte[] ivData = RandomUtils.generateRandomBytes(IV_LENGTH);
-
-        // Setup block cipher.
-        final BufferedBlockCipher cipher = setupBlockCipher(sharedKey, ivData, true);
-
-        // Encode.
-        final byte[] buf = transform(cipher, input);
-        if (null == buf) {
-            return null;
-        }
-
-        final byte[] result = new byte[ivData.length + buf.length];
-        System.arraycopy(ivData, 0, result, 0, ivData.length);
-        System.arraycopy(buf, 0, result, ivData.length, buf.length);
-        return result;
+        final byte[] sharedKey = getSharedKey(this.senderKeyPair.getPrivateKey(), this.recipientKeyPair.getPublicKey());
+        return AESGCM.encrypt(sharedKey, ivData, plainText);
     }
 
     @Override
-    @SuppressWarnings("squid:S1168")
     public byte[] decrypt(final byte[] input) {
-        if (input.length < 32) {
-            return null;
+        if (input == null) {
+            throw new CryptoException("Cannot decrypt. Input is required.");
         }
-
-        final byte[] ivData = Arrays.copyOfRange(input, 0, IV_LENGTH);
-        final byte[] encData = Arrays.copyOfRange(input, IV_LENGTH, input.length);
-
-        // Derive shared key.
-        final byte[] sharedKey = getSharedKey(this.recipientKeyPair.getPrivateKey(),
-            this.senderKeyPair.getPublicKey());
-
-        // Setup block cipher.
-        final BufferedBlockCipher cipher = setupBlockCipher(sharedKey, ivData, false);
-
-        // Decode.
-        return transform(cipher, encData);
-    }
-
-    @SuppressWarnings("squid:S1168")
-    public static byte[] transform(final BufferedBlockCipher cipher, final byte[] data) {
-        final byte[] buf = new byte[cipher.getOutputSize(data.length)];
-        int length = cipher.processBytes(data, 0, data.length, buf, 0);
-        try {
-            length += cipher.doFinal(buf, length);
-        } catch (final InvalidCipherTextException e) {
-            return null;
+        int minSize = TAG_LENGTH + IV_LENGTH;
+        if (input.length < minSize) {
+            throw new CryptoException(
+                "Cannot decrypt input. Size is " + input.length + " when at least " + minSize + " is expected.");
         }
+        final byte[] authTag = Arrays.copyOfRange(input, 0, TAG_LENGTH);
+        final byte[] ivData = Arrays.copyOfRange(input, TAG_LENGTH, IV_LENGTH + TAG_LENGTH);
+        final byte[] cypherText = Arrays.copyOfRange(input, TAG_LENGTH + IV_LENGTH, input.length);
+        return decode(authTag, ivData, cypherText);
 
-        return Arrays.copyOf(buf, length);
     }
 
-    public static BufferedBlockCipher setupBlockCipher(
-        final byte[] sharedKey, final byte[] ivData, final boolean forEncryption) {
-        // Setup cipher parameters with key and IV.
-        final KeyParameter keyParam = new KeyParameter(sharedKey);
-        final CipherParameters params = new ParametersWithIV(keyParam, ivData);
-
-        // Setup AES cipher in CBC mode with PKCS7 padding.
-        final BlockCipherPadding padding = new PKCS7Padding();
-        final BufferedBlockCipher cipher =
-            new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESEngine()), padding);
-        cipher.reset();
-        cipher.init(forEncryption, params);
-        return cipher;
+    public byte[] decode(byte[] authTag, byte[] ivData, byte[] cypherText) {
+        final byte[] sharedKey = getSharedKey(this.recipientKeyPair.getPrivateKey(), this.senderKeyPair.getPublicKey());
+        return AESGCM.decrypt(sharedKey, ivData, cypherText, authTag);
     }
+
 
     public static byte[] getSharedKey(final PrivateKey privateKey, final PublicKey publicKey) {
         return Hashes.sha256ForSharedKey(getSharedSecret(privateKey, publicKey));
     }
 
     public static byte[] getSharedSecret(final PrivateKey privateKey, final PublicKey publicKey) {
-        final Ed25519GroupElement senderA =
-            new Ed25519EncodedGroupElement(publicKey.getBytes()).decode();
+        final Ed25519GroupElement senderA = new Ed25519EncodedGroupElement(publicKey.getBytes()).decode();
         senderA.precomputeForScalarMultiplication();
-        return senderA
-            .scalarMultiply(Ed25519Utils.prepareForScalarMultiply(privateKey))
-            .encode()
-            .getRaw();
+        return senderA.scalarMultiply(Ed25519Utils.prepareForScalarMultiply(privateKey)).encode().getRaw();
     }
 }

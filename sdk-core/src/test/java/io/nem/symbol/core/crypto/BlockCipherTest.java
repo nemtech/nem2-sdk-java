@@ -49,8 +49,7 @@ public abstract class BlockCipherTest {
         final CryptoEngine engine = this.getCryptoEngine();
         final KeyPair skp = KeyPair.random(engine);
         final KeyPair rkp = KeyPair.random(engine);
-        final BlockCipher blockCipher =
-            this.getBlockCipher(skp, KeyPair.onlyPublic(rkp.getPublicKey(), engine));
+        final BlockCipher blockCipher = this.getBlockCipher(skp, KeyPair.onlyPublic(rkp.getPublicKey(), engine));
         final byte[] input = RandomUtils.generateRandomBytes();
 
         // Act:
@@ -66,10 +65,8 @@ public abstract class BlockCipherTest {
         final CryptoEngine engine = this.getCryptoEngine();
         final KeyPair skp = KeyPair.random(engine);
         final KeyPair rkp = KeyPair.random(engine);
-        final BlockCipher blockCipher1 =
-            this.getBlockCipher(skp, KeyPair.onlyPublic(rkp.getPublicKey(), engine));
-        final BlockCipher blockCipher2 =
-            this.getBlockCipher(KeyPair.onlyPublic(skp.getPublicKey(), engine), rkp);
+        final BlockCipher blockCipher1 = this.getBlockCipher(skp, KeyPair.onlyPublic(rkp.getPublicKey(), engine));
+        final BlockCipher blockCipher2 = this.getBlockCipher(KeyPair.onlyPublic(skp.getPublicKey(), engine), rkp);
         final byte[] input = RandomUtils.generateRandomBytes();
 
         // Act:
@@ -86,10 +83,8 @@ public abstract class BlockCipherTest {
         final CryptoEngine engine = this.getCryptoEngine();
         final KeyPair skp = KeyPair.random(engine);
         final KeyPair rkp = KeyPair.random(engine);
-        final BlockCipher blockCipher1 =
-            this.getBlockCipher(skp, KeyPair.onlyPublic(rkp.getPublicKey(), engine));
-        final BlockCipher blockCipher2 =
-            this.getBlockCipher(KeyPair.onlyPublic(rkp.getPublicKey(), engine), skp);
+        final BlockCipher blockCipher1 = this.getBlockCipher(skp, KeyPair.onlyPublic(rkp.getPublicKey(), engine));
+        final BlockCipher blockCipher2 = this.getBlockCipher(KeyPair.onlyPublic(rkp.getPublicKey(), engine), skp);
         final byte[] input = "Some text".getBytes();
 
         // Act:
@@ -97,19 +92,33 @@ public abstract class BlockCipherTest {
         final byte[] decryptedBytes = blockCipher2.decrypt(encryptedBytes);
 
         // Assert:
-        MatcherAssert.assertThat(ConvertUtils.toHex(decryptedBytes),
-            IsEqual.equalTo(ConvertUtils.toHex(input)));
+        MatcherAssert.assertThat(ConvertUtils.toHex(decryptedBytes), IsEqual.equalTo(ConvertUtils.toHex(input)));
     }
 
     @Test
-    void dataEncryptedWithPrivateKeyCanOnlyBeDecryptedByMatchingPublicKey(
-    ) {
+    void dataCanBeDecryptedWhenSmallest() {
         // Arrange:
         final CryptoEngine engine = this.getCryptoEngine();
-        final BlockCipher blockCipher1 =
-            this.getBlockCipher(KeyPair.random(engine), KeyPair.random(engine));
-        final BlockCipher blockCipher2 =
-            this.getBlockCipher(KeyPair.random(engine), KeyPair.random(engine));
+        final KeyPair skp = KeyPair.random(engine);
+        final KeyPair rkp = KeyPair.random(engine);
+        final BlockCipher blockCipher1 = this.getBlockCipher(skp, KeyPair.onlyPublic(rkp.getPublicKey(), engine));
+        final BlockCipher blockCipher2 = this.getBlockCipher(KeyPair.onlyPublic(rkp.getPublicKey(), engine), skp);
+        final byte[] input = new byte[0];
+
+        // Act:
+        final byte[] encryptedBytes = blockCipher1.encrypt(input);
+        final byte[] decryptedBytes = blockCipher2.decrypt(encryptedBytes);
+
+        // Assert:
+        MatcherAssert.assertThat(ConvertUtils.toHex(decryptedBytes), IsEqual.equalTo(ConvertUtils.toHex(input)));
+    }
+
+    @Test
+    void dataEncryptedWithPrivateKeyCanOnlyBeDecryptedByMatchingPublicKey() {
+        // Arrange:
+        final CryptoEngine engine = this.getCryptoEngine();
+        final BlockCipher blockCipher1 = this.getBlockCipher(KeyPair.random(engine), KeyPair.random(engine));
+        final BlockCipher blockCipher2 = this.getBlockCipher(KeyPair.random(engine), KeyPair.random(engine));
         final byte[] input = RandomUtils.generateRandomBytes();
 
         // Act:
@@ -118,17 +127,22 @@ public abstract class BlockCipherTest {
 
         // Assert:
         MatcherAssert.assertThat(blockCipher1.decrypt(encryptedBytes1), IsEqual.equalTo(input));
-        MatcherAssert
-            .assertThat(blockCipher1.decrypt(encryptedBytes2), IsNot.not(IsEqual.equalTo(input)));
-        MatcherAssert
-            .assertThat(blockCipher2.decrypt(encryptedBytes1), IsNot.not(IsEqual.equalTo(input)));
         MatcherAssert.assertThat(blockCipher2.decrypt(encryptedBytes2), IsEqual.equalTo(input));
+
+        CryptoException e1 = Assertions
+            .assertThrows(CryptoException.class, () -> blockCipher2.decrypt(encryptedBytes1));
+        Assertions
+            .assertEquals("Could decrypt value: InvalidCipherTextException: mac check in GCM failed", e1.getMessage());
+
+        CryptoException e2 = Assertions
+            .assertThrows(CryptoException.class, () -> blockCipher1.decrypt(encryptedBytes2));
+        Assertions
+            .assertEquals("Could decrypt value: InvalidCipherTextException: mac check in GCM failed", e2.getMessage());
+
     }
 
-    protected BlockCipher getBlockCipher(
-        final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
-        return this.getCryptoEngine()
-            .createBlockCipher(senderKeyPair, recipientKeyPair);
+    protected BlockCipher getBlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
+        return this.getCryptoEngine().createBlockCipher(senderKeyPair, recipientKeyPair);
     }
 
     protected abstract CryptoEngine getCryptoEngine();
