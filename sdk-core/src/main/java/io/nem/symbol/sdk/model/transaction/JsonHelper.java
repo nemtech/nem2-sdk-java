@@ -22,9 +22,8 @@ import java.util.List;
 /**
  * JSON Helper interface used by the mappers to process json objects.
  *
- * Mappers should use the statically typed open API generated DTOs when possible. This helper should
- * be used when there is no way of just using the DTOs. For example when processing "anyOf" kind of
- * attributes.
+ * Mappers should use the statically typed open API generated DTOs when possible. This helper should be used when there
+ * is no way of just using the DTOs. For example when processing "anyOf" kind of attributes.
  *
  * This interface hides the json underline implementation like gson or jackson2.
  *
@@ -49,8 +48,8 @@ public interface JsonHelper {
     String prettyPrint(Object object);
 
     /**
-     * It parse a json string into an object of the underlying implementation (e.g. gson
-     * JsonObject or jackson ObjectNode)
+     * It parse a json string into an object of the underlying implementation (e.g. gson JsonObject or jackson
+     * ObjectNode)
      *
      * @param string the json string
      * @return the object or null if the string is null.
@@ -78,8 +77,7 @@ public interface JsonHelper {
     <T> T parse(String string, Class<T> clazz);
 
     /**
-     * It converts a object (for example a native json object or a map) into another type (like a
-     * statically type DTO).
+     * It converts a object (for example a native json object or a map) into another type (like a statically type DTO).
      *
      * This is usefull to convert opan api "anyOf" objects into a defined DTO.
      *
@@ -153,7 +151,6 @@ public interface JsonHelper {
      */
     Boolean getBoolean(Object object, String... path);
 
-
     /**
      * This method retrieves a BigInteger attribute following the the provided path
      *
@@ -178,4 +175,12 @@ public interface JsonHelper {
      */
     boolean contains(Object object, String... path);
 
+    /**
+     * A generic object form the given payload.
+     *
+     * @param object the object
+     * @param path the path
+     * @return a generic object for the fiven payload.
+     */
+    Object getObject(Object object, String... path);
 }

@@ -224,6 +224,12 @@ public class JsonHelperGson implements JsonHelper {
     }
 
 
+    @Override
+    public Object getObject(Object object, String... path) {
+        return getNode(convert(object, JsonObject.class), path);
+    }
+
+
     private JsonElement getNode(final JsonObject parent, final String... path) {
         JsonElement child = parent;
         if (child == null) {

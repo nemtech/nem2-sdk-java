@@ -16,18 +16,27 @@
 
 package io.nem.symbol.sdk.infrastructure;
 
+/**
+ * The listener payload with the parsed data.
+ */
 public class ListenerMessage {
 
     private final ListenerChannel channel;
+    private final String channelParams;
     private final Object message;
 
-    public ListenerMessage(ListenerChannel channel, Object message) {
+    public ListenerMessage(ListenerChannel channel, String channelParams, Object message) {
         this.channel = channel;
+        this.channelParams = channelParams;
         this.message = message;
     }
 
     public ListenerChannel getChannel() {
         return channel;
+    }
+
+    public String getChannelParams() {
+        return channelParams;
     }
 
     public Object getMessage() {

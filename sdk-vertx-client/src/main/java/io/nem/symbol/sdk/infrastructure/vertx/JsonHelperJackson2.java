@@ -211,6 +211,11 @@ public class JsonHelperJackson2 implements JsonHelper {
         return child != null && !child.isNull();
     }
 
+    @Override
+    public Object getObject(Object object, String... path) {
+        return getNode(convert(object, JsonNode.class), path);
+    }
+
     private JsonNode getNode(final JsonNode parent, final String... path) {
         JsonNode child = parent;
         if (child == null) {

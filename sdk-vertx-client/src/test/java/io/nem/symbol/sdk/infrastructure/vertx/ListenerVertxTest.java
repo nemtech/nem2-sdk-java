@@ -182,7 +182,7 @@ public class ListenerVertxTest {
         List<CosignatureSignedTransaction> transactions = new ArrayList<>();
         listener.cosignatureAdded(address).forEach(transactions::add);
 
-        listener.handle(transactionInfoDtoJsonObject, null);
+        handle(transactionInfoDtoJsonObject, consignature.toString() + "/" + address.plain());
 
         Assertions.assertEquals(1, transactions.size());
 
@@ -211,8 +211,6 @@ public class ListenerVertxTest {
 
         String channelName = channel.toString();
 
-        ((ObjectNode) transactionInfoDtoJsonObject.get("meta")).put("channelName", channelName);
-
         List<Transaction> transactions = new ArrayList<>();
         List<Throwable> exceptions = new ArrayList<>();
         BiFunction<Address, String, Observable<? extends Transaction>> subscriber =
@@ -222,7 +220,7 @@ public class ListenerVertxTest {
         TransactionMetaDTO meta = jsonHelper.convert(transactionInfo.getMeta(), TransactionMetaDTO.class);
         subscriber.apply(address, meta.getHash()).doOnError(exceptions::add).forEach(transactions::add);
 
-        listener.handle(transactionInfoDtoJsonObject, null);
+        handle(transactionInfoDtoJsonObject, channelName + "/" + Address.generateRandom(NETWORK_TYPE).plain());
 
         Assertions.assertEquals(1, transactions.size());
         Assertions.assertEquals(0, exceptions.size());
@@ -254,7 +252,6 @@ public class ListenerVertxTest {
 
         String channelName = channel.toString();
 
-        ((ObjectNode) transactionInfoDtoJsonObject.get("meta")).put("channelName", channelName);
 
         List<Transaction> transactions = new ArrayList<>();
         List<Throwable> exceptions = new ArrayList<>();
@@ -266,7 +263,7 @@ public class ListenerVertxTest {
         TransactionMetaDTO meta = jsonHelper.convert(transactionInfo.getMeta(), TransactionMetaDTO.class);
         subscriber.apply(address, meta.getHash()).doOnError(exceptions::add).forEach(transactions::add);
 
-        listener.handle(transactionInfoDtoJsonObject, null);
+        handle(transactionInfoDtoJsonObject, channel.toString() + "/" + Address.generateRandom(NETWORK_TYPE).plain());
 
         Assertions.assertEquals(1, transactions.size());
         Assertions.assertEquals(0, exceptions.size());
@@ -294,18 +291,15 @@ public class ListenerVertxTest {
 
         ObjectNode transactionInfoDtoJsonObject = jsonHelper.convert(transactionInfo, ObjectNode.class);
 
-        ((ObjectNode) transactionInfoDtoJsonObject.get("meta")).put("channelName", channelName);
-
         ((ObjectNode) transactionInfoDtoJsonObject.get("transaction")).put("recipientAddress",
             ConvertUtils.toHex(SerializationUtils.toUnresolvedAddress(namespaceId, NETWORK_TYPE).serialize()));
 
-        Address address = Account.generateNewAccount(NETWORK_TYPE).getAddress();
+        Address address = Address.generateRandom(NETWORK_TYPE);
 
         Mockito.when(namespaceRepository.getAccountsNames(Mockito.eq(Collections.singletonList(address)))).thenReturn(
             Observable.just(Collections.singletonList(
                 new AccountNames(address, Collections.singletonList(new NamespaceName(namespaceId, "alias"))))));
 
-        ((ObjectNode) transactionInfoDtoJsonObject.get("meta")).put("channelName", channelName);
 
         List<Transaction> transactions = new ArrayList<>();
 
@@ -317,7 +311,7 @@ public class ListenerVertxTest {
         TransactionMetaDTO meta = jsonHelper.convert(transactionInfo.getMeta(), TransactionMetaDTO.class);
         subscriber.apply(address, meta.getHash()).forEach(transactions::add);
 
-        listener.handle(transactionInfoDtoJsonObject, null);
+        handle(transactionInfoDtoJsonObject, channelName + "/" + Address.generateRandom(NETWORK_TYPE).plain());
 
         Assertions.assertEquals(1, transactions.size());
 
@@ -338,7 +332,7 @@ public class ListenerVertxTest {
         String channelName = channel.toString();
         simulateWebSocketStartup();
 
-        Address address = Account.generateNewAccount(NETWORK_TYPE).getAddress();
+        Address address = Address.generateRandom(NETWORK_TYPE);
 
         String hash = "someHash";
         List<String> hashes = new ArrayList<>();
@@ -350,13 +344,47 @@ public class ListenerVertxTest {
 
         Map<String, Map<String, String>> message = new HashMap<>();
         Map<String, String> meta = new HashMap<>();
-        meta.put("channelName", channel.toString());
         meta.put("hash", hash);
         message.put("meta", meta);
-        listener.handle(message, null);
+        handle(message, channel.toString() + "/" + address.plain());
 
         Assertions.assertEquals(1, hashes.size());
         Assertions.assertEquals(hash, hashes.get(0));
+
+        Mockito.verify(webSocketMock).handler(Mockito.any());
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
+
+        Mockito.verify(webSocketMock).writeTextMessage(
+            jsonHelper.print(new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
+
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"AGGREGATE_BONDED_REMOVED", "UNCONFIRMED_REMOVED"})
+    public void subscribeToHashIncorrectAddress(ListenerChannel channel)
+        throws InterruptedException, ExecutionException, TimeoutException {
+        String channelName = channel.toString();
+        simulateWebSocketStartup();
+
+        Address address = Address.generateRandom(NETWORK_TYPE);
+
+        String hash = "someHash";
+        List<String> hashes = new ArrayList<>();
+        BiFunction<Address, String, Observable<String>> subscriber =
+            channel == ListenerChannel.AGGREGATE_BONDED_REMOVED ? listener::aggregateBondedRemoved
+                : listener::unconfirmedRemoved;
+
+        subscriber.apply(address, hash).forEach(hashes::add);
+
+        Map<String, Map<String, String>> message = new HashMap<>();
+        Map<String, String> meta = new HashMap<>();
+        meta.put("hash", hash);
+        message.put("meta", meta);
+        Address invalidAddress = Address.generateRandom(NETWORK_TYPE);
+        handle(message, channel.toString() + "/" + invalidAddress.plain());
+
+        Assertions.assertEquals(0, hashes.size());
 
         Mockito.verify(webSocketMock).handler(Mockito.any());
         Mockito.verify(webSocketMock).writeTextMessage(
@@ -373,7 +401,7 @@ public class ListenerVertxTest {
         throws InterruptedException, ExecutionException, TimeoutException {
         String channelName = channel.toString();
         simulateWebSocketStartup();
-        Address address = Account.generateNewAccount(NETWORK_TYPE).getAddress();
+        Address address = Address.generateRandom(NETWORK_TYPE);
         String hash = "someHash";
         List<String> hashes = new ArrayList<>();
         BiFunction<Address, String, Observable<String>> subscriber =
@@ -382,10 +410,9 @@ public class ListenerVertxTest {
         subscriber.apply(address, hash).forEach(hashes::add);
         Map<String, Map<String, String>> message = new HashMap<>();
         Map<String, String> meta = new HashMap<>();
-        meta.put("channelName", channel.toString());
         meta.put("hash", "invalidHash");
         message.put("meta", meta);
-        listener.handle(message, null);
+        handle(message, channelName + "/" + address.plain());
 
         Assertions.assertEquals(0, hashes.size());
 
@@ -430,7 +457,7 @@ public class ListenerVertxTest {
 
         subscriber.apply(address, meta.getHash()).doOnError(exceptions::add).forEach(transactions::add);
 
-        listener.handle(transactionStatusError, null);
+        handle(transactionStatusError, "status/" + address.plain());
 
         Assertions.assertEquals(0, transactions.size());
         Assertions.assertEquals(1, exceptions.size());
@@ -572,7 +599,7 @@ public class ListenerVertxTest {
         message.put("address", account1.getAddress().encoded());
         message.put("code", "some error");
         message.put("deadline", 5555);
-        listener.handle(message, null);
+        handle(message, "status/" + account1.getAddress().plain());
 
         Assertions.assertNotNull(reference.get());
 
@@ -602,7 +629,7 @@ public class ListenerVertxTest {
         message.put("address", account1.getAddress().encoded());
         message.put("code", "some error");
         message.put("deadline", 5555);
-        listener.handle(message, null);
+        handle(message, "status/" + account1.getAddress().plain());
 
         Assertions.assertNull(reference.get());
 
@@ -857,10 +884,12 @@ public class ListenerVertxTest {
         Assertions.assertFalse(transactionFromAddress(listener,
             mosaicAddressRestriction(account1.getPublicAccount(), account2.getAddress()), account3.getAddress()));
 
-        Assertions.assertTrue(transactionFromAddress(listener,
-            mosaicAddressRestriction(account1.getPublicAccount(), alias2), account3.getAddress(), alias2));
-        Assertions.assertFalse(transactionFromAddress(listener,
-            mosaicAddressRestriction(account1.getPublicAccount(), alias2), account3.getAddress(), alias1));
+        Assertions.assertTrue(
+            transactionFromAddress(listener, mosaicAddressRestriction(account1.getPublicAccount(), alias2),
+                account3.getAddress(), alias2));
+        Assertions.assertFalse(
+            transactionFromAddress(listener, mosaicAddressRestriction(account1.getPublicAccount(), alias2),
+                account3.getAddress(), alias1));
 
     }
 
@@ -889,5 +918,11 @@ public class ListenerVertxTest {
         return factory.build();
     }
 
+    private void handle(Object data, String topic) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("data", data);
+        map.put("topic", topic);
+        listener.handle(map, null);
+    }
 
 }

@@ -16,7 +16,6 @@
 
 package io.nem.symbol.sdk.infrastructure;
 
-import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.Listener;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.model.account.Address;
@@ -45,6 +44,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -57,6 +57,7 @@ public abstract class ListenerBase implements Listener {
     private final Subject<ListenerMessage> messageSubject = PublishSubject.create();
 
     private final JsonHelper jsonHelper;
+
     private final NamespaceRepository namespaceRepository;
 
     private String uid;
@@ -67,37 +68,54 @@ public abstract class ListenerBase implements Listener {
     }
 
     /**
-     * It knows how to handle a ws message coming from the server. Each subclass is responsible of hooking the web
+     * It knows how to handle a ws wsPayload coming from the server. Each subclass is responsible of hooking the web
      * socket implementation with this method.
      *
-     * @param message the generic json with the message.
+     * @param wsPayload the generic json with the wsPayload.
      * @param future to tell the user that the connection to the ws has been stabilised.
      */
-    public void handle(Object message, CompletableFuture<Void> future) {
-        if (jsonHelper.contains(message, "uid")) {
-            uid = jsonHelper.getString(message, "uid");
+    public void handle(Object wsPayload, CompletableFuture<Void> future) {
+        if (jsonHelper.contains(wsPayload, "uid")) {
+            uid = jsonHelper.getString(wsPayload, "uid");
             future.complete(null);
-        } else if (jsonHelper.contains(message, "transaction")) {
-            ListenerChannel channel = ListenerChannel.rawValueOf(jsonHelper.getString(message, "meta", "channelName"));
-            TransactionGroup group = toGroup(channel);
-            Transaction messageObject = toTransaction(group, message);
-            onNext(channel, messageObject);
-        } else if (jsonHelper.contains(message, "block")) {
-            BlockInfo messageObject = toBlockInfo(message);
-            onNext(ListenerChannel.BLOCK, messageObject);
-        } else if (jsonHelper.contains(message, "code")) {
-            TransactionStatusError messageObject = new TransactionStatusError(
-                MapperUtils.toAddress(jsonHelper.getString(message, "address")), jsonHelper.getString(message, "hash"),
-                jsonHelper.getString(message, "code"),
-                new Deadline(new BigInteger(jsonHelper.getString(message, "deadline"))));
-            onNext(ListenerChannel.STATUS, messageObject);
-        } else if (jsonHelper.contains(message, "parentHash")) {
-            CosignatureSignedTransaction messageObject = toCosignatureSignedTransaction(message);
-            onNext(ListenerChannel.COSIGNATURE, messageObject);
-        } else if (jsonHelper.contains(message, "meta")) {
-            onNext(ListenerChannel.rawValueOf(jsonHelper.getString(message, "meta", "channelName")),
-                jsonHelper.getString(message, "meta", "hash"));
+            return;
         }
+        String topic = jsonHelper.getString(wsPayload, "topic");
+        Validate.notNull(topic, "Topic must be included in the WebSocket payload!");
+        ListenerChannel channel = ListenerChannel.rawValueOf(StringUtils.substringBefore(topic, "/"));
+        String channelParams = StringUtils.substringAfter(topic, "/");
+        Object message = jsonHelper.getObject(wsPayload, "data");
+        Validate.notNull(message, "Data must be included in the WebSocket payload!");
+        switch (channel) {
+            case CONFIRMED_ADDED:
+            case UNCONFIRMED_ADDED:
+            case AGGREGATE_BONDED_ADDED:
+                onNext(channel, channelParams, toTransaction(toGroup(channel), message));
+                break;
+            case BLOCK:
+                onNext(channel, channelParams, toBlockInfo(message));
+                break;
+            case STATUS:
+                onNext(channel, channelParams, toStatus(message, channelParams));
+                break;
+            case COSIGNATURE:
+                onNext(channel, channelParams, toCosignatureSignedTransaction(message));
+                break;
+            case AGGREGATE_BONDED_REMOVED:
+            case UNCONFIRMED_REMOVED:
+                onNext(channel, channelParams, jsonHelper.getString(message, "meta", "hash"));
+                break;
+            default:
+                throw new IllegalArgumentException("Channel " + channel + "is not supported.");
+        }
+    }
+
+    private TransactionStatusError toStatus(Object message, String channelParams) {
+        Address address = Address.createFromRawAddress(channelParams);
+        String hash = jsonHelper.getString(message, "hash");
+        String code = jsonHelper.getString(message, "code");
+        Deadline deadline = new Deadline(new BigInteger(jsonHelper.getString(message, "deadline")));
+        return new TransactionStatusError(address, hash, code, deadline);
     }
 
     private TransactionGroup toGroup(ListenerChannel channel) {
@@ -159,8 +177,8 @@ public abstract class ListenerBase implements Listener {
         validateOpen();
         this.subscribeTo(ListenerChannel.STATUS + "/" + address.plain());
         return getMessageSubject().filter(rawMessage -> rawMessage.getChannel().equals(ListenerChannel.STATUS))
+            .filter(rawMessage -> fromAddress(rawMessage, address))
             .map(rawMessage -> (TransactionStatusError) rawMessage.getMessage())
-            .filter(status -> address.equals(status.getAddress()))
             .filter(status -> transactionHash == null || transactionHash.equalsIgnoreCase(status.getHash()));
     }
 
@@ -171,6 +189,7 @@ public abstract class ListenerBase implements Listener {
         ListenerChannel channel = ListenerChannel.COSIGNATURE;
         this.subscribeTo(channel + "/" + address.plain());
         return getMessageSubject().filter(rawMessage -> rawMessage.getChannel().equals(channel))
+            .filter(rawMessage -> fromAddress(rawMessage, address))
             .map(rawMessage -> (CosignatureSignedTransaction) rawMessage.getMessage()).filter(
                 status -> parentTransactionHash == null || parentTransactionHash
                     .equalsIgnoreCase(status.getParentHash()));
@@ -199,6 +218,7 @@ public abstract class ListenerBase implements Listener {
             if (errorOrTransaction instanceof TransactionStatusError) {
                 throw new TransactionStatusException(caller, (TransactionStatusError) errorOrTransaction);
             } else {
+                //noinspection unchecked
                 return (T) errorOrTransaction;
             }
         });
@@ -211,11 +231,23 @@ public abstract class ListenerBase implements Listener {
         validateOpen();
         this.subscribeTo(channel.toString() + "/" + address.plain());
         return getMessageSubject().filter(rawMessage -> rawMessage.getChannel().equals(channel))
-            .map(rawMessage -> (T) rawMessage.getMessage()).filter(t -> t.getTransactionInfo().filter(
-                info -> transactionHash == null || info.getHash().filter(transactionHash::equalsIgnoreCase).isPresent())
-                .isPresent()).flatMap(
-                transaction -> this.transactionFromAddress(transaction, address, getNamespaceIds(address))
-                    .flatMap(include -> include ? Observable.just(transaction) : Observable.empty()));
+            .flatMap(rawMessage -> this.processTransactionFromMessage(rawMessage, address, transactionHash));
+    }
+
+    private <T extends Transaction> Observable<T> processTransactionFromMessage(ListenerMessage rawMessage,
+        Address address, String transactionHash) {
+        @SuppressWarnings("unchecked") T transaction = (T) rawMessage.getMessage();
+
+        if (transactionHash != null && !transaction.getTransactionInfo()
+            .filter(info -> info.getHash().filter(transactionHash::equalsIgnoreCase).isPresent()).isPresent()) {
+            return Observable.empty();
+
+        }
+        if (fromAddress(rawMessage, address)) {
+            return Observable.just(transaction);
+        }
+        return this.transactionFromAddress(transaction, address, getNamespaceIds(address))
+            .flatMap(include -> include ? Observable.just(transaction) : Observable.empty());
     }
 
     private Observable<String> subscribeTransactionHash(ListenerChannel channel, Address address,
@@ -224,8 +256,16 @@ public abstract class ListenerBase implements Listener {
         validateOpen();
         this.subscribeTo(channel + "/" + address.plain());
         return getMessageSubject().filter(rawMessage -> rawMessage.getChannel().equals(channel))
-            .map(rawMessage -> (String) rawMessage.getMessage())
+            .filter(rawMessage -> fromAddress(rawMessage, address)).map(rawMessage -> (String) rawMessage.getMessage())
             .filter(hash -> transactionHash == null || transactionHash.equalsIgnoreCase(hash));
+    }
+
+    private boolean fromAddress(ListenerMessage rawMessage, Address address) {
+        try {
+            return address.equals(Address.createFromRawAddress(rawMessage.getChannelParams()));
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     public Observable<Boolean> transactionFromAddress(final Transaction transaction, final Address address,
@@ -333,10 +373,11 @@ public abstract class ListenerBase implements Listener {
      * I fires the new message object to the subject listenrs.
      *
      * @param channel the channel
+     * @param channelParams the topic param.
      * @param messageObject the message object.
      */
-    private void onNext(ListenerChannel channel, Object messageObject) {
-        this.getMessageSubject().onNext(new ListenerMessage(channel, messageObject));
+    private void onNext(ListenerChannel channel, String channelParams, Object messageObject) {
+        this.getMessageSubject().onNext(new ListenerMessage(channel, channelParams, messageObject));
     }
 
     /**
