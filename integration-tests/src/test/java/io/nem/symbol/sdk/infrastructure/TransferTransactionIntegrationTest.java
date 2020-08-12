@@ -24,6 +24,7 @@ import io.nem.symbol.sdk.model.message.EncryptedMessage;
 import io.nem.symbol.sdk.model.message.Message;
 import io.nem.symbol.sdk.model.message.MessageType;
 import io.nem.symbol.sdk.model.message.PersistentHarvestingDelegationMessage;
+import io.nem.symbol.sdk.model.message.PersistentHarvestingDelegationMessage.HarvestingKeys;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
@@ -46,31 +47,18 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
     @EnumSource(RepositoryType.class)
     void aggregateTransferTransaction(RepositoryType type) {
         UnresolvedAddress recipient = getRecipient();
-        String message =
-            "E2ETest:aggregateTransferTransaction:messagelooooooooooooooooooooooooooooooooooooooo"
-                +
-                "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
-                +
-                "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
-                +
-                "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
-                +
-                "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
-                +
-                "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
-                +
-                "oooooooong";
-        TransferTransaction transferTransaction =
-            TransferTransactionFactory.create(
-                getNetworkType(), recipient,
-                Collections
-                    .singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-                new PlainMessage(message)
-            ).maxFee(this.maxFee).build();
+        String message = "E2ETest:aggregateTransferTransaction:messagelooooooooooooooooooooooooooooooooooooooo"
+            + "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
+            + "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
+            + "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
+            + "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
+            + "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
+            + "oooooooong";
+        TransferTransaction transferTransaction = TransferTransactionFactory.create(getNetworkType(), recipient,
+            Collections.singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
+            new PlainMessage(message)).maxFee(this.maxFee).build();
 
-        TransferTransaction processed = announceAggregateAndValidate(type, transferTransaction,
-            account
-        ).getKey();
+        TransferTransaction processed = announceAggregateAndValidate(type, transferTransaction, account).getKey();
         Assertions.assertEquals(message, processed.getMessage().getPayload());
     }
 
@@ -80,25 +68,19 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         String namespaceName = "testaccount2";
 
         NamespaceId recipient = setAddressAlias(type, getRecipient(), namespaceName);
-        Assertions.assertEquals("9988DD7D72227ECAE7000000000000000000000000000000",
-            recipient.encoded(getNetworkType()));
+        Assertions
+            .assertEquals("9988DD7D72227ECAE7000000000000000000000000000000", recipient.encoded(getNetworkType()));
         String message = "E2ETest:standaloneTransferTransaction:message 漢字";
 
         KeyPair senderKeyPair = KeyPair.random();
         KeyPair recipientKeyPair = KeyPair.random();
 
         Message encryptedMessage = EncryptedMessage
-            .create(message, senderKeyPair.getPrivateKey(), recipientKeyPair.getPublicKey()
-            );
+            .create(message, senderKeyPair.getPrivateKey(), recipientKeyPair.getPublicKey());
 
-        TransferTransaction transferTransaction =
-            TransferTransactionFactory.create(
-                getNetworkType(),
-                recipient,
-                Collections
-                    .singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-                encryptedMessage
-            ).maxFee(this.maxFee).build();
+        TransferTransaction transferTransaction = TransferTransactionFactory.create(getNetworkType(), recipient,
+            Collections.singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))), encryptedMessage)
+            .maxFee(this.maxFee).build();
 
         TransferTransaction processed = announceAndValidate(type, account, transferTransaction);
 
@@ -112,8 +94,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
 
         assertTransferTransactions(transferTransaction, restTransaction);
 
-        assertEncryptedMessageTransaction(message, senderKeyPair, recipientKeyPair,
-            restTransaction);
+        assertEncryptedMessageTransaction(message, senderKeyPair, recipientKeyPair, restTransaction);
     }
 
 
@@ -127,45 +108,32 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
 
         Account account = Account.generateNewAccount(networkType);
 
-        TransferTransaction transferTransaction =
-            TransferTransactionFactory.create(
-                getNetworkType(),
-                recipient,
-                Collections
-                    .singletonList(
-                        getNetworkCurrency().createAbsolute(BigInteger.valueOf(1000000000))),
-                PlainMessage.Empty
-            ).maxFee(this.maxFee).build();
+        TransferTransaction transferTransaction = TransferTransactionFactory.create(getNetworkType(), recipient,
+            Collections.singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1000000000))),
+            PlainMessage.Empty).maxFee(this.maxFee).build();
 
-        IllegalArgumentException exceptions = Assertions
-            .assertThrows(IllegalArgumentException.class,
-                () -> announceAndValidate(type, account, transferTransaction));
+        IllegalArgumentException exceptions = Assertions.assertThrows(IllegalArgumentException.class,
+            () -> announceAndValidate(type, account, transferTransaction));
 
-        Assertions
-            .assertTrue(exceptions.getMessage().contains("Failure_Core_Insufficient_Balance"));
+        Assertions.assertTrue(exceptions.getMessage().contains("Failure_Core_Insufficient_Balance"));
 
 
     }
 
-    private void assertTransferTransactions(TransferTransaction expected,
-        TransferTransaction processed) {
-        Assertions
-            .assertEquals(expected.getRecipient().encoded(getNetworkType()),
-                processed.getRecipient().encoded(
-                    getNetworkType()));
+    private void assertTransferTransactions(TransferTransaction expected, TransferTransaction processed) {
+        Assertions.assertEquals(expected.getRecipient().encoded(getNetworkType()),
+            processed.getRecipient().encoded(getNetworkType()));
         Assertions.assertEquals(expected.getRecipient(), processed.getRecipient());
         Assertions.assertEquals(expected.getMessage().getType(), processed.getMessage().getType());
-        Assertions
-            .assertEquals(expected.getMessage().getPayload(), processed.getMessage().getPayload());
+        Assertions.assertEquals(expected.getMessage().getPayload(), processed.getMessage().getPayload());
     }
 
-    private void assertEncryptedMessageTransaction(String message,
-        KeyPair senderKeyPair, KeyPair recipientKeyPair, TransferTransaction transaction) {
+    private void assertEncryptedMessageTransaction(String message, KeyPair senderKeyPair, KeyPair recipientKeyPair,
+        TransferTransaction transaction) {
         Assertions.assertTrue(transaction.getMessage() instanceof EncryptedMessage);
         Assertions.assertNotEquals(message, transaction.getMessage().getPayload());
         String decryptedMessage = ((EncryptedMessage) transaction.getMessage())
-            .decryptPayload(senderKeyPair.getPublicKey(), recipientKeyPair.getPrivateKey()
-            );
+            .decryptPayload(senderKeyPair.getPublicKey(), recipientKeyPair.getPrivateKey());
         Assertions.assertNotNull(message, decryptedMessage);
     }
 
@@ -174,39 +142,36 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
     @EnumSource(RepositoryType.class)
     public void standaloneCreatePersistentDelegationRequestTransaction(RepositoryType type) {
 
-        NetworkType networkType = getNetworkType();
         KeyPair senderKeyPair = KeyPair.random();
+        KeyPair vrfPrivateKey = KeyPair.random();
         KeyPair recipientKeyPair = KeyPair.random();
 
-        TransferTransaction transferTransaction =
-            TransferTransactionFactory.createPersistentDelegationRequestTransaction(
-                getNetworkType(), senderKeyPair.getPrivateKey(),
-                recipientKeyPair.getPublicKey()
-            ).maxFee(this.maxFee).build();
+        TransferTransaction transferTransaction = TransferTransactionFactory
+            .createPersistentDelegationRequestTransaction(getNetworkType(), senderKeyPair.getPrivateKey(),
+                vrfPrivateKey.getPrivateKey(), recipientKeyPair.getPublicKey()).maxFee(this.maxFee).build();
 
         TransferTransaction processed = announceAndValidate(type, account, transferTransaction);
 
-        assertPersistentDelegationTransaction(recipientKeyPair, processed);
+        assertPersistentDelegationTransaction(recipientKeyPair, vrfPrivateKey, processed);
 
         TransferTransaction restTransaction = (TransferTransaction) get(
             getRepositoryFactory(type).createTransactionRepository()
                 .getTransaction(TransactionGroup.CONFIRMED, processed.getTransactionInfo().get().getHash().get()));
 
-        assertPersistentDelegationTransaction(recipientKeyPair, restTransaction);
+        assertPersistentDelegationTransaction(recipientKeyPair, vrfPrivateKey, restTransaction);
     }
 
-    private void assertPersistentDelegationTransaction(
-        KeyPair recipientKeyPair, TransferTransaction transaction) {
+    private void assertPersistentDelegationTransaction(KeyPair recipientKeyPair, KeyPair vrfPrivateKey,
+        TransferTransaction transaction) {
         String message = recipientKeyPair.getPublicKey().toHex();
-        Assertions
-            .assertTrue(transaction.getMessage() instanceof PersistentHarvestingDelegationMessage);
+        Assertions.assertTrue(transaction.getMessage() instanceof PersistentHarvestingDelegationMessage);
         Assertions.assertNotEquals(message, transaction.getMessage().getPayload());
-        Assertions.assertEquals(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,
-            transaction.getMessage().getType());
-        String decryptedMessage = ((PersistentHarvestingDelegationMessage) transaction.getMessage())
-            .decryptPayload(recipientKeyPair.getPrivateKey()
-            );
-        Assertions.assertNotNull(message, decryptedMessage);
+        Assertions
+            .assertEquals(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE, transaction.getMessage().getType());
+        HarvestingKeys decryptedMessage = ((PersistentHarvestingDelegationMessage) transaction.getMessage())
+            .decryptPayload(recipientKeyPair.getPrivateKey());
+        Assertions.assertEquals(recipientKeyPair.getPrivateKey(), decryptedMessage.getSigningPrivateKey());
+        Assertions.assertEquals(vrfPrivateKey.getPrivateKey(), decryptedMessage.getVrfPrivateKey());
     }
 
 }

@@ -34,6 +34,7 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.message.MessageType;
 import io.nem.symbol.sdk.model.message.PersistentHarvestingDelegationMessage;
+import io.nem.symbol.sdk.model.message.PersistentHarvestingDelegationMessage.HarvestingKeys;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -239,15 +240,18 @@ class TransferTransactionTest extends AbstractTransactionTester {
     @Test
     void createPersistentDelegationRequestTransaction() {
 
-        KeyPair remoteProxy = KeyPair
+        KeyPair signingPrivateKey = KeyPair
             .fromPrivate(PrivateKey.fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C111"));
+
+        KeyPair vrfPrivateKey = KeyPair
+            .fromPrivate(PrivateKey.fromHexString("2602F4236B199B3DF762B2AAB46FC3B77D8DDB214F0B62538D3827576C46C000"));
 
         KeyPair recipient = KeyPair
             .fromPrivate(PrivateKey.fromHexString("B72F2950498111BADF276D6D9D5E345F04E0D5C9B8342DA983C3395B4CF18F08"));
 
         TransferTransaction transferTransaction = TransferTransactionFactory
-            .createPersistentDelegationRequestTransaction(networkType, remoteProxy.getPrivateKey(),
-                recipient.getPublicKey()).deadline(new FakeDeadline()).build();
+            .createPersistentDelegationRequestTransaction(networkType, signingPrivateKey.getPrivateKey(),
+                vrfPrivateKey.getPrivateKey(), recipient.getPublicKey()).deadline(new FakeDeadline()).build();
 
         assertEquals(networkType, transferTransaction.getNetworkType());
         assertEquals(1, (int) transferTransaction.getVersion());
@@ -262,8 +266,9 @@ class TransferTransactionTest extends AbstractTransactionTester {
 
         PersistentHarvestingDelegationMessage message = (PersistentHarvestingDelegationMessage) transferTransaction
             .getMessage();
-        Assertions.assertEquals(remoteProxy.getPrivateKey().toHex().toUpperCase(),
-            message.decryptPayload(recipient.getPrivateKey()));
+        HarvestingKeys decodedKeys = message.decryptPayload(recipient.getPrivateKey());
+        Assertions.assertEquals(signingPrivateKey.getPrivateKey(), decodedKeys.getSigningPrivateKey());
+        Assertions.assertEquals(vrfPrivateKey.getPrivateKey(), decodedKeys.getVrfPrivateKey());
 
         byte[] actual = transferTransaction.serialize();
 
@@ -274,8 +279,9 @@ class TransferTransactionTest extends AbstractTransactionTester {
         assertEquals(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE, deserialized.getMessage().getType());
         PersistentHarvestingDelegationMessage deserializedMessage = (PersistentHarvestingDelegationMessage) deserialized
             .getMessage();
-        Assertions.assertEquals(remoteProxy.getPrivateKey().toHex().toUpperCase(),
-            deserializedMessage.decryptPayload(recipient.getPrivateKey()));
+        HarvestingKeys decodedKeys2 = deserializedMessage.decryptPayload(recipient.getPrivateKey());
+        Assertions.assertEquals(signingPrivateKey.getPrivateKey(), decodedKeys2.getSigningPrivateKey());
+        Assertions.assertEquals(vrfPrivateKey.getPrivateKey(), decodedKeys2.getVrfPrivateKey());
 
     }
 

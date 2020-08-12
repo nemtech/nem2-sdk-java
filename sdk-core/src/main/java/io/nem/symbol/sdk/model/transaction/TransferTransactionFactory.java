@@ -37,11 +37,8 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
     private final List<Mosaic> mosaics;
     private final Message message;
 
-    private TransferTransactionFactory(
-        final NetworkType networkType,
-        final UnresolvedAddress recipient,
-        final List<Mosaic> mosaics,
-        final Message message) {
+    private TransferTransactionFactory(final NetworkType networkType, final UnresolvedAddress recipient,
+        final List<Mosaic> mosaics, final Message message) {
         super(TransactionType.TRANSFER, networkType);
         Validate.notNull(recipient, "Recipient must not be null");
         Validate.notNull(mosaics, "Mosaics must not be null");
@@ -60,32 +57,26 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
      * @param message Message.
      * @return Transfer transaction.
      */
-    public static TransferTransactionFactory create(
-        final NetworkType networkType,
-        final UnresolvedAddress recipient,
-        final List<Mosaic> mosaics,
-        final Message message) {
+    public static TransferTransactionFactory create(final NetworkType networkType, final UnresolvedAddress recipient,
+        final List<Mosaic> mosaics, final Message message) {
         return new TransferTransactionFactory(networkType, recipient, mosaics, message);
     }
 
     /**
-     * Creates a TransferTransactionFactory with special message payload for persistent harvesting
-     * delegation unlocking
+     * Creates a TransferTransactionFactory with special message payload for persistent harvesting delegation unlocking
      *
      * @param networkType The network type.
-     * @param remoteProxyPrivateKey the remote’s account proxy private key.=
-     * @param harvesterPublicKey The harvester public key
+     * @param signingPrivateKey Remote harvester signing private key linked to the main account
+     * @param vrfPrivateKey VRF private key linked to the main account
+     * @param nodePublicKey Recipient public key
      * @return {@link TransferTransactionFactory}
      */
-    public static TransferTransactionFactory createPersistentDelegationRequestTransaction(
-        NetworkType networkType,
-        PrivateKey remoteProxyPrivateKey,
-        PublicKey harvesterPublicKey) {
+    public static TransferTransactionFactory createPersistentDelegationRequestTransaction(NetworkType networkType,
+        PrivateKey signingPrivateKey, PrivateKey vrfPrivateKey, PublicKey nodePublicKey) {
         PersistentHarvestingDelegationMessage message = PersistentHarvestingDelegationMessage
-            .create(remoteProxyPrivateKey, harvesterPublicKey);
+            .create(signingPrivateKey, vrfPrivateKey, nodePublicKey);
         return new TransferTransactionFactory(networkType,
-            Address.createFromPublicKey(harvesterPublicKey.toHex(), networkType),
-            Collections.emptyList(), message);
+            Address.createFromPublicKey(nodePublicKey.toHex(), networkType), Collections.emptyList(), message);
     }
 
     /**
