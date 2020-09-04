@@ -22,12 +22,12 @@ import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
-import io.nem.symbol.sdk.model.transaction.LockHashAlgorithmType;
+import io.nem.symbol.sdk.model.transaction.SecretHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransaction;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
-import io.nem.symbol.sdk.openapi.vertx.model.LockHashAlgorithmEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.SecretHashAlgorithmEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.SecretLockTransactionDTO;
 
 /**
@@ -47,12 +47,8 @@ class SecretLockTransactionMapper extends
             new Mosaic(
                 toUnresolvedMosaicId(transaction.getMosaicId()),
                 transaction.getAmount());
-        return SecretLockTransactionFactory.create(
-            networkType,
-            mosaic,
-            transaction.getDuration(),
-            LockHashAlgorithmType.rawValueOf(transaction.getHashAlgorithm().getValue()),
-            transaction.getSecret(),
+        return SecretLockTransactionFactory.create(networkType, mosaic, transaction.getDuration(),
+            SecretHashAlgorithm.rawValueOf(transaction.getHashAlgorithm().getValue()), transaction.getSecret(),
             MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()));
     }
 
@@ -61,8 +57,7 @@ class SecretLockTransactionMapper extends
         dto.setAmount(transaction.getMosaic().getAmount());
         dto.setMosaicId(MapperUtils.getIdAsHex(transaction.getMosaic().getId()));
         dto.setDuration(transaction.getDuration());
-        dto.setHashAlgorithm(
-            LockHashAlgorithmEnum.fromValue(transaction.getHashAlgorithm().getValue()));
+        dto.setHashAlgorithm(SecretHashAlgorithmEnum.fromValue(transaction.getHashAlgorithm().getValue()));
         dto.setSecret(transaction.getSecret());
         dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));
     }

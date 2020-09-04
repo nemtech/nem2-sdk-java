@@ -60,18 +60,25 @@ public abstract class AbstractRepositoryVertxImpl {
         IllegalArgumentException originalException = new IllegalArgumentException("Original call");
         Function<? super Throwable, ? extends ObservableSource<? extends T>> resumeFunction = this
             .onError(originalException);
-        return new AsyncResultSingle<T>(callback::accept).toObservable()
-            .onErrorResumeNext(resumeFunction);
+        return new AsyncResultSingle<T>(callback::accept).toObservable().onErrorResumeNext(resumeFunction);
     }
 
-    public RepositoryCallException exceptionHandling(Throwable e,
-        IllegalArgumentException originalException) {
+    public <T, R> Observable<R> call(Consumer<Handler<AsyncResult<T>>> callback,
+        Function<? super T, ? extends R> mapper) {
+        return exceptionHandling(this.call(callback).map(mapper));
+    }
+
+    public <T, R> Observable<List<R>> callList(Consumer<Handler<AsyncResult<List<T>>>> callback,
+        java.util.function.Function<T, R> mapper) {
+        return exceptionHandling(this.call(callback).map(l -> l.stream().map(mapper).collect(Collectors.toList())));
+    }
+
+    public RepositoryCallException exceptionHandling(Throwable e, IllegalArgumentException originalException) {
         if (e instanceof RepositoryCallException) {
             return (RepositoryCallException) e;
         }
-        return new RepositoryCallException(
-            extractMessageFromException(e),
-            extractStatusCodeFromException(e), e instanceof ApiException ? originalException : e);
+        return new RepositoryCallException(extractMessageFromException(e), extractStatusCodeFromException(e),
+            e instanceof ApiException ? originalException : e);
     }
 
     private String extractMessageFromException(Throwable e) {
@@ -132,8 +139,7 @@ public abstract class AbstractRepositoryVertxImpl {
     }
 
     protected <T> Page<T> toPage(Pagination pagination, List<T> data) {
-        return new Page<>(data, pagination.getPageNumber(), pagination.getPageSize(),
-            pagination.getTotalEntries(), pagination.getTotalPages());
+        return new Page<>(data, pagination.getPageNumber(), pagination.getPageSize());
     }
 
 

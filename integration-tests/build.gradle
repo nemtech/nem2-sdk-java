@@ -10,7 +10,8 @@ dependencies {
             includeEngines 'junit-jupiter'
         }
         testLogging {
-            events "skipped", "failed"
+//            events "skipped", "failed"
+            exceptionFormat = 'full'
         }
     }
 }

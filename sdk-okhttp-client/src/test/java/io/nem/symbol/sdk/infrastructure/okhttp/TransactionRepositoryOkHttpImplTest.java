@@ -226,8 +226,7 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         Assertions.assertEquals(1, transactions.getData().size());
         Assertions.assertEquals(1, transactions.getPageNumber());
         Assertions.assertEquals(2, transactions.getPageSize());
-        Assertions.assertEquals(3, transactions.getTotalEntries());
-        Assertions.assertEquals(4, transactions.getTotalPages());
+
 
     }
 
@@ -251,8 +250,7 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         Assertions.assertEquals(1, transactions.getData().size());
         Assertions.assertEquals(1, transactions.getPageNumber());
         Assertions.assertEquals(2, transactions.getPageSize());
-        Assertions.assertEquals(3, transactions.getTotalEntries());
-        Assertions.assertEquals(4, transactions.getTotalPages());
+
 
     }
 
@@ -276,15 +274,14 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
         Assertions.assertEquals(1, transactions.getData().size());
         Assertions.assertEquals(1, transactions.getPageNumber());
         Assertions.assertEquals(2, transactions.getPageSize());
-        Assertions.assertEquals(3, transactions.getTotalEntries());
-        Assertions.assertEquals(4, transactions.getTotalPages());
+
 
     }
 
     private TransactionPage toPage(TransactionInfoDTO dto) {
         return new TransactionPage()
             .data(Collections.singletonList(jsonHelper.parse(jsonHelper.print(dto), TransactionInfoDTO.class)))
-            .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
+            .pagination(new Pagination().pageNumber(1).pageSize(2));
     }
 
 

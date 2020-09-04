@@ -29,6 +29,7 @@ import io.nem.symbol.sdk.model.transaction.MosaicSupplyChangeTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicSupplyChangeTransactionFactory;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -36,15 +37,19 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationTest {
 
-    Account account = config().getDefaultAccount();
+    private Account account;
+
+    @BeforeEach
+    void setup() {
+        account = config().getDefaultAccount();
+    }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void standaloneMosaicDefinitionTransaction(RepositoryType type) {
         MosaicId mosaicId = createMosaic(type);
         sleep(1000);
-        MosaicInfo mosaicInfo = get(
-            getRepositoryFactory(type).createMosaicRepository().getMosaic(mosaicId));
+        MosaicInfo mosaicInfo = get(getRepositoryFactory(type).createMosaicRepository().getMosaic(mosaicId));
 
         Assertions.assertEquals(mosaicId, mosaicInfo.getMosaicId());
         Assertions.assertEquals(4, mosaicInfo.getDivisibility());

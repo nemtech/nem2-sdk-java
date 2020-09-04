@@ -155,7 +155,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
 
     private NamespacePage toPage(NamespaceInfoDTO dto) {
         return new NamespacePage().data(Collections.singletonList(dto))
-            .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
+            .pagination(new Pagination().pageNumber(1).pageSize(2));
     }
 
 

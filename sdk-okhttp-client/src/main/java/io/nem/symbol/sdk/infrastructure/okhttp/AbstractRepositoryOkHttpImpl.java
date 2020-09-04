@@ -65,6 +65,15 @@ public abstract class AbstractRepositoryOkHttpImpl {
         }).onErrorResumeNext(resumeFunction);
     }
 
+    public <T, R> Observable<R> call(Callable<T> callback, Function<? super T, ? extends R> mapper) {
+        return exceptionHandling(this.call(callback).map(mapper));
+    }
+
+    public <T, R> Observable<List<R>> callList(Callable<List<T>> callback, java.util.function.Function<T, R> mapper) {
+        return exceptionHandling(this.call(callback).map(l -> l.stream().map(mapper).collect(Collectors.toList())));
+    }
+
+
     public RepositoryCallException exceptionHandling(Throwable e) {
         if (e instanceof RepositoryCallException) {
             return (RepositoryCallException) e;
@@ -127,8 +136,7 @@ public abstract class AbstractRepositoryOkHttpImpl {
     }
 
     protected <T> Page<T> toPage(Pagination pagination, List<T> data) {
-        return new Page<>(data, pagination.getPageNumber(), pagination.getPageSize(), pagination.getTotalEntries(),
-            pagination.getTotalPages());
+        return new Page<>(data, pagination.getPageNumber(), pagination.getPageSize());
     }
 
     public JsonHelper getJsonHelper() {

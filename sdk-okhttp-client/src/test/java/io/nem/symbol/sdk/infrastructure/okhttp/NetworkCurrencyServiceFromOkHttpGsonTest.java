@@ -85,7 +85,7 @@ public class NetworkCurrencyServiceFromOkHttpGsonTest {
             .pageNumber(1);
 
         when(transactionRepository.search(Mockito.eq(ctieria)))
-            .thenReturn(Observable.just(new Page<>(transactions, 1, 1, 1, 1)));
+            .thenReturn(Observable.just(new Page<>(transactions, 1, 1)));
 
         List<NetworkCurrency> networkCurrencies = service.getNetworkCurrenciesFromNemesis()
             .toFuture().get();

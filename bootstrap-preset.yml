@@ -1,0 +1,6 @@
+symbolRestImage: symbolplatform/symbol-rest:1.3.1
+throttlingBurst: 35
+throttlingRate: 100
+nemesis:
+  mosaics:
+    - accounts: 20

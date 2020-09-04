@@ -68,8 +68,8 @@ public class MetadataRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl i
             .searchMetadataEntries(sourceAddress, targetAddress, scopedMetadataKey, targetId, metadataType, pageSize,
                 pageNumber, offset, order);
 
-        return exceptionHandling(call(callback).map(page -> this
-            .toPage(page.getPagination(), page.getData().stream().map(this::toMetadata).collect(Collectors.toList()))));
+        return call(callback, page -> this
+            .toPage(page.getPagination(), page.getData().stream().map(this::toMetadata).collect(Collectors.toList())));
     }
 
     public MetadataRoutesApi getClient() {

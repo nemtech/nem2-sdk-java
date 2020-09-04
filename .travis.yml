@@ -1,17 +1,26 @@
 dist: trusty
 language: java
+node_js: 12
 jdk:
   - oraclejdk8
   - oraclejdk9
   - openjdk8
+services:
+  - docker
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
+  npm: true
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
     - gradle/wrapper/
+jobs:
+  include:
+    - stage: e2e
+      script: source e2e.sh
+      if: branch = e2e
 install:
   - true  #If install is not set, travis will run gradle assemble
 script: /bin/sh travis/build.sh

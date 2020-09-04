@@ -75,9 +75,7 @@ public class TransactionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImp
     @Override
     public Observable<List<Transaction>> getTransactions(TransactionGroup group, List<String> transactionHashes) {
         Callable<List<TransactionInfoDTO>> callback = () -> getBasicTransactions(group, transactionHashes);
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(info -> mapTransaction(group, info)).toList()
-                .toObservable());
+        return callList(callback, info -> mapTransaction(group, info));
     }
 
     @Override
@@ -85,14 +83,14 @@ public class TransactionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImp
 
         Callable<AnnounceTransactionInfoDTO> callback = () -> getClient()
             .announceTransaction(new TransactionPayload().payload(signedTransaction.getPayload()));
-        return exceptionHandling(call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
+        return call(callback, dto -> new TransactionAnnounceResponse(dto.getMessage()));
     }
 
     @Override
     public Observable<TransactionAnnounceResponse> announceAggregateBonded(SignedTransaction signedTransaction) {
         Callable<AnnounceTransactionInfoDTO> callback = () -> getClient()
             .announcePartialTransaction(new TransactionPayload().payload(signedTransaction.getPayload()));
-        return exceptionHandling(call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
+        return call(callback, dto -> new TransactionAnnounceResponse(dto.getMessage()));
     }
 
     @Override
@@ -104,19 +102,19 @@ public class TransactionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImp
                 .signature(cosignatureSignedTransaction.getSignature())
                 .version(cosignatureSignedTransaction.getVersion())
                 .signerPublicKey(cosignatureSignedTransaction.getSignerPublicKey()));
-        return exceptionHandling(call(callback).map(dto -> new TransactionAnnounceResponse(dto.getMessage())));
+        return call(callback, dto -> new TransactionAnnounceResponse(dto.getMessage()));
 
     }
 
     @Override
     public Observable<Page<Transaction>> search(TransactionSearchCriteria criteria) {
         Callable<TransactionPage> callback = () -> basicSearch(criteria);
-        return exceptionHandling(call(callback).map(p -> {
+        return call(callback, p -> {
             List<Transaction> data = p.getData().stream()
                 .map(transactionInfoDTO -> mapTransaction(criteria.getGroup(), transactionInfoDTO))
                 .collect(Collectors.toList());
             return toPage(p.getPagination(), data);
-        }));
+        });
     }
 
     private TransactionPage basicSearch(TransactionSearchCriteria criteria) throws ApiException {

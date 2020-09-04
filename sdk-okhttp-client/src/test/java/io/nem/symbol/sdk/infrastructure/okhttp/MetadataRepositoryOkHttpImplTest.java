@@ -102,7 +102,7 @@ public class MetadataRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
 
     private MetadataPage getMetadataEntriesDTO() {
         MetadataPage metadataPage = new MetadataPage();
-        metadataPage.setPagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
+        metadataPage.setPagination(new Pagination().pageNumber(1).pageSize(2));
 
         List<MetadataInfoDTO> data = new ArrayList<>();
         data.add(createMetadataDto(ConvertUtils.toSize16Hex(BigInteger.valueOf(10)), MetadataTypeEnum.NUMBER_0, null));

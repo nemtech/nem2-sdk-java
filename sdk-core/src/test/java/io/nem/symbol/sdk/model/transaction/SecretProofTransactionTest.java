@@ -49,12 +49,8 @@ class SecretProofTransactionTest extends AbstractTransactionTester {
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
         String secretSeed = "9a493664";
         SecretProofTransaction transaction =
-            SecretProofTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                LockHashAlgorithmType.SHA3_256,
-                recipient,
-                secret,
-                secretSeed).deadline(new FakeDeadline()).build();
+            SecretProofTransactionFactory.create(NetworkType.MIJIN_TEST, SecretHashAlgorithm.SHA3_256, recipient,
+                secret, secretSeed).deadline(new FakeDeadline()).build();
 
         assertSerialization(expected, transaction);
 
@@ -69,12 +65,8 @@ class SecretProofTransactionTest extends AbstractTransactionTester {
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
         String proof = "9a493664";
         SecretProofTransaction transaction =
-            SecretProofTransactionFactory.create(NetworkType.MIJIN_TEST,
-                LockHashAlgorithmType.SHA3_256,
-                recipient,
-                secret,
-                proof
-            ).deadline(new FakeDeadline()).build();
+            SecretProofTransactionFactory.create(NetworkType.MIJIN_TEST, SecretHashAlgorithm.SHA3_256, recipient,
+                secret, proof).deadline(new FakeDeadline()).build();
 
         transaction
             .toAggregate(
@@ -91,12 +83,8 @@ class SecretProofTransactionTest extends AbstractTransactionTester {
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
         String secretSeed = "9a493664";
         SecretProofTransaction transaction =
-            SecretProofTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                LockHashAlgorithmType.SHA3_256,
-                recipient,
-                secret,
-                secretSeed).deadline(new FakeDeadline()).build();
+            SecretProofTransactionFactory.create(NetworkType.MIJIN_TEST, SecretHashAlgorithm.SHA3_256, recipient,
+                secret, secretSeed).deadline(new FakeDeadline()).build();
         SignedTransaction signedTransaction = transaction.signWith(account, generationHash);
         String payload = signedTransaction.getPayload();
         assertEquals(
@@ -117,12 +105,8 @@ class SecretProofTransactionTest extends AbstractTransactionTester {
             IllegalArgumentException.class,
             () -> {
                 SecretProofTransaction transaction =
-                    SecretProofTransactionFactory.create(
-                        NetworkType.MIJIN_TEST,
-                        LockHashAlgorithmType.SHA3_256,
-                        recipient,
-                        "non valid hash",
-                        proof).deadline(new FakeDeadline()).build();
+                    SecretProofTransactionFactory.create(NetworkType.MIJIN_TEST, SecretHashAlgorithm.SHA3_256,
+                        recipient, "non valid hash", proof).deadline(new FakeDeadline()).build();
             },
             "not a valid secret");
     }

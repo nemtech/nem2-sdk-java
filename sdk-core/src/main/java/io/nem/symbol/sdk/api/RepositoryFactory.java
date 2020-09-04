@@ -101,13 +101,18 @@ public interface RepositoryFactory extends Closeable {
     RestrictionMosaicRepository createRestrictionMosaicRepository();
 
     /**
+     * @return a newly created {@link LockHashRepository}
+     */
+    LockHashRepository createLockHashRepository();
+
+    /**
      * @return a newly created {@link Listener}
      */
     Listener createListener();
 
     /**
-     * @return it creates a new {@link JsonSerialization} that allows you serialize model objects
-     * using the generated json dto objects from the open api spec.
+     * @return it creates a new {@link JsonSerialization} that allows you serialize model objects using the generated
+     * json dto objects from the open api spec.
      */
     JsonSerialization createJsonSerialization();
 

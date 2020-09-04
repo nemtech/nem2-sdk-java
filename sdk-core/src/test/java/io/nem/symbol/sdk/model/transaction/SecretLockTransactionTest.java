@@ -46,12 +46,9 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
 
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
         SecretLockTransaction transaction =
-            SecretLockTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
-                BigInteger.valueOf(100),
-                LockHashAlgorithmType.SHA3_256,
-                secret,
+            SecretLockTransactionFactory.create(NetworkType.MIJIN_TEST,
+                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)), BigInteger.valueOf(100),
+                SecretHashAlgorithm.SHA3_256, secret,
                 Address.createFromRawAddress("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ"))
                 .deadline(new FakeDeadline()).build();
         assertSerialization(expected, transaction);
@@ -68,12 +65,9 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
 
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
         SecretLockTransaction transaction =
-            SecretLockTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
-                BigInteger.valueOf(100),
-                LockHashAlgorithmType.SHA3_256,
-                secret,
+            SecretLockTransactionFactory.create(NetworkType.MIJIN_TEST,
+                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)), BigInteger.valueOf(100),
+                SecretHashAlgorithm.SHA3_256, secret,
                 Address.createFromRawAddress("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ"))
                 .deadline(new FakeDeadline()).signer(publicAccount).build();
 
@@ -94,12 +88,9 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
         SecretLockTransaction transaction =
             SecretLockTransactionFactory.create(NetworkType.MIJIN_TEST,
-                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
-                BigInteger.valueOf(100),
-                LockHashAlgorithmType.SHA3_256,
-                secret,
-                Address.createFromRawAddress("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ")
-            ).deadline(new FakeDeadline()).build();
+                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)), BigInteger.valueOf(100),
+                SecretHashAlgorithm.SHA3_256, secret,
+                Address.createFromRawAddress("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ")).deadline(new FakeDeadline()).build();
         SignedTransaction signedTransaction = transaction.signWith(account, generationHash);
         String payload = signedTransaction.getPayload();
         assertEquals(
@@ -115,13 +106,9 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
     void shouldThrowErrorWhenSecretIsNotValid() {
         IllegalArgumentException e = assertThrows(
             IllegalArgumentException.class,
-            () -> SecretLockTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
-                BigInteger.valueOf(100),
-                LockHashAlgorithmType.SHA3_256,
-                "non valid hash",
-                Address.generateRandom(NetworkType.MIJIN_TEST))
+            () -> SecretLockTransactionFactory.create(NetworkType.MIJIN_TEST,
+                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)), BigInteger.valueOf(100),
+                SecretHashAlgorithm.SHA3_256, "non valid hash", Address.generateRandom(NetworkType.MIJIN_TEST))
                 .deadline(new FakeDeadline()).build(),
             "not a valid secret");
         Assertions

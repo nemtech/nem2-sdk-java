@@ -26,6 +26,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -36,7 +37,12 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AccountMetadataIntegrationTest extends BaseIntegrationTest {
 
-    private final Account testAccount = config().getDefaultAccount();
+    private Account testAccount;
+
+    @BeforeEach
+    void setup() {
+        testAccount = config().getDefaultAccount();
+    }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)

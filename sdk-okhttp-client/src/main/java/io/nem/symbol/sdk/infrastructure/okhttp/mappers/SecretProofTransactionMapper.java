@@ -19,12 +19,12 @@ package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
-import io.nem.symbol.sdk.model.transaction.LockHashAlgorithmType;
+import io.nem.symbol.sdk.model.transaction.SecretHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretProofTransaction;
 import io.nem.symbol.sdk.model.transaction.SecretProofTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.LockHashAlgorithmEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretHashAlgorithmEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretProofTransactionDTO;
 
 /**
@@ -40,17 +40,15 @@ class SecretProofTransactionMapper extends
     @Override
     protected TransactionFactory<SecretProofTransaction> createFactory(NetworkType networkType,
         SecretProofTransactionDTO transaction) {
-        return SecretProofTransactionFactory.create(
-            networkType,
-            LockHashAlgorithmType.rawValueOf(transaction.getHashAlgorithm().getValue()),
-            MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()),
-            transaction.getSecret(),
+        return SecretProofTransactionFactory.create(networkType,
+            SecretHashAlgorithm.rawValueOf(transaction.getHashAlgorithm().getValue()),
+            MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()), transaction.getSecret(),
             transaction.getProof());
     }
 
     @Override
     protected void copyToDto(SecretProofTransaction transaction, SecretProofTransactionDTO dto) {
-        dto.setHashAlgorithm(LockHashAlgorithmEnum.fromValue(transaction.getHashType().getValue()));
+        dto.setHashAlgorithm(SecretHashAlgorithmEnum.fromValue(transaction.getHashType().getValue()));
         dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));
         dto.setSecret(transaction.getSecret());
         dto.setProof(transaction.getProof());

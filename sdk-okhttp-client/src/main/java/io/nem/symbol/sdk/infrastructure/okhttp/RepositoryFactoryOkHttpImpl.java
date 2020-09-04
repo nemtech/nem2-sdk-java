@@ -22,6 +22,7 @@ import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.ChainRepository;
 import io.nem.symbol.sdk.api.JsonSerialization;
 import io.nem.symbol.sdk.api.Listener;
+import io.nem.symbol.sdk.api.LockHashRepository;
 import io.nem.symbol.sdk.api.MetadataRepository;
 import io.nem.symbol.sdk.api.MosaicRepository;
 import io.nem.symbol.sdk.api.MultisigRepository;
@@ -133,6 +134,11 @@ public class RepositoryFactoryOkHttpImpl extends RepositoryFactoryBase {
     @Override
     public RestrictionMosaicRepository createRestrictionMosaicRepository() {
         return new RestrictionMosaicRepositoryOkHttpImpl(apiClient);
+    }
+
+    @Override
+    public LockHashRepository createLockHashRepository() {
+        return new LockHashRepositoryOkHttpImpl(apiClient);
     }
 
     @Override

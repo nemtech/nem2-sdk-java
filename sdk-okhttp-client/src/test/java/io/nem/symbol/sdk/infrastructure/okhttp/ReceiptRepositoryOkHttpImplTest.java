@@ -115,12 +115,11 @@ public class ReceiptRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
 
     private ResolutionStatementPage toPage(ResolutionStatementInfoDTO dto) {
         return new ResolutionStatementPage().data(Collections.singletonList(dto))
-            .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
+            .pagination(new Pagination().pageNumber(1).pageSize(2));
     }
 
     private TransactionStatementPage toPage(List<TransactionStatementInfoDTO> dtos) {
-        return new TransactionStatementPage().data(dtos)
-            .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
+        return new TransactionStatementPage().data(dtos).pagination(new Pagination().pageNumber(1).pageSize(2));
     }
 
 

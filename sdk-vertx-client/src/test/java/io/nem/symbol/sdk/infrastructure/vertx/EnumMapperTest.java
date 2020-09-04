@@ -37,8 +37,8 @@ import io.nem.symbol.sdk.model.receipt.ReceiptType;
 import io.nem.symbol.sdk.model.restriction.MosaicRestrictionEntryType;
 import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.LinkAction;
-import io.nem.symbol.sdk.model.transaction.LockHashAlgorithmType;
 import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
+import io.nem.symbol.sdk.model.transaction.SecretHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.TransactionState;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountRestrictionFlagsEnum;
@@ -46,7 +46,6 @@ import io.nem.symbol.sdk.openapi.vertx.model.AccountTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.AliasActionEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.AliasTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.LinkActionEnum;
-import io.nem.symbol.sdk.openapi.vertx.model.LockHashAlgorithmEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.MessageTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicRestrictionEntryTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicRestrictionTypeEnum;
@@ -57,6 +56,7 @@ import io.nem.symbol.sdk.openapi.vertx.model.NodeStatusEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.PositionEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.ReceiptTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.RolesTypeEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.SecretHashAlgorithmEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionGroupEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionTypeEnum;
 import java.util.Arrays;
@@ -244,8 +244,8 @@ public class EnumMapperTest {
     @Test
     void testLockHashAlgorithmDTO() {
         Set<Integer> existingValues = new HashSet<>();
-        Arrays.stream(LockHashAlgorithmType.values()).forEach(v -> {
-            Assertions.assertNotNull(LockHashAlgorithmEnum.fromValue(v.getValue()), v.name());
+        Arrays.stream(SecretHashAlgorithm.values()).forEach(v -> {
+            Assertions.assertNotNull(SecretHashAlgorithmEnum.fromValue(v.getValue()), v.name());
             Assertions.assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
         });
     }
@@ -253,8 +253,8 @@ public class EnumMapperTest {
     @Test
     void testLockHashAlgorithmTypeModel() {
         Set<Integer> existingValues = new HashSet<>();
-        Arrays.stream(LockHashAlgorithmEnum.values()).forEach(v -> {
-            Assertions.assertNotNull(LockHashAlgorithmType.rawValueOf(v.getValue().byteValue()), v.name());
+        Arrays.stream(SecretHashAlgorithmEnum.values()).forEach(v -> {
+            Assertions.assertNotNull(SecretHashAlgorithm.rawValueOf(v.getValue().byteValue()), v.name());
             Assertions.assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
         });
     }
@@ -262,7 +262,7 @@ public class EnumMapperTest {
     @Test
     void testLockHashAlgorithmTypeCatbuffer() {
         Set<Integer> existingValues = new HashSet<>();
-        Arrays.stream(LockHashAlgorithmType.values()).forEach(v -> {
+        Arrays.stream(SecretHashAlgorithm.values()).forEach(v -> {
             Assertions.assertNotNull(LockHashAlgorithmDto.rawValueOf((byte) v.getValue()), v.name());
             Assertions.assertTrue(existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
         });

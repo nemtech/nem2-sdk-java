@@ -25,6 +25,7 @@ import io.nem.symbol.sdk.model.metadata.Metadata;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransaction;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -35,9 +36,15 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
-    private Account signerAccount = config().getDefaultAccount();
+    private Account signerAccount;
 
-    private Account targetAccount = config().getDefaultAccount();
+    private Account targetAccount;
+
+    @BeforeEach
+    void setup() {
+        signerAccount = config().getDefaultAccount();
+        targetAccount = config().getDefaultAccount();
+    }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
@@ -50,12 +57,10 @@ class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
         RepositoryFactory repositoryFactory = getRepositoryFactory(type);
         MetadataRepository metadataRepository = repositoryFactory.createMetadataRepository();
 
-        MetadataTransactionService service = new MetadataTransactionServiceImpl(
-            repositoryFactory);
+        MetadataTransactionService service = new MetadataTransactionServiceImpl(repositoryFactory);
 
         AccountMetadataTransaction originalTransaction = get(service
-            .createAccountMetadataTransactionFactory(
-                targetAccount.getAddress(), key, originalMessage,
+            .createAccountMetadataTransactionFactory(targetAccount.getAddress(), key, originalMessage,
                 signerAccount.getAddress())).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, originalTransaction, signerAccount);

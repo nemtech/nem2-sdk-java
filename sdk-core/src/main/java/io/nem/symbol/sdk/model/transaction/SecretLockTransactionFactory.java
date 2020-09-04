@@ -30,23 +30,18 @@ public class SecretLockTransactionFactory extends TransactionFactory<SecretLockT
 
     private final Mosaic mosaic;
     private final BigInteger duration;
-    private final LockHashAlgorithmType hashAlgorithm;
+    private final SecretHashAlgorithm hashAlgorithm;
     private final String secret;
     private final UnresolvedAddress recipient;
 
-    private SecretLockTransactionFactory(
-        NetworkType networkType,
-        Mosaic mosaic,
-        BigInteger duration,
-        LockHashAlgorithmType hashAlgorithm,
-        String secret,
-        UnresolvedAddress recipient) {
+    private SecretLockTransactionFactory(NetworkType networkType, Mosaic mosaic, BigInteger duration,
+        SecretHashAlgorithm hashAlgorithm, String secret, UnresolvedAddress recipient) {
         super(TransactionType.SECRET_LOCK, networkType);
         Validate.notNull(mosaic, "Mosaic must not be null");
         Validate.notNull(duration, "Duration must not be null");
         Validate.notNull(secret, "Secret must not be null");
         Validate.notNull(recipient, "Recipient must not be null");
-        if (!LockHashAlgorithmType.validator(hashAlgorithm, secret)) {
+        if (!SecretHashAlgorithm.validator(hashAlgorithm, secret)) {
             throw new IllegalArgumentException(
                 "HashType and Secret have incompatible length or not hexadecimal string");
         }
@@ -69,8 +64,8 @@ public class SecretLockTransactionFactory extends TransactionFactory<SecretLockT
      * @param recipient Recipient.
      * @return Secret lock transaction.
      */
-    public static SecretLockTransactionFactory create(NetworkType networkType, Mosaic mosaic,
-        BigInteger duration, LockHashAlgorithmType hashAlgorithm, String secret, UnresolvedAddress recipient) {
+    public static SecretLockTransactionFactory create(NetworkType networkType, Mosaic mosaic, BigInteger duration,
+        SecretHashAlgorithm hashAlgorithm, String secret, UnresolvedAddress recipient) {
         return new SecretLockTransactionFactory(networkType, mosaic, duration, hashAlgorithm, secret, recipient);
     }
 
@@ -97,7 +92,7 @@ public class SecretLockTransactionFactory extends TransactionFactory<SecretLockT
      *
      * @return the hash algorithm, secret is generated with.
      */
-    public LockHashAlgorithmType getHashAlgorithm() {
+    public SecretHashAlgorithm getHashAlgorithm() {
         return hashAlgorithm;
     }
 

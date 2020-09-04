@@ -25,25 +25,20 @@ import org.apache.commons.lang3.Validate;
  */
 public class SecretProofTransactionFactory extends TransactionFactory<SecretProofTransaction> {
 
-    private final LockHashAlgorithmType hashType;
+    private final SecretHashAlgorithm hashType;
     private final String secret;
     private final String proof;
     private final UnresolvedAddress recipient;
 
-    private SecretProofTransactionFactory(
-        final NetworkType networkType,
-        final LockHashAlgorithmType hashType,
-        final UnresolvedAddress recipient,
-        final String secret,
-        final String proof) {
+    private SecretProofTransactionFactory(final NetworkType networkType, final SecretHashAlgorithm hashType,
+        final UnresolvedAddress recipient, final String secret, final String proof) {
         super(TransactionType.SECRET_PROOF, networkType);
         Validate.notNull(secret, "Secret must not be null.");
         Validate.notNull(proof, "Proof must not be null.");
         Validate.notNull(recipient, "Recipient must not be null.");
-        if (!LockHashAlgorithmType.validator(hashType, secret)) {
+        if (!SecretHashAlgorithm.validator(hashType, secret)) {
             throw new IllegalArgumentException(
-                "HashType  " + hashType
-                    + " and Secret have incompatible length or not hexadecimal string");
+                "HashType  " + hashType + " and Secret have incompatible length or not hexadecimal string");
         }
         this.hashType = hashType;
         this.secret = secret;
@@ -61,8 +56,8 @@ public class SecretProofTransactionFactory extends TransactionFactory<SecretProo
      * @param proof Seed proof
      * @return Secret proof transaction.
      */
-    public static SecretProofTransactionFactory create(NetworkType networkType,
-        LockHashAlgorithmType hashType, UnresolvedAddress recipient, String secret, String proof) {
+    public static SecretProofTransactionFactory create(NetworkType networkType, SecretHashAlgorithm hashType,
+        UnresolvedAddress recipient, String secret, String proof) {
         return new SecretProofTransactionFactory(networkType, hashType, recipient, secret, proof);
     }
 
@@ -71,7 +66,7 @@ public class SecretProofTransactionFactory extends TransactionFactory<SecretProo
      *
      * @return the hash algorithm secret is generated with.
      */
-    public LockHashAlgorithmType getHashType() {
+    public SecretHashAlgorithm getHashType() {
         return hashType;
     }
 

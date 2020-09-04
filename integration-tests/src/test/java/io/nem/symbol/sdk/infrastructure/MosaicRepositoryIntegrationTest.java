@@ -45,12 +45,13 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
 
-    private final Account testAccount = config().getDefaultAccount();
+    private Account testAccount;
     private final List<MosaicId> mosaicIds = new ArrayList<>();
     private MosaicId mosaicId;
 
     @BeforeAll
     void setup() {
+        testAccount = config().getDefaultAccount();
         mosaicId = createMosaic(DEFAULT_REPOSITORY_TYPE, testAccount);
         mosaicIds.add(mosaicId);
     }
@@ -58,12 +59,12 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void getMosaicsFromAccount(RepositoryType type) {
-        List<MosaicInfo> mosaicInfos = get(getMosaicRepository(type)
-            .search(new MosaicSearchCriteria().ownerAddress(testAccount.getAddress()))).getData();
+        List<MosaicInfo> mosaicInfos = get(
+            getMosaicRepository(type).search(new MosaicSearchCriteria().ownerAddress(testAccount.getAddress())))
+            .getData();
         Assertions.assertTrue(mosaicInfos.size() > 0);
         mosaicInfos.forEach(this::assertMosaic);
-        Assertions.assertTrue(
-            mosaicInfos.stream().anyMatch(mosaicInfo -> mosaicInfo.getMosaicId().equals(mosaicId)));
+        Assertions.assertTrue(mosaicInfos.stream().anyMatch(mosaicInfo -> mosaicInfo.getMosaicId().equals(mosaicId)));
     }
 
     private void assertMosaic(MosaicInfo m) {
@@ -106,9 +107,8 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void throwExceptionWhenMosaicDoesNotExists(RepositoryType type) {
-        RepositoryCallException exception = Assertions
-            .assertThrows(RepositoryCallException.class, () -> get(getMosaicRepository(type)
-                .getMosaic(new MosaicId("AAAAAE18BE375DA2"))));
+        RepositoryCallException exception = Assertions.assertThrows(RepositoryCallException.class,
+            () -> get(getMosaicRepository(type).getMosaic(new MosaicId("AAAAAE18BE375DA2"))));
         Assertions.assertEquals(
             "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'AAAAAE18BE375DA2'",
             exception.getMessage());
@@ -117,21 +117,18 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
     private MosaicId createMosaic(RepositoryType type, Account testAccount) {
         MosaicNonce nonce = new MosaicNonce(new byte[4]);
         System.out.println("Nonce: " + nonce.getNonceAsInt());
-        System.out.println("Address: " +testAccount.getAddress().plain());
+        System.out.println("Address: " + testAccount.getAddress().plain());
         MosaicId mosaicId = MosaicId.createFromNonce(nonce, testAccount.getPublicAccount());
         System.out.println("mosaicId Hex: " + mosaicId.getIdAsHex());
 
         System.out.println(mosaicId.getIdAsHex());
 
-        MosaicDefinitionTransaction mosaicDefinitionTransaction =
-            MosaicDefinitionTransactionFactory.create(getNetworkType(),
-                nonce,
-                mosaicId,
-                MosaicFlags.create(true, true, true),
-                4, new BlockDuration(100)).maxFee(this.maxFee).build();
+        MosaicDefinitionTransaction mosaicDefinitionTransaction = MosaicDefinitionTransactionFactory
+            .create(getNetworkType(), nonce, mosaicId, MosaicFlags.create(true, true, true), 4, new BlockDuration(100))
+            .maxFee(this.maxFee).build();
 
-        MosaicDefinitionTransaction validateTransaction = announceAndValidate(type,
-            testAccount, mosaicDefinitionTransaction);
+        MosaicDefinitionTransaction validateTransaction = announceAndValidate(type, testAccount,
+            mosaicDefinitionTransaction);
         Assertions.assertEquals(mosaicId, validateTransaction.getMosaicId());
         return mosaicId;
     }
@@ -199,8 +196,7 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
     }
 
     private PaginationTester<MosaicInfo, MosaicSearchCriteria> getPaginationTester(RepositoryType type) {
-        return new PaginationTester<>(
-            MosaicSearchCriteria::new, getMosaicRepository(type)::search);
+        return new PaginationTester<>(MosaicSearchCriteria::new, getMosaicRepository(type)::search);
     }
 
     @ParameterizedTest
@@ -221,12 +217,12 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
         criteria.setOffset(mosaicsWithoutOffset.get(offsetIndex).getRecordId().get());
 
         List<MosaicInfo> mosaicFromOffsets = get(streamer.search(criteria).toList().toObservable());
-        PaginationTester.sameEntities(mosaicsWithoutOffset.stream().skip(offsetIndex + 1).collect(Collectors.toList()), mosaicFromOffsets);
+        PaginationTester.sameEntities(mosaicsWithoutOffset.stream().skip(offsetIndex + 1).collect(Collectors.toList()),
+            mosaicFromOffsets);
     }
 
 
-    private MosaicRepository getMosaicRepository(
-        RepositoryType type) {
+    private MosaicRepository getMosaicRepository(RepositoryType type) {
         return getRepositoryFactory(type).createMosaicRepository();
     }
 

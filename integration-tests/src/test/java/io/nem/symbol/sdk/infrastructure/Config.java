@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 public class Config {
@@ -62,12 +61,7 @@ public class Config {
 
     private static List<Account> loadNemesisAccountsFromBootstrap(NetworkType networkType) {
 
-        String bootstrapFolder = System.getenv("CATAPULT_SERVICE_BOOTSTRAP");
-        if (StringUtils.isBlank(bootstrapFolder)) {
-            bootstrapFolder = "../../catapult-service-bootstrap";
-        }
-        File generatedAddressesOption = new File(
-            StringUtils.removeEnd(bootstrapFolder, "/") + "/build/generated-addresses/addresses.yaml");
+        File generatedAddressesOption = new File("../target/bootstrap/config/generated-addresses/addresses.yml");
         if (!generatedAddressesOption.exists()) {
             throw new IllegalArgumentException("File " + generatedAddressesOption.getAbsolutePath() + " doesn't exist");
         }
@@ -87,10 +81,11 @@ public class Config {
                     + " Nemesis address must bue added manually");
                 return Collections.emptyList();
             }
-            List<Map<String, String>> bootstrapAddresses = (List<Map<String, String>>) mapper
-                .readValue(generatedAddresses, Map.class).get("nemesis_addresses");
+            Map<String, List<Map<String, String>>> mosaics = (Map<String, List<Map<String, String>>>) mapper
+                .readValue(generatedAddresses, Map.class).get("mosaics");
+            List<Map<String, String>> bootstrapAddresses = mosaics.get("currency");
 
-            return bootstrapAddresses.stream().map(m -> Account.createFromPrivateKey(m.get("private"), networkType))
+            return bootstrapAddresses.stream().map(m -> Account.createFromPrivateKey(m.get("privateKey"), networkType))
                 .collect(Collectors.toList());
 
         } catch (Exception e) {

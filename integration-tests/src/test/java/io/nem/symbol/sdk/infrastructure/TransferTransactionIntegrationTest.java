@@ -34,6 +34,7 @@ import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
 import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -41,7 +42,12 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
 
-    private Account account = config().getDefaultAccount();
+    private Account account;
+
+    @BeforeEach
+    void setup() {
+        account = config().getDefaultAccount();
+    }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)

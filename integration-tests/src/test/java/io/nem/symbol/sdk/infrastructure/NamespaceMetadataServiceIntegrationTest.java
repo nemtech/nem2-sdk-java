@@ -26,6 +26,7 @@ import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.transaction.NamespaceMetadataTransaction;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -36,21 +37,25 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NamespaceMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
-    private final Account signerAccount = config().getDefaultAccount();
+    private Account signerAccount;
 
-    private final Account targetAccount = config().getDefaultAccount();
+    private Account targetAccount;
+
+    @BeforeEach
+    void setup() {
+        signerAccount = config().getDefaultAccount();
+        targetAccount = config().getDefaultAccount();
+    }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void setAndUpdateNamespaceMetadata(RepositoryType type) {
 
         String namespaceName =
-            "namespace-id-metadata-service-integration-test-" + new Double(
-                Math.floor(Math.random() * 10000))
+            "namespace-id-metadata-service-integration-test-" + new Double(Math.floor(Math.random() * 10000))
                 .intValue();
 
-        NamespaceId targetNamespaceId = super
-            .createRootNamespace(type, signerAccount, namespaceName);
+        NamespaceId targetNamespaceId = super.createRootNamespace(type, signerAccount, namespaceName);
 
         BigInteger key = BigInteger.valueOf(RandomUtils.generateRandomInt(100000));
 
@@ -60,24 +65,19 @@ class NamespaceMetadataServiceIntegrationTest extends BaseIntegrationTest {
         RepositoryFactory repositoryFactory = getRepositoryFactory(type);
         MetadataRepository metadataRepository = repositoryFactory.createMetadataRepository();
 
-        MetadataTransactionService service = new MetadataTransactionServiceImpl(
-            repositoryFactory);
+        MetadataTransactionService service = new MetadataTransactionServiceImpl(repositoryFactory);
 
         NamespaceMetadataTransaction originalTransaction = get(service
-            .createNamespaceMetadataTransactionFactory(
-                targetAccount.getAddress(), key, originalMessage,
-                signerAccount.getAddress(), targetNamespaceId))
-            .maxFee(this.maxFee).build();
+            .createNamespaceMetadataTransactionFactory(targetAccount.getAddress(), key, originalMessage,
+                signerAccount.getAddress(), targetNamespaceId)).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, originalTransaction, signerAccount);
 
         assertMetadata(targetNamespaceId, key, originalMessage, metadataRepository);
 
         NamespaceMetadataTransaction updateTransaction = get(service
-            .createNamespaceMetadataTransactionFactory(
-                targetAccount.getAddress(), key, newMessage,
-                signerAccount.getAddress(), targetNamespaceId))
-            .maxFee(this.maxFee).build();
+            .createNamespaceMetadataTransactionFactory(targetAccount.getAddress(), key, newMessage,
+                signerAccount.getAddress(), targetNamespaceId)).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, updateTransaction, signerAccount);
 

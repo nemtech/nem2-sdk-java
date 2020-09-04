@@ -23,7 +23,7 @@ import io.nem.symbol.sdk.model.account.UnresolvedAddress;
  */
 public class SecretProofTransaction extends Transaction implements RecipientTransaction {
 
-    private final LockHashAlgorithmType hashType;
+    private final SecretHashAlgorithm hashType;
     private final String secret;
     private final String proof;
     private final UnresolvedAddress recipient;
@@ -48,7 +48,7 @@ public class SecretProofTransaction extends Transaction implements RecipientTran
      *
      * @return the hash algorithm secret is generated with.
      */
-    public LockHashAlgorithmType getHashType() {
+    public SecretHashAlgorithm getHashType() {
         return hashType;
     }
 

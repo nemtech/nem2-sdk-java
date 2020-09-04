@@ -17,16 +17,22 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.AccountRepository;
+import io.nem.symbol.sdk.api.HashLockSearchCriteria;
+import io.nem.symbol.sdk.api.LockHashRepository;
 import io.nem.symbol.sdk.api.MultisigRepository;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.message.PlainMessage;
+import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.HashLockInfo;
+import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
@@ -151,14 +157,30 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
         SignedTransaction signedAggregateTransaction = aggregateTransaction
             .signTransactionWithCosigners(multisigAccount, Arrays.asList(accounts), getGenerationHash());
 
-        SignedTransaction signedHashLockTransaction = HashLockTransactionFactory
-            .create(getNetworkType(), getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
-                BigInteger.valueOf(100), signedAggregateTransaction).maxFee(this.maxFee).build()
+        Mosaic hashAmount = getNetworkCurrency().createRelative(BigInteger.valueOf(10));
+        HashLockTransaction hashLockTransaction = HashLockTransactionFactory
+            .create(getNetworkType(), hashAmount, BigInteger.valueOf(100), signedAggregateTransaction)
+            .maxFee(this.maxFee).build();
+        SignedTransaction signedHashLockTransaction = hashLockTransaction
             .signWith(multisigAccount, getGenerationHash());
 
         getTransactionOrFail(getTransactionService(type)
                 .announceHashLockAggregateBonded(getListener(type), signedHashLockTransaction, signedAggregateTransaction),
             aggregateTransaction);
+
+        LockHashRepository lockHashRepository = getRepositoryFactory(type).createLockHashRepository();
+
+        HashLockInfo hashLockInfo = get(lockHashRepository.getLockHash(hashLockTransaction.getHash()));
+        Assertions.assertNotNull(hashLockInfo);
+        Assertions.assertEquals(multisigAccount.getAddress(), hashLockInfo.getOwnerAddress());
+        Assertions.assertEquals(hashAmount.getAmount(), hashLockInfo.getAmount());
+        Assertions.assertEquals(0, hashLockInfo.getStatus());
+        Assertions.assertEquals(hashLockTransaction.getHash(), hashLockInfo.getHash());
+
+        Page<HashLockInfo> page = get(
+            lockHashRepository.search(new HashLockSearchCriteria(multisigAccount.getAddress())));
+        Assertions.assertTrue(page.getData().stream().anyMatch(m -> m.getHash().equals(hashLockTransaction.getHash())));
+        Assertions.assertEquals(20, page.getPageSize());
 
     }
 

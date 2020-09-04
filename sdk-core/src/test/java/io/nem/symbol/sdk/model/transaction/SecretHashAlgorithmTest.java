@@ -25,36 +25,36 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-class LockHashAlgorithmTypeTest {
+class SecretHashAlgorithmTest {
 
     @ParameterizedTest
-    @EnumSource(value = LockHashAlgorithmType.class)
-    void shouldBeExactly64CharactersLength(LockHashAlgorithmType type) {
+    @EnumSource(value = SecretHashAlgorithm.class)
+    void shouldBeExactly64CharactersLength(SecretHashAlgorithm type) {
         byte[] secretBytes = RandomUtils.generateRandomBytes(20);
         byte[] result = type.hash(secretBytes);
         String secret = ConvertUtils.toHex(result);
-        assertTrue(LockHashAlgorithmType.validator(type, secret));
+        assertTrue(SecretHashAlgorithm.validator(type, secret));
     }
 
     @ParameterizedTest
-    @EnumSource(value = LockHashAlgorithmType.class)
-    void shouldReturnFalseIfItIsNotAValidHash(LockHashAlgorithmType type) {
+    @EnumSource(value = SecretHashAlgorithm.class)
+    void shouldReturnFalseIfItIsNotAValidHash(SecretHashAlgorithm type) {
         byte[] secretBytes = RandomUtils.generateRandomBytes(20);
         byte[] result = type.hash(secretBytes);
         String secret = ConvertUtils.toHex(result) + "aaa";
-        assertFalse(LockHashAlgorithmType.validator(type, secret));
+        assertFalse(SecretHashAlgorithm.validator(type, secret));
     }
 
     @Test
     void HASH_160ShouldReturnTrueIfItIsNot64Or40CharsLength() {
-        assertFalse(LockHashAlgorithmType.validator(LockHashAlgorithmType.HASH_160,
-            "400C2CDA984F04D00C78417D2AED8443AF451E40D77721AC1F5E5334555F0"));
+        assertFalse(SecretHashAlgorithm
+            .validator(SecretHashAlgorithm.HASH_160, "400C2CDA984F04D00C78417D2AED8443AF451E40D77721AC1F5E5334555F0"));
     }
 
     @Test
     void HASH_160ShouldReturnFalseIfItIsNotAValidHash() {
         String secret = "zyz6053bb910a6027f138ac5ebe92d43a9a18b7239b3c4d5ea69f1632e50aeef";
-        assertFalse(LockHashAlgorithmType.validator(LockHashAlgorithmType.HASH_160, secret));
+        assertFalse(SecretHashAlgorithm.validator(SecretHashAlgorithm.HASH_160, secret));
     }
 
 }

@@ -86,8 +86,7 @@ public class PaginationStreamerTester<E, C extends SearchCriteria<C>> {
         }
         AtomicInteger pageNumber = new AtomicInteger();
         return partitions.stream().map(
-            pageData -> Observable
-                .just(new Page<T>(pageData, pageNumber.incrementAndGet(), pageSize, infos.size(), partitions.size())))
+            pageData -> Observable.just(new Page<T>(pageData, pageNumber.incrementAndGet(), pageSize)))
             .collect(Collectors.toList());
     }
 }

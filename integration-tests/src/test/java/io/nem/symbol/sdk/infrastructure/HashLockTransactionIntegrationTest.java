@@ -26,6 +26,7 @@ import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
 import java.util.Collections;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -34,34 +35,29 @@ import org.junit.jupiter.params.provider.EnumSource;
 @SuppressWarnings("squid:S2699")
 public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
 
-    private final Account account = config().getDefaultAccount();
+    private Account account;
+
+    @BeforeEach
+    void setup() {
+        account = config().getDefaultAccount();
+    }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void standaloneLockFundsTransaction(RepositoryType type) {
 
-        TransferTransactionFactory factory =
-            TransferTransactionFactory.create(
-                getNetworkType(),
-                account.getAddress(),
-                Collections.singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-                new PlainMessage("E2ETest:standaloneLockFundsTransaction")
-            );
+        TransferTransactionFactory factory = TransferTransactionFactory.create(getNetworkType(), account.getAddress(),
+            Collections.singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
+            new PlainMessage("E2ETest:standaloneLockFundsTransaction"));
 
-        AggregateTransaction aggregateTransaction =
-            AggregateTransactionFactory.createBonded(
-                getNetworkType(),
-                Collections.singletonList(factory.build().toAggregate(account.getPublicAccount()))).maxFee(this.maxFee)
-                .build();
-        SignedTransaction signedTransaction = this.account
-            .sign(aggregateTransaction, getGenerationHash());
+        AggregateTransaction aggregateTransaction = AggregateTransactionFactory.createBonded(getNetworkType(),
+            Collections.singletonList(factory.build().toAggregate(account.getPublicAccount()))).maxFee(this.maxFee)
+            .build();
+        SignedTransaction signedTransaction = this.account.sign(aggregateTransaction, getGenerationHash());
 
-        HashLockTransaction hashLockTransaction =
-            HashLockTransactionFactory.create(getNetworkType(),
-                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
-                BigInteger.valueOf(100),
-                signedTransaction
-            ).maxFee(this.maxFee).build();
+        HashLockTransaction hashLockTransaction = HashLockTransactionFactory
+            .create(getNetworkType(), getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
+                BigInteger.valueOf(100), signedTransaction).maxFee(this.maxFee).build();
 
         announceAndValidate(type, this.account, hashLockTransaction);
 
@@ -72,28 +68,19 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
     @EnumSource(RepositoryType.class)
     void aggregateLockFundsTransaction(RepositoryType type) {
 
-        TransferTransactionFactory factory =
-            TransferTransactionFactory.create(
-                getNetworkType(),
-                this.account.getAddress(),
+        TransferTransactionFactory factory = TransferTransactionFactory
+            .create(getNetworkType(), this.account.getAddress(),
                 Collections.singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-                new PlainMessage("E2ETest:standaloneLockFundsTransaction")
-            );
+                new PlainMessage("E2ETest:standaloneLockFundsTransaction"));
 
-        AggregateTransaction aggregateTransaction =
-            AggregateTransactionFactory.createBonded(
-                getNetworkType(),
-                Collections.singletonList(factory.build().toAggregate(account.getPublicAccount()))).maxFee(this.maxFee)
-                .build();
+        AggregateTransaction aggregateTransaction = AggregateTransactionFactory.createBonded(getNetworkType(),
+            Collections.singletonList(factory.build().toAggregate(account.getPublicAccount()))).maxFee(this.maxFee)
+            .build();
 
-        SignedTransaction signedTransaction = this.account
-            .sign(aggregateTransaction, getGenerationHash());
-        HashLockTransaction hashLockTransaction =
-            HashLockTransactionFactory.create(
-                getNetworkType(),
-                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
-                BigInteger.valueOf(100),
-                signedTransaction).maxFee(this.maxFee).build();
+        SignedTransaction signedTransaction = this.account.sign(aggregateTransaction, getGenerationHash());
+        HashLockTransaction hashLockTransaction = HashLockTransactionFactory
+            .create(getNetworkType(), getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
+                BigInteger.valueOf(100), signedTransaction).maxFee(this.maxFee).build();
 
         announceAggregateAndValidate(type, hashLockTransaction, this.account);
 

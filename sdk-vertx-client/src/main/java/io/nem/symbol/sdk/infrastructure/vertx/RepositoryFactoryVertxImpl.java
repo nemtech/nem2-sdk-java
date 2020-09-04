@@ -21,6 +21,7 @@ import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.ChainRepository;
 import io.nem.symbol.sdk.api.JsonSerialization;
 import io.nem.symbol.sdk.api.Listener;
+import io.nem.symbol.sdk.api.LockHashRepository;
 import io.nem.symbol.sdk.api.MetadataRepository;
 import io.nem.symbol.sdk.api.MosaicRepository;
 import io.nem.symbol.sdk.api.MultisigRepository;
@@ -146,9 +147,13 @@ public class RepositoryFactoryVertxImpl extends RepositoryFactoryBase {
     }
 
     @Override
+    public LockHashRepository createLockHashRepository() {
+        return new LockHashRepositoryVertxImpl(apiClient);
+    }
+
+    @Override
     public Listener createListener() {
-        return new ListenerVertx(vertx.createHttpClient(), getBaseUrl(),
-            createNamespaceRepository());
+        return new ListenerVertx(vertx.createHttpClient(), getBaseUrl(), createNamespaceRepository());
     }
 
     @Override

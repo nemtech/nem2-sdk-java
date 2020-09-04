@@ -156,9 +156,8 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
     }
 
     private MosaicPage toPage(MosaicInfoDTO dto) {
-        return new MosaicPage()
-            .data(Collections.singletonList(dto))
-            .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
+        return new MosaicPage().data(Collections.singletonList(dto))
+            .pagination(new Pagination().pageNumber(1).pageSize(2));
     }
 
     @Override

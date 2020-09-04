@@ -17,7 +17,6 @@
 package io.nem.symbol.sdk.api;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,20 +26,18 @@ class PageTest {
     @Test
     void testConstructor() {
         List<String> data = Arrays.asList("a", "b", "c");
-        Page<String> page = new Page<>(data, 1, 2, 3, 4);
+        Page<String> page = new Page<>(data, 1, 2);
         Assertions.assertEquals(1, page.getPageNumber());
         Assertions.assertEquals(2, page.getPageSize());
-        Assertions.assertEquals(3, page.getTotalEntries());
-        Assertions.assertEquals(4, page.getTotalPages());
         Assertions.assertEquals(data, page.getData());
         Assertions.assertFalse(page.isLast());
     }
 
     @Test
     void isLast() {
-        Assertions.assertFalse(new Page<>(Collections.emptyList(), 1, 2, 3, 4).isLast());
-        Assertions.assertTrue(new Page<>(Collections.emptyList(), 4, 2, 3, 4).isLast());
-        Assertions.assertTrue(new Page<>(Collections.emptyList(), 5, 2, 3, 4).isLast());
+        Assertions.assertFalse(new Page<>(Arrays.asList("a", "b", "c"), 1, 2).isLast());
+        Assertions.assertFalse(new Page<>(Arrays.asList("a", "b"), 4, 2).isLast());
+        Assertions.assertTrue(new Page<>(Arrays.asList("a"), 5, 2).isLast());
     }
 
 }

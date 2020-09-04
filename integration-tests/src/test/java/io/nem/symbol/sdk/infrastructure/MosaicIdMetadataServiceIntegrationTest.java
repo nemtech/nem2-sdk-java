@@ -36,15 +36,12 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
-    private final Account signerAccount = config().getTestAccount();
-
-    private final Account targetAccount = config().getTestAccount();
-
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void setAndUpdateMosaicMetadata(RepositoryType type) {
-
+        Account signerAccount = config().getDefaultAccount();
+        Account targetAccount = config().getTestAccount();
         MosaicId targetMosaicId = super.createMosaic(signerAccount, type, BigInteger.ZERO, null);
 
         BigInteger key = BigInteger.valueOf(RandomUtils.generateRandomInt(100000));
@@ -59,24 +56,24 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
         MosaicMetadataTransaction originalTransaction = get(service
             .createMosaicMetadataTransactionFactory(targetAccount.getAddress(), key, originalMessage,
-                signerAccount.getAddress(), targetMosaicId)).maxFee(this.maxFee).build();
+                signerAccount.getAddress(), targetMosaicId)).maxFee(maxFee).build();
 
         announceAggregateAndValidate(type, originalTransaction, signerAccount);
 
-        assertMetadata(targetMosaicId, key, originalMessage, metadataRepository);
+        assertMetadata(targetMosaicId, key, originalMessage, metadataRepository, signerAccount);
 
         MosaicMetadataTransaction updateTransaction = get(service
             .createMosaicMetadataTransactionFactory(targetAccount.getAddress(), key, newMessage,
-                signerAccount.getAddress(), targetMosaicId)).maxFee(this.maxFee).build();
+                signerAccount.getAddress(), targetMosaicId)).maxFee(maxFee).build();
 
         announceAggregateAndValidate(type, updateTransaction, signerAccount);
 
-        assertMetadata(targetMosaicId, key, newMessage, metadataRepository);
+        assertMetadata(targetMosaicId, key, newMessage, metadataRepository, signerAccount);
 
     }
 
     private void assertMetadata(MosaicId targetMosaicId, BigInteger key, String value,
-        MetadataRepository metadataRepository) {
+        MetadataRepository metadataRepository, Account signerAccount) {
         MetadataSearchCriteria criteria = new MetadataSearchCriteria().targetId(targetMosaicId).scopedMetadataKey(key)
             .sourceAddress(signerAccount.getAddress());
         Metadata originalMetadata = get(metadataRepository.search(criteria)).getData().get(0);

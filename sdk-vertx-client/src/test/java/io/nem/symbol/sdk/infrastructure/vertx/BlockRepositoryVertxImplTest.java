@@ -173,7 +173,6 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
         Assertions.assertEquals(NetworkType.MIJIN_TEST, info.getNetworkType());
         Assertions.assertEquals(BigInteger.valueOf(9L), info.getHeight());
         Assertions.assertEquals(metaDTO.getHash(), info.getHash());
-        Assertions.assertEquals(metaDTO.getNumTransactions(), info.getNumTransactions());
         Assertions.assertEquals(metaDTO.getGenerationHash(), info.getGenerationHash());
         Assertions.assertEquals(metaDTO.getNumTransactions(), info.getNumTransactions());
         Assertions.assertEquals(metaDTO.getStateHashSubCacheMerkleRoots(), info.getSubCacheMerkleRoots());
@@ -189,12 +188,8 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
 
     private BlockPage toPage(BlockInfoDTO dto) {
         return new BlockPage().data(Collections.singletonList(dto))
-            .pagination(new Pagination().pageNumber(1).pageSize(2).totalEntries(3).totalPages(4));
+            .pagination(new Pagination().pageNumber(1).pageSize(2));
     }
-
-
-
-
 
     @Test
     public void shouldGetMerkleReceipts() throws Exception {

@@ -30,6 +30,7 @@ import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
 import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -37,46 +38,38 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTest {
 
-    private Account multisigAccount = config().getMultisigAccount();
+    private Account multisigAccount;
+    private Account cosignatoryAccount;
 
-    private Account cosignatoryAccount = config().getCosignatoryAccount();
+
+    @BeforeEach
+    void setup() {
+        multisigAccount = config().getMultisigAccount();
+        cosignatoryAccount = config().getCosignatoryAccount();
+    }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void cosignatureTransactionOnSign(RepositoryType type) {
         Address recipient = getRecipient();
-        TransferTransaction transferTransaction =
-            TransferTransactionFactory.create(
-                getNetworkType(),
-                recipient,
-                Collections
-                    .singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-                PlainMessage.create("test-message")
-            ).maxFee(this.maxFee).build();
+        TransferTransaction transferTransaction = TransferTransactionFactory.create(getNetworkType(), recipient,
+            Collections.singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
+            PlainMessage.create("test-message")).maxFee(this.maxFee).build();
 
-        AggregateTransaction aggregateTransaction =
-            AggregateTransactionFactory.createBonded(
-                getNetworkType(),
-                Collections.singletonList(
-                    transferTransaction.toAggregate(this.multisigAccount.getPublicAccount())))
-                .maxFee(this.maxFee).build();
+        AggregateTransaction aggregateTransaction = AggregateTransactionFactory.createBonded(getNetworkType(),
+            Collections.singletonList(transferTransaction.toAggregate(this.multisigAccount.getPublicAccount())))
+            .maxFee(this.maxFee).build();
 
-        SignedTransaction signedTransaction =
-            this.cosignatoryAccount.sign(aggregateTransaction, getGenerationHash());
+        SignedTransaction signedTransaction = this.cosignatoryAccount.sign(aggregateTransaction, getGenerationHash());
 
         TransactionFactory<HashLockTransaction> hashLockTransaction = HashLockTransactionFactory
-            .create(
-                getNetworkType(),
-                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
-                BigInteger.valueOf(100),
-                signedTransaction)
-            .maxFee(this.maxFee);
+            .create(getNetworkType(), getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
+                BigInteger.valueOf(100), signedTransaction).maxFee(this.maxFee);
         SignedTransaction signedHashLockTransaction = hashLockTransaction.build()
             .signWith(this.cosignatoryAccount, getGenerationHash());
 
         AggregateTransaction finalTransaction = getTransactionOrFail(getTransactionService(type)
-                .announceHashLockAggregateBonded(getListener(type), signedHashLockTransaction,
-                    signedTransaction),
+                .announceHashLockAggregateBonded(getListener(type), signedHashLockTransaction, signedTransaction),
             aggregateTransaction);
         Assertions.assertNotNull(finalTransaction);
     }

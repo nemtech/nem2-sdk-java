@@ -41,14 +41,10 @@ public class Page<E> {
     private final Integer pageSize;
 
     /**
-     * The total entries.
+     * If it's the last page.
      */
-    private final Integer totalEntries;
+    private final boolean last;
 
-    /**
-     * The total pages.
-     */
-    private final Integer totalPages;
 
     /**
      * Constructor.
@@ -56,15 +52,24 @@ public class Page<E> {
      * @param data the page data
      * @param pageNumber the current page number starting from 1.
      * @param pageSize the page size.
-     * @param totalEntries the total entries.
-     * @param totalPages the total pages for the given criteria.
+     * @param last if it's the last page.
      */
-    public Page(List<E> data, Integer pageNumber, Integer pageSize, Integer totalEntries, Integer totalPages) {
+    public Page(List<E> data, Integer pageNumber, Integer pageSize, boolean last) {
         this.data = data;
         this.pageNumber = pageNumber;
         this.pageSize = pageSize;
-        this.totalEntries = totalEntries;
-        this.totalPages = totalPages;
+        this.last = last;
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param data the page data
+     * @param pageNumber the current page number starting from 1.
+     * @param pageSize the page size.
+     */
+    public Page(List<E> data, Integer pageNumber, Integer pageSize) {
+        this(data, pageNumber, pageSize, data.isEmpty() || pageSize > data.size());
     }
 
     /**
@@ -73,7 +78,7 @@ public class Page<E> {
      * @param data the page data
      */
     public Page(List<E> data) {
-        this(data, 1, data.size(), data.size(), 1);
+        this(data, 1, data.size(), true);
     }
 
     /**
@@ -97,24 +102,11 @@ public class Page<E> {
         return pageSize;
     }
 
-    /**
-     * @return the total entries.
-     */
-    public Integer getTotalEntries() {
-        return totalEntries;
-    }
-
-    /**
-     * @return the total pages.
-     */
-    public Integer getTotalPages() {
-        return totalPages;
-    }
 
     /**
      * @return if this page is the last one.
      */
     public boolean isLast() {
-        return getPageNumber() >= getTotalPages();
+        return last;
     }
 }

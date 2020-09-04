@@ -52,7 +52,6 @@ import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.FakeDeadline;
 import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.LockHashAlgorithmType;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransaction;
@@ -64,6 +63,7 @@ import io.nem.symbol.sdk.model.transaction.MosaicMetadataTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
 import io.nem.symbol.sdk.model.transaction.MosaicSupplyChangeTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicSupplyChangeTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.SecretHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransaction;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.SecretProofTransaction;
@@ -374,7 +374,7 @@ class TransactionServiceTest {
         String secret = "3fc8ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
 
         TransactionFactory<SecretLockTransaction> factory = SecretLockTransactionFactory
-            .create(NetworkType.MIJIN_TEST, unresolvedMosaicId, BigInteger.TEN, LockHashAlgorithmType.SHA3_256, secret,
+            .create(NetworkType.MIJIN_TEST, unresolvedMosaicId, BigInteger.TEN, SecretHashAlgorithm.SHA3_256, secret,
                 recipient).transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
         simulateStatement(height, 1, 0);
@@ -406,7 +406,7 @@ class TransactionServiceTest {
         String proof = "2228ba10229ab5778d05d9c4b7f56676a88bf9295c185acfc0f961db5408cafe";
 
         TransactionFactory<SecretProofTransaction> factory = SecretProofTransactionFactory
-            .create(NetworkType.MIJIN_TEST, LockHashAlgorithmType.SHA3_256, recipient, secret, proof)
+            .create(NetworkType.MIJIN_TEST, SecretHashAlgorithm.SHA3_256, recipient, secret, proof)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
         simulateStatement(height, 1, 0);

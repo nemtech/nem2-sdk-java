@@ -20,7 +20,7 @@ import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
-import io.nem.symbol.sdk.model.transaction.LockHashAlgorithmType;
+import io.nem.symbol.sdk.model.transaction.SecretHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransaction;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.SecretProofTransaction;
@@ -41,8 +41,8 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
     static List<Arguments> provider() {
         List<Arguments> arguments = new ArrayList<>();
         for (RepositoryType repositoryType : RepositoryType.values()) {
-            for (LockHashAlgorithmType lockHashAlgorithmType : LockHashAlgorithmType.values()) {
-                arguments.add(Arguments.of(repositoryType, lockHashAlgorithmType));
+            for (SecretHashAlgorithm secretHashAlgorithm : SecretHashAlgorithm.values()) {
+                arguments.add(Arguments.of(repositoryType, secretHashAlgorithm));
             }
         }
         return arguments;
@@ -51,7 +51,7 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("provider")
-    void secretLockAndProofTransaction(RepositoryType type, LockHashAlgorithmType lockHashType) {
+    void secretLockAndProofTransaction(RepositoryType type, SecretHashAlgorithm lockHashType) {
 
         RepositoryFactory repositoryFactory = getRepositoryFactory(type);
         byte[] secretSeed = RandomUtils.generateRandomBytes(20);

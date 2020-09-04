@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -43,7 +44,12 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
 
-    private final Account testAccount = config().getDefaultAccount();
+    private Account testAccount;
+
+    @BeforeEach
+    void setup() {
+        testAccount = config().getDefaultAccount();
+    }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
@@ -69,7 +75,7 @@ public class NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
         AggregateTransaction aggregateTransaction = AggregateTransactionFactory.createComplete(getNetworkType(),
             Collections.singletonList(transaction.toAggregate(testAccount.getPublicAccount()))).maxFee(this.maxFee)
             .build();
-        
+
         AggregateTransaction announceCorrectly = announceAndValidate(type, testAccount, aggregateTransaction);
 
         Assertions.assertEquals(testAccount.getPublicAccount(), announceCorrectly.getSigner().get());

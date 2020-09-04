@@ -51,8 +51,7 @@ public class ChainRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl impl
     public Observable<BigInteger> getBlockchainHeight() {
 
         Callable<HeightInfoDTO> callback = getClient()::getChainHeight;
-        return exceptionHandling(
-            call(callback).map(blockchainHeight -> (blockchainHeight.getHeight())));
+        return exceptionHandling(call(callback).map(HeightInfoDTO::getHeight));
 
     }
 

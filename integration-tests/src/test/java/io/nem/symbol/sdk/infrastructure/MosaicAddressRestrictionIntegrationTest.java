@@ -36,6 +36,7 @@ import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
 import java.math.BigInteger;
 import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -43,9 +44,16 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest {
 
-    private Account testAccount = config().getDefaultAccount();
-    private Account testAccount2 = config().getTestAccount2();
-    private BigInteger restrictionKey = BigInteger.valueOf(22222);
+    private Account testAccount;
+    private Account testAccount2;
+    private BigInteger restrictionKey;
+
+    @BeforeEach
+    void setup() {
+        testAccount = config().getDefaultAccount();
+        testAccount2 = config().getTestAccount2();
+        restrictionKey = BigInteger.valueOf(22222);
+    }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)

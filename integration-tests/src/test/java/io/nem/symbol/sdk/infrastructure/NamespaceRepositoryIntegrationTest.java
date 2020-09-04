@@ -51,7 +51,7 @@ class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
     void getNamespace(RepositoryType type) {
         NamespaceInfo namespaceInfo = get(getNamespaceRepository(type).getNamespace(namespaceId));
         assertEquals(new BigInteger("1"), namespaceInfo.getStartHeight());
-        assertEquals(namespaceId, namespaceInfo.getRecordId());
+        assertEquals(namespaceId, namespaceInfo.getId());
         assertEquals(namespaceId, namespaceInfo.getLevels().get(1));
     }
 
