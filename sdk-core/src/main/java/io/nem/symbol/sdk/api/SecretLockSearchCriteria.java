@@ -5,16 +5,16 @@ import io.nem.symbol.sdk.model.account.Address;
 import java.util.Objects;
 
 /**
- * Criteria used to hash lock entities.
+ * Criteria used to search secret lock entities.
  */
-public class HashLockSearchCriteria extends SearchCriteria<HashLockSearchCriteria> {
+public class SecretLockSearchCriteria extends SearchCriteria<SecretLockSearchCriteria> {
 
     /**
      * Account address.
      */
     private final Address address;
 
-    public HashLockSearchCriteria(Address address) {
+    public SecretLockSearchCriteria(Address address) {
         this.address = address;
     }
 
@@ -33,7 +33,7 @@ public class HashLockSearchCriteria extends SearchCriteria<HashLockSearchCriteri
         if (!super.equals(o)) {
             return false;
         }
-        HashLockSearchCriteria that = (HashLockSearchCriteria) o;
+        SecretLockSearchCriteria that = (SecretLockSearchCriteria) o;
         return Objects.equals(address, that.address);
     }
 

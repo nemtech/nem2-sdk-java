@@ -4,9 +4,9 @@ set -e
 
 if [ "$TRAVIS" = "true" ]; then
     echo "Installing node"
-#    nvm install v12.18.3
+    nvm install v12.18.3
     npm install -g symbol-bootstrap
 fi
-source bootstrap-start.sh
+source bootstrap-start.sh -d
 gradle integrationTest
 source bootstrap-stop.sh

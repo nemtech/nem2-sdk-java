@@ -101,9 +101,14 @@ public interface RepositoryFactory extends Closeable {
     RestrictionMosaicRepository createRestrictionMosaicRepository();
 
     /**
-     * @return a newly created {@link LockHashRepository}
+     * @return a newly created {@link HashLockRepository}
      */
-    LockHashRepository createLockHashRepository();
+    HashLockRepository createHashLockRepository();
+
+    /**
+     * @return a newly created {@link SecretLockRepository}
+     */
+    SecretLockRepository createSecretLockRepository();
 
     /**
      * @return a newly created {@link Listener}

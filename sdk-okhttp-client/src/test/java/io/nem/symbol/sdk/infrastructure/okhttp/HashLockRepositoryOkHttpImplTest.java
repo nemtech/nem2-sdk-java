@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package io.nem.symbol.sdk.infrastructure.vertx;
+package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.sdk.api.HashLockSearchCriteria;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNonce;
 import io.nem.symbol.sdk.model.transaction.HashLockInfo;
-import io.nem.symbol.sdk.openapi.vertx.model.HashLockEntryDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.HashLockInfoDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.HashLockPage;
-import io.nem.symbol.sdk.openapi.vertx.model.Pagination;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.HashLockEntryDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.HashLockInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.HashLockPage;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.Pagination;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
@@ -33,22 +33,27 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit Tests for {@link LockHashRepositoryVertxImpl}
+ * Unit Tests for {@link HashLockRepositoryOkHttpImpl}
  *
  * @author Fernando Boucquez
  */
-public class LockHashRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
+public class HashLockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest {
 
-    private LockHashRepositoryVertxImpl repository;
+    private HashLockRepositoryOkHttpImpl repository;
 
     @BeforeEach
     public void setUp() {
         super.setUp();
-        repository = new LockHashRepositoryVertxImpl(apiClientMock);
+        repository = new HashLockRepositoryOkHttpImpl(apiClientMock);
+    }
+
+    @Override
+    protected AbstractRepositoryOkHttpImpl getRepository() {
+        return repository;
     }
 
     @Test
-    public void shouldGetLockHashInfo() throws Exception {
+    public void shouldGetHashLockInfo() throws Exception {
         Address address = Address.generateRandom(this.networkType);
         MosaicId mosaicId = MosaicId.createFromNonce(MosaicNonce.createRandom(), address);
 
@@ -66,15 +71,15 @@ public class LockHashRepositoryVertxImplTest extends AbstractVertxRespositoryTes
 
         mockRemoteCall(hashLockInfoDTO);
 
-        HashLockInfo resolvedLockHashInfo = repository.getLockHash("abc").toFuture().get();
-        Assertions.assertEquals(address, resolvedLockHashInfo.getOwnerAddress());
-        Assertions.assertEquals(hashLockInfoDTO.getId(), resolvedLockHashInfo.getRecordId().get());
-        Assertions.assertEquals(address, resolvedLockHashInfo.getOwnerAddress());
-        Assertions.assertEquals(lockHashDto.getHash(), resolvedLockHashInfo.getHash());
-        Assertions.assertEquals(lockHashDto.getStatus(), resolvedLockHashInfo.getStatus());
-        Assertions.assertEquals(mosaicId, resolvedLockHashInfo.getMosaicId());
-        Assertions.assertEquals(lockHashDto.getAmount(), resolvedLockHashInfo.getAmount());
-        Assertions.assertEquals(lockHashDto.getEndHeight(), resolvedLockHashInfo.getEndHeight());
+        HashLockInfo resolvedHashLockInfo = repository.getHashLock("abc").toFuture().get();
+        Assertions.assertEquals(address, resolvedHashLockInfo.getOwnerAddress());
+        Assertions.assertEquals(hashLockInfoDTO.getId(), resolvedHashLockInfo.getRecordId().get());
+        Assertions.assertEquals(address, resolvedHashLockInfo.getOwnerAddress());
+        Assertions.assertEquals(lockHashDto.getHash(), resolvedHashLockInfo.getHash());
+        Assertions.assertEquals(lockHashDto.getStatus(), resolvedHashLockInfo.getStatus());
+        Assertions.assertEquals(mosaicId, resolvedHashLockInfo.getMosaicId());
+        Assertions.assertEquals(lockHashDto.getAmount(), resolvedHashLockInfo.getAmount());
+        Assertions.assertEquals(lockHashDto.getEndHeight(), resolvedHashLockInfo.getEndHeight());
     }
 
     @Test
@@ -98,15 +103,15 @@ public class LockHashRepositoryVertxImplTest extends AbstractVertxRespositoryTes
 
         List<HashLockInfo> list = repository.search(new HashLockSearchCriteria(address)).toFuture().get().getData();
         Assertions.assertEquals(1, list.size());
-        HashLockInfo resolvedLockHashInfo = list.get(0);
-        Assertions.assertEquals(address, resolvedLockHashInfo.getOwnerAddress());
-        Assertions.assertEquals(hashLockInfoDTO.getId(), resolvedLockHashInfo.getRecordId().get());
-        Assertions.assertEquals(address, resolvedLockHashInfo.getOwnerAddress());
-        Assertions.assertEquals(lockHashDto.getHash(), resolvedLockHashInfo.getHash());
-        Assertions.assertEquals(lockHashDto.getStatus(), resolvedLockHashInfo.getStatus());
-        Assertions.assertEquals(mosaicId, resolvedLockHashInfo.getMosaicId());
-        Assertions.assertEquals(lockHashDto.getAmount(), resolvedLockHashInfo.getAmount());
-        Assertions.assertEquals(lockHashDto.getEndHeight(), resolvedLockHashInfo.getEndHeight());
+        HashLockInfo resolvedHashLockInfo = list.get(0);
+        Assertions.assertEquals(address, resolvedHashLockInfo.getOwnerAddress());
+        Assertions.assertEquals(hashLockInfoDTO.getId(), resolvedHashLockInfo.getRecordId().get());
+        Assertions.assertEquals(address, resolvedHashLockInfo.getOwnerAddress());
+        Assertions.assertEquals(lockHashDto.getHash(), resolvedHashLockInfo.getHash());
+        Assertions.assertEquals(lockHashDto.getStatus(), resolvedHashLockInfo.getStatus());
+        Assertions.assertEquals(mosaicId, resolvedHashLockInfo.getMosaicId());
+        Assertions.assertEquals(lockHashDto.getAmount(), resolvedHashLockInfo.getAmount());
+        Assertions.assertEquals(lockHashDto.getEndHeight(), resolvedHashLockInfo.getEndHeight());
     }
 
 

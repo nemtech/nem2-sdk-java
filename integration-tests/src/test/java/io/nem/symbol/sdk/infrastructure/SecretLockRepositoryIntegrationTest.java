@@ -16,29 +16,29 @@
 
 package io.nem.symbol.sdk.infrastructure;
 
-import io.nem.symbol.sdk.api.HashLockSearchCriteria;
-import io.nem.symbol.sdk.api.LockHashRepository;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RepositoryCallException;
+import io.nem.symbol.sdk.api.SecretLockRepository;
+import io.nem.symbol.sdk.api.SecretLockSearchCriteria;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.transaction.HashLockInfo;
+import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class LockHashRepositoryIntegrationTest extends BaseIntegrationTest {
+class SecretLockRepositoryIntegrationTest extends BaseIntegrationTest {
 
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void getLockHashWhenDoesNotExist(RepositoryType type) {
-        LockHashRepository lockHashRepository = getRepositoryFactory(type).createLockHashRepository();
-        String addressObject = "671653C94E2254F2A23EFEDB15D67C38332AED1FBD24B063C0A8E675582B6A96";
+    void getSecretLockWhenDoesNotExist(RepositoryType type) {
+        SecretLockRepository SecretLockRepository = getRepositoryFactory(type).createSecretLockRepository();
+        String secret = "671653C94E2254F2A23EFEDB15D67C38332AED1FBD24B063C0A8E675582B6A96";
 
         RepositoryCallException exception = Assertions
-            .assertThrows(RepositoryCallException.class, () -> get(lockHashRepository.getLockHash(addressObject)));
+            .assertThrows(RepositoryCallException.class, () -> get(SecretLockRepository.getSecretLock(secret)));
 
         Assertions.assertTrue(exception.getMessage()
             .contains("ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id"));
@@ -46,23 +46,23 @@ class LockHashRepositoryIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
-    void getLockHashWhenInvalid(RepositoryType type) {
-        LockHashRepository lockHashRepository = getRepositoryFactory(type).createLockHashRepository();
-        String addressObject = "invalid!";
+    void getSecretLockWhenInvalid(RepositoryType type) {
+        SecretLockRepository SecretLockRepository = getRepositoryFactory(type).createSecretLockRepository();
+        String secret = "invalid!";
 
         RepositoryCallException exception = Assertions
-            .assertThrows(RepositoryCallException.class, () -> get(lockHashRepository.getLockHash(addressObject)));
+            .assertThrows(RepositoryCallException.class, () -> get(SecretLockRepository.getSecretLock(secret)));
 
-        Assertions.assertEquals("ApiException: Conflict - 409 - InvalidArgument - hash has an invalid format",
+        Assertions.assertEquals("ApiException: Conflict - 409 - InvalidArgument - secret has an invalid format",
             exception.getMessage());
     }
 
     @ParameterizedTest
     @EnumSource(RepositoryType.class)
     void searchWhenInvalidAddress(RepositoryType type) {
-        LockHashRepository lockHashRepository = getRepositoryFactory(type).createLockHashRepository();
+        SecretLockRepository repository = getRepositoryFactory(type).createSecretLockRepository();
         Address address = Address.generateRandom(getNetworkType());
-        Page<HashLockInfo> page = get(lockHashRepository.search(new HashLockSearchCriteria(address)));
+        Page<SecretLockInfo> page = get(repository.search(new SecretLockSearchCriteria(address)));
         Assertions.assertTrue(page.isLast());
         Assertions.assertTrue(page.getData().isEmpty());
         Assertions.assertEquals(20, page.getPageSize());

@@ -6,7 +6,7 @@ import io.reactivex.Observable;
 /**
  * Repository used to retrieves lock hashes.
  */
-public interface LockHashRepository extends Searcher<HashLockInfo, HashLockSearchCriteria> {
+public interface HashLockRepository extends Searcher<HashLockInfo, HashLockSearchCriteria> {
 
     /**
      * Returns a lock hash info based on the hash
@@ -14,7 +14,7 @@ public interface LockHashRepository extends Searcher<HashLockInfo, HashLockSearc
      * @param hash the hash
      * @return an observable of {@link HashLockInfo}
      */
-    Observable<HashLockInfo> getLockHash(String hash);
+    Observable<HashLockInfo> getHashLock(String hash);
 
 
 }

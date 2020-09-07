@@ -17,8 +17,8 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.AccountRepository;
+import io.nem.symbol.sdk.api.HashLockRepository;
 import io.nem.symbol.sdk.api.HashLockSearchCriteria;
-import io.nem.symbol.sdk.api.LockHashRepository;
 import io.nem.symbol.sdk.api.MultisigRepository;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RepositoryCallException;
@@ -147,20 +147,20 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
         List<UnresolvedAddress> additions = Arrays.stream(accounts).map(Account::getAddress)
             .collect(Collectors.toList());
         MultisigAccountModificationTransaction convertIntoMultisigTransaction = MultisigAccountModificationTransactionFactory
-            .create(getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList()).maxFee(this.maxFee)
+            .create(getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList()).maxFee(maxFee)
             .build();
 
         AggregateTransaction aggregateTransaction = AggregateTransactionFactory.createBonded(getNetworkType(),
             Collections.singletonList(convertIntoMultisigTransaction.toAggregate(multisigAccount.getPublicAccount())))
-            .maxFee(this.maxFee).build();
+            .maxFee(maxFee).build();
 
         SignedTransaction signedAggregateTransaction = aggregateTransaction
             .signTransactionWithCosigners(multisigAccount, Arrays.asList(accounts), getGenerationHash());
 
         Mosaic hashAmount = getNetworkCurrency().createRelative(BigInteger.valueOf(10));
         HashLockTransaction hashLockTransaction = HashLockTransactionFactory
-            .create(getNetworkType(), hashAmount, BigInteger.valueOf(100), signedAggregateTransaction)
-            .maxFee(this.maxFee).build();
+            .create(getNetworkType(), hashAmount, BigInteger.valueOf(100), signedAggregateTransaction).maxFee(maxFee)
+            .build();
         SignedTransaction signedHashLockTransaction = hashLockTransaction
             .signWith(multisigAccount, getGenerationHash());
 
@@ -168,9 +168,9 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
                 .announceHashLockAggregateBonded(getListener(type), signedHashLockTransaction, signedAggregateTransaction),
             aggregateTransaction);
 
-        LockHashRepository lockHashRepository = getRepositoryFactory(type).createLockHashRepository();
+        HashLockRepository hashLockRepository = getRepositoryFactory(type).createHashLockRepository();
 
-        HashLockInfo hashLockInfo = get(lockHashRepository.getLockHash(hashLockTransaction.getHash()));
+        HashLockInfo hashLockInfo = get(hashLockRepository.getHashLock(hashLockTransaction.getHash()));
         Assertions.assertNotNull(hashLockInfo);
         Assertions.assertEquals(multisigAccount.getAddress(), hashLockInfo.getOwnerAddress());
         Assertions.assertEquals(hashAmount.getAmount(), hashLockInfo.getAmount());
@@ -178,7 +178,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
         Assertions.assertEquals(hashLockTransaction.getHash(), hashLockInfo.getHash());
 
         Page<HashLockInfo> page = get(
-            lockHashRepository.search(new HashLockSearchCriteria(multisigAccount.getAddress())));
+            hashLockRepository.search(new HashLockSearchCriteria(multisigAccount.getAddress())));
         Assertions.assertTrue(page.getData().stream().anyMatch(m -> m.getHash().equals(hashLockTransaction.getHash())));
         Assertions.assertEquals(20, page.getPageSize());
 
@@ -210,12 +210,12 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
         List<UnresolvedAddress> additions = Arrays.stream(accounts).map(Account::getAddress)
             .collect(Collectors.toList());
         MultisigAccountModificationTransaction convertIntoMultisigTransaction = MultisigAccountModificationTransactionFactory
-            .create(getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList()).maxFee(this.maxFee)
+            .create(getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList()).maxFee(maxFee)
             .build();
 
         AggregateTransaction aggregateTransaction = AggregateTransactionFactory.createComplete(getNetworkType(),
             Collections.singletonList(convertIntoMultisigTransaction.toAggregate(multisigAccount.getPublicAccount())))
-            .maxFee(this.maxFee).build();
+            .maxFee(maxFee).build();
 
         SignedTransaction signedAggregateTransaction = aggregateTransaction
             .signTransactionWithCosigners(multisigAccount, Arrays.asList(accounts), getGenerationHash());
@@ -250,7 +250,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
             .create(getNetworkType(), recipient, Collections.singletonList(getNetworkCurrency().createAbsolute(amount)),
                 new PlainMessage("E2ETest:SetUpAccountsTool"));
 
-        factory.maxFee(this.maxFee);
+        factory.maxFee(maxFee);
         TransferTransaction transferTransaction = factory.build();
 
         TransferTransaction processedTransaction = announceAndValidate(type, nemesisAccount, transferTransaction);

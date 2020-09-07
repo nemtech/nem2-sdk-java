@@ -1,36 +1,39 @@
-package io.nem.symbol.sdk.infrastructure.vertx;
+package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.core.utils.MapperUtils;
+import io.nem.symbol.sdk.api.HashLockRepository;
 import io.nem.symbol.sdk.api.HashLockSearchCriteria;
-import io.nem.symbol.sdk.api.LockHashRepository;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.model.transaction.HashLockInfo;
-import io.nem.symbol.sdk.openapi.vertx.api.LockHashRoutesApi;
-import io.nem.symbol.sdk.openapi.vertx.api.LockHashRoutesApiImpl;
-import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
-import io.nem.symbol.sdk.openapi.vertx.model.HashLockEntryDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.HashLockInfoDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.HashLockPage;
-import io.nem.symbol.sdk.openapi.vertx.model.Order;
+import io.nem.symbol.sdk.openapi.okhttp_gson.api.HashLockRoutesApi;
+import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.HashLockEntryDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.HashLockInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.HashLockPage;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.Order;
 import io.reactivex.Observable;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-public class LockHashRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements LockHashRepository {
+/**
+ * Implements {@link HashLockRepository}
+ *
+ * @author Fernando Boucquez
+ */
+public class HashLockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements HashLockRepository {
 
-    private final LockHashRoutesApi client;
+    private final HashLockRoutesApi client;
 
-    public LockHashRepositoryVertxImpl(ApiClient apiClient) {
+    public HashLockRepositoryOkHttpImpl(ApiClient apiClient) {
         super(apiClient);
-        this.client = new LockHashRoutesApiImpl(apiClient);
+        this.client = new HashLockRoutesApi(apiClient);
     }
 
     @Override
-    public Observable<HashLockInfo> getLockHash(String hash) {
-        return this.call((h) -> getClient().getLockHash(hash, h), this::toHashLockInfo);
+    public Observable<HashLockInfo> getHashLock(String hash) {
+        Callable<HashLockInfoDTO> callback = () -> getClient().getHashLock(hash);
+        return this.call(callback, this::toHashLockInfo);
 
     }
 
@@ -48,9 +51,9 @@ public class LockHashRepositoryVertxImpl extends AbstractRepositoryVertxImpl imp
         Integer pageNumber = criteria.getPageNumber();
         String offset = criteria.getOffset();
         Order order = toDto(criteria.getOrder());
-        Consumer<Handler<AsyncResult<HashLockPage>>> handlerConsumer = (h) -> getClient()
-            .searchLockHash(address, pageSize, pageNumber, offset, order, h);
-        return this.call(handlerConsumer, this::toPage);
+        Callable<HashLockPage> callback = () -> getClient()
+            .searchHashLock(address, pageSize, pageNumber, offset, order);
+        return this.call(callback, this::toPage);
     }
 
     private Page<HashLockInfo> toPage(HashLockPage hashLockPage) {
@@ -58,8 +61,7 @@ public class LockHashRepositoryVertxImpl extends AbstractRepositoryVertxImpl imp
             hashLockPage.getData().stream().map(this::toHashLockInfo).collect(Collectors.toList()));
     }
 
-    public LockHashRoutesApi getClient() {
+    public HashLockRoutesApi getClient() {
         return client;
     }
-
 }

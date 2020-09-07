@@ -20,9 +20,9 @@ import com.google.gson.Gson;
 import io.nem.symbol.sdk.api.AccountRepository;
 import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.ChainRepository;
+import io.nem.symbol.sdk.api.HashLockRepository;
 import io.nem.symbol.sdk.api.JsonSerialization;
 import io.nem.symbol.sdk.api.Listener;
-import io.nem.symbol.sdk.api.LockHashRepository;
 import io.nem.symbol.sdk.api.MetadataRepository;
 import io.nem.symbol.sdk.api.MosaicRepository;
 import io.nem.symbol.sdk.api.MultisigRepository;
@@ -34,6 +34,7 @@ import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.RepositoryFactoryConfiguration;
 import io.nem.symbol.sdk.api.RestrictionAccountRepository;
 import io.nem.symbol.sdk.api.RestrictionMosaicRepository;
+import io.nem.symbol.sdk.api.SecretLockRepository;
 import io.nem.symbol.sdk.api.TransactionRepository;
 import io.nem.symbol.sdk.api.TransactionStatusRepository;
 import io.nem.symbol.sdk.infrastructure.RepositoryFactoryBase;
@@ -137,8 +138,13 @@ public class RepositoryFactoryOkHttpImpl extends RepositoryFactoryBase {
     }
 
     @Override
-    public LockHashRepository createLockHashRepository() {
-        return new LockHashRepositoryOkHttpImpl(apiClient);
+    public HashLockRepository createHashLockRepository() {
+        return new HashLockRepositoryOkHttpImpl(apiClient);
+    }
+
+    @Override
+    public SecretLockRepository createSecretLockRepository() {
+        return new SecretLockRepositoryOkHttpImpl(apiClient);
     }
 
     @Override
