@@ -255,13 +255,13 @@ public abstract class BaseIntegrationTest {
 
     <T extends Transaction> T announceAndValidate(RepositoryType type, Account testAccount, T transaction) {
 
+        SignedTransaction signedTransaction = testAccount.sign(transaction, getGenerationHash());
         if (transaction.getType() != TransactionType.AGGREGATE_COMPLETE) {
             System.out.println(
                 "Announcing Transaction Transaction: " + transaction.getType() + " Address: " + testAccount.getAddress()
-                    .plain() + " Public Key: " + testAccount.getPublicAccount().getPublicKey().toHex());
+                    .plain() + " Public Key: " + testAccount.getPublicAccount().getPublicKey().toHex() + " hash "
+                    + signedTransaction.getHash());
         }
-        SignedTransaction signedTransaction = testAccount.sign(transaction, getGenerationHash());
-
         TransactionService transactionService = getTransactionService(type);
         Transaction announceCorrectly = getTransactionOrFail(
             transactionService.announce(getListener(type), signedTransaction), transaction);

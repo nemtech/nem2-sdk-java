@@ -1,5 +1,6 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
+import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.SecretLockRepository;
@@ -32,8 +33,9 @@ public class SecretLockRepositoryVertxImpl extends AbstractRepositoryVertxImpl i
 
     @Override
     public Observable<SecretLockInfo> getSecretLock(String secret) {
-        return this.call((h) -> getClient().getSecretLock(secret, h), this::toSecretLockInfo);
-
+        return this.call((h) -> getClient()
+                .getSecretLock(ConvertUtils.padHex(secret, SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE), h),
+            this::toSecretLockInfo);
     }
 
     private SecretLockInfo toSecretLockInfo(SecretLockInfoDTO dto) {

@@ -1,5 +1,6 @@
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
+import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.SecretLockRepository;
@@ -34,7 +35,8 @@ public class SecretLockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
 
     @Override
     public Observable<SecretLockInfo> getSecretLock(String secret) {
-        Callable<SecretLockInfoDTO> callback = () -> getClient().getSecretLock(secret);
+        Callable<SecretLockInfoDTO> callback = () -> getClient()
+            .getSecretLock(ConvertUtils.padHex(secret, SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE));
         return this.call(callback, this::toSecretLockInfo);
 
     }

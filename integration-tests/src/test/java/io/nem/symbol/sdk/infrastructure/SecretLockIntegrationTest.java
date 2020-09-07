@@ -17,6 +17,7 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.core.utils.ConvertUtils;
+import io.nem.symbol.sdk.api.OrderBy;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.SecretLockRepository;
@@ -33,7 +34,6 @@ import io.nem.symbol.sdk.model.transaction.SecretProofTransactionFactory;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -61,6 +61,14 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
         RepositoryFactory repositoryFactory = getRepositoryFactory(type);
         byte[] secretSeed = RandomUtils.generateRandomBytes(20);
         String secret = ConvertUtils.toHex(secretHashAlgorithm.hash(secretSeed));
+        String storedSecret = ConvertUtils.padHex(secret, SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE);
+        if (secretHashAlgorithm == SecretHashAlgorithm.HASH_160) {
+            Assertions.assertEquals(SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE, storedSecret.length());
+            Assertions.assertEquals(40, secret.length());
+        } else {
+            Assertions.assertEquals(SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE, storedSecret.length());
+            Assertions.assertEquals(SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE, secret.length());
+        }
         String proof = ConvertUtils.toHex(secretSeed);
 
         Account account = config().getNemesisAccount1();
@@ -82,7 +90,7 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
 
         Assertions.assertEquals(secretHashAlgorithm, secretProofTransactionAnnounced.getHashType());
         Assertions.assertEquals(account2.getAddress(), secretProofTransactionAnnounced.getRecipient());
-        Assertions.assertEquals(StringUtils.rightPad(secret, 64, "0"), secretProofTransactionAnnounced.getSecret());
+        Assertions.assertEquals(storedSecret, secretProofTransactionAnnounced.getSecret());
         Assertions.assertEquals(proof, secretProofTransactionAnnounced.getProof());
 
         SecretLockRepository hashLockRepository = getRepositoryFactory(type).createSecretLockRepository();
@@ -94,20 +102,23 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
         Assertions.assertEquals(amount, info.getAmount());
         Assertions.assertEquals(secretHashAlgorithm, info.getHashAlgorithm());
         Assertions.assertEquals(1, info.getStatus());
-        Assertions.assertEquals(secret, info.getSecret());
+        Assertions.assertEquals(storedSecret, info.getSecret());
 
-        Page<SecretLockInfo> page = get(hashLockRepository.search(new SecretLockSearchCriteria(account.getAddress())));
-        Assertions.assertTrue(page.getData().stream().anyMatch(m -> m.getSecret().equals(secret)));
+        Page<SecretLockInfo> page = get(
+            hashLockRepository.search(new SecretLockSearchCriteria(account.getAddress()).order(OrderBy.DESC)));
+
+        Assertions.assertTrue(page.getData().stream().anyMatch(m -> m.getSecret().equals(storedSecret)));
         Assertions.assertEquals(20, page.getPageSize());
 
-        SecretLockInfo infoSearch = page.getData().stream().filter(m -> m.getSecret().equals(secret)).findFirst().get();
+        SecretLockInfo infoSearch = page.getData().stream().filter(m -> m.getSecret().equals(storedSecret)).findFirst()
+            .get();
         Assertions.assertNotNull(infoSearch);
         Assertions.assertEquals(account.getAddress(), infoSearch.getOwnerAddress());
         Assertions.assertEquals(account2.getAddress(), infoSearch.getRecipientAddress());
         Assertions.assertEquals(amount, infoSearch.getAmount());
         Assertions.assertEquals(secretHashAlgorithm, infoSearch.getHashAlgorithm());
         Assertions.assertEquals(1, infoSearch.getStatus());
-        Assertions.assertEquals(secret, infoSearch.getSecret());
+        Assertions.assertEquals(storedSecret, infoSearch.getSecret());
 
 
     }

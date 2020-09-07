@@ -43,6 +43,15 @@ public enum SecretHashAlgorithm implements Hasher {
      * The regex used to validate a hashed value.
      */
     public static final String VALIDATOR_REGEX = "-?[0-9a-fA-F]+";
+    /**
+     * The default size used for secret hashes.
+     */
+    public static final int DEFAULT_SECRET_BYTE_ARRAY_SIZE = 32;
+
+    /**
+     * The default size used for secret hashes.
+     */
+    public static final int DEFAULT_SECRET_HEX_SIZE = DEFAULT_SECRET_BYTE_ARRAY_SIZE * 2;
 
     /**
      * The catbuffer and open api value of this type
@@ -76,9 +85,9 @@ public enum SecretHashAlgorithm implements Hasher {
             return false;
         }
         if (hashType == SecretHashAlgorithm.HASH_160) {
-            return input.length() == 64 || input.length() == 40;
+            return input.length() == DEFAULT_SECRET_HEX_SIZE || input.length() == 40;
         }
-        return input.length() == 64;
+        return input.length() == DEFAULT_SECRET_HEX_SIZE;
     }
 
     /**

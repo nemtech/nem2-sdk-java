@@ -220,6 +220,21 @@ public class ConvertUtilsTest {
         Assertions.assertEquals(hex, ConvertUtils.reverseHexString(reverseHex));
     }
 
+    @Test
+    void padHex() {
+        Assertions.assertEquals("F8CBC85DAC0BA67AD8E3196814F5ABED2149B41D000000000000000000000000",
+            ConvertUtils.padHex("F8CBC85DAC0BA67AD8E3196814F5ABED2149B41D", 64));
+
+        Assertions.assertEquals("F8CBC85DAC0BA67AD8E3196814F5ABED2149B41D",
+            ConvertUtils.padHex("F8CBC85DAC0BA67AD8E3196814F5ABED2149B41D", 40));
+
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
+            () -> ConvertUtils.padHex("F8CBC85DAC0BA67AD8E3196814F5ABED2149B41D", 20));
+        Assertions.assertEquals("Hex F8CBC85DAC0BA67AD8E3196814F5ABED2149B41D size must be at least 20",
+            exception.getMessage());
+    }
+
+
     private void assertIsHexString(String input, Integer size, String errorMessage) {
         try {
             if (size == null) {

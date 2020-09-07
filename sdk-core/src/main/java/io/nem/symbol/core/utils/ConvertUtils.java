@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -72,6 +73,18 @@ public class ConvertUtils {
         final Hex codec = new Hex();
         final byte[] decodedBytes = codec.encode(bytes);
         return StringEncoder.getString(decodedBytes).toUpperCase();
+    }
+
+    /**
+     * Adds 0 to the left of the hex to convert the hex to the right size.
+     *
+     * @param hex the hex
+     * @param hexStringSize the expected hex string size
+     * @return the hex with 0.
+     */
+    public static String padHex(final String hex, int hexStringSize) {
+        Validate.isTrue(hex.length() <= hexStringSize, "Hex " + hex + " size must be at least " + hexStringSize);
+        return StringUtils.rightPad(hex, hexStringSize, '0');
     }
 
     /**
