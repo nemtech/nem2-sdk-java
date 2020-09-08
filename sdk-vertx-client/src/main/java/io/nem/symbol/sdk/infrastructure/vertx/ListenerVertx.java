@@ -22,12 +22,15 @@ import io.nem.symbol.sdk.infrastructure.ListenerBase;
 import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.symbol.sdk.infrastructure.TransactionMapper;
 import io.nem.symbol.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
+import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.openapi.vertx.model.BlockInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.Cosignature;
+import io.reactivex.Observable;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.RequestOptions;
 import io.vertx.core.http.WebSocket;
@@ -56,11 +59,17 @@ public class ListenerVertx extends ListenerBase implements Listener {
    * @param httpClient the http client instance.
    * @param url of the host
    * @param namespaceRepository the namespace repository used to resolve alias.
+   * @param networkTypeObservable the network type
    */
-  public ListenerVertx(HttpClient httpClient, String url, NamespaceRepository namespaceRepository) {
+  public ListenerVertx(
+      HttpClient httpClient,
+      String url,
+      NamespaceRepository namespaceRepository,
+      Observable<NetworkType> networkTypeObservable) {
     super(
         new JsonHelperJackson2(JsonHelperJackson2.configureMapper(Json.mapper)),
-        namespaceRepository);
+        namespaceRepository,
+        networkTypeObservable);
     try {
       this.url = new URL(url);
     } catch (MalformedURLException e) {
@@ -110,13 +119,14 @@ public class ListenerVertx extends ListenerBase implements Listener {
   }
 
   @Override
-  protected CosignatureSignedTransaction toCosignatureSignedTransaction(Object cosignatureJson) {
+  protected CosignatureSignedTransaction toCosignatureSignedTransaction(
+      Object cosignatureJson, NetworkType networkType) {
     Cosignature cosignature = getJsonHelper().convert(cosignatureJson, Cosignature.class);
     return new CosignatureSignedTransaction(
         cosignature.getVersion(),
         cosignature.getParentHash(),
         cosignature.getSignature(),
-        cosignature.getSignerPublicKey());
+        PublicAccount.createFromPublicKey(cosignature.getSignerPublicKey(), networkType));
   }
 
   /** Close webSocket connection */

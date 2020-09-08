@@ -23,12 +23,15 @@ import io.nem.symbol.sdk.infrastructure.ListenerBase;
 import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.symbol.sdk.infrastructure.TransactionMapper;
 import io.nem.symbol.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
+import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.BlockInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Cosignature;
+import io.reactivex.Observable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
@@ -58,10 +61,15 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
    * @param url nis host
    * @param gson gson's gson.
    * @param namespaceRepository the namespace repository used to resolve alias.
+   * @param networkTypeObservable the network type;
    */
   public ListenerOkHttp(
-      OkHttpClient httpClient, String url, Gson gson, NamespaceRepository namespaceRepository) {
-    super(new JsonHelperGson(gson), namespaceRepository);
+      OkHttpClient httpClient,
+      String url,
+      Gson gson,
+      NamespaceRepository namespaceRepository,
+      Observable<NetworkType> networkTypeObservable) {
+    super(new JsonHelperGson(gson), namespaceRepository, networkTypeObservable);
     try {
       this.url = new URL(url);
     } catch (MalformedURLException e) {
@@ -109,13 +117,14 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
   }
 
   @Override
-  protected CosignatureSignedTransaction toCosignatureSignedTransaction(Object cosignatureJson) {
+  protected CosignatureSignedTransaction toCosignatureSignedTransaction(
+      Object cosignatureJson, NetworkType networkType) {
     Cosignature cosignature = getJsonHelper().convert(cosignatureJson, Cosignature.class);
     return new CosignatureSignedTransaction(
         cosignature.getVersion(),
         cosignature.getParentHash(),
         cosignature.getSignature(),
-        cosignature.getSignerPublicKey());
+        PublicAccount.createFromPublicKey(cosignature.getSignerPublicKey(), networkType));
   }
 
   /** Close webSocket connection */

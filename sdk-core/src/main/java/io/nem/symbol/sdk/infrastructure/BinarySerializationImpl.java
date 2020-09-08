@@ -1563,10 +1563,8 @@ public class BinarySerializationImpl implements BinarySerialization {
           SerializationUtils.toPublicAccount(cosignatureBuilder.getSignerPublicKey(), networkType);
       String cosignature =
           SerializationUtils.toHexString(cosignatureBuilder.getSignature().getSignature());
-      return new AggregateTransactionCosignature(
-          SerializationUtils.toUnsignedBigInteger(cosignatureBuilder.getVersion()),
-          cosignature,
-          signer);
+      BigInteger version = SerializationUtils.toUnsignedBigInteger(cosignatureBuilder.getVersion());
+      return new AggregateTransactionCosignature(version, cosignature, signer);
     }
 
     @Override

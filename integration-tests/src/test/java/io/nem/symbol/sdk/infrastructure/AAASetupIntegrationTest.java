@@ -45,7 +45,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -102,8 +101,6 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
     setAddressAlias(type, config().getMultisigAccount().getAddress(), "multisig-account");
     createMultisigAccountBonded(
         config().getMultisigAccount(),
-        accountRepository1 ->
-            get(accountRepository1.getAccountInfo(config().getMultisigAccount().getAddress())),
         config().getCosignatoryAccount(),
         config().getCosignatory2Account());
   }
@@ -124,22 +121,17 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
     System.out.println(config().getNemesisAccount7().getAddress().encoded());
     createMultisigAccountBonded(
         config().getNemesisAccount8(),
-        accountRepository1 ->
-            get(accountRepository1.getAccountInfo(config().getNemesisAccount8().getAddress())),
         config().getNemesisAccount9(),
         config().getNemesisAccount10());
   }
 
-  private void createMultisigAccountBonded(
-      Account multisigAccount,
-      Function<AccountRepository, AccountInfo> function,
-      Account... accounts) {
+  private void createMultisigAccountBonded(Account multisigAccount, Account... accounts) {
 
     AccountRepository accountRepository = getRepositoryFactory(type).createAccountRepository();
 
     MultisigRepository multisigRepository = getRepositoryFactory(type).createMultisigRepository();
 
-    AccountInfo accountInfo = function.apply(accountRepository);
+    AccountInfo accountInfo = get(accountRepository.getAccountInfo(multisigAccount.getAddress()));
     System.out.println(jsonHelper().print(accountInfo));
 
     try {

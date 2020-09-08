@@ -58,7 +58,7 @@ We enjoy working with contributors to get their code accepted. There are many ap
 important to find the best approach before writing too much code.
 
 ### Code styles
-This SDK project applies [Google Code Style](https://source.android.com/setup/contribute/code-style).
+This SDK project applies [Google Code Style](https://google.github.io/styleguide/javaguide.html).
 
 Intellij users can use [google-java-format](https://plugins.jetbrains.com/plugin/8527-google-java-format) plugin. Remember to enable it.
 

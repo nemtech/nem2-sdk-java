@@ -24,6 +24,7 @@ import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -45,8 +46,8 @@ public class AggregateTransaction extends Transaction {
   AggregateTransaction(AggregateTransactionFactory factory) {
     super(factory);
     this.transactionsHash = factory.getTransactionsHash();
-    this.innerTransactions = factory.getInnerTransactions();
-    this.cosignatures = factory.getCosignatures();
+    this.innerTransactions = Collections.unmodifiableList(factory.getInnerTransactions());
+    this.cosignatures = Collections.unmodifiableList(factory.getCosignatures());
   }
 
   /**

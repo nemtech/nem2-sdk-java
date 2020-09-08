@@ -23,6 +23,8 @@ import io.nem.symbol.sdk.infrastructure.BinarySerializationImpl;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 
@@ -31,7 +33,7 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
 
   public static final int COSIGNATURE_SIZE = 104;
 
-  private String transactionsHash;
+  private final String transactionsHash;
 
   private final List<Transaction> innerTransactions;
 
@@ -52,8 +54,8 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
     Validate.notNull(cosignatures, "Cosignatures must not be null");
     ConvertUtils.validateIsHexString(theTransactionsHash, 64);
     this.transactionsHash = theTransactionsHash;
-    this.innerTransactions = innerTransactions;
-    this.cosignatures = cosignatures;
+    this.innerTransactions = Collections.unmodifiableList(innerTransactions);
+    this.cosignatures = new ArrayList<>(cosignatures);
   }
 
   /**
@@ -175,6 +177,19 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
    */
   public List<AggregateTransactionCosignature> getCosignatures() {
     return cosignatures;
+  }
+
+  /**
+   * Adds cosignatures to the factory if they have been signed independently
+   *
+   * @param newCosignatures new cosignatures to add
+   * @return this builder.
+   */
+  public AggregateTransactionFactory addCosignatures(
+      AggregateTransactionCosignature... newCosignatures) {
+    Validate.notNull(newCosignatures, "newCosignatures is required");
+    this.cosignatures.addAll(Arrays.asList(newCosignatures));
+    return this;
   }
 
   /** @return Aggregate hash of an aggregate's transactions */

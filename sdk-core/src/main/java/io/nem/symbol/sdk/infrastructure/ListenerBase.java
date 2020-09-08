@@ -21,6 +21,7 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.namespace.NamespaceName;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
@@ -59,11 +60,17 @@ public abstract class ListenerBase implements Listener {
 
   private final NamespaceRepository namespaceRepository;
 
+  private final Observable<NetworkType> networkTypeObservable;
+
   private String uid;
 
-  protected ListenerBase(JsonHelper jsonHelper, NamespaceRepository namespaceRepository) {
+  protected ListenerBase(
+      JsonHelper jsonHelper,
+      NamespaceRepository namespaceRepository,
+      Observable<NetworkType> networkTypeObservable) {
     this.jsonHelper = jsonHelper;
     this.namespaceRepository = namespaceRepository;
+    this.networkTypeObservable = networkTypeObservable;
   }
 
   /**
@@ -98,7 +105,10 @@ public abstract class ListenerBase implements Listener {
         onNext(channel, channelParams, toStatus(message, channelParams));
         break;
       case COSIGNATURE:
-        onNext(channel, channelParams, toCosignatureSignedTransaction(message));
+        networkTypeObservable.subscribe(
+            networkType ->
+                onNext(
+                    channel, channelParams, toCosignatureSignedTransaction(message, networkType)));
         break;
       case AGGREGATE_BONDED_REMOVED:
       case UNCONFIRMED_REMOVED:
@@ -232,7 +242,7 @@ public abstract class ListenerBase implements Listener {
             throw new TransactionStatusException(
                 caller, (TransactionStatusError) errorOrTransaction);
           } else {
-            // noinspection unchecked
+            //noinspection unchecked
             return (T) errorOrTransaction;
           }
         });
@@ -446,10 +456,11 @@ public abstract class ListenerBase implements Listener {
    * using the generated DTOs of the implementation.
    *
    * @param cosignature the generic json
+   * @param networkType networkType
    * @return the model {@link CosignatureSignedTransaction}
    */
   protected abstract CosignatureSignedTransaction toCosignatureSignedTransaction(
-      Object cosignature);
+      Object cosignature, NetworkType networkType);
 
   protected abstract void subscribeTo(String channel);
 

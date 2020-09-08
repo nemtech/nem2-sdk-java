@@ -67,7 +67,7 @@ public class CosignatureTransaction {
   }
 
   /**
-   * Serialize and sign transaction creating a new SignedTransaction.
+   * Serialize and sign transaction creating a new CosignatureSignedTransaction.
    *
    * @param account Account
    * @return {@link CosignatureSignedTransaction}
@@ -80,6 +80,6 @@ public class CosignatureTransaction {
         AggregateTransactionCosignature.DEFAULT_VERSION,
         transactionHash,
         ConvertUtils.toHex(signatureBytes),
-        account.getPublicKey());
+        account.getPublicAccount());
   }
 }

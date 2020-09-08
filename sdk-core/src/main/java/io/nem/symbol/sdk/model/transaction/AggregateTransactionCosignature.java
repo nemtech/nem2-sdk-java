@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import java.math.BigInteger;
+import org.apache.commons.lang3.Validate;
 
 /**
  * The model representing cosignature of an aggregate transaction.
@@ -32,6 +33,9 @@ public class AggregateTransactionCosignature {
 
   public AggregateTransactionCosignature(
       BigInteger version, String signature, PublicAccount signer) {
+    Validate.notNull(version, "version is required");
+    Validate.notNull(signature, "signature is required");
+    Validate.notNull(signer, "signer is required");
     this.version = version;
     this.signature = signature;
     this.signer = signer;

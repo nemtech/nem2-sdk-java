@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -84,5 +85,39 @@ class NetworkCurrencyTest {
     Assertions.assertEquals(namespaceId, networkCurrency.getNamespaceId().get());
     Assertions.assertEquals(namespaceId, networkCurrency.getUnresolvedMosaicId());
     assertEquals(mosaicId, networkCurrency.getMosaicId().get());
+  }
+
+  @Test
+  void createMosaicWithIntegers() {
+    NamespaceId namespaceId = NamespaceId.createFromName("mycurrency");
+    NetworkCurrency networkCurrency =
+        new NetworkCurrencyBuilder(namespaceId, 3)
+            .withSupplyMutable(false)
+            .withTransferable(true)
+            .build();
+    Mosaic mosaic1 = networkCurrency.createRelative(15);
+    Mosaic mosaic2 = networkCurrency.createRelative(BigInteger.valueOf(15));
+    Mosaic mosaic3 = networkCurrency.createAbsolute(15000);
+    Assertions.assertEquals(mosaic1, mosaic2);
+    Assertions.assertEquals(mosaic1, mosaic3);
+  }
+
+  @Test
+  void createMosaicWithDecimals() {
+    NamespaceId namespaceId = NamespaceId.createFromName("mycurrency");
+    NetworkCurrency networkCurrency =
+        new NetworkCurrencyBuilder(namespaceId, 3)
+            .withSupplyMutable(false)
+            .withTransferable(true)
+            .build();
+    Mosaic mosaic1 = networkCurrency.createRelative(15.2);
+    Mosaic mosaic2 = networkCurrency.createRelative(BigDecimal.valueOf(15.2));
+    Mosaic mosaic3 = networkCurrency.createAbsolute(15200);
+    Mosaic mosaic4 = networkCurrency.createRelative(15.2004);
+    Mosaic mosaic5 = networkCurrency.createRelative(BigDecimal.valueOf(15.2004));
+    Assertions.assertEquals(mosaic1, mosaic2);
+    Assertions.assertEquals(mosaic1, mosaic3);
+    Assertions.assertEquals(mosaic1, mosaic4);
+    Assertions.assertEquals(mosaic1, mosaic5);
   }
 }

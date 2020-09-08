@@ -258,9 +258,11 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
   @Test
   public void announceAggregateBondedCosignature() throws Exception {
 
+    Account signer = Account.generateNewAccount(networkType);
     BigInteger version = AggregateTransactionCosignature.DEFAULT_VERSION;
     CosignatureSignedTransaction signedTransaction =
-        new CosignatureSignedTransaction(version, "aParentHash", "aSignature", "aSigner");
+        new CosignatureSignedTransaction(
+            version, "aParentHash", "aSignature", signer.getPublicAccount());
 
     AnnounceTransactionInfoDTO announceTransactionInfoDTO = new AnnounceTransactionInfoDTO();
     announceTransactionInfoDTO.setMessage("SomeMessage");
@@ -279,7 +281,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     Assertions.assertEquals(signedTransaction.getParentHash(), cosignature.getParentHash());
     Assertions.assertEquals(signedTransaction.getSignature(), cosignature.getSignature());
     Assertions.assertEquals(
-        signedTransaction.getSignerPublicKey(), cosignature.getSignerPublicKey());
+        signedTransaction.getSigner().getPublicKey().toHex(), cosignature.getSignerPublicKey());
     Assertions.assertEquals(signedTransaction.getVersion(), cosignature.getVersion());
   }
 

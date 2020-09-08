@@ -97,10 +97,9 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
   void shouldReturnConfirmedTransactionAddressSignerViaListener(RepositoryType type) {
     Listener listener = getListener(type);
 
-    // listener.unconfirmedAdded(getRecipient()).forEach(t ->
-    // System.out.println(toJson(t)));
-    // listener.unconfirmedAdded(this.account.getAddress())
-    // .forEach(t -> System.out.println(toJson(t)));
+    //        listener.unconfirmedAdded(getRecipient()).forEach(t -> System.out.println(toJson(t)));
+    //        listener.unconfirmedAdded(this.account.getAddress())
+    //            .forEach(t -> System.out.println(toJson(t)));
 
     Observable<Transaction> confirmed = listener.confirmed(this.account.getAddress());
 
@@ -213,7 +212,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
         get(listener.cosignatureAdded(this.cosignatoryAccount.getAddress()));
 
     assertEquals(
-        cosignatureSignedTransaction.getSignerPublicKey(), this.cosignatoryAccount2.getPublicKey());
+        cosignatureSignedTransaction.getSigner(), this.cosignatoryAccount2.getPublicAccount());
   }
 
   @ParameterizedTest

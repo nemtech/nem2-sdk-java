@@ -73,9 +73,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
     // 3) Announce the create restriction transaction
     MosaicGlobalRestrictionTransaction processedCreateTransaction =
         announceAndValidate(type, testAccount, createTransaction);
-    // 4) Validate that the received processedCreateTransaction and the create
-    // transaction are
-    // the
+    // 4) Validate that the received processedCreateTransaction and the create transaction are the
     // same
     assertTransaction(createTransaction, processedCreateTransaction);
 
@@ -92,8 +90,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
         get(restrictionRepository.getMosaicGlobalRestrictions(Collections.singletonList(mosaicId)))
             .get(0));
 
-    // 6) Modifying the restriction by sending a new transaction with the previous
-    // values.
+    // 6) Modifying the restriction by sending a new transaction with the previous values.
     MosaicGlobalRestrictionTransaction updateTransaction =
         MosaicGlobalRestrictionTransactionFactory.create(
                 getNetworkType(),
@@ -106,8 +103,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
             .maxFee(this.maxFee)
             .build();
 
-    // 7) Announcing the update restriction transaction and checking the processed
-    // one.
+    // 7) Announcing the update restriction transaction and checking the processed one.
     MosaicGlobalRestrictionTransaction processedUpdateTransaction =
         announceAndValidate(type, testAccount, updateTransaction);
 

@@ -155,4 +155,12 @@ public class MosaicInfo implements Stored {
   public Optional<String> getRecordId() {
     return Optional.ofNullable(recordId);
   }
+
+  /** @return a network currency that can be used to create mosiac. */
+  public NetworkCurrency toNetworkCurrency() {
+    return new NetworkCurrencyBuilder(getMosaicId(), getDivisibility())
+        .withTransferable(isTransferable())
+        .withSupplyMutable(isSupplyMutable())
+        .build();
+  }
 }

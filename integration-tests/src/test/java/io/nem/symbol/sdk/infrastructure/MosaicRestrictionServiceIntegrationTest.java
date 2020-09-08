@@ -35,8 +35,9 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest {
 
-  private final BigInteger restrictionKey = BigInteger.valueOf(11111);
   private Account testAccount;
+
+  private BigInteger restrictionKey = BigInteger.valueOf(11111);
 
   @BeforeEach
   void setup() {
@@ -60,15 +61,13 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
     MosaicGlobalRestrictionTransaction createTransaction =
         get(restrictionService.createMosaicGlobalRestrictionTransactionFactory(
                 mosaicId, restrictionKey, originalValue, originalRestrictionType))
-            .maxFee(maxFee)
+            .maxFee(this.maxFee)
             .build();
 
     // 3) Announce the create restriction transaction
     MosaicGlobalRestrictionTransaction processedCreateTransaction =
         announceAndValidate(type, testAccount, createTransaction);
-    // 4) Validate that the received processedCreateTransaction and the create
-    // transaction are
-    // the
+    // 4) Validate that the received processedCreateTransaction and the create transaction are the
     // same
     assertTransaction(createTransaction, processedCreateTransaction);
 
@@ -85,16 +84,14 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
         get(restrictionRepository.getMosaicGlobalRestrictions(Collections.singletonList(mosaicId)))
             .get(0));
 
-    // 6) Modifying the restriction by sending a new transaction with the previous
-    // values.
+    // 6) Modifying the restriction by sending a new transaction with the previous values.
     MosaicGlobalRestrictionTransaction updateTransaction =
         get(restrictionService.createMosaicGlobalRestrictionTransactionFactory(
                 mosaicId, restrictionKey, BigInteger.valueOf(40), MosaicRestrictionType.EQ))
-            .maxFee(maxFee)
+            .maxFee(this.maxFee)
             .build();
 
-    // 7) Announcing the update restriction transaction and checking the processed
-    // one.
+    // 7) Announcing the update restriction transaction and checking the processed one.
     MosaicGlobalRestrictionTransaction processedUpdateTransaction =
         announceAndValidate(type, testAccount, updateTransaction);
 
@@ -184,15 +181,13 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
     MosaicGlobalRestrictionTransaction createTransaction =
         get(restrictionService.createMosaicGlobalRestrictionTransactionFactory(
                 mosaicId, restrictionKey, originalValue, originalRestrictionType))
-            .maxFee(maxFee)
+            .maxFee(this.maxFee)
             .build();
 
     // 3) Announce the create restriction transaction
     MosaicGlobalRestrictionTransaction processedCreateTransaction =
         announceAndValidate(type, testAccount, createTransaction);
-    // 4) Validate that the received processedCreateTransaction and the create
-    // transaction are
-    // the
+    // 4) Validate that the received processedCreateTransaction and the create transaction are the
     // same
     assertTransaction(createTransaction, processedCreateTransaction);
 
@@ -213,17 +208,16 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
     MosaicAddressRestrictionTransaction createAddressTransaction =
         get(restrictionService.createMosaicAddressRestrictionTransactionFactory(
                 mosaicId, restrictionKey, testAccount.getAddress(), BigInteger.valueOf(40)))
-            .maxFee(maxFee)
+            .maxFee(this.maxFee)
             .build();
 
     announceAndValidate(type, testAccount, createAddressTransaction);
 
-    // 7) Announcing the update restriction transaction and checking the processed
-    // one.
+    // 7) Announcing the update restriction transaction and checking the processed one.
     MosaicAddressRestrictionTransaction updateAddressTransaction =
         get(restrictionService.createMosaicAddressRestrictionTransactionFactory(
                 mosaicId, restrictionKey, testAccount.getAddress(), BigInteger.valueOf(50)))
-            .maxFee(maxFee)
+            .maxFee(this.maxFee)
             .build();
 
     MosaicAddressRestrictionTransaction finalTransaction =
@@ -253,15 +247,13 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
     MosaicGlobalRestrictionTransaction createTransaction =
         get(restrictionService.createMosaicGlobalRestrictionTransactionFactory(
                 mosaicAlias, restrictionKey, originalValue, originalRestrictionType))
-            .maxFee(maxFee)
+            .maxFee(this.maxFee)
             .build();
 
     // 3) Announce the create restriction transaction
     MosaicGlobalRestrictionTransaction processedCreateTransaction =
         announceAndValidate(type, testAccount, createTransaction);
-    // 4) Validate that the received processedCreateTransaction and the create
-    // transaction are
-    // the
+    // 4) Validate that the received processedCreateTransaction and the create transaction are the
     // same
     assertTransaction(createTransaction, processedCreateTransaction);
 
@@ -282,17 +274,16 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
     MosaicAddressRestrictionTransaction createAddressTransaction =
         get(restrictionService.createMosaicAddressRestrictionTransactionFactory(
                 mosaicAlias, restrictionKey, testAccount.getAddress(), BigInteger.valueOf(40)))
-            .maxFee(maxFee)
+            .maxFee(this.maxFee)
             .build();
 
     announceAndValidate(type, testAccount, createAddressTransaction);
 
-    // 7) Announcing the update restriction transaction and checking the processed
-    // one.
+    // 7) Announcing the update restriction transaction and checking the processed one.
     MosaicAddressRestrictionTransaction updateAddressTransaction =
         get(restrictionService.createMosaicAddressRestrictionTransactionFactory(
                 mosaicAlias, restrictionKey, testAccount.getAddress(), BigInteger.valueOf(50)))
-            .maxFee(maxFee)
+            .maxFee(this.maxFee)
             .build();
 
     MosaicAddressRestrictionTransaction finalTransaction =

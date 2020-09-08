@@ -116,7 +116,8 @@ public class TransactionRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImp
                         .parentHash(cosignatureSignedTransaction.getParentHash())
                         .signature(cosignatureSignedTransaction.getSignature())
                         .version(cosignatureSignedTransaction.getVersion())
-                        .signerPublicKey(cosignatureSignedTransaction.getSignerPublicKey()));
+                        .signerPublicKey(
+                            cosignatureSignedTransaction.getSigner().getPublicKey().toHex()));
     return call(callback, dto -> new TransactionAnnounceResponse(dto.getMessage()));
   }
 

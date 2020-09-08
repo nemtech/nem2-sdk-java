@@ -133,6 +133,26 @@ public class NetworkCurrency {
    * @param amount amount to send
    * @return a NetworkCurrencyMosaic instance
    */
+  public Mosaic createRelative(double amount) {
+    return createRelative(BigDecimal.valueOf(amount));
+  }
+
+  /**
+   * Create xem with using xem as unit.
+   *
+   * @param amount amount to send
+   * @return a NetworkCurrencyMosaic instance
+   */
+  public Mosaic createRelative(long amount) {
+    return createRelative(BigInteger.valueOf(amount));
+  }
+
+  /**
+   * Create xem with using xem as unit.
+   *
+   * @param amount amount to send
+   * @return a NetworkCurrencyMosaic instance
+   */
   public Mosaic createRelative(BigDecimal amount) {
     BigInteger relativeAmount =
         BigDecimal.valueOf(Math.pow(10, getDivisibility())).multiply(amount).toBigInteger();
@@ -160,6 +180,17 @@ public class NetworkCurrency {
    */
   public Mosaic createAbsolute(BigInteger amount) {
     return new Mosaic(getUnresolvedMosaicId(), amount);
+  }
+
+  /**
+   * Create xem with using micro xem as unit, 1 NetworkCurrencyMosaic = 1000000 micro
+   * NetworkCurrencyMosaic.
+   *
+   * @param amount amount to send
+   * @return a NetworkCurrencyMosaic instance
+   */
+  public Mosaic createAbsolute(long amount) {
+    return createAbsolute(BigInteger.valueOf(amount));
   }
 
   @Override

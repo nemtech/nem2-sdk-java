@@ -119,7 +119,9 @@ public class ListenerVertxTest {
     httpClientMock = Mockito.mock(HttpClient.class);
     String url = "http://nem.com:3000/";
     namespaceRepository = Mockito.mock(NamespaceRepository.class);
-    listener = new ListenerVertx(httpClientMock, url, namespaceRepository);
+    listener =
+        new ListenerVertx(
+            httpClientMock, url, namespaceRepository, Observable.just(NetworkType.MIJIN_TEST));
     jsonHelper = listener.getJsonHelper();
     webSocketMock = Mockito.mock(WebSocket.class);
   }
@@ -173,6 +175,7 @@ public class ListenerVertxTest {
         new Cosignature()
             .parentHash("aParentHash")
             .signature("aSignature")
+            .version(BigInteger.ONE)
             .signerPublicKey(Account.generateNewAccount(networkType).getPublicKey());
 
     ObjectNode transactionInfoDtoJsonObject = jsonHelper.convert(cosignature, ObjectNode.class);
@@ -189,7 +192,7 @@ public class ListenerVertxTest {
     Assertions.assertEquals(1, transactions.size());
 
     Assertions.assertEquals(
-        cosignature.getSignerPublicKey(), transactions.get(0).getSignerPublicKey());
+        cosignature.getSignerPublicKey(), transactions.get(0).getSigner().getPublicKey().toHex());
     Assertions.assertEquals(cosignature.getParentHash(), transactions.get(0).getParentHash());
     Assertions.assertEquals(cosignature.getSignature(), transactions.get(0).getSignature());
     Mockito.verify(webSocketMock).handler(Mockito.any());
@@ -909,6 +912,7 @@ public class ListenerVertxTest {
     Account account1 = Account.generateNewAccount(NETWORK_TYPE);
     Account account2 = Account.generateNewAccount(NETWORK_TYPE);
     Account account3 = Account.generateNewAccount(NETWORK_TYPE);
+    Account account4 = Account.generateNewAccount(NETWORK_TYPE);
     NamespaceId alias1 = NamespaceId.createFromName("alias1");
     NamespaceId alias2 = NamespaceId.createFromName("alias2");
     Transaction hashLockTransaction = hashLockTransaction(account2.getPublicAccount());
@@ -1026,7 +1030,7 @@ public class ListenerVertxTest {
             listener,
             aggregateTransaction(
                 account2.getPublicAccount(),
-                null,
+                account4.getPublicAccount(),
                 transferTransaction2,
                 hashLockTransaction,
                 transferTransaction1),

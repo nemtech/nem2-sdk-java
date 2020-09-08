@@ -17,20 +17,24 @@ package io.nem.symbol.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.network.NetworkType;
 import org.junit.jupiter.api.Test;
 
 public class CosignatureSignedTransactionTest {
 
   @Test
   void createACosignatureSignedTransactionViaConstructor() {
+    PublicAccount signer = Account.generateNewAccount(NetworkType.MIJIN_TEST).getPublicAccount();
     CosignatureSignedTransaction cosignatureSignedTransaction =
         new CosignatureSignedTransaction(
-            AggregateTransactionCosignature.DEFAULT_VERSION, "parentHash", "signature", "signer");
+            AggregateTransactionCosignature.DEFAULT_VERSION, "parentHash", "signature", signer);
 
     assertEquals(
         AggregateTransactionCosignature.DEFAULT_VERSION, cosignatureSignedTransaction.getVersion());
     assertEquals("parentHash", cosignatureSignedTransaction.getParentHash());
     assertEquals("signature", cosignatureSignedTransaction.getSignature());
-    assertEquals("signer", cosignatureSignedTransaction.getSignerPublicKey());
+    assertEquals(signer, cosignatureSignedTransaction.getSigner());
   }
 }

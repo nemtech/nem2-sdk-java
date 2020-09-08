@@ -32,6 +32,8 @@ import io.nem.symbol.sdk.model.transaction.TransactionStatusError;
 import io.nem.symbol.sdk.model.transaction.TransactionStatusException;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Cosignature;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
+import io.reactivex.Observable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,6 +70,8 @@ public class ListenerOkHttpTest {
 
   private final String wsId = "TheWSid";
 
+  private NetworkType networkType = NetworkType.MIJIN_TEST;
+
   @BeforeEach
   public void setUp() {
     httpClientMock = Mockito.mock(OkHttpClient.class);
@@ -75,7 +79,11 @@ public class ListenerOkHttpTest {
     String url = "http://nem.com:3000/";
     listener =
         new ListenerOkHttp(
-            httpClientMock, url, JsonHelperGson.creatGson(false), namespaceRepository);
+            httpClientMock,
+            url,
+            JsonHelperGson.creatGson(false),
+            namespaceRepository,
+            Observable.defer(() -> Observable.just(networkType)));
     jsonHelper = listener.getJsonHelper();
   }
 
@@ -135,7 +143,7 @@ public class ListenerOkHttpTest {
     Address address =
         Address.createFromPublicKey(
             jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
-            NetworkType.MIJIN_TEST);
+            networkType);
 
     String channelName = ListenerChannel.CONFIRMED_ADDED.toString();
 
@@ -158,11 +166,11 @@ public class ListenerOkHttpTest {
   public void cosignatureAdded() throws InterruptedException, ExecutionException, TimeoutException {
     simulateWebSocketStartup();
 
-    NetworkType networkType = NetworkType.MIJIN_TEST;
     Cosignature cosignature =
         new Cosignature()
             .parentHash("aParentHash")
             .signature("aSignature")
+            .version(BigInteger.ONE)
             .signerPublicKey(Account.generateNewAccount(networkType).getPublicKey());
 
     JsonObject transactionInfoDtoJsonObject = jsonHelper.convert(cosignature, JsonObject.class);
@@ -179,7 +187,7 @@ public class ListenerOkHttpTest {
     Assertions.assertEquals(1, transactions.size());
 
     Assertions.assertEquals(
-        cosignature.getSignerPublicKey(), transactions.get(0).getSignerPublicKey());
+        cosignature.getSignerPublicKey(), transactions.get(0).getSigner().getPublicKey().toHex());
     Assertions.assertEquals(cosignature.getParentHash(), transactions.get(0).getParentHash());
     Assertions.assertEquals(cosignature.getSignature(), transactions.get(0).getSignature());
 
@@ -202,7 +210,7 @@ public class ListenerOkHttpTest {
     Address address =
         Address.createFromPublicKey(
             jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
-            NetworkType.MIJIN_TEST);
+            networkType);
 
     String channelName = ListenerChannel.CONFIRMED_ADDED.toString();
 
@@ -244,7 +252,7 @@ public class ListenerOkHttpTest {
     Address address =
         Address.createFromPublicKey(
             jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
-            NetworkType.MIJIN_TEST);
+            networkType);
 
     String channelName = ListenerChannel.CONFIRMED_ADDED.toString();
 
@@ -294,7 +302,7 @@ public class ListenerOkHttpTest {
     Address address =
         Address.createFromPublicKey(
             jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
-            NetworkType.MIJIN_TEST);
+            networkType);
 
     String channelName = ListenerChannel.AGGREGATE_BONDED_ADDED.toString();
 
@@ -342,7 +350,7 @@ public class ListenerOkHttpTest {
     Address address =
         Address.createFromPublicKey(
             jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
-            NetworkType.MIJIN_TEST);
+            networkType);
 
     String channelName = ListenerChannel.AGGREGATE_BONDED_ADDED.toString();
 
@@ -407,7 +415,7 @@ public class ListenerOkHttpTest {
   @Test
   public void shouldHandleStatus()
       throws InterruptedException, ExecutionException, TimeoutException {
-    Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+    Account account1 = Account.generateNewAccount(networkType);
 
     AtomicReference<TransactionStatusError> reference = new AtomicReference<>();
 
@@ -437,8 +445,8 @@ public class ListenerOkHttpTest {
   @Test
   public void shouldFilterOutHandleStatus()
       throws InterruptedException, ExecutionException, TimeoutException {
-    Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
-    Account account2 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+    Account account1 = Account.generateNewAccount(networkType);
+    Account account2 = Account.generateNewAccount(networkType);
 
     AtomicReference<TransactionStatusError> reference = new AtomicReference<>();
 

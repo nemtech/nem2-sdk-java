@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.model.mosaic;
 
 import io.nem.symbol.core.utils.ConvertUtils;
 import java.math.BigInteger;
+import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -65,5 +66,22 @@ public class Mosaic {
    */
   public BigInteger getAmount() {
     return amount;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Mosaic mosaic = (Mosaic) o;
+    return Objects.equals(id, mosaic.id) && Objects.equals(amount, mosaic.amount);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, amount);
   }
 }

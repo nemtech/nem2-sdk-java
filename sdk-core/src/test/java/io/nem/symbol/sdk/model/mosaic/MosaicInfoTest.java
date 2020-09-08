@@ -59,6 +59,32 @@ class MosaicInfoTest {
   }
 
   @Test
+  void toNetworkCurrency() {
+    MosaicFlags mosaicFlags = MosaicFlags.create(true, true, true);
+    MosaicId mosaicId = new MosaicId(new BigInteger("-3087871471161192663"));
+
+    Address address = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
+    MosaicInfo mosaicInfo =
+        new MosaicInfo(
+            "abc",
+            mosaicId,
+            new BigInteger("100"),
+            new BigInteger("0"),
+            address,
+            1L,
+            mosaicFlags,
+            3,
+            BigInteger.valueOf(10));
+
+    NetworkCurrency networkCurrency = mosaicInfo.toNetworkCurrency();
+    assertEquals(mosaicId, networkCurrency.getMosaicId().get());
+    assertFalse(networkCurrency.getNamespaceId().isPresent());
+    assertTrue(networkCurrency.isSupplyMutable());
+    assertTrue(networkCurrency.isTransferable());
+    assertEquals(3, networkCurrency.getDivisibility());
+  }
+
+  @Test
   void shouldReturnIsSupplyMutableWhenIsMutable() {
     MosaicFlags mosaicFlags = MosaicFlags.create(true, true, true);
 
