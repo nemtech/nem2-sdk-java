@@ -13,49 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
-
 package io.nem.symbol.sdk.model.network;
-
-/**
- * NetworkConfiguration
- */
+/** NetworkConfiguration */
 public class NetworkConfiguration {
 
-    /**
-     * Network configuration.
-     */
-    private final NetworkProperties network;
+  /** Network configuration. */
+  private final NetworkProperties network;
 
-    /**
-     * Chain configuration.
-     */
-    private final ChainProperties chain;
+  /** Chain configuration. */
+  private final ChainProperties chain;
 
-    /**
-     * Plugins configuration.
-     */
-    private final PluginsProperties plugins;
+  /** Plugins configuration. */
+  private final PluginsProperties plugins;
 
-    public NetworkConfiguration(NetworkProperties network,
-        ChainProperties chain, PluginsProperties plugins) {
-        this.network = network;
-        this.chain = chain;
-        this.plugins = plugins;
-    }
+  public NetworkConfiguration(
+      NetworkProperties network, ChainProperties chain, PluginsProperties plugins) {
+    this.network = network;
+    this.chain = chain;
+    this.plugins = plugins;
+  }
 
-    public NetworkProperties getNetwork() {
-        return network;
-    }
+  public NetworkProperties getNetwork() {
+    return network;
+  }
 
-    public ChainProperties getChain() {
-        return chain;
-    }
+  public ChainProperties getChain() {
+    return chain;
+  }
 
-    public PluginsProperties getPlugins() {
-        return plugins;
-    }
+  public PluginsProperties getPlugins() {
+    return plugins;
+  }
 }
-

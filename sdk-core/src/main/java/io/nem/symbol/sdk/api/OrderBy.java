@@ -13,32 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
-
-/**
- * It defines the direction of ordered results.
- */
+/** It defines the direction of ordered results. */
 public enum OrderBy {
 
-    /**
-     * Values are sorted from small/old to big/new.
-     */
-    ASC("asc"),
+  /** Values are sorted from small/old to big/new. */
+  ASC("asc"),
 
-    /**
-     * Values are sorted from big/new to small/old.
-     */
-    DESC("desc");
+  /** Values are sorted from big/new to small/old. */
+  DESC("desc");
 
-    private String value;
+  private String value;
 
-    OrderBy(String value) {
-        this.value = value;
-    }
+  OrderBy(String value) {
+    this.value = value;
+  }
 
-    public String getValue() {
-        return value;
-    }
-
+  public String getValue() {
+    return value;
+  }
 }

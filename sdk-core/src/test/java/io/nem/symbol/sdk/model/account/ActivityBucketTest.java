@@ -13,30 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test ActivityBucket
- */
+/** Test ActivityBucket */
 class ActivityBucketTest {
 
-    @Test
-    void constructor() {
-        BigInteger startHeight = BigInteger.ONE;
-        BigInteger totalFeesPaid = BigInteger.valueOf(2);
-        int beneficiaryCount = 3;
-        BigInteger rawScore = BigInteger.valueOf(4);
-        ActivityBucket bucket = new ActivityBucket(startHeight, totalFeesPaid, beneficiaryCount, rawScore);
+  @Test
+  void constructor() {
+    BigInteger startHeight = BigInteger.ONE;
+    BigInteger totalFeesPaid = BigInteger.valueOf(2);
+    int beneficiaryCount = 3;
+    BigInteger rawScore = BigInteger.valueOf(4);
+    ActivityBucket bucket =
+        new ActivityBucket(startHeight, totalFeesPaid, beneficiaryCount, rawScore);
 
-        Assertions.assertEquals(startHeight, bucket.getStartHeight());
-        Assertions.assertEquals(totalFeesPaid, bucket.getTotalFeesPaid());
-        Assertions.assertEquals(beneficiaryCount, bucket.getBeneficiaryCount());
-        Assertions.assertEquals(rawScore, bucket.getRawScore());
-    }
-
+    Assertions.assertEquals(startHeight, bucket.getStartHeight());
+    Assertions.assertEquals(totalFeesPaid, bucket.getTotalFeesPaid());
+    Assertions.assertEquals(beneficiaryCount, bucket.getBeneficiaryCount());
+    Assertions.assertEquals(rawScore, bucket.getRawScore());
+  }
 }

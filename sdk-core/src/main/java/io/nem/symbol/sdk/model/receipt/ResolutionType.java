@@ -13,14 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.receipt;
-
-/**
- * Enum containing resolution type constants.
- */
+/** Enum containing resolution type constants. */
 public enum ResolutionType {
-
-    ADDRESS,
-    MOSAIC
+  ADDRESS,
+  MOSAIC
 }

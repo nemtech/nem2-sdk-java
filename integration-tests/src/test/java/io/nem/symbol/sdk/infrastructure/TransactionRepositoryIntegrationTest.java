@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,123 +48,166 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TransactionRepositoryIntegrationTest extends BaseIntegrationTest {
 
-    private String transactionHash;
+  private String transactionHash;
 
-    private final String invalidTransactionHash = "AAAAAADBDA00BA39D06B9E67AE5B43162366C862D9B8F656F7E7068D327377BE";
+  private final String invalidTransactionHash =
+      "AAAAAADBDA00BA39D06B9E67AE5B43162366C862D9B8F656F7E7068D327377BE";
 
-    @BeforeAll
-    void setup() {
-        RepositoryType type = RepositoryType.VERTX;
-        TransactionRepository transactionRepository = getRepositoryFactory(type).createTransactionRepository();
+  @BeforeAll
+  void setup() {
+    RepositoryType type = RepositoryType.VERTX;
+    TransactionRepository transactionRepository =
+        getRepositoryFactory(type).createTransactionRepository();
 
-        Address recipient = getRecipient();
+    Address recipient = getRecipient();
 
-        String message = "someMessage";
-        TransferTransaction transferTransaction = TransferTransactionFactory.create(getNetworkType(), recipient,
-            Collections.singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-            PlainMessage.create(message)).maxFee(this.maxFee).build();
+    String message = "someMessage";
+    TransferTransaction transferTransaction =
+        TransferTransactionFactory.create(
+                getNetworkType(),
+                recipient,
+                Collections.singletonList(
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
+                PlainMessage.create(message))
+            .maxFee(this.maxFee)
+            .build();
 
-        TransferTransaction processed = announceAndValidate(type, config().getDefaultAccount(), transferTransaction);
+    TransferTransaction processed =
+        announceAndValidate(type, config().getDefaultAccount(), transferTransaction);
 
-        Assertions.assertEquals(message, processed.getMessage().getPayload());
+    Assertions.assertEquals(message, processed.getMessage().getPayload());
 
-        PublicAccount account = config().getDefaultAccount().getPublicAccount();
-        List<Transaction> allTransactions = get(transactionRepository.search(
-            new TransactionSearchCriteria(TransactionGroup.CONFIRMED).order(OrderBy.DESC)
-                .signerPublicKey(account.getPublicKey()))).getData();
-        List<Transaction> transactions = allTransactions.stream().filter(t -> t.getType() == TransactionType.TRANSFER)
+    PublicAccount account = config().getDefaultAccount().getPublicAccount();
+    List<Transaction> allTransactions =
+        get(transactionRepository.search(
+                new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
+                    .order(OrderBy.DESC)
+                    .signerPublicKey(account.getPublicKey())))
+            .getData();
+    List<Transaction> transactions =
+        allTransactions.stream()
+            .filter(t -> t.getType() == TransactionType.TRANSFER)
             .collect(Collectors.toList());
-        Assertions.assertTrue(allTransactions.size() > 0);
-        Assertions.assertTrue(transactions.size() > 0);
-        transactionHash = transactions.get(0).getTransactionInfo().get().getHash().get();
-    }
+    Assertions.assertTrue(allTransactions.size() > 0);
+    Assertions.assertTrue(transactions.size() > 0);
+    transactionHash = transactions.get(0).getTransactionInfo().get().getHash().get();
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    public void getTransaction(RepositoryType type) {
-        Transaction transaction = get(getTransactionRepository(type).getTransaction(TransactionGroup.CONFIRMED,
-            transactionHash));
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  public void getTransaction(RepositoryType type) {
+    Transaction transaction =
+        get(
+            getTransactionRepository(type)
+                .getTransaction(TransactionGroup.CONFIRMED, transactionHash));
 
-        assertEquals(TransactionType.TRANSFER, transaction.getType());
-        assertEquals(transactionHash, transaction.getTransactionInfo().get().getHash().get());
-    }
+    assertEquals(TransactionType.TRANSFER, transaction.getType());
+    assertEquals(transactionHash, transaction.getTransactionInfo().get().getHash().get());
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    public void getTransactions(RepositoryType type) throws ExecutionException, InterruptedException {
-        List<Transaction> transaction = getTransactionRepository(type)
-            .getTransactions(TransactionGroup.CONFIRMED, Collections.singletonList(transactionHash)).toFuture().get();
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  public void getTransactions(RepositoryType type) throws ExecutionException, InterruptedException {
+    List<Transaction> transaction =
+        getTransactionRepository(type)
+            .getTransactions(TransactionGroup.CONFIRMED, Collections.singletonList(transactionHash))
+            .toFuture()
+            .get();
 
-        assertEquals(TransactionType.TRANSFER, transaction.get(0).getType());
-        assertEquals(transactionHash, transaction.get(0).getTransactionInfo().get().getHash().get());
-    }
+    assertEquals(TransactionType.TRANSFER, transaction.get(0).getType());
+    assertEquals(transactionHash, transaction.get(0).getTransactionInfo().get().getHash().get());
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    public void getTransactionStatus(RepositoryType type) {
-        TransactionStatus transactionStatus = get(
-            getTransactionStatusRepository(type).getTransactionStatus(transactionHash));
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  public void getTransactionStatus(RepositoryType type) {
+    TransactionStatus transactionStatus =
+        get(getTransactionStatusRepository(type).getTransactionStatus(transactionHash));
 
-        assertEquals(transactionHash, transactionStatus.getHash());
-        assertNotNull(transactionStatus.getCode());
-    }
+    assertEquals(transactionHash, transactionStatus.getHash());
+    assertNotNull(transactionStatus.getCode());
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    public void getTransactionsStatuses(RepositoryType type) {
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  public void getTransactionsStatuses(RepositoryType type) {
 
-        TransactionStatusRepository transactionRepository = getTransactionStatusRepository(type);
+    TransactionStatusRepository transactionRepository = getTransactionStatusRepository(type);
 
-        List<TransactionStatus> transactionStatuses = get(
-            transactionRepository.getTransactionStatuses(Collections.singletonList(transactionHash)));
+    List<TransactionStatus> transactionStatuses =
+        get(
+            transactionRepository.getTransactionStatuses(
+                Collections.singletonList(transactionHash)));
 
-        assertEquals(transactionHash, transactionStatuses.get(0).getHash());
-    }
+    assertEquals(transactionHash, transactionStatuses.get(0).getHash());
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    public void throwExceptionWhenTransactionStatusOfATransactionDoesNotExists(RepositoryType type) {
-        RepositoryCallException exception = Assertions.assertThrows(RepositoryCallException.class,
-            () -> get(getTransactionStatusRepository(type).getTransactionStatus(invalidTransactionHash)));
-        Assertions.assertEquals(
-            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '" + invalidTransactionHash
-                + "'", exception.getMessage());
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  public void throwExceptionWhenTransactionStatusOfATransactionDoesNotExists(RepositoryType type) {
+    RepositoryCallException exception =
+        Assertions.assertThrows(
+            RepositoryCallException.class,
+            () ->
+                get(
+                    getTransactionStatusRepository(type)
+                        .getTransactionStatus(invalidTransactionHash)));
+    Assertions.assertEquals(
+        "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '"
+            + invalidTransactionHash
+            + "'",
+        exception.getMessage());
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    public void throwExceptionWhenTransactionDoesNotExists(RepositoryType type) {
-        RepositoryCallException exception = Assertions.assertThrows(RepositoryCallException.class,
-            () -> get(getTransactionRepository(type).getTransaction(TransactionGroup.CONFIRMED, invalidTransactionHash)));
-        Assertions.assertEquals(
-            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '" + invalidTransactionHash
-                + "'", exception.getMessage());
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  public void throwExceptionWhenTransactionDoesNotExists(RepositoryType type) {
+    RepositoryCallException exception =
+        Assertions.assertThrows(
+            RepositoryCallException.class,
+            () ->
+                get(
+                    getTransactionRepository(type)
+                        .getTransaction(TransactionGroup.CONFIRMED, invalidTransactionHash)));
+    Assertions.assertEquals(
+        "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '"
+            + invalidTransactionHash
+            + "'",
+        exception.getMessage());
+  }
 
-    private TransactionRepository getTransactionRepository(RepositoryType type) {
-        return getRepositoryFactory(type).createTransactionRepository();
-    }
+  private TransactionRepository getTransactionRepository(RepositoryType type) {
+    return getRepositoryFactory(type).createTransactionRepository();
+  }
 
-    private TransactionStatusRepository getTransactionStatusRepository(RepositoryType type) {
-        return getRepositoryFactory(type).createTransactionStatusRepository();
-    }
+  private TransactionStatusRepository getTransactionStatusRepository(RepositoryType type) {
+    return getRepositoryFactory(type).createTransactionStatusRepository();
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getBlockTransactions(RepositoryType type) {
-        TransactionRepository transactionRepository = getRepositoryFactory(type).createTransactionRepository();
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getBlockTransactions(RepositoryType type) {
+    TransactionRepository transactionRepository =
+        getRepositoryFactory(type).createTransactionRepository();
 
-        List<Transaction> transactions = get(transactionRepository
-            .search(new TransactionSearchCriteria(TransactionGroup.CONFIRMED).height(BigInteger.ONE).pageNumber(1)))
+    List<Transaction> transactions =
+        get(transactionRepository.search(
+                new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
+                    .height(BigInteger.ONE)
+                    .pageNumber(1)))
             .getData();
 
-        assertEquals(20, transactions.size());
+    assertEquals(20, transactions.size());
 
-        List<Transaction> nextTransactions = get(transactionRepository
-            .search(new TransactionSearchCriteria(TransactionGroup.CONFIRMED).height(BigInteger.ONE).pageNumber(2)))
+    List<Transaction> nextTransactions =
+        get(transactionRepository.search(
+                new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
+                    .height(BigInteger.ONE)
+                    .pageNumber(2)))
             .getData();
-        assertTrue(nextTransactions.size() > 0);
-        assertNotEquals(transactions.get(1).getTransactionInfo().get().getHash(),
-            nextTransactions.get(0).getTransactionInfo().get().getHash());
-    }
+    assertTrue(nextTransactions.size() > 0);
+    assertNotEquals(
+        transactions.get(1).getTransactionInfo().get().getHash(),
+        nextTransactions.get(0).getTransactionInfo().get().getHash());
+  }
 }

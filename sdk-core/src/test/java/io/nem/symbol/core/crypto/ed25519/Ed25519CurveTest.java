@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto.ed25519;
 
 import io.nem.symbol.core.crypto.CryptoEngines;
@@ -24,31 +23,31 @@ import org.junit.jupiter.api.Test;
 
 public class Ed25519CurveTest {
 
-    private static final BigInteger GROUP_ORDER =
-        BigInteger.ONE.shiftLeft(252).add(new BigInteger("27742317777372353535851937790883648493"));
+  private static final BigInteger GROUP_ORDER =
+      BigInteger.ONE.shiftLeft(252).add(new BigInteger("27742317777372353535851937790883648493"));
 
-    @Test
-    public void getNameReturnsCorrectName() {
-        // Assert:
-        MatcherAssert.assertThat(
-            CryptoEngines.ed25519Engine().getCurve().getName(), IsEqual.equalTo("ed25519"));
-    }
+  @Test
+  public void getNameReturnsCorrectName() {
+    // Assert:
+    MatcherAssert.assertThat(
+        CryptoEngines.ed25519Engine().getCurve().getName(), IsEqual.equalTo("ed25519"));
+  }
 
-    @Test
-    public void getNameReturnsCorrectGroupOrder() {
-        // Assert:
-        MatcherAssert.assertThat(
-            CryptoEngines.ed25519Engine().getCurve().getGroupOrder(), IsEqual.equalTo(GROUP_ORDER));
-    }
+  @Test
+  public void getNameReturnsCorrectGroupOrder() {
+    // Assert:
+    MatcherAssert.assertThat(
+        CryptoEngines.ed25519Engine().getCurve().getGroupOrder(), IsEqual.equalTo(GROUP_ORDER));
+  }
 
-    @Test
-    public void getNameReturnsCorrectHalfGroupOrder() {
-        // Arrange:
-        final BigInteger halfGroupOrder = GROUP_ORDER.shiftRight(1);
+  @Test
+  public void getNameReturnsCorrectHalfGroupOrder() {
+    // Arrange:
+    final BigInteger halfGroupOrder = GROUP_ORDER.shiftRight(1);
 
-        // Assert:
-        MatcherAssert.assertThat(
-            CryptoEngines.ed25519Engine().getCurve().getHalfGroupOrder(),
-            IsEqual.equalTo(halfGroupOrder));
-    }
+    // Assert:
+    MatcherAssert.assertThat(
+        CryptoEngines.ed25519Engine().getCurve().getHalfGroupOrder(),
+        IsEqual.equalTo(halfGroupOrder));
+  }
 }

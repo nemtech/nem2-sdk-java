@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.message;
-
 /**
  * The plain message model defines a plain string. When sending it to the network we transform the
  * payload to hex-string.
@@ -24,27 +22,25 @@ package io.nem.symbol.sdk.model.message;
  */
 public class PlainMessage extends Message {
 
-    /**
-     * Plain message containing an empty string.
-     */
-    public static final PlainMessage Empty = new PlainMessage("");
+  /** Plain message containing an empty string. */
+  public static final PlainMessage Empty = new PlainMessage("");
 
-    /**
-     * Constructor
-     *
-     * @param payload plain message payload
-     */
-    public PlainMessage(String payload) {
-        super(MessageType.PLAIN_MESSAGE, payload);
-    }
+  /**
+   * Constructor
+   *
+   * @param payload plain message payload
+   */
+  public PlainMessage(String payload) {
+    super(MessageType.PLAIN_MESSAGE, payload);
+  }
 
-    /**
-     * Create a plain message object.
-     *
-     * @param payload plain message payload
-     * @return instance of PlainMessage
-     */
-    public static PlainMessage create(String payload) {
-        return new PlainMessage(payload);
-    }
+  /**
+   * Create a plain message object.
+   *
+   * @param payload plain message payload
+   * @return instance of PlainMessage
+   */
+  public static PlainMessage create(String payload) {
+    return new PlainMessage(payload);
+  }
 }

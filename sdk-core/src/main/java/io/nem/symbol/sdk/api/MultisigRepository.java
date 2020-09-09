@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.account.Address;
@@ -23,20 +22,19 @@ import io.reactivex.Observable;
 
 public interface MultisigRepository {
 
-    /**
-     * Gets a MultisigAccountInfo for an account.
-     *
-     * @param address Address
-     * @return Observable {@link MultisigAccountInfo}
-     */
-    Observable<MultisigAccountInfo> getMultisigAccountInfo(Address address);
+  /**
+   * Gets a MultisigAccountInfo for an account.
+   *
+   * @param address Address
+   * @return Observable {@link MultisigAccountInfo}
+   */
+  Observable<MultisigAccountInfo> getMultisigAccountInfo(Address address);
 
-    /**
-     * Gets a MultisigAccountGraphInfo for an account.
-     *
-     * @param address Address
-     * @return Observable {@link MultisigAccountGraphInfo}
-     */
-    Observable<MultisigAccountGraphInfo> getMultisigAccountGraphInfo(Address address);
-
+  /**
+   * Gets a MultisigAccountGraphInfo for an account.
+   *
+   * @param address Address
+   * @return Observable {@link MultisigAccountGraphInfo}
+   */
+  Observable<MultisigAccountGraphInfo> getMultisigAccountGraphInfo(Address address);
 }

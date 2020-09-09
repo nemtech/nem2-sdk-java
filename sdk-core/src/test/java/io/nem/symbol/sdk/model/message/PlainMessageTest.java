@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.message;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,17 +22,17 @@ import org.junit.jupiter.api.Test;
 
 class PlainMessageTest {
 
-    @Test
-    void shouldCreatePlainMessageViaConstructor() {
-        PlainMessage plainMessage = new PlainMessage("test-message");
-        assertEquals("test-message", plainMessage.getPayload());
-        assertSame(MessageType.PLAIN_MESSAGE, plainMessage.getType());
-    }
+  @Test
+  void shouldCreatePlainMessageViaConstructor() {
+    PlainMessage plainMessage = new PlainMessage("test-message");
+    assertEquals("test-message", plainMessage.getPayload());
+    assertSame(MessageType.PLAIN_MESSAGE, plainMessage.getType());
+  }
 
-    @Test
-    void shouldCreatePlainMessageViaStaticConstructor() {
-        PlainMessage plainMessage = PlainMessage.create("test-message");
-        assertEquals("test-message", plainMessage.getPayload());
-        assertSame(MessageType.PLAIN_MESSAGE, plainMessage.getType());
-    }
+  @Test
+  void shouldCreatePlainMessageViaStaticConstructor() {
+    PlainMessage plainMessage = PlainMessage.create("test-message");
+    assertEquals("test-message", plainMessage.getPayload());
+    assertSame(MessageType.PLAIN_MESSAGE, plainMessage.getType());
+  }
 }

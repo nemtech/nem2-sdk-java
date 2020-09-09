@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.sdk.model.network.NetworkType;
@@ -47,146 +46,139 @@ import org.junit.jupiter.api.Test;
  */
 public class NodeRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest {
 
-    private NodeRepositoryOkHttpImpl repository;
+  private NodeRepositoryOkHttpImpl repository;
 
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-        repository = new NodeRepositoryOkHttpImpl(apiClientMock);
-    }
+  @BeforeEach
+  public void setUp() {
+    super.setUp();
+    repository = new NodeRepositoryOkHttpImpl(apiClientMock);
+  }
 
-    @Test
-    public void shouldGetNode() throws Exception {
+  @Test
+  public void shouldGetNode() throws Exception {
 
-        NodeInfoDTO dto = new NodeInfoDTO();
-        dto.setPort(3000);
-        dto.setHost("http://hostname");
-        dto.setFriendlyName("friendlyName");
-        dto.setNetworkIdentifier(104);
-        dto.setRoles(RolesTypeEnum.NUMBER_2);
-        dto.setVersion(1234);
-        dto.setPublicKey("somePublicKey");
-        dto.setNetworkGenerationHashSeed("abc");
+    NodeInfoDTO dto = new NodeInfoDTO();
+    dto.setPort(3000);
+    dto.setHost("http://hostname");
+    dto.setFriendlyName("friendlyName");
+    dto.setNetworkIdentifier(104);
+    dto.setRoles(RolesTypeEnum.NUMBER_2);
+    dto.setVersion(1234);
+    dto.setPublicKey("somePublicKey");
+    dto.setNetworkGenerationHashSeed("abc");
 
-        mockRemoteCall(dto);
+    mockRemoteCall(dto);
 
-        NodeInfo info = repository.getNodeInfo().toFuture().get();
+    NodeInfo info = repository.getNodeInfo().toFuture().get();
 
-        Assertions.assertNotNull(info);
+    Assertions.assertNotNull(info);
 
-        Assertions.assertEquals(dto.getPort().intValue(), info.getPort());
-        Assertions.assertEquals(dto.getHost(), info.getHost());
-        Assertions.assertEquals(dto.getPublicKey(), info.getPublicKey());
-        Assertions.assertEquals(dto.getFriendlyName(), info.getFriendlyName());
-        Assertions.assertEquals(NetworkType.MAIN_NET, info.getNetworkIdentifier());
-        Assertions.assertEquals(RoleType.API_NODE, info.getRoles());
-        Assertions.assertEquals(dto.getVersion().intValue(), info.getVersion());
-        Assertions.assertEquals(dto.getNetworkGenerationHashSeed(), info.getNetworkGenerationHashSeed());
+    Assertions.assertEquals(dto.getPort().intValue(), info.getPort());
+    Assertions.assertEquals(dto.getHost(), info.getHost());
+    Assertions.assertEquals(dto.getPublicKey(), info.getPublicKey());
+    Assertions.assertEquals(dto.getFriendlyName(), info.getFriendlyName());
+    Assertions.assertEquals(NetworkType.MAIN_NET, info.getNetworkIdentifier());
+    Assertions.assertEquals(RoleType.API_NODE, info.getRoles());
+    Assertions.assertEquals(dto.getVersion().intValue(), info.getVersion());
+    Assertions.assertEquals(
+        dto.getNetworkGenerationHashSeed(), info.getNetworkGenerationHashSeed());
+  }
 
-    }
+  @Test
+  public void shouldGetNodeTime() throws Exception {
 
-    @Test
-    public void shouldGetNodeTime() throws Exception {
+    NodeTimeDTO dto = new NodeTimeDTO();
+    CommunicationTimestampsDTO comm = new CommunicationTimestampsDTO();
+    comm.setReceiveTimestamp(BigInteger.valueOf(1L));
+    comm.setSendTimestamp(BigInteger.valueOf(2L));
 
-        NodeTimeDTO dto = new NodeTimeDTO();
-        CommunicationTimestampsDTO comm = new CommunicationTimestampsDTO();
-        comm.setReceiveTimestamp(BigInteger.valueOf(1L));
-        comm.setSendTimestamp(BigInteger.valueOf(2L));
+    dto.setCommunicationTimestamps(comm);
+    mockRemoteCall(dto);
 
-        dto.setCommunicationTimestamps(comm);
-        mockRemoteCall(dto);
+    NodeTime info = repository.getNodeTime().toFuture().get();
 
-        NodeTime info = repository.getNodeTime().toFuture().get();
+    Assertions.assertNotNull(info);
 
-        Assertions.assertNotNull(info);
+    Assertions.assertEquals(BigInteger.valueOf(1L), info.getReceiveTimestamp());
+    Assertions.assertEquals(BigInteger.valueOf(2L), info.getSendTimestamp());
+  }
 
-        Assertions.assertEquals(BigInteger.valueOf(1L), info.getReceiveTimestamp());
-        Assertions.assertEquals(BigInteger.valueOf(2L), info.getSendTimestamp());
+  @Test
+  public void getNodePeers() throws Exception {
 
-    }
+    NodeInfoDTO dto = new NodeInfoDTO();
+    dto.setPort(3000);
+    dto.setHost("http://hostname");
+    dto.setFriendlyName("friendlyName");
+    dto.setNetworkIdentifier(104);
+    dto.setRoles(RolesTypeEnum.NUMBER_2);
+    dto.setVersion(1234);
+    dto.setPublicKey("somePublicKey");
+    dto.setNetworkGenerationHashSeed("abc");
 
-    @Test
-    public void getNodePeers() throws Exception {
+    mockRemoteCall(Collections.singletonList(dto));
 
-        NodeInfoDTO dto = new NodeInfoDTO();
-        dto.setPort(3000);
-        dto.setHost("http://hostname");
-        dto.setFriendlyName("friendlyName");
-        dto.setNetworkIdentifier(104);
-        dto.setRoles(RolesTypeEnum.NUMBER_2);
-        dto.setVersion(1234);
-        dto.setPublicKey("somePublicKey");
-        dto.setNetworkGenerationHashSeed("abc");
+    NodeInfo info = repository.getNodePeers().toFuture().get().get(0);
 
-        mockRemoteCall(Collections.singletonList(dto));
+    Assertions.assertNotNull(info);
 
-        NodeInfo info = repository.getNodePeers().toFuture().get().get(0);
+    Assertions.assertEquals(dto.getPort().intValue(), info.getPort());
+    Assertions.assertEquals(dto.getHost(), info.getHost());
+    Assertions.assertEquals(dto.getPublicKey(), info.getPublicKey());
+    Assertions.assertEquals(dto.getFriendlyName(), info.getFriendlyName());
+    Assertions.assertEquals(NetworkType.MAIN_NET, info.getNetworkIdentifier());
+    Assertions.assertEquals(RoleType.API_NODE, info.getRoles());
+    Assertions.assertEquals(dto.getVersion().intValue(), info.getVersion());
+    Assertions.assertEquals(
+        dto.getNetworkGenerationHashSeed(), info.getNetworkGenerationHashSeed());
+  }
 
-        Assertions.assertNotNull(info);
+  @Test
+  public void getNodeStorage() throws Exception {
+    StorageInfoDTO dto = new StorageInfoDTO();
+    dto.setNumAccounts(1);
+    dto.setNumBlocks(2);
+    dto.setNumTransactions(3);
 
-        Assertions.assertEquals(dto.getPort().intValue(), info.getPort());
-        Assertions.assertEquals(dto.getHost(), info.getHost());
-        Assertions.assertEquals(dto.getPublicKey(), info.getPublicKey());
-        Assertions.assertEquals(dto.getFriendlyName(), info.getFriendlyName());
-        Assertions.assertEquals(NetworkType.MAIN_NET, info.getNetworkIdentifier());
-        Assertions.assertEquals(RoleType.API_NODE, info.getRoles());
-        Assertions.assertEquals(dto.getVersion().intValue(), info.getVersion());
-        Assertions.assertEquals(dto.getNetworkGenerationHashSeed(), info.getNetworkGenerationHashSeed());
+    mockRemoteCall(dto);
 
-    }
+    StorageInfo storageInfo = repository.getNodeStorage().toFuture().get();
+    Assertions.assertEquals(dto.getNumAccounts(), storageInfo.getNumAccounts());
+    Assertions.assertEquals(dto.getNumBlocks(), storageInfo.getNumBlocks());
+    Assertions.assertEquals(dto.getNumTransactions(), storageInfo.getNumTransactions());
+  }
 
-    @Test
-    public void getNodeStorage() throws Exception {
-        StorageInfoDTO dto = new StorageInfoDTO();
-        dto.setNumAccounts(1);
-        dto.setNumBlocks(2);
-        dto.setNumTransactions(3);
+  @Test
+  public void getNodeHealth() throws Exception {
+    NodeHealthInfoDTO dto =
+        new NodeHealthInfoDTO()
+            .status(new NodeHealthDTO().apiNode(NodeStatusEnum.DOWN).db(NodeStatusEnum.UP));
 
-        mockRemoteCall(dto);
+    mockRemoteCall(dto);
 
-        StorageInfo storageInfo = repository.getNodeStorage().toFuture()
-            .get();
-        Assertions.assertEquals(dto.getNumAccounts(), storageInfo.getNumAccounts());
-        Assertions.assertEquals(dto.getNumBlocks(), storageInfo.getNumBlocks());
-        Assertions
-            .assertEquals(dto.getNumTransactions(), storageInfo.getNumTransactions());
+    NodeHealth nodeHealth = repository.getNodeHealth().toFuture().get();
+    Assertions.assertEquals(NodeStatus.DOWN, nodeHealth.getApiNode());
+    Assertions.assertEquals(NodeStatus.UP, nodeHealth.getDb());
+  }
 
-    }
+  @Test
+  public void shouldGetServerInfo() throws Exception {
+    ServerInfoDTO dto = new ServerInfoDTO();
+    ServerDTO serverInfoDto = new ServerDTO();
+    serverInfoDto.setRestVersion("RestVersion1");
+    serverInfoDto.setSdkVersion("SdkVersion1");
+    dto.serverInfo(serverInfoDto);
 
-    @Test
-    public void getNodeHealth() throws Exception {
-        NodeHealthInfoDTO dto = new NodeHealthInfoDTO().status(new NodeHealthDTO().apiNode(
-            NodeStatusEnum.DOWN).db(NodeStatusEnum.UP));
+    mockRemoteCall(dto);
 
-        mockRemoteCall(dto);
+    ServerInfo serverInfo = repository.getServerInfo().toFuture().get();
 
-        NodeHealth nodeHealth = repository.getNodeHealth().toFuture()
-            .get();
-        Assertions.assertEquals(NodeStatus.DOWN, nodeHealth.getApiNode());
-        Assertions.assertEquals(NodeStatus.UP, nodeHealth.getDb());
+    Assertions.assertEquals(dto.getServerInfo().getRestVersion(), serverInfo.getRestVersion());
+    Assertions.assertEquals(dto.getServerInfo().getSdkVersion(), serverInfo.getSdkVersion());
+  }
 
-    }
-
-    @Test
-    public void shouldGetServerInfo() throws Exception {
-        ServerInfoDTO dto = new ServerInfoDTO();
-        ServerDTO serverInfoDto = new ServerDTO();
-        serverInfoDto.setRestVersion("RestVersion1");
-        serverInfoDto.setSdkVersion("SdkVersion1");
-        dto.serverInfo(serverInfoDto);
-
-        mockRemoteCall(dto);
-
-        ServerInfo serverInfo = repository.getServerInfo().toFuture()
-            .get();
-
-        Assertions.assertEquals(dto.getServerInfo().getRestVersion(), serverInfo.getRestVersion());
-        Assertions.assertEquals(dto.getServerInfo().getSdkVersion(), serverInfo.getSdkVersion());
-
-    }
-
-    @Override
-    public NodeRepositoryOkHttpImpl getRepository() {
-        return repository;
-    }
+  @Override
+  public NodeRepositoryOkHttpImpl getRepository() {
+    return repository;
+  }
 }

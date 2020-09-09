@@ -13,59 +13,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 
-/**
- * Mosaic alias transaction.
- */
+/** Mosaic alias transaction. */
 public class MosaicAliasTransaction extends Transaction {
 
-    private final AliasAction aliasAction;
-    private final NamespaceId namespaceId;
-    private final MosaicId mosaicId;
+  private final AliasAction aliasAction;
+  private final NamespaceId namespaceId;
+  private final MosaicId mosaicId;
 
-    /**
-     * Crates a {@link MosaicAliasTransaction} based on the factory.
-     *
-     * @param factory the factory.
-     */
-    MosaicAliasTransaction(MosaicAliasTransactionFactory factory) {
-        super(factory);
-        this.aliasAction = factory.getAliasAction();
-        this.namespaceId = factory.getNamespaceId();
-        this.mosaicId = factory.getMosaicId();
-    }
+  /**
+   * Crates a {@link MosaicAliasTransaction} based on the factory.
+   *
+   * @param factory the factory.
+   */
+  MosaicAliasTransaction(MosaicAliasTransactionFactory factory) {
+    super(factory);
+    this.aliasAction = factory.getAliasAction();
+    this.namespaceId = factory.getNamespaceId();
+    this.mosaicId = factory.getMosaicId();
+  }
 
-    /**
-     * Gets the alias action.
-     *
-     * @return Alias Action.
-     */
-    public AliasAction getAliasAction() {
-        return this.aliasAction;
-    }
+  /**
+   * Gets the alias action.
+   *
+   * @return Alias Action.
+   */
+  public AliasAction getAliasAction() {
+    return this.aliasAction;
+  }
 
-    /**
-     * Gets the namespace id.
-     *
-     * @return Namespace id.
-     */
-    public NamespaceId getNamespaceId() {
-        return this.namespaceId;
-    }
+  /**
+   * Gets the namespace id.
+   *
+   * @return Namespace id.
+   */
+  public NamespaceId getNamespaceId() {
+    return this.namespaceId;
+  }
 
-    /**
-     * Gets the mosiac id.
-     *
-     * @return Mosaic id.
-     */
-    public MosaicId getMosaicId() {
-        return this.mosaicId;
-    }
-
+  /**
+   * Gets the mosiac id.
+   *
+   * @return Mosaic id.
+   */
+  public MosaicId getMosaicId() {
+    return this.mosaicId;
+  }
 }

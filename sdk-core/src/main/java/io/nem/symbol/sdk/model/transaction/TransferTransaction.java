@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
@@ -27,49 +26,47 @@ import java.util.List;
  */
 public class TransferTransaction extends Transaction implements RecipientTransaction {
 
-    private final UnresolvedAddress recipient;
-    private final List<Mosaic> mosaics;
-    private final Message message;
+  private final UnresolvedAddress recipient;
+  private final List<Mosaic> mosaics;
+  private final Message message;
 
-    /**
-     * Constructor of the transfer transaction using the factory.
-     *
-     * @param factory the factory;
-     */
-    TransferTransaction(TransferTransactionFactory factory) {
-        super(factory);
-        this.recipient = factory.getRecipient();
-        this.mosaics = factory.getMosaics();
-        this.message = factory.getMessage();
-    }
+  /**
+   * Constructor of the transfer transaction using the factory.
+   *
+   * @param factory the factory;
+   */
+  TransferTransaction(TransferTransactionFactory factory) {
+    super(factory);
+    this.recipient = factory.getRecipient();
+    this.mosaics = factory.getMosaics();
+    this.message = factory.getMessage();
+  }
 
-    /**
-     * Returns address of the recipient.
-     *
-     * @return recipient address
-     */
-    @Override
-    public UnresolvedAddress getRecipient() {
-        return recipient;
-    }
+  /**
+   * Returns address of the recipient.
+   *
+   * @return recipient address
+   */
+  @Override
+  public UnresolvedAddress getRecipient() {
+    return recipient;
+  }
 
+  /**
+   * Returns list of mosaic objects.
+   *
+   * @return List of {@link Mosaic}
+   */
+  public List<Mosaic> getMosaics() {
+    return mosaics;
+  }
 
-    /**
-     * Returns list of mosaic objects.
-     *
-     * @return List of {@link Mosaic}
-     */
-    public List<Mosaic> getMosaics() {
-        return mosaics;
-    }
-
-    /**
-     * Returns transaction message.
-     *
-     * @return Message.
-     */
-    public Message getMessage() {
-        return message;
-    }
-
+  /**
+   * Returns transaction message.
+   *
+   * @return Message.
+   */
+  public Message getMessage() {
+    return message;
+  }
 }

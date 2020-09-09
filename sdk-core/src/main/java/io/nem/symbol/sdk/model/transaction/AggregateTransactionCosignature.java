@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
@@ -26,39 +25,38 @@ import java.math.BigInteger;
  */
 public class AggregateTransactionCosignature {
 
-    public static final BigInteger DEFAULT_VERSION = BigInteger.ZERO;
-    private final BigInteger version;
-    private final String signature;
-    private final PublicAccount signer;
+  public static final BigInteger DEFAULT_VERSION = BigInteger.ZERO;
+  private final BigInteger version;
+  private final String signature;
+  private final PublicAccount signer;
 
-    public AggregateTransactionCosignature(BigInteger version, String signature, PublicAccount signer) {
-        this.version = version;
-        this.signature = signature;
-        this.signer = signer;
-    }
+  public AggregateTransactionCosignature(
+      BigInteger version, String signature, PublicAccount signer) {
+    this.version = version;
+    this.signature = signature;
+    this.signer = signer;
+  }
 
-    /**
-     * Returns the signature of aggregate transaction done by the cosigner.
-     *
-     * @return String
-     */
-    public String getSignature() {
-        return signature;
-    }
+  /**
+   * Returns the signature of aggregate transaction done by the cosigner.
+   *
+   * @return String
+   */
+  public String getSignature() {
+    return signature;
+  }
 
-    /**
-     * Returns cosigner public account.
-     *
-     * @return {@link PublicAccount}
-     */
-    public PublicAccount getSigner() {
-        return signer;
-    }
+  /**
+   * Returns cosigner public account.
+   *
+   * @return {@link PublicAccount}
+   */
+  public PublicAccount getSigner() {
+    return signer;
+  }
 
-    /**
-     * @return the vers
-     */
-    public BigInteger getVersion() {
-        return version;
-    }
+  /** @return the vers */
+  public BigInteger getVersion() {
+    return version;
+  }
 }

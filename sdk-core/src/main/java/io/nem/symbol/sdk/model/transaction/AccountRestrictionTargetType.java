@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
-
 
 import io.nem.symbol.core.utils.MapperUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -26,46 +24,44 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  */
 public enum AccountRestrictionTargetType {
 
-    /**
-     * The value should be an unresolved address.
-     */
-    ADDRESS,
+  /** The value should be an unresolved address. */
+  ADDRESS,
 
-    /**
-     * The value should be a unresolved mosaic id.
-     */
-    MOSAIC_ID,
+  /** The value should be a unresolved mosaic id. */
+  MOSAIC_ID,
 
-    /**
-     * The value should be an int of a known Transaction Type.
-     */
-    TRANSACTION_TYPE;
+  /** The value should be an int of a known Transaction Type. */
+  TRANSACTION_TYPE;
 
-    /**
-     * This method knows how to convert the basic value returned in rest api to the more useful
-     * model objects.
-     *
-     * @param value the string value.
-     * @return the model representation.
-     */
-    public Object fromString(String value) {
-        try {
-            if (this == ADDRESS) {
-                return MapperUtils.toUnresolvedAddress(value);
-            }
-            if (this == MOSAIC_ID) {
-                return MapperUtils.toUnresolvedMosaicId(value);
-            }
-            if (this == TRANSACTION_TYPE) {
-                // https://stackoverflow.com/questions/15507997/how-to-prevent-gson-from-expressing-integers-as-floats/15508288
-                return TransactionType.rawValueOf((int) Double.parseDouble(value));
-            }
-            throw new IllegalStateException("Unknown enum value " + this);
-        } catch (RuntimeException e) {
-            throw new IllegalArgumentException(
-                "Value '" + value + "' cannot be converted to " + this + ". Error: " +
-                    ExceptionUtils.getMessage(e), e);
-        }
-
+  /**
+   * This method knows how to convert the basic value returned in rest api to the more useful model
+   * objects.
+   *
+   * @param value the string value.
+   * @return the model representation.
+   */
+  public Object fromString(String value) {
+    try {
+      if (this == ADDRESS) {
+        return MapperUtils.toUnresolvedAddress(value);
+      }
+      if (this == MOSAIC_ID) {
+        return MapperUtils.toUnresolvedMosaicId(value);
+      }
+      if (this == TRANSACTION_TYPE) {
+        // https://stackoverflow.com/questions/15507997/how-to-prevent-gson-from-expressing-integers-as-floats/15508288
+        return TransactionType.rawValueOf((int) Double.parseDouble(value));
+      }
+      throw new IllegalStateException("Unknown enum value " + this);
+    } catch (RuntimeException e) {
+      throw new IllegalArgumentException(
+          "Value '"
+              + value
+              + "' cannot be converted to "
+              + this
+              + ". Error: "
+              + ExceptionUtils.getMessage(e),
+          e);
     }
+  }
 }

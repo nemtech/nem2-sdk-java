@@ -20,40 +20,35 @@ import java.util.List;
 
 public class AccountAddressRestrictionTransaction extends Transaction {
 
-    private final AccountAddressRestrictionFlags restrictionFlags;
+  private final AccountAddressRestrictionFlags restrictionFlags;
 
-    private final List<UnresolvedAddress> restrictionAdditions;
+  private final List<UnresolvedAddress> restrictionAdditions;
 
-    private final List<UnresolvedAddress> restrictionDeletions;
+  private final List<UnresolvedAddress> restrictionDeletions;
 
-    AccountAddressRestrictionTransaction(
-        AccountAddressRestrictionTransactionFactory factory) {
-        super(factory);
-        this.restrictionFlags = factory.getRestrictionFlags();
-        this.restrictionAdditions = factory.getRestrictionAdditions();
-        this.restrictionDeletions = factory.getRestrictionDeletions();
-    }
+  AccountAddressRestrictionTransaction(AccountAddressRestrictionTransactionFactory factory) {
+    super(factory);
+    this.restrictionFlags = factory.getRestrictionFlags();
+    this.restrictionAdditions = factory.getRestrictionAdditions();
+    this.restrictionDeletions = factory.getRestrictionDeletions();
+  }
 
-    /**
-     * Get account restriction flags
-     *
-     * @return {@link AccountAddressRestrictionFlags}
-     */
-    public AccountAddressRestrictionFlags getRestrictionFlags() {
-        return this.restrictionFlags;
-    }
+  /**
+   * Get account restriction flags
+   *
+   * @return {@link AccountAddressRestrictionFlags}
+   */
+  public AccountAddressRestrictionFlags getRestrictionFlags() {
+    return this.restrictionFlags;
+  }
 
-    /**
-     * @return List of addresses that are going to be added to the restriction.
-     */
-    public List<UnresolvedAddress> getRestrictionAdditions() {
-        return restrictionAdditions;
-    }
+  /** @return List of addresses that are going to be added to the restriction. */
+  public List<UnresolvedAddress> getRestrictionAdditions() {
+    return restrictionAdditions;
+  }
 
-    /**
-     * @return List of addresses that are going to be removed from the restriction.
-     */
-    public List<UnresolvedAddress> getRestrictionDeletions() {
-        return restrictionDeletions;
-    }
+  /** @return List of addresses that are going to be removed from the restriction. */
+  public List<UnresolvedAddress> getRestrictionDeletions() {
+    return restrictionDeletions;
+  }
 }

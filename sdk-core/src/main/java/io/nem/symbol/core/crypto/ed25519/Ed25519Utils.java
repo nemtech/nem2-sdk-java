@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto.ed25519;
 
 import io.nem.symbol.core.crypto.Hashes;
@@ -21,30 +20,25 @@ import io.nem.symbol.core.crypto.PrivateKey;
 import io.nem.symbol.core.crypto.ed25519.arithmetic.Ed25519EncodedFieldElement;
 import java.util.Arrays;
 
-/**
- * Utility methods for Ed25519.
- */
+/** Utility methods for Ed25519. */
 public class Ed25519Utils {
 
-    /**
-     * Private constructor for this utility class.
-     */
-    private Ed25519Utils() {
-    }
+  /** Private constructor for this utility class. */
+  private Ed25519Utils() {}
 
-    /**
-     * Prepares a private key's raw value for scalar multiplication. The hashing is for achieving
-     * better randomness and the clamping prevents small subgroup attacks.
-     *
-     * @param key The private key.
-     * @return The prepared encoded field element.
-     */
-    public static Ed25519EncodedFieldElement prepareForScalarMultiply(final PrivateKey key) {
-        final byte[] hash = Hashes.sha512(key.getBytes());
-        final byte[] a = Arrays.copyOfRange(hash, 0, 32);
-        a[31] &= 0x7F;
-        a[31] |= 0x40;
-        a[0] &= 0xF8;
-        return new Ed25519EncodedFieldElement(a);
-    }
+  /**
+   * Prepares a private key's raw value for scalar multiplication. The hashing is for achieving
+   * better randomness and the clamping prevents small subgroup attacks.
+   *
+   * @param key The private key.
+   * @return The prepared encoded field element.
+   */
+  public static Ed25519EncodedFieldElement prepareForScalarMultiply(final PrivateKey key) {
+    final byte[] hash = Hashes.sha512(key.getBytes());
+    final byte[] a = Arrays.copyOfRange(hash, 0, 32);
+    a[31] &= 0x7F;
+    a[31] |= 0x40;
+    a[0] &= 0xF8;
+    return new Ed25519EncodedFieldElement(a);
+  }
 }

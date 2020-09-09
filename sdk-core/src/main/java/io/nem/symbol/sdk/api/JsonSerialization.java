@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.transaction.Transaction;
@@ -23,21 +22,19 @@ import io.nem.symbol.sdk.model.transaction.Transaction;
  */
 public interface JsonSerialization {
 
-    /**
-     * It converts a {@link Transaction} to a json string.
-     *
-     * @param transaction the transaction
-     * @return the json string.
-     */
-    String transactionToJson(Transaction transaction);
+  /**
+   * It converts a {@link Transaction} to a json string.
+   *
+   * @param transaction the transaction
+   * @return the json string.
+   */
+  String transactionToJson(Transaction transaction);
 
-    /**
-     * It parses and converts a json string into a {@link Transaction}.
-     *
-     * @param json the json string.
-     * @return the transaction
-     */
-    Transaction jsonToTransaction(String json);
-
-
+  /**
+   * It parses and converts a json string into a {@link Transaction}.
+   *
+   * @param json the json string.
+   * @return the transaction
+   */
+  Transaction jsonToTransaction(String json);
 }

@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 public class FakeTransferTransaction extends Transaction {
 
-    public FakeTransferTransaction(FakeTransferTransactionFactory factory) {
-        super(factory);
-    }
+  public FakeTransferTransaction(FakeTransferTransactionFactory factory) {
+    super(factory);
+  }
 }

@@ -19,35 +19,35 @@ import java.math.BigInteger;
 
 public class BlockchainScore {
 
-    private final BigInteger scoreLow;
-    private final BigInteger scoreHigh;
+  private final BigInteger scoreLow;
+  private final BigInteger scoreHigh;
 
-    /**
-     * Constructor
-     *
-     * @param scoreLow the score low.
-     * @param scoreHigh the score high.
-     */
-    public BlockchainScore(BigInteger scoreLow, BigInteger scoreHigh) {
-        this.scoreHigh = scoreHigh;
-        this.scoreLow = scoreLow;
-    }
+  /**
+   * Constructor
+   *
+   * @param scoreLow the score low.
+   * @param scoreHigh the score high.
+   */
+  public BlockchainScore(BigInteger scoreLow, BigInteger scoreHigh) {
+    this.scoreHigh = scoreHigh;
+    this.scoreLow = scoreLow;
+  }
 
-    /**
-     * Get scoreLow
-     *
-     * @return BigInteger
-     */
-    public BigInteger getScoreLow() {
-        return this.scoreLow;
-    }
+  /**
+   * Get scoreLow
+   *
+   * @return BigInteger
+   */
+  public BigInteger getScoreLow() {
+    return this.scoreLow;
+  }
 
-    /**
-     * Get scoreHigh
-     *
-     * @return BigInteger
-     */
-    public BigInteger getScoreHigh() {
-        return this.scoreHigh;
-    }
+  /**
+   * Get scoreHigh
+   *
+   * @return BigInteger
+   */
+  public BigInteger getScoreHigh() {
+    return this.scoreHigh;
+  }
 }

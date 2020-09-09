@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,64 +29,58 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.internal.util.collections.Sets;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-//TODO BROKEN!
+// TODO BROKEN!
 public class MultisigRepositoryIntegrationTest extends BaseIntegrationTest {
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getMultisigAccountInfo(RepositoryType type) {
-        System.out.println(config().getMultisigAccount().getAddress().plain());
-        MultisigAccountInfo multisigAccountInfo = get(getRepositoryFactory(type)
-            .createMultisigRepository()
-            .getMultisigAccountInfo(
-                config().getMultisigAccount().getAddress())
-        );
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getMultisigAccountInfo(RepositoryType type) {
+    System.out.println(config().getMultisigAccount().getAddress().plain());
+    MultisigAccountInfo multisigAccountInfo =
+        get(
+            getRepositoryFactory(type)
+                .createMultisigRepository()
+                .getMultisigAccountInfo(config().getMultisigAccount().getAddress()));
 
-        Set<UnresolvedAddress> cosignatoriesSet = multisigAccountInfo.getCosignatoryAddresses().stream().collect(
-            Collectors.toSet());
+    Set<UnresolvedAddress> cosignatoriesSet =
+        multisigAccountInfo.getCosignatoryAddresses().stream().collect(Collectors.toSet());
 
-        Assertions.assertEquals(Sets.newSet(config().getCosignatoryAccount().getAddress(),
-            config().getCosignatory2Account().getAddress()), cosignatoriesSet);
+    Assertions.assertEquals(
+        Sets.newSet(
+            config().getCosignatoryAccount().getAddress(),
+            config().getCosignatory2Account().getAddress()),
+        cosignatoriesSet);
 
-        Assertions.assertTrue(multisigAccountInfo.isMultisig());
+    Assertions.assertTrue(multisigAccountInfo.isMultisig());
 
-        assertEquals(
-            config().getMultisigAccount().getAddress(),
-            multisigAccountInfo.getAccountAddress());
+    assertEquals(
+        config().getMultisigAccount().getAddress(), multisigAccountInfo.getAccountAddress());
 
-        Assertions.assertEquals(1,
-            multisigAccountInfo.getMinApproval());
-        Assertions.assertEquals(1,
-            multisigAccountInfo.getMinRemoval());
-    }
+    Assertions.assertEquals(1, multisigAccountInfo.getMinApproval());
+    Assertions.assertEquals(1, multisigAccountInfo.getMinRemoval());
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getMultisigAccountGraphInfo(RepositoryType type) {
-        MultisigAccountGraphInfo multisigAccountGraphInfos = get(
-            this.getRepositoryFactory(type).createMultisigRepository()
-                .getMultisigAccountGraphInfo(
-                    config().getMultisigAccount().getAddress())
-        );
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getMultisigAccountGraphInfo(RepositoryType type) {
+    MultisigAccountGraphInfo multisigAccountGraphInfos =
+        get(
+            this.getRepositoryFactory(type)
+                .createMultisigRepository()
+                .getMultisigAccountGraphInfo(config().getMultisigAccount().getAddress()));
 
-        assertEquals(2,
-            multisigAccountGraphInfos.getLevelsNumber().size());
+    assertEquals(2, multisigAccountGraphInfos.getLevelsNumber().size());
 
-        assertEquals(2,
-            multisigAccountGraphInfos.getMultisigEntries().size());
+    assertEquals(2, multisigAccountGraphInfos.getMultisigEntries().size());
 
-        assertEquals(1,
-            multisigAccountGraphInfos.getMultisigEntries().get(0).size());
+    assertEquals(1, multisigAccountGraphInfos.getMultisigEntries().get(0).size());
 
-        assertEquals(1,
-            multisigAccountGraphInfos.getMultisigEntries().get(0).size());
+    assertEquals(1, multisigAccountGraphInfos.getMultisigEntries().get(0).size());
 
-        assertEquals(2,
-            multisigAccountGraphInfos.getMultisigEntries().get(1).size());
+    assertEquals(2, multisigAccountGraphInfos.getMultisigEntries().get(1).size());
 
-        assertEquals(config().getMultisigAccount().getAddress(),
-            multisigAccountGraphInfos.getMultisigEntries().get(0).get(0).getAccountAddress());
-
-    }
-
+    assertEquals(
+        config().getMultisigAccount().getAddress(),
+        multisigAccountGraphInfos.getMultisigEntries().get(0).get(0).getAccountAddress());
+  }
 }

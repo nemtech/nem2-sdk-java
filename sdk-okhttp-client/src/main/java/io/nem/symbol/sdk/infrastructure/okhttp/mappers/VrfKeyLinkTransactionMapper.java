@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
 import io.nem.symbol.core.crypto.PublicKey;
@@ -27,28 +26,25 @@ import io.nem.symbol.sdk.model.transaction.VrfKeyLinkTransactionFactory;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.LinkActionEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.VrfKeyLinkTransactionDTO;
 
-/**
- * {@link VrfKeyLinkTransaction} mapper.
- */
-public class VrfKeyLinkTransactionMapper extends
-    AbstractTransactionMapper<VrfKeyLinkTransactionDTO, VrfKeyLinkTransaction> {
+/** {@link VrfKeyLinkTransaction} mapper. */
+public class VrfKeyLinkTransactionMapper
+    extends AbstractTransactionMapper<VrfKeyLinkTransactionDTO, VrfKeyLinkTransaction> {
 
-    public VrfKeyLinkTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.VRF_KEY_LINK, VrfKeyLinkTransactionDTO.class);
-    }
+  public VrfKeyLinkTransactionMapper(JsonHelper jsonHelper) {
+    super(jsonHelper, TransactionType.VRF_KEY_LINK, VrfKeyLinkTransactionDTO.class);
+  }
 
-    @Override
-    protected TransactionFactory<VrfKeyLinkTransaction> createFactory(NetworkType networkType,
-        VrfKeyLinkTransactionDTO transaction) {
-        PublicKey linkedPublicKey = PublicKey.fromHexString(transaction.getLinkedPublicKey());
-        LinkAction linkAction = LinkAction.rawValueOf(transaction.getLinkAction().getValue());
-        return VrfKeyLinkTransactionFactory.create(networkType, linkedPublicKey, linkAction);
-    }
+  @Override
+  protected TransactionFactory<VrfKeyLinkTransaction> createFactory(
+      NetworkType networkType, VrfKeyLinkTransactionDTO transaction) {
+    PublicKey linkedPublicKey = PublicKey.fromHexString(transaction.getLinkedPublicKey());
+    LinkAction linkAction = LinkAction.rawValueOf(transaction.getLinkAction().getValue());
+    return VrfKeyLinkTransactionFactory.create(networkType, linkedPublicKey, linkAction);
+  }
 
-    @Override
-    protected void copyToDto(VrfKeyLinkTransaction transaction, VrfKeyLinkTransactionDTO dto) {
-        dto.setLinkAction(LinkActionEnum.fromValue((int) transaction.getLinkAction().getValue()));
-        dto.setLinkedPublicKey(transaction.getLinkedPublicKey().toHex());
-    }
-
+  @Override
+  protected void copyToDto(VrfKeyLinkTransaction transaction, VrfKeyLinkTransactionDTO dto) {
+    dto.setLinkAction(LinkActionEnum.fromValue((int) transaction.getLinkAction().getValue()));
+    dto.setLinkedPublicKey(transaction.getLinkedPublicKey().toHex());
+  }
 }

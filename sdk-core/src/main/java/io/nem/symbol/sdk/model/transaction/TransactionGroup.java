@@ -13,48 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import java.util.Arrays;
 
-/**
- * A stored transaction could be classified in the following groups:
-*/
+/** A stored transaction could be classified in the following groups: */
 public enum TransactionGroup {
 
-    /**
-     * The transaction reached * the P2P network. At this point, it is not guaranteed that the
-     * transaction will be included in a block.
-     */
-    UNCONFIRMED("unconfirmed"),
+  /**
+   * The transaction reached * the P2P network. At this point, it is not guaranteed that the
+   * transaction will be included in a block.
+   */
+  UNCONFIRMED("unconfirmed"),
 
-    /**
-     * Confirmed: The transaction is included in a block.
-     */
-    CONFIRMED("confirmed"),
+  /** Confirmed: The transaction is included in a block. */
+  CONFIRMED("confirmed"),
 
-    /**
-     * The transaction requires to be cosigned by other transaction participants in order to be
-     * included in a block.
-     */
-    PARTIAL("partial");
+  /**
+   * The transaction requires to be cosigned by other transaction participants in order to be
+   * included in a block.
+   */
+  PARTIAL("partial");
 
-    /**
-     * Refernce value.
-     */
-    private final String value;
+  /** Refernce value. */
+  private final String value;
 
-    TransactionGroup(String value) {
-        this.value = value;
-    }
+  TransactionGroup(String value) {
+    this.value = value;
+  }
 
-    public String getValue() {
-        return value;
-    }
+  public String getValue() {
+    return value;
+  }
 
-    public static TransactionGroup rawValueOf(String value) {
-        return Arrays.stream(values()).filter(e -> e.value.equals(value)).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
+  public static TransactionGroup rawValueOf(String value) {
+    return Arrays.stream(values())
+        .filter(e -> e.value.equals(value))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 }

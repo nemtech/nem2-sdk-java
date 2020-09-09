@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.sdk.api.TransactionStatusRepository;
@@ -36,40 +35,48 @@ import java.util.function.Consumer;
  *
  * @since 1.0
  */
-public class TransactionStatusRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements
-    TransactionStatusRepository {
+public class TransactionStatusRepositoryVertxImpl extends AbstractRepositoryVertxImpl
+    implements TransactionStatusRepository {
 
-    private final TransactionStatusRoutesApi client;
+  private final TransactionStatusRoutesApi client;
 
-    public TransactionStatusRepositoryVertxImpl(ApiClient apiClient) {
-        super(apiClient);
-        client = new TransactionStatusRoutesApiImpl(apiClient);
-    }
+  public TransactionStatusRepositoryVertxImpl(ApiClient apiClient) {
+    super(apiClient);
+    client = new TransactionStatusRoutesApiImpl(apiClient);
+  }
 
-    public TransactionStatusRoutesApi getClient() {
-        return client;
-    }
+  public TransactionStatusRoutesApi getClient() {
+    return client;
+  }
 
-    @Override
-    public Observable<TransactionStatus> getTransactionStatus(String transactionHash) {
-        Consumer<Handler<AsyncResult<TransactionStatusDTO>>> callback = handler -> getClient()
-            .getTransactionStatus(transactionHash, handler);
-        return exceptionHandling(call(callback).map(this::toTransactionStatus));
-    }
+  @Override
+  public Observable<TransactionStatus> getTransactionStatus(String transactionHash) {
+    Consumer<Handler<AsyncResult<TransactionStatusDTO>>> callback =
+        handler -> getClient().getTransactionStatus(transactionHash, handler);
+    return exceptionHandling(call(callback).map(this::toTransactionStatus));
+  }
 
-    private TransactionStatus toTransactionStatus(TransactionStatusDTO transactionStatusDTO) {
-        return new TransactionStatus(TransactionState.valueOf(transactionStatusDTO.getGroup().name()),
-            transactionStatusDTO.getCode() == null ? null : transactionStatusDTO.getCode().getValue(),
-            transactionStatusDTO.getHash(), new Deadline(transactionStatusDTO.getDeadline()),
-            transactionStatusDTO.getHeight());
-    }
+  private TransactionStatus toTransactionStatus(TransactionStatusDTO transactionStatusDTO) {
+    return new TransactionStatus(
+        TransactionState.valueOf(transactionStatusDTO.getGroup().name()),
+        transactionStatusDTO.getCode() == null ? null : transactionStatusDTO.getCode().getValue(),
+        transactionStatusDTO.getHash(),
+        new Deadline(transactionStatusDTO.getDeadline()),
+        transactionStatusDTO.getHeight());
+  }
 
-    @Override
-    public Observable<List<TransactionStatus>> getTransactionStatuses(List<String> transactionHashes) {
-        Consumer<Handler<AsyncResult<List<TransactionStatusDTO>>>> callback = handler -> client
-            .getTransactionStatuses(new TransactionHashes().hashes(transactionHashes), handler);
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toTransactionStatus).toList().toObservable());
-    }
-
+  @Override
+  public Observable<List<TransactionStatus>> getTransactionStatuses(
+      List<String> transactionHashes) {
+    Consumer<Handler<AsyncResult<List<TransactionStatusDTO>>>> callback =
+        handler ->
+            client.getTransactionStatuses(
+                new TransactionHashes().hashes(transactionHashes), handler);
+    return exceptionHandling(
+        call(callback)
+            .flatMapIterable(item -> item)
+            .map(this::toTransactionStatus)
+            .toList()
+            .toObservable());
+  }
 }

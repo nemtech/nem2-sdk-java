@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.sdk.model.transaction.Deadline;
@@ -21,12 +20,12 @@ import java.time.temporal.ChronoUnit;
 
 public class VertxFakeDeadline extends Deadline {
 
-    public VertxFakeDeadline() {
-        super(1, ChronoUnit.HOURS);
-    }
+  public VertxFakeDeadline() {
+    super(1, ChronoUnit.HOURS);
+  }
 
-    @Override
-    public long getInstant() {
-        return 1;
-    }
+  @Override
+  public long getInstant() {
+    return 1;
+  }
 }

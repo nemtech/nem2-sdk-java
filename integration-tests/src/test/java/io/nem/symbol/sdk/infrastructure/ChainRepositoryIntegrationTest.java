@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,22 +27,22 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ChainRepositoryIntegrationTest extends BaseIntegrationTest {
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getBlockchainHeight(RepositoryType type) {
-        BigInteger blockchainHeight = get(getChainRepository(type).getBlockchainHeight());
-        assertTrue(blockchainHeight.intValue() > 0);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getBlockchainHeight(RepositoryType type) {
+    BigInteger blockchainHeight = get(getChainRepository(type).getBlockchainHeight());
+    assertTrue(blockchainHeight.intValue() > 0);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getBlockchainScore(RepositoryType type) {
-        BlockchainScore blockchainScore = get(getChainRepository(type).getChainScore());
-        assertTrue(blockchainScore.getScoreLow().longValue() >= 0);
-        assertTrue(blockchainScore.getScoreHigh().longValue() >= 0);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getBlockchainScore(RepositoryType type) {
+    BlockchainScore blockchainScore = get(getChainRepository(type).getChainScore());
+    assertTrue(blockchainScore.getScoreLow().longValue() >= 0);
+    assertTrue(blockchainScore.getScoreHigh().longValue() >= 0);
+  }
 
-    private ChainRepository getChainRepository(RepositoryType type) {
-        return getRepositoryFactory(type).createChainRepository();
-    }
+  private ChainRepository getChainRepository(RepositoryType type) {
+    return getRepositoryFactory(type).createChainRepository();
+  }
 }

@@ -13,27 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
-
-/**
- * Account properties structure describes property information for an account.
- */
+/** Account properties structure describes property information for an account. */
 public class AccountPropertiesInfo {
 
-    private final String metaId;
-    private final AccountRestrictions accountRestrictions;
+  private final String metaId;
+  private final AccountRestrictions accountRestrictions;
 
-    public AccountPropertiesInfo(String metaId, AccountRestrictions accountRestrictions) {
-        this.metaId = metaId;
-        this.accountRestrictions = accountRestrictions;
-    }
+  public AccountPropertiesInfo(String metaId, AccountRestrictions accountRestrictions) {
+    this.metaId = metaId;
+    this.accountRestrictions = accountRestrictions;
+  }
 
-    public String getMetaId() {
-        return metaId;
-    }
+  public String getMetaId() {
+    return metaId;
+  }
 
-    public AccountRestrictions getAccountRestrictions() {
-        return accountRestrictions;
-    }
+  public AccountRestrictions getAccountRestrictions() {
+    return accountRestrictions;
+  }
 }

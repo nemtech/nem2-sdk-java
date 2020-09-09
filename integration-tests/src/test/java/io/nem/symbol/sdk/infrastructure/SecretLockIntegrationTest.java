@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.core.utils.ConvertUtils;
@@ -43,84 +42,94 @@ import org.junit.jupiter.params.provider.MethodSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SecretLockIntegrationTest extends BaseIntegrationTest {
 
-    static List<Arguments> provider() {
-        List<Arguments> arguments = new ArrayList<>();
-        for (RepositoryType repositoryType : RepositoryType.values()) {
-            for (SecretHashAlgorithm secretHashAlgorithm : SecretHashAlgorithm.values()) {
-                arguments.add(Arguments.of(repositoryType, secretHashAlgorithm));
-            }
-        }
-        return arguments;
+  static List<Arguments> provider() {
+    List<Arguments> arguments = new ArrayList<>();
+    for (RepositoryType repositoryType : RepositoryType.values()) {
+      for (SecretHashAlgorithm secretHashAlgorithm : SecretHashAlgorithm.values()) {
+        arguments.add(Arguments.of(repositoryType, secretHashAlgorithm));
+      }
     }
+    return arguments;
+  }
 
+  @ParameterizedTest
+  @MethodSource("provider")
+  void secretLockAndProofTransaction(RepositoryType type, SecretHashAlgorithm secretHashAlgorithm) {
 
-    @ParameterizedTest
-    @MethodSource("provider")
-    void secretLockAndProofTransaction(RepositoryType type, SecretHashAlgorithm secretHashAlgorithm) {
-
-        RepositoryFactory repositoryFactory = getRepositoryFactory(type);
-        byte[] secretSeed = RandomUtils.generateRandomBytes(20);
-        String secret = ConvertUtils.toHex(secretHashAlgorithm.hash(secretSeed));
-        String storedSecret = ConvertUtils.padHex(secret, SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE);
-        if (secretHashAlgorithm == SecretHashAlgorithm.HASH_160) {
-            Assertions.assertEquals(SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE, storedSecret.length());
-            Assertions.assertEquals(40, secret.length());
-        } else {
-            Assertions.assertEquals(SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE, storedSecret.length());
-            Assertions.assertEquals(SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE, secret.length());
-        }
-        String proof = ConvertUtils.toHex(secretSeed);
-
-        Account account = config().getNemesisAccount1();
-        Account account2 = config().getNemesisAccount2();
-        NetworkCurrency networkCurrency = get(repositoryFactory.getNetworkCurrency());
-        Mosaic mosaic = networkCurrency.createAbsolute(BigInteger.valueOf(1));
-        BigInteger amount = mosaic.getAmount();
-        SecretLockTransaction secretLockTransaction = SecretLockTransactionFactory
-            .create(getNetworkType(), mosaic, BigInteger.valueOf(100), secretHashAlgorithm, secret,
-                account2.getAddress()).maxFee(maxFee).build();
-
-        announceAndValidate(type, account, secretLockTransaction);
-
-        SecretProofTransaction secretProofTransaction = SecretProofTransactionFactory
-            .create(getNetworkType(), secretHashAlgorithm, account2.getAddress(), secret, proof).maxFee(maxFee).build();
-
-        SecretProofTransaction secretProofTransactionAnnounced = announceAndValidate(type, account,
-            secretProofTransaction);
-
-        Assertions.assertEquals(secretHashAlgorithm, secretProofTransactionAnnounced.getHashType());
-        Assertions.assertEquals(account2.getAddress(), secretProofTransactionAnnounced.getRecipient());
-        Assertions.assertEquals(storedSecret, secretProofTransactionAnnounced.getSecret());
-        Assertions.assertEquals(proof, secretProofTransactionAnnounced.getProof());
-
-        SecretLockRepository hashLockRepository = getRepositoryFactory(type).createSecretLockRepository();
-
-        SecretLockInfo info = get(hashLockRepository.getSecretLock(secret));
-        Assertions.assertNotNull(info);
-        Assertions.assertEquals(account.getAddress(), info.getOwnerAddress());
-        Assertions.assertEquals(account2.getAddress(), info.getRecipientAddress());
-        Assertions.assertEquals(amount, info.getAmount());
-        Assertions.assertEquals(secretHashAlgorithm, info.getHashAlgorithm());
-        Assertions.assertEquals(1, info.getStatus());
-        Assertions.assertEquals(storedSecret, info.getSecret());
-
-        Page<SecretLockInfo> page = get(
-            hashLockRepository.search(new SecretLockSearchCriteria(account.getAddress()).order(OrderBy.DESC)));
-
-        Assertions.assertTrue(page.getData().stream().anyMatch(m -> m.getSecret().equals(storedSecret)));
-        Assertions.assertEquals(20, page.getPageSize());
-
-        SecretLockInfo infoSearch = page.getData().stream().filter(m -> m.getSecret().equals(storedSecret)).findFirst()
-            .get();
-        Assertions.assertNotNull(infoSearch);
-        Assertions.assertEquals(account.getAddress(), infoSearch.getOwnerAddress());
-        Assertions.assertEquals(account2.getAddress(), infoSearch.getRecipientAddress());
-        Assertions.assertEquals(amount, infoSearch.getAmount());
-        Assertions.assertEquals(secretHashAlgorithm, infoSearch.getHashAlgorithm());
-        Assertions.assertEquals(1, infoSearch.getStatus());
-        Assertions.assertEquals(storedSecret, infoSearch.getSecret());
-
-
+    RepositoryFactory repositoryFactory = getRepositoryFactory(type);
+    byte[] secretSeed = RandomUtils.generateRandomBytes(20);
+    String secret = ConvertUtils.toHex(secretHashAlgorithm.hash(secretSeed));
+    String storedSecret = ConvertUtils.padHex(secret, SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE);
+    if (secretHashAlgorithm == SecretHashAlgorithm.HASH_160) {
+      Assertions.assertEquals(SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE, storedSecret.length());
+      Assertions.assertEquals(40, secret.length());
+    } else {
+      Assertions.assertEquals(SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE, storedSecret.length());
+      Assertions.assertEquals(SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE, secret.length());
     }
+    String proof = ConvertUtils.toHex(secretSeed);
 
+    Account account = config().getNemesisAccount1();
+    Account account2 = config().getNemesisAccount2();
+    NetworkCurrency networkCurrency = get(repositoryFactory.getNetworkCurrency());
+    Mosaic mosaic = networkCurrency.createAbsolute(BigInteger.valueOf(1));
+    BigInteger amount = mosaic.getAmount();
+    SecretLockTransaction secretLockTransaction =
+        SecretLockTransactionFactory.create(
+                getNetworkType(),
+                mosaic,
+                BigInteger.valueOf(100),
+                secretHashAlgorithm,
+                secret,
+                account2.getAddress())
+            .maxFee(maxFee)
+            .build();
+
+    announceAndValidate(type, account, secretLockTransaction);
+
+    SecretProofTransaction secretProofTransaction =
+        SecretProofTransactionFactory.create(
+                getNetworkType(), secretHashAlgorithm, account2.getAddress(), secret, proof)
+            .maxFee(maxFee)
+            .build();
+
+    SecretProofTransaction secretProofTransactionAnnounced =
+        announceAndValidate(type, account, secretProofTransaction);
+
+    Assertions.assertEquals(secretHashAlgorithm, secretProofTransactionAnnounced.getHashType());
+    Assertions.assertEquals(account2.getAddress(), secretProofTransactionAnnounced.getRecipient());
+    Assertions.assertEquals(storedSecret, secretProofTransactionAnnounced.getSecret());
+    Assertions.assertEquals(proof, secretProofTransactionAnnounced.getProof());
+
+    SecretLockRepository hashLockRepository =
+        getRepositoryFactory(type).createSecretLockRepository();
+
+    SecretLockInfo info = get(hashLockRepository.getSecretLock(secret));
+    Assertions.assertNotNull(info);
+    Assertions.assertEquals(account.getAddress(), info.getOwnerAddress());
+    Assertions.assertEquals(account2.getAddress(), info.getRecipientAddress());
+    Assertions.assertEquals(amount, info.getAmount());
+    Assertions.assertEquals(secretHashAlgorithm, info.getHashAlgorithm());
+    Assertions.assertEquals(1, info.getStatus());
+    Assertions.assertEquals(storedSecret, info.getSecret());
+
+    Page<SecretLockInfo> page =
+        get(
+            hashLockRepository.search(
+                new SecretLockSearchCriteria(account.getAddress()).order(OrderBy.DESC)));
+
+    Assertions.assertTrue(
+        page.getData().stream().anyMatch(m -> m.getSecret().equals(storedSecret)));
+    Assertions.assertEquals(20, page.getPageSize());
+
+    SecretLockInfo infoSearch =
+        page.getData().stream().filter(m -> m.getSecret().equals(storedSecret)).findFirst().get();
+    Assertions.assertNotNull(infoSearch);
+    Assertions.assertEquals(account.getAddress(), infoSearch.getOwnerAddress());
+    Assertions.assertEquals(account2.getAddress(), infoSearch.getRecipientAddress());
+    Assertions.assertEquals(amount, infoSearch.getAmount());
+    Assertions.assertEquals(secretHashAlgorithm, infoSearch.getHashAlgorithm());
+    Assertions.assertEquals(1, infoSearch.getStatus());
+    Assertions.assertEquals(storedSecret, infoSearch.getSecret());
+  }
 }

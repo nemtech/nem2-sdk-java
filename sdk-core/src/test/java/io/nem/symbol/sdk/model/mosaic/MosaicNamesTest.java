@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.mosaic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,14 +25,14 @@ import org.junit.jupiter.api.Test;
 
 class MosaicNamesTest {
 
-    @Test
-    void createMosaicNames() {
-        MosaicId mosaicId = new MosaicId(new BigInteger("-3087871471161192663"));
-        List<NamespaceName> namespaceNames = Arrays
-            .asList(new NamespaceName("xem"), new NamespaceName("anotheralias"));
-        MosaicNames names = new MosaicNames(mosaicId, namespaceNames);
-        assertEquals(mosaicId, names.getMosaicId());
+  @Test
+  void createMosaicNames() {
+    MosaicId mosaicId = new MosaicId(new BigInteger("-3087871471161192663"));
+    List<NamespaceName> namespaceNames =
+        Arrays.asList(new NamespaceName("xem"), new NamespaceName("anotheralias"));
+    MosaicNames names = new MosaicNames(mosaicId, namespaceNames);
+    assertEquals(mosaicId, names.getMosaicId());
 
-        assertEquals(namespaceNames, names.getNames());
-    }
+    assertEquals(namespaceNames, names.getNames());
+  }
 }

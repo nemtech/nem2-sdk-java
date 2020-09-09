@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -36,129 +35,172 @@ import org.junit.jupiter.api.TestInstance;
 @Disabled
 class ListenerStatusIntegrationTest extends BaseIntegrationTest {
 
+  @Test
+  void statusListener() throws ExecutionException, InterruptedException {
+    RepositoryType type = DEFAULT_REPOSITORY_TYPE;
+    Account account1 = Account.generateNewAccount(getNetworkType());
+    Account account2 = Account.generateNewAccount(getNetworkType());
+    Account account3 = Account.generateNewAccount(getNetworkType());
 
-    @Test
-    void statusListener() throws ExecutionException, InterruptedException {
-        RepositoryType type = DEFAULT_REPOSITORY_TYPE;
-        Account account1 = Account.generateNewAccount(getNetworkType());
-        Account account2 = Account.generateNewAccount(getNetworkType());
-        Account account3 = Account.generateNewAccount(getNetworkType());
+    createListener(type)
+        .status(account1.getAddress())
+        .subscribe(
+            a -> {
+              System.out.println(
+                  ">>>> account 1 "
+                      + a.getAddress().plain()
+                      + " "
+                      + a.getHash()
+                      + " "
+                      + a.getStatus());
+            });
 
-        createListener(type).status(account1.getAddress()).subscribe(a -> {
-            System.out.println(
-                ">>>> account 1 " + a.getAddress().plain() + " " + a.getHash() + " " + a
-                    .getStatus());
-        });
+    createListener(type)
+        .status(account2.getAddress())
+        .subscribe(
+            a -> {
+              System.out.println(
+                  ">>>> account 2 "
+                      + a.getAddress().plain()
+                      + " "
+                      + a.getHash()
+                      + " "
+                      + a.getStatus());
+            });
 
-        createListener(type).status(account2.getAddress()).subscribe(a -> {
-            System.out.println(
-                ">>>> account 2 " + a.getAddress().plain() + " " + a.getHash() + " " + a
-                    .getStatus());
-        });
+    createListener(type)
+        .status(account3.getAddress())
+        .subscribe(
+            a -> {
+              System.out.println(
+                  ">>>> account 3  "
+                      + a.getAddress().plain()
+                      + " "
+                      + a.getHash()
+                      + " "
+                      + a.getStatus());
+            });
 
-        createListener(type).status(account3.getAddress()).subscribe(a -> {
-            System.out.println(
-                ">>>> account 3  " + a.getAddress().plain() + " " + a.getHash() + " " + a
-                    .getStatus());
-        });
-
-        TransferTransaction transferTransaction =
-            TransferTransactionFactory.create(
+    TransferTransaction transferTransaction =
+        TransferTransactionFactory.create(
                 getNetworkType(),
                 account2.getAddress(),
-                Collections
-                    .singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-                PlainMessage.create("test-message")
-            ).maxFee(this.maxFee).build();
-        announceAndValidate(type, account1, transferTransaction);
+                Collections.singletonList(
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
+                PlainMessage.create("test-message"))
+            .maxFee(this.maxFee)
+            .build();
+    announceAndValidate(type, account1, transferTransaction);
+  }
 
-    }
+  @Test
+  void sendTransactionsReusingListener() throws ExecutionException, InterruptedException {
+    RepositoryType type = DEFAULT_REPOSITORY_TYPE;
+    Account account1 = config().getNemesisAccount1();
+    Account account2 = Account.generateNewAccount(getNetworkType());
+    Account account3 = Account.generateNewAccount(getNetworkType());
 
-    @Test
-    void sendTransactionsReusingListener() throws ExecutionException, InterruptedException {
-        RepositoryType type = DEFAULT_REPOSITORY_TYPE;
-        Account account1 = config().getNemesisAccount1();
-        Account account2 = Account.generateNewAccount(getNetworkType());
-        Account account3 = Account.generateNewAccount(getNetworkType());
+    Listener listener = createListener(type);
+    listener
+        .unconfirmedRemoved(account1.getAddress())
+        .subscribe(
+            a -> {
+              System.out.println(">>>> account 1 " + a);
+            });
 
-        Listener listener = createListener(type);
-        listener.unconfirmedRemoved(account1.getAddress()).subscribe(a -> {
-            System.out.println(">>>> account 1 " + a);
-        });
+    listener
+        .unconfirmedRemoved(account2.getAddress())
+        .subscribe(
+            a -> {
+              System.out.println(">>>> account 2 " + a);
+            });
 
-        listener.unconfirmedRemoved(account2.getAddress()).subscribe(a -> {
-            System.out.println(">>>> account 2 " + a);
-        });
+    listener
+        .unconfirmedRemoved(account3.getAddress())
+        .subscribe(
+            a -> {
+              System.out.println(">>>> account 3  " + a);
+            });
+    // IT PRINTS:
+    // >>>> account 1
+    // 94BE61F8FA091319A3564D843468ABD8E51034F7CDF132A74BBA2A7465E27C7D
+    // >>>> account 2
+    // 94BE61F8FA091319A3564D843468ABD8E51034F7CDF132A74BBA2A7465E27C7D
+    // >>>> account 3
+    // 94BE61F8FA091319A3564D843468ABD8E51034F7CDF132A74BBA2A7465E27C7D
+    // >>>> account 1
+    // 94BE61F8FA091319A3564D843468ABD8E51034F7CDF132A74BBA2A7465E27C7D
+    // >>>> account 2
+    // 94BE61F8FA091319A3564D843468ABD8E51034F7CDF132A74BBA2A7465E27C7D
+    // >>>> account 3
+    // 94BE61F8FA091319A3564D843468ABD8E51034F7CDF132A74BBA2A7465E27C7D
 
-        listener.unconfirmedRemoved(account3.getAddress()).subscribe(a -> {
-            System.out.println(">>>> account 3  " + a);
-        });
-// IT PRINTS:
-//             >>>> account 1 94BE61F8FA091319A3564D843468ABD8E51034F7CDF132A74BBA2A7465E27C7D
-//            >>>> account 2 94BE61F8FA091319A3564D843468ABD8E51034F7CDF132A74BBA2A7465E27C7D
-//            >>>> account 3  94BE61F8FA091319A3564D843468ABD8E51034F7CDF132A74BBA2A7465E27C7D
-//            >>>> account 1 94BE61F8FA091319A3564D843468ABD8E51034F7CDF132A74BBA2A7465E27C7D
-//            >>>> account 2 94BE61F8FA091319A3564D843468ABD8E51034F7CDF132A74BBA2A7465E27C7D
-//            >>>> account 3  94BE61F8FA091319A3564D843468ABD8E51034F7CDF132A74BBA2A7465E27C7D
-
-        TransferTransaction transferTransaction =
-            TransferTransactionFactory.create(
+    TransferTransaction transferTransaction =
+        TransferTransactionFactory.create(
                 getNetworkType(),
                 account2.getAddress(),
-                Collections
-                    .singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-                PlainMessage.create("test-message")
-            ).maxFee(this.maxFee).build();
-        announceAndValidate(type, account1, transferTransaction);
-        sleep(1000);
+                Collections.singletonList(
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
+                PlainMessage.create("test-message"))
+            .maxFee(this.maxFee)
+            .build();
+    announceAndValidate(type, account1, transferTransaction);
+    sleep(1000);
+  }
 
-    }
+  @Test
+  void sendTransactionsNewListener() throws ExecutionException, InterruptedException {
+    RepositoryType type = DEFAULT_REPOSITORY_TYPE;
+    Account account1 = config().getNemesisAccount1();
+    Account account2 = Account.generateNewAccount(getNetworkType());
+    Account account3 = Account.generateNewAccount(getNetworkType());
 
-    @Test
-    void sendTransactionsNewListener() throws ExecutionException, InterruptedException {
-        RepositoryType type = DEFAULT_REPOSITORY_TYPE;
-        Account account1 = config().getNemesisAccount1();
-        Account account2 = Account.generateNewAccount(getNetworkType());
-        Account account3 = Account.generateNewAccount(getNetworkType());
+    createListener(type)
+        .unconfirmedRemoved(account1.getAddress())
+        .subscribe(
+            a -> {
+              System.out.println(">>>> account 1 " + a);
+            });
 
-        createListener(type).unconfirmedRemoved(account1.getAddress()).subscribe(a -> {
-            System.out.println(">>>> account 1 " + a);
-        });
+    createListener(type)
+        .unconfirmedRemoved(account2.getAddress())
+        .subscribe(
+            a -> {
+              System.out.println(">>>> account 2 " + a);
+            });
 
-        createListener(type).unconfirmedRemoved(account2.getAddress()).subscribe(a -> {
-            System.out.println(">>>> account 2 " + a);
-        });
+    createListener(type)
+        .unconfirmedRemoved(account3.getAddress())
+        .subscribe(
+            a -> {
+              System.out.println(">>>> account 3  " + a);
+            });
 
-        createListener(type).unconfirmedRemoved(account3.getAddress()).subscribe(a -> {
-            System.out.println(">>>> account 3  " + a);
-        });
+    // IT prints:
+    // >>>> account 1
+    // B742A00E5F7D8381F78EBE8CE47023C6298FB1802CDB3861CA0C05286DE0EE63
+    // >>>> account 2
+    // B742A00E5F7D8381F78EBE8CE47023C6298FB1802CDB3861CA0C05286DE0EE63
 
-        // IT prints:
-        // >>>> account 1 B742A00E5F7D8381F78EBE8CE47023C6298FB1802CDB3861CA0C05286DE0EE63
-        //  >>>> account 2 B742A00E5F7D8381F78EBE8CE47023C6298FB1802CDB3861CA0C05286DE0EE63
-
-
-        TransferTransaction transferTransaction =
-            TransferTransactionFactory.create(
+    TransferTransaction transferTransaction =
+        TransferTransactionFactory.create(
                 getNetworkType(),
                 account2.getAddress(),
-                Collections
-                    .singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-                PlainMessage.create("test-message")
-            ).maxFee(this.maxFee).build();
-        announceAndValidate(type, account1, transferTransaction);
-        sleep(1000);
+                Collections.singletonList(
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
+                PlainMessage.create("test-message"))
+            .maxFee(this.maxFee)
+            .build();
+    announceAndValidate(type, account1, transferTransaction);
+    sleep(1000);
+  }
 
-    }
-
-    private Listener createListener(RepositoryType type)
-        throws InterruptedException, ExecutionException {
-        Listener listener = getRepositoryFactory(type).createListener();
-        CompletableFuture<Void> connected = listener.open();
-        connected.get();
-        assertTrue(connected.isDone());
-        return listener;
-    }
-
-
+  private Listener createListener(RepositoryType type)
+      throws InterruptedException, ExecutionException {
+    Listener listener = getRepositoryFactory(type).createListener();
+    CompletableFuture<Void> connected = listener.open();
+    connected.get();
+    assertTrue(connected.isDone());
+    return listener;
+  }
 }

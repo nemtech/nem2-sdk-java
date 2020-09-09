@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.namespace;
 
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 
-/**
- * Mosaic alias.
- */
+/** Mosaic alias. */
 public class MosaicAlias extends AliasBase<MosaicId> {
 
-    /**
-     * Creates mosaicId alias.
-     *
-     * @param mosaicId Mosaic id.
-     */
-    public MosaicAlias(MosaicId mosaicId) {
-        super(AliasType.MOSAIC, mosaicId);
-    }
-
+  /**
+   * Creates mosaicId alias.
+   *
+   * @param mosaicId Mosaic id.
+   */
+  public MosaicAlias(MosaicId mosaicId) {
+    super(AliasType.MOSAIC, mosaicId);
+  }
 }

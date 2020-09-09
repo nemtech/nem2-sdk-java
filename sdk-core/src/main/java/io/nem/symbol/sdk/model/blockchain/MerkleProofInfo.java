@@ -13,31 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.blockchain;
 
 import java.util.List;
 
 public class MerkleProofInfo {
 
-    private final List<MerklePathItem> merklePath;
+  private final List<MerklePathItem> merklePath;
 
-    /**
-     * Constructor
-     *
-     * @param merklePath the path.
-     */
-    public MerkleProofInfo(List<MerklePathItem> merklePath) {
-        this.merklePath = merklePath;
-    }
+  /**
+   * Constructor
+   *
+   * @param merklePath the path.
+   */
+  public MerkleProofInfo(List<MerklePathItem> merklePath) {
+    this.merklePath = merklePath;
+  }
 
-
-    /**
-     * Return Payload
-     *
-     * @return {@link List} of MerklePathItem
-     */
-    public List<MerklePathItem> getMerklePath() {
-        return this.merklePath;
-    }
+  /**
+   * Return Payload
+   *
+   * @return {@link List} of MerklePathItem
+   */
+  public List<MerklePathItem> getMerklePath() {
+    return this.merklePath;
+  }
 }

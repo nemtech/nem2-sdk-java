@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.MetadataRepository;
@@ -30,54 +29,68 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-/**
- * Integration tests around mosaic metadata service.
- */
+/** Integration tests around mosaic metadata service. */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void setAndUpdateMosaicMetadata(RepositoryType type) {
+    Account signerAccount = config().getDefaultAccount();
+    Account targetAccount = config().getTestAccount();
+    MosaicId targetMosaicId = super.createMosaic(signerAccount, type, BigInteger.ZERO, null);
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void setAndUpdateMosaicMetadata(RepositoryType type) {
-        Account signerAccount = config().getDefaultAccount();
-        Account targetAccount = config().getTestAccount();
-        MosaicId targetMosaicId = super.createMosaic(signerAccount, type, BigInteger.ZERO, null);
+    BigInteger key = BigInteger.valueOf(RandomUtils.generateRandomInt(100000));
 
-        BigInteger key = BigInteger.valueOf(RandomUtils.generateRandomInt(100000));
+    String originalMessage = "The original message";
+    String newMessage = "The new Message";
 
-        String originalMessage = "The original message";
-        String newMessage = "The new Message";
+    RepositoryFactory repositoryFactory = getRepositoryFactory(type);
+    MetadataRepository metadataRepository = repositoryFactory.createMetadataRepository();
 
-        RepositoryFactory repositoryFactory = getRepositoryFactory(type);
-        MetadataRepository metadataRepository = repositoryFactory.createMetadataRepository();
+    MetadataTransactionService service = new MetadataTransactionServiceImpl(repositoryFactory);
 
-        MetadataTransactionService service = new MetadataTransactionServiceImpl(repositoryFactory);
+    MosaicMetadataTransaction originalTransaction =
+        get(service.createMosaicMetadataTransactionFactory(
+                targetAccount.getAddress(),
+                key,
+                originalMessage,
+                signerAccount.getAddress(),
+                targetMosaicId))
+            .maxFee(maxFee)
+            .build();
 
-        MosaicMetadataTransaction originalTransaction = get(service
-            .createMosaicMetadataTransactionFactory(targetAccount.getAddress(), key, originalMessage,
-                signerAccount.getAddress(), targetMosaicId)).maxFee(maxFee).build();
+    announceAggregateAndValidate(type, originalTransaction, signerAccount);
 
-        announceAggregateAndValidate(type, originalTransaction, signerAccount);
+    assertMetadata(targetMosaicId, key, originalMessage, metadataRepository, signerAccount);
 
-        assertMetadata(targetMosaicId, key, originalMessage, metadataRepository, signerAccount);
+    MosaicMetadataTransaction updateTransaction =
+        get(service.createMosaicMetadataTransactionFactory(
+                targetAccount.getAddress(),
+                key,
+                newMessage,
+                signerAccount.getAddress(),
+                targetMosaicId))
+            .maxFee(maxFee)
+            .build();
 
-        MosaicMetadataTransaction updateTransaction = get(service
-            .createMosaicMetadataTransactionFactory(targetAccount.getAddress(), key, newMessage,
-                signerAccount.getAddress(), targetMosaicId)).maxFee(maxFee).build();
+    announceAggregateAndValidate(type, updateTransaction, signerAccount);
 
-        announceAggregateAndValidate(type, updateTransaction, signerAccount);
+    assertMetadata(targetMosaicId, key, newMessage, metadataRepository, signerAccount);
+  }
 
-        assertMetadata(targetMosaicId, key, newMessage, metadataRepository, signerAccount);
-
-    }
-
-    private void assertMetadata(MosaicId targetMosaicId, BigInteger key, String value,
-        MetadataRepository metadataRepository, Account signerAccount) {
-        MetadataSearchCriteria criteria = new MetadataSearchCriteria().targetId(targetMosaicId).scopedMetadataKey(key)
+  private void assertMetadata(
+      MosaicId targetMosaicId,
+      BigInteger key,
+      String value,
+      MetadataRepository metadataRepository,
+      Account signerAccount) {
+    MetadataSearchCriteria criteria =
+        new MetadataSearchCriteria()
+            .targetId(targetMosaicId)
+            .scopedMetadataKey(key)
             .sourceAddress(signerAccount.getAddress());
-        Metadata originalMetadata = get(metadataRepository.search(criteria)).getData().get(0);
-        Assertions.assertEquals(value, originalMetadata.getValue());
-    }
-
+    Metadata originalMetadata = get(metadataRepository.search(criteria)).getData().get(0);
+    Assertions.assertEquals(value, originalMetadata.getValue());
+  }
 }

@@ -13,36 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import java.util.List;
 
-/**
- * Account properties structure describes property information for an account.
- */
+/** Account properties structure describes property information for an account. */
 public class AccountRestrictions {
 
-    /**
-     * The address where the restrictions apply.
-     */
-    private final Address address;
+  /** The address where the restrictions apply. */
+  private final Address address;
 
-    /**
-     * The restrictions.
-     */
-    private final List<AccountRestriction> restrictions;
+  /** The restrictions. */
+  private final List<AccountRestriction> restrictions;
 
-    public AccountRestrictions(Address address, List<AccountRestriction> restrictions) {
-        this.address = address;
-        this.restrictions = restrictions;
-    }
+  public AccountRestrictions(Address address, List<AccountRestriction> restrictions) {
+    this.address = address;
+    this.restrictions = restrictions;
+  }
 
-    public Address getAddress() {
-        return address;
-    }
+  public Address getAddress() {
+    return address;
+  }
 
-    public List<AccountRestriction> getRestrictions() {
-        return restrictions;
-    }
+  public List<AccountRestriction> getRestrictions() {
+    return restrictions;
+  }
 }

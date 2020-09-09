@@ -13,66 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto;
 
 import io.nem.symbol.sdk.infrastructure.RandomUtils;
 import java.math.BigInteger;
 
-/**
- * Represents a private key.
- */
+/** Represents a private key. */
 public class PrivateKey extends Key {
 
-    /**
-     * The size of Symbol's private keys .
-     */
-    public static final int SIZE = 32;
+  /** The size of Symbol's private keys . */
+  public static final int SIZE = 32;
 
-    /**
-     * Creates a new private key from a big int value.
-     *
-     * @param value the big int.
-     */
-    public PrivateKey(final BigInteger value) {
-        super(value, SIZE);
-    }
+  /**
+   * Creates a new private key from a big int value.
+   *
+   * @param value the big int.
+   */
+  public PrivateKey(final BigInteger value) {
+    super(value, SIZE);
+  }
 
-    public PrivateKey(byte[] bytes) {
-        super(bytes, SIZE);
-    }
+  public PrivateKey(byte[] bytes) {
+    super(bytes, SIZE);
+  }
 
-    public PrivateKey(String hex) {
-        super(hex, SIZE);
-    }
+  public PrivateKey(String hex) {
+    super(hex, SIZE);
+  }
 
-    /**
-     * Creates a private key from a hex string.
-     *
-     * @param hex The hex string.
-     * @return The new private key.
-     */
-    public static PrivateKey fromHexString(final String hex) {
-        return new PrivateKey(hex);
-    }
+  /**
+   * Creates a private key from a hex string.
+   *
+   * @param hex The hex string.
+   * @return The new private key.
+   */
+  public static PrivateKey fromHexString(final String hex) {
+    return new PrivateKey(hex);
+  }
 
-    /**
-     * Creates a private key from a decimal string.
-     *
-     * @param decimal The decimal string.
-     * @return The new private key.
-     */
-    public static PrivateKey fromDecimalString(final String decimal) {
-        return new PrivateKey(new BigInteger(decimal, 10));
-    }
+  /**
+   * Creates a private key from a decimal string.
+   *
+   * @param decimal The decimal string.
+   * @return The new private key.
+   */
+  public static PrivateKey fromDecimalString(final String decimal) {
+    return new PrivateKey(new BigInteger(decimal, 10));
+  }
 
-    /**
-     * Generates a random private key.
-     *
-     * @return The new private key.
-     */
-    public static PrivateKey generateRandom() {
-        return new PrivateKey(RandomUtils.generateRandomBytes(SIZE));
-    }
-
+  /**
+   * Generates a random private key.
+   *
+   * @return The new private key.
+   */
+  public static PrivateKey generateRandom() {
+    return new PrivateKey(RandomUtils.generateRandomBytes(SIZE));
+  }
 }

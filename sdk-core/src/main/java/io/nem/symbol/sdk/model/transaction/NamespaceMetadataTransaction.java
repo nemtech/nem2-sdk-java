@@ -13,33 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 
-/**
- * Announce an NameMetadataTransaction to associate a key-value state to an namespace.
- */
+/** Announce an NameMetadataTransaction to associate a key-value state to an namespace. */
 public class NamespaceMetadataTransaction extends MetadataTransaction {
 
-    /**
-     * Metadata target Namespace id.
-     */
-    private final NamespaceId targetNamespaceId;
+  /** Metadata target Namespace id. */
+  private final NamespaceId targetNamespaceId;
 
-    /**
-     * Constructor
-     *
-     * @param factory the factory with the configured data.
-     */
-    NamespaceMetadataTransaction(NamespaceMetadataTransactionFactory factory) {
-        super(factory);
-        this.targetNamespaceId = factory.getTargetNamespaceId();
-    }
+  /**
+   * Constructor
+   *
+   * @param factory the factory with the configured data.
+   */
+  NamespaceMetadataTransaction(NamespaceMetadataTransactionFactory factory) {
+    super(factory);
+    this.targetNamespaceId = factory.getTargetNamespaceId();
+  }
 
-    public NamespaceId getTargetNamespaceId() {
-        return targetNamespaceId;
-    }
-
+  public NamespaceId getTargetNamespaceId() {
+    return targetNamespaceId;
+  }
 }

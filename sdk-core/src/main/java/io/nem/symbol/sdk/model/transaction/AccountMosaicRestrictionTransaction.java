@@ -20,42 +20,35 @@ import java.util.List;
 
 public class AccountMosaicRestrictionTransaction extends Transaction {
 
-    private final AccountMosaicRestrictionFlags restrictionFlags;
+  private final AccountMosaicRestrictionFlags restrictionFlags;
 
-    private final List<UnresolvedMosaicId> restrictionAdditions;
+  private final List<UnresolvedMosaicId> restrictionAdditions;
 
-    private final List<UnresolvedMosaicId> restrictionDeletions;
+  private final List<UnresolvedMosaicId> restrictionDeletions;
 
-    AccountMosaicRestrictionTransaction(
-        AccountMosaicRestrictionTransactionFactory factory) {
-        super(factory);
-        this.restrictionFlags = factory.getRestrictionFlags();
-        this.restrictionAdditions = factory.getRestrictionAdditions();
-        this.restrictionDeletions = factory.getRestrictionDeletions();
-    }
+  AccountMosaicRestrictionTransaction(AccountMosaicRestrictionTransactionFactory factory) {
+    super(factory);
+    this.restrictionFlags = factory.getRestrictionFlags();
+    this.restrictionAdditions = factory.getRestrictionAdditions();
+    this.restrictionDeletions = factory.getRestrictionDeletions();
+  }
 
-    /**
-     * Get account restriction flags
-     *
-     * @return {@link AccountMosaicRestrictionFlags}
-     */
-    public AccountMosaicRestrictionFlags getRestrictionFlags() {
-        return this.restrictionFlags;
-    }
+  /**
+   * Get account restriction flags
+   *
+   * @return {@link AccountMosaicRestrictionFlags}
+   */
+  public AccountMosaicRestrictionFlags getRestrictionFlags() {
+    return this.restrictionFlags;
+  }
 
+  /** @return List of mosaic ids that are going to be added to the restriction. */
+  public List<UnresolvedMosaicId> getRestrictionAdditions() {
+    return restrictionAdditions;
+  }
 
-    /**
-     * @return List of mosaic ids that are going to be added to the restriction.
-     */
-    public List<UnresolvedMosaicId> getRestrictionAdditions() {
-        return restrictionAdditions;
-    }
-
-    /**
-     * @return List of mosaic ids that are going to be removed from the restriction.
-     */
-    public List<UnresolvedMosaicId> getRestrictionDeletions() {
-        return restrictionDeletions;
-    }
-
+  /** @return List of mosaic ids that are going to be removed from the restriction. */
+  public List<UnresolvedMosaicId> getRestrictionDeletions() {
+    return restrictionDeletions;
+  }
 }

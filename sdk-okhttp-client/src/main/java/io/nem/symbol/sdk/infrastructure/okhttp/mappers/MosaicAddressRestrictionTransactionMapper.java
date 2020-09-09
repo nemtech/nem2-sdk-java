@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
 import static io.nem.symbol.core.utils.MapperUtils.getIdAsHex;
@@ -28,37 +27,37 @@ import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicAddressRestrictionTransactionDTO;
 
-/**
- * Mosaic address restriction transaction mapper.
- */
-class MosaicAddressRestrictionTransactionMapper extends
-    AbstractTransactionMapper<MosaicAddressRestrictionTransactionDTO, MosaicAddressRestrictionTransaction> {
+/** Mosaic address restriction transaction mapper. */
+class MosaicAddressRestrictionTransactionMapper
+    extends AbstractTransactionMapper<
+        MosaicAddressRestrictionTransactionDTO, MosaicAddressRestrictionTransaction> {
 
-    public MosaicAddressRestrictionTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.MOSAIC_ADDRESS_RESTRICTION,
-            MosaicAddressRestrictionTransactionDTO.class);
-    }
+  public MosaicAddressRestrictionTransactionMapper(JsonHelper jsonHelper) {
+    super(
+        jsonHelper,
+        TransactionType.MOSAIC_ADDRESS_RESTRICTION,
+        MosaicAddressRestrictionTransactionDTO.class);
+  }
 
-    @Override
-    protected TransactionFactory<MosaicAddressRestrictionTransaction> createFactory(
-        NetworkType networkType,
-        MosaicAddressRestrictionTransactionDTO transaction) {
-        return MosaicAddressRestrictionTransactionFactory.create(networkType,
+  @Override
+  protected TransactionFactory<MosaicAddressRestrictionTransaction> createFactory(
+      NetworkType networkType, MosaicAddressRestrictionTransactionDTO transaction) {
+    return MosaicAddressRestrictionTransactionFactory.create(
+            networkType,
             toUnresolvedMosaicId(transaction.getMosaicId()),
             MapperUtils.fromHexToBigInteger(transaction.getRestrictionKey()),
             MapperUtils.toUnresolvedAddress(transaction.getTargetAddress()),
             transaction.getNewRestrictionValue())
-            .previousRestrictionValue(transaction.getPreviousRestrictionValue());
-    }
+        .previousRestrictionValue(transaction.getPreviousRestrictionValue());
+  }
 
-    @Override
-    protected void copyToDto(MosaicAddressRestrictionTransaction transaction,
-        MosaicAddressRestrictionTransactionDTO dto) {
-        dto.setMosaicId(getIdAsHex(transaction.getMosaicId()));
-        dto.setRestrictionKey(MapperUtils.fromBigIntegerToHex(transaction.getRestrictionKey()));
-        dto.setTargetAddress(transaction.getTargetAddress().encoded(transaction.getNetworkType()));
-        dto.setPreviousRestrictionValue(transaction.getPreviousRestrictionValue());
-        dto.setNewRestrictionValue(transaction.getNewRestrictionValue());
-
-    }
+  @Override
+  protected void copyToDto(
+      MosaicAddressRestrictionTransaction transaction, MosaicAddressRestrictionTransactionDTO dto) {
+    dto.setMosaicId(getIdAsHex(transaction.getMosaicId()));
+    dto.setRestrictionKey(MapperUtils.fromBigIntegerToHex(transaction.getRestrictionKey()));
+    dto.setTargetAddress(transaction.getTargetAddress().encoded(transaction.getNetworkType()));
+    dto.setPreviousRestrictionValue(transaction.getPreviousRestrictionValue());
+    dto.setNewRestrictionValue(transaction.getNewRestrictionValue());
+  }
 }

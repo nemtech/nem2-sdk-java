@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright 2020 NEM
  *
@@ -15,58 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.network;
-
 /**
  * Information about the average, median, highest and lower fee multiplier over the last
  * "numBlocksTransactionFeeStats".
  */
 public class TransactionFees {
 
-    /**
-     * Average fee multiplier over the last "numBlocksTransactionFeeStats".
-     */
-    private final Long averageFeeMultiplier;
+  /** Average fee multiplier over the last "numBlocksTransactionFeeStats". */
+  private final Long averageFeeMultiplier;
 
-    /**
-     * Median fee multiplier over the last "numBlocksTransactionFeeStats".
-     **/
-    private final Long medianFeeMultiplier;
+  /** Median fee multiplier over the last "numBlocksTransactionFeeStats". */
+  private final Long medianFeeMultiplier;
 
+  /** Lowest fee multiplier over the last "numBlocksTransactionFeeStats". */
+  private final Long lowestFeeMultiplier;
 
-    /**
-     * Lowest fee multiplier over the last "numBlocksTransactionFeeStats".
-     **/
-    private final Long lowestFeeMultiplier;
+  /** Highest fee multiplier over the last "numBlocksTransactionFeeStats". */
+  private final Long highestFeeMultiplier;
 
-    /**
-     * Highest fee multiplier over the last "numBlocksTransactionFeeStats".
-     **/
-    private final Long highestFeeMultiplier;
+  public TransactionFees(
+      Long averageFeeMultiplier,
+      Long medianFeeMultiplier,
+      Long lowestFeeMultiplier,
+      Long highestFeeMultiplier) {
+    this.averageFeeMultiplier = averageFeeMultiplier;
+    this.medianFeeMultiplier = medianFeeMultiplier;
+    this.lowestFeeMultiplier = lowestFeeMultiplier;
+    this.highestFeeMultiplier = highestFeeMultiplier;
+  }
 
-    public TransactionFees(Long averageFeeMultiplier, Long medianFeeMultiplier,
-        Long lowestFeeMultiplier, Long highestFeeMultiplier) {
-        this.averageFeeMultiplier = averageFeeMultiplier;
-        this.medianFeeMultiplier = medianFeeMultiplier;
-        this.lowestFeeMultiplier = lowestFeeMultiplier;
-        this.highestFeeMultiplier = highestFeeMultiplier;
-    }
+  public Long getAverageFeeMultiplier() {
+    return averageFeeMultiplier;
+  }
 
-    public Long getAverageFeeMultiplier() {
-        return averageFeeMultiplier;
-    }
+  public Long getMedianFeeMultiplier() {
+    return medianFeeMultiplier;
+  }
 
-    public Long getMedianFeeMultiplier() {
-        return medianFeeMultiplier;
-    }
+  public Long getLowestFeeMultiplier() {
+    return lowestFeeMultiplier;
+  }
 
-    public Long getLowestFeeMultiplier() {
-        return lowestFeeMultiplier;
-    }
-
-    public Long getHighestFeeMultiplier() {
-        return highestFeeMultiplier;
-    }
+  public Long getHighestFeeMultiplier() {
+    return highestFeeMultiplier;
+  }
 }
-

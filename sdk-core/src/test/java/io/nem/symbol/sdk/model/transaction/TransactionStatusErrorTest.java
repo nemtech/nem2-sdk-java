@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,39 +24,37 @@ import org.junit.jupiter.api.Test;
 
 class TransactionStatusErrorTest {
 
-    @Test
-    void getHash() {
-        Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
-        final TransactionStatusError transactionStatusError =
-            new TransactionStatusError(address, "hash", "error",
-                new Deadline(BigInteger.valueOf(1)));
-        assertEquals("hash", transactionStatusError.getHash());
-    }
+  @Test
+  void getHash() {
+    Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
+    final TransactionStatusError transactionStatusError =
+        new TransactionStatusError(address, "hash", "error", new Deadline(BigInteger.valueOf(1)));
+    assertEquals("hash", transactionStatusError.getHash());
+  }
 
-    @Test
-    void getStatus() {
-        Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
-        final TransactionStatusError transactionStatusError =
-            new TransactionStatusError(address, "hash", "error",
-                new Deadline(BigInteger.valueOf(1)));
-        assertEquals("error", transactionStatusError.getStatus());
-    }
+  @Test
+  void getStatus() {
+    Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
+    final TransactionStatusError transactionStatusError =
+        new TransactionStatusError(address, "hash", "error", new Deadline(BigInteger.valueOf(1)));
+    assertEquals("error", transactionStatusError.getStatus());
+  }
 
-    @Test
-    void getDeadline() {
-        Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
-        Deadline deadline = new Deadline(BigInteger.valueOf(1));
-        final TransactionStatusError transactionStatusError =
-            new TransactionStatusError(address, "hash", "error", deadline);
-        assertEquals(deadline, transactionStatusError.getDeadline());
-    }
+  @Test
+  void getDeadline() {
+    Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
+    Deadline deadline = new Deadline(BigInteger.valueOf(1));
+    final TransactionStatusError transactionStatusError =
+        new TransactionStatusError(address, "hash", "error", deadline);
+    assertEquals(deadline, transactionStatusError.getDeadline());
+  }
 
-    @Test
-    void getAddress() {
-        Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
-        Deadline deadline = new Deadline(BigInteger.valueOf(1));
-        final TransactionStatusError transactionStatusError =
-            new TransactionStatusError(address, "hash", "error", deadline);
-        assertEquals(address, transactionStatusError.getAddress());
-    }
+  @Test
+  void getAddress() {
+    Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
+    Deadline deadline = new Deadline(BigInteger.valueOf(1));
+    final TransactionStatusError transactionStatusError =
+        new TransactionStatusError(address, "hash", "error", deadline);
+    assertEquals(address, transactionStatusError.getAddress());
+  }
 }

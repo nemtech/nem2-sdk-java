@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.core.crypto.Hashes;
@@ -35,84 +34,112 @@ import org.junit.jupiter.params.provider.EnumSource;
 @SuppressWarnings("squid:S2699")
 public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegrationTest {
 
-    Account account;
+  Account account;
 
-    @BeforeEach
-    void setup() {
-        account = config().getDefaultAccount();
-    }
+  @BeforeEach
+  void setup() {
+    account = config().getDefaultAccount();
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void standaloneSecretLockTransaction(RepositoryType type) {
-        byte[] secretBytes = RandomUtils.generateRandomBytes(20);
-        byte[] result = Hashes.sha3_256(secretBytes);
-        String secret = ConvertUtils.toHex(result);
-        Address recipient = config().getTestAccount2().getAddress();
-        SecretLockTransaction secretLockTransaction = SecretLockTransactionFactory.create(getNetworkType(),
-                getNetworkCurrency().createRelative(BigInteger.valueOf(10)), BigInteger.valueOf(100),
-                SecretHashAlgorithm.SHA3_256, secret, recipient).maxFee(this.maxFee).build();
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void standaloneSecretLockTransaction(RepositoryType type) {
+    byte[] secretBytes = RandomUtils.generateRandomBytes(20);
+    byte[] result = Hashes.sha3_256(secretBytes);
+    String secret = ConvertUtils.toHex(result);
+    Address recipient = config().getTestAccount2().getAddress();
+    SecretLockTransaction secretLockTransaction =
+        SecretLockTransactionFactory.create(
+                getNetworkType(),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
+                BigInteger.valueOf(100),
+                SecretHashAlgorithm.SHA3_256,
+                secret,
+                recipient)
+            .maxFee(this.maxFee)
+            .build();
 
-        announceAndValidate(type, account, secretLockTransaction);
-    }
+    announceAndValidate(type, account, secretLockTransaction);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void aggregateSecretLockTransaction(RepositoryType type) {
-        byte[] secretBytes = RandomUtils.generateRandomBytes(20);
-        byte[] result = Hashes.sha3_256(secretBytes);
-        String secret = ConvertUtils.toHex(result);
-        Address recipient = config().getTestAccount2().getAddress();
-        SecretLockTransaction transaction =
-            SecretLockTransactionFactory.create(getNetworkType(),
-                getNetworkCurrency().createRelative(BigInteger.valueOf(10)), BigInteger.valueOf(100),
-                SecretHashAlgorithm.SHA3_256, secret, recipient).maxFee(this.maxFee).build();
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void aggregateSecretLockTransaction(RepositoryType type) {
+    byte[] secretBytes = RandomUtils.generateRandomBytes(20);
+    byte[] result = Hashes.sha3_256(secretBytes);
+    String secret = ConvertUtils.toHex(result);
+    Address recipient = config().getTestAccount2().getAddress();
+    SecretLockTransaction transaction =
+        SecretLockTransactionFactory.create(
+                getNetworkType(),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
+                BigInteger.valueOf(100),
+                SecretHashAlgorithm.SHA3_256,
+                secret,
+                recipient)
+            .maxFee(this.maxFee)
+            .build();
 
-        announceAggregateAndValidate(type, transaction, account);
+    announceAggregateAndValidate(type, transaction, account);
+  }
 
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void standaloneSecretProofTransaction(RepositoryType type) {
+    byte[] secretBytes = RandomUtils.generateRandomBytes(20);
+    byte[] result = Hashes.sha3_256(secretBytes);
+    String secret = ConvertUtils.toHex(result);
+    String proof = ConvertUtils.toHex(secretBytes);
+    Address recipient = config().getTestAccount2().getAddress();
+    SecretLockTransaction secretLockTransaction =
+        SecretLockTransactionFactory.create(
+                getNetworkType(),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
+                BigInteger.valueOf(100),
+                SecretHashAlgorithm.SHA3_256,
+                secret,
+                recipient)
+            .maxFee(this.maxFee)
+            .build();
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void standaloneSecretProofTransaction(RepositoryType type) {
-        byte[] secretBytes = RandomUtils.generateRandomBytes(20);
-        byte[] result = Hashes.sha3_256(secretBytes);
-        String secret = ConvertUtils.toHex(result);
-        String proof = ConvertUtils.toHex(secretBytes);
-        Address recipient = config().getTestAccount2().getAddress();
-        SecretLockTransaction secretLockTransaction =
-            SecretLockTransactionFactory.create(getNetworkType(),
-                getNetworkCurrency().createRelative(BigInteger.valueOf(10)), BigInteger.valueOf(100),
-                SecretHashAlgorithm.SHA3_256, secret, recipient).maxFee(this.maxFee).build();
+    announceAndValidate(type, account, secretLockTransaction);
 
-        announceAndValidate(type, account, secretLockTransaction);
+    SecretProofTransaction secretProofTransaction =
+        SecretProofTransactionFactory.create(
+                getNetworkType(), SecretHashAlgorithm.SHA3_256, recipient, secret, proof)
+            .maxFee(this.maxFee)
+            .build();
 
-        SecretProofTransaction secretProofTransaction =
-            SecretProofTransactionFactory.create(getNetworkType(), SecretHashAlgorithm.SHA3_256, recipient, secret,
-                proof).maxFee(this.maxFee).build();
+    announceAndValidate(type, account, secretProofTransaction);
+  }
 
-        announceAndValidate(type, account, secretProofTransaction);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void aggregateSecretProofTransaction(RepositoryType type) {
+    byte[] secretBytes = RandomUtils.generateRandomBytes(20);
+    byte[] result = Hashes.sha3_256(secretBytes);
+    String secret = ConvertUtils.toHex(result);
+    String proof = ConvertUtils.toHex(secretBytes);
+    Address recipient = config().getTestAccount2().getAddress();
+    SecretLockTransaction secretLockTransaction =
+        SecretLockTransactionFactory.create(
+                getNetworkType(),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
+                BigInteger.valueOf(100),
+                SecretHashAlgorithm.SHA3_256,
+                secret,
+                recipient)
+            .maxFee(this.maxFee)
+            .build();
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void aggregateSecretProofTransaction(RepositoryType type) {
-        byte[] secretBytes = RandomUtils.generateRandomBytes(20);
-        byte[] result = Hashes.sha3_256(secretBytes);
-        String secret = ConvertUtils.toHex(result);
-        String proof = ConvertUtils.toHex(secretBytes);
-        Address recipient = config().getTestAccount2().getAddress();
-        SecretLockTransaction secretLockTransaction =
-            SecretLockTransactionFactory.create(getNetworkType(),
-                getNetworkCurrency().createRelative(BigInteger.valueOf(10)), BigInteger.valueOf(100),
-                SecretHashAlgorithm.SHA3_256, secret, recipient).maxFee(this.maxFee).build();
+    announceAndValidate(type, account, secretLockTransaction);
 
-        announceAndValidate(type, account, secretLockTransaction);
+    SecretProofTransaction secretProofTransaction =
+        SecretProofTransactionFactory.create(
+                getNetworkType(), SecretHashAlgorithm.SHA3_256, recipient, secret, proof)
+            .maxFee(this.maxFee)
+            .build();
 
-        SecretProofTransaction secretProofTransaction =
-            SecretProofTransactionFactory.create(getNetworkType(), SecretHashAlgorithm.SHA3_256, recipient, secret,
-                proof).maxFee(this.maxFee).build();
-
-        announceAggregateAndValidate(type, secretProofTransaction, account);
-    }
+    announceAggregateAndValidate(type, secretProofTransaction, account);
+  }
 }

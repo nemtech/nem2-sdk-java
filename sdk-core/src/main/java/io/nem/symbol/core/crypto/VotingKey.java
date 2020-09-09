@@ -13,66 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto;
 
 import io.nem.symbol.sdk.infrastructure.RandomUtils;
 import java.math.BigInteger;
 
-/**
- * Represents a public key.
- */
+/** Represents a public key. */
 public class VotingKey extends Key {
 
-    /**
-     * The size of Symbol's voting keys.
-     */
-    public static final int SIZE = 48;
+  /** The size of Symbol's voting keys. */
+  public static final int SIZE = 48;
 
-    /**
-     * Creates a new voting key.
-     *
-     * @param bytes The raw voting key value.
-     */
-    public VotingKey(byte[] bytes) {
-        super(bytes, SIZE);
-    }
+  /**
+   * Creates a new voting key.
+   *
+   * @param bytes The raw voting key value.
+   */
+  public VotingKey(byte[] bytes) {
+    super(bytes, SIZE);
+  }
 
-    /**
-     * Creates a new voting key from a big int value
-     *
-     * @param value the value
-     */
-    public VotingKey(BigInteger value) {
-        super(value, SIZE);
-    }
+  /**
+   * Creates a new voting key from a big int value
+   *
+   * @param value the value
+   */
+  public VotingKey(BigInteger value) {
+    super(value, SIZE);
+  }
 
-    /**
-     * Creates a new voting key from an hex.
-     *
-     * @param hex the hex.
-     */
-    public VotingKey(String hex) {
-        super(hex, SIZE);
-    }
+  /**
+   * Creates a new voting key from an hex.
+   *
+   * @param hex the hex.
+   */
+  public VotingKey(String hex) {
+    super(hex, SIZE);
+  }
 
-    /**
-     * Creates a voting key from a hex string.
-     *
-     * @param hex The hex string.
-     * @return The new voting key.
-     */
-    public static VotingKey fromHexString(final String hex) {
-        return new VotingKey(hex);
-    }
+  /**
+   * Creates a voting key from a hex string.
+   *
+   * @param hex The hex string.
+   * @return The new voting key.
+   */
+  public static VotingKey fromHexString(final String hex) {
+    return new VotingKey(hex);
+  }
 
-    /**
-     * Generates a random voting key.
-     *
-     * @return The new voting key.
-     */
-    public static VotingKey generateRandom() {
-        return new VotingKey(RandomUtils.generateRandomBytes(SIZE));
-    }
-
+  /**
+   * Generates a random voting key.
+   *
+   * @return The new voting key.
+   */
+  public static VotingKey generateRandom() {
+    return new VotingKey(RandomUtils.generateRandomBytes(SIZE));
+  }
 }

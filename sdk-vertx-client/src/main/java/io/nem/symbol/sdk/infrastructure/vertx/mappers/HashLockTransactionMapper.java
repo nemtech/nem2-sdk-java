@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
 import static io.nem.symbol.core.utils.MapperUtils.toMosaicId;
@@ -28,34 +27,30 @@ import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.HashLockTransactionDTO;
 
-/**
- * Hash lock transaction mapper.
- */
-class HashLockTransactionMapper extends
-    AbstractTransactionMapper<HashLockTransactionDTO, HashLockTransaction> {
+/** Hash lock transaction mapper. */
+class HashLockTransactionMapper
+    extends AbstractTransactionMapper<HashLockTransactionDTO, HashLockTransaction> {
 
-    public HashLockTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.HASH_LOCK, HashLockTransactionDTO.class);
-    }
+  public HashLockTransactionMapper(JsonHelper jsonHelper) {
+    super(jsonHelper, TransactionType.HASH_LOCK, HashLockTransactionDTO.class);
+  }
 
-    private Mosaic getMosaic(HashLockTransactionDTO mosaic) {
-        return new Mosaic(toMosaicId(mosaic.getMosaicId()),
-            mosaic.getAmount());
-    }
+  private Mosaic getMosaic(HashLockTransactionDTO mosaic) {
+    return new Mosaic(toMosaicId(mosaic.getMosaicId()), mosaic.getAmount());
+  }
 
-    @Override
-    protected TransactionFactory<HashLockTransaction> createFactory(NetworkType networkType,
-        HashLockTransactionDTO transaction) {
-        return HashLockTransactionFactory.create(networkType, getMosaic(transaction),
-            transaction.getDuration(),
-            transaction.getHash());
-    }
+  @Override
+  protected TransactionFactory<HashLockTransaction> createFactory(
+      NetworkType networkType, HashLockTransactionDTO transaction) {
+    return HashLockTransactionFactory.create(
+        networkType, getMosaic(transaction), transaction.getDuration(), transaction.getHash());
+  }
 
-    @Override
-    protected void copyToDto(HashLockTransaction transaction, HashLockTransactionDTO dto) {
-        dto.setMosaicId(MapperUtils.getIdAsHex(transaction.getMosaic().getId()));
-        dto.setAmount(transaction.getMosaic().getAmount());
-        dto.setDuration(transaction.getDuration());
-        dto.setHash(transaction.getHash());
-    }
+  @Override
+  protected void copyToDto(HashLockTransaction transaction, HashLockTransactionDTO dto) {
+    dto.setMosaicId(MapperUtils.getIdAsHex(transaction.getMosaic().getId()));
+    dto.setAmount(transaction.getMosaic().getAmount());
+    dto.setDuration(transaction.getDuration());
+    dto.setHash(transaction.getHash());
+  }
 }

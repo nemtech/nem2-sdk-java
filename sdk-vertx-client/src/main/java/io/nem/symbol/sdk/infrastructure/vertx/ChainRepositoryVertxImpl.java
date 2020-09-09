@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.sdk.api.ChainRepository;
@@ -29,46 +28,43 @@ import io.vertx.core.Handler;
 import java.math.BigInteger;
 import java.util.function.Consumer;
 
-/**
- * Chain http repository.
- */
-public class ChainRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements
-    ChainRepository {
+/** Chain http repository. */
+public class ChainRepositoryVertxImpl extends AbstractRepositoryVertxImpl
+    implements ChainRepository {
 
-    private final ChainRoutesApi client;
+  private final ChainRoutesApi client;
 
-    public ChainRepositoryVertxImpl(ApiClient apiClient) {
-        super(apiClient);
-        client = new ChainRoutesApiImpl(apiClient);
-    }
+  public ChainRepositoryVertxImpl(ApiClient apiClient) {
+    super(apiClient);
+    client = new ChainRoutesApiImpl(apiClient);
+  }
 
-    public ChainRoutesApi getClient() {
-        return client;
-    }
+  public ChainRoutesApi getClient() {
+    return client;
+  }
 
+  /**
+   * Get Block chain height
+   *
+   * @return {@link Observable} of {@link BigInteger}
+   */
+  public Observable<BigInteger> getBlockchainHeight() {
+    Consumer<Handler<AsyncResult<HeightInfoDTO>>> callback = client::getChainHeight;
+    return exceptionHandling(call(callback).map(HeightInfoDTO::getHeight));
+  }
 
-    /**
-     * Get Block chain height
-     *
-     * @return {@link Observable} of {@link BigInteger}
-     */
-    public Observable<BigInteger> getBlockchainHeight() {
-        Consumer<Handler<AsyncResult<HeightInfoDTO>>> callback = client::getChainHeight;
-        return exceptionHandling(call(callback).map(HeightInfoDTO::getHeight));
-
-    }
-
-    /**
-     * Get Block chain score
-     *
-     * @return {@link Observable} of {@link BigInteger}
-     */
-    public Observable<BlockchainScore> getChainScore() {
-        Consumer<Handler<AsyncResult<ChainScoreDTO>>> callback = client::getChainScore;
-        return exceptionHandling(call(callback).map(
-            blockchainScoreDTO ->
-                new BlockchainScore(
-                    blockchainScoreDTO.getScoreLow(),
-                    blockchainScoreDTO.getScoreHigh())));
-    }
+  /**
+   * Get Block chain score
+   *
+   * @return {@link Observable} of {@link BigInteger}
+   */
+  public Observable<BlockchainScore> getChainScore() {
+    Consumer<Handler<AsyncResult<ChainScoreDTO>>> callback = client::getChainScore;
+    return exceptionHandling(
+        call(callback)
+            .map(
+                blockchainScoreDTO ->
+                    new BlockchainScore(
+                        blockchainScoreDTO.getScoreLow(), blockchainScoreDTO.getScoreHigh())));
+  }
 }

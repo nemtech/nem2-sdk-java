@@ -13,14 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto;
-
-/**
- * Function that hashes inputs according to the preconfigured schema.
- */
+/** Function that hashes inputs according to the preconfigured schema. */
 @FunctionalInterface
 public interface Hasher {
 
-    byte[] hash(byte[]... inputs);
+  byte[] hash(byte[]... inputs);
 }

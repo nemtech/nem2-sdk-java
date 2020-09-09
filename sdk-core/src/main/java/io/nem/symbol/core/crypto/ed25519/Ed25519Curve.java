@@ -13,45 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto.ed25519;
 
 import io.nem.symbol.core.crypto.Curve;
 import io.nem.symbol.core.crypto.ed25519.arithmetic.Ed25519Group;
 import java.math.BigInteger;
 
-/**
- * Class that wraps the elliptic curve Ed25519.
- */
+/** Class that wraps the elliptic curve Ed25519. */
 public class Ed25519Curve implements Curve {
 
-    private static final Ed25519Curve ED25519;
+  private static final Ed25519Curve ED25519;
 
-    static {
-        ED25519 = new Ed25519Curve();
-    }
+  static {
+    ED25519 = new Ed25519Curve();
+  }
 
-    /**
-     * Gets the Ed25519 instance.
-     *
-     * @return The Ed25519 instance.
-     */
-    public static Ed25519Curve ed25519() {
-        return ED25519;
-    }
+  /**
+   * Gets the Ed25519 instance.
+   *
+   * @return The Ed25519 instance.
+   */
+  public static Ed25519Curve ed25519() {
+    return ED25519;
+  }
 
-    @Override
-    public String getName() {
-        return "ed25519";
-    }
+  @Override
+  public String getName() {
+    return "ed25519";
+  }
 
-    @Override
-    public BigInteger getGroupOrder() {
-        return Ed25519Group.GROUP_ORDER;
-    }
+  @Override
+  public BigInteger getGroupOrder() {
+    return Ed25519Group.GROUP_ORDER;
+  }
 
-    @Override
-    public BigInteger getHalfGroupOrder() {
-        return Ed25519Group.GROUP_ORDER.shiftRight(1);
-    }
+  @Override
+  public BigInteger getHalfGroupOrder() {
+    return Ed25519Group.GROUP_ORDER.shiftRight(1);
+  }
 }

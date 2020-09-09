@@ -25,47 +25,45 @@ import java.util.List;
 
 public interface NodeRepository {
 
-    /**
-     * Supplies additional information about the application running on a node.
-     *
-     * @return Get the node information
-     */
-    Observable<NodeInfo> getNodeInfo();
+  /**
+   * Supplies additional information about the application running on a node.
+   *
+   * @return Get the node information
+   */
+  Observable<NodeInfo> getNodeInfo();
 
-    /**
-     * Get node info of the pears visible by the node.
-     *
-     * @return {@link Observable} of a list of {@link NodeInfo}
-     */
-    Observable<List<NodeInfo>> getNodePeers();
+  /**
+   * Get node info of the pears visible by the node.
+   *
+   * @return {@link Observable} of a list of {@link NodeInfo}
+   */
+  Observable<List<NodeInfo>> getNodePeers();
 
-    /**
-     * Gets the node time at the moment the reply was sent and received.
-     *
-     * @return Get the node time
-     */
-    Observable<NodeTime> getNodeTime();
+  /**
+   * Gets the node time at the moment the reply was sent and received.
+   *
+   * @return Get the node time
+   */
+  Observable<NodeTime> getNodeTime();
 
-    /**
-     * Gets node storage info.
-     *
-     * @return Observable of {@link StorageInfo}
-     */
-    Observable<StorageInfo> getNodeStorage();
+  /**
+   * Gets node storage info.
+   *
+   * @return Observable of {@link StorageInfo}
+   */
+  Observable<StorageInfo> getNodeStorage();
 
-    /**
-     * Get node health information
-     *
-     * @return {@link NodeHealth} of NodeHealth
-     */
-    Observable<NodeHealth> getNodeHealth();
+  /**
+   * Get node health information
+   *
+   * @return {@link NodeHealth} of NodeHealth
+   */
+  Observable<NodeHealth> getNodeHealth();
 
-    /**
-     * Gets node server info.
-     *
-     * @return {@link Observable} of ServerInfo
-     */
-    Observable<ServerInfo> getServerInfo();
-
-
+  /**
+   * Gets node server info.
+   *
+   * @return {@link Observable} of ServerInfo
+   */
+  Observable<ServerInfo> getServerInfo();
 }

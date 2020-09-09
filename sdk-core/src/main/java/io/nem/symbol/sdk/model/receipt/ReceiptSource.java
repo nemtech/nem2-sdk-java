@@ -13,54 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.receipt;
 
 import io.nem.symbol.catapult.builders.ReceiptSourceBuilder;
 
-/**
- * The Receipt Source class
- */
+/** The Receipt Source class */
 public class ReceiptSource {
 
-    private final long primaryId;
-    private final long secondaryId;
+  private final long primaryId;
+  private final long secondaryId;
 
-    /**
-     * Constructor
-     *
-     * @param primaryId Receipt source primary id
-     * @param secondaryId Receipt source secondary id
-     */
-    public ReceiptSource(long primaryId, long secondaryId) {
-        this.primaryId = primaryId;
-        this.secondaryId = secondaryId;
-    }
+  /**
+   * Constructor
+   *
+   * @param primaryId Receipt source primary id
+   * @param secondaryId Receipt source secondary id
+   */
+  public ReceiptSource(long primaryId, long secondaryId) {
+    this.primaryId = primaryId;
+    this.secondaryId = secondaryId;
+  }
 
-    /**
-     * Returns Receipt source primary id
-     *
-     * @return Receipt source primary id
-     */
-    public long getPrimaryId() {
-        return this.primaryId;
-    }
+  /**
+   * Returns Receipt source primary id
+   *
+   * @return Receipt source primary id
+   */
+  public long getPrimaryId() {
+    return this.primaryId;
+  }
 
-    /**
-     * Returns Receipt source secondary id
-     *
-     * @return Receipt source secondary id
-     */
-    public long getSecondaryId() {
-        return this.secondaryId;
-    }
+  /**
+   * Returns Receipt source secondary id
+   *
+   * @return Receipt source secondary id
+   */
+  public long getSecondaryId() {
+    return this.secondaryId;
+  }
 
-    /**
-     * Serialize receipt and returns receipt bytes
-     *
-     * @return receipt bytes
-     */
-    public byte[] serialize() {
-        return ReceiptSourceBuilder.create((int) getPrimaryId(), (int) getSecondaryId()).serialize();
-    }
+  /**
+   * Serialize receipt and returns receipt bytes
+   *
+   * @return receipt bytes
+   */
+  public byte[] serialize() {
+    return ReceiptSourceBuilder.create((int) getPrimaryId(), (int) getSecondaryId()).serialize();
+  }
 }

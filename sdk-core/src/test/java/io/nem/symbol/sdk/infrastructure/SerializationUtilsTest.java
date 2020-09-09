@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.core.utils.ConvertUtils;
@@ -22,43 +21,39 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of {@link SerializationUtils}
- */
-
+/** Test of {@link SerializationUtils} */
 public class SerializationUtilsTest {
 
+  @Test
+  void toUnresolvedAddressFromNamespaceId() {
 
-    @Test
-    void toUnresolvedAddressFromNamespaceId() {
+    NamespaceId namespaceId = NamespaceId.createFromName("this.currency");
 
-        NamespaceId namespaceId = NamespaceId.createFromName("this.currency");
+    Assertions.assertEquals("BDED68013AAEE068", namespaceId.getIdAsHex());
 
-        Assertions.assertEquals("BDED68013AAEE068", namespaceId.getIdAsHex());
+    Assertions.assertEquals(
+        "9168E0AE3A0168EDBD000000000000000000000000000000",
+        ConvertUtils.toHex(
+            SerializationUtils.fromUnresolvedAddressToByteBuffer(
+                    namespaceId, NetworkType.MIJIN_TEST)
+                .array()));
 
-        Assertions.assertEquals("9168E0AE3A0168EDBD000000000000000000000000000000",
-            ConvertUtils.toHex(
-                SerializationUtils
-                    .fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MIJIN_TEST)
-                    .array()));
+    Assertions.assertEquals(
+        "6968E0AE3A0168EDBD000000000000000000000000000000",
+        ConvertUtils.toHex(
+            SerializationUtils.fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MAIN_NET)
+                .array()));
 
-        Assertions.assertEquals("6968E0AE3A0168EDBD000000000000000000000000000000",
-            ConvertUtils.toHex(
-                SerializationUtils
-                    .fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MAIN_NET)
-                    .array()));
+    Assertions.assertEquals(
+        "6168E0AE3A0168EDBD000000000000000000000000000000",
+        ConvertUtils.toHex(
+            SerializationUtils.fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MIJIN)
+                .array()));
 
-        Assertions.assertEquals("6168E0AE3A0168EDBD000000000000000000000000000000",
-            ConvertUtils.toHex(
-                SerializationUtils
-                    .fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MIJIN)
-                    .array()));
-
-        Assertions.assertEquals("6968E0AE3A0168EDBD000000000000000000000000000000",
-            ConvertUtils.toHex(
-                SerializationUtils
-                    .fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MAIN_NET)
-                    .array()));
-    }
-
+    Assertions.assertEquals(
+        "6968E0AE3A0168EDBD000000000000000000000000000000",
+        ConvertUtils.toHex(
+            SerializationUtils.fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MAIN_NET)
+                .array()));
+  }
 }

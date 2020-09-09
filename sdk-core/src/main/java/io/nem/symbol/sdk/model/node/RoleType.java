@@ -18,33 +18,35 @@ package io.nem.symbol.sdk.model.node;
 import java.util.Arrays;
 
 public enum RoleType {
-    PEER_NODE(1),
-    API_NODE(2),
-    DUAL_NODE(3);
+  PEER_NODE(1),
+  API_NODE(2),
+  DUAL_NODE(3);
 
-    private final int value;
+  private final int value;
 
-    RoleType(int value) {
-        this.value = value;
-    }
+  RoleType(int value) {
+    this.value = value;
+  }
 
-    /**
-     * Static constructor converting role type raw value to enum instance.
-     *
-     * @param value the low level int value.
-     * @return {@link RoleType}
-     */
-    public static RoleType rawValueOf(int value) {
-        return Arrays.stream(values()).filter(e -> e.value == value).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
+  /**
+   * Static constructor converting role type raw value to enum instance.
+   *
+   * @param value the low level int value.
+   * @return {@link RoleType}
+   */
+  public static RoleType rawValueOf(int value) {
+    return Arrays.stream(values())
+        .filter(e -> e.value == value)
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 
-    /**
-     * Returns enum value.
-     *
-     * @return enum value
-     */
-    public int getValue() {
-        return this.value;
-    }
+  /**
+   * Returns enum value.
+   *
+   * @return enum value
+   */
+  public int getValue() {
+    return this.value;
+  }
 }

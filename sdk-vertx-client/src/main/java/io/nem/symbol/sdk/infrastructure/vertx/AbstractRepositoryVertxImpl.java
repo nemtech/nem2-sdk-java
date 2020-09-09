@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.core.crypto.PublicKey;
@@ -49,101 +48,105 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  */
 public abstract class AbstractRepositoryVertxImpl {
 
+  private final JsonHelper jsonHelper;
 
-    private final JsonHelper jsonHelper;
+  public AbstractRepositoryVertxImpl(ApiClient apiClient) {
+    this.jsonHelper = new JsonHelperJackson2(apiClient.getObjectMapper());
+  }
 
-    public AbstractRepositoryVertxImpl(ApiClient apiClient) {
-        this.jsonHelper = new JsonHelperJackson2(apiClient.getObjectMapper());
+  public <T> Observable<T> call(Consumer<Handler<AsyncResult<T>>> callback) {
+    IllegalArgumentException originalException = new IllegalArgumentException("Original call");
+    Function<? super Throwable, ? extends ObservableSource<? extends T>> resumeFunction =
+        this.onError(originalException);
+    return new AsyncResultSingle<T>(callback::accept)
+        .toObservable()
+        .onErrorResumeNext(resumeFunction);
+  }
+
+  public <T, R> Observable<R> call(
+      Consumer<Handler<AsyncResult<T>>> callback, Function<? super T, ? extends R> mapper) {
+    return exceptionHandling(this.call(callback).map(mapper));
+  }
+
+  public <T, R> Observable<List<R>> callList(
+      Consumer<Handler<AsyncResult<List<T>>>> callback, java.util.function.Function<T, R> mapper) {
+    return exceptionHandling(
+        this.call(callback).map(l -> l.stream().map(mapper).collect(Collectors.toList())));
+  }
+
+  public RepositoryCallException exceptionHandling(
+      Throwable e, IllegalArgumentException originalException) {
+    if (e instanceof RepositoryCallException) {
+      return (RepositoryCallException) e;
     }
+    return new RepositoryCallException(
+        extractMessageFromException(e),
+        extractStatusCodeFromException(e),
+        e instanceof ApiException ? originalException : e);
+  }
 
-    public <T> Observable<T> call(Consumer<Handler<AsyncResult<T>>> callback) {
-        IllegalArgumentException originalException = new IllegalArgumentException("Original call");
-        Function<? super Throwable, ? extends ObservableSource<? extends T>> resumeFunction = this
-            .onError(originalException);
-        return new AsyncResultSingle<T>(callback::accept).toObservable().onErrorResumeNext(resumeFunction);
-    }
-
-    public <T, R> Observable<R> call(Consumer<Handler<AsyncResult<T>>> callback,
-        Function<? super T, ? extends R> mapper) {
-        return exceptionHandling(this.call(callback).map(mapper));
-    }
-
-    public <T, R> Observable<List<R>> callList(Consumer<Handler<AsyncResult<List<T>>>> callback,
-        java.util.function.Function<T, R> mapper) {
-        return exceptionHandling(this.call(callback).map(l -> l.stream().map(mapper).collect(Collectors.toList())));
-    }
-
-    public RepositoryCallException exceptionHandling(Throwable e, IllegalArgumentException originalException) {
-        if (e instanceof RepositoryCallException) {
-            return (RepositoryCallException) e;
+  private String extractMessageFromException(Throwable e) {
+    List<String> messages = new ArrayList<>();
+    messages.add(ExceptionUtils.getMessage(e));
+    if (e instanceof ApiException) {
+      messages.add("" + ((ApiException) e).getCode());
+      String responseBody = ((ApiException) e).getResponseBody();
+      if (responseBody != null) {
+        try {
+          // Extracting message from the response body.
+          Object json = jsonHelper.parse(responseBody);
+          messages.add(jsonHelper.getString(json, "code"));
+          messages.add(jsonHelper.getString(json, "message"));
+        } catch (IllegalArgumentException ignore) {
+          messages.add(StringUtils.truncate(responseBody, 100));
         }
-        return new RepositoryCallException(extractMessageFromException(e), extractStatusCodeFromException(e),
-            e instanceof ApiException ? originalException : e);
+      }
     }
+    return messages.stream().filter(StringUtils::isNotBlank).collect(Collectors.joining(" - "));
+  }
 
-    private String extractMessageFromException(Throwable e) {
-        List<String> messages = new ArrayList<>();
-        messages.add(ExceptionUtils.getMessage(e));
-        if (e instanceof ApiException) {
-            messages.add("" + ((ApiException) e).getCode());
-            String responseBody = ((ApiException) e).getResponseBody();
-            if (responseBody != null) {
-                try {
-                    // Extracting message from the response body.
-                    Object json = jsonHelper.parse(responseBody);
-                    messages.add(jsonHelper.getString(json, "code"));
-                    messages.add(jsonHelper.getString(json, "message"));
-                } catch (IllegalArgumentException ignore) {
-                    messages.add(StringUtils.truncate(responseBody, 100));
-                }
-            }
-        }
-        return messages.stream().filter(StringUtils::isNotBlank).collect(Collectors.joining(" - "));
+  private int extractStatusCodeFromException(Throwable e) {
+    return (e instanceof ApiException) ? ((ApiException) e).getCode() : 0;
+  }
+
+  public <T> Function<Throwable, Observable<T>> onError(
+      IllegalArgumentException originalException) {
+    return (Throwable e) -> Observable.error(exceptionHandling(e, originalException));
+  }
+
+  public <T> Observable<T> exceptionHandling(Observable<T> observable) {
+
+    IllegalArgumentException originalException = new IllegalArgumentException("Original call");
+    Function<? super Throwable, ? extends ObservableSource<? extends T>> resumeFunction =
+        this.onError(originalException);
+    return observable.onErrorResumeNext(resumeFunction);
+  }
+
+  protected Order toDto(OrderBy order) {
+    return order == null ? null : Order.fromValue(order.getValue());
+  }
+
+  protected String toDto(PublicKey publicKey) {
+    return publicKey == null ? null : publicKey.toHex();
+  }
+
+  protected String toDto(Address address) {
+    return address == null ? null : address.plain();
+  }
+
+  protected String toDto(BigInteger number) {
+    if (number == null) {
+      return null;
     }
+    ConvertUtils.validateNotNegative(number);
+    return MapperUtils.fromBigIntegerToHex(number);
+  }
 
-    private int extractStatusCodeFromException(Throwable e) {
-        return (e instanceof ApiException) ? ((ApiException) e).getCode() : 0;
-    }
+  protected <T> Page<T> toPage(Pagination pagination, List<T> data) {
+    return new Page<>(data, pagination.getPageNumber(), pagination.getPageSize());
+  }
 
-    public <T> Function<Throwable, Observable<T>> onError(
-        IllegalArgumentException originalException) {
-        return (Throwable e) -> Observable.error(exceptionHandling(e, originalException));
-    }
-
-    public <T> Observable<T> exceptionHandling(Observable<T> observable) {
-
-        IllegalArgumentException originalException = new IllegalArgumentException("Original call");
-        Function<? super Throwable, ? extends ObservableSource<? extends T>> resumeFunction = this
-            .onError(originalException);
-        return observable.onErrorResumeNext(resumeFunction);
-    }
-
-    protected Order toDto(OrderBy order) {
-        return order == null ? null : Order.fromValue(order.getValue());
-    }
-
-    protected String toDto(PublicKey publicKey) {
-        return publicKey == null ? null : publicKey.toHex();
-    }
-
-    protected String toDto(Address address) {
-        return address == null ? null : address.plain();
-    }
-
-    protected String toDto(BigInteger number) {
-        if (number == null) {
-            return null;
-        }
-        ConvertUtils.validateNotNegative(number);
-        return MapperUtils.fromBigIntegerToHex(number);
-    }
-
-    protected <T> Page<T> toPage(Pagination pagination, List<T> data) {
-        return new Page<>(data, pagination.getPageNumber(), pagination.getPageSize());
-    }
-
-
-    public JsonHelper getJsonHelper() {
-        return jsonHelper;
-    }
+  public JsonHelper getJsonHelper() {
+    return jsonHelper;
+  }
 }

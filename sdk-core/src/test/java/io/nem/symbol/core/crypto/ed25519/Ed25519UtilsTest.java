@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto.ed25519;
 
 import io.nem.symbol.core.crypto.PrivateKey;
@@ -30,47 +29,45 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class Ed25519UtilsTest {
 
-    private static Stream<Arguments> params() {
-        return Stream.of(
-            Arguments
-                .of("000000000000000000000000000000000000000000000000000000000000227F",
-                    "C0294A89A92F21B520F75BAFDD73500711F5FFCC08A4B307A5A7AD9C84AF5049"),
-            Arguments
-                .of("000000000000000000000000000000000000000000000000000000000000AAAA",
-                    "B0B326832F810025B52EE4A5AB2B897A0590A13BD9B4E705E25AA089F5061852"),
+  private static Stream<Arguments> params() {
+    return Stream.of(
+        Arguments.of(
+            "000000000000000000000000000000000000000000000000000000000000227F",
+            "C0294A89A92F21B520F75BAFDD73500711F5FFCC08A4B307A5A7AD9C84AF5049"),
+        Arguments.of(
+            "000000000000000000000000000000000000000000000000000000000000AAAA",
+            "B0B326832F810025B52EE4A5AB2B897A0590A13BD9B4E705E25AA089F5061852"),
+        Arguments.of(
+            "000000000000000000000000000000000000000000000000000000BBADABA123",
+            "D0983B05E5DED10A63DC1EEABD82164411625A104995398582F75F1674E47061"));
+  }
 
-            Arguments.of("000000000000000000000000000000000000000000000000000000BBADABA123",
-                "D0983B05E5DED10A63DC1EEABD82164411625A104995398582F75F1674E47061")
-        );
-    }
+  // region prepareForScalarMultiply
 
-    // region prepareForScalarMultiply
+  @Test
+  public void prepareForScalarMultiplyReturnsClampedValue() {
+    // Arrange:
+    final PrivateKey privateKey = new PrivateKey(RandomUtils.generateRandomBytes(32));
 
-    @Test
-    public void prepareForScalarMultiplyReturnsClampedValue() {
-        // Arrange:
-        final PrivateKey privateKey = new PrivateKey(RandomUtils.generateRandomBytes(32));
+    // Act:
+    final byte[] a = Ed25519Utils.prepareForScalarMultiply(privateKey).getRaw();
 
-        // Act:
-        final byte[] a = Ed25519Utils.prepareForScalarMultiply(privateKey).getRaw();
+    // Assert:
+    MatcherAssert.assertThat(a[31] & 0x40, IsEqual.equalTo(0x40));
+    MatcherAssert.assertThat(a[31] & 0x80, IsEqual.equalTo(0x0));
+    MatcherAssert.assertThat(a[0] & 0x7, IsEqual.equalTo(0x0));
+  }
 
-        // Assert:
-        MatcherAssert.assertThat(a[31] & 0x40, IsEqual.equalTo(0x40));
-        MatcherAssert.assertThat(a[31] & 0x80, IsEqual.equalTo(0x0));
-        MatcherAssert.assertThat(a[0] & 0x7, IsEqual.equalTo(0x0));
-    }
+  @ParameterizedTest
+  @MethodSource("params")
+  public void shouldPrepareForScalarMultiply(String input, String expected) {
+    // Arrange:
+    final PrivateKey privateKey = PrivateKey.fromHexString(input);
+    Assertions.assertEquals(input.toUpperCase(), privateKey.toHex().toUpperCase());
+    Assertions.assertEquals(
+        expected.toUpperCase(),
+        ConvertUtils.toHex(Ed25519Utils.prepareForScalarMultiply(privateKey).getRaw()));
+  }
 
-    @ParameterizedTest
-    @MethodSource("params")
-    public void shouldPrepareForScalarMultiply(String input,
-        String expected) {
-        // Arrange:
-        final PrivateKey privateKey = PrivateKey.fromHexString(input);
-        Assertions.assertEquals(input.toUpperCase(), privateKey.toHex().toUpperCase());
-        Assertions.assertEquals(expected.toUpperCase(),
-            ConvertUtils.toHex(
-                Ed25519Utils.prepareForScalarMultiply(privateKey).getRaw()));
-    }
-
-    // endregion
+  // endregion
 }

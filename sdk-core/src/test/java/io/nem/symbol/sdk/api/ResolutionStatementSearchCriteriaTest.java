@@ -13,82 +13,87 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
 
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of {@link ResolutionStatementSearchCriteria}
- */
+/** Test of {@link ResolutionStatementSearchCriteria} */
 class ResolutionStatementSearchCriteriaTest {
 
-    @Test
-    void shouldCreate() {
-        ResolutionStatementSearchCriteria criteria = new ResolutionStatementSearchCriteria();
-        Assertions.assertNull(criteria.getOrder());
-        Assertions.assertNull(criteria.getPageSize());
-        Assertions.assertNull(criteria.getPageNumber());
-        Assertions.assertNull(criteria.getOffset());
-        Assertions.assertNull(criteria.getHeight());
-    }
+  @Test
+  void shouldCreate() {
+    ResolutionStatementSearchCriteria criteria = new ResolutionStatementSearchCriteria();
+    Assertions.assertNull(criteria.getOrder());
+    Assertions.assertNull(criteria.getPageSize());
+    Assertions.assertNull(criteria.getPageNumber());
+    Assertions.assertNull(criteria.getOffset());
+    Assertions.assertNull(criteria.getHeight());
+  }
 
-    @Test
-    void shouldSetValues() {
+  @Test
+  void shouldSetValues() {
 
-        ResolutionStatementSearchCriteria criteria = new ResolutionStatementSearchCriteria();
+    ResolutionStatementSearchCriteria criteria = new ResolutionStatementSearchCriteria();
 
-        criteria.setOrder(OrderBy.DESC);
-        criteria.setPageSize(10);
-        criteria.setPageNumber(5);
-        criteria.setOffset("abc");
-        criteria.setHeight(BigInteger.ONE);
+    criteria.setOrder(OrderBy.DESC);
+    criteria.setPageSize(10);
+    criteria.setPageNumber(5);
+    criteria.setOffset("abc");
+    criteria.setHeight(BigInteger.ONE);
 
-        Assertions.assertEquals(OrderBy.DESC, criteria.getOrder());
-        Assertions.assertEquals(10, criteria.getPageSize());
-        Assertions.assertEquals(5, criteria.getPageNumber());
-        Assertions.assertEquals(BigInteger.ONE, criteria.getHeight());
-        Assertions.assertEquals("abc", criteria.getOffset());
-    }
+    Assertions.assertEquals(OrderBy.DESC, criteria.getOrder());
+    Assertions.assertEquals(10, criteria.getPageSize());
+    Assertions.assertEquals(5, criteria.getPageNumber());
+    Assertions.assertEquals(BigInteger.ONE, criteria.getHeight());
+    Assertions.assertEquals("abc", criteria.getOffset());
+  }
 
-    @Test
-    void shouldUseBuilderMethods() {
+  @Test
+  void shouldUseBuilderMethods() {
 
-        ResolutionStatementSearchCriteria criteria = new ResolutionStatementSearchCriteria().height(BigInteger.ONE);
-        criteria.order(OrderBy.ASC).pageSize(10).pageNumber(5);
+    ResolutionStatementSearchCriteria criteria =
+        new ResolutionStatementSearchCriteria().height(BigInteger.ONE);
+    criteria.order(OrderBy.ASC).pageSize(10).pageNumber(5);
 
-        criteria.offset("abc");
-        Assertions.assertEquals(OrderBy.ASC, criteria.getOrder());
-        Assertions.assertEquals(10, criteria.getPageSize());
-        Assertions.assertEquals(5, criteria.getPageNumber());
-        Assertions.assertEquals(BigInteger.ONE, criteria.getHeight());
-        Assertions.assertEquals("abc", criteria.getOffset());
-    }
+    criteria.offset("abc");
+    Assertions.assertEquals(OrderBy.ASC, criteria.getOrder());
+    Assertions.assertEquals(10, criteria.getPageSize());
+    Assertions.assertEquals(5, criteria.getPageNumber());
+    Assertions.assertEquals(BigInteger.ONE, criteria.getHeight());
+    Assertions.assertEquals("abc", criteria.getOffset());
+  }
 
-    @Test
-    void shouldBeEquals() {
+  @Test
+  void shouldBeEquals() {
 
-        ResolutionStatementSearchCriteria criteria1 = new ResolutionStatementSearchCriteria().order(OrderBy.ASC)
-            .pageSize(10).pageNumber(5).height(BigInteger.ONE);
-        criteria1.offset("abc");
+    ResolutionStatementSearchCriteria criteria1 =
+        new ResolutionStatementSearchCriteria()
+            .order(OrderBy.ASC)
+            .pageSize(10)
+            .pageNumber(5)
+            .height(BigInteger.ONE);
+    criteria1.offset("abc");
 
-        ResolutionStatementSearchCriteria criteria2 = new ResolutionStatementSearchCriteria().order(OrderBy.ASC)
-            .pageSize(10).pageNumber(5).height(BigInteger.ONE);
-        criteria2.offset("abc");
+    ResolutionStatementSearchCriteria criteria2 =
+        new ResolutionStatementSearchCriteria()
+            .order(OrderBy.ASC)
+            .pageSize(10)
+            .pageNumber(5)
+            .height(BigInteger.ONE);
+    criteria2.offset("abc");
 
-        Assertions.assertEquals(new ResolutionStatementSearchCriteria(), new ResolutionStatementSearchCriteria());
-        Assertions.assertEquals(criteria1, criteria2);
-        Assertions.assertEquals(criteria1, criteria1);
-        Assertions.assertEquals(criteria1.hashCode(), criteria2.hashCode());
+    Assertions.assertEquals(
+        new ResolutionStatementSearchCriteria(), new ResolutionStatementSearchCriteria());
+    Assertions.assertEquals(criteria1, criteria2);
+    Assertions.assertEquals(criteria1, criteria1);
+    Assertions.assertEquals(criteria1.hashCode(), criteria2.hashCode());
 
-        criteria1.setHeight(BigInteger.TEN);
-        Assertions.assertNotEquals(criteria1, criteria2);
-        Assertions.assertNotEquals(criteria1.hashCode(), criteria2.hashCode());
+    criteria1.setHeight(BigInteger.TEN);
+    Assertions.assertNotEquals(criteria1, criteria2);
+    Assertions.assertNotEquals(criteria1.hashCode(), criteria2.hashCode());
 
-        Assertions.assertNotEquals("ABC", criteria2);
-    }
-
-
+    Assertions.assertNotEquals("ABC", criteria2);
+  }
 }

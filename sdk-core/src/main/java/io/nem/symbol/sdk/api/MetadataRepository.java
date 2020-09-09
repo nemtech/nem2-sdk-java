@@ -13,14 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.metadata.Metadata;
 
-/**
- * Metadata interface repository.
- */
-public interface MetadataRepository extends Searcher<Metadata, MetadataSearchCriteria> {
-
-}
+/** Metadata interface repository. */
+public interface MetadataRepository extends Searcher<Metadata, MetadataSearchCriteria> {}

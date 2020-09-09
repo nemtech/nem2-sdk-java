@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,45 +29,44 @@ import org.junit.jupiter.api.Test;
 
 class MosaicSupplyChangeTransactionTest extends AbstractTransactionTester {
 
-    @Test
-    void createAMosaicSupplyChangeTransactionViaConstructor() {
+  @Test
+  void createAMosaicSupplyChangeTransactionViaConstructor() {
 
-        MosaicSupplyChangeTransaction mosaicSupplyChangeTx =
-            MosaicSupplyChangeTransactionFactory.create(
+    MosaicSupplyChangeTransaction mosaicSupplyChangeTx =
+        MosaicSupplyChangeTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new MosaicId(new BigInteger("6300565133566699912")),
                 MosaicSupplyChangeActionType.INCREASE,
-                BigInteger.valueOf(10)).build();
+                BigInteger.valueOf(10))
+            .build();
 
-        assertEquals(NetworkType.MIJIN_TEST, mosaicSupplyChangeTx.getNetworkType());
-        assertTrue(1 == mosaicSupplyChangeTx.getVersion());
-        assertTrue(
-            LocalDateTime.now().isBefore(mosaicSupplyChangeTx.getDeadline().getLocalDateTime()));
-        assertEquals(BigInteger.valueOf(0), mosaicSupplyChangeTx.getMaxFee());
-        assertEquals(new BigInteger("6300565133566699912"),
-            mosaicSupplyChangeTx.getMosaicId().getId());
-        assertEquals(
-            MosaicSupplyChangeActionType.INCREASE, mosaicSupplyChangeTx.getAction());
-        assertEquals(BigInteger.valueOf(10), mosaicSupplyChangeTx.getDelta());
-    }
+    assertEquals(NetworkType.MIJIN_TEST, mosaicSupplyChangeTx.getNetworkType());
+    assertTrue(1 == mosaicSupplyChangeTx.getVersion());
+    assertTrue(LocalDateTime.now().isBefore(mosaicSupplyChangeTx.getDeadline().getLocalDateTime()));
+    assertEquals(BigInteger.valueOf(0), mosaicSupplyChangeTx.getMaxFee());
+    assertEquals(new BigInteger("6300565133566699912"), mosaicSupplyChangeTx.getMosaicId().getId());
+    assertEquals(MosaicSupplyChangeActionType.INCREASE, mosaicSupplyChangeTx.getAction());
+    assertEquals(BigInteger.valueOf(10), mosaicSupplyChangeTx.getDelta());
+  }
 
-    @Test
-    @DisplayName("Serialization")
-    void serialization() {
-        String expected =
-            "91000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904D42000000000000000001000000000000008869746E9B1A70570A0000000000000001";
+  @Test
+  @DisplayName("Serialization")
+  void serialization() {
+    String expected =
+        "91000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001904D42000000000000000001000000000000008869746E9B1A70570A0000000000000001";
 
-        MosaicSupplyChangeTransaction transaction =
-            MosaicSupplyChangeTransactionFactory.create(
+    MosaicSupplyChangeTransaction transaction =
+        MosaicSupplyChangeTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new MosaicId(new BigInteger("6300565133566699912")),
                 MosaicSupplyChangeActionType.INCREASE,
-                BigInteger.valueOf(10)
-            ).deadline(new FakeDeadline()).build();
+                BigInteger.valueOf(10))
+            .deadline(new FakeDeadline())
+            .build();
 
-        byte[] actual = transaction.serialize();
-        assertEquals(expected, ConvertUtils.toHex(actual));
+    byte[] actual = transaction.serialize();
+    assertEquals(expected, ConvertUtils.toHex(actual));
 
-        assertSerialization(expected, transaction);
-    }
+    assertSerialization(expected, transaction);
+  }
 }

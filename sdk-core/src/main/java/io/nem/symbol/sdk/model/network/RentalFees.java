@@ -13,51 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.network;
 
 import java.math.BigInteger;
 
-/**
- * The estimated effective rental fees for namespaces and mosaics.
- */
+/** The estimated effective rental fees for namespaces and mosaics. */
 public class RentalFees {
 
-    /**
-     * Absolute amount. An amount of 123456789 (absolute) for a mosaic with divisibility 6 means
-     * 123.456789 (relative).
-     */
-    private final BigInteger effectiveRootNamespaceRentalFeePerBlock;
+  /**
+   * Absolute amount. An amount of 123456789 (absolute) for a mosaic with divisibility 6 means
+   * 123.456789 (relative).
+   */
+  private final BigInteger effectiveRootNamespaceRentalFeePerBlock;
 
-    /**
-     * Absolute amount. An amount of 123456789 (absolute) for a mosaic with divisibility 6 means
-     * 123.456789 (relative).
-     */
-    private final BigInteger effectiveChildNamespaceRentalFee;
+  /**
+   * Absolute amount. An amount of 123456789 (absolute) for a mosaic with divisibility 6 means
+   * 123.456789 (relative).
+   */
+  private final BigInteger effectiveChildNamespaceRentalFee;
 
+  /**
+   * Absolute amount. An amount of 123456789 (absolute) for a mosaic with divisibility 6 means
+   * 123.456789 (relative).
+   */
+  private final BigInteger effectiveMosaicRentalFee;
 
-    /**
-     * Absolute amount. An amount of 123456789 (absolute) for a mosaic with divisibility 6 means
-     * 123.456789 (relative).
-     */
-    private final BigInteger effectiveMosaicRentalFee;
+  public RentalFees(
+      BigInteger effectiveRootNamespaceRentalFeePerBlock,
+      BigInteger effectiveChildNamespaceRentalFee,
+      BigInteger effectiveMosaicRentalFee) {
+    this.effectiveRootNamespaceRentalFeePerBlock = effectiveRootNamespaceRentalFeePerBlock;
+    this.effectiveChildNamespaceRentalFee = effectiveChildNamespaceRentalFee;
+    this.effectiveMosaicRentalFee = effectiveMosaicRentalFee;
+  }
 
-    public RentalFees(BigInteger effectiveRootNamespaceRentalFeePerBlock,
-        BigInteger effectiveChildNamespaceRentalFee, BigInteger effectiveMosaicRentalFee) {
-        this.effectiveRootNamespaceRentalFeePerBlock = effectiveRootNamespaceRentalFeePerBlock;
-        this.effectiveChildNamespaceRentalFee = effectiveChildNamespaceRentalFee;
-        this.effectiveMosaicRentalFee = effectiveMosaicRentalFee;
-    }
+  public BigInteger getEffectiveRootNamespaceRentalFeePerBlock() {
+    return effectiveRootNamespaceRentalFeePerBlock;
+  }
 
-    public BigInteger getEffectiveRootNamespaceRentalFeePerBlock() {
-        return effectiveRootNamespaceRentalFeePerBlock;
-    }
+  public BigInteger getEffectiveChildNamespaceRentalFee() {
+    return effectiveChildNamespaceRentalFee;
+  }
 
-    public BigInteger getEffectiveChildNamespaceRentalFee() {
-        return effectiveChildNamespaceRentalFee;
-    }
-
-    public BigInteger getEffectiveMosaicRentalFee() {
-        return effectiveMosaicRentalFee;
-    }
+  public BigInteger getEffectiveMosaicRentalFee() {
+    return effectiveMosaicRentalFee;
+  }
 }

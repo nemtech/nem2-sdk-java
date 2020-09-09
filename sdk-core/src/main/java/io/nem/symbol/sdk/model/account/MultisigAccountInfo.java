@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import java.util.List;
@@ -25,96 +24,96 @@ import java.util.List;
  */
 public class MultisigAccountInfo {
 
-    private final Address accountAddress;
-    private final long minApproval;
-    private final long minRemoval;
-    private final List<Address> cosignatoryAddresses;
-    private final List<Address> multisigAddresses;
+  private final Address accountAddress;
+  private final long minApproval;
+  private final long minRemoval;
+  private final List<Address> cosignatoryAddresses;
+  private final List<Address> multisigAddresses;
 
-    public MultisigAccountInfo(
-        Address accountAddress,
-        long minApproval,
-        long minRemoval,
-        List<Address> cosignatories,
-        List<Address> multisigAddresses) {
-        this.accountAddress = accountAddress;
-        this.minApproval = minApproval;
-        this.minRemoval = minRemoval;
-        this.cosignatoryAddresses = cosignatories;
-        this.multisigAddresses = multisigAddresses;
-    }
+  public MultisigAccountInfo(
+      Address accountAddress,
+      long minApproval,
+      long minRemoval,
+      List<Address> cosignatories,
+      List<Address> multisigAddresses) {
+    this.accountAddress = accountAddress;
+    this.minApproval = minApproval;
+    this.minRemoval = minRemoval;
+    this.cosignatoryAddresses = cosignatories;
+    this.multisigAddresses = multisigAddresses;
+  }
 
-    /**
-     * Returns account multisig public account.
-     *
-     * @return PublicAccount
-     */
-    public Address getAccountAddress() {
-        return accountAddress;
-    }
+  /**
+   * Returns account multisig public account.
+   *
+   * @return PublicAccount
+   */
+  public Address getAccountAddress() {
+    return accountAddress;
+  }
 
-    /**
-     * Returns number of signatures needed to approve a transaction.
-     *
-     * @return int
-     */
-    public long getMinApproval() {
-        return minApproval;
-    }
+  /**
+   * Returns number of signatures needed to approve a transaction.
+   *
+   * @return int
+   */
+  public long getMinApproval() {
+    return minApproval;
+  }
 
-    /**
-     * Returns number of signatures needed to remove a cosignatory.
-     *
-     * @return int
-     */
-    public long getMinRemoval() {
-        return minRemoval;
-    }
+  /**
+   * Returns number of signatures needed to remove a cosignatory.
+   *
+   * @return int
+   */
+  public long getMinRemoval() {
+    return minRemoval;
+  }
 
-    /**
-     * Returns multisig account cosignatories.
-     *
-     * @return List of {@link PublicAccount}
-     */
-    public List<Address> getCosignatoryAddresses() {
-        return cosignatoryAddresses;
-    }
+  /**
+   * Returns multisig account cosignatories.
+   *
+   * @return List of {@link PublicAccount}
+   */
+  public List<Address> getCosignatoryAddresses() {
+    return cosignatoryAddresses;
+  }
 
-    /**
-     * Returns multisig accounts this account is cosigner of.
-     *
-     * @return List of {@link PublicAccount}
-     */
-    public List<Address> getMultisigAddresses() {
-        return multisigAddresses;
-    }
+  /**
+   * Returns multisig accounts this account is cosigner of.
+   *
+   * @return List of {@link PublicAccount}
+   */
+  public List<Address> getMultisigAddresses() {
+    return multisigAddresses;
+  }
 
-    /**
-     * Checks if an account is cosignatory of the multisig account.
-     *
-     * @param account PublicAccount
-     * @return boolean
-     */
-    public boolean hasCosigner(Address account) {
-        return this.cosignatoryAddresses.contains(account);
-    }
+  /**
+   * Checks if an account is cosignatory of the multisig account.
+   *
+   * @param account PublicAccount
+   * @return boolean
+   */
+  public boolean hasCosigner(Address account) {
+    return this.cosignatoryAddresses.contains(account);
+  }
 
-    /**
-     * Checks if the multisig account is cosignatory of an account.
-     *
-     * @param account PublicAccount
-     * @return boolean
-     */
-    public boolean isCosignerOfMultisigAccount(Address account) {
-        return this.multisigAddresses.contains(account);
-    }
+  /**
+   * Checks if the multisig account is cosignatory of an account.
+   *
+   * @param account PublicAccount
+   * @return boolean
+   */
+  public boolean isCosignerOfMultisigAccount(Address account) {
+    return this.multisigAddresses.contains(account);
+  }
 
-    /**
-     * Checks if the account is a multisig account.
-     *
-     * @return boolean
-     */
-    public boolean isMultisig() {
-        return minApproval != 0 && minRemoval != 0;
-    }
+  /**
+   * Checks if the account is a multisig account.
+   *
+   * @return boolean
+   */
+  public boolean isMultisig() {
+    return minApproval != 0 && minRemoval != 0;
+  }
 }

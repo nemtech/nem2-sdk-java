@@ -13,32 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.core.crypto.PublicKey;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import org.apache.commons.lang3.Validate;
 
-/**
- * Factory of {@link AccountKeyLinkTransaction}
- */
-public class AccountKeyLinkTransactionFactory extends TransactionFactory<AccountKeyLinkTransaction> {
+/** Factory of {@link AccountKeyLinkTransaction} */
+public class AccountKeyLinkTransactionFactory
+    extends TransactionFactory<AccountKeyLinkTransaction> {
 
-    private final PublicKey linkedPublicKey;
-    private final LinkAction linkAction;
+  private final PublicKey linkedPublicKey;
+  private final LinkAction linkAction;
 
-    private AccountKeyLinkTransactionFactory(
-        final NetworkType networkType,
-        final PublicKey linkedPublicKey,
-        final LinkAction linkAction) {
-        super(TransactionType.ACCOUNT_KEY_LINK, networkType);
-        Validate.notNull(linkedPublicKey, "LinkedPublicKey must not be null");
-        Validate.notNull(linkAction, "LinkAction must not be null");
-        this.linkedPublicKey = linkedPublicKey;
-        this.linkAction = linkAction;
-    }
+  private AccountKeyLinkTransactionFactory(
+      final NetworkType networkType, final PublicKey linkedPublicKey, final LinkAction linkAction) {
+    super(TransactionType.ACCOUNT_KEY_LINK, networkType);
+    Validate.notNull(linkedPublicKey, "LinkedPublicKey must not be null");
+    Validate.notNull(linkAction, "LinkAction must not be null");
+    this.linkedPublicKey = linkedPublicKey;
+    this.linkAction = linkAction;
+  }
 
   /**
    * Static create method for factory.
@@ -50,30 +45,29 @@ public class AccountKeyLinkTransactionFactory extends TransactionFactory<Account
    */
   public static AccountKeyLinkTransactionFactory create(
       NetworkType networkType, PublicKey linkedPublicKey, LinkAction linkAction) {
-        return new AccountKeyLinkTransactionFactory(networkType, linkedPublicKey, linkAction);
-    }
+    return new AccountKeyLinkTransactionFactory(networkType, linkedPublicKey, linkAction);
+  }
 
-    /**
-     * Gets the public key.
-     *
-     * @return Public key.
-     */
-    public PublicKey getLinkedPublicKey() {
-        return linkedPublicKey;
-    }
+  /**
+   * Gets the public key.
+   *
+   * @return Public key.
+   */
+  public PublicKey getLinkedPublicKey() {
+    return linkedPublicKey;
+  }
 
-    /**
-     * Gets the link action.
-     *
-     * @return Link action.
-     */
-    public LinkAction getLinkAction() {
-        return linkAction;
-    }
+  /**
+   * Gets the link action.
+   *
+   * @return Link action.
+   */
+  public LinkAction getLinkAction() {
+    return linkAction;
+  }
 
-
-    @Override
-    public AccountKeyLinkTransaction build() {
-        return new AccountKeyLinkTransaction(this);
-    }
+  @Override
+  public AccountKeyLinkTransaction build() {
+    return new AccountKeyLinkTransaction(this);
+  }
 }

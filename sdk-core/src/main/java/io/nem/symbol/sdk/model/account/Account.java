@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import io.nem.symbol.core.crypto.KeyPair;
@@ -34,134 +33,134 @@ import java.util.List;
  */
 public class Account {
 
-    private final KeyPair keyPair;
+  private final KeyPair keyPair;
 
-    private final PublicAccount publicAccount;
+  private final PublicAccount publicAccount;
 
-    private final NetworkType networkType;
+  private final NetworkType networkType;
 
-    /**
-     * Constructor
-     *
-     * @param privateKey String
-     * @param networkType NetworkType
-     */
-    public Account(String privateKey, NetworkType networkType) {
-        this.keyPair = KeyPair.fromPrivate(PrivateKey.fromHexString(privateKey));
-        this.publicAccount = new PublicAccount(this.getPublicKey(), networkType);
-        this.networkType = networkType;
-    }
+  /**
+   * Constructor
+   *
+   * @param privateKey String
+   * @param networkType NetworkType
+   */
+  public Account(String privateKey, NetworkType networkType) {
+    this.keyPair = KeyPair.fromPrivate(PrivateKey.fromHexString(privateKey));
+    this.publicAccount = new PublicAccount(this.getPublicKey(), networkType);
+    this.networkType = networkType;
+  }
 
-    public Account(KeyPair keyPair, NetworkType networkType) {
-        this.keyPair = keyPair;
-        this.publicAccount = new PublicAccount(this.getPublicKey(), networkType);
-        this.networkType = networkType;
-    }
+  public Account(KeyPair keyPair, NetworkType networkType) {
+    this.keyPair = keyPair;
+    this.publicAccount = new PublicAccount(this.getPublicKey(), networkType);
+    this.networkType = networkType;
+  }
 
-    /**
-     * Create an Account from a given private key.
-     *
-     * @param privateKey Private key from an account
-     * @param networkType NetworkType
-     * @return {@link Account}
-     */
-    public static Account createFromPrivateKey(String privateKey, NetworkType networkType) {
-        return new Account(privateKey, networkType);
-    }
+  /**
+   * Create an Account from a given private key.
+   *
+   * @param privateKey Private key from an account
+   * @param networkType NetworkType
+   * @return {@link Account}
+   */
+  public static Account createFromPrivateKey(String privateKey, NetworkType networkType) {
+    return new Account(privateKey, networkType);
+  }
 
-    /**
-     * Generates an new Account for provided network type
-     *
-     * @param networkType the network type
-     * @return the account.
-     */
-    public static Account generateNewAccount(NetworkType networkType) {
-        return new Account(KeyPair.random(), networkType);
-    }
+  /**
+   * Generates an new Account for provided network type
+   *
+   * @param networkType the network type
+   * @return the account.
+   */
+  public static Account generateNewAccount(NetworkType networkType) {
+    return new Account(KeyPair.random(), networkType);
+  }
 
-    /**
-     * Account public key.
-     *
-     * @return {@link String}
-     */
-    public String getPublicKey() {
-        return this.keyPair.getPublicKey().toHex();
-    }
+  /**
+   * Account public key.
+   *
+   * @return {@link String}
+   */
+  public String getPublicKey() {
+    return this.keyPair.getPublicKey().toHex();
+  }
 
-    /**
-     * Account private key.
-     *
-     * @return {@link String}
-     */
-    public String getPrivateKey() {
-        return this.keyPair.getPrivateKey().toHex();
-    }
+  /**
+   * Account private key.
+   *
+   * @return {@link String}
+   */
+  public String getPrivateKey() {
+    return this.keyPair.getPrivateKey().toHex();
+  }
 
-    /**
-     * Account keyPair containing public and private key.
-     *
-     * @return {@link KeyPair}
-     */
-    public KeyPair getKeyPair() {
-        return keyPair;
-    }
+  /**
+   * Account keyPair containing public and private key.
+   *
+   * @return {@link KeyPair}
+   */
+  public KeyPair getKeyPair() {
+    return keyPair;
+  }
 
-    /**
-     * Account address.
-     *
-     * @return {@link Address}
-     */
-    public Address getAddress() {
-        return this.publicAccount.getAddress();
-    }
+  /**
+   * Account address.
+   *
+   * @return {@link Address}
+   */
+  public Address getAddress() {
+    return this.publicAccount.getAddress();
+  }
 
-    /**
-     * Public account.
-     *
-     * @return {@link PublicAccount}
-     */
-    public PublicAccount getPublicAccount() {
-        return publicAccount;
-    }
+  /**
+   * Public account.
+   *
+   * @return {@link PublicAccount}
+   */
+  public PublicAccount getPublicAccount() {
+    return publicAccount;
+  }
 
-    /**
-     * Sign a transaction.
-     *
-     * @param transaction The transaction to be signed.
-     * @param generationHash the generation hash.
-     * @return {@link SignedTransaction}
-     */
-    public SignedTransaction sign(final Transaction transaction, final String generationHash) {
-        return transaction.signWith(this, generationHash);
-    }
+  /**
+   * Sign a transaction.
+   *
+   * @param transaction The transaction to be signed.
+   * @param generationHash the generation hash.
+   * @return {@link SignedTransaction}
+   */
+  public SignedTransaction sign(final Transaction transaction, final String generationHash) {
+    return transaction.signWith(this, generationHash);
+  }
 
-    /**
-     * Sign aggregate signature transaction.
-     *
-     * @param cosignatureTransaction The aggregate signature transaction.
-     * @return {@link CosignatureSignedTransaction}
-     */
-    public CosignatureSignedTransaction signCosignatureTransaction(
-        CosignatureTransaction cosignatureTransaction) {
-        return cosignatureTransaction.signWith(this);
-    }
+  /**
+   * Sign aggregate signature transaction.
+   *
+   * @param cosignatureTransaction The aggregate signature transaction.
+   * @return {@link CosignatureSignedTransaction}
+   */
+  public CosignatureSignedTransaction signCosignatureTransaction(
+      CosignatureTransaction cosignatureTransaction) {
+    return cosignatureTransaction.signWith(this);
+  }
 
-    /**
-     * Sign transaction with cosignatories creating a new SignedTransaction.
-     *
-     * @param transaction The aggregate transaction to be signed.
-     * @param cosignatories The list of accounts that will cosign the transaction
-     * @param generationHash the generation hash.
-     * @return {@link SignedTransaction}
-     */
-    public SignedTransaction signTransactionWithCosignatories(
-        final AggregateTransaction transaction,
-        final List<Account> cosignatories,
-        final String generationHash) {
-        return transaction.signTransactionWithCosigners(this, cosignatories, generationHash);
-    }
+  /**
+   * Sign transaction with cosignatories creating a new SignedTransaction.
+   *
+   * @param transaction The aggregate transaction to be signed.
+   * @param cosignatories The list of accounts that will cosign the transaction
+   * @param generationHash the generation hash.
+   * @return {@link SignedTransaction}
+   */
+  public SignedTransaction signTransactionWithCosignatories(
+      final AggregateTransaction transaction,
+      final List<Account> cosignatories,
+      final String generationHash) {
+    return transaction.signTransactionWithCosigners(this, cosignatories, generationHash);
+  }
 
-    public NetworkType getNetworkType() {
-        return networkType;
-    }
+  public NetworkType getNetworkType() {
+    return networkType;
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.receipt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,13 +22,13 @@ import org.junit.jupiter.api.Test;
 
 public class ReceiptSourceTest {
 
-    @Test
-    void shouldCreateReceiptSource() {
+  @Test
+  void shouldCreateReceiptSource() {
 
-        ReceiptSource source = new ReceiptSource(10, 2);
-        assertEquals(10, source.getPrimaryId());
-        assertEquals(2, source.getSecondaryId());
+    ReceiptSource source = new ReceiptSource(10, 2);
+    assertEquals(10, source.getPrimaryId());
+    assertEquals(2, source.getSecondaryId());
 
-        assertEquals("0A00000002000000", ConvertUtils.toHex(source.serialize()));
-    }
+    assertEquals("0A00000002000000", ConvertUtils.toHex(source.serialize()));
+  }
 }

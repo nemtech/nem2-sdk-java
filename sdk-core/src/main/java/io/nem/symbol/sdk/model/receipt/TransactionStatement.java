@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.receipt;
 
 import io.nem.symbol.core.crypto.Hashes;
@@ -27,78 +26,81 @@ import java.util.Optional;
 
 public class TransactionStatement implements Stored {
 
-    private final Optional<String> recordId;
-    private final BigInteger height;
-    private final ReceiptSource receiptSource;
-    private final List<Receipt> receipts;
+  private final Optional<String> recordId;
+  private final BigInteger height;
+  private final ReceiptSource receiptSource;
+  private final List<Receipt> receipts;
 
-    /**
-     * Constructor
-     *
-     * @param recordId the database record id if known.
-     * @param height Block height
-     * @param receiptSource The receipt source.
-     * @param receipts Array of receipts.
-     */
-    public TransactionStatement(String recordId, BigInteger height, ReceiptSource receiptSource, List<Receipt> receipts) {
-        this.recordId = Optional.ofNullable(recordId);
-        this.height = height;
-        this.receiptSource = receiptSource;
-        this.receipts = receipts;
-    }
+  /**
+   * Constructor
+   *
+   * @param recordId the database record id if known.
+   * @param height Block height
+   * @param receiptSource The receipt source.
+   * @param receipts Array of receipts.
+   */
+  public TransactionStatement(
+      String recordId, BigInteger height, ReceiptSource receiptSource, List<Receipt> receipts) {
+    this.recordId = Optional.ofNullable(recordId);
+    this.height = height;
+    this.receiptSource = receiptSource;
+    this.receipts = receipts;
+  }
 
-    /**
-     * Returns receipt source
-     *
-     * @return receipt source
-     */
-    public ReceiptSource getReceiptSource() {
-        return this.receiptSource;
-    }
+  /**
+   * Returns receipt source
+   *
+   * @return receipt source
+   */
+  public ReceiptSource getReceiptSource() {
+    return this.receiptSource;
+  }
 
-    /**
-     * Returns block height
-     *
-     * @return block height
-     */
-    public BigInteger getHeight() {
-        return this.height;
-    }
+  /**
+   * Returns block height
+   *
+   * @return block height
+   */
+  public BigInteger getHeight() {
+    return this.height;
+  }
 
-    /**
-     * Returns Array of receipts.
-     *
-     * @return Array of receipts.
-     */
-    public List<Receipt> getReceipts() {
-        return this.receipts;
-    }
+  /**
+   * Returns Array of receipts.
+   *
+   * @return Array of receipts.
+   */
+  public List<Receipt> getReceipts() {
+    return this.receipts;
+  }
 
-    /**
-     * Serialize transaction statement and generate hash
-     *
-     * @return transaction statement hash
-     */
-    public String generateHash() {
+  /**
+   * Serialize transaction statement and generate hash
+   *
+   * @return transaction statement hash
+   */
+  public String generateHash() {
 
-        final byte[] versionByte = ByteUtils.shortToBytes(
+    final byte[] versionByte =
+        ByteUtils.shortToBytes(
             Short.reverseBytes((short) ReceiptVersion.TRANSACTION_STATEMENT.getValue()));
-        final byte[] typeByte = ByteUtils
-            .shortToBytes(Short.reverseBytes((short) ReceiptType.TRANSACTION_GROUP.getValue()));
-        final byte[] sourceByte = getReceiptSource().serialize();
+    final byte[] typeByte =
+        ByteUtils.shortToBytes(
+            Short.reverseBytes((short) ReceiptType.TRANSACTION_GROUP.getValue()));
+    final byte[] sourceByte = getReceiptSource().serialize();
 
-        byte[] results = ArrayUtils.concat(versionByte, typeByte, sourceByte);
+    byte[] results = ArrayUtils.concat(versionByte, typeByte, sourceByte);
 
-        for (final Receipt receipt : receipts) {
-            results = ArrayUtils.concat(results, receipt.serialize());
-        }
-
-        byte[] hash = Hashes.sha3_256(results);
-        return ConvertUtils.toHex(hash);
+    for (final Receipt receipt : receipts) {
+      results = ArrayUtils.concat(results, receipt.serialize());
     }
 
-    @Override
-    public Optional<String> getRecordId() {
-        return recordId;
-    }
+    byte[] hash = Hashes.sha3_256(results);
+    return ConvertUtils.toHex(hash);
+  }
+
+  @Override
+  public Optional<String> getRecordId() {
+    return recordId;
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -21,8 +20,8 @@ import io.nem.symbol.sdk.api.Listener;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.infrastructure.ListenerBase;
 import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
-import io.nem.symbol.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.infrastructure.TransactionMapper;
+import io.nem.symbol.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
@@ -45,99 +44,94 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  */
 public class ListenerVertx extends ListenerBase implements Listener {
 
-    private final URL url;
+  private final URL url;
 
-    private final HttpClient httpClient;
+  private final HttpClient httpClient;
 
-    private final TransactionMapper transactionMapper;
+  private final TransactionMapper transactionMapper;
 
-    private WebSocket webSocket;
+  private WebSocket webSocket;
 
-
-    /**
-     * @param httpClient the http client instance.
-     * @param url of the host
-     * @param namespaceRepository the namespace repository used to resolve alias.
-     */
-    public ListenerVertx(HttpClient httpClient, String url, NamespaceRepository namespaceRepository) {
-        super(new JsonHelperJackson2(JsonHelperJackson2.configureMapper(Json.mapper)),
-            namespaceRepository);
-        try {
-            this.url = new URL(url);
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("Parameter '" + url +
-                "' is not a valid URL. " + ExceptionUtils.getMessage(e));
-        }
-        this.httpClient = httpClient;
-        this.transactionMapper = new GeneralTransactionMapper(getJsonHelper());
+  /**
+   * @param httpClient the http client instance.
+   * @param url of the host
+   * @param namespaceRepository the namespace repository used to resolve alias.
+   */
+  public ListenerVertx(HttpClient httpClient, String url, NamespaceRepository namespaceRepository) {
+    super(
+        new JsonHelperJackson2(JsonHelperJackson2.configureMapper(Json.mapper)),
+        namespaceRepository);
+    try {
+      this.url = new URL(url);
+    } catch (MalformedURLException e) {
+      throw new IllegalArgumentException(
+          "Parameter '" + url + "' is not a valid URL. " + ExceptionUtils.getMessage(e));
     }
+    this.httpClient = httpClient;
+    this.transactionMapper = new GeneralTransactionMapper(getJsonHelper());
+  }
 
-    /**
-     * @return a {@link CompletableFuture} that resolves when the websocket connection is opened
-     */
-    @Override
-    public CompletableFuture<Void> open() {
+  /** @return a {@link CompletableFuture} that resolves when the websocket connection is opened */
+  @Override
+  public CompletableFuture<Void> open() {
 
-        CompletableFuture<Void> future = new CompletableFuture<>();
-        if (this.webSocket != null) {
-            return CompletableFuture.completedFuture(null);
-        }
-        RequestOptions requestOptions = new RequestOptions();
-        requestOptions.setHost(this.url.getHost());
-        requestOptions.setPort(this.url.getPort());
-        requestOptions.setURI("/ws");
-
-        httpClient.websocket(
-            requestOptions,
-            ws -> {
-                this.webSocket = ws;
-                ws.handler(
-                    handler -> {
-                        ObjectNode message = getJsonHelper()
-                            .convert(handler.toJsonObject(), ObjectNode.class);
-                        handle(message, future);
-                    });
-            });
-        return future;
+    CompletableFuture<Void> future = new CompletableFuture<>();
+    if (this.webSocket != null) {
+      return CompletableFuture.completedFuture(null);
     }
+    RequestOptions requestOptions = new RequestOptions();
+    requestOptions.setHost(this.url.getHost());
+    requestOptions.setPort(this.url.getPort());
+    requestOptions.setURI("/ws");
 
+    httpClient.websocket(
+        requestOptions,
+        ws -> {
+          this.webSocket = ws;
+          ws.handler(
+              handler -> {
+                ObjectNode message =
+                    getJsonHelper().convert(handler.toJsonObject(), ObjectNode.class);
+                handle(message, future);
+              });
+        });
+    return future;
+  }
 
-    @Override
-    protected BlockInfo toBlockInfo(Object blockInfoDTO) {
-        return BlockRepositoryVertxImpl
-            .toBlockInfo(getJsonHelper().convert(blockInfoDTO, BlockInfoDTO.class));
+  @Override
+  protected BlockInfo toBlockInfo(Object blockInfoDTO) {
+    return BlockRepositoryVertxImpl.toBlockInfo(
+        getJsonHelper().convert(blockInfoDTO, BlockInfoDTO.class));
+  }
+
+  @Override
+  protected Transaction toTransaction(TransactionGroup group, Object transactionInfo) {
+    return transactionMapper.mapToFactoryFromDto(transactionInfo).group(group).build();
+  }
+
+  @Override
+  protected CosignatureSignedTransaction toCosignatureSignedTransaction(Object cosignatureJson) {
+    Cosignature cosignature = getJsonHelper().convert(cosignatureJson, Cosignature.class);
+    return new CosignatureSignedTransaction(
+        cosignature.getVersion(),
+        cosignature.getParentHash(),
+        cosignature.getSignature(),
+        cosignature.getSignerPublicKey());
+  }
+
+  /** Close webSocket connection */
+  @Override
+  public void close() {
+    if (this.webSocket != null) {
+      this.setUid(null);
+      this.webSocket.close();
+      this.webSocket = null;
     }
+  }
 
-    @Override
-    protected Transaction toTransaction(TransactionGroup group, Object transactionInfo) {
-        return transactionMapper.mapToFactoryFromDto(transactionInfo).group(group).build();
-    }
-
-    @Override
-    protected CosignatureSignedTransaction toCosignatureSignedTransaction(
-        Object cosignatureJson) {
-        Cosignature cosignature = getJsonHelper().convert(cosignatureJson, Cosignature.class);
-        return new CosignatureSignedTransaction(cosignature.getVersion(), cosignature.getParentHash(),
-            cosignature.getSignature(), cosignature.getSignerPublicKey());
-    }
-
-    /**
-     * Close webSocket connection
-     */
-    @Override
-    public void close() {
-        if (this.webSocket != null) {
-            this.setUid(null);
-            this.webSocket.close();
-            this.webSocket = null;
-        }
-    }
-
-    protected void subscribeTo(String channel) {
-        final ListenerSubscribeMessage subscribeMessage = new ListenerSubscribeMessage(
-            this.getUid(),
-            channel);
-        this.webSocket.writeTextMessage(getJsonHelper().print(subscribeMessage));
-    }
-
+  protected void subscribeTo(String channel) {
+    final ListenerSubscribeMessage subscribeMessage =
+        new ListenerSubscribeMessage(this.getUid(), channel);
+    this.webSocket.writeTextMessage(getJsonHelper().print(subscribeMessage));
+  }
 }

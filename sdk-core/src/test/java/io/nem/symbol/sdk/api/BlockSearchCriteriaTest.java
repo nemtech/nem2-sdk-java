@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.core.crypto.PublicKey;
@@ -22,92 +21,104 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of {@link BlockSearchCriteria}
- */
+/** Test of {@link BlockSearchCriteria} */
 class BlockSearchCriteriaTest {
-    private final Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
-    private final Account account2 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
-    private final PublicKey publicKey2 = account2.getKeyPair().getPublicKey();
 
-    @Test
-    void shouldCreate() {
-        BlockSearchCriteria criteria = new BlockSearchCriteria();
-        Assertions.assertNull(criteria.getOrder());
-        Assertions.assertNull(criteria.getPageSize());
-        Assertions.assertNull(criteria.getPageNumber());
-        Assertions.assertNull(criteria.getOffset());
-        Assertions.assertNull(criteria.getBeneficiaryAddress());
-        Assertions.assertNull(criteria.getSignerPublicKey());
-        Assertions.assertNull(criteria.getOrderBy());
-    }
+  private final Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+  private final Account account2 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+  private final PublicKey publicKey2 = account2.getKeyPair().getPublicKey();
 
-    @Test
-    void shouldSetValues() {
+  @Test
+  void shouldCreate() {
+    BlockSearchCriteria criteria = new BlockSearchCriteria();
+    Assertions.assertNull(criteria.getOrder());
+    Assertions.assertNull(criteria.getPageSize());
+    Assertions.assertNull(criteria.getPageNumber());
+    Assertions.assertNull(criteria.getOffset());
+    Assertions.assertNull(criteria.getBeneficiaryAddress());
+    Assertions.assertNull(criteria.getSignerPublicKey());
+    Assertions.assertNull(criteria.getOrderBy());
+  }
 
-        BlockSearchCriteria criteria = new BlockSearchCriteria();
-        criteria.setOrder(OrderBy.DESC);
-        criteria.setPageSize(10);
-        criteria.setPageNumber(5);
-        criteria.setOffset("abc");
-        criteria.setBeneficiaryAddress(account1.getAddress());
-        criteria.setSignerPublicKey(publicKey2);
-        criteria.setOrderBy(BlockOrderBy.HEIGHT);
+  @Test
+  void shouldSetValues() {
 
-        Assertions.assertEquals(OrderBy.DESC, criteria.getOrder());
-        Assertions.assertEquals(10, criteria.getPageSize());
-        Assertions.assertEquals(5, criteria.getPageNumber());
-        Assertions.assertEquals("abc", criteria.getOffset());
-        Assertions.assertEquals(account1.getAddress(), criteria.getBeneficiaryAddress());
-        Assertions.assertEquals(publicKey2, criteria.getSignerPublicKey());
-        Assertions.assertEquals(BlockOrderBy.HEIGHT, criteria.getOrderBy());
-    }
+    BlockSearchCriteria criteria = new BlockSearchCriteria();
+    criteria.setOrder(OrderBy.DESC);
+    criteria.setPageSize(10);
+    criteria.setPageNumber(5);
+    criteria.setOffset("abc");
+    criteria.setBeneficiaryAddress(account1.getAddress());
+    criteria.setSignerPublicKey(publicKey2);
+    criteria.setOrderBy(BlockOrderBy.HEIGHT);
 
-    @Test
-    void shouldUseBuilderMethods() {
+    Assertions.assertEquals(OrderBy.DESC, criteria.getOrder());
+    Assertions.assertEquals(10, criteria.getPageSize());
+    Assertions.assertEquals(5, criteria.getPageNumber());
+    Assertions.assertEquals("abc", criteria.getOffset());
+    Assertions.assertEquals(account1.getAddress(), criteria.getBeneficiaryAddress());
+    Assertions.assertEquals(publicKey2, criteria.getSignerPublicKey());
+    Assertions.assertEquals(BlockOrderBy.HEIGHT, criteria.getOrderBy());
+  }
 
-        BlockSearchCriteria criteria = new BlockSearchCriteria()
-            .order(OrderBy.ASC).pageSize(10).pageNumber(5).beneficiaryAddress(account1.getAddress())
-            .signerPublicKey(publicKey2).orderBy(BlockOrderBy.HEIGHT);
+  @Test
+  void shouldUseBuilderMethods() {
 
-        criteria.offset("abc");
-        Assertions.assertEquals(OrderBy.ASC, criteria.getOrder());
-        Assertions.assertEquals(10, criteria.getPageSize());
-        Assertions.assertEquals(5, criteria.getPageNumber());
-        Assertions.assertEquals("abc", criteria.getOffset());
-        Assertions.assertEquals(account1.getAddress(), criteria.getBeneficiaryAddress());
-        Assertions.assertEquals(publicKey2, criteria.getSignerPublicKey());
-        Assertions.assertEquals(BlockOrderBy.HEIGHT, criteria.getOrderBy());
-    }
+    BlockSearchCriteria criteria =
+        new BlockSearchCriteria()
+            .order(OrderBy.ASC)
+            .pageSize(10)
+            .pageNumber(5)
+            .beneficiaryAddress(account1.getAddress())
+            .signerPublicKey(publicKey2)
+            .orderBy(BlockOrderBy.HEIGHT);
 
-    @Test
-    void shouldBeEquals() {
+    criteria.offset("abc");
+    Assertions.assertEquals(OrderBy.ASC, criteria.getOrder());
+    Assertions.assertEquals(10, criteria.getPageSize());
+    Assertions.assertEquals(5, criteria.getPageNumber());
+    Assertions.assertEquals("abc", criteria.getOffset());
+    Assertions.assertEquals(account1.getAddress(), criteria.getBeneficiaryAddress());
+    Assertions.assertEquals(publicKey2, criteria.getSignerPublicKey());
+    Assertions.assertEquals(BlockOrderBy.HEIGHT, criteria.getOrderBy());
+  }
 
-        BlockSearchCriteria criteria1 = new BlockSearchCriteria()
-            .order(OrderBy.ASC).pageSize(10).pageNumber(5).beneficiaryAddress(account1.getAddress())
-            .signerPublicKey(publicKey2).orderBy(BlockOrderBy.HEIGHT);
-        criteria1.offset("abc");
+  @Test
+  void shouldBeEquals() {
 
-        BlockSearchCriteria criteria2 = new BlockSearchCriteria()
-            .order(OrderBy.ASC).pageSize(10).pageNumber(5).beneficiaryAddress(account1.getAddress())
-            .signerPublicKey(publicKey2).orderBy(BlockOrderBy.HEIGHT);
-        criteria2.offset("abc");
+    BlockSearchCriteria criteria1 =
+        new BlockSearchCriteria()
+            .order(OrderBy.ASC)
+            .pageSize(10)
+            .pageNumber(5)
+            .beneficiaryAddress(account1.getAddress())
+            .signerPublicKey(publicKey2)
+            .orderBy(BlockOrderBy.HEIGHT);
+    criteria1.offset("abc");
 
-        Assertions.assertEquals(new BlockSearchCriteria(), new BlockSearchCriteria());
-        Assertions.assertEquals(criteria1, criteria2);
-        Assertions.assertEquals(criteria1, criteria1);
-        Assertions.assertEquals(criteria1.hashCode(), criteria2.hashCode());
+    BlockSearchCriteria criteria2 =
+        new BlockSearchCriteria()
+            .order(OrderBy.ASC)
+            .pageSize(10)
+            .pageNumber(5)
+            .beneficiaryAddress(account1.getAddress())
+            .signerPublicKey(publicKey2)
+            .orderBy(BlockOrderBy.HEIGHT);
+    criteria2.offset("abc");
 
-        criteria1.pageNumber(30);
-        Assertions.assertNotEquals(criteria1, criteria2);
-        Assertions.assertNotEquals(criteria1.hashCode(), criteria2.hashCode());
+    Assertions.assertEquals(new BlockSearchCriteria(), new BlockSearchCriteria());
+    Assertions.assertEquals(criteria1, criteria2);
+    Assertions.assertEquals(criteria1, criteria1);
+    Assertions.assertEquals(criteria1.hashCode(), criteria2.hashCode());
 
-        criteria2.pageNumber(100);
-        Assertions.assertNotEquals(criteria1, criteria2);
-        Assertions.assertNotEquals(criteria1.hashCode(), criteria2.hashCode());
+    criteria1.pageNumber(30);
+    Assertions.assertNotEquals(criteria1, criteria2);
+    Assertions.assertNotEquals(criteria1.hashCode(), criteria2.hashCode());
 
-        Assertions.assertNotEquals("ABC", criteria2);
-    }
+    criteria2.pageNumber(100);
+    Assertions.assertNotEquals(criteria1, criteria2);
+    Assertions.assertNotEquals(criteria1.hashCode(), criteria2.hashCode());
 
-
+    Assertions.assertNotEquals("ABC", criteria2);
+  }
 }

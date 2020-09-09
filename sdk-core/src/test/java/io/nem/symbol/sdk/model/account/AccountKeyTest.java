@@ -13,21 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test for account Key.
- */
+/** Test for account Key. */
 public class AccountKeyTest {
 
-    @Test
-    void constructor(){
-        AccountKey accountKey = new AccountKey(AccountKeyType.LINKED,"ABC");
-        Assertions.assertEquals(AccountKeyType.LINKED, accountKey.getKeyType());
-        Assertions.assertEquals("ABC", accountKey.getKey());
-    }
+  @Test
+  void constructor() {
+    AccountKey accountKey = new AccountKey(AccountKeyType.LINKED, "ABC");
+    Assertions.assertEquals(AccountKeyType.LINKED, accountKey.getKeyType());
+    Assertions.assertEquals("ABC", accountKey.getKey());
+  }
 }

@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.utils;
-
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,35 +28,38 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.provider.Arguments;
 
 /**
- * Abstract class for all the vector tests. Tests that take their input from https://raw.githubusercontent.com/nemtech/test-vectors/main/
+ * Abstract class for all the vector tests. Tests that take their input from
+ * https://raw.githubusercontent.com/nemtech/test-vectors/main/
  */
 public class AbstractVectorTester {
 
-    protected static Stream<Arguments> createArguments(String fileName,
-        Function<Map<String, String>, List<Arguments>> extractArguments, int limit) {
-        try {
-            //The files loaded here are a trimmed down version of the vectors tests https://github.com/nemtech/test-vectors
-            String resourceName = "file:src/test/resources/vectors/" + fileName;
-            URL url = new URL(resourceName);
-            Assertions.assertNotNull(url, "Vector test not found: " + resourceName);
-            ObjectMapper objectMapper = new ObjectMapper();
-            // Change this to just load the first 'limit' objects from the json array file.
-            List<Map<String, String>> list = objectMapper
-                .readValue(url, new TypeReference<List<Map<String, String>>>() {
-                });
-            //Not all the tests can be run every time as it would be slow.
-            //It may be good to shuffle the list so different vectors are tested each run.
-            return list.stream().limit(limit).map(extractArguments::apply).flatMap(List::stream)
-                .filter(Objects::nonNull);
+  protected static Stream<Arguments> createArguments(
+      String fileName, Function<Map<String, String>, List<Arguments>> extractArguments, int limit) {
+    try {
+      // The files loaded here are a trimmed down version of the vectors tests
+      // https://github.com/nemtech/test-vectors
+      String resourceName = "file:src/test/resources/vectors/" + fileName;
+      URL url = new URL(resourceName);
+      Assertions.assertNotNull(url, "Vector test not found: " + resourceName);
+      ObjectMapper objectMapper = new ObjectMapper();
+      // Change this to just load the first 'limit' objects from the json array file.
+      List<Map<String, String>> list =
+          objectMapper.readValue(url, new TypeReference<List<Map<String, String>>>() {});
+      // Not all the tests can be run every time as it would be slow.
+      // It may be good to shuffle the list so different vectors are tested each run.
+      return list.stream()
+          .limit(limit)
+          .map(extractArguments::apply)
+          .flatMap(List::stream)
+          .filter(Objects::nonNull);
 
-        } catch (Exception e) {
-            throw new IllegalArgumentException(
-                "Arguments could not be generated: for file name " + fileName + ". Exception: "
-                    + ExceptionUtils
-                    .getMessage(e), e);
-        }
-
+    } catch (Exception e) {
+      throw new IllegalArgumentException(
+          "Arguments could not be generated: for file name "
+              + fileName
+              + ". Exception: "
+              + ExceptionUtils.getMessage(e),
+          e);
     }
-
-
+  }
 }

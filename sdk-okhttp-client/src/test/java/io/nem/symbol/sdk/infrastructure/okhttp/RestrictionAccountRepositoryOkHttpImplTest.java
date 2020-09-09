@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.core.utils.MapperUtils;
@@ -38,75 +37,77 @@ import org.junit.jupiter.api.Test;
  */
 public class RestrictionAccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest {
 
-    private RestrictionAccountRepositoryOkHttpImpl repository;
+  private RestrictionAccountRepositoryOkHttpImpl repository;
 
+  @BeforeEach
+  public void setUp() {
+    super.setUp();
+    repository = new RestrictionAccountRepositoryOkHttpImpl(apiClientMock);
+  }
 
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-        repository = new RestrictionAccountRepositoryOkHttpImpl(apiClientMock);
-    }
+  @Test
+  public void shouldGetAccountRestrictions() throws Exception {
+    Address address = Address.generateRandom(networkType);
 
-    @Test
-    public void shouldGetAccountRestrictions() throws Exception {
-        Address address = Address.generateRandom(networkType);
+    AccountRestrictionsDTO dto = new AccountRestrictionsDTO();
+    dto.setAddress(address.encoded());
+    AccountRestrictionDTO restriction = new AccountRestrictionDTO();
+    restriction.setRestrictionFlags(AccountRestrictionFlagsEnum.NUMBER_32770);
+    restriction.setValues(Arrays.asList("9636553580561478212"));
+    dto.setRestrictions(Collections.singletonList(restriction));
 
-        AccountRestrictionsDTO dto = new AccountRestrictionsDTO();
-        dto.setAddress(address.encoded());
-        AccountRestrictionDTO restriction = new AccountRestrictionDTO();
-        restriction.setRestrictionFlags(AccountRestrictionFlagsEnum.NUMBER_32770);
-        restriction.setValues(Arrays.asList("9636553580561478212"));
-        dto.setRestrictions(Collections.singletonList(restriction));
+    AccountRestrictionsInfoDTO info = new AccountRestrictionsInfoDTO();
+    info.setAccountRestrictions(dto);
+    mockRemoteCall(info);
 
-        AccountRestrictionsInfoDTO info = new AccountRestrictionsInfoDTO();
-        info.setAccountRestrictions(dto);
-        mockRemoteCall(info);
+    AccountRestrictions accountRestrictions =
+        repository.getAccountRestrictions(address).toFuture().get();
 
-        AccountRestrictions accountRestrictions = repository
-            .getAccountRestrictions(address).toFuture().get();
+    Assertions.assertEquals(address, accountRestrictions.getAddress());
+    Assertions.assertEquals(1, accountRestrictions.getRestrictions().size());
+    Assertions.assertEquals(
+        AccountMosaicRestrictionFlags.BLOCK_MOSAIC,
+        accountRestrictions.getRestrictions().get(0).getRestrictionFlags());
+    Assertions.assertEquals(
+        Arrays.asList(MapperUtils.toMosaicId("9636553580561478212")),
+        accountRestrictions.getRestrictions().get(0).getValues());
+  }
 
-        Assertions.assertEquals(address, accountRestrictions.getAddress());
-        Assertions.assertEquals(1, accountRestrictions.getRestrictions().size());
-        Assertions.assertEquals(AccountMosaicRestrictionFlags.BLOCK_MOSAIC,
-            accountRestrictions.getRestrictions().get(0).getRestrictionFlags());
-        Assertions.assertEquals(
-            Arrays.asList(MapperUtils.toMosaicId("9636553580561478212")),
-            accountRestrictions.getRestrictions().get(0).getValues());
+  @Test
+  public void shouldGetAccountsRestrictionsFromAddresses() throws Exception {
+    Address address = Address.generateRandom(networkType);
 
-    }
+    AccountRestrictionsDTO dto = new AccountRestrictionsDTO();
+    dto.setAddress(address.encoded());
+    AccountRestrictionDTO restriction = new AccountRestrictionDTO();
+    restriction.setRestrictionFlags(AccountRestrictionFlagsEnum.NUMBER_1);
+    restriction.setValues(Arrays.asList("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1"));
+    dto.setRestrictions(Collections.singletonList(restriction));
 
-    @Test
-    public void shouldGetAccountsRestrictionsFromAddresses() throws Exception {
-        Address address = Address.generateRandom(networkType);
+    AccountRestrictionsInfoDTO info = new AccountRestrictionsInfoDTO();
+    info.setAccountRestrictions(dto);
+    mockRemoteCall(Collections.singletonList(info));
 
-        AccountRestrictionsDTO dto = new AccountRestrictionsDTO();
-        dto.setAddress(address.encoded());
-        AccountRestrictionDTO restriction = new AccountRestrictionDTO();
-        restriction.setRestrictionFlags(AccountRestrictionFlagsEnum.NUMBER_1);
-        restriction.setValues(Arrays.asList("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1"));
-        dto.setRestrictions(Collections.singletonList(restriction));
+    AccountRestrictions accountRestrictions =
+        repository
+            .getAccountsRestrictions(Collections.singletonList(address))
+            .toFuture()
+            .get()
+            .get(0);
 
-        AccountRestrictionsInfoDTO info = new AccountRestrictionsInfoDTO();
-        info.setAccountRestrictions(dto);
-        mockRemoteCall(Collections.singletonList(info));
+    Assertions.assertEquals(address, accountRestrictions.getAddress());
+    Assertions.assertEquals(1, accountRestrictions.getRestrictions().size());
+    Assertions.assertEquals(
+        AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
+        accountRestrictions.getRestrictions().get(0).getRestrictionFlags());
+    Assertions.assertEquals(
+        Collections.singletonList(
+            MapperUtils.toUnresolvedAddress("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1")),
+        accountRestrictions.getRestrictions().get(0).getValues());
+  }
 
-        AccountRestrictions accountRestrictions = repository
-            .getAccountsRestrictions(Collections.singletonList(address)).toFuture()
-            .get().get(0);
-
-        Assertions.assertEquals(address, accountRestrictions.getAddress());
-        Assertions.assertEquals(1, accountRestrictions.getRestrictions().size());
-        Assertions.assertEquals(AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
-            accountRestrictions.getRestrictions().get(0).getRestrictionFlags());
-        Assertions.assertEquals(Collections.singletonList(MapperUtils
-                .toUnresolvedAddress("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1")),
-            accountRestrictions.getRestrictions().get(0).getValues());
-
-    }
-
-
-    @Override
-    public RestrictionAccountRepositoryOkHttpImpl getRepository() {
-        return repository;
-    }
+  @Override
+  public RestrictionAccountRepositoryOkHttpImpl getRepository() {
+    return repository;
+  }
 }

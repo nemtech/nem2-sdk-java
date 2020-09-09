@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import java.util.Arrays;
@@ -24,38 +23,38 @@ import java.util.Arrays;
  * property is interpreted as a blocking operation.
  */
 public enum PropertyType {
-    ALLOW_ADDRESS(0x01),
-    ALLOW_MOSAIC(0x02),
-    ALLOW_TRANSACTION(0x04),
-    SENTINEL(0x05),
-    BLOCK_ADDRESS(0x80 + 0x01),
-    BLOCK_MOSAIC(0x80 + 0x02),
-    BLOCK_TRANSACTION(0x80 + 0x04);
+  ALLOW_ADDRESS(0x01),
+  ALLOW_MOSAIC(0x02),
+  ALLOW_TRANSACTION(0x04),
+  SENTINEL(0x05),
+  BLOCK_ADDRESS(0x80 + 0x01),
+  BLOCK_MOSAIC(0x80 + 0x02),
+  BLOCK_TRANSACTION(0x80 + 0x04);
 
-    private Integer value;
+  private Integer value;
 
-    PropertyType(int value) {
-        this.value = value;
+  PropertyType(int value) {
+    this.value = value;
+  }
+
+  public static PropertyType rawValueOf(String stringValue) {
+    try {
+      int value = Integer.decode(stringValue);
+      return Arrays.stream(values())
+          .filter(e -> e.value == value)
+          .findFirst()
+          .orElseThrow(() -> new IllegalArgumentException(stringValue + " is not a valid value"));
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException(stringValue + " is not a valid value");
     }
+  }
 
-    public static PropertyType rawValueOf(String stringValue) {
-        try {
-            int value = Integer.decode(stringValue);
-            return Arrays.stream(values()).filter(e -> e.value == value).findFirst()
-                .orElseThrow(
-                    () -> new IllegalArgumentException(stringValue + " is not a valid value"));
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(stringValue + " is not a valid value");
-        }
-
-    }
-
-    /**
-     * Returns enum value.
-     *
-     * @return enum value
-     */
-    public Integer getValue() {
-        return this.value;
-    }
+  /**
+   * Returns enum value.
+   *
+   * @return enum value
+   */
+  public Integer getValue() {
+    return this.value;
+  }
 }

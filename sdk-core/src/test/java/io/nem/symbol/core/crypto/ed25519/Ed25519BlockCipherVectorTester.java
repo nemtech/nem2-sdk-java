@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto.ed25519;
 
 import io.nem.symbol.core.crypto.KeyPair;
@@ -32,57 +31,73 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class Ed25519BlockCipherVectorTester extends AbstractVectorTester {
 
+  private static Stream<Arguments> cipherVector() {
+    return createArguments(
+        "4.test-cipher.json", Ed25519BlockCipherVectorTester::extractArguments, 20);
+  }
 
-    private static Stream<Arguments> cipherVector() {
-        return createArguments("4.test-cipher.json", Ed25519BlockCipherVectorTester::extractArguments, 20);
-    }
+  private static List<Arguments> extractArguments(Map<String, String> entry) {
+    return Collections.singletonList(
+        Arguments.of(
+            entry.get("privateKey"),
+            entry.get("otherPublicKey"),
+            entry.get("iv"),
+            entry.get("tag"),
+            entry.get("cipherText"),
+            entry.get("clearText")));
+  }
 
+  @ParameterizedTest
+  @MethodSource("cipherVector")
+  void testDecrypt(
+      String privateKey,
+      String otherPublicKey,
+      String iv,
+      String tag,
+      String cipherText,
+      String clearText) {
+    PrivateKey privateKeyObject = PrivateKey.fromHexString(privateKey);
+    PublicKey otherPublicKeyObject = PublicKey.fromHexString(otherPublicKey);
 
-    private static List<Arguments> extractArguments(Map<String, String> entry) {
-        return Collections.singletonList(Arguments
-            .of(entry.get("privateKey"), entry.get("otherPublicKey"), entry.get("iv"), entry.get("tag"),
-                entry.get("cipherText"), entry.get("clearText")));
-    }
+    Ed25519BlockCipher cipher =
+        new Ed25519BlockCipher(
+            KeyPair.onlyPublic(otherPublicKeyObject), KeyPair.fromPrivate(privateKeyObject));
 
-    @ParameterizedTest
-    @MethodSource("cipherVector")
-    void testDecrypt(String privateKey, String otherPublicKey, String iv, String tag, String cipherText,
-        String clearText) {
-        PrivateKey privateKeyObject = PrivateKey.fromHexString(privateKey);
-        PublicKey otherPublicKeyObject = PublicKey.fromHexString(otherPublicKey);
-
-        Ed25519BlockCipher cipher = new Ed25519BlockCipher(KeyPair.onlyPublic(otherPublicKeyObject),
-            KeyPair.fromPrivate(privateKeyObject));
-
-        byte[] decrypted = cipher.decode(ConvertUtils.fromHexToBytes(tag), ConvertUtils.fromHexToBytes(iv),
+    byte[] decrypted =
+        cipher.decode(
+            ConvertUtils.fromHexToBytes(tag),
+            ConvertUtils.fromHexToBytes(iv),
             ConvertUtils.fromHexToBytes(cipherText));
 
-        Assertions.assertNotNull(decrypted);
-        Assertions.assertEquals(clearText.toUpperCase(), ConvertUtils.toHex(decrypted).toUpperCase());
-    }
+    Assertions.assertNotNull(decrypted);
+    Assertions.assertEquals(clearText.toUpperCase(), ConvertUtils.toHex(decrypted).toUpperCase());
+  }
 
+  @ParameterizedTest
+  @MethodSource("cipherVector")
+  void testEncrypt(
+      String privateKey,
+      String otherPublicKey,
+      String iv,
+      String tag,
+      String cipherText,
+      String clearText) {
+    PrivateKey privateKeyObject = PrivateKey.fromHexString(privateKey);
+    PublicKey otherPublicKeyObject = PublicKey.fromHexString(otherPublicKey);
 
-    @ParameterizedTest
-    @MethodSource("cipherVector")
-    void testEncrypt(String privateKey, String otherPublicKey, String iv, String tag, String cipherText,
-        String clearText) {
-        PrivateKey privateKeyObject = PrivateKey.fromHexString(privateKey);
-        PublicKey otherPublicKeyObject = PublicKey.fromHexString(otherPublicKey);
+    Ed25519BlockCipher cipher =
+        new Ed25519BlockCipher(
+            KeyPair.fromPrivate(privateKeyObject), KeyPair.onlyPublic(otherPublicKeyObject));
 
-        Ed25519BlockCipher cipher = new Ed25519BlockCipher(KeyPair.fromPrivate(privateKeyObject),
-            KeyPair.onlyPublic(otherPublicKeyObject));
+    AuthenticatedCipherText encodedData =
+        cipher.encode(ConvertUtils.fromHexToBytes(clearText), ConvertUtils.fromHexToBytes(iv));
 
-        AuthenticatedCipherText encodedData = cipher
-            .encode(ConvertUtils.fromHexToBytes(clearText), ConvertUtils.fromHexToBytes(iv));
+    Assertions.assertEquals(iv, ConvertUtils.toHex(encodedData.getIv()));
+    Assertions.assertEquals(cipherText, ConvertUtils.toHex(encodedData.getCipherText()));
+    Assertions.assertEquals(tag, ConvertUtils.toHex(encodedData.getAuthenticationTag()));
 
-        Assertions.assertEquals(iv, ConvertUtils.toHex(encodedData.getIv()));
-        Assertions.assertEquals(cipherText, ConvertUtils.toHex(encodedData.getCipherText()));
-        Assertions.assertEquals(tag, ConvertUtils.toHex(encodedData.getAuthenticationTag()));
-
-        byte[] encryptData = cipher.encrypt(ConvertUtils.fromHexToBytes(clearText), ConvertUtils.fromHexToBytes(iv));
-        Assertions.assertEquals(tag + iv + cipherText, ConvertUtils.toHex(encryptData));
-
-
-    }
-
+    byte[] encryptData =
+        cipher.encrypt(ConvertUtils.fromHexToBytes(clearText), ConvertUtils.fromHexToBytes(iv));
+    Assertions.assertEquals(tag + iv + cipherText, ConvertUtils.toHex(encryptData));
+  }
 }

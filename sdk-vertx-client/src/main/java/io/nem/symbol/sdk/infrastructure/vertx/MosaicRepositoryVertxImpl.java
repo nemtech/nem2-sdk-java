@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import static io.nem.symbol.core.utils.MapperUtils.toMosaicId;
@@ -45,83 +44,95 @@ import java.util.stream.Collectors;
  *
  * @since 1.0
  */
-public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements
-    MosaicRepository {
+public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl
+    implements MosaicRepository {
 
-    private final MosaicRoutesApi client;
+  private final MosaicRoutesApi client;
 
-    private final Observable<NetworkType> networkTypeObservable;
+  private final Observable<NetworkType> networkTypeObservable;
 
-    public MosaicRepositoryVertxImpl(ApiClient apiClient,
-        Observable<NetworkType> networkTypeObservable) {
-        super(apiClient);
-        this.client = new MosaicRoutesApiImpl(apiClient);
-        this.networkTypeObservable = networkTypeObservable;
-    }
+  public MosaicRepositoryVertxImpl(
+      ApiClient apiClient, Observable<NetworkType> networkTypeObservable) {
+    super(apiClient);
+    this.client = new MosaicRoutesApiImpl(apiClient);
+    this.networkTypeObservable = networkTypeObservable;
+  }
 
-    public MosaicRoutesApi getClient() {
-        return client;
-    }
+  public MosaicRoutesApi getClient() {
+    return client;
+  }
 
-    @Override
-    public Observable<MosaicInfo> getMosaic(MosaicId mosaicId) {
+  @Override
+  public Observable<MosaicInfo> getMosaic(MosaicId mosaicId) {
 
-        Consumer<Handler<AsyncResult<MosaicInfoDTO>>> callback = handler -> getClient()
-            .getMosaic(mosaicId.getIdAsHex(), handler);
-        return exceptionHandling(networkTypeObservable.flatMap(networkType -> call(callback).map(
-            mosaicInfoDTO -> createMosaicInfo(mosaicInfoDTO))));
-    }
+    Consumer<Handler<AsyncResult<MosaicInfoDTO>>> callback =
+        handler -> getClient().getMosaic(mosaicId.getIdAsHex(), handler);
+    return exceptionHandling(
+        networkTypeObservable.flatMap(
+            networkType -> call(callback).map(mosaicInfoDTO -> createMosaicInfo(mosaicInfoDTO))));
+  }
 
-    @Override
-    public Observable<List<MosaicInfo>> getMosaics(List<MosaicId> ids) {
+  @Override
+  public Observable<List<MosaicInfo>> getMosaics(List<MosaicId> ids) {
 
-        MosaicIds mosaicIds = new MosaicIds();
-        mosaicIds.mosaicIds(ids.stream()
-            .map(MosaicId::getIdAsHex)
-            .collect(Collectors.toList()));
-        Consumer<Handler<AsyncResult<List<MosaicInfoDTO>>>> callback = handler -> getClient()
-            .getMosaics(mosaicIds, handler);
-        return exceptionHandling(networkTypeObservable.flatMap(networkType ->
-            call(callback).flatMapIterable(item -> item).map(
-                mosaicInfoDTO -> createMosaicInfo(mosaicInfoDTO))
-                .toList()
-                .toObservable()));
-    }
+    MosaicIds mosaicIds = new MosaicIds();
+    mosaicIds.mosaicIds(ids.stream().map(MosaicId::getIdAsHex).collect(Collectors.toList()));
+    Consumer<Handler<AsyncResult<List<MosaicInfoDTO>>>> callback =
+        handler -> getClient().getMosaics(mosaicIds, handler);
+    return exceptionHandling(
+        networkTypeObservable.flatMap(
+            networkType ->
+                call(callback)
+                    .flatMapIterable(item -> item)
+                    .map(mosaicInfoDTO -> createMosaicInfo(mosaicInfoDTO))
+                    .toList()
+                    .toObservable()));
+  }
 
+  @Override
+  public Observable<Page<MosaicInfo>> search(MosaicSearchCriteria criteria) {
+    Consumer<Handler<AsyncResult<MosaicPage>>> callback =
+        handler ->
+            getClient()
+                .searchMosaics(
+                    toDto(criteria.getOwnerAddress()),
+                    criteria.getPageSize(),
+                    criteria.getPageNumber(),
+                    criteria.getOffset(),
+                    toDto(criteria.getOrder()),
+                    handler);
 
-    @Override
-    public Observable<Page<MosaicInfo>> search(MosaicSearchCriteria criteria) {
-        Consumer<Handler<AsyncResult<MosaicPage>>> callback = handler -> getClient()
-            .searchMosaics(toDto(criteria.getOwnerAddress()),
-                criteria.getPageSize(),
-                criteria.getPageNumber(), criteria.getOffset(),
-                toDto(criteria.getOrder()), handler);
+    return exceptionHandling(
+        networkTypeObservable.flatMap(
+            networkType ->
+                call(callback)
+                    .map(
+                        mosaicPage ->
+                            this.toPage(
+                                mosaicPage.getPagination(),
+                                mosaicPage.getData().stream()
+                                    .map(this::createMosaicInfo)
+                                    .collect(Collectors.toList())))));
+  }
 
-        return exceptionHandling(networkTypeObservable.flatMap(networkType ->
-            call(callback).map(mosaicPage -> this.toPage(mosaicPage.getPagination(),
-                mosaicPage.getData().stream().map(this::createMosaicInfo).collect(
-                    Collectors.toList())))));
-    }
+  private MosaicInfo createMosaicInfo(MosaicInfoDTO mosaicInfoDTO) {
+    return createMosaicInfo(mosaicInfoDTO.getMosaic(), mosaicInfoDTO.getId());
+  }
 
+  private MosaicInfo createMosaicInfo(MosaicDTO mosaic, String recordId) {
+    return new MosaicInfo(
+        recordId,
+        toMosaicId(mosaic.getId()),
+        mosaic.getSupply(),
+        mosaic.getStartHeight(),
+        MapperUtils.toAddress(mosaic.getOwnerAddress()),
+        mosaic.getRevision(),
+        extractMosaicFlags(mosaic),
+        mosaic.getDivisibility(),
+        mosaic.getDuration());
+  }
 
-    private MosaicInfo createMosaicInfo(MosaicInfoDTO mosaicInfoDTO) {
-        return createMosaicInfo(mosaicInfoDTO.getMosaic(),mosaicInfoDTO.getId());
-    }
-
-    private MosaicInfo createMosaicInfo(MosaicDTO mosaic, String recordId) {
-        return new MosaicInfo(
-            recordId,
-            toMosaicId(mosaic.getId()),
-            mosaic.getSupply(),
-            mosaic.getStartHeight(),
-            MapperUtils.toAddress(mosaic.getOwnerAddress()),
-            mosaic.getRevision(),
-            extractMosaicFlags(mosaic),
-            mosaic.getDivisibility(),
-            mosaic.getDuration());
-    }
-
-    private static MosaicFlags extractMosaicFlags(MosaicDTO mosaicDTO) {
-        return MosaicFlags.create(mosaicDTO.getFlags());
-    }
+  private static MosaicFlags extractMosaicFlags(MosaicDTO mosaicDTO) {
+    return MosaicFlags.create(mosaicDTO.getFlags());
+  }
 }

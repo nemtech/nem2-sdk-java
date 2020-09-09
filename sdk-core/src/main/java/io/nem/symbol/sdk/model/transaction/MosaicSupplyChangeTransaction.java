@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.mosaic.MosaicSupplyChangeActionType;
@@ -28,42 +27,41 @@ import java.math.BigInteger;
  */
 public class MosaicSupplyChangeTransaction extends Transaction {
 
-    private final UnresolvedMosaicId mosaicId;
-    private final MosaicSupplyChangeActionType action;
-    private final BigInteger delta;
+  private final UnresolvedMosaicId mosaicId;
+  private final MosaicSupplyChangeActionType action;
+  private final BigInteger delta;
 
-    MosaicSupplyChangeTransaction(MosaicSupplyChangeTransactionFactory factory) {
-        super(factory);
-        this.mosaicId = factory.getMosaicId();
-        this.action = factory.getAction();
-        this.delta = factory.getDelta();
-    }
+  MosaicSupplyChangeTransaction(MosaicSupplyChangeTransactionFactory factory) {
+    super(factory);
+    this.mosaicId = factory.getMosaicId();
+    this.action = factory.getAction();
+    this.delta = factory.getDelta();
+  }
 
-    /**
-     * Returns mosaic id.
-     *
-     * @return BigInteger
-     */
-    public UnresolvedMosaicId getMosaicId() {
-        return mosaicId;
-    }
+  /**
+   * Returns mosaic id.
+   *
+   * @return BigInteger
+   */
+  public UnresolvedMosaicId getMosaicId() {
+    return mosaicId;
+  }
 
-    /**
-     * Returns mosaic supply type.
-     *
-     * @return {@link MosaicSupplyChangeActionType}
-     */
-    public MosaicSupplyChangeActionType getAction() {
-        return action;
-    }
+  /**
+   * Returns mosaic supply type.
+   *
+   * @return {@link MosaicSupplyChangeActionType}
+   */
+  public MosaicSupplyChangeActionType getAction() {
+    return action;
+  }
 
-    /**
-     * Returns amount of mosaics added or removed.
-     *
-     * @return BigInteger
-     */
-    public BigInteger getDelta() {
-        return delta;
-    }
-
+  /**
+   * Returns amount of mosaics added or removed.
+   *
+   * @return BigInteger
+   */
+  public BigInteger getDelta() {
+    return delta;
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.restriction;
 
 import io.nem.symbol.sdk.model.account.Address;
@@ -21,62 +20,52 @@ import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
 import java.util.Map;
 
-/**
- * Mosaic address restriction structure describes restriction information for an mosaic.
- */
+/** Mosaic address restriction structure describes restriction information for an mosaic. */
 public class MosaicAddressRestriction {
 
-    /**
-     * composite hash
-     */
-    public final String compositeHash;
+  /** composite hash */
+  public final String compositeHash;
 
-    /**
-     * Mosaic restriction entry type.
-     */
-    public final MosaicRestrictionEntryType entryType;
-    /**
-     * Mosaic identifier.
-     */
-    private final MosaicId mosaicId;
-    /**
-     * Target address
-     */
-    private final Address targetAddress;
+  /** Mosaic restriction entry type. */
+  public final MosaicRestrictionEntryType entryType;
+  /** Mosaic identifier. */
+  private final MosaicId mosaicId;
+  /** Target address */
+  private final Address targetAddress;
 
-    /**
-     * Mosaic restriction items
-     */
-    private final Map<BigInteger, BigInteger> restrictions;
+  /** Mosaic restriction items */
+  private final Map<BigInteger, BigInteger> restrictions;
 
-    public MosaicAddressRestriction(String compositeHash,
-        MosaicRestrictionEntryType entryType,
-        MosaicId mosaicId, Address targetAddress,
-        Map<BigInteger, BigInteger> restrictions) {
-        this.compositeHash = compositeHash;
-        this.entryType = entryType;
-        this.mosaicId = mosaicId;
-        this.targetAddress = targetAddress;
-        this.restrictions = restrictions;
-    }
+  public MosaicAddressRestriction(
+      String compositeHash,
+      MosaicRestrictionEntryType entryType,
+      MosaicId mosaicId,
+      Address targetAddress,
+      Map<BigInteger, BigInteger> restrictions) {
+    this.compositeHash = compositeHash;
+    this.entryType = entryType;
+    this.mosaicId = mosaicId;
+    this.targetAddress = targetAddress;
+    this.restrictions = restrictions;
+  }
 
-    public String getCompositeHash() {
-        return compositeHash;
-    }
+  public String getCompositeHash() {
+    return compositeHash;
+  }
 
-    public MosaicRestrictionEntryType getEntryType() {
-        return entryType;
-    }
+  public MosaicRestrictionEntryType getEntryType() {
+    return entryType;
+  }
 
-    public MosaicId getMosaicId() {
-        return mosaicId;
-    }
+  public MosaicId getMosaicId() {
+    return mosaicId;
+  }
 
-    public Address getTargetAddress() {
-        return targetAddress;
-    }
+  public Address getTargetAddress() {
+    return targetAddress;
+  }
 
-    public Map<BigInteger, BigInteger> getRestrictions() {
-        return restrictions;
-    }
+  public Map<BigInteger, BigInteger> getRestrictions() {
+    return restrictions;
+  }
 }

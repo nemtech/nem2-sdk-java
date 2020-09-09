@@ -13,26 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
-
 
 import io.nem.symbol.catapult.builders.AccountRestrictionFlagsDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests for {@link AccountRestrictionFlags}
- */
+/** Tests for {@link AccountRestrictionFlags} */
 public class AccountRestrictionFlagsTest {
 
-
-    @Test
-    public void shouldMatchCatbufferValues() {
-        AccountRestrictionFlags.values().stream().forEach(a -> {
-            //Testing that all possible values are handled.
-            Assertions.assertNotNull(AccountRestrictionFlagsDto.rawValueOf((byte) a.getValue()));
-        });
-    }
-
+  @Test
+  public void shouldMatchCatbufferValues() {
+    AccountRestrictionFlags.values().stream()
+        .forEach(
+            a -> {
+              // Testing that all possible values are handled.
+              Assertions.assertNotNull(AccountRestrictionFlagsDto.rawValueOf((byte) a.getValue()));
+            });
+  }
 }

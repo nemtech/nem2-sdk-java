@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto;
 
 import java.math.BigInteger;
@@ -25,124 +24,131 @@ import org.junit.jupiter.api.Test;
 
 public class PrivateKeyTest {
 
-    // region constructors / factories
+  // region constructors / factories
 
-    @Test
-    public void canCreateFromBigInteger() {
-        // Arrange:
-        final PrivateKey key = new PrivateKey(new BigInteger("2275"));
-        Assertions.assertEquals(PrivateKey.SIZE, key.getSize());
+  @Test
+  public void canCreateFromBigInteger() {
+    // Arrange:
+    final PrivateKey key = new PrivateKey(new BigInteger("2275"));
+    Assertions.assertEquals(PrivateKey.SIZE, key.getSize());
 
-        // Assert:
-        MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("2275")));
-    }
+    // Assert:
+    MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("2275")));
+  }
 
-    @Test
-    public void canCreateFromDecimalString() {
-        // Arrange:
-        final PrivateKey key = PrivateKey.fromDecimalString("2279");
+  @Test
+  public void canCreateFromDecimalString() {
+    // Arrange:
+    final PrivateKey key = PrivateKey.fromDecimalString("2279");
 
-        // Assert:
-        MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("2279")));
-    }
+    // Assert:
+    MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("2279")));
+  }
 
-    @Test
-    public void canCreateFromNegativeDecimalString() {
-        // Arrange:
-        final PrivateKey key = PrivateKey.fromDecimalString("-2279");
+  @Test
+  public void canCreateFromNegativeDecimalString() {
+    // Arrange:
+    final PrivateKey key = PrivateKey.fromDecimalString("-2279");
 
-        // Assert:
-        MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("63257")));
-    }
+    // Assert:
+    MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("63257")));
+  }
 
-    @Test
-    public void canCreateFromHexString() {
-        // Arrange:
-        final PrivateKey key = PrivateKey.fromHexString("227F");
+  @Test
+  public void canCreateFromHexString() {
+    // Arrange:
+    final PrivateKey key = PrivateKey.fromHexString("227F");
 
-        // Assert:
-        MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("227F", 16)));
-    }
+    // Assert:
+    MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger("227F", 16)));
+  }
 
-    @Test
-    public void canCreateFromOddLengthHexString() {
-        // Arrange:
-        final PrivateKey key = PrivateKey.fromHexString("ABC");
+  @Test
+  public void canCreateFromOddLengthHexString() {
+    // Arrange:
+    final PrivateKey key = PrivateKey.fromHexString("ABC");
 
-        // Assert:
-        MatcherAssert.assertThat(
-            key.getRaw(), IsEqual.equalTo(new BigInteger(new byte[]{(byte) 0x0A, (byte) 0xBC})));
-    }
+    // Assert:
+    MatcherAssert.assertThat(
+        key.getRaw(), IsEqual.equalTo(new BigInteger(new byte[] {(byte) 0x0A, (byte) 0xBC})));
+  }
 
-    @Test
-    public void canCreateFromNegativeHexString() {
-        // Arrange:
-        final PrivateKey key = PrivateKey.fromHexString("8000");
-        Assertions.assertEquals("0000000000000000000000000000000000000000000000000000000000008000", key.toHex());
-        Assertions.assertEquals(BigInteger.valueOf(32768), key.getRaw());
-    }
+  @Test
+  public void canCreateFromNegativeHexString() {
+    // Arrange:
+    final PrivateKey key = PrivateKey.fromHexString("8000");
+    Assertions.assertEquals(
+        "0000000000000000000000000000000000000000000000000000000000008000", key.toHex());
+    Assertions.assertEquals(BigInteger.valueOf(32768), key.getRaw());
+  }
 
-    @Test
-    public void cannotCreateAroundMalformedDecimalString() {
-        // Act:
-        Assertions.assertThrows(NumberFormatException.class, () -> PrivateKey.fromDecimalString("22A75"));
-    }
+  @Test
+  public void cannotCreateAroundMalformedDecimalString() {
+    // Act:
+    Assertions.assertThrows(
+        NumberFormatException.class, () -> PrivateKey.fromDecimalString("22A75"));
+  }
 
-    @Test
-    public void cannotCreateAroundMalformedHexString() {
-        // Act:
-        Assertions.assertThrows(IllegalArgumentException.class, () -> PrivateKey.fromHexString("22G75"));
-    }
+  @Test
+  public void cannotCreateAroundMalformedHexString() {
+    // Act:
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> PrivateKey.fromHexString("22G75"));
+  }
 
-    // endregion
+  // endregion
 
-    // region serializer
+  // region serializer
 
-    // endregion
+  // endregion
 
-    // region equals / hashCode
+  // region equals / hashCode
 
-    @Test
-    public void equalsOnlyReturnsTrueForEquivalentObjects() {
-        // Arrange:
-        final PrivateKey key = new PrivateKey(new BigInteger("2275"));
+  @Test
+  public void equalsOnlyReturnsTrueForEquivalentObjects() {
+    // Arrange:
+    final PrivateKey key = new PrivateKey(new BigInteger("2275"));
 
-        // Assert:
-        MatcherAssert.assertThat(PrivateKey.fromDecimalString("2275"), IsEqual.equalTo(key));
-        MatcherAssert.assertThat(PrivateKey.fromDecimalString("2276"), IsNot.not(IsEqual.equalTo(key)));
-        MatcherAssert.assertThat(PrivateKey.fromHexString("2276"), IsNot.not(IsEqual.equalTo(key)));
-        MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
-        MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo(key)));
-        MatcherAssert.assertThat(PrivateKey.generateRandom(), IsNot.not(IsEqual.equalTo(PrivateKey.fromDecimalString("2275"))));
-    }
+    // Assert:
+    MatcherAssert.assertThat(PrivateKey.fromDecimalString("2275"), IsEqual.equalTo(key));
+    MatcherAssert.assertThat(PrivateKey.fromDecimalString("2276"), IsNot.not(IsEqual.equalTo(key)));
+    MatcherAssert.assertThat(PrivateKey.fromHexString("2276"), IsNot.not(IsEqual.equalTo(key)));
+    MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
+    MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo(key)));
+    MatcherAssert.assertThat(
+        PrivateKey.generateRandom(),
+        IsNot.not(IsEqual.equalTo(PrivateKey.fromDecimalString("2275"))));
+  }
 
-    @Test
-    public void hashCodesAreEqualForEquivalentObjects() {
-        // Arrange:
-        final PrivateKey key = new PrivateKey(new BigInteger("2275"));
-        final int hashCode = key.hashCode();
+  @Test
+  public void hashCodesAreEqualForEquivalentObjects() {
+    // Arrange:
+    final PrivateKey key = new PrivateKey(new BigInteger("2275"));
+    final int hashCode = key.hashCode();
 
-        // Assert:
-        MatcherAssert
-            .assertThat(PrivateKey.fromDecimalString("2275").hashCode(), IsEqual.equalTo(hashCode));
-        MatcherAssert.assertThat(
-            PrivateKey.fromDecimalString("2276").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-        MatcherAssert.assertThat(
-            PrivateKey.fromHexString("2275").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-    }
+    // Assert:
+    MatcherAssert.assertThat(
+        PrivateKey.fromDecimalString("2275").hashCode(), IsEqual.equalTo(hashCode));
+    MatcherAssert.assertThat(
+        PrivateKey.fromDecimalString("2276").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+    MatcherAssert.assertThat(
+        PrivateKey.fromHexString("2275").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+  }
 
-    // endregion
+  // endregion
 
-    // region toString
+  // region toString
 
-    @Test
-    public void toStringReturnsHexRepresentation() {
-        // Assert:
-        MatcherAssert.assertThat(PrivateKey.fromHexString("2275").toHex(),
-            IsEqual.equalTo("0000000000000000000000000000000000000000000000000000000000002275"));
-        MatcherAssert.assertThat(PrivateKey.fromDecimalString("2275").toHex(),
-            IsEqual.equalTo("00000000000000000000000000000000000000000000000000000000000008E3"));
-    }
+  @Test
+  public void toStringReturnsHexRepresentation() {
+    // Assert:
+    MatcherAssert.assertThat(
+        PrivateKey.fromHexString("2275").toHex(),
+        IsEqual.equalTo("0000000000000000000000000000000000000000000000000000000000002275"));
+    MatcherAssert.assertThat(
+        PrivateKey.fromDecimalString("2275").toHex(),
+        IsEqual.equalTo("00000000000000000000000000000000000000000000000000000000000008E3"));
+  }
 
-    // endregion
+  // endregion
 }

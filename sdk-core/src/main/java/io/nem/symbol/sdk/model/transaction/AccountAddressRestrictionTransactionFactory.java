@@ -20,75 +20,72 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 
-/**
- * Factory of {@link AccountAddressRestrictionTransaction}
- */
-public class AccountAddressRestrictionTransactionFactory extends
-    TransactionFactory<AccountAddressRestrictionTransaction> {
+/** Factory of {@link AccountAddressRestrictionTransaction} */
+public class AccountAddressRestrictionTransactionFactory
+    extends TransactionFactory<AccountAddressRestrictionTransaction> {
 
-    private final AccountAddressRestrictionFlags restrictionFlags;
+  private final AccountAddressRestrictionFlags restrictionFlags;
 
-    private final List<UnresolvedAddress> restrictionAdditions;
+  private final List<UnresolvedAddress> restrictionAdditions;
 
-    private final List<UnresolvedAddress> restrictionDeletions;
+  private final List<UnresolvedAddress> restrictionDeletions;
 
-    private AccountAddressRestrictionTransactionFactory(final NetworkType networkType,
-        final AccountAddressRestrictionFlags restrictionFlags, List<UnresolvedAddress> restrictionAdditions,
-        List<UnresolvedAddress> restrictionDeletions) {
-        super(TransactionType.ACCOUNT_ADDRESS_RESTRICTION, networkType);
+  private AccountAddressRestrictionTransactionFactory(
+      final NetworkType networkType,
+      final AccountAddressRestrictionFlags restrictionFlags,
+      List<UnresolvedAddress> restrictionAdditions,
+      List<UnresolvedAddress> restrictionDeletions) {
+    super(TransactionType.ACCOUNT_ADDRESS_RESTRICTION, networkType);
 
-        Validate.notNull(restrictionFlags, "RestrictionType must not be null");
-        Validate.notNull(restrictionAdditions, "RestrictionAdditions must not be null");
-        Validate.notNull(restrictionDeletions, "RestrictionDeletions must not be null");
+    Validate.notNull(restrictionFlags, "RestrictionType must not be null");
+    Validate.notNull(restrictionAdditions, "RestrictionAdditions must not be null");
+    Validate.notNull(restrictionDeletions, "RestrictionDeletions must not be null");
 
-        this.restrictionFlags = restrictionFlags;
-        this.restrictionAdditions = restrictionAdditions;
-        this.restrictionDeletions = restrictionDeletions;
-    }
+    this.restrictionFlags = restrictionFlags;
+    this.restrictionAdditions = restrictionAdditions;
+    this.restrictionDeletions = restrictionDeletions;
+  }
 
-    /**
-     * Static create method for factory.
-     *
-     * @param networkType Network type.
-     * @param restrictionFlags Restriction type.
-     * @param restrictionAdditions List of addresses that are going to be added to the restriction.
-     * @param restrictionDeletions List of addresses that are going to be removed from the
-     * restriction.
-     * @return Account address restriction transaction.
-     */
-    public static AccountAddressRestrictionTransactionFactory create(NetworkType networkType,
-        AccountAddressRestrictionFlags restrictionFlags, List<UnresolvedAddress> restrictionAdditions,
-        List<UnresolvedAddress> restrictionDeletions) {
-        return new AccountAddressRestrictionTransactionFactory(networkType, restrictionFlags,
-            restrictionAdditions, restrictionDeletions);
-    }
+  /**
+   * Static create method for factory.
+   *
+   * @param networkType Network type.
+   * @param restrictionFlags Restriction type.
+   * @param restrictionAdditions List of addresses that are going to be added to the restriction.
+   * @param restrictionDeletions List of addresses that are going to be removed from the
+   *     restriction.
+   * @return Account address restriction transaction.
+   */
+  public static AccountAddressRestrictionTransactionFactory create(
+      NetworkType networkType,
+      AccountAddressRestrictionFlags restrictionFlags,
+      List<UnresolvedAddress> restrictionAdditions,
+      List<UnresolvedAddress> restrictionDeletions) {
+    return new AccountAddressRestrictionTransactionFactory(
+        networkType, restrictionFlags, restrictionAdditions, restrictionDeletions);
+  }
 
-    /**
-     * Get account restriction flags.
-     *
-     * @return {@link AccountAddressRestrictionFlags}
-     */
-    public AccountAddressRestrictionFlags getRestrictionFlags() {
-        return this.restrictionFlags;
-    }
+  /**
+   * Get account restriction flags.
+   *
+   * @return {@link AccountAddressRestrictionFlags}
+   */
+  public AccountAddressRestrictionFlags getRestrictionFlags() {
+    return this.restrictionFlags;
+  }
 
+  @Override
+  public AccountAddressRestrictionTransaction build() {
+    return new AccountAddressRestrictionTransaction(this);
+  }
 
-    @Override
-    public AccountAddressRestrictionTransaction build() {
-        return new AccountAddressRestrictionTransaction(this);
-    }
+  /** @return List of addresses that are going to be added to the restriction. */
+  public List<UnresolvedAddress> getRestrictionAdditions() {
+    return restrictionAdditions;
+  }
 
-    /**
-     * @return List of addresses that are going to be added to the restriction.
-     */
-    public List<UnresolvedAddress> getRestrictionAdditions() {
-        return restrictionAdditions;
-    }
-
-    /**
-     * @return List of addresses that are going to be removed from the restriction.
-     */
-    public List<UnresolvedAddress> getRestrictionDeletions() {
-        return restrictionDeletions;
-    }
+  /** @return List of addresses that are going to be removed from the restriction. */
+  public List<UnresolvedAddress> getRestrictionDeletions() {
+    return restrictionDeletions;
+  }
 }

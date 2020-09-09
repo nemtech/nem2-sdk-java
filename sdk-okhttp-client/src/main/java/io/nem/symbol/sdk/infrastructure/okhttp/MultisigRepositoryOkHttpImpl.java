@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.core.utils.MapperUtils;
@@ -33,67 +32,69 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class MultisigRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements
-    MultisigRepository {
+public class MultisigRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
+    implements MultisigRepository {
 
-    private final MultisigRoutesApi client;
+  private final MultisigRoutesApi client;
 
-    private final Observable<NetworkType> networkTypeObservable;
+  private final Observable<NetworkType> networkTypeObservable;
 
-    public MultisigRepositoryOkHttpImpl(ApiClient apiClient,
-        Observable<NetworkType> networkTypeObservable) {
-        super(apiClient);
-        this.client = new MultisigRoutesApi(apiClient);
-        this.networkTypeObservable = networkTypeObservable;
-    }
+  public MultisigRepositoryOkHttpImpl(
+      ApiClient apiClient, Observable<NetworkType> networkTypeObservable) {
+    super(apiClient);
+    this.client = new MultisigRoutesApi(apiClient);
+    this.networkTypeObservable = networkTypeObservable;
+  }
 
-    @Override
-    public Observable<MultisigAccountInfo> getMultisigAccountInfo(Address address) {
-        return exceptionHandling(networkTypeObservable.flatMap(networkType -> call(
-            () -> getClient().getAccountMultisig(address.plain()))
-            .map(MultisigAccountInfoDTO::getMultisig)
-            .map(dto -> toMultisigAccountInfo(dto))));
+  @Override
+  public Observable<MultisigAccountInfo> getMultisigAccountInfo(Address address) {
+    return exceptionHandling(
+        networkTypeObservable.flatMap(
+            networkType ->
+                call(() -> getClient().getAccountMultisig(address.plain()))
+                    .map(MultisigAccountInfoDTO::getMultisig)
+                    .map(dto -> toMultisigAccountInfo(dto))));
+  }
 
-    }
+  @Override
+  public Observable<MultisigAccountGraphInfo> getMultisigAccountGraphInfo(Address address) {
+    return exceptionHandling(
+        networkTypeObservable.flatMap(
+            networkType ->
+                call(() -> getClient().getAccountMultisigGraph(address.plain()))
+                    .map(
+                        multisigAccountGraphInfoDTOList -> {
+                          Map<Integer, List<MultisigAccountInfo>> multisigAccountInfoMap =
+                              new HashMap<>();
+                          multisigAccountGraphInfoDTOList.forEach(
+                              item ->
+                                  multisigAccountInfoMap.put(
+                                      item.getLevel(), toMultisigAccountInfo(item)));
+                          return new MultisigAccountGraphInfo(multisigAccountInfoMap);
+                        })));
+  }
 
-    @Override
-    public Observable<MultisigAccountGraphInfo> getMultisigAccountGraphInfo(Address address) {
-        return exceptionHandling(networkTypeObservable.flatMap(networkType -> call(
-            () -> getClient().getAccountMultisigGraph(address.plain()))
-            .map(multisigAccountGraphInfoDTOList -> {
-                Map<Integer, List<MultisigAccountInfo>> multisigAccountInfoMap = new HashMap<>();
-                multisigAccountGraphInfoDTOList.forEach(
-                    item ->
-                        multisigAccountInfoMap.put(
-                            item.getLevel(),
-                            toMultisigAccountInfo(item)));
-                return new MultisigAccountGraphInfo(multisigAccountInfoMap);
-            })));
-    }
+  private List<MultisigAccountInfo> toMultisigAccountInfo(MultisigAccountGraphInfoDTO item) {
+    return item.getMultisigEntries().stream()
+        .map(MultisigAccountInfoDTO::getMultisig)
+        .map(dto -> toMultisigAccountInfo(dto))
+        .collect(Collectors.toList());
+  }
 
-    private List<MultisigAccountInfo> toMultisigAccountInfo(MultisigAccountGraphInfoDTO item) {
-        return item.getMultisigEntries().stream()
-            .map(MultisigAccountInfoDTO::getMultisig)
-            .map(dto -> toMultisigAccountInfo(dto))
-            .collect(Collectors.toList());
-    }
+  private MultisigAccountInfo toMultisigAccountInfo(MultisigDTO dto) {
+    return new MultisigAccountInfo(
+        MapperUtils.toAddress(dto.getAccountAddress()),
+        dto.getMinApproval(),
+        dto.getMinRemoval(),
+        dto.getCosignatoryAddresses().stream()
+            .map(MapperUtils::toAddress)
+            .collect(Collectors.toList()),
+        dto.getMultisigAddresses().stream()
+            .map(MapperUtils::toAddress)
+            .collect(Collectors.toList()));
+  }
 
-
-    private MultisigAccountInfo toMultisigAccountInfo(MultisigDTO dto) {
-        return new MultisigAccountInfo(
-            MapperUtils.toAddress(dto.getAccountAddress()),
-            dto.getMinApproval(),
-            dto.getMinRemoval(),
-            dto.getCosignatoryAddresses().stream()
-                .map(MapperUtils::toAddress)
-                .collect(Collectors.toList()),
-            dto.getMultisigAddresses().stream()
-                .map(MapperUtils::toAddress)
-                .collect(Collectors.toList()));
-    }
-
-
-    public MultisigRoutesApi getClient() {
-        return client;
-    }
+  public MultisigRoutesApi getClient() {
+    return client;
+  }
 }

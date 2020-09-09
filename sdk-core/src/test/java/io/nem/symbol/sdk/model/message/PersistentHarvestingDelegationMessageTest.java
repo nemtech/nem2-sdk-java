@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.message;
 
 import io.nem.symbol.core.crypto.KeyPair;
@@ -21,29 +20,28 @@ import io.nem.symbol.sdk.model.message.PersistentHarvestingDelegationMessage.Har
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test class for the EncryptMessage.
- */
+/** Test class for the EncryptMessage. */
 public class PersistentHarvestingDelegationMessageTest {
 
-    @Test
-    public void testCreateEncryptedMessage() {
-        KeyPair signing = KeyPair.random();
-        KeyPair vrf = KeyPair.random();
-        KeyPair harvester = KeyPair.random();
+  @Test
+  public void testCreateEncryptedMessage() {
+    KeyPair signing = KeyPair.random();
+    KeyPair vrf = KeyPair.random();
+    KeyPair harvester = KeyPair.random();
 
-        PersistentHarvestingDelegationMessage encryptedMessage = PersistentHarvestingDelegationMessage
-            .create(signing.getPrivateKey(), vrf.getPrivateKey(), harvester.getPublicKey());
+    PersistentHarvestingDelegationMessage encryptedMessage =
+        PersistentHarvestingDelegationMessage.create(
+            signing.getPrivateKey(), vrf.getPrivateKey(), harvester.getPublicKey());
 
-        Assertions.assertTrue(encryptedMessage.getPayload().startsWith(MessageMarker.PERSISTENT_DELEGATION_UNLOCK));
+    Assertions.assertTrue(
+        encryptedMessage.getPayload().startsWith(MessageMarker.PERSISTENT_DELEGATION_UNLOCK));
 
-        Assertions.assertEquals(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE, encryptedMessage.getType());
+    Assertions.assertEquals(
+        MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE, encryptedMessage.getType());
 
-        HarvestingKeys plainMessage = encryptedMessage.decryptPayload(harvester.getPrivateKey());
+    HarvestingKeys plainMessage = encryptedMessage.decryptPayload(harvester.getPrivateKey());
 
-        Assertions.assertEquals(signing.getPrivateKey(), plainMessage.getSigningPrivateKey());
-        Assertions.assertEquals(vrf.getPrivateKey(), plainMessage.getVrfPrivateKey());
-    }
-
-
+    Assertions.assertEquals(signing.getPrivateKey(), plainMessage.getSigningPrivateKey());
+    Assertions.assertEquals(vrf.getPrivateKey(), plainMessage.getVrfPrivateKey());
+  }
 }

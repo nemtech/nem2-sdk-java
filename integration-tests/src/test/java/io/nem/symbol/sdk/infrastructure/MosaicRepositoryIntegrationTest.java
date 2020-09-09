@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,185 +44,194 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
 
-    private Account testAccount;
-    private final List<MosaicId> mosaicIds = new ArrayList<>();
-    private MosaicId mosaicId;
+  private Account testAccount;
+  private final List<MosaicId> mosaicIds = new ArrayList<>();
+  private MosaicId mosaicId;
 
-    @BeforeAll
-    void setup() {
-        testAccount = config().getDefaultAccount();
-        mosaicId = createMosaic(DEFAULT_REPOSITORY_TYPE, testAccount);
-        mosaicIds.add(mosaicId);
-    }
+  @BeforeAll
+  void setup() {
+    testAccount = config().getDefaultAccount();
+    mosaicId = createMosaic(DEFAULT_REPOSITORY_TYPE, testAccount);
+    mosaicIds.add(mosaicId);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getMosaicsFromAccount(RepositoryType type) {
-        List<MosaicInfo> mosaicInfos = get(
-            getMosaicRepository(type).search(new MosaicSearchCriteria().ownerAddress(testAccount.getAddress())))
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getMosaicsFromAccount(RepositoryType type) {
+    List<MosaicInfo> mosaicInfos =
+        get(getMosaicRepository(type)
+                .search(new MosaicSearchCriteria().ownerAddress(testAccount.getAddress())))
             .getData();
-        Assertions.assertTrue(mosaicInfos.size() > 0);
-        mosaicInfos.forEach(this::assertMosaic);
-        Assertions.assertTrue(mosaicInfos.stream().anyMatch(mosaicInfo -> mosaicInfo.getMosaicId().equals(mosaicId)));
-    }
+    Assertions.assertTrue(mosaicInfos.size() > 0);
+    mosaicInfos.forEach(this::assertMosaic);
+    Assertions.assertTrue(
+        mosaicInfos.stream().anyMatch(mosaicInfo -> mosaicInfo.getMosaicId().equals(mosaicId)));
+  }
 
-    private void assertMosaic(MosaicInfo m) {
-        Assertions.assertEquals(testAccount.getAddress(), m.getOwnerAddress());
-        Assertions.assertNotNull(m.getMosaicId());
-        Assertions.assertNotNull(m.getStartHeight());
-        Assertions.assertNotNull(m.getDuration());
-        Assertions.assertNotNull(m.getRevision());
-        Assertions.assertNotNull(m.getSupply());
-    }
+  private void assertMosaic(MosaicInfo m) {
+    Assertions.assertEquals(testAccount.getAddress(), m.getOwnerAddress());
+    Assertions.assertNotNull(m.getMosaicId());
+    Assertions.assertNotNull(m.getStartHeight());
+    Assertions.assertNotNull(m.getDuration());
+    Assertions.assertNotNull(m.getRevision());
+    Assertions.assertNotNull(m.getSupply());
+  }
 
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getMosaicViaMosaicId(RepositoryType type) {
+    MosaicInfo mosaicInfo = get(getMosaicRepository(type).getMosaic(mosaicId));
+    assertEquals(mosaicId, mosaicInfo.getMosaicId());
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getMosaicViaMosaicId(RepositoryType type) {
-        MosaicInfo mosaicInfo = get(getMosaicRepository(type).getMosaic(mosaicId));
-        assertEquals(mosaicId, mosaicInfo.getMosaicId());
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getMosaicsNames(RepositoryType type) {
+    List<MosaicNames> mosaicNames =
+        get(
+            getRepositoryFactory(type)
+                .createNamespaceRepository()
+                .getMosaicsNames(Collections.singletonList(mosaicId)));
+    assertEquals(1, mosaicNames.size());
+    assertEquals(mosaicId, mosaicNames.get(0).getMosaicId());
+    assertEquals(0, mosaicNames.get(0).getNames().size());
+  }
 
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getMosaicsViaMosaicId(RepositoryType type) {
+    List<MosaicInfo> mosaicsInfo = get(getMosaicRepository(type).getMosaics(mosaicIds));
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getMosaicsNames(RepositoryType type) {
-        List<MosaicNames> mosaicNames = get(getRepositoryFactory(type).createNamespaceRepository()
-            .getMosaicsNames(Collections.singletonList(mosaicId)));
-        assertEquals(1, mosaicNames.size());
-        assertEquals(mosaicId, mosaicNames.get(0).getMosaicId());
-        assertEquals(0, mosaicNames.get(0).getNames().size());
-    }
+    assertEquals(mosaicIds.size(), mosaicsInfo.size());
+    assertEquals(mosaicIds.get(0), mosaicsInfo.get(0).getMosaicId());
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getMosaicsViaMosaicId(RepositoryType type) {
-        List<MosaicInfo> mosaicsInfo = get(getMosaicRepository(type).getMosaics(mosaicIds));
-
-        assertEquals(mosaicIds.size(), mosaicsInfo.size());
-        assertEquals(mosaicIds.get(0), mosaicsInfo.get(0).getMosaicId());
-    }
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void throwExceptionWhenMosaicDoesNotExists(RepositoryType type) {
-        RepositoryCallException exception = Assertions.assertThrows(RepositoryCallException.class,
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void throwExceptionWhenMosaicDoesNotExists(RepositoryType type) {
+    RepositoryCallException exception =
+        Assertions.assertThrows(
+            RepositoryCallException.class,
             () -> get(getMosaicRepository(type).getMosaic(new MosaicId("AAAAAE18BE375DA2"))));
-        Assertions.assertEquals(
-            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'AAAAAE18BE375DA2'",
-            exception.getMessage());
-    }
+    Assertions.assertEquals(
+        "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'AAAAAE18BE375DA2'",
+        exception.getMessage());
+  }
 
-    private MosaicId createMosaic(RepositoryType type, Account testAccount) {
-        MosaicNonce nonce = new MosaicNonce(new byte[4]);
-        System.out.println("Nonce: " + nonce.getNonceAsInt());
-        System.out.println("Address: " + testAccount.getAddress().plain());
-        MosaicId mosaicId = MosaicId.createFromNonce(nonce, testAccount.getPublicAccount());
-        System.out.println("mosaicId Hex: " + mosaicId.getIdAsHex());
+  private MosaicId createMosaic(RepositoryType type, Account testAccount) {
+    MosaicNonce nonce = new MosaicNonce(new byte[4]);
+    System.out.println("Nonce: " + nonce.getNonceAsInt());
+    System.out.println("Address: " + testAccount.getAddress().plain());
+    MosaicId mosaicId = MosaicId.createFromNonce(nonce, testAccount.getPublicAccount());
+    System.out.println("mosaicId Hex: " + mosaicId.getIdAsHex());
 
-        System.out.println(mosaicId.getIdAsHex());
+    System.out.println(mosaicId.getIdAsHex());
 
-        MosaicDefinitionTransaction mosaicDefinitionTransaction = MosaicDefinitionTransactionFactory
-            .create(getNetworkType(), nonce, mosaicId, MosaicFlags.create(true, true, true), 4, new BlockDuration(100))
-            .maxFee(this.maxFee).build();
+    MosaicDefinitionTransaction mosaicDefinitionTransaction =
+        MosaicDefinitionTransactionFactory.create(
+                getNetworkType(),
+                nonce,
+                mosaicId,
+                MosaicFlags.create(true, true, true),
+                4,
+                new BlockDuration(100))
+            .maxFee(this.maxFee)
+            .build();
 
-        MosaicDefinitionTransaction validateTransaction = announceAndValidate(type, testAccount,
-            mosaicDefinitionTransaction);
-        Assertions.assertEquals(mosaicId, validateTransaction.getMosaicId());
-        return mosaicId;
-    }
+    MosaicDefinitionTransaction validateTransaction =
+        announceAndValidate(type, testAccount, mosaicDefinitionTransaction);
+    Assertions.assertEquals(mosaicId, validateTransaction.getMosaicId());
+    return mosaicId;
+  }
 
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchByOwnerAddress(RepositoryType type) {
+    MosaicSearchCriteria criteria = new MosaicSearchCriteria();
+    Address address = config().getDefaultAccount().getAddress();
+    criteria.ownerAddress(address);
+    MosaicPaginationStreamer streamer = new MosaicPaginationStreamer(getMosaicRepository(type));
+    List<MosaicInfo> mosaics = get(streamer.search(criteria).toList().toObservable());
+    mosaics.forEach(m -> Assertions.assertEquals(address, m.getOwnerAddress()));
+    Assertions.assertFalse(mosaics.isEmpty());
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void searchByOwnerAddress(RepositoryType type) {
-        MosaicSearchCriteria criteria = new MosaicSearchCriteria();
-        Address address = config().getDefaultAccount().getAddress();
-        criteria.ownerAddress(address);
-        MosaicPaginationStreamer streamer = new MosaicPaginationStreamer(getMosaicRepository(type));
-        List<MosaicInfo> mosaics = get(streamer.search(criteria).toList().toObservable());
-        mosaics.forEach(m -> Assertions.assertEquals(address, m.getOwnerAddress()));
-        Assertions.assertFalse(mosaics.isEmpty());
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchByOwnerAddressInvalid(RepositoryType type) {
+    MosaicSearchCriteria criteria = new MosaicSearchCriteria();
+    Address address = Account.generateNewAccount(getNetworkType()).getAddress();
+    criteria.ownerAddress(address);
+    MosaicPaginationStreamer streamer = new MosaicPaginationStreamer(getMosaicRepository(type));
+    List<MosaicInfo> mosaics = get(streamer.search(criteria).toList().toObservable());
+    Assertions.assertTrue(mosaics.isEmpty());
+  }
 
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearch(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(null);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void searchByOwnerAddressInvalid(RepositoryType type) {
-        MosaicSearchCriteria criteria = new MosaicSearchCriteria();
-        Address address = Account.generateNewAccount(getNetworkType()).getAddress();
-        criteria.ownerAddress(address);
-        MosaicPaginationStreamer streamer = new MosaicPaginationStreamer(getMosaicRepository(type));
-        List<MosaicInfo> mosaics = get(streamer.search(criteria).toList().toObservable());
-        Assertions.assertTrue(mosaics.isEmpty());
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearchSize50(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(50);
+  }
 
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearchBlock(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(null);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearch(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(null);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearchBlockPageSize50(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(50);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearchSize50(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(50);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchOrderByIdAsc(RepositoryType type) {
+    getPaginationTester(type).searchOrderByIdAsc();
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearchBlock(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(null);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchOrderByIdDesc(RepositoryType type) {
+    getPaginationTester(type).searchOrderByIdDesc();
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearchBlockPageSize50(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(50);
-    }
+  private PaginationTester<MosaicInfo, MosaicSearchCriteria> getPaginationTester(
+      RepositoryType type) {
+    return new PaginationTester<>(MosaicSearchCriteria::new, getMosaicRepository(type)::search);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void searchOrderByIdAsc(RepositoryType type) {
-        getPaginationTester(type).searchOrderByIdAsc();
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void usingBigPageSize(RepositoryType type) {
+    getPaginationTester(type).usingBigPageSize();
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void searchOrderByIdDesc(RepositoryType type) {
-        getPaginationTester(type).searchOrderByIdDesc();
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchUsingOffset(RepositoryType type) {
+    MosaicRepository mosaicRepository = getMosaicRepository(type);
+    MosaicPaginationStreamer streamer = new MosaicPaginationStreamer(mosaicRepository);
+    MosaicSearchCriteria criteria = new MosaicSearchCriteria();
+    criteria.setPageSize(10);
+    int offsetIndex = 2;
+    List<MosaicInfo> mosaicsWithoutOffset = get(streamer.search(criteria).toList().toObservable());
+    criteria.setOffset(mosaicsWithoutOffset.get(offsetIndex).getRecordId().get());
 
-    private PaginationTester<MosaicInfo, MosaicSearchCriteria> getPaginationTester(RepositoryType type) {
-        return new PaginationTester<>(MosaicSearchCriteria::new, getMosaicRepository(type)::search);
-    }
+    List<MosaicInfo> mosaicFromOffsets = get(streamer.search(criteria).toList().toObservable());
+    PaginationTester.sameEntities(
+        mosaicsWithoutOffset.stream().skip(offsetIndex + 1).collect(Collectors.toList()),
+        mosaicFromOffsets);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void usingBigPageSize(RepositoryType type) {
-        getPaginationTester(type).usingBigPageSize();
-    }
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void searchUsingOffset(RepositoryType type) {
-        MosaicRepository mosaicRepository = getMosaicRepository(type);
-        MosaicPaginationStreamer streamer = new MosaicPaginationStreamer(mosaicRepository);
-        MosaicSearchCriteria criteria = new MosaicSearchCriteria();
-        criteria.setPageSize(10);
-        int offsetIndex = 2;
-        List<MosaicInfo> mosaicsWithoutOffset = get(streamer.search(criteria).toList().toObservable());
-        criteria.setOffset(mosaicsWithoutOffset.get(offsetIndex).getRecordId().get());
-
-        List<MosaicInfo> mosaicFromOffsets = get(streamer.search(criteria).toList().toObservable());
-        PaginationTester.sameEntities(mosaicsWithoutOffset.stream().skip(offsetIndex + 1).collect(Collectors.toList()),
-            mosaicFromOffsets);
-    }
-
-
-    private MosaicRepository getMosaicRepository(RepositoryType type) {
-        return getRepositoryFactory(type).createMosaicRepository();
-    }
-
+  private MosaicRepository getMosaicRepository(RepositoryType type) {
+    return getRepositoryFactory(type).createMosaicRepository();
+  }
 }

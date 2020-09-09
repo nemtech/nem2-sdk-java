@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.MetadataRepository;
@@ -31,66 +30,80 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-/**
- * Integration tests around namespace metadata service.
- */
+/** Integration tests around namespace metadata service. */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NamespaceMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
-    private Account signerAccount;
+  private Account signerAccount;
 
-    private Account targetAccount;
+  private Account targetAccount;
 
-    @BeforeEach
-    void setup() {
-        signerAccount = config().getDefaultAccount();
-        targetAccount = config().getDefaultAccount();
-    }
+  @BeforeEach
+  void setup() {
+    signerAccount = config().getDefaultAccount();
+    targetAccount = config().getDefaultAccount();
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void setAndUpdateNamespaceMetadata(RepositoryType type) {
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void setAndUpdateNamespaceMetadata(RepositoryType type) {
 
-        String namespaceName =
-            "namespace-id-metadata-service-integration-test-" + new Double(Math.floor(Math.random() * 10000))
-                .intValue();
+    String namespaceName =
+        "namespace-id-metadata-service-integration-test-"
+            + new Double(Math.floor(Math.random() * 10000)).intValue();
 
-        NamespaceId targetNamespaceId = super.createRootNamespace(type, signerAccount, namespaceName);
+    NamespaceId targetNamespaceId = super.createRootNamespace(type, signerAccount, namespaceName);
 
-        BigInteger key = BigInteger.valueOf(RandomUtils.generateRandomInt(100000));
+    BigInteger key = BigInteger.valueOf(RandomUtils.generateRandomInt(100000));
 
-        String originalMessage = "The original message";
-        String newMessage = "The new Message";
+    String originalMessage = "The original message";
+    String newMessage = "The new Message";
 
-        RepositoryFactory repositoryFactory = getRepositoryFactory(type);
-        MetadataRepository metadataRepository = repositoryFactory.createMetadataRepository();
+    RepositoryFactory repositoryFactory = getRepositoryFactory(type);
+    MetadataRepository metadataRepository = repositoryFactory.createMetadataRepository();
 
-        MetadataTransactionService service = new MetadataTransactionServiceImpl(repositoryFactory);
+    MetadataTransactionService service = new MetadataTransactionServiceImpl(repositoryFactory);
 
-        NamespaceMetadataTransaction originalTransaction = get(service
-            .createNamespaceMetadataTransactionFactory(targetAccount.getAddress(), key, originalMessage,
-                signerAccount.getAddress(), targetNamespaceId)).maxFee(this.maxFee).build();
+    NamespaceMetadataTransaction originalTransaction =
+        get(service.createNamespaceMetadataTransactionFactory(
+                targetAccount.getAddress(),
+                key,
+                originalMessage,
+                signerAccount.getAddress(),
+                targetNamespaceId))
+            .maxFee(this.maxFee)
+            .build();
 
-        announceAggregateAndValidate(type, originalTransaction, signerAccount);
+    announceAggregateAndValidate(type, originalTransaction, signerAccount);
 
-        assertMetadata(targetNamespaceId, key, originalMessage, metadataRepository);
+    assertMetadata(targetNamespaceId, key, originalMessage, metadataRepository);
 
-        NamespaceMetadataTransaction updateTransaction = get(service
-            .createNamespaceMetadataTransactionFactory(targetAccount.getAddress(), key, newMessage,
-                signerAccount.getAddress(), targetNamespaceId)).maxFee(this.maxFee).build();
+    NamespaceMetadataTransaction updateTransaction =
+        get(service.createNamespaceMetadataTransactionFactory(
+                targetAccount.getAddress(),
+                key,
+                newMessage,
+                signerAccount.getAddress(),
+                targetNamespaceId))
+            .maxFee(this.maxFee)
+            .build();
 
-        announceAggregateAndValidate(type, updateTransaction, signerAccount);
+    announceAggregateAndValidate(type, updateTransaction, signerAccount);
 
-        assertMetadata(targetNamespaceId, key, newMessage, metadataRepository);
+    assertMetadata(targetNamespaceId, key, newMessage, metadataRepository);
+  }
 
-    }
-
-    private void assertMetadata(NamespaceId targetNamespaceId, BigInteger key, String value,
-        MetadataRepository metadataRepository) {
-        MetadataSearchCriteria criteria = new MetadataSearchCriteria().targetId(targetNamespaceId)
-            .scopedMetadataKey(key).sourceAddress(signerAccount.getAddress());
-        Metadata originalMetadata = get(metadataRepository.search(criteria)).getData().get(0);
-        Assertions.assertEquals(value, originalMetadata.getValue());
-    }
-
+  private void assertMetadata(
+      NamespaceId targetNamespaceId,
+      BigInteger key,
+      String value,
+      MetadataRepository metadataRepository) {
+    MetadataSearchCriteria criteria =
+        new MetadataSearchCriteria()
+            .targetId(targetNamespaceId)
+            .scopedMetadataKey(key)
+            .sourceAddress(signerAccount.getAddress());
+    Metadata originalMetadata = get(metadataRepository.search(criteria)).getData().get(0);
+    Assertions.assertEquals(value, originalMetadata.getValue());
+  }
 }

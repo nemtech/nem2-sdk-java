@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.mosaic;
 
 import io.nem.symbol.sdk.model.namespace.NamespaceName;
@@ -26,30 +25,26 @@ import java.util.List;
  */
 public class MosaicNames {
 
-    /**
-     * The id of the mosaic.
-     */
-    private final MosaicId mosaicId;
+  /** The id of the mosaic. */
+  private final MosaicId mosaicId;
 
-    /**
-     * The names
-     */
-    private final List<NamespaceName> names;
+  /** The names */
+  private final List<NamespaceName> names;
 
-    /**
-     * @param mosaicId the id of the mosaic.
-     * @param names the names.
-     */
-    public MosaicNames(MosaicId mosaicId, List<NamespaceName> names) {
-        this.mosaicId = mosaicId;
-        this.names = names;
-    }
+  /**
+   * @param mosaicId the id of the mosaic.
+   * @param names the names.
+   */
+  public MosaicNames(MosaicId mosaicId, List<NamespaceName> names) {
+    this.mosaicId = mosaicId;
+    this.names = names;
+  }
 
-    public MosaicId getMosaicId() {
-        return mosaicId;
-    }
+  public MosaicId getMosaicId() {
+    return mosaicId;
+  }
 
-    public List<NamespaceName> getNames() {
-        return names;
-    }
+  public List<NamespaceName> getNames() {
+    return names;
+  }
 }

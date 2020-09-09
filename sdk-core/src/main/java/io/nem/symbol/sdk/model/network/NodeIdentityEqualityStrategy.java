@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package io.nem.symbol.sdk.model.network;
 
 import java.util.Arrays;
@@ -23,29 +21,29 @@ import java.util.Arrays;
  * Node equality strategy. Defines if the identifier for the node must be its public key or host.
  */
 public enum NodeIdentityEqualityStrategy {
+  HOST("host"),
 
-    HOST("host"),
+  PUBLIC_KEY("public-key");
 
-    PUBLIC_KEY("public-key");
+  private String value;
 
-    private String value;
+  NodeIdentityEqualityStrategy(String value) {
+    this.value = value;
+  }
 
-    NodeIdentityEqualityStrategy(String value) {
-        this.value = value;
-    }
+  public String getValue() {
+    return value;
+  }
 
-    public String getValue() {
-        return value;
-    }
+  public static NodeIdentityEqualityStrategy rawValueOf(String value) {
+    return Arrays.stream(values())
+        .filter(e -> e.getValue().equals(value))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 
-    public static NodeIdentityEqualityStrategy rawValueOf(String value) {
-        return Arrays.stream(values()).filter(e -> e.getValue().equals(value)).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+  @Override
+  public String toString() {
+    return value;
+  }
 }
-

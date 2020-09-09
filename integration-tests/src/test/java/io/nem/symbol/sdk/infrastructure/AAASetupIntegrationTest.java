@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.AccountRepository;
@@ -46,6 +45,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -55,225 +55,269 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 
 /**
- * Utility main class that uses the nemesis address configured to generate new accounts necessary for the integration
- * tests. Use with caution!!
+ * Utility main class that uses the nemesis address configured to generate new accounts necessary
+ * for the integration tests. Use with caution!!
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(OrderAnnotation.class)
 public class AAASetupIntegrationTest extends BaseIntegrationTest {
 
-    public static final long AMOUNT_PER_TRANSFER = 100000000;
+  public static final long AMOUNT_PER_TRANSFER = 100000000;
 
-    private final RepositoryType type = DEFAULT_REPOSITORY_TYPE;
+  private final RepositoryType type = DEFAULT_REPOSITORY_TYPE;
 
-    @Test
-    @Order(1)
-    void createTestAccount() {
-        sendMosaicFromNemesis(config().getTestAccount(), false);
-        setAddressAlias(type, config().getTestAccount().getAddress(), "testaccount");
-        basicSendMosaicToNemesis(NamespaceId.createFromName("testaccount"));
+  @Test
+  @Order(1)
+  void createTestAccount() {
+    sendMosaicFromNemesis(config().getTestAccount(), false);
+    setAddressAlias(type, config().getTestAccount().getAddress(), "testaccount");
+    basicSendMosaicToNemesis(NamespaceId.createFromName("testaccount"));
+  }
+
+  @Test
+  @Order(2)
+  void createTestAccount2() {
+    sendMosaicFromNemesis(config().getTestAccount2(), false);
+    setAddressAlias(type, config().getTestAccount2().getAddress(), "testaccount2");
+  }
+
+  @Test
+  @Order(3)
+  void createCosignatoryAccount() {
+    sendMosaicFromNemesis(config().getCosignatoryAccount(), true);
+    setAddressAlias(type, config().getCosignatoryAccount().getAddress(), "cosignatory-account");
+  }
+
+  @Test
+  @Order(4)
+  void createCosignatoryAccount2() {
+    sendMosaicFromNemesis(config().getCosignatory2Account(), true);
+    setAddressAlias(type, config().getCosignatory2Account().getAddress(), "cosignatory-account2");
+  }
+
+  @Test
+  @Order(5)
+  void createMultisigAccountBonded() {
+    sendMosaicFromNemesis(config().getMultisigAccount(), true);
+    setAddressAlias(type, config().getMultisigAccount().getAddress(), "multisig-account");
+    createMultisigAccountBonded(
+        config().getMultisigAccount(),
+        accountRepository1 ->
+            get(accountRepository1.getAccountInfo(config().getMultisigAccount().getAddress())),
+        config().getCosignatoryAccount(),
+        config().getCosignatory2Account());
+  }
+
+  @Test
+  @Order(6)
+  void createMultisigAccountCompleteUsingNemesis() {
+    System.out.println(config().getNemesisAccount8().getAddress().encoded());
+    createMultisigAccountComplete(
+        config().getNemesisAccount8(),
+        config().getNemesisAccount9(),
+        config().getNemesisAccount10());
+  }
+
+  @Test
+  @Order(7)
+  void createMultisigAccountBondedUsingNemesis() {
+    System.out.println(config().getNemesisAccount7().getAddress().encoded());
+    createMultisigAccountBonded(
+        config().getNemesisAccount8(),
+        accountRepository1 ->
+            get(accountRepository1.getAccountInfo(config().getNemesisAccount8().getAddress())),
+        config().getNemesisAccount9(),
+        config().getNemesisAccount10());
+  }
+
+  private void createMultisigAccountBonded(
+      Account multisigAccount,
+      Function<AccountRepository, AccountInfo> function,
+      Account... accounts) {
+
+    AccountRepository accountRepository = getRepositoryFactory(type).createAccountRepository();
+
+    MultisigRepository multisigRepository = getRepositoryFactory(type).createMultisigRepository();
+
+    AccountInfo accountInfo = function.apply(accountRepository);
+    System.out.println(jsonHelper().print(accountInfo));
+
+    try {
+      MultisigAccountInfo multisigAccountInfo =
+          get(multisigRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
+
+      System.out.println(
+          "Multisig account with address "
+              + multisigAccount.getAddress().plain()
+              + " already exist");
+      System.out.println(jsonHelper().print(multisigAccountInfo));
+      return;
+    } catch (RepositoryCallException e) {
+      System.out.println(
+          "Multisig account with address "
+              + multisigAccount.getAddress().plain()
+              + " does not exist. Creating");
     }
 
-    @Test
-    @Order(2)
-    void createTestAccount2() {
-        sendMosaicFromNemesis(config().getTestAccount2(), false);
-        setAddressAlias(type, config().getTestAccount2().getAddress(), "testaccount2");
-    }
-
-    @Test
-    @Order(3)
-    void createCosignatoryAccount() {
-        sendMosaicFromNemesis(config().getCosignatoryAccount(), true);
-        setAddressAlias(type, config().getCosignatoryAccount().getAddress(), "cosignatory-account");
-    }
-
-    @Test
-    @Order(4)
-    void createCosignatoryAccount2() {
-        sendMosaicFromNemesis(config().getCosignatory2Account(), true);
-        setAddressAlias(type, config().getCosignatory2Account().getAddress(), "cosignatory-account2");
-    }
-
-    @Test
-    @Order(5)
-    void createMultisigAccountBonded() {
-        sendMosaicFromNemesis(config().getMultisigAccount(), true);
-        setAddressAlias(type, config().getMultisigAccount().getAddress(), "multisig-account");
-        createMultisigAccountBonded(config().getMultisigAccount(), config().getCosignatoryAccount(),
-            config().getCosignatory2Account());
-    }
-
-    @Test
-    @Order(6)
-    void createMultisigAccountCompleteUsingNemesis() {
-        System.out.println(config().getNemesisAccount8().getAddress().encoded());
-        createMultisigAccountComplete(config().getNemesisAccount8(), config().getNemesisAccount9(),
-            config().getNemesisAccount10());
-    }
-
-    @Test
-    @Order(7)
-    void createMultisigAccountBondedUsingNemesis() {
-        System.out.println(config().getNemesisAccount7().getAddress().encoded());
-        createMultisigAccountBonded(config().getNemesisAccount8(), config().getNemesisAccount9(),
-            config().getNemesisAccount10());
-    }
-
-
-    private void createMultisigAccountBonded(Account multisigAccount, Account... accounts) {
-
-        AccountRepository accountRepository = getRepositoryFactory(type).createAccountRepository();
-
-        MultisigRepository multisigRepository = getRepositoryFactory(type).createMultisigRepository();
-
-        AccountInfo accountInfo = get(accountRepository.getAccountInfo(multisigAccount.getAddress()));
-        System.out.println(jsonHelper().print(accountInfo));
-
-        try {
-            MultisigAccountInfo multisigAccountInfo = get(
-                multisigRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
-
-            System.out
-                .println("Multisig account with address " + multisigAccount.getAddress().plain() + " already exist");
-            System.out.println(jsonHelper().print(multisigAccountInfo));
-            return;
-        } catch (RepositoryCallException e) {
-            System.out.println(
-                "Multisig account with address " + multisigAccount.getAddress().plain() + " does not exist. Creating");
-        }
-
-        System.out.println("Creating multisg account " + multisigAccount.getAddress().plain());
-        List<UnresolvedAddress> additions = Arrays.stream(accounts).map(Account::getAddress)
-            .collect(Collectors.toList());
-        MultisigAccountModificationTransaction convertIntoMultisigTransaction = MultisigAccountModificationTransactionFactory
-            .create(getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList()).maxFee(maxFee)
+    System.out.println("Creating multisg account " + multisigAccount.getAddress().plain());
+    List<UnresolvedAddress> additions =
+        Arrays.stream(accounts).map(Account::getAddress).collect(Collectors.toList());
+    MultisigAccountModificationTransaction convertIntoMultisigTransaction =
+        MultisigAccountModificationTransactionFactory.create(
+                getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList())
+            .maxFee(maxFee)
             .build();
 
-        AggregateTransaction aggregateTransaction = AggregateTransactionFactory.createBonded(getNetworkType(),
-            Collections.singletonList(convertIntoMultisigTransaction.toAggregate(multisigAccount.getPublicAccount())))
-            .maxFee(maxFee).build();
-
-        SignedTransaction signedAggregateTransaction = aggregateTransaction
-            .signTransactionWithCosigners(multisigAccount, Arrays.asList(accounts), getGenerationHash());
-
-        Mosaic hashAmount = getNetworkCurrency().createRelative(BigInteger.valueOf(10));
-        HashLockTransaction hashLockTransaction = HashLockTransactionFactory
-            .create(getNetworkType(), hashAmount, BigInteger.valueOf(100), signedAggregateTransaction).maxFee(maxFee)
-            .build();
-        SignedTransaction signedHashLockTransaction = hashLockTransaction
-            .signWith(multisigAccount, getGenerationHash());
-
-        getTransactionOrFail(getTransactionService(type)
-                .announceHashLockAggregateBonded(getListener(type), signedHashLockTransaction, signedAggregateTransaction),
-            aggregateTransaction);
-
-        HashLockRepository hashLockRepository = getRepositoryFactory(type).createHashLockRepository();
-
-        HashLockInfo hashLockInfo = get(hashLockRepository.getHashLock(hashLockTransaction.getHash()));
-        Assertions.assertNotNull(hashLockInfo);
-        Assertions.assertEquals(multisigAccount.getAddress(), hashLockInfo.getOwnerAddress());
-        Assertions.assertEquals(hashAmount.getAmount(), hashLockInfo.getAmount());
-        Assertions.assertEquals(0, hashLockInfo.getStatus());
-        Assertions.assertEquals(hashLockTransaction.getHash(), hashLockInfo.getHash());
-
-        Page<HashLockInfo> page = get(
-            hashLockRepository.search(new HashLockSearchCriteria(multisigAccount.getAddress())));
-        Assertions.assertTrue(page.getData().stream().anyMatch(m -> m.getHash().equals(hashLockTransaction.getHash())));
-        Assertions.assertEquals(20, page.getPageSize());
-
-    }
-
-    private void createMultisigAccountComplete(Account multisigAccount, Account... accounts) {
-
-        AccountRepository accountRepository = getRepositoryFactory(type).createAccountRepository();
-
-        MultisigRepository multisigRepository = getRepositoryFactory(type).createMultisigRepository();
-
-        AccountInfo accountInfo = get(accountRepository.getAccountInfo(multisigAccount.getAddress()));
-        System.out.println(jsonHelper().print(accountInfo));
-
-        try {
-            MultisigAccountInfo multisigAccountInfo = get(
-                multisigRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
-
-            System.out
-                .println("Multisig account with address " + multisigAccount.getAddress().plain() + " already exist");
-            System.out.println(jsonHelper().print(multisigAccountInfo));
-            return;
-        } catch (RepositoryCallException e) {
-            System.out.println(
-                "Multisig account with address " + multisigAccount.getAddress().plain() + " does not exist. Creating");
-        }
-
-        System.out.println("Creating multisg account " + multisigAccount.getAddress().plain());
-        List<UnresolvedAddress> additions = Arrays.stream(accounts).map(Account::getAddress)
-            .collect(Collectors.toList());
-        MultisigAccountModificationTransaction convertIntoMultisigTransaction = MultisigAccountModificationTransactionFactory
-            .create(getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList()).maxFee(maxFee)
+    AggregateTransaction aggregateTransaction =
+        AggregateTransactionFactory.createBonded(
+                getNetworkType(),
+                Collections.singletonList(
+                    convertIntoMultisigTransaction.toAggregate(multisigAccount.getPublicAccount())))
+            .maxFee(maxFee)
             .build();
 
-        AggregateTransaction aggregateTransaction = AggregateTransactionFactory.createComplete(getNetworkType(),
-            Collections.singletonList(convertIntoMultisigTransaction.toAggregate(multisigAccount.getPublicAccount())))
-            .maxFee(maxFee).build();
+    SignedTransaction signedAggregateTransaction =
+        aggregateTransaction.signTransactionWithCosigners(
+            multisigAccount, Arrays.asList(accounts), getGenerationHash());
 
-        SignedTransaction signedAggregateTransaction = aggregateTransaction
-            .signTransactionWithCosigners(multisigAccount, Arrays.asList(accounts), getGenerationHash());
+    Mosaic hashAmount = getNetworkCurrency().createRelative(BigInteger.valueOf(10));
+    HashLockTransaction hashLockTransaction =
+        HashLockTransactionFactory.create(
+                getNetworkType(), hashAmount, BigInteger.valueOf(100), signedAggregateTransaction)
+            .maxFee(maxFee)
+            .build();
+    SignedTransaction signedHashLockTransaction =
+        hashLockTransaction.signWith(multisigAccount, getGenerationHash());
 
-        Transaction aggregateTransaciton = get(
-            getTransactionService(type).announce(getListener(type), signedAggregateTransaction));
+    getTransactionOrFail(
+        getTransactionService(type)
+            .announceHashLockAggregateBonded(
+                getListener(type), signedHashLockTransaction, signedAggregateTransaction),
+        aggregateTransaction);
 
-        sleep(1000);
+    HashLockRepository hashLockRepository = getRepositoryFactory(type).createHashLockRepository();
 
-        Assertions.assertEquals(aggregateTransaciton.getTransactionInfo().get().getHash().get(),
-            signedAggregateTransaction.getHash());
+    HashLockInfo hashLockInfo = get(hashLockRepository.getHashLock(hashLockTransaction.getHash()));
+    Assertions.assertNotNull(hashLockInfo);
+    Assertions.assertEquals(multisigAccount.getAddress(), hashLockInfo.getOwnerAddress());
+    Assertions.assertEquals(hashAmount.getAmount(), hashLockInfo.getAmount());
+    Assertions.assertEquals(0, hashLockInfo.getStatus());
+    Assertions.assertEquals(hashLockTransaction.getHash(), hashLockInfo.getHash());
+
+    Page<HashLockInfo> page =
+        get(hashLockRepository.search(new HashLockSearchCriteria(multisigAccount.getAddress())));
+    Assertions.assertTrue(
+        page.getData().stream().anyMatch(m -> m.getHash().equals(hashLockTransaction.getHash())));
+    Assertions.assertEquals(20, page.getPageSize());
+  }
+
+  private void createMultisigAccountComplete(Account multisigAccount, Account... accounts) {
+
+    AccountRepository accountRepository = getRepositoryFactory(type).createAccountRepository();
+
+    MultisigRepository multisigRepository = getRepositoryFactory(type).createMultisigRepository();
+
+    AccountInfo accountInfo = get(accountRepository.getAccountInfo(multisigAccount.getAddress()));
+    System.out.println(jsonHelper().print(accountInfo));
+
+    try {
+      MultisigAccountInfo multisigAccountInfo =
+          get(multisigRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
+
+      System.out.println(
+          "Multisig account with address "
+              + multisigAccount.getAddress().plain()
+              + " already exist");
+      System.out.println(jsonHelper().print(multisigAccountInfo));
+      return;
+    } catch (RepositoryCallException e) {
+      System.out.println(
+          "Multisig account with address "
+              + multisigAccount.getAddress().plain()
+              + " does not exist. Creating");
     }
 
+    System.out.println("Creating multisg account " + multisigAccount.getAddress().plain());
+    List<UnresolvedAddress> additions =
+        Arrays.stream(accounts).map(Account::getAddress).collect(Collectors.toList());
+    MultisigAccountModificationTransaction convertIntoMultisigTransaction =
+        MultisigAccountModificationTransactionFactory.create(
+                getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList())
+            .maxFee(maxFee)
+            .build();
 
-    private void sendMosaicFromNemesis(Account recipient, boolean force) {
-        if (hasMosaic(recipient) && !force) {
-            System.out.println("Ignoring recipient. It has the mosaic already: ");
-            printAccount(recipient);
-            return;
-        }
-        System.out.println("Sending " + AMOUNT_PER_TRANSFER + " Mosaic to: ");
-        printAccount(recipient);
-        basicSendMosaicToNemesis(recipient.getAddress());
+    AggregateTransaction aggregateTransaction =
+        AggregateTransactionFactory.createComplete(
+                getNetworkType(),
+                Collections.singletonList(
+                    convertIntoMultisigTransaction.toAggregate(multisigAccount.getPublicAccount())))
+            .maxFee(maxFee)
+            .build();
+
+    SignedTransaction signedAggregateTransaction =
+        aggregateTransaction.signTransactionWithCosigners(
+            multisigAccount, Arrays.asList(accounts), getGenerationHash());
+
+    Transaction aggregateTransaciton =
+        get(getTransactionService(type).announce(getListener(type), signedAggregateTransaction));
+
+    sleep(1000);
+
+    Assertions.assertEquals(
+        aggregateTransaciton.getTransactionInfo().get().getHash().get(),
+        signedAggregateTransaction.getHash());
+  }
+
+  private void sendMosaicFromNemesis(Account recipient, boolean force) {
+    if (hasMosaic(recipient) && !force) {
+      System.out.println("Ignoring recipient. It has the mosaic already: ");
+      printAccount(recipient);
+      return;
     }
+    System.out.println("Sending " + AMOUNT_PER_TRANSFER + " Mosaic to: ");
+    printAccount(recipient);
+    basicSendMosaicToNemesis(recipient.getAddress());
+  }
 
-    private void basicSendMosaicToNemesis(UnresolvedAddress recipient) {
+  private void basicSendMosaicToNemesis(UnresolvedAddress recipient) {
 
-        Account nemesisAccount = config().getNemesisAccount();
-        BigInteger amount = BigInteger.valueOf(AMOUNT_PER_TRANSFER);
+    Account nemesisAccount = config().getNemesisAccount();
+    BigInteger amount = BigInteger.valueOf(AMOUNT_PER_TRANSFER);
 
-        TransferTransactionFactory factory = TransferTransactionFactory
-            .create(getNetworkType(), recipient, Collections.singletonList(getNetworkCurrency().createAbsolute(amount)),
-                new PlainMessage("E2ETest:SetUpAccountsTool"));
+    TransferTransactionFactory factory =
+        TransferTransactionFactory.create(
+            getNetworkType(),
+            recipient,
+            Collections.singletonList(getNetworkCurrency().createAbsolute(amount)),
+            new PlainMessage("E2ETest:SetUpAccountsTool"));
 
-        factory.maxFee(maxFee);
-        TransferTransaction transferTransaction = factory.build();
+    factory.maxFee(maxFee);
+    TransferTransaction transferTransaction = factory.build();
 
-        TransferTransaction processedTransaction = announceAndValidate(type, nemesisAccount, transferTransaction);
-        Assertions.assertEquals(amount, processedTransaction.getMosaics().get(0).getAmount());
+    TransferTransaction processedTransaction =
+        announceAndValidate(type, nemesisAccount, transferTransaction);
+    Assertions.assertEquals(amount, processedTransaction.getMosaics().get(0).getAmount());
+  }
 
+  private boolean hasMosaic(Account recipient) {
+    try {
+      AccountInfo accountInfo =
+          get(
+              getRepositoryFactory(type)
+                  .createAccountRepository()
+                  .getAccountInfo(recipient.getAddress()));
+      return accountInfo.getMosaics().stream()
+          .anyMatch(m -> m.getAmount().longValue() >= AMOUNT_PER_TRANSFER);
+    } catch (RepositoryCallException e) {
+      return false;
     }
+  }
 
-    private boolean hasMosaic(Account recipient) {
-        try {
-            AccountInfo accountInfo = get(
-                getRepositoryFactory(type).createAccountRepository().getAccountInfo(recipient.getAddress()));
-            return accountInfo.getMosaics().stream().anyMatch(m -> m.getAmount().longValue() >= AMOUNT_PER_TRANSFER);
-        } catch (RepositoryCallException e) {
-            return false;
-        }
-    }
-
-    void printAccount(Account account) {
-        Map<String, String> map = new LinkedHashMap<>();
-        map.put("privateKey", account.getPrivateKey());
-        map.put("publicKey", account.getPublicKey());
-        map.put("address", account.getAddress().plain());
-        System.out.println(jsonHelper().print(map));
-    }
-
+  void printAccount(Account account) {
+    Map<String, String> map = new LinkedHashMap<>();
+    map.put("privateKey", account.getPrivateKey());
+    map.put("publicKey", account.getPublicKey());
+    map.put("address", account.getAddress().plain());
+    System.out.println(jsonHelper().print(map));
+  }
 }

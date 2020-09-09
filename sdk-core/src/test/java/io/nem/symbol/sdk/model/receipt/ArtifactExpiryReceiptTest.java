@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.receipt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,87 +32,86 @@ import org.junit.jupiter.api.Test;
 
 public class ArtifactExpiryReceiptTest {
 
-    @Test
-    void shouldMosaicExpiryReceiptBuilderSerialize() {
-        MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
-        MosaicExpiryReceiptBuilder builder = MosaicExpiryReceiptBuilder
-            .create((short) 1, ReceiptTypeDto.INFLATION, new MosaicIdDto(mosaicId.getId().longValue()));
-        byte[] serialize = builder.serialize();
-        // NOTE, size must be ignored for some reason!
-        Assertions.assertEquals(12, serialize.length);
-        Assertions.assertEquals(16, builder.getSize());
-        String hex = ConvertUtils.toHex(serialize);
-        Assertions.assertEquals("0100435144B262C46CEABB85", hex);
-    }
+  @Test
+  void shouldMosaicExpiryReceiptBuilderSerialize() {
+    MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
+    MosaicExpiryReceiptBuilder builder =
+        MosaicExpiryReceiptBuilder.create(
+            (short) 1, ReceiptTypeDto.INFLATION, new MosaicIdDto(mosaicId.getId().longValue()));
+    byte[] serialize = builder.serialize();
+    // NOTE, size must be ignored for some reason!
+    Assertions.assertEquals(12, serialize.length);
+    Assertions.assertEquals(16, builder.getSize());
+    String hex = ConvertUtils.toHex(serialize);
+    Assertions.assertEquals("0100435144B262C46CEABB85", hex);
+  }
 
-    @Test
-    void shouldCreateMosaicExpiryReceipt() {
-        MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
-        ArtifactExpiryReceipt<MosaicId> mosaicExpiryReceipt =
-            new ArtifactExpiryReceipt<>(
-                mosaicId, ReceiptType.MOSAIC_EXPIRED, ReceiptVersion.ARTIFACT_EXPIRY);
-        assertEquals(ReceiptType.MOSAIC_EXPIRED, mosaicExpiryReceipt.getType());
-        assertFalse(mosaicExpiryReceipt.getSize().isPresent());
-        assertEquals(ReceiptVersion.ARTIFACT_EXPIRY, mosaicExpiryReceipt.getVersion());
-        assertEquals("85BBEA6CC462B244",
-            mosaicExpiryReceipt.getArtifactId().getIdAsHex().toUpperCase());
+  @Test
+  void shouldCreateMosaicExpiryReceipt() {
+    MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
+    ArtifactExpiryReceipt<MosaicId> mosaicExpiryReceipt =
+        new ArtifactExpiryReceipt<>(
+            mosaicId, ReceiptType.MOSAIC_EXPIRED, ReceiptVersion.ARTIFACT_EXPIRY);
+    assertEquals(ReceiptType.MOSAIC_EXPIRED, mosaicExpiryReceipt.getType());
+    assertFalse(mosaicExpiryReceipt.getSize().isPresent());
+    assertEquals(ReceiptVersion.ARTIFACT_EXPIRY, mosaicExpiryReceipt.getVersion());
+    assertEquals(
+        "85BBEA6CC462B244", mosaicExpiryReceipt.getArtifactId().getIdAsHex().toUpperCase());
 
-        String hex = ConvertUtils.toHex(mosaicExpiryReceipt.serialize());
-        Assertions.assertEquals("01004D4144B262C46CEABB85", hex);
-    }
+    String hex = ConvertUtils.toHex(mosaicExpiryReceipt.serialize());
+    Assertions.assertEquals("01004D4144B262C46CEABB85", hex);
+  }
 
-    @Test
-    void shouldCreateNamespaceExpiryReceipt() {
-        NamespaceId namespaceId = NamespaceId.createFromId(new BigInteger("9562080086528621131"));
-        ArtifactExpiryReceipt<NamespaceId> namespaceExpiryReceipt =
-            new ArtifactExpiryReceipt<>(
-                namespaceId, ReceiptType.NAMESPACE_EXPIRED, ReceiptVersion.ARTIFACT_EXPIRY);
-        assertEquals(ReceiptType.NAMESPACE_EXPIRED, namespaceExpiryReceipt.getType());
-        assertFalse(namespaceExpiryReceipt.getSize().isPresent());
-        assertEquals(ReceiptVersion.ARTIFACT_EXPIRY, namespaceExpiryReceipt.getVersion());
-        assertEquals(
-            namespaceExpiryReceipt.getArtifactId().getId(), new BigInteger("9562080086528621131"));
+  @Test
+  void shouldCreateNamespaceExpiryReceipt() {
+    NamespaceId namespaceId = NamespaceId.createFromId(new BigInteger("9562080086528621131"));
+    ArtifactExpiryReceipt<NamespaceId> namespaceExpiryReceipt =
+        new ArtifactExpiryReceipt<>(
+            namespaceId, ReceiptType.NAMESPACE_EXPIRED, ReceiptVersion.ARTIFACT_EXPIRY);
+    assertEquals(ReceiptType.NAMESPACE_EXPIRED, namespaceExpiryReceipt.getType());
+    assertFalse(namespaceExpiryReceipt.getSize().isPresent());
+    assertEquals(ReceiptVersion.ARTIFACT_EXPIRY, namespaceExpiryReceipt.getVersion());
+    assertEquals(
+        namespaceExpiryReceipt.getArtifactId().getId(), new BigInteger("9562080086528621131"));
 
-        String hex = ConvertUtils.toHex(namespaceExpiryReceipt.serialize());
-        Assertions.assertEquals("01004E414BFA5F372D55B384", hex);
-    }
+    String hex = ConvertUtils.toHex(namespaceExpiryReceipt.serialize());
+    Assertions.assertEquals("01004E414BFA5F372D55B384", hex);
+  }
 
-    @Test
-    void shouldCreateMosaicExpiryReceiptWithSize() {
-        MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
-        ArtifactExpiryReceipt<MosaicId> mosaicExpiryReceipt =
-            new ArtifactExpiryReceipt<>(
-                mosaicId, ReceiptType.MOSAIC_EXPIRED, ReceiptVersion.ARTIFACT_EXPIRY,
-                Optional.of(100));
-        assertEquals(ReceiptType.MOSAIC_EXPIRED, mosaicExpiryReceipt.getType());
-        assertEquals(ReceiptVersion.ARTIFACT_EXPIRY, mosaicExpiryReceipt.getVersion());
-        assertEquals("85BBEA6CC462B244",
-            mosaicExpiryReceipt.getArtifactId().getIdAsHex().toUpperCase());
-        assertEquals(100, mosaicExpiryReceipt.getSize().get().intValue());
+  @Test
+  void shouldCreateMosaicExpiryReceiptWithSize() {
+    MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
+    ArtifactExpiryReceipt<MosaicId> mosaicExpiryReceipt =
+        new ArtifactExpiryReceipt<>(
+            mosaicId, ReceiptType.MOSAIC_EXPIRED, ReceiptVersion.ARTIFACT_EXPIRY, Optional.of(100));
+    assertEquals(ReceiptType.MOSAIC_EXPIRED, mosaicExpiryReceipt.getType());
+    assertEquals(ReceiptVersion.ARTIFACT_EXPIRY, mosaicExpiryReceipt.getVersion());
+    assertEquals(
+        "85BBEA6CC462B244", mosaicExpiryReceipt.getArtifactId().getIdAsHex().toUpperCase());
+    assertEquals(100, mosaicExpiryReceipt.getSize().get().intValue());
 
-        String hex = ConvertUtils.toHex(mosaicExpiryReceipt.serialize());
-        Assertions.assertEquals("01004D4144B262C46CEABB85", hex);
-    }
+    String hex = ConvertUtils.toHex(mosaicExpiryReceipt.serialize());
+    Assertions.assertEquals("01004D4144B262C46CEABB85", hex);
+  }
 
-    @Test
-    void shouldThrowIllegalArgumentExceptionWithWrongType() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> {
-                new ArtifactExpiryReceipt<>(
-                    "", ReceiptType.MOSAIC_EXPIRED, ReceiptVersion.ARTIFACT_EXPIRY, null);
-            });
-    }
+  @Test
+  void shouldThrowIllegalArgumentExceptionWithWrongType() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          new ArtifactExpiryReceipt<>(
+              "", ReceiptType.MOSAIC_EXPIRED, ReceiptVersion.ARTIFACT_EXPIRY, null);
+        });
+  }
 
-    @Test
-    void shouldThrowIllegalArgumentExceptionWithWrongReceiptType() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> {
-                MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
-                new ArtifactExpiryReceipt<>(
-                    mosaicId, ReceiptType.LOCK_HASH_COMPLETED, ReceiptVersion.ARTIFACT_EXPIRY,
-                    null);
-            });
-    }
+  @Test
+  void shouldThrowIllegalArgumentExceptionWithWrongReceiptType() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
+          new ArtifactExpiryReceipt<>(
+              mosaicId, ReceiptType.LOCK_HASH_COMPLETED, ReceiptVersion.ARTIFACT_EXPIRY, null);
+        });
+  }
 }

@@ -13,61 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.restriction;
 
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
 import java.util.Map;
 
-/**
- * Mosaic global restriction structure describes restriction information for an mosaic.
- */
+/** Mosaic global restriction structure describes restriction information for an mosaic. */
 public class MosaicGlobalRestriction {
 
-    /**
-     * composite hash
-     */
-    public final String compositeHash;
+  /** composite hash */
+  public final String compositeHash;
 
-    /**
-     * Mosaic restriction entry type.
-     */
-    public final MosaicRestrictionEntryType entryType;
-    /**
-     * Mosaic identifier.
-     */
-    private final MosaicId mosaicId;
+  /** Mosaic restriction entry type. */
+  public final MosaicRestrictionEntryType entryType;
+  /** Mosaic identifier. */
+  private final MosaicId mosaicId;
 
-    /**
-     * Mosaic restriction items
-     */
-    private final Map<BigInteger, MosaicGlobalRestrictionItem> restrictions;
+  /** Mosaic restriction items */
+  private final Map<BigInteger, MosaicGlobalRestrictionItem> restrictions;
 
-    public MosaicGlobalRestriction(String compositeHash,
-        MosaicRestrictionEntryType entryType,
-        MosaicId mosaicId,
-        Map<BigInteger, MosaicGlobalRestrictionItem> restrictions) {
-        this.compositeHash = compositeHash;
-        this.entryType = entryType;
-        this.mosaicId = mosaicId;
-        this.restrictions = restrictions;
-    }
+  public MosaicGlobalRestriction(
+      String compositeHash,
+      MosaicRestrictionEntryType entryType,
+      MosaicId mosaicId,
+      Map<BigInteger, MosaicGlobalRestrictionItem> restrictions) {
+    this.compositeHash = compositeHash;
+    this.entryType = entryType;
+    this.mosaicId = mosaicId;
+    this.restrictions = restrictions;
+  }
 
-    public String getCompositeHash() {
-        return compositeHash;
-    }
+  public String getCompositeHash() {
+    return compositeHash;
+  }
 
-    public MosaicRestrictionEntryType getEntryType() {
-        return entryType;
-    }
+  public MosaicRestrictionEntryType getEntryType() {
+    return entryType;
+  }
 
-    public MosaicId getMosaicId() {
-        return mosaicId;
-    }
+  public MosaicId getMosaicId() {
+    return mosaicId;
+  }
 
-
-    public Map<BigInteger, MosaicGlobalRestrictionItem> getRestrictions() {
-        return restrictions;
-    }
+  public Map<BigInteger, MosaicGlobalRestrictionItem> getRestrictions() {
+    return restrictions;
+  }
 }

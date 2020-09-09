@@ -13,90 +13,95 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import org.apache.commons.lang3.Validate;
 
-/**
- * Factory of {@link SecretProofTransaction}
- */
+/** Factory of {@link SecretProofTransaction} */
 public class SecretProofTransactionFactory extends TransactionFactory<SecretProofTransaction> {
 
-    private final SecretHashAlgorithm hashType;
-    private final String secret;
-    private final String proof;
-    private final UnresolvedAddress recipient;
+  private final SecretHashAlgorithm hashType;
+  private final String secret;
+  private final String proof;
+  private final UnresolvedAddress recipient;
 
-    private SecretProofTransactionFactory(final NetworkType networkType, final SecretHashAlgorithm hashType,
-        final UnresolvedAddress recipient, final String secret, final String proof) {
-        super(TransactionType.SECRET_PROOF, networkType);
-        Validate.notNull(secret, "Secret must not be null.");
-        Validate.notNull(proof, "Proof must not be null.");
-        Validate.notNull(recipient, "Recipient must not be null.");
-        if (!SecretHashAlgorithm.validator(hashType, secret)) {
-            throw new IllegalArgumentException(
-                "HashType  " + hashType + " and Secret have incompatible length or not hexadecimal string");
-        }
-        this.hashType = hashType;
-        this.secret = secret;
-        this.proof = proof;
-        this.recipient = recipient;
+  private SecretProofTransactionFactory(
+      final NetworkType networkType,
+      final SecretHashAlgorithm hashType,
+      final UnresolvedAddress recipient,
+      final String secret,
+      final String proof) {
+    super(TransactionType.SECRET_PROOF, networkType);
+    Validate.notNull(secret, "Secret must not be null.");
+    Validate.notNull(proof, "Proof must not be null.");
+    Validate.notNull(recipient, "Recipient must not be null.");
+    if (!SecretHashAlgorithm.validator(hashType, secret)) {
+      throw new IllegalArgumentException(
+          "HashType  "
+              + hashType
+              + " and Secret have incompatible length or not hexadecimal string");
     }
+    this.hashType = hashType;
+    this.secret = secret;
+    this.proof = proof;
+    this.recipient = recipient;
+  }
 
-    /**
-     * Static create method for factory.
-     *
-     * @param networkType Network type.
-     * @param hashType Hash algorithm secret is generated with.
-     * @param recipient Recipient address.
-     * @param secret Seed proof hashed.
-     * @param proof Seed proof
-     * @return Secret proof transaction.
-     */
-    public static SecretProofTransactionFactory create(NetworkType networkType, SecretHashAlgorithm hashType,
-        UnresolvedAddress recipient, String secret, String proof) {
-        return new SecretProofTransactionFactory(networkType, hashType, recipient, secret, proof);
-    }
+  /**
+   * Static create method for factory.
+   *
+   * @param networkType Network type.
+   * @param hashType Hash algorithm secret is generated with.
+   * @param recipient Recipient address.
+   * @param secret Seed proof hashed.
+   * @param proof Seed proof
+   * @return Secret proof transaction.
+   */
+  public static SecretProofTransactionFactory create(
+      NetworkType networkType,
+      SecretHashAlgorithm hashType,
+      UnresolvedAddress recipient,
+      String secret,
+      String proof) {
+    return new SecretProofTransactionFactory(networkType, hashType, recipient, secret, proof);
+  }
 
-    /**
-     * Returns the hash algorithm secret is generated with.
-     *
-     * @return the hash algorithm secret is generated with.
-     */
-    public SecretHashAlgorithm getHashType() {
-        return hashType;
-    }
+  /**
+   * Returns the hash algorithm secret is generated with.
+   *
+   * @return the hash algorithm secret is generated with.
+   */
+  public SecretHashAlgorithm getHashType() {
+    return hashType;
+  }
 
-    /**
-     * Returns the proof hashed.
-     *
-     * @return the proof hashed.
-     */
-    public String getSecret() {
-        return secret;
-    }
+  /**
+   * Returns the proof hashed.
+   *
+   * @return the proof hashed.
+   */
+  public String getSecret() {
+    return secret;
+  }
 
-    /**
-     * Returns proof.
-     *
-     * @return proof.
-     */
-    public String getProof() {
-        return proof;
-    }
+  /**
+   * Returns proof.
+   *
+   * @return proof.
+   */
+  public String getProof() {
+    return proof;
+  }
 
-    /**
-     * @return the recipient
-     */
-    public UnresolvedAddress getRecipient() {
-        return recipient;
-    }
+  /** @return the recipient */
+  public UnresolvedAddress getRecipient() {
+    return recipient;
+  }
 
-    @Override
-    public SecretProofTransaction build() {
-        return new SecretProofTransaction(this);
-    }
+  @Override
+  public SecretProofTransaction build() {
+    return new SecretProofTransaction(this);
+  }
 }

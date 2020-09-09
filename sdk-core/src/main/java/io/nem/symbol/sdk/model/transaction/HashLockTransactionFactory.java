@@ -21,92 +21,89 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import org.apache.commons.lang3.Validate;
 
-/**
- * Factory of {@link HashLockTransaction}
- */
+/** Factory of {@link HashLockTransaction} */
 public class HashLockTransactionFactory extends TransactionFactory<HashLockTransaction> {
 
-    private final Mosaic mosaic;
-    private final BigInteger duration;
-    private final String hash;
+  private final Mosaic mosaic;
+  private final BigInteger duration;
+  private final String hash;
 
-    private HashLockTransactionFactory(
-        NetworkType networkType,
-        Mosaic mosaic,
-        BigInteger duration,
-        String hash) {
-        super(TransactionType.HASH_LOCK, networkType);
-        Validate.notNull(mosaic, "Mosaic must not be null");
-        Validate.notNull(duration, "Duration must not be null");
-        Validate.notNull(hash, "Hash must not be null");
-        ConvertUtils.validateNotNegative(duration);
-        this.mosaic = mosaic;
-        this.duration = duration;
-        this.hash = hash;
-    }
+  private HashLockTransactionFactory(
+      NetworkType networkType, Mosaic mosaic, BigInteger duration, String hash) {
+    super(TransactionType.HASH_LOCK, networkType);
+    Validate.notNull(mosaic, "Mosaic must not be null");
+    Validate.notNull(duration, "Duration must not be null");
+    Validate.notNull(hash, "Hash must not be null");
+    ConvertUtils.validateNotNegative(duration);
+    this.mosaic = mosaic;
+    this.duration = duration;
+    this.hash = hash;
+  }
 
-    /**
-     * Static create method for factory.
-     *
-     * @param networkType Network type.
-     * @param mosaic Mosaic.
-     * @param duration Duration.
-     * @param hash the transaction hash.
-     * @return Hash lock transaction.
-     */
-    public static HashLockTransactionFactory create(NetworkType networkType,
-        Mosaic mosaic, BigInteger duration, String hash) {
-        return new HashLockTransactionFactory(networkType, mosaic, duration, hash);
-    }
+  /**
+   * Static create method for factory.
+   *
+   * @param networkType Network type.
+   * @param mosaic Mosaic.
+   * @param duration Duration.
+   * @param hash the transaction hash.
+   * @return Hash lock transaction.
+   */
+  public static HashLockTransactionFactory create(
+      NetworkType networkType, Mosaic mosaic, BigInteger duration, String hash) {
+    return new HashLockTransactionFactory(networkType, mosaic, duration, hash);
+  }
 
-    /**
-     * Static create method for factory.
-     *
-     * @param networkType Network type.
-     * @param mosaic Mosaic.
-     * @param duration Duration.
-     * @param signedTransaction Signed transaction.
-     * @return Hash lock transaction.
-     */
-    public static HashLockTransactionFactory create(NetworkType networkType,
-        Mosaic mosaic, BigInteger duration, SignedTransaction signedTransaction) {
-        if (signedTransaction.getType() != TransactionType.AGGREGATE_BONDED) {
-            throw new IllegalArgumentException(
-                "Signed transaction must be Aggregate Bonded Transaction");
-        }
-        return new HashLockTransactionFactory(networkType, mosaic, duration,
-            signedTransaction.getHash());
+  /**
+   * Static create method for factory.
+   *
+   * @param networkType Network type.
+   * @param mosaic Mosaic.
+   * @param duration Duration.
+   * @param signedTransaction Signed transaction.
+   * @return Hash lock transaction.
+   */
+  public static HashLockTransactionFactory create(
+      NetworkType networkType,
+      Mosaic mosaic,
+      BigInteger duration,
+      SignedTransaction signedTransaction) {
+    if (signedTransaction.getType() != TransactionType.AGGREGATE_BONDED) {
+      throw new IllegalArgumentException("Signed transaction must be Aggregate Bonded Transaction");
     }
+    return new HashLockTransactionFactory(
+        networkType, mosaic, duration, signedTransaction.getHash());
+  }
 
-    /**
-     * Returns locked mosaic.
-     *
-     * @return locked mosaic.
-     */
-    public Mosaic getMosaic() {
-        return mosaic;
-    }
+  /**
+   * Returns locked mosaic.
+   *
+   * @return locked mosaic.
+   */
+  public Mosaic getMosaic() {
+    return mosaic;
+  }
 
-    /**
-     * Returns funds lock duration in number of blocks.
-     *
-     * @return funds lock duration in number of blocks.
-     */
-    public BigInteger getDuration() {
-        return duration;
-    }
+  /**
+   * Returns funds lock duration in number of blocks.
+   *
+   * @return funds lock duration in number of blocks.
+   */
+  public BigInteger getDuration() {
+    return duration;
+  }
 
-    /**
-     * Returns signed transaction hash for which funds are locked.
-     *
-     * @return signed transaction hash for which funds are locked.
-     */
-    public String getHash() {
-        return hash;
-    }
+  /**
+   * Returns signed transaction hash for which funds are locked.
+   *
+   * @return signed transaction hash for which funds are locked.
+   */
+  public String getHash() {
+    return hash;
+  }
 
-    @Override
-    public HashLockTransaction build() {
-        return new HashLockTransaction(this);
-    }
+  @Override
+  public HashLockTransaction build() {
+    return new HashLockTransaction(this);
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,19 +23,23 @@ import org.junit.jupiter.api.Test;
 
 public class AggregateTransactionCosignatureTest {
 
-    @Test
-    void createAnAggregateCosignatureViaConstructor() {
-        AggregateTransactionCosignature aggregateTransactionCosignature =
-            new AggregateTransactionCosignature(AggregateTransactionCosignature.DEFAULT_VERSION, "signature",
-                new PublicAccount(
-                    "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
-                    NetworkType.MIJIN_TEST));
-        assertEquals(AggregateTransactionCosignature.DEFAULT_VERSION, aggregateTransactionCosignature.getVersion());
-        assertEquals("signature", aggregateTransactionCosignature.getSignature());
-        assertEquals(
+  @Test
+  void createAnAggregateCosignatureViaConstructor() {
+    AggregateTransactionCosignature aggregateTransactionCosignature =
+        new AggregateTransactionCosignature(
+            AggregateTransactionCosignature.DEFAULT_VERSION,
+            "signature",
             new PublicAccount(
                 "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
-                NetworkType.MIJIN_TEST),
-            aggregateTransactionCosignature.getSigner());
-    }
+                NetworkType.MIJIN_TEST));
+    assertEquals(
+        AggregateTransactionCosignature.DEFAULT_VERSION,
+        aggregateTransactionCosignature.getVersion());
+    assertEquals("signature", aggregateTransactionCosignature.getSignature());
+    assertEquals(
+        new PublicAccount(
+            "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
+            NetworkType.MIJIN_TEST),
+        aggregateTransactionCosignature.getSigner());
+  }
 }

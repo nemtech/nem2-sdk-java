@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.receipt;
 
 import io.nem.symbol.catapult.builders.ReceiptTypeDto;
@@ -23,24 +22,23 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 class ReceiptTypeTest {
 
+  @ParameterizedTest
+  @EnumSource(ReceiptType.class)
+  void validReceiptTypeValues(ReceiptType transactionType) {
 
-    @ParameterizedTest
-    @EnumSource(ReceiptType.class)
-    void validReceiptTypeValues(ReceiptType transactionType) {
+    Assertions.assertNotNull(
+        ReceiptTypeDto.rawValueOf((short) transactionType.getValue()),
+        transactionType.getValue() + " not found. ReceiptType " + transactionType.getValue());
+  }
 
-        Assertions.assertNotNull(ReceiptTypeDto.rawValueOf((short) transactionType.getValue()),
-            transactionType.getValue() + " not found. ReceiptType " + transactionType.getValue());
+  @ParameterizedTest
+  @EnumSource(ReceiptTypeDto.class)
+  void valueReceiptTypeDtoValue(ReceiptTypeDto enumTypeDto) {
+    if (enumTypeDto == ReceiptTypeDto.RESERVED) {
+      return;
     }
-
-    @ParameterizedTest
-    @EnumSource(ReceiptTypeDto.class)
-    void valueReceiptTypeDtoValue(ReceiptTypeDto enumTypeDto) {
-        if (enumTypeDto == ReceiptTypeDto.RESERVED) {
-            return;
-        }
-        Assertions.assertNotNull(ReceiptTypeDto.rawValueOf(enumTypeDto.getValue()),
-            enumTypeDto.getValue() + " not found. ReceiptType " + enumTypeDto.getValue());
-
-
-    }
+    Assertions.assertNotNull(
+        ReceiptTypeDto.rawValueOf(enumTypeDto.getValue()),
+        enumTypeDto.getValue() + " not found. ReceiptType " + enumTypeDto.getValue());
+  }
 }

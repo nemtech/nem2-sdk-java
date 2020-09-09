@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
 import io.nem.symbol.core.crypto.PublicKey;
@@ -27,28 +26,25 @@ import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.LinkActionEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.NodeKeyLinkTransactionDTO;
 
-/**
- * {@link NodeKeyLinkTransaction} mapper.
- */
-public class NodeKeyLinkTransactionMapper extends
-    AbstractTransactionMapper<NodeKeyLinkTransactionDTO, NodeKeyLinkTransaction> {
+/** {@link NodeKeyLinkTransaction} mapper. */
+public class NodeKeyLinkTransactionMapper
+    extends AbstractTransactionMapper<NodeKeyLinkTransactionDTO, NodeKeyLinkTransaction> {
 
-    public NodeKeyLinkTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.NODE_KEY_LINK, NodeKeyLinkTransactionDTO.class);
-    }
+  public NodeKeyLinkTransactionMapper(JsonHelper jsonHelper) {
+    super(jsonHelper, TransactionType.NODE_KEY_LINK, NodeKeyLinkTransactionDTO.class);
+  }
 
-    @Override
-    protected TransactionFactory<NodeKeyLinkTransaction> createFactory(NetworkType networkType,
-        NodeKeyLinkTransactionDTO transaction) {
-        PublicKey linkedPublicKey = PublicKey.fromHexString(transaction.getLinkedPublicKey());
-        LinkAction linkAction = LinkAction.rawValueOf(transaction.getLinkAction().getValue());
-        return NodeKeyLinkTransactionFactory.create(networkType, linkedPublicKey, linkAction);
-    }
+  @Override
+  protected TransactionFactory<NodeKeyLinkTransaction> createFactory(
+      NetworkType networkType, NodeKeyLinkTransactionDTO transaction) {
+    PublicKey linkedPublicKey = PublicKey.fromHexString(transaction.getLinkedPublicKey());
+    LinkAction linkAction = LinkAction.rawValueOf(transaction.getLinkAction().getValue());
+    return NodeKeyLinkTransactionFactory.create(networkType, linkedPublicKey, linkAction);
+  }
 
-    @Override
-    protected void copyToDto(NodeKeyLinkTransaction transaction, NodeKeyLinkTransactionDTO dto) {
-        dto.setLinkAction(LinkActionEnum.fromValue((int) transaction.getLinkAction().getValue()));
-        dto.setLinkedPublicKey(transaction.getLinkedPublicKey().toHex());
-    }
-
+  @Override
+  protected void copyToDto(NodeKeyLinkTransaction transaction, NodeKeyLinkTransactionDTO dto) {
+    dto.setLinkAction(LinkActionEnum.fromValue((int) transaction.getLinkAction().getValue()));
+    dto.setLinkedPublicKey(transaction.getLinkedPublicKey().toHex());
+  }
 }

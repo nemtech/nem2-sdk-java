@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
 import static io.nem.symbol.core.utils.MapperUtils.getIdAsHex;
@@ -31,37 +30,34 @@ import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicDefinitionTransactionDTO;
 import java.math.BigInteger;
 
-/**
- * Mosaic definition transaction mapper.
- */
-class MosaicDefinitionTransactionMapper extends
-    AbstractTransactionMapper<MosaicDefinitionTransactionDTO, MosaicDefinitionTransaction> {
+/** Mosaic definition transaction mapper. */
+class MosaicDefinitionTransactionMapper
+    extends AbstractTransactionMapper<MosaicDefinitionTransactionDTO, MosaicDefinitionTransaction> {
 
-    public MosaicDefinitionTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.MOSAIC_DEFINITION, MosaicDefinitionTransactionDTO.class);
-    }
+  public MosaicDefinitionTransactionMapper(JsonHelper jsonHelper) {
+    super(jsonHelper, TransactionType.MOSAIC_DEFINITION, MosaicDefinitionTransactionDTO.class);
+  }
 
-    @Override
-    protected TransactionFactory<MosaicDefinitionTransaction> createFactory(NetworkType networkType,
-        MosaicDefinitionTransactionDTO transaction) {
-        MosaicFlags mosaicFlags =
-            MosaicFlags.create(transaction.getFlags());
-        return MosaicDefinitionTransactionFactory.create(networkType,
-            MosaicNonce.createFromInteger(transaction.getNonce().intValue()),
-            MapperUtils.toMosaicId(transaction.getId()),
-            mosaicFlags, transaction.getDivisibility(),
-            new BlockDuration(transaction.getDuration()));
-    }
+  @Override
+  protected TransactionFactory<MosaicDefinitionTransaction> createFactory(
+      NetworkType networkType, MosaicDefinitionTransactionDTO transaction) {
+    MosaicFlags mosaicFlags = MosaicFlags.create(transaction.getFlags());
+    return MosaicDefinitionTransactionFactory.create(
+        networkType,
+        MosaicNonce.createFromInteger(transaction.getNonce().intValue()),
+        MapperUtils.toMosaicId(transaction.getId()),
+        mosaicFlags,
+        transaction.getDivisibility(),
+        new BlockDuration(transaction.getDuration()));
+  }
 
-    @Override
-    protected void copyToDto(MosaicDefinitionTransaction transaction,
-        MosaicDefinitionTransactionDTO dto) {
-        dto.setFlags(transaction.getMosaicFlags().getValue());
-        dto.setId(getIdAsHex(transaction.getMosaicId()));
-        dto.setDivisibility(transaction.getDivisibility());
-        dto.setNonce(transaction.getMosaicNonce().getNonceAsLong());
-        dto.setDuration(BigInteger.valueOf(transaction.getBlockDuration().getDuration()));
-    }
-
-
+  @Override
+  protected void copyToDto(
+      MosaicDefinitionTransaction transaction, MosaicDefinitionTransactionDTO dto) {
+    dto.setFlags(transaction.getMosaicFlags().getValue());
+    dto.setId(getIdAsHex(transaction.getMosaicId()));
+    dto.setDivisibility(transaction.getDivisibility());
+    dto.setNonce(transaction.getMosaicNonce().getNonceAsLong());
+    dto.setDuration(BigInteger.valueOf(transaction.getBlockDuration().getDuration()));
+  }
 }

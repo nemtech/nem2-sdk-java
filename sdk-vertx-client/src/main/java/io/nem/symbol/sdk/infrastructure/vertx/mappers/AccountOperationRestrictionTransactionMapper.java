@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
 import io.nem.symbol.sdk.model.network.NetworkType;
@@ -28,50 +27,55 @@ import io.nem.symbol.sdk.openapi.vertx.model.TransactionTypeEnum;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * DTO mapper of {@link AccountOperationRestrictionTransaction}.
- */
-public class AccountOperationRestrictionTransactionMapper extends
-    AbstractTransactionMapper<AccountOperationRestrictionTransactionDTO, AccountOperationRestrictionTransaction> {
+/** DTO mapper of {@link AccountOperationRestrictionTransaction}. */
+public class AccountOperationRestrictionTransactionMapper
+    extends AbstractTransactionMapper<
+        AccountOperationRestrictionTransactionDTO, AccountOperationRestrictionTransaction> {
 
-    public AccountOperationRestrictionTransactionMapper(
-        JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.ACCOUNT_OPERATION_RESTRICTION,
-            AccountOperationRestrictionTransactionDTO.class);
-    }
+  public AccountOperationRestrictionTransactionMapper(JsonHelper jsonHelper) {
+    super(
+        jsonHelper,
+        TransactionType.ACCOUNT_OPERATION_RESTRICTION,
+        AccountOperationRestrictionTransactionDTO.class);
+  }
 
-    @Override
-    protected AccountOperationRestrictionTransactionFactory createFactory(
-        NetworkType networkType, AccountOperationRestrictionTransactionDTO transaction) {
-        AccountOperationRestrictionFlags restrictionFlags = AccountOperationRestrictionFlags
-            .rawValueOf(transaction.getRestrictionFlags().getValue());
+  @Override
+  protected AccountOperationRestrictionTransactionFactory createFactory(
+      NetworkType networkType, AccountOperationRestrictionTransactionDTO transaction) {
+    AccountOperationRestrictionFlags restrictionFlags =
+        AccountOperationRestrictionFlags.rawValueOf(transaction.getRestrictionFlags().getValue());
 
-        List<TransactionType> additions = transaction.getRestrictionAdditions().stream()
-            .map(transactionTypeEnum -> TransactionType.rawValueOf(transactionTypeEnum.getValue())).collect(
-                Collectors.toList());
+    List<TransactionType> additions =
+        transaction.getRestrictionAdditions().stream()
+            .map(transactionTypeEnum -> TransactionType.rawValueOf(transactionTypeEnum.getValue()))
+            .collect(Collectors.toList());
 
-        List<TransactionType> deletions = transaction.getRestrictionDeletions().stream()
-            .map(transactionTypeEnum -> TransactionType.rawValueOf(transactionTypeEnum.getValue())).collect(
-                Collectors.toList());
-        return AccountOperationRestrictionTransactionFactory.create(networkType, restrictionFlags,
-            additions, deletions);
-    }
+    List<TransactionType> deletions =
+        transaction.getRestrictionDeletions().stream()
+            .map(transactionTypeEnum -> TransactionType.rawValueOf(transactionTypeEnum.getValue()))
+            .collect(Collectors.toList());
+    return AccountOperationRestrictionTransactionFactory.create(
+        networkType, restrictionFlags, additions, deletions);
+  }
 
-    @Override
-    protected void copyToDto(AccountOperationRestrictionTransaction transaction,
-        AccountOperationRestrictionTransactionDTO dto) {
-        dto.setRestrictionFlags(
-            AccountRestrictionFlagsEnum.fromValue(transaction.getRestrictionFlags().getValue()));
+  @Override
+  protected void copyToDto(
+      AccountOperationRestrictionTransaction transaction,
+      AccountOperationRestrictionTransactionDTO dto) {
+    dto.setRestrictionFlags(
+        AccountRestrictionFlagsEnum.fromValue(transaction.getRestrictionFlags().getValue()));
 
-        List<TransactionTypeEnum> additions = transaction.getRestrictionAdditions().stream()
-            .map(transactionType -> TransactionTypeEnum.fromValue(transactionType.getValue())).collect(
-                Collectors.toList());
+    List<TransactionTypeEnum> additions =
+        transaction.getRestrictionAdditions().stream()
+            .map(transactionType -> TransactionTypeEnum.fromValue(transactionType.getValue()))
+            .collect(Collectors.toList());
 
-        List<TransactionTypeEnum> deletions = transaction.getRestrictionDeletions().stream()
-            .map(transactionType -> TransactionTypeEnum.fromValue(transactionType.getValue())).collect(
-                Collectors.toList());
+    List<TransactionTypeEnum> deletions =
+        transaction.getRestrictionDeletions().stream()
+            .map(transactionType -> TransactionTypeEnum.fromValue(transactionType.getValue()))
+            .collect(Collectors.toList());
 
-        dto.setRestrictionAdditions(additions);
-        dto.setRestrictionDeletions(deletions);
-    }
+    dto.setRestrictionAdditions(additions);
+    dto.setRestrictionDeletions(deletions);
+  }
 }

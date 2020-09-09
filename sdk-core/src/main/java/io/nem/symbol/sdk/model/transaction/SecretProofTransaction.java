@@ -13,70 +13,61 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 
-/**
- * Secret proof transaction.
- */
+/** Secret proof transaction. */
 public class SecretProofTransaction extends Transaction implements RecipientTransaction {
 
-    private final SecretHashAlgorithm hashType;
-    private final String secret;
-    private final String proof;
-    private final UnresolvedAddress recipient;
+  private final SecretHashAlgorithm hashType;
+  private final String secret;
+  private final String proof;
+  private final UnresolvedAddress recipient;
 
+  /**
+   * The transaction contructor using the factory.
+   *
+   * @param factory the factory with the configured data.
+   */
+  public SecretProofTransaction(SecretProofTransactionFactory factory) {
+    super(factory);
+    this.hashType = factory.getHashType();
+    this.secret = factory.getSecret();
+    this.proof = factory.getProof();
+    this.recipient = factory.getRecipient();
+  }
 
-    /**
-     * The transaction contructor using the factory.
-     *
-     * @param factory the factory with the configured data.
-     */
-    public SecretProofTransaction(SecretProofTransactionFactory factory) {
-        super(factory);
-        this.hashType = factory.getHashType();
-        this.secret = factory.getSecret();
-        this.proof = factory.getProof();
-        this.recipient = factory.getRecipient();
-    }
+  /**
+   * Returns the hash algorithm secret is generated with.
+   *
+   * @return the hash algorithm secret is generated with.
+   */
+  public SecretHashAlgorithm getHashType() {
+    return hashType;
+  }
 
+  /**
+   * Returns the proof hashed.
+   *
+   * @return the proof hashed.
+   */
+  public String getSecret() {
+    return secret;
+  }
 
-    /**
-     * Returns the hash algorithm secret is generated with.
-     *
-     * @return the hash algorithm secret is generated with.
-     */
-    public SecretHashAlgorithm getHashType() {
-        return hashType;
-    }
+  /**
+   * Returns proof.
+   *
+   * @return proof.
+   */
+  public String getProof() {
+    return proof;
+  }
 
-    /**
-     * Returns the proof hashed.
-     *
-     * @return the proof hashed.
-     */
-    public String getSecret() {
-        return secret;
-    }
-
-    /**
-     * Returns proof.
-     *
-     * @return proof.
-     */
-    public String getProof() {
-        return proof;
-    }
-
-
-    /**
-     * @return the recipient
-     */
-    @Override
-    public UnresolvedAddress getRecipient() {
-        return recipient;
-    }
-
+  /** @return the recipient */
+  @Override
+  public UnresolvedAddress getRecipient() {
+    return recipient;
+  }
 }

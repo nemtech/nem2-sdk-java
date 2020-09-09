@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionFactory;
-
 
 /**
  * This interface allow users to serialize and deserialize transaction using the symbol binary
@@ -26,40 +24,37 @@ import io.nem.symbol.sdk.model.transaction.TransactionFactory;
  */
 public interface BinarySerialization {
 
-    /**
-     * It serializes a transaction into a byte array using the symbol buffer format.
-     *
-     * @param <T> the type of the transaction
-     * @param transaction the transaction
-     * @return the byte array.
-     */
-    <T extends Transaction> byte[] serialize(T transaction);
+  /**
+   * It serializes a transaction into a byte array using the symbol buffer format.
+   *
+   * @param <T> the type of the transaction
+   * @param transaction the transaction
+   * @return the byte array.
+   */
+  <T extends Transaction> byte[] serialize(T transaction);
 
+  /**
+   * It deserializes the symbol buffer payload into a transaction factory.
+   *
+   * @param payload the byte array payload
+   * @return the {@link TransactionFactory}.
+   */
+  TransactionFactory<?> deserializeToFactory(byte[] payload);
 
-    /**
-     * It deserializes the symbol buffer payload into a transaction factory.
-     *
-     * @param payload the byte array payload
-     * @return the {@link TransactionFactory}.
-     */
-    TransactionFactory<?> deserializeToFactory(byte[] payload);
+  /**
+   * It deserializes the symbol buffer payload into a transaction.
+   *
+   * @param payload the byte array payload
+   * @return the transaction.
+   */
+  Transaction deserialize(byte[] payload);
 
-    /**
-     * It deserializes the symbol buffer payload into a transaction.
-     *
-     * @param payload the byte array payload
-     * @return the transaction.
-     */
-    Transaction deserialize(byte[] payload);
-
-
-    /**
-     * It returns the transaction's byte array size useful to calculate its fee.
-     *
-     * @param <T> the type of the transaction
-     * @param transaction the transaction
-     * @return the size of the transaction.
-     */
-    <T extends Transaction> long getSize(T transaction);
-
+  /**
+   * It returns the transaction's byte array size useful to calculate its fee.
+   *
+   * @param <T> the type of the transaction
+   * @param transaction the transaction
+   * @return the size of the transaction.
+   */
+  <T extends Transaction> long getSize(T transaction);
 }

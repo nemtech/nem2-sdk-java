@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.namespace;
 
 import java.util.Arrays;
@@ -24,27 +23,25 @@ import java.util.Arrays;
  * @since 1.0
  */
 public enum NamespaceRegistrationType {
-    /**
-     * Root namespace
-     */
-    ROOT_NAMESPACE(0),
-    /**
-     * Sub namespace
-     */
-    SUB_NAMESPACE(1);
+  /** Root namespace */
+  ROOT_NAMESPACE(0),
+  /** Sub namespace */
+  SUB_NAMESPACE(1);
 
-    private final int value;
+  private final int value;
 
-    NamespaceRegistrationType(int value) {
-        this.value = value;
-    }
+  NamespaceRegistrationType(int value) {
+    this.value = value;
+  }
 
-    public static NamespaceRegistrationType rawValueOf(int value) {
-        return Arrays.stream(values()).filter(e -> e.value == value).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
+  public static NamespaceRegistrationType rawValueOf(int value) {
+    return Arrays.stream(values())
+        .filter(e -> e.value == value)
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 
-    public int getValue() {
-        return value;
-    }
+  public int getValue() {
+    return value;
+  }
 }

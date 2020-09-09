@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.metadata;
 
 import io.nem.symbol.core.utils.MapperUtils;
@@ -30,104 +29,97 @@ import java.util.Optional;
  */
 public class Metadata implements Stored {
 
-    /**
-     * The stored database.
-     */
-    private final Optional<String> recordId;
-    /**
-     * The composite hash
-     */
-    private final String compositeHash;
-    /**
-     * The metadata source address
-     */
-    private final Address sourceAddress;
+  /** The stored database. */
+  private final Optional<String> recordId;
+  /** The composite hash */
+  private final String compositeHash;
+  /** The metadata source address */
+  private final Address sourceAddress;
 
-    /**
-     * The metadata target address
-     */
-    private final Address targetAddress;
+  /** The metadata target address */
+  private final Address targetAddress;
 
-    /**
-     * The key scoped to source, target and type
-     */
-    private final BigInteger scopedMetadataKey;
+  /** The key scoped to source, target and type */
+  private final BigInteger scopedMetadataKey;
 
-    /**
-     * The metadata type
-     */
-    private final MetadataType metadataType;
+  /** The metadata type */
+  private final MetadataType metadataType;
 
-    /**
-     * The metadata value
-     */
-    private final String value;
+  /** The metadata value */
+  private final String value;
 
-    /**
-     * The target {@link MosaicId} (when metadata type is MOSAIC)
-     *
-     * or
-     *
-     * {@link NamespaceId} (when metadata type is NAMESPACE)
-     */
-    private final Optional<Object> targetId;
+  /**
+   * The target {@link MosaicId} (when metadata type is MOSAIC)
+   *
+   * <p>or
+   *
+   * <p>{@link NamespaceId} (when metadata type is NAMESPACE)
+   */
+  private final Optional<Object> targetId;
 
-    @SuppressWarnings("squid:S00107")
-    public Metadata(String recordId, String compositeHash, Address sourceAddress, Address targetAddress,
-        BigInteger scopedMetadataKey, MetadataType metadataType, String value, Optional<String> targetId) {
-        this.recordId = Optional.ofNullable(recordId);
-        this.compositeHash = compositeHash;
-        this.sourceAddress = sourceAddress;
-        this.targetAddress = targetAddress;
-        this.scopedMetadataKey = scopedMetadataKey;
-        this.metadataType = metadataType;
-        this.value = value;
-        this.targetId = resolveTargetId(targetId, metadataType);
+  @SuppressWarnings("squid:S00107")
+  public Metadata(
+      String recordId,
+      String compositeHash,
+      Address sourceAddress,
+      Address targetAddress,
+      BigInteger scopedMetadataKey,
+      MetadataType metadataType,
+      String value,
+      Optional<String> targetId) {
+    this.recordId = Optional.ofNullable(recordId);
+    this.compositeHash = compositeHash;
+    this.sourceAddress = sourceAddress;
+    this.targetAddress = targetAddress;
+    this.scopedMetadataKey = scopedMetadataKey;
+    this.metadataType = metadataType;
+    this.value = value;
+    this.targetId = resolveTargetId(targetId, metadataType);
+  }
+
+  private Optional<Object> resolveTargetId(Optional<String> targetId, MetadataType metadataType) {
+    if (!targetId.isPresent() && metadataType == MetadataType.ACCOUNT) {
+      return Optional.empty();
     }
-
-    private Optional<Object> resolveTargetId(Optional<String> targetId, MetadataType metadataType) {
-        if (!targetId.isPresent() && metadataType == MetadataType.ACCOUNT) {
-            return Optional.empty();
-        }
-        if (metadataType == MetadataType.NAMESPACE) {
-            return targetId.map(MapperUtils::toNamespaceId);
-        }
-        if (metadataType == MetadataType.MOSAIC) {
-            return targetId.map(MapperUtils::toMosaicId);
-        }
-        return Optional.empty();
+    if (metadataType == MetadataType.NAMESPACE) {
+      return targetId.map(MapperUtils::toNamespaceId);
     }
-
-    public String getCompositeHash() {
-        return compositeHash;
+    if (metadataType == MetadataType.MOSAIC) {
+      return targetId.map(MapperUtils::toMosaicId);
     }
+    return Optional.empty();
+  }
 
-    public Address getSourceAddress() {
-        return sourceAddress;
-    }
+  public String getCompositeHash() {
+    return compositeHash;
+  }
 
-    public Address getTargetAddress() {
-        return targetAddress;
-    }
+  public Address getSourceAddress() {
+    return sourceAddress;
+  }
 
-    public BigInteger getScopedMetadataKey() {
-        return scopedMetadataKey;
-    }
+  public Address getTargetAddress() {
+    return targetAddress;
+  }
 
-    public MetadataType getMetadataType() {
-        return metadataType;
-    }
+  public BigInteger getScopedMetadataKey() {
+    return scopedMetadataKey;
+  }
 
-    public String getValue() {
-        return value;
-    }
+  public MetadataType getMetadataType() {
+    return metadataType;
+  }
 
-    public Optional<Object> getTargetId() {
-        return targetId;
-    }
+  public String getValue() {
+    return value;
+  }
 
-    @Override
-    public Optional<String> getRecordId() {
-        return recordId;
-    }
+  public Optional<Object> getTargetId() {
+    return targetId;
+  }
+
+  @Override
+  public Optional<String> getRecordId() {
+    return recordId;
+  }
 }

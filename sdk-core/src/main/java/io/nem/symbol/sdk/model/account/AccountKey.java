@@ -13,34 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
-
-/**
- * Public keys the account could be associated with.
- */
+/** Public keys the account could be associated with. */
 public class AccountKey {
 
-    /**
-     * The key type.
-     */
-    private final AccountKeyType keyType;
+  /** The key type. */
+  private final AccountKeyType keyType;
 
-    /**
-     * The public key in hex.
-     */
-    private final String key;
+  /** The public key in hex. */
+  private final String key;
 
-    public AccountKey(AccountKeyType accountKeyType, String key) {
-        this.keyType = accountKeyType;
-        this.key = key;
-    }
+  public AccountKey(AccountKeyType accountKeyType, String key) {
+    this.keyType = accountKeyType;
+    this.key = key;
+  }
 
-    public AccountKeyType getKeyType() {
-        return keyType;
-    }
+  public AccountKeyType getKeyType() {
+    return keyType;
+  }
 
-    public String getKey() {
-        return key;
-    }
+  public String getKey() {
+    return key;
+  }
 }

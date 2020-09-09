@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,12 +23,15 @@ import org.junit.jupiter.api.Test;
 
 public class AccountRestrictionTest {
 
-    @Test
-    void shouldCreateAccountRestrictionViaConstructor() {
-        AccountRestriction accountRestriction =
-            new AccountRestriction(AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
-                Arrays.asList("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQM"));
-        assertEquals(AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS, accountRestriction.getRestrictionFlags());
-        assertEquals(1, accountRestriction.getValues().size());
-    }
+  @Test
+  void shouldCreateAccountRestrictionViaConstructor() {
+    AccountRestriction accountRestriction =
+        new AccountRestriction(
+            AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
+            Arrays.asList("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQM"));
+    assertEquals(
+        AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
+        accountRestriction.getRestrictionFlags());
+    assertEquals(1, accountRestriction.getValues().size());
+  }
 }

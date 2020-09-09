@@ -13,46 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 
-/**
- * Factory of {@link AccountMetadataTransaction}
- */
-public class AccountMetadataTransactionFactory extends
-    MetadataTransactionFactory<AccountMetadataTransaction> {
+/** Factory of {@link AccountMetadataTransaction} */
+public class AccountMetadataTransactionFactory
+    extends MetadataTransactionFactory<AccountMetadataTransaction> {
 
-    private AccountMetadataTransactionFactory(
-        NetworkType networkType,
-        UnresolvedAddress targetAddress,
-        BigInteger scopedMetadataKey,
-        String value) {
-        super(TransactionType.ACCOUNT_METADATA, networkType, targetAddress,
-            scopedMetadataKey, value);
-    }
+  private AccountMetadataTransactionFactory(
+      NetworkType networkType,
+      UnresolvedAddress targetAddress,
+      BigInteger scopedMetadataKey,
+      String value) {
+    super(TransactionType.ACCOUNT_METADATA, networkType, targetAddress, scopedMetadataKey, value);
+  }
 
-    /**
-     * Static create method for factory.
-     *
-     * @param networkType Network type.
-     * @param targetAddress Target address.
-     * @param scopedMetadataKey Scoped metadata key.
-     * @param value Value.
-     * @return Account metadata transaction.
-     */
-    public static AccountMetadataTransactionFactory create(NetworkType networkType,
-        UnresolvedAddress targetAddress, BigInteger scopedMetadataKey, String value) {
-        return new AccountMetadataTransactionFactory(networkType, targetAddress, scopedMetadataKey,
-            value);
-    }
+  /**
+   * Static create method for factory.
+   *
+   * @param networkType Network type.
+   * @param targetAddress Target address.
+   * @param scopedMetadataKey Scoped metadata key.
+   * @param value Value.
+   * @return Account metadata transaction.
+   */
+  public static AccountMetadataTransactionFactory create(
+      NetworkType networkType,
+      UnresolvedAddress targetAddress,
+      BigInteger scopedMetadataKey,
+      String value) {
+    return new AccountMetadataTransactionFactory(
+        networkType, targetAddress, scopedMetadataKey, value);
+  }
 
-    @Override
-    public AccountMetadataTransaction build() {
-        return new AccountMetadataTransaction(this);
-    }
+  @Override
+  public AccountMetadataTransaction build() {
+    return new AccountMetadataTransaction(this);
+  }
 }

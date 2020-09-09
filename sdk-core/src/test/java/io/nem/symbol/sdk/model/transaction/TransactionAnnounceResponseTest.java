@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,11 +21,11 @@ import org.junit.jupiter.api.Test;
 
 public class TransactionAnnounceResponseTest {
 
-    @Test
-    void shouldCreateTransactionAnnounceReponseViaConstructor() {
-        TransactionAnnounceResponse transactionAnnounceResponse =
-            new TransactionAnnounceResponse("message");
+  @Test
+  void shouldCreateTransactionAnnounceReponseViaConstructor() {
+    TransactionAnnounceResponse transactionAnnounceResponse =
+        new TransactionAnnounceResponse("message");
 
-        assertEquals("message", transactionAnnounceResponse.getMessage());
-    }
+    assertEquals("message", transactionAnnounceResponse.getMessage());
+  }
 }

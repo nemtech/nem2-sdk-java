@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
 import static io.nem.symbol.core.utils.MapperUtils.toUnresolvedMosaicId;
@@ -30,36 +29,36 @@ import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretHashAlgorithmEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretLockTransactionDTO;
 
-/**
- * Secret lock transaction mapper.
- */
-class SecretLockTransactionMapper extends
-    AbstractTransactionMapper<SecretLockTransactionDTO, SecretLockTransaction> {
+/** Secret lock transaction mapper. */
+class SecretLockTransactionMapper
+    extends AbstractTransactionMapper<SecretLockTransactionDTO, SecretLockTransaction> {
 
-    public SecretLockTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.SECRET_LOCK, SecretLockTransactionDTO.class);
-    }
+  public SecretLockTransactionMapper(JsonHelper jsonHelper) {
+    super(jsonHelper, TransactionType.SECRET_LOCK, SecretLockTransactionDTO.class);
+  }
 
-    @Override
-    protected TransactionFactory<SecretLockTransaction> createFactory(NetworkType networkType,
-        SecretLockTransactionDTO transaction) {
-        Mosaic mosaic =
-            new Mosaic(
-                toUnresolvedMosaicId(transaction.getMosaicId()),
-                transaction.getAmount());
-        return SecretLockTransactionFactory.create(networkType, mosaic, transaction.getDuration(),
-            SecretHashAlgorithm.rawValueOf(transaction.getHashAlgorithm().getValue()), transaction.getSecret(),
-            MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()));
-    }
+  @Override
+  protected TransactionFactory<SecretLockTransaction> createFactory(
+      NetworkType networkType, SecretLockTransactionDTO transaction) {
+    Mosaic mosaic =
+        new Mosaic(toUnresolvedMosaicId(transaction.getMosaicId()), transaction.getAmount());
+    return SecretLockTransactionFactory.create(
+        networkType,
+        mosaic,
+        transaction.getDuration(),
+        SecretHashAlgorithm.rawValueOf(transaction.getHashAlgorithm().getValue()),
+        transaction.getSecret(),
+        MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()));
+  }
 
-    @Override
-    protected void copyToDto(SecretLockTransaction transaction, SecretLockTransactionDTO dto) {
-        dto.setAmount(transaction.getMosaic().getAmount());
-        dto.setMosaicId(MapperUtils.getIdAsHex(transaction.getMosaic().getId()));
-        dto.setDuration(transaction.getDuration());
-        dto.setHashAlgorithm(SecretHashAlgorithmEnum.fromValue(transaction.getHashAlgorithm().getValue()));
-        dto.setSecret(transaction.getSecret());
-        dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));
-    }
-
+  @Override
+  protected void copyToDto(SecretLockTransaction transaction, SecretLockTransactionDTO dto) {
+    dto.setAmount(transaction.getMosaic().getAmount());
+    dto.setMosaicId(MapperUtils.getIdAsHex(transaction.getMosaic().getId()));
+    dto.setDuration(transaction.getDuration());
+    dto.setHashAlgorithm(
+        SecretHashAlgorithmEnum.fromValue(transaction.getHashAlgorithm().getValue()));
+    dto.setSecret(transaction.getSecret());
+    dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));
+  }
 }

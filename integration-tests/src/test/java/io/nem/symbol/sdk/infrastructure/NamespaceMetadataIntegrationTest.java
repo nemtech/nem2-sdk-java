@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.MetadataSearchCriteria;
@@ -38,93 +37,124 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-/**
- * Integration tests around account metadata.
- */
+/** Integration tests around account metadata. */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
 
-    private Account testAccount;
+  private Account testAccount;
 
-    @BeforeEach
-    void setup() {
-        testAccount = config().getDefaultAccount();
-    }
+  @BeforeEach
+  void setup() {
+    testAccount = config().getDefaultAccount();
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    public void addMetadataToNamespace(RepositoryType type) {
-        String namespaceName =
-            "namespace-for-metadata-integration-test-" + Double.valueOf(Math.floor(Math.random() * 10000)).intValue();
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  public void addMetadataToNamespace(RepositoryType type) {
+    String namespaceName =
+        "namespace-for-metadata-integration-test-"
+            + Double.valueOf(Math.floor(Math.random() * 10000)).intValue();
 
-        NamespaceId targetNamespaceId = createRootNamespace(type, testAccount, namespaceName);
+    NamespaceId targetNamespaceId = createRootNamespace(type, testAccount, namespaceName);
 
-        System.out.println("Setting metadata " + targetNamespaceId.getIdAsHex());
+    System.out.println("Setting metadata " + targetNamespaceId.getIdAsHex());
 
-        String message = "This is the message in the Namespace!";
-        BigInteger key = BigInteger.TEN;
-        Address targetAddress = testAccount.getAddress();
+    String message = "This is the message in the Namespace!";
+    BigInteger key = BigInteger.TEN;
+    Address targetAddress = testAccount.getAddress();
 
-        MetadataTransactionService metadataTransactionService = new MetadataTransactionServiceImpl(
-            getRepositoryFactory(type));
+    MetadataTransactionService metadataTransactionService =
+        new MetadataTransactionServiceImpl(getRepositoryFactory(type));
 
-        Observable<NamespaceMetadataTransactionFactory> namespaceMetadataTransactionFactory = metadataTransactionService
-            .createNamespaceMetadataTransactionFactory(targetAddress, key, message, targetAddress, targetNamespaceId);
+    Observable<NamespaceMetadataTransactionFactory> namespaceMetadataTransactionFactory =
+        metadataTransactionService.createNamespaceMetadataTransactionFactory(
+            targetAddress, key, message, targetAddress, targetNamespaceId);
 
-        NamespaceMetadataTransaction transaction = get(namespaceMetadataTransactionFactory).build();
-        AggregateTransaction aggregateTransaction = AggregateTransactionFactory.createComplete(getNetworkType(),
-            Collections.singletonList(transaction.toAggregate(testAccount.getPublicAccount()))).maxFee(this.maxFee)
+    NamespaceMetadataTransaction transaction = get(namespaceMetadataTransactionFactory).build();
+    AggregateTransaction aggregateTransaction =
+        AggregateTransactionFactory.createComplete(
+                getNetworkType(),
+                Collections.singletonList(transaction.toAggregate(testAccount.getPublicAccount())))
+            .maxFee(this.maxFee)
             .build();
 
-        AggregateTransaction announceCorrectly = announceAndValidate(type, testAccount, aggregateTransaction);
+    AggregateTransaction announceCorrectly =
+        announceAndValidate(type, testAccount, aggregateTransaction);
 
-        Assertions.assertEquals(testAccount.getPublicAccount(), announceCorrectly.getSigner().get());
-        Assertions.assertEquals(1, announceCorrectly.getInnerTransactions().size());
-        Assertions.assertEquals(transaction.getType(), announceCorrectly.getInnerTransactions().get(0).getType());
-        NamespaceMetadataTransaction processedTransaction = (NamespaceMetadataTransaction) announceCorrectly
-            .getInnerTransactions().get(0);
+    Assertions.assertEquals(testAccount.getPublicAccount(), announceCorrectly.getSigner().get());
+    Assertions.assertEquals(1, announceCorrectly.getInnerTransactions().size());
+    Assertions.assertEquals(
+        transaction.getType(), announceCorrectly.getInnerTransactions().get(0).getType());
+    NamespaceMetadataTransaction processedTransaction =
+        (NamespaceMetadataTransaction) announceCorrectly.getInnerTransactions().get(0);
 
-        //TODO problem comparing namespaces, sometime they are negative big integers
-        Assertions.assertEquals(transaction.getTargetNamespaceId().getIdAsHex(),
-            processedTransaction.getTargetNamespaceId().getIdAsHex());
-        Assertions.assertEquals(transaction.getValueSizeDelta(), processedTransaction.getValueSizeDelta());
+    // TODO problem comparing namespaces, sometime they are negative big integers
+    Assertions.assertEquals(
+        transaction.getTargetNamespaceId().getIdAsHex(),
+        processedTransaction.getTargetNamespaceId().getIdAsHex());
+    Assertions.assertEquals(
+        transaction.getValueSizeDelta(), processedTransaction.getValueSizeDelta());
 
-        Assertions.assertEquals(transaction.getScopedMetadataKey(), processedTransaction.getScopedMetadataKey());
+    Assertions.assertEquals(
+        transaction.getScopedMetadataKey(), processedTransaction.getScopedMetadataKey());
 
-        System.out.println("Metadata '" + message + "' stored!");
+    System.out.println("Metadata '" + message + "' stored!");
 
-        sleep(3000);
-        List<Metadata> metadata = get(getRepositoryFactory(type).createMetadataRepository()
-            .search(new MetadataSearchCriteria().targetId(targetNamespaceId).metadataType(MetadataType.NAMESPACE)))
+    sleep(3000);
+    List<Metadata> metadata =
+        get(getRepositoryFactory(type)
+                .createMetadataRepository()
+                .search(
+                    new MetadataSearchCriteria()
+                        .targetId(targetNamespaceId)
+                        .metadataType(MetadataType.NAMESPACE)))
             .getData();
 
-        assertMetadata(transaction, metadata);
+    assertMetadata(transaction, metadata);
 
-        assertMetadata(transaction, get(getRepositoryFactory(type).createMetadataRepository().search(
-            new MetadataSearchCriteria().targetId(targetNamespaceId).metadataType(MetadataType.NAMESPACE)
-                .scopedMetadataKey(key))).getData());
+    assertMetadata(
+        transaction,
+        get(getRepositoryFactory(type)
+                .createMetadataRepository()
+                .search(
+                    new MetadataSearchCriteria()
+                        .targetId(targetNamespaceId)
+                        .metadataType(MetadataType.NAMESPACE)
+                        .scopedMetadataKey(key)))
+            .getData());
 
-        assertMetadata(transaction, get(getRepositoryFactory(type).createMetadataRepository().search(
-            new MetadataSearchCriteria().targetId(targetNamespaceId).metadataType(MetadataType.NAMESPACE)
-                .targetAddress(targetAddress).scopedMetadataKey(key))).getData());
+    assertMetadata(
+        transaction,
+        get(getRepositoryFactory(type)
+                .createMetadataRepository()
+                .search(
+                    new MetadataSearchCriteria()
+                        .targetId(targetNamespaceId)
+                        .metadataType(MetadataType.NAMESPACE)
+                        .targetAddress(targetAddress)
+                        .scopedMetadataKey(key)))
+            .getData());
 
-        Assertions.assertEquals(message, processedTransaction.getValue());
+    Assertions.assertEquals(message, processedTransaction.getValue());
+  }
 
-    }
+  private String assertMetadata(NamespaceMetadataTransaction transaction, List<Metadata> metadata) {
 
-    private String assertMetadata(NamespaceMetadataTransaction transaction, List<Metadata> metadata) {
+    Optional<Metadata> endpointMetadata =
+        metadata.stream()
+            .filter(
+                m ->
+                    m.getScopedMetadataKey().equals(transaction.getScopedMetadataKey())
+                        && m.getMetadataType().equals(MetadataType.NAMESPACE)
+                        && m.getTargetAddress().equals(testAccount.getAddress()))
+            .findFirst();
 
-        Optional<Metadata> endpointMetadata = metadata.stream().filter(
-            m -> m.getScopedMetadataKey().equals(transaction.getScopedMetadataKey()) && m.getMetadataType()
-                .equals(MetadataType.NAMESPACE) && m.getTargetAddress().equals(testAccount.getAddress())).findFirst();
+    Assertions.assertTrue(endpointMetadata.isPresent());
 
-        Assertions.assertTrue(endpointMetadata.isPresent());
-
-        Assertions.assertEquals(transaction.getTargetNamespaceId(), endpointMetadata.get().getTargetId().get());
-        Assertions.assertNotNull(endpointMetadata.get().getCompositeHash());
-        Assertions.assertEquals(transaction.getValue(), endpointMetadata.get().getValue());
-        return endpointMetadata.get().getCompositeHash();
-    }
-
-
+    Assertions.assertEquals(
+        transaction.getTargetNamespaceId(), endpointMetadata.get().getTargetId().get());
+    Assertions.assertNotNull(endpointMetadata.get().getCompositeHash());
+    Assertions.assertEquals(transaction.getValue(), endpointMetadata.get().getValue());
+    return endpointMetadata.get().getCompositeHash();
+  }
 }

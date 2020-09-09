@@ -13,22 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.message;
-
-/**
- * Special message prefix for symbol.
- */
+/** Special message prefix for symbol. */
 public class MessageMarker {
 
-    /**
-     * private constructor.
-     */
-    private MessageMarker(){
+  /** private constructor. */
+  private MessageMarker() {}
 
-    }
-    /**
-     * 8-byte marker: E201735761802AFE for PersistentDelegationRequestTransaction message
-     */
-    public static final String PERSISTENT_DELEGATION_UNLOCK = "E201735761802AFE";
+  /** 8-byte marker: E201735761802AFE for PersistentDelegationRequestTransaction message */
+  public static final String PERSISTENT_DELEGATION_UNLOCK = "E201735761802AFE";
 }

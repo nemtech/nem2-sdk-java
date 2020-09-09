@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto.ed25519;
 
 import io.nem.symbol.core.crypto.CryptoEngines;
@@ -24,30 +23,26 @@ import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.core.crypto.ed25519.arithmetic.Ed25519EncodedFieldElement;
 import io.nem.symbol.core.crypto.ed25519.arithmetic.Ed25519Group;
 import io.nem.symbol.core.crypto.ed25519.arithmetic.Ed25519GroupElement;
-import io.nem.symbol.sdk.infrastructure.RandomUtils;
 
-/**
- * Implementation of the key generator for Ed25519.
- */
+/** Implementation of the key generator for Ed25519. */
 public class Ed25519KeyGenerator implements KeyGenerator {
 
+  @Override
+  public KeyPair generateKeyPair() {
+    // seed is the private key.
+    final PrivateKey privateKey = PrivateKey.generateRandom();
+    return KeyPair.fromPrivate(privateKey, CryptoEngines.ed25519Engine());
+  }
 
-    @Override
-    public KeyPair generateKeyPair() {
-        // seed is the private key.
-        final PrivateKey privateKey = PrivateKey.generateRandom();
-        return KeyPair.fromPrivate(privateKey, CryptoEngines.ed25519Engine());
-    }
+  @Override
+  public PublicKey derivePublicKey(final PrivateKey privateKey) {
+    final Ed25519EncodedFieldElement a = Ed25519Utils.prepareForScalarMultiply(privateKey);
 
-    @Override
-    public PublicKey derivePublicKey(final PrivateKey privateKey) {
-        final Ed25519EncodedFieldElement a = Ed25519Utils.prepareForScalarMultiply(privateKey);
+    // a * base point is the public key.
+    final Ed25519GroupElement pubKey = Ed25519Group.BASE_POINT.scalarMultiply(a);
 
-        // a * base point is the public key.
-        final Ed25519GroupElement pubKey = Ed25519Group.BASE_POINT.scalarMultiply(a);
-
-        // verification of signatures will be about twice as fast when pre-calculating
-        // a suitable table of group elements.
-        return new PublicKey(pubKey.encode().getRaw());
-    }
+    // verification of signatures will be about twice as fast when pre-calculating
+    // a suitable table of group elements.
+    return new PublicKey(pubKey.encode().getRaw());
+  }
 }

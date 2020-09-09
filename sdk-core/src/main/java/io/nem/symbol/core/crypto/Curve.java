@@ -13,34 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto;
 
 import java.math.BigInteger;
 
-/**
- * Interface for getting information for a curve.
- */
+/** Interface for getting information for a curve. */
 public interface Curve {
 
-    /**
-     * Gets the name of the curve.
-     *
-     * @return The name of the curve.
-     */
-    String getName();
+  /**
+   * Gets the name of the curve.
+   *
+   * @return The name of the curve.
+   */
+  String getName();
 
-    /**
-     * Gets the group order.
-     *
-     * @return The group order.
-     */
-    BigInteger getGroupOrder();
+  /**
+   * Gets the group order.
+   *
+   * @return The group order.
+   */
+  BigInteger getGroupOrder();
 
-    /**
-     * Gets the group order / 2.
-     *
-     * @return The group order / 2.
-     */
-    BigInteger getHalfGroupOrder();
+  /**
+   * Gets the group order / 2.
+   *
+   * @return The group order / 2.
+   */
+  BigInteger getHalfGroupOrder();
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import com.google.gson.Gson;
@@ -47,121 +46,119 @@ import org.apache.commons.io.IOUtils;
  *
  * @author Fernando Boucquez
  */
-
 public class RepositoryFactoryOkHttpImpl extends RepositoryFactoryBase {
 
+  private final ApiClient apiClient;
 
-    private final ApiClient apiClient;
+  private final Gson gson = JsonHelperGson.creatGson(false);
 
-    private final Gson gson = JsonHelperGson.creatGson(false);
+  public RepositoryFactoryOkHttpImpl(String baseUrl) {
+    this(new RepositoryFactoryConfiguration(baseUrl));
+  }
 
-    public RepositoryFactoryOkHttpImpl(String baseUrl) {
-        this(new RepositoryFactoryConfiguration(baseUrl));
-    }
+  public RepositoryFactoryOkHttpImpl(RepositoryFactoryConfiguration configuration) {
+    super(configuration);
+    this.apiClient = new ApiClient();
+    this.apiClient.setBasePath(getBaseUrl());
+    this.apiClient.getJSON().setGson(gson);
+  }
 
-    public RepositoryFactoryOkHttpImpl(RepositoryFactoryConfiguration configuration) {
-        super(configuration);
-        this.apiClient = new ApiClient();
-        this.apiClient.setBasePath(getBaseUrl());
-        this.apiClient.getJSON().setGson(gson);
-    }
+  @Override
+  public AccountRepository createAccountRepository() {
+    return new AccountRepositoryOkHttpImpl(apiClient);
+  }
 
-    @Override
-    public AccountRepository createAccountRepository() {
-        return new AccountRepositoryOkHttpImpl(apiClient);
-    }
+  @Override
+  public MultisigRepository createMultisigRepository() {
+    return new MultisigRepositoryOkHttpImpl(apiClient, getNetworkType());
+  }
 
-    @Override
-    public MultisigRepository createMultisigRepository() {
-        return new MultisigRepositoryOkHttpImpl(apiClient, getNetworkType());
-    }
+  @Override
+  public BlockRepository createBlockRepository() {
+    return new BlockRepositoryOkHttpImpl(apiClient);
+  }
 
-    @Override
-    public BlockRepository createBlockRepository() {
-        return new BlockRepositoryOkHttpImpl(apiClient);
-    }
+  @Override
+  public ReceiptRepository createReceiptRepository() {
+    return new ReceiptRepositoryOkHttpImpl(apiClient);
+  }
 
-    @Override
-    public ReceiptRepository createReceiptRepository() {
-        return new ReceiptRepositoryOkHttpImpl(apiClient);
-    }
+  @Override
+  public ChainRepository createChainRepository() {
+    return new ChainRepositoryOkHttpImpl(apiClient);
+  }
 
-    @Override
-    public ChainRepository createChainRepository() {
-        return new ChainRepositoryOkHttpImpl(apiClient);
-    }
+  @Override
+  public MosaicRepository createMosaicRepository() {
+    return new MosaicRepositoryOkHttpImpl(apiClient, getNetworkType());
+  }
 
-    @Override
-    public MosaicRepository createMosaicRepository() {
-        return new MosaicRepositoryOkHttpImpl(apiClient, getNetworkType());
-    }
+  @Override
+  public NamespaceRepository createNamespaceRepository() {
+    return new NamespaceRepositoryOkHttpImpl(apiClient);
+  }
 
-    @Override
-    public NamespaceRepository createNamespaceRepository() {
-        return new NamespaceRepositoryOkHttpImpl(apiClient);
-    }
+  @Override
+  public NetworkRepository createNetworkRepository() {
+    return new NetworkRepositoryOkHttpImpl(apiClient);
+  }
 
-    @Override
-    public NetworkRepository createNetworkRepository() {
-        return new NetworkRepositoryOkHttpImpl(apiClient);
-    }
+  @Override
+  public NodeRepository createNodeRepository() {
+    return new NodeRepositoryOkHttpImpl(apiClient);
+  }
 
-    @Override
-    public NodeRepository createNodeRepository() {
-        return new NodeRepositoryOkHttpImpl(apiClient);
-    }
+  @Override
+  public TransactionRepository createTransactionRepository() {
+    return new TransactionRepositoryOkHttpImpl(apiClient);
+  }
 
-    @Override
-    public TransactionRepository createTransactionRepository() {
-        return new TransactionRepositoryOkHttpImpl(apiClient);
-    }
+  @Override
+  public TransactionStatusRepository createTransactionStatusRepository() {
+    return new TransactionStatusRepositoryOkHttpImpl(apiClient);
+  }
 
-    @Override
-    public TransactionStatusRepository createTransactionStatusRepository() {
-        return new TransactionStatusRepositoryOkHttpImpl(apiClient);
-    }
+  @Override
+  public MetadataRepository createMetadataRepository() {
+    return new MetadataRepositoryOkHttpImpl(apiClient);
+  }
 
+  @Override
+  public RestrictionAccountRepository createRestrictionAccountRepository() {
+    return new RestrictionAccountRepositoryOkHttpImpl(apiClient);
+  }
 
-    @Override
-    public MetadataRepository createMetadataRepository() {
-        return new MetadataRepositoryOkHttpImpl(apiClient);
-    }
+  @Override
+  public RestrictionMosaicRepository createRestrictionMosaicRepository() {
+    return new RestrictionMosaicRepositoryOkHttpImpl(apiClient);
+  }
 
-    @Override
-    public RestrictionAccountRepository createRestrictionAccountRepository() {
-        return new RestrictionAccountRepositoryOkHttpImpl(apiClient);
-    }
+  @Override
+  public HashLockRepository createHashLockRepository() {
+    return new HashLockRepositoryOkHttpImpl(apiClient);
+  }
 
-    @Override
-    public RestrictionMosaicRepository createRestrictionMosaicRepository() {
-        return new RestrictionMosaicRepositoryOkHttpImpl(apiClient);
-    }
+  @Override
+  public SecretLockRepository createSecretLockRepository() {
+    return new SecretLockRepositoryOkHttpImpl(apiClient);
+  }
 
-    @Override
-    public HashLockRepository createHashLockRepository() {
-        return new HashLockRepositoryOkHttpImpl(apiClient);
-    }
+  @Override
+  public Listener createListener() {
+    return new ListenerOkHttp(
+        apiClient.getHttpClient(), getBaseUrl(), gson, createNamespaceRepository());
+  }
 
-    @Override
-    public SecretLockRepository createSecretLockRepository() {
-        return new SecretLockRepositoryOkHttpImpl(apiClient);
-    }
+  @Override
+  public JsonSerialization createJsonSerialization() {
+    return new JsonSerializationOkHttp(apiClient.getJSON().getGson());
+  }
 
-    @Override
-    public Listener createListener() {
-        return new ListenerOkHttp(apiClient.getHttpClient(), getBaseUrl(), gson, createNamespaceRepository());
-    }
-
-    @Override
-    public JsonSerialization createJsonSerialization() {
-        return new JsonSerializationOkHttp(apiClient.getJSON().getGson());
-    }
-
-    @Override
-    public void close() {
-        OkHttpClient client = apiClient.getHttpClient();
-        client.dispatcher().executorService().shutdown();
-        client.connectionPool().evictAll();
-        IOUtils.closeQuietly(client.cache());
-    }
+  @Override
+  public void close() {
+    OkHttpClient client = apiClient.getHttpClient();
+    client.dispatcher().executorService().shutdown();
+    client.connectionPool().evictAll();
+    IOUtils.closeQuietly(client.cache());
+  }
 }

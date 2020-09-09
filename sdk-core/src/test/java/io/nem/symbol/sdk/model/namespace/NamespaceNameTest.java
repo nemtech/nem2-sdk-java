@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.namespace;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,24 +23,24 @@ import org.junit.jupiter.api.Test;
 
 class NamespaceNameTest {
 
-    @Test
-    void createANamespaceName() {
-        NamespaceId namespaceId = NamespaceId.createFromId(new BigInteger("-8884663987180930485"));
-        NamespaceName namespaceName = new NamespaceName(namespaceId, "nem");
+  @Test
+  void createANamespaceName() {
+    NamespaceId namespaceId = NamespaceId.createFromId(new BigInteger("-8884663987180930485"));
+    NamespaceName namespaceName = new NamespaceName(namespaceId, "nem");
 
-        assertEquals(namespaceId, namespaceName.getNamespaceId());
-        assertEquals("nem", namespaceName.getName());
-        assertFalse(namespaceName.getParentId().isPresent());
-    }
+    assertEquals(namespaceId, namespaceName.getNamespaceId());
+    assertEquals("nem", namespaceName.getName());
+    assertFalse(namespaceName.getParentId().isPresent());
+  }
 
-    @Test
-    void createANamespaceNameWithParentId() {
-        NamespaceId namespaceId = NamespaceId.createFromId(new BigInteger("-8884663987180930485"));
-        NamespaceId parentId = NamespaceId.createFromId(new BigInteger("-3087871471161192663"));
-        NamespaceName namespaceName = new NamespaceName(namespaceId, "nem", parentId);
+  @Test
+  void createANamespaceNameWithParentId() {
+    NamespaceId namespaceId = NamespaceId.createFromId(new BigInteger("-8884663987180930485"));
+    NamespaceId parentId = NamespaceId.createFromId(new BigInteger("-3087871471161192663"));
+    NamespaceName namespaceName = new NamespaceName(namespaceId, "nem", parentId);
 
-        assertEquals(namespaceId, namespaceName.getNamespaceId());
-        assertEquals("nem", namespaceName.getName());
-        assertEquals(parentId, namespaceName.getParentId().get());
-    }
+    assertEquals(namespaceId, namespaceName.getNamespaceId());
+    assertEquals("nem", namespaceName.getName());
+    assertEquals(parentId, namespaceName.getParentId().get());
+  }
 }

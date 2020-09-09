@@ -13,26 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto;
-
-/**
- * Interface for generating keys.
- */
+/** Interface for generating keys. */
 public interface KeyGenerator {
 
-    /**
-     * Creates a random key pair.
-     *
-     * @return The key pair.
-     */
-    KeyPair generateKeyPair();
+  /**
+   * Creates a random key pair.
+   *
+   * @return The key pair.
+   */
+  KeyPair generateKeyPair();
 
-    /**
-     * Derives a public key from a private key.
-     *
-     * @param privateKey the private key.
-     * @return The public key.
-     */
-    PublicKey derivePublicKey(final PrivateKey privateKey);
+  /**
+   * Derives a public key from a private key.
+   *
+   * @param privateKey the private key.
+   * @return The public key.
+   */
+  PublicKey derivePublicKey(final PrivateKey privateKey);
 }

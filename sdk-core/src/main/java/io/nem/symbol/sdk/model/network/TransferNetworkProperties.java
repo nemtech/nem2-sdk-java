@@ -13,28 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
-
 package io.nem.symbol.sdk.model.network;
-
-/**
- * TransferNetworkPropertiesDTO
- */
+/** TransferNetworkPropertiesDTO */
 public class TransferNetworkProperties {
 
-    /**
-     * Maximum transaction message size.
-     **/
-    private final String maxMessageSize;
+  /** Maximum transaction message size. */
+  private final String maxMessageSize;
 
-    public TransferNetworkProperties(String maxMessageSize) {
-        this.maxMessageSize = maxMessageSize;
-    }
+  public TransferNetworkProperties(String maxMessageSize) {
+    this.maxMessageSize = maxMessageSize;
+  }
 
-    public String getMaxMessageSize() {
-        return maxMessageSize;
-    }
+  public String getMaxMessageSize() {
+    return maxMessageSize;
+  }
 }
-

@@ -13,21 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto.ed25519;
 
 import io.nem.symbol.core.crypto.Key;
 import io.nem.symbol.core.crypto.KeyAnalyzer;
 
-/**
- * Implementation of the key analyzer for Ed25519.
- */
+/** Implementation of the key analyzer for Ed25519. */
 public class Ed25519KeyAnalyzer implements KeyAnalyzer {
 
-    private static final int COMPRESSED_KEY_SIZE = 32;
+  private static final int COMPRESSED_KEY_SIZE = 32;
 
-    @Override
-    public boolean isKeyCompressed(final Key publicKey) {
-        return COMPRESSED_KEY_SIZE == publicKey.getBytes().length;
-    }
+  @Override
+  public boolean isKeyCompressed(final Key publicKey) {
+    return COMPRESSED_KEY_SIZE == publicKey.getBytes().length;
+  }
 }

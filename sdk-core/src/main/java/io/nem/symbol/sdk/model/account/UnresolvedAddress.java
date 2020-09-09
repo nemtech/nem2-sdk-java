@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import io.nem.symbol.sdk.infrastructure.SerializationUtils;
@@ -26,11 +25,10 @@ import io.nem.symbol.sdk.model.network.NetworkType;
  */
 public interface UnresolvedAddress {
 
-    /**
-     * @param networkType the network type.
-     * @return the encoded address or namespace id. Note that namespace id get the hex reversed and
-     * zero padded. See {@link SerializationUtils}
-     */
-    String encoded(NetworkType networkType);
-
+  /**
+   * @param networkType the network type.
+   * @return the encoded address or namespace id. Note that namespace id get the hex reversed and
+   *     zero padded. See {@link SerializationUtils}
+   */
+  String encoded(NetworkType networkType);
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
 import static io.nem.symbol.core.utils.MapperUtils.getIdAsHex;
@@ -30,34 +29,28 @@ import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AliasActionEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicAliasTransactionDTO;
 
-/**
- * Mosaic alias transaction mapper.
- */
-class MosaicAliasTransactionMapper extends
-    AbstractTransactionMapper<MosaicAliasTransactionDTO, MosaicAliasTransaction> {
+/** Mosaic alias transaction mapper. */
+class MosaicAliasTransactionMapper
+    extends AbstractTransactionMapper<MosaicAliasTransactionDTO, MosaicAliasTransaction> {
 
-    public MosaicAliasTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.MOSAIC_ALIAS, MosaicAliasTransactionDTO.class);
-    }
+  public MosaicAliasTransactionMapper(JsonHelper jsonHelper) {
+    super(jsonHelper, TransactionType.MOSAIC_ALIAS, MosaicAliasTransactionDTO.class);
+  }
 
-    @Override
-    protected TransactionFactory<MosaicAliasTransaction> createFactory(NetworkType networkType,
-        MosaicAliasTransactionDTO transaction) {
-        NamespaceId namespaceId = MapperUtils.toNamespaceId(transaction.getNamespaceId());
-        AliasAction aliasAction = AliasAction
-            .rawValueOf(transaction.getAliasAction().getValue().byteValue());
-        return MosaicAliasTransactionFactory.create(
-            networkType,
-            aliasAction,
-            namespaceId,
-            MapperUtils.toMosaicId(transaction.getMosaicId()));
-    }
+  @Override
+  protected TransactionFactory<MosaicAliasTransaction> createFactory(
+      NetworkType networkType, MosaicAliasTransactionDTO transaction) {
+    NamespaceId namespaceId = MapperUtils.toNamespaceId(transaction.getNamespaceId());
+    AliasAction aliasAction =
+        AliasAction.rawValueOf(transaction.getAliasAction().getValue().byteValue());
+    return MosaicAliasTransactionFactory.create(
+        networkType, aliasAction, namespaceId, MapperUtils.toMosaicId(transaction.getMosaicId()));
+  }
 
-    @Override
-    protected void copyToDto(MosaicAliasTransaction transaction, MosaicAliasTransactionDTO dto) {
-        dto.setAliasAction(
-            AliasActionEnum.fromValue((int) transaction.getAliasAction().getValue()));
-        dto.setNamespaceId(getIdAsHex(transaction.getNamespaceId()));
-        dto.setMosaicId(getIdAsHex(transaction.getMosaicId()));
-    }
+  @Override
+  protected void copyToDto(MosaicAliasTransaction transaction, MosaicAliasTransactionDTO dto) {
+    dto.setAliasAction(AliasActionEnum.fromValue((int) transaction.getAliasAction().getValue()));
+    dto.setNamespaceId(getIdAsHex(transaction.getNamespaceId()));
+    dto.setMosaicId(getIdAsHex(transaction.getMosaicId()));
+  }
 }

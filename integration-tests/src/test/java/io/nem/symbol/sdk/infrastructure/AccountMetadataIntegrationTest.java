@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.MetadataSearchCriteria;
@@ -31,66 +30,100 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-/**
- * Integration tests around account metadata.
- */
+/** Integration tests around account metadata. */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AccountMetadataIntegrationTest extends BaseIntegrationTest {
 
-    private Account testAccount;
+  private Account testAccount;
 
-    @BeforeEach
-    void setup() {
-        testAccount = config().getDefaultAccount();
-    }
+  @BeforeEach
+  void setup() {
+    testAccount = config().getDefaultAccount();
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    public void addMetadataToAccount(RepositoryType type) {
-        BigInteger key = SerializationUtils
-            .toUnsignedBigInteger(RandomUtils.generateRandomInt(100000) + Long.MAX_VALUE);
-        Assertions.assertTrue(key.compareTo(BigInteger.ZERO) > 0);
-        System.out.println("Key: " + key);
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  public void addMetadataToAccount(RepositoryType type) {
+    BigInteger key =
+        SerializationUtils.toUnsignedBigInteger(
+            RandomUtils.generateRandomInt(100000) + Long.MAX_VALUE);
+    Assertions.assertTrue(key.compareTo(BigInteger.ZERO) > 0);
+    System.out.println("Key: " + key);
 
-        String message = "This is the message for this account! 汉字" + key;
-        System.out.println("Storing message '" + message + "' in account metadata " + testAccount.getAddress().plain());
+    String message = "This is the message for this account! 汉字" + key;
+    System.out.println(
+        "Storing message '"
+            + message
+            + "' in account metadata "
+            + testAccount.getAddress().plain());
 
-        AccountMetadataTransaction transaction = AccountMetadataTransactionFactory
-            .create(getNetworkType(), testAccount.getAddress(), key, message).maxFee(this.maxFee).build();
+    AccountMetadataTransaction transaction =
+        AccountMetadataTransactionFactory.create(
+                getNetworkType(), testAccount.getAddress(), key, message)
+            .maxFee(this.maxFee)
+            .build();
 
-        AccountMetadataTransaction processedTransaction = announceAggregateAndValidate(type, transaction, testAccount)
-            .getLeft();
+    AccountMetadataTransaction processedTransaction =
+        announceAggregateAndValidate(type, transaction, testAccount).getLeft();
 
-        Assertions.assertEquals(transaction.getValueSizeDelta(), processedTransaction.getValueSizeDelta());
+    Assertions.assertEquals(
+        transaction.getValueSizeDelta(), processedTransaction.getValueSizeDelta());
 
-        Assertions.assertEquals(transaction.getScopedMetadataKey(), processedTransaction.getScopedMetadataKey());
+    Assertions.assertEquals(
+        transaction.getScopedMetadataKey(), processedTransaction.getScopedMetadataKey());
 
-        sleep(1000);
+    sleep(1000);
 
-        Metadata metadata = assertMetadata(transaction, get(getRepositoryFactory(type).createMetadataRepository()
-            .search(new MetadataSearchCriteria().metadataType(MetadataType.ACCOUNT)
-                .sourceAddress(testAccount.getAddress()))).getData());
+    Metadata metadata =
+        assertMetadata(
+            transaction,
+            get(getRepositoryFactory(type)
+                    .createMetadataRepository()
+                    .search(
+                        new MetadataSearchCriteria()
+                            .metadataType(MetadataType.ACCOUNT)
+                            .sourceAddress(testAccount.getAddress())))
+                .getData());
 
-        assertMetadata(transaction, get(getRepositoryFactory(type).createMetadataRepository().search(
-            new MetadataSearchCriteria().metadataType(MetadataType.ACCOUNT).sourceAddress(testAccount.getAddress())
-                .scopedMetadataKey(metadata.getScopedMetadataKey()))).getData());
-
-        assertMetadata(transaction, get(getRepositoryFactory(type).createMetadataRepository().search(
-            new MetadataSearchCriteria().metadataType(MetadataType.ACCOUNT).sourceAddress(testAccount.getAddress())
-                .targetAddress(testAccount.getAddress()).scopedMetadataKey(metadata.getScopedMetadataKey())))
+    assertMetadata(
+        transaction,
+        get(getRepositoryFactory(type)
+                .createMetadataRepository()
+                .search(
+                    new MetadataSearchCriteria()
+                        .metadataType(MetadataType.ACCOUNT)
+                        .sourceAddress(testAccount.getAddress())
+                        .scopedMetadataKey(metadata.getScopedMetadataKey())))
             .getData());
 
-        Assertions.assertEquals(message, processedTransaction.getValue());
-    }
+    assertMetadata(
+        transaction,
+        get(getRepositoryFactory(type)
+                .createMetadataRepository()
+                .search(
+                    new MetadataSearchCriteria()
+                        .metadataType(MetadataType.ACCOUNT)
+                        .sourceAddress(testAccount.getAddress())
+                        .targetAddress(testAccount.getAddress())
+                        .scopedMetadataKey(metadata.getScopedMetadataKey())))
+            .getData());
 
-    private Metadata assertMetadata(AccountMetadataTransaction transaction, List<Metadata> metadata) {
+    Assertions.assertEquals(message, processedTransaction.getValue());
+  }
 
-        Optional<Metadata> endpointMetadata = metadata.stream().filter(
-            m -> m.getScopedMetadataKey().equals(transaction.getScopedMetadataKey()) && m.getMetadataType()
-                .equals(MetadataType.ACCOUNT) && m.getTargetAddress().equals(testAccount.getAddress())).findFirst();
+  private Metadata assertMetadata(AccountMetadataTransaction transaction, List<Metadata> metadata) {
 
-        Assertions.assertTrue(endpointMetadata.isPresent());
-        Assertions.assertEquals(transaction.getValue(), endpointMetadata.get().getValue());
-        return endpointMetadata.get();
-    }
+    Optional<Metadata> endpointMetadata =
+        metadata.stream()
+            .filter(
+                m ->
+                    m.getScopedMetadataKey().equals(transaction.getScopedMetadataKey())
+                        && m.getMetadataType().equals(MetadataType.ACCOUNT)
+                        && m.getTargetAddress().equals(testAccount.getAddress()))
+            .findFirst();
+
+    Assertions.assertTrue(endpointMetadata.isPresent());
+    Assertions.assertEquals(transaction.getValue(), endpointMetadata.get().getValue());
+    return endpointMetadata.get();
+  }
 }

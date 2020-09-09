@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
@@ -28,32 +27,31 @@ import java.math.BigInteger;
  */
 public interface BlockRepository extends Searcher<BlockInfo, BlockSearchCriteria> {
 
-    /**
-     * Gets a BlockInfo for a given block height.
-     *
-     * @param height BigInteger
-     * @return Observable of {@link BlockInfo}
-     */
-    Observable<BlockInfo> getBlockByHeight(BigInteger height);
+  /**
+   * Gets a BlockInfo for a given block height.
+   *
+   * @param height BigInteger
+   * @return Observable of {@link BlockInfo}
+   */
+  Observable<BlockInfo> getBlockByHeight(BigInteger height);
 
-    /**
-     * Get the merkle path for a given a transaction and block Returns the merkle path for a
-     * [transaction](https://nemtech.github.io/concepts/transaction.html) included in a block. The path is the
-     * complementary data needed to calculate the merkle root. A client can compare if the calculated root equals the
-     * one recorded in the block header, verifying that the transaction was included in the block.
-     *
-     * @param height the height.
-     * @param hash the expected hash.
-     * @return {@link Observable} of MerkleProofInfo
-     */
-    Observable<MerkleProofInfo> getMerkleTransaction(BigInteger height, String hash);
+  /**
+   * Get the merkle path for a given a transaction and block Returns the merkle path for a
+   * [transaction](https://nemtech.github.io/concepts/transaction.html) included in a block. The
+   * path is the complementary data needed to calculate the merkle root. A client can compare if the
+   * calculated root equals the one recorded in the block header, verifying that the transaction was
+   * included in the block.
+   *
+   * @param height the height.
+   * @param hash the expected hash.
+   * @return {@link Observable} of MerkleProofInfo
+   */
+  Observable<MerkleProofInfo> getMerkleTransaction(BigInteger height, String hash);
 
-    /**
-     * @param height the height
-     * @param hash the hash.
-     * @return {@link Observable} of MerkleProofInfo
-     */
-    Observable<MerkleProofInfo> getMerkleReceipts(BigInteger height, String hash);
-
-
+  /**
+   * @param height the height
+   * @param hash the hash.
+   * @return {@link Observable} of MerkleProofInfo
+   */
+  Observable<MerkleProofInfo> getMerkleReceipts(BigInteger height, String hash);
 }

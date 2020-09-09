@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.Account;
@@ -28,44 +27,55 @@ import org.junit.jupiter.api.Test;
 
 public class AccountMosaicRestrictionTransactionTest extends AbstractTransactionTester {
 
-    static Account account =
-        new Account(
-            "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
-            NetworkType.MIJIN_TEST);
+  static Account account =
+      new Account(
+          "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
+          NetworkType.MIJIN_TEST);
 
-    static UnresolvedMosaicId mosaicId = new MosaicId(BigInteger.valueOf(1000));
+  static UnresolvedMosaicId mosaicId = new MosaicId(BigInteger.valueOf(1000));
 
-    static UnresolvedMosaicId mosaicId2 = new MosaicId(BigInteger.valueOf(2000));
+  static UnresolvedMosaicId mosaicId2 = new MosaicId(BigInteger.valueOf(2000));
 
+  @Test
+  void create() {
+    List<UnresolvedMosaicId> additions = Collections.singletonList(mosaicId);
+    List<UnresolvedMosaicId> deletions = Collections.singletonList(mosaicId2);
 
-    @Test
-    void create() {
-        List<UnresolvedMosaicId> additions = Collections.singletonList(mosaicId);
-        List<UnresolvedMosaicId> deletions = Collections.singletonList(mosaicId2);
+    AccountMosaicRestrictionTransaction transaction =
+        AccountMosaicRestrictionTransactionFactory.create(
+                NetworkType.MIJIN_TEST,
+                AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC,
+                additions,
+                deletions)
+            .deadline(new FakeDeadline())
+            .build();
+    Assertions.assertEquals(
+        AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC, transaction.getRestrictionFlags());
+    Assertions.assertEquals(additions, transaction.getRestrictionAdditions());
+    Assertions.assertEquals(deletions, transaction.getRestrictionDeletions());
+  }
 
-        AccountMosaicRestrictionTransaction transaction =
-            AccountMosaicRestrictionTransactionFactory.create(NetworkType.MIJIN_TEST,
-                AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC, additions, deletions).deadline(new FakeDeadline()).build();
-        Assertions.assertEquals(AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC, transaction.getRestrictionFlags());
-        Assertions.assertEquals(additions, transaction.getRestrictionAdditions());
-        Assertions.assertEquals(deletions, transaction.getRestrictionDeletions());
-    }
+  @Test
+  void shouldGenerateBytes() {
 
-    @Test
-    void shouldGenerateBytes() {
+    List<UnresolvedMosaicId> additions = Collections.singletonList(mosaicId);
+    List<UnresolvedMosaicId> deletions = Collections.singletonList(mosaicId2);
+    AccountMosaicRestrictionTransaction transaction =
+        AccountMosaicRestrictionTransactionFactory.create(
+                NetworkType.MIJIN_TEST,
+                AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC,
+                additions,
+                deletions)
+            .deadline(new FakeDeadline())
+            .signer(account.getPublicAccount())
+            .build();
 
-        List<UnresolvedMosaicId> additions = Collections.singletonList(mosaicId);
-        List<UnresolvedMosaicId> deletions = Collections.singletonList(mosaicId2);
-        AccountMosaicRestrictionTransaction transaction =
-            AccountMosaicRestrictionTransactionFactory.create(NetworkType.MIJIN_TEST,
-                AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC, additions, deletions).deadline(new FakeDeadline())
-                .signer(account.getPublicAccount())
-                .build();
+    String expected =
+        "980000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001905042000000000000000001000000000000000200010100000000e803000000000000d007000000000000";
+    assertSerialization(expected, transaction);
 
-        String expected = "980000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001905042000000000000000001000000000000000200010100000000e803000000000000d007000000000000";
-        assertSerialization(expected, transaction);
-
-        String expectedEmbeddedHash = "4800000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e600000000019050420200010100000000e803000000000000d007000000000000";
-        assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
-    }
+    String expectedEmbeddedHash =
+        "4800000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e600000000019050420200010100000000e803000000000000d007000000000000";
+    assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
+  }
 }

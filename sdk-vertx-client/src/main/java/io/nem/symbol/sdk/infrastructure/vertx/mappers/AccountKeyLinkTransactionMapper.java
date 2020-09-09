@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
 import io.nem.symbol.core.crypto.PublicKey;
@@ -26,29 +25,26 @@ import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountKeyLinkTransactionDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.LinkActionEnum;
 
-/**
- * Account link transaction mapper.
- */
-class AccountKeyLinkTransactionMapper extends
-    AbstractTransactionMapper<AccountKeyLinkTransactionDTO, AccountKeyLinkTransaction> {
+/** Account link transaction mapper. */
+class AccountKeyLinkTransactionMapper
+    extends AbstractTransactionMapper<AccountKeyLinkTransactionDTO, AccountKeyLinkTransaction> {
 
-    public AccountKeyLinkTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.ACCOUNT_KEY_LINK, AccountKeyLinkTransactionDTO.class);
-    }
+  public AccountKeyLinkTransactionMapper(JsonHelper jsonHelper) {
+    super(jsonHelper, TransactionType.ACCOUNT_KEY_LINK, AccountKeyLinkTransactionDTO.class);
+  }
 
-    @Override
-    protected AccountKeyLinkTransactionFactory createFactory(NetworkType networkType,
-        AccountKeyLinkTransactionDTO dto) {
-        PublicKey linkedPublicKey = PublicKey.fromHexString(dto.getLinkedPublicKey());
-        return AccountKeyLinkTransactionFactory.create(networkType,
-            linkedPublicKey, LinkAction.rawValueOf(dto.getLinkAction().getValue()));
-    }
+  @Override
+  protected AccountKeyLinkTransactionFactory createFactory(
+      NetworkType networkType, AccountKeyLinkTransactionDTO dto) {
+    PublicKey linkedPublicKey = PublicKey.fromHexString(dto.getLinkedPublicKey());
+    return AccountKeyLinkTransactionFactory.create(
+        networkType, linkedPublicKey, LinkAction.rawValueOf(dto.getLinkAction().getValue()));
+  }
 
-    @Override
-    protected void copyToDto(AccountKeyLinkTransaction transaction,
-        AccountKeyLinkTransactionDTO dto) {
-        dto.setLinkedPublicKey(transaction.getLinkedPublicKey().toHex());
-        dto.setLinkAction(LinkActionEnum.fromValue((int) transaction.getLinkAction().getValue()));
-    }
-
+  @Override
+  protected void copyToDto(
+      AccountKeyLinkTransaction transaction, AccountKeyLinkTransactionDTO dto) {
+    dto.setLinkedPublicKey(transaction.getLinkedPublicKey().toHex());
+    dto.setLinkAction(LinkActionEnum.fromValue((int) transaction.getLinkAction().getValue()));
+  }
 }

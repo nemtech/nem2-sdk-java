@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
@@ -25,45 +24,40 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
-/**
- * Helper class for the okHttp tests.
- */
+/** Helper class for the okHttp tests. */
 public class TestHelperOkHttp {
 
-    private static final JsonHelper jsonHelper;
+  private static final JsonHelper jsonHelper;
 
-    static {
-        jsonHelper = new JsonHelperGson();
+  static {
+    jsonHelper = new JsonHelperGson();
+  }
+
+  private TestHelperOkHttp() {}
+
+  public static TransactionInfoDTO loadTransactionInfoDTO(String name) {
+    String resourceName = "transaction-" + name;
+    return loadResource(resourceName, TransactionInfoDTO.class);
+  }
+
+  public static <T> T loadTransactionInfoDTO(String name, Class<T> clazz) {
+    String resourceName = "transaction-" + name;
+    return loadResource(resourceName, clazz);
+  }
+
+  public static <T> T loadResource(String resourceName, Class<T> clazz) {
+    return jsonHelper.parse(loadResource(resourceName), clazz);
+  }
+
+  public static String loadResource(String resourceName) {
+
+    String resName = "../sdk-core/src/test/resources/json/" + resourceName;
+    File file = new File(resName);
+    try (InputStream resourceAsStream = new FileInputStream(file)) {
+      return IOUtils.toString(resourceAsStream, StandardCharsets.UTF_8);
+    } catch (Exception e) {
+      throw new IllegalStateException(
+          "Cannot open resource " + resourceName + ". Error: " + ExceptionUtils.getMessage(e), e);
     }
-
-    private TestHelperOkHttp() {
-    }
-
-
-    public static TransactionInfoDTO loadTransactionInfoDTO(String name) {
-        String resourceName = "transaction-" + name;
-        return loadResource(resourceName, TransactionInfoDTO.class);
-    }
-
-    public static <T> T loadTransactionInfoDTO(String name, Class<T> clazz) {
-        String resourceName = "transaction-" + name;
-        return loadResource(resourceName, clazz);
-    }
-
-    public static <T> T loadResource(String resourceName, Class<T> clazz) {
-        return jsonHelper.parse(loadResource(resourceName), clazz);
-    }
-
-    public static String loadResource(String resourceName) {
-
-        String resName = "../sdk-core/src/test/resources/json/" + resourceName;
-        File file = new File(resName);
-        try (InputStream resourceAsStream = new FileInputStream(file)) {
-            return IOUtils.toString(resourceAsStream, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new IllegalStateException(
-                "Cannot open resource " + resourceName + ". Error: " + ExceptionUtils.getMessage(e),
-                e);
-        }
-    }
+  }
 }

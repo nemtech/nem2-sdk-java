@@ -13,21 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
-
-/**
- * Announce an AccountMetadataTransaction to associate a key-value state to an account.
- */
+/** Announce an AccountMetadataTransaction to associate a key-value state to an account. */
 public class AccountMetadataTransaction extends MetadataTransaction {
 
-    /**
-     * Constructor
-     *
-     * @param factory the factory with the configured data.
-     */
-    AccountMetadataTransaction(AccountMetadataTransactionFactory factory) {
-        super(factory);
-    }
-
+  /**
+   * Constructor
+   *
+   * @param factory the factory with the configured data.
+   */
+  AccountMetadataTransaction(AccountMetadataTransactionFactory factory) {
+    super(factory);
+  }
 }

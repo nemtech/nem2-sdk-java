@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import java.util.Arrays;
@@ -27,56 +26,45 @@ import org.junit.jupiter.api.Test;
  */
 public class PropertyTypeTest {
 
+  @Test
+  public void rawValueOf() {
+    Assertions.assertEquals(PropertyType.BLOCK_MOSAIC, PropertyType.rawValueOf("0x82"));
+    Assertions.assertEquals(PropertyType.BLOCK_MOSAIC, PropertyType.rawValueOf("130"));
 
-    @Test
-    public void rawValueOf() {
-        Assertions
-            .assertEquals(PropertyType.BLOCK_MOSAIC, PropertyType.rawValueOf("0x82"));
-        Assertions
-            .assertEquals(PropertyType.BLOCK_MOSAIC, PropertyType.rawValueOf("130"));
+    Assertions.assertEquals(PropertyType.BLOCK_TRANSACTION, PropertyType.rawValueOf("0x84"));
 
-        Assertions
-            .assertEquals(PropertyType.BLOCK_TRANSACTION, PropertyType.rawValueOf("0x84"));
+    Assertions.assertEquals(PropertyType.BLOCK_TRANSACTION, PropertyType.rawValueOf("132"));
 
-        Assertions
-            .assertEquals(PropertyType.BLOCK_TRANSACTION, PropertyType.rawValueOf("132"));
+    Assertions.assertEquals(PropertyType.ALLOW_MOSAIC, PropertyType.rawValueOf("0x02"));
+    Assertions.assertEquals(PropertyType.ALLOW_MOSAIC, PropertyType.rawValueOf("2"));
+  }
 
-        Assertions.assertEquals(PropertyType.ALLOW_MOSAIC,
-            PropertyType.rawValueOf("0x02"));
-        Assertions
-            .assertEquals(PropertyType.ALLOW_MOSAIC, PropertyType.rawValueOf("2"));
+  @Test
+  public void rawValueOfAllVales() {
+    Arrays.stream(PropertyType.values())
+        .forEach(t -> Assertions.assertEquals(t, PropertyType.rawValueOf(t.getValue().toString())));
 
-    }
+    Arrays.stream(PropertyType.values())
+        .forEach(
+            t ->
+                Assertions.assertEquals(
+                    t, PropertyType.rawValueOf("0x" + Integer.toHexString(t.getValue()))));
+  }
 
+  @Test
+  void rawValueOfInvalidValueIncorrectNumber() {
+    IllegalArgumentException thrown =
+        Assertions.assertThrows(IllegalArgumentException.class, () -> PropertyType.rawValueOf("3"));
 
-    @Test
-    public void rawValueOfAllVales() {
-        Arrays.stream(PropertyType.values())
-            .forEach(t -> Assertions
-                .assertEquals(t, PropertyType.rawValueOf(t.getValue().toString())));
+    Assertions.assertEquals("3 is not a valid value", thrown.getMessage());
+  }
 
-        Arrays.stream(PropertyType.values())
-            .forEach(t -> Assertions
-                .assertEquals(t,
-                    PropertyType.rawValueOf("0x" + Integer.toHexString(t.getValue()))));
+  @Test
+  void rawValueOfInvalidValueNotANumber() {
+    IllegalArgumentException thrown =
+        Assertions.assertThrows(
+            IllegalArgumentException.class, () -> PropertyType.rawValueOf("IMNotANumber"));
 
-    }
-
-    @Test
-    void rawValueOfInvalidValueIncorrectNumber() {
-        IllegalArgumentException thrown =
-            Assertions.assertThrows(IllegalArgumentException.class,
-                () -> PropertyType.rawValueOf("3"));
-
-        Assertions.assertEquals("3 is not a valid value", thrown.getMessage());
-    }
-
-    @Test
-    void rawValueOfInvalidValueNotANumber() {
-        IllegalArgumentException thrown =
-            Assertions.assertThrows(IllegalArgumentException.class,
-                () -> PropertyType.rawValueOf("IMNotANumber"));
-
-        Assertions.assertEquals("IMNotANumber is not a valid value", thrown.getMessage());
-    }
+    Assertions.assertEquals("IMNotANumber is not a valid value", thrown.getMessage());
+  }
 }

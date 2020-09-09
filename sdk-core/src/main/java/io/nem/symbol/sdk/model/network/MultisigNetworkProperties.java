@@ -13,46 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package io.nem.symbol.sdk.model.network;
-
-/**
- * MultisigNetworkProperties
- */
+/** MultisigNetworkProperties */
 public class MultisigNetworkProperties {
 
-    /**
-     * Maximum number of multisig levels.
-     **/
-    private final String maxMultisigDepth;
+  /** Maximum number of multisig levels. */
+  private final String maxMultisigDepth;
 
-    /**
-     * Maximum number of cosignatories per account.
-     **/
-    private final String maxCosignatoriesPerAccount;
-    /**
-     * Maximum number of accounts a single account can cosign.
-     **/
-    private final String maxCosignedAccountsPerAccount;
+  /** Maximum number of cosignatories per account. */
+  private final String maxCosignatoriesPerAccount;
+  /** Maximum number of accounts a single account can cosign. */
+  private final String maxCosignedAccountsPerAccount;
 
-    public MultisigNetworkProperties(String maxMultisigDepth,
-        String maxCosignatoriesPerAccount, String maxCosignedAccountsPerAccount) {
-        this.maxMultisigDepth = maxMultisigDepth;
-        this.maxCosignatoriesPerAccount = maxCosignatoriesPerAccount;
-        this.maxCosignedAccountsPerAccount = maxCosignedAccountsPerAccount;
-    }
+  public MultisigNetworkProperties(
+      String maxMultisigDepth,
+      String maxCosignatoriesPerAccount,
+      String maxCosignedAccountsPerAccount) {
+    this.maxMultisigDepth = maxMultisigDepth;
+    this.maxCosignatoriesPerAccount = maxCosignatoriesPerAccount;
+    this.maxCosignedAccountsPerAccount = maxCosignedAccountsPerAccount;
+  }
 
-    public String getMaxMultisigDepth() {
-        return maxMultisigDepth;
-    }
+  public String getMaxMultisigDepth() {
+    return maxMultisigDepth;
+  }
 
-    public String getMaxCosignatoriesPerAccount() {
-        return maxCosignatoriesPerAccount;
-    }
+  public String getMaxCosignatoriesPerAccount() {
+    return maxCosignatoriesPerAccount;
+  }
 
-    public String getMaxCosignedAccountsPerAccount() {
-        return maxCosignedAccountsPerAccount;
-    }
+  public String getMaxCosignedAccountsPerAccount() {
+    return maxCosignedAccountsPerAccount;
+  }
 }
-

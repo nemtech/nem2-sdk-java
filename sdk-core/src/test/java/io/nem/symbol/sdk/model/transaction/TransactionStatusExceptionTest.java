@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,17 +24,15 @@ import org.junit.jupiter.api.Test;
 
 class TransactionStatusExceptionTest {
 
-    @Test
-    void getStatusError() {
-        Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
-        TransactionStatusError transactionStatusError =
-            new TransactionStatusError(address, "hash", "error",
-                new Deadline(BigInteger.valueOf(1)));
+  @Test
+  void getStatusError() {
+    Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
+    TransactionStatusError transactionStatusError =
+        new TransactionStatusError(address, "hash", "error", new Deadline(BigInteger.valueOf(1)));
 
-        TransactionStatusException exception = new TransactionStatusException(
-            new IllegalStateException("Caller"), transactionStatusError);
+    TransactionStatusException exception =
+        new TransactionStatusException(new IllegalStateException("Caller"), transactionStatusError);
 
-        assertEquals(transactionStatusError, exception.getStatusError());
-    }
-
+    assertEquals(transactionStatusError, exception.getStatusError());
+  }
 }

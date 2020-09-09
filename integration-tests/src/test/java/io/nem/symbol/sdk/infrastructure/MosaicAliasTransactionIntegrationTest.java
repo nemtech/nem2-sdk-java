@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,52 +39,54 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
 
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void sendMosaicAliasTransaction(RepositoryType type) {
+    String namespaceName =
+        "test-root-namespace-for-mosaic-alias-"
+            + new Double(Math.floor(Math.random() * 10000)).intValue();
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void sendMosaicAliasTransaction(RepositoryType type) {
-        String namespaceName =
-            "test-root-namespace-for-mosaic-alias-" + new Double(Math.floor(Math.random() * 10000))
-                .intValue();
+    Account account = this.config().getDefaultAccount();
+    AccountInfo accountInfo =
+        get(
+            getRepositoryFactory(type)
+                .createAccountRepository()
+                .getAccountInfo(account.getPublicAccount().getAddress()));
 
-        Account account = this.config().getDefaultAccount();
-        AccountInfo accountInfo = get(getRepositoryFactory(type).createAccountRepository()
-            .getAccountInfo(account.getPublicAccount().getAddress()));
+    Assertions.assertFalse(accountInfo.getMosaics().isEmpty());
 
-        Assertions.assertFalse(
-            accountInfo.getMosaics().isEmpty());
+    MosaicId mosaicId = createMosaic(account, type, BigInteger.ZERO, null);
 
-        MosaicId mosaicId = createMosaic(account, type, BigInteger.ZERO, null);
+    NamespaceRegistrationTransaction namespaceRegistrationTransaction =
+        NamespaceRegistrationTransactionFactory.createRootNamespace(
+                getNetworkType(), namespaceName, BigInteger.valueOf(100))
+            .maxFee(this.maxFee)
+            .build();
 
-        NamespaceRegistrationTransaction namespaceRegistrationTransaction =
-            NamespaceRegistrationTransactionFactory.createRootNamespace(
-                getNetworkType(),
-                namespaceName,
-                BigInteger.valueOf(100)).maxFee(this.maxFee).build();
+    NamespaceId rootNamespaceId =
+        announceAggregateAndValidate(type, namespaceRegistrationTransaction, account)
+            .getLeft()
+            .getNamespaceId();
 
-        NamespaceId rootNamespaceId = announceAggregateAndValidate(type,
-            namespaceRegistrationTransaction, account
-        ).getLeft().getNamespaceId();
+    MosaicAliasTransaction addressAliasTransaction =
+        MosaicAliasTransactionFactory.create(
+                getNetworkType(), AliasAction.LINK, rootNamespaceId, mosaicId)
+            .maxFee(this.maxFee)
+            .build();
 
-        MosaicAliasTransaction addressAliasTransaction =
-            MosaicAliasTransactionFactory.create(
-                getNetworkType(),
-                AliasAction.LINK,
-                rootNamespaceId,
-                mosaicId).maxFee(this.maxFee).build();
+    announceAggregateAndValidate(type, addressAliasTransaction, account);
 
-        announceAggregateAndValidate(type, addressAliasTransaction, account);
+    List<MosaicNames> accountNames =
+        get(
+            getRepositoryFactory(type)
+                .createNamespaceRepository()
+                .getMosaicsNames(Collections.singletonList(mosaicId)));
 
-        List<MosaicNames> accountNames = get(getRepositoryFactory(type).createNamespaceRepository()
-            .getMosaicsNames(Collections.singletonList(mosaicId)));
+    Assertions.assertEquals(1, accountNames.size());
 
-        Assertions.assertEquals(1, accountNames.size());
-
-        assertEquals(1, accountNames.size());
-        assertEquals(mosaicId, accountNames.get(0).getMosaicId());
-        assertTrue(accountNames.get(0).getNames().stream()
-            .anyMatch(n -> namespaceName.equals(n.getName())));
-    }
-
-
+    assertEquals(1, accountNames.size());
+    assertEquals(mosaicId, accountNames.get(0).getMosaicId());
+    assertTrue(
+        accountNames.get(0).getNames().stream().anyMatch(n -> namespaceName.equals(n.getName())));
+  }
 }

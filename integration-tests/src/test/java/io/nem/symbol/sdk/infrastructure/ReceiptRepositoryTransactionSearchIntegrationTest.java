@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
-
 
 import io.nem.symbol.sdk.api.PaginationStreamer;
 import io.nem.symbol.sdk.api.ReceiptPaginationStreamer;
@@ -34,84 +32,89 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ReceiptRepositoryTransactionSearchIntegrationTest extends BaseIntegrationTest {
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearch(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(null);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearch(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(null);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearchSize50(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(50);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearchSize50(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(50);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearchTransaction(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(null);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearchTransaction(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(null);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearchTransactionPageSize50(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(50);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearchTransactionPageSize50(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(50);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void searchOrderByIdAsc(RepositoryType type) {
-        getPaginationTester(type).searchOrderByIdAsc();
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchOrderByIdAsc(RepositoryType type) {
+    getPaginationTester(type).searchOrderByIdAsc();
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void searchOrderByIdDesc(RepositoryType type) {
-        getPaginationTester(type).searchOrderByIdDesc();
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchOrderByIdDesc(RepositoryType type) {
+    getPaginationTester(type).searchOrderByIdDesc();
+  }
 
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchUsingRecipientTypes(RepositoryType type) {
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void searchUsingRecipientTypes(RepositoryType type) {
+    assertRecipientType(type, Collections.singletonList(ReceiptType.HARVEST_FEE), false);
+    assertRecipientType(type, Collections.singletonList(ReceiptType.NAMESPACE_RENTAL_FEE), false);
+    assertRecipientType(
+        type, Arrays.asList(ReceiptType.HARVEST_FEE, ReceiptType.NAMESPACE_RENTAL_FEE), false);
+    assertRecipientType(
+        type,
+        Arrays.asList(ReceiptType.TRANSACTION_GROUP, ReceiptType.NAMESPACE_RENTAL_FEE),
+        false);
+    assertRecipientType(type, Collections.singletonList(ReceiptType.TRANSACTION_GROUP), true);
+  }
 
-        assertRecipientType(type, Collections.singletonList(ReceiptType.HARVEST_FEE), false);
-        assertRecipientType(type, Collections.singletonList(ReceiptType.NAMESPACE_RENTAL_FEE), false);
-        assertRecipientType(type, Arrays.asList(ReceiptType.HARVEST_FEE, ReceiptType.NAMESPACE_RENTAL_FEE), false);
-        assertRecipientType(type, Arrays.asList(ReceiptType.TRANSACTION_GROUP, ReceiptType.NAMESPACE_RENTAL_FEE),
-            false);
-        assertRecipientType(type, Collections.singletonList(ReceiptType.TRANSACTION_GROUP), true);
-    }
+  List<TransactionStatement> assertRecipientType(
+      RepositoryType type, List<ReceiptType> receiptTypes, boolean empty) {
 
-    List<TransactionStatement> assertRecipientType(RepositoryType type, List<ReceiptType> receiptTypes, boolean empty) {
-
-        ReceiptRepository receiptRepository = getReceiptRepository(type);
-        PaginationStreamer<TransactionStatement, TransactionStatementSearchCriteria> streamer = ReceiptPaginationStreamer
-            .transactions(receiptRepository);
-        List<TransactionStatement> transactionStatements = get(
-            streamer.search(new TransactionStatementSearchCriteria().receiptTypes(receiptTypes)).toList()
+    ReceiptRepository receiptRepository = getReceiptRepository(type);
+    PaginationStreamer<TransactionStatement, TransactionStatementSearchCriteria> streamer =
+        ReceiptPaginationStreamer.transactions(receiptRepository);
+    List<TransactionStatement> transactionStatements =
+        get(
+            streamer
+                .search(new TransactionStatementSearchCriteria().receiptTypes(receiptTypes))
+                .toList()
                 .toObservable());
 
-        transactionStatements.forEach(s -> {
-            s.getReceipts().forEach(r -> {
-                Assertions.assertTrue(receiptTypes.contains(r.getType()));
-            });
-
+    transactionStatements.forEach(
+        s -> {
+          s.getReceipts()
+              .forEach(
+                  r -> {
+                    Assertions.assertTrue(receiptTypes.contains(r.getType()));
+                  });
         });
-        Assertions.assertEquals(empty, transactionStatements.isEmpty());
-        return transactionStatements;
-    }
+    Assertions.assertEquals(empty, transactionStatements.isEmpty());
+    return transactionStatements;
+  }
 
+  private ReceiptRepository getReceiptRepository(RepositoryType type) {
+    return getRepositoryFactory(type).createReceiptRepository();
+  }
 
-    private ReceiptRepository getReceiptRepository(RepositoryType type) {
-        return getRepositoryFactory(type).createReceiptRepository();
-    }
-
-
-    private PaginationTester<TransactionStatement, TransactionStatementSearchCriteria> getPaginationTester(
-        RepositoryType type) {
-        return new PaginationTester<>(TransactionStatementSearchCriteria::new,
-            getReceiptRepository(type)::searchReceipts);
-    }
-
+  private PaginationTester<TransactionStatement, TransactionStatementSearchCriteria>
+      getPaginationTester(RepositoryType type) {
+    return new PaginationTester<>(
+        TransactionStatementSearchCriteria::new, getReceiptRepository(type)::searchReceipts);
+  }
 }

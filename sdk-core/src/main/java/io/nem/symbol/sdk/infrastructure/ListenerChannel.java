@@ -13,35 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import java.util.Arrays;
 
 public enum ListenerChannel {
-    BLOCK("block"),
-    CONFIRMED_ADDED("confirmedAdded"),
-    UNCONFIRMED_ADDED("unconfirmedAdded"),
-    UNCONFIRMED_REMOVED("unconfirmedRemoved"),
-    AGGREGATE_BONDED_ADDED("partialAdded"),
-    AGGREGATE_BONDED_REMOVED("partialRemoved"),
-    COSIGNATURE("cosignature"),
-    STATUS("status");
+  BLOCK("block"),
+  CONFIRMED_ADDED("confirmedAdded"),
+  UNCONFIRMED_ADDED("unconfirmedAdded"),
+  UNCONFIRMED_REMOVED("unconfirmedRemoved"),
+  AGGREGATE_BONDED_ADDED("partialAdded"),
+  AGGREGATE_BONDED_REMOVED("partialRemoved"),
+  COSIGNATURE("cosignature"),
+  STATUS("status");
 
-    private final String value;
+  private final String value;
 
-    ListenerChannel(final String value) {
-        this.value = value;
-    }
+  ListenerChannel(final String value) {
+    this.value = value;
+  }
 
-    public static ListenerChannel rawValueOf(String value) {
-        return Arrays.stream(values()).filter(e -> e.value.equals(value)).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  public static ListenerChannel rawValueOf(String value) {
+    return Arrays.stream(values())
+        .filter(e -> e.value.equals(value))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 
-    }
-
-    @Override
-    public String toString() {
-        return this.value;
-    }
+  @Override
+  public String toString() {
+    return this.value;
+  }
 }

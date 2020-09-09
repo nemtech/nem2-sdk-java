@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.mosaic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.symbol.sdk.model.account.PublicAccount;
@@ -28,90 +26,90 @@ import org.junit.jupiter.api.Test;
 
 class MosaicIdTest {
 
-    String publicKey = "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf";
+  String publicKey = "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf";
 
-    @Test
-    void createAMosaicIdFromIdViaConstructor() {
-        MosaicId mosaicId = new MosaicId(new BigInteger("-8810190493148073404"));
-        assertEquals(mosaicId.getId(), new BigInteger("-8810190493148073404"));
-    }
+  @Test
+  void createAMosaicIdFromIdViaConstructor() {
+    MosaicId mosaicId = new MosaicId(new BigInteger("-8810190493148073404"));
+    assertEquals(mosaicId.getId(), new BigInteger("-8810190493148073404"));
+  }
 
-    @Test
-    void createAMosaicIdFromHexViaConstructor() {
-        MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
-        assertEquals(mosaicId.getId(), new BigInteger("9636553580561478212"));
-    }
+  @Test
+  void createAMosaicIdFromHexViaConstructor() {
+    MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
+    assertEquals(mosaicId.getId(), new BigInteger("9636553580561478212"));
+  }
 
-    @Test
-    void shouldCompareMosaicIdsForEquality() {
-        MosaicId mosaicId = new MosaicId(new BigInteger("-8810190493148073404"));
-        MosaicId mosaicId2 = new MosaicId(new BigInteger("-8810190493148073404"));
-        assertTrue(mosaicId.equals(mosaicId2));
-    }
+  @Test
+  void shouldCompareMosaicIdsForEquality() {
+    MosaicId mosaicId = new MosaicId(new BigInteger("-8810190493148073404"));
+    MosaicId mosaicId2 = new MosaicId(new BigInteger("-8810190493148073404"));
+    assertTrue(mosaicId.equals(mosaicId2));
+  }
 
-    @Test
-    void shouldCompareMosaicIdsHexForEquality() {
-        MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
-        MosaicId mosaicId2 = new MosaicId(new BigInteger("9636553580561478212"));
-        assertEquals(mosaicId.getIdAsHex(), mosaicId2.getIdAsHex());
-    }
+  @Test
+  void shouldCompareMosaicIdsHexForEquality() {
+    MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
+    MosaicId mosaicId2 = new MosaicId(new BigInteger("9636553580561478212"));
+    assertEquals(mosaicId.getIdAsHex(), mosaicId2.getIdAsHex());
+  }
 
-    @Test
-    void shouldCompareMosaicIdsArraysForEquality() {
-        MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
-        BigInteger bigInt1 = new BigInteger("9636553580561478212");
-        MosaicId mosaicId1 = new MosaicId(bigInt1);
-        assertEquals(mosaicId.getId(), mosaicId1.getId());
-    }
+  @Test
+  void shouldCompareMosaicIdsArraysForEquality() {
+    MosaicId mosaicId = new MosaicId("85BBEA6CC462B244");
+    BigInteger bigInt1 = new BigInteger("9636553580561478212");
+    MosaicId mosaicId1 = new MosaicId(bigInt1);
+    assertEquals(mosaicId.getId(), mosaicId1.getId());
+  }
 
-    @Test
-    void shouldCompareMosaicIdsForNotEquality() {
-        BigInteger bigInt1 = new BigInteger("9636553580561478212");
-        MosaicId mosaicId1 = new MosaicId(bigInt1);
-        BigInteger bigInt2 = new BigInteger("-8810190493148073404");
-        MosaicId mosaicId2 = new MosaicId(bigInt2);
-        assertNotEquals(bigInt1, bigInt2);
-        assertNotEquals(mosaicId1.getId(), mosaicId2.getId());
-    }
+  @Test
+  void shouldCompareMosaicIdsForNotEquality() {
+    BigInteger bigInt1 = new BigInteger("9636553580561478212");
+    MosaicId mosaicId1 = new MosaicId(bigInt1);
+    BigInteger bigInt2 = new BigInteger("-8810190493148073404");
+    MosaicId mosaicId2 = new MosaicId(bigInt2);
+    assertNotEquals(bigInt1, bigInt2);
+    assertNotEquals(mosaicId1.getId(), mosaicId2.getId());
+  }
 
-    @Test
-    void createAMosaicIdFromNonceAndOwner() {
-        PublicAccount owner = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST);
-        byte[] bytes = new byte[]{0x0, 0x0, 0x0, 0x0};
-        MosaicNonce nonce = new MosaicNonce(bytes);
-        MosaicId mosaicId = MosaicId.createFromNonce(nonce, owner);
-        MosaicId mosaicId2 = new MosaicId(new BigInteger("5331590414131997017"));
-        MosaicId mosaicId3 = MosaicId.createFromNonce(nonce, owner.getAddress());
-        assertEquals(mosaicId, mosaicId);
-        assertEquals(mosaicId, mosaicId2);
-        assertEquals(mosaicId, mosaicId3);
-        assertEquals(5331590414131997017L, mosaicId2.getIdAsLong());
-    }
+  @Test
+  void createAMosaicIdFromNonceAndOwner() {
+    PublicAccount owner = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST);
+    byte[] bytes = new byte[] {0x0, 0x0, 0x0, 0x0};
+    MosaicNonce nonce = new MosaicNonce(bytes);
+    MosaicId mosaicId = MosaicId.createFromNonce(nonce, owner);
+    MosaicId mosaicId2 = new MosaicId(new BigInteger("5331590414131997017"));
+    MosaicId mosaicId3 = MosaicId.createFromNonce(nonce, owner.getAddress());
+    assertEquals(mosaicId, mosaicId);
+    assertEquals(mosaicId, mosaicId2);
+    assertEquals(mosaicId, mosaicId3);
+    assertEquals(5331590414131997017L, mosaicId2.getIdAsLong());
+  }
 
-    @Test
-    void hashCodeAndEquals() {
-        PublicAccount owner = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST);
-        byte[] bytes = new byte[]{0x0, 0x0, 0x0, 0x0};
-        MosaicNonce nonce = new MosaicNonce(bytes);
-        MosaicId mosaicId = MosaicId.createFromNonce(nonce, owner);
-        MosaicId mosaicId2 = new MosaicId(new BigInteger("5331590414131997017"));
-        MosaicId mosaicId3 = MosaicId.createFromNonce(nonce, owner.getAddress());
-        assertEquals(mosaicId, mosaicId);
-        assertNotEquals("", mosaicId);
-        assertNotEquals(mosaicId, "");
-        assertEquals(mosaicId, mosaicId2);
-        assertEquals(mosaicId.hashCode(), mosaicId2.hashCode());
-        assertEquals(mosaicId, mosaicId3);
-    }
+  @Test
+  void hashCodeAndEquals() {
+    PublicAccount owner = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST);
+    byte[] bytes = new byte[] {0x0, 0x0, 0x0, 0x0};
+    MosaicNonce nonce = new MosaicNonce(bytes);
+    MosaicId mosaicId = MosaicId.createFromNonce(nonce, owner);
+    MosaicId mosaicId2 = new MosaicId(new BigInteger("5331590414131997017"));
+    MosaicId mosaicId3 = MosaicId.createFromNonce(nonce, owner.getAddress());
+    assertEquals(mosaicId, mosaicId);
+    assertNotEquals("", mosaicId);
+    assertNotEquals(mosaicId, "");
+    assertEquals(mosaicId, mosaicId2);
+    assertEquals(mosaicId.hashCode(), mosaicId2.hashCode());
+    assertEquals(mosaicId, mosaicId3);
+  }
 
-    @Test
-    void createAMosaicIdFromNonceAndOwnerTwiceTheSame() {
-        PublicAccount owner = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST);
-        byte[] bytes = new byte[]{0x0, 0x0, 0x0, 0x0};
-        MosaicNonce nonce = new MosaicNonce(bytes);
-        MosaicId mosaicId1 = MosaicId.createFromNonce(nonce, owner);
-        MosaicId mosaicId2 = MosaicId.createFromNonce(nonce, owner);
-        assertEquals(mosaicId1, mosaicId2);
-        assertEquals(mosaicId1.hashCode(), mosaicId2.hashCode());
-    }
+  @Test
+  void createAMosaicIdFromNonceAndOwnerTwiceTheSame() {
+    PublicAccount owner = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST);
+    byte[] bytes = new byte[] {0x0, 0x0, 0x0, 0x0};
+    MosaicNonce nonce = new MosaicNonce(bytes);
+    MosaicId mosaicId1 = MosaicId.createFromNonce(nonce, owner);
+    MosaicId mosaicId2 = MosaicId.createFromNonce(nonce, owner);
+    assertEquals(mosaicId1, mosaicId2);
+    assertEquals(mosaicId1.hashCode(), mosaicId2.hashCode());
+  }
 }

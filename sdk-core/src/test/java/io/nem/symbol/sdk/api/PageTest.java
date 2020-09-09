@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
 
 import java.util.Arrays;
@@ -23,21 +22,20 @@ import org.junit.jupiter.api.Test;
 
 class PageTest {
 
-    @Test
-    void testConstructor() {
-        List<String> data = Arrays.asList("a", "b", "c");
-        Page<String> page = new Page<>(data, 1, 2);
-        Assertions.assertEquals(1, page.getPageNumber());
-        Assertions.assertEquals(2, page.getPageSize());
-        Assertions.assertEquals(data, page.getData());
-        Assertions.assertFalse(page.isLast());
-    }
+  @Test
+  void testConstructor() {
+    List<String> data = Arrays.asList("a", "b", "c");
+    Page<String> page = new Page<>(data, 1, 2);
+    Assertions.assertEquals(1, page.getPageNumber());
+    Assertions.assertEquals(2, page.getPageSize());
+    Assertions.assertEquals(data, page.getData());
+    Assertions.assertFalse(page.isLast());
+  }
 
-    @Test
-    void isLast() {
-        Assertions.assertFalse(new Page<>(Arrays.asList("a", "b", "c"), 1, 2).isLast());
-        Assertions.assertFalse(new Page<>(Arrays.asList("a", "b"), 4, 2).isLast());
-        Assertions.assertTrue(new Page<>(Arrays.asList("a"), 5, 2).isLast());
-    }
-
+  @Test
+  void isLast() {
+    Assertions.assertFalse(new Page<>(Arrays.asList("a", "b", "c"), 1, 2).isLast());
+    Assertions.assertFalse(new Page<>(Arrays.asList("a", "b"), 4, 2).isLast());
+    Assertions.assertTrue(new Page<>(Arrays.asList("a"), 5, 2).isLast());
+  }
 }

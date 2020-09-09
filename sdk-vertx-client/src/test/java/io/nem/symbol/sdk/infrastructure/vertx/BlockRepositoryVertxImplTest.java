@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.sdk.api.BlockSearchCriteria;
@@ -46,169 +45,172 @@ import org.junit.jupiter.api.Test;
  */
 public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
 
-    private BlockRepositoryVertxImpl repository;
+  private BlockRepositoryVertxImpl repository;
 
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-        repository = new BlockRepositoryVertxImpl(apiClientMock);
-    }
+  @BeforeEach
+  public void setUp() {
+    super.setUp();
+    repository = new BlockRepositoryVertxImpl(apiClientMock);
+  }
 
-    @Test
-    public void getMerkleTransaction() throws Exception {
+  @Test
+  public void getMerkleTransaction() throws Exception {
 
-        MerkleProofInfoDTO merkleProofInfoDTO = new MerkleProofInfoDTO();
+    MerkleProofInfoDTO merkleProofInfoDTO = new MerkleProofInfoDTO();
 
-        MerklePathItemDTO item = new MerklePathItemDTO().hash("someHash").position(PositionEnum.LEFT);
-        mockRemoteCall(merkleProofInfoDTO.addMerklePathItem(item));
+    MerklePathItemDTO item = new MerklePathItemDTO().hash("someHash").position(PositionEnum.LEFT);
+    mockRemoteCall(merkleProofInfoDTO.addMerklePathItem(item));
 
-        MerkleProofInfo merkleProofInfo = repository.getMerkleTransaction(BigInteger.ONE, "HASH!").toFuture().get();
-        Assertions.assertEquals(1, merkleProofInfo.getMerklePath().size());
-        Assertions.assertEquals("someHash", merkleProofInfo.getMerklePath().get(0).getHash());
-        Assertions.assertEquals(Position.LEFT, merkleProofInfo.getMerklePath().get(0).getPosition());
+    MerkleProofInfo merkleProofInfo =
+        repository.getMerkleTransaction(BigInteger.ONE, "HASH!").toFuture().get();
+    Assertions.assertEquals(1, merkleProofInfo.getMerklePath().size());
+    Assertions.assertEquals("someHash", merkleProofInfo.getMerklePath().get(0).getHash());
+    Assertions.assertEquals(Position.LEFT, merkleProofInfo.getMerklePath().get(0).getPosition());
+  }
 
-    }
+  @Test
+  public void shouldGetBlockByHeight() throws Exception {
 
-    @Test
-    public void shouldGetBlockByHeight() throws Exception {
+    Address address = Address.generateRandom(this.networkType);
+    BlockInfoDTO dto = new BlockInfoDTO();
+    BlockMetaDTO metaDTO = new BlockMetaDTO();
+    metaDTO.setHash("someHash");
+    metaDTO.setNumTransactions(10);
+    metaDTO.setGenerationHash("generationHash");
+    metaDTO.setNumStatements(20);
+    metaDTO.setStateHashSubCacheMerkleRoots(Arrays.asList("string1", "string2"));
+    metaDTO.setTotalFee(BigInteger.valueOf(8));
 
-        Address address = Address.generateRandom(this.networkType);
-        BlockInfoDTO dto = new BlockInfoDTO();
-        BlockMetaDTO metaDTO = new BlockMetaDTO();
-        metaDTO.setHash("someHash");
-        metaDTO.setNumTransactions(10);
-        metaDTO.setGenerationHash("generationHash");
-        metaDTO.setNumStatements(20);
-        metaDTO.setStateHashSubCacheMerkleRoots(Arrays.asList("string1", "string2"));
-        metaDTO.setTotalFee(BigInteger.valueOf(8));
+    dto.setMeta(metaDTO);
 
-        dto.setMeta(metaDTO);
+    BlockDTO blockDto = new BlockDTO();
+    blockDto.setType(16716);
+    blockDto.setVersion(3);
+    blockDto.setSize(10L);
+    blockDto.setNetwork(NetworkTypeEnum.NUMBER_144);
+    blockDto.setSignerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
+    blockDto.setBeneficiaryAddress(address.encoded());
+    blockDto.setHeight(BigInteger.valueOf(9));
 
-        BlockDTO blockDto = new BlockDTO();
-        blockDto.setType(16716);
-        blockDto.setVersion(3);
-        blockDto.setSize(10L);
-        blockDto.setNetwork(NetworkTypeEnum.NUMBER_144);
-        blockDto.setSignerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
-        blockDto.setBeneficiaryAddress(address.encoded());
-        blockDto.setHeight(BigInteger.valueOf(9));
+    dto.setBlock(blockDto);
 
-        dto.setBlock(blockDto);
+    mockRemoteCall(dto);
 
-        mockRemoteCall(dto);
+    BigInteger height = BigInteger.valueOf(10L);
+    BlockInfo info = repository.getBlockByHeight(height).toFuture().get();
 
-        BigInteger height = BigInteger.valueOf(10L);
-        BlockInfo info = repository.getBlockByHeight(height).toFuture().get();
+    Assertions.assertNotNull(info);
 
-        Assertions.assertNotNull(info);
+    Assertions.assertEquals(
+        blockDto.getBeneficiaryAddress(), info.getBeneficiaryAddress().encoded());
 
-        Assertions.assertEquals(blockDto.getBeneficiaryAddress(), info.getBeneficiaryAddress().encoded());
+    Assertions.assertEquals(
+        blockDto.getSignerPublicKey(), info.getSignerPublicAccount().getPublicKey().toHex());
 
-        Assertions.assertEquals(blockDto.getSignerPublicKey(), info.getSignerPublicAccount().getPublicKey().toHex());
+    Assertions.assertEquals(16716, info.getType());
+    Assertions.assertEquals(10, info.getSize());
+    Assertions.assertEquals(3, info.getVersion().intValue());
+    Assertions.assertEquals(NetworkType.MIJIN_TEST, info.getNetworkType());
+    Assertions.assertEquals(BigInteger.valueOf(9L), info.getHeight());
+    Assertions.assertEquals(metaDTO.getHash(), info.getHash());
+    Assertions.assertEquals(metaDTO.getNumTransactions(), info.getNumTransactions());
+    Assertions.assertEquals(metaDTO.getNumStatements(), info.getNumStatements().get());
+    Assertions.assertEquals(metaDTO.getGenerationHash(), info.getGenerationHash());
+    Assertions.assertEquals(
+        metaDTO.getStateHashSubCacheMerkleRoots(), info.getSubCacheMerkleRoots());
+    Assertions.assertEquals(metaDTO.getTotalFee(), info.getTotalFee());
 
-        Assertions.assertEquals(16716, info.getType());
-        Assertions.assertEquals(10, info.getSize());
-        Assertions.assertEquals(3, info.getVersion().intValue());
-        Assertions.assertEquals(NetworkType.MIJIN_TEST, info.getNetworkType());
-        Assertions.assertEquals(BigInteger.valueOf(9L), info.getHeight());
-        Assertions.assertEquals(metaDTO.getHash(), info.getHash());
-        Assertions.assertEquals(metaDTO.getNumTransactions(), info.getNumTransactions());
-        Assertions.assertEquals(metaDTO.getNumStatements(), info.getNumStatements().get());
-        Assertions.assertEquals(metaDTO.getGenerationHash(), info.getGenerationHash());
-        Assertions.assertEquals(metaDTO.getStateHashSubCacheMerkleRoots(), info.getSubCacheMerkleRoots());
-        Assertions.assertEquals(metaDTO.getTotalFee(), info.getTotalFee());
+    Assertions.assertEquals(blockDto.getHeight(), info.getHeight());
+    Assertions.assertEquals(address, info.getBeneficiaryAddress());
+  }
 
-        Assertions.assertEquals(blockDto.getHeight(), info.getHeight());
-        Assertions.assertEquals(address, info.getBeneficiaryAddress());
+  @Test
+  public void shouldGetBlocksByHeightWithLimit() throws Exception {
 
-    }
+    Address address = Address.generateRandom(this.networkType);
+    BlockInfoDTO dto = new BlockInfoDTO();
+    BlockMetaDTO metaDTO = new BlockMetaDTO();
+    metaDTO.setHash("someHash");
+    metaDTO.setNumTransactions(10);
+    metaDTO.setGenerationHash("generationHash");
+    metaDTO.setNumStatements(20);
+    metaDTO.setStateHashSubCacheMerkleRoots(Arrays.asList("string1", "string2"));
+    metaDTO.setTotalFee(BigInteger.valueOf(8));
 
-    @Test
-    public void shouldGetBlocksByHeightWithLimit() throws Exception {
+    dto.setMeta(metaDTO);
 
-        Address address = Address.generateRandom(this.networkType);
-        BlockInfoDTO dto = new BlockInfoDTO();
-        BlockMetaDTO metaDTO = new BlockMetaDTO();
-        metaDTO.setHash("someHash");
-        metaDTO.setNumTransactions(10);
-        metaDTO.setGenerationHash("generationHash");
-        metaDTO.setNumStatements(20);
-        metaDTO.setStateHashSubCacheMerkleRoots(Arrays.asList("string1", "string2"));
-        metaDTO.setTotalFee(BigInteger.valueOf(8));
+    BlockDTO blockDto = new BlockDTO();
+    blockDto.setType(16716);
+    blockDto.setVersion(3);
+    blockDto.setSignerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
+    blockDto.setBeneficiaryAddress(address.encoded());
+    blockDto.setHeight(BigInteger.valueOf(9L));
+    blockDto.setNetwork(NetworkTypeEnum.NUMBER_144);
 
-        dto.setMeta(metaDTO);
+    blockDto.setProofGamma("proofGamma");
+    blockDto.setProofScalar("proofScalar");
+    blockDto.setProofVerificationHash("proofVerificationHash");
 
-        BlockDTO blockDto = new BlockDTO();
-        blockDto.setType(16716);
-        blockDto.setVersion(3);
-        blockDto.setSignerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
-        blockDto.setBeneficiaryAddress(address.encoded());
-        blockDto.setHeight(BigInteger.valueOf(9L));
-        blockDto.setNetwork(NetworkTypeEnum.NUMBER_144);
+    dto.setBlock(blockDto);
 
-        blockDto.setProofGamma("proofGamma");
-        blockDto.setProofScalar("proofScalar");
-        blockDto.setProofVerificationHash("proofVerificationHash");
+    mockRemoteCall(Collections.singletonList(dto));
 
-        dto.setBlock(blockDto);
+    mockRemoteCall(toPage(dto));
 
-        mockRemoteCall(Collections.singletonList(dto));
+    BlockSearchCriteria criteria = new BlockSearchCriteria();
+    criteria.offset("abc");
+    List<BlockInfo> resolvedList = repository.search(criteria).toFuture().get().getData();
 
-        mockRemoteCall(toPage(dto));
+    BlockInfo info = resolvedList.get(0);
+    Assertions.assertNotNull(info);
 
-        BlockSearchCriteria criteria = new BlockSearchCriteria();
-        criteria.offset("abc");
-        List<BlockInfo> resolvedList = repository.search(criteria).toFuture().get()
-            .getData();
+    Assertions.assertEquals(
+        blockDto.getBeneficiaryAddress(), info.getBeneficiaryAddress().encoded());
 
-        BlockInfo info = resolvedList.get(0);
-        Assertions.assertNotNull(info);
+    Assertions.assertEquals(
+        blockDto.getSignerPublicKey(), info.getSignerPublicAccount().getPublicKey().toHex());
 
-        Assertions.assertEquals(blockDto.getBeneficiaryAddress(), info.getBeneficiaryAddress().encoded());
+    Assertions.assertEquals(16716, info.getType());
+    Assertions.assertEquals(3, info.getVersion().intValue());
+    Assertions.assertEquals(NetworkType.MIJIN_TEST, info.getNetworkType());
+    Assertions.assertEquals(BigInteger.valueOf(9L), info.getHeight());
+    Assertions.assertEquals(metaDTO.getHash(), info.getHash());
+    Assertions.assertEquals(metaDTO.getGenerationHash(), info.getGenerationHash());
+    Assertions.assertEquals(metaDTO.getNumTransactions(), info.getNumTransactions());
+    Assertions.assertEquals(
+        metaDTO.getStateHashSubCacheMerkleRoots(), info.getSubCacheMerkleRoots());
+    Assertions.assertEquals(metaDTO.getTotalFee(), info.getTotalFee());
 
-        Assertions.assertEquals(blockDto.getSignerPublicKey(), info.getSignerPublicAccount().getPublicKey().toHex());
+    Assertions.assertEquals(blockDto.getHeight(), info.getHeight());
+    Assertions.assertEquals(blockDto.getProofGamma(), info.getProofGamma());
+    Assertions.assertEquals(blockDto.getProofScalar(), info.getProofScalar());
+    Assertions.assertEquals(blockDto.getProofVerificationHash(), info.getProofVerificationHash());
+    Assertions.assertEquals(address, info.getBeneficiaryAddress());
+  }
 
-        Assertions.assertEquals(16716, info.getType());
-        Assertions.assertEquals(3, info.getVersion().intValue());
-        Assertions.assertEquals(NetworkType.MIJIN_TEST, info.getNetworkType());
-        Assertions.assertEquals(BigInteger.valueOf(9L), info.getHeight());
-        Assertions.assertEquals(metaDTO.getHash(), info.getHash());
-        Assertions.assertEquals(metaDTO.getGenerationHash(), info.getGenerationHash());
-        Assertions.assertEquals(metaDTO.getNumTransactions(), info.getNumTransactions());
-        Assertions.assertEquals(metaDTO.getStateHashSubCacheMerkleRoots(), info.getSubCacheMerkleRoots());
-        Assertions.assertEquals(metaDTO.getTotalFee(), info.getTotalFee());
+  private BlockPage toPage(BlockInfoDTO dto) {
+    return new BlockPage()
+        .data(Collections.singletonList(dto))
+        .pagination(new Pagination().pageNumber(1).pageSize(2));
+  }
 
-        Assertions.assertEquals(blockDto.getHeight(), info.getHeight());
-        Assertions.assertEquals(blockDto.getProofGamma(), info.getProofGamma());
-        Assertions.assertEquals(blockDto.getProofScalar(), info.getProofScalar());
-        Assertions.assertEquals(blockDto.getProofVerificationHash(), info.getProofVerificationHash());
-        Assertions.assertEquals(address, info.getBeneficiaryAddress());
-    }
+  @Test
+  public void shouldGetMerkleReceipts() throws Exception {
+    MerkleProofInfoDTO merkleProofInfoDTO = new MerkleProofInfoDTO();
+    MerklePathItemDTO marklePathItem = new MerklePathItemDTO();
+    marklePathItem.setHash("SomeHash");
+    marklePathItem.setPosition(PositionEnum.LEFT);
+    merkleProofInfoDTO.setMerklePath(Collections.singletonList(marklePathItem));
 
+    mockRemoteCall(merkleProofInfoDTO);
 
-    private BlockPage toPage(BlockInfoDTO dto) {
-        return new BlockPage().data(Collections.singletonList(dto))
-            .pagination(new Pagination().pageNumber(1).pageSize(2));
-    }
+    BigInteger height = BigInteger.valueOf(10L);
+    MerkleProofInfo info = repository.getMerkleReceipts(height, "AnotherHash").toFuture().get();
 
-    @Test
-    public void shouldGetMerkleReceipts() throws Exception {
-        MerkleProofInfoDTO merkleProofInfoDTO = new MerkleProofInfoDTO();
-        MerklePathItemDTO marklePathItem = new MerklePathItemDTO();
-        marklePathItem.setHash("SomeHash");
-        marklePathItem.setPosition(PositionEnum.LEFT);
-        merkleProofInfoDTO.setMerklePath(Collections.singletonList(marklePathItem));
+    Assertions.assertNotNull(info);
 
-        mockRemoteCall(merkleProofInfoDTO);
-
-        BigInteger height = BigInteger.valueOf(10L);
-        MerkleProofInfo info = repository.getMerkleReceipts(height, "AnotherHash").toFuture().get();
-
-        Assertions.assertNotNull(info);
-
-        Assertions.assertEquals(1, info.getMerklePath().size());
-        Assertions.assertEquals(marklePathItem.getHash(), info.getMerklePath().get(0).getHash());
-        Assertions.assertEquals(Position.LEFT, info.getMerklePath().get(0).getPosition());
-    }
-
+    Assertions.assertEquals(1, info.getMerklePath().size());
+    Assertions.assertEquals(marklePathItem.getHash(), info.getMerklePath().get(0).getHash());
+    Assertions.assertEquals(Position.LEFT, info.getMerklePath().get(0).getPosition());
+  }
 }

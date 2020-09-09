@@ -13,45 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto;
 
 import io.nem.symbol.core.crypto.ed25519.Ed25519CryptoEngine;
 
-/**
- * Static class that exposes crypto engines.
- */
+/** Static class that exposes crypto engines. */
 public class CryptoEngines {
 
-    private static final CryptoEngine ED25519_ENGINE;
-    private static final CryptoEngine DEFAULT_ENGINE;
+  private static final CryptoEngine ED25519_ENGINE;
+  private static final CryptoEngine DEFAULT_ENGINE;
 
-    static {
-        ED25519_ENGINE = new Ed25519CryptoEngine();
-        DEFAULT_ENGINE = ED25519_ENGINE;
-    }
+  static {
+    ED25519_ENGINE = new Ed25519CryptoEngine();
+    DEFAULT_ENGINE = ED25519_ENGINE;
+  }
 
-    /**
-     * Private constructor for this utility class.
-     */
-    private CryptoEngines() {
-    }
+  /** Private constructor for this utility class. */
+  private CryptoEngines() {}
 
-    /**
-     * Gets the default crypto engine.
-     *
-     * @return The default crypto engine.
-     */
-    public static CryptoEngine defaultEngine() {
-        return DEFAULT_ENGINE;
-    }
+  /**
+   * Gets the default crypto engine.
+   *
+   * @return The default crypto engine.
+   */
+  public static CryptoEngine defaultEngine() {
+    return DEFAULT_ENGINE;
+  }
 
-    /**
-     * Gets the ED25519 crypto engine.
-     *
-     * @return The ED25519 crypto engine.
-     */
-    public static CryptoEngine ed25519Engine() {
-        return ED25519_ENGINE;
-    }
+  /**
+   * Gets the ED25519 crypto engine.
+   *
+   * @return The ED25519 crypto engine.
+   */
+  public static CryptoEngine ed25519Engine() {
+    return ED25519_ENGINE;
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.core.utils.ConvertUtils;
@@ -48,226 +47,239 @@ import org.junit.jupiter.api.Test;
  */
 public class RestrictionMosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest {
 
-    private RestrictionMosaicRepositoryOkHttpImpl repository;
+  private RestrictionMosaicRepositoryOkHttpImpl repository;
 
+  @BeforeEach
+  public void setUp() {
+    super.setUp();
+    repository = new RestrictionMosaicRepositoryOkHttpImpl(apiClientMock);
+  }
 
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-        repository = new RestrictionMosaicRepositoryOkHttpImpl(apiClientMock);
-    }
+  @Test
+  public void shouldGetMosaicAddressRestrictions() throws Exception {
+    Address address = Address.generateRandom(networkType);
 
+    MosaicId mosaicId = MapperUtils.toMosaicId("123");
 
-    @Test
-    public void shouldGetMosaicAddressRestrictions() throws Exception {
-        Address address = Address.generateRandom(networkType);
+    MosaicAddressRestrictionDTO dto = new MosaicAddressRestrictionDTO();
+    MosaicAddressRestrictionEntryWrapperDTO wrapperDTO =
+        new MosaicAddressRestrictionEntryWrapperDTO();
+    dto.setMosaicRestrictionEntry(wrapperDTO);
 
-        MosaicId mosaicId = MapperUtils.toMosaicId("123");
+    MosaicAddressRestrictionEntryDTO entryDTO = new MosaicAddressRestrictionEntryDTO();
+    entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
+    entryDTO.setValue("2222");
+    List<MosaicAddressRestrictionEntryDTO> restrictions = new ArrayList<>();
+    restrictions.add(entryDTO);
 
-        MosaicAddressRestrictionDTO dto = new MosaicAddressRestrictionDTO();
-        MosaicAddressRestrictionEntryWrapperDTO wrapperDTO = new MosaicAddressRestrictionEntryWrapperDTO();
-        dto.setMosaicRestrictionEntry(wrapperDTO);
+    wrapperDTO.setCompositeHash("compositeHash");
+    wrapperDTO.setMosaicId(mosaicId.getIdAsHex());
+    wrapperDTO.setRestrictions(restrictions);
+    wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_0);
+    wrapperDTO.setTargetAddress(address.encoded());
 
-        MosaicAddressRestrictionEntryDTO entryDTO = new MosaicAddressRestrictionEntryDTO();
-        entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
-        entryDTO.setValue("2222");
-        List<MosaicAddressRestrictionEntryDTO> restrictions = new ArrayList<>();
-        restrictions.add(entryDTO);
+    List<MosaicAddressRestrictionDTO> list = new ArrayList<>();
+    list.add(dto);
 
-        wrapperDTO.setCompositeHash("compositeHash");
-        wrapperDTO.setMosaicId(mosaicId.getIdAsHex());
-        wrapperDTO.setRestrictions(restrictions);
-        wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_0);
-        wrapperDTO.setTargetAddress(address.encoded());
+    mockRemoteCall(list);
 
-        List<MosaicAddressRestrictionDTO> list = new ArrayList<>();
-        list.add(dto);
-
-        mockRemoteCall(list);
-
-        List<MosaicAddressRestriction> mosaicAddressRestrictions = repository
-            .getMosaicAddressRestrictions(mosaicId, Collections.singletonList(address)).toFuture()
+    List<MosaicAddressRestriction> mosaicAddressRestrictions =
+        repository
+            .getMosaicAddressRestrictions(mosaicId, Collections.singletonList(address))
+            .toFuture()
             .get();
 
-        Assertions.assertEquals(1, mosaicAddressRestrictions.size());
-        MosaicAddressRestriction mosaicAddressRestriction = mosaicAddressRestrictions.get(0);
+    Assertions.assertEquals(1, mosaicAddressRestrictions.size());
+    MosaicAddressRestriction mosaicAddressRestriction = mosaicAddressRestrictions.get(0);
 
-        Assertions.assertEquals(wrapperDTO.getCompositeHash(),
-            mosaicAddressRestriction.getCompositeHash());
+    Assertions.assertEquals(
+        wrapperDTO.getCompositeHash(), mosaicAddressRestriction.getCompositeHash());
 
-        Assertions.assertEquals(MosaicRestrictionEntryType.ADDRESS,
-            mosaicAddressRestriction.getEntryType());
+    Assertions.assertEquals(
+        MosaicRestrictionEntryType.ADDRESS, mosaicAddressRestriction.getEntryType());
 
-        Assertions.assertEquals(mosaicId, mosaicAddressRestriction.getMosaicId());
-        Assertions.assertEquals(address, mosaicAddressRestriction.getTargetAddress());
-        Assertions.assertEquals(1, mosaicAddressRestriction.getRestrictions().size());
-        Assertions
-            .assertEquals(BigInteger.valueOf(2222),
-                mosaicAddressRestriction.getRestrictions().get(BigInteger.valueOf(1111)));
+    Assertions.assertEquals(mosaicId, mosaicAddressRestriction.getMosaicId());
+    Assertions.assertEquals(address, mosaicAddressRestriction.getTargetAddress());
+    Assertions.assertEquals(1, mosaicAddressRestriction.getRestrictions().size());
+    Assertions.assertEquals(
+        BigInteger.valueOf(2222),
+        mosaicAddressRestriction.getRestrictions().get(BigInteger.valueOf(1111)));
+  }
 
-    }
+  @Test
+  public void shouldGetMosaicGlobalRestrictions() throws Exception {
 
-    @Test
-    public void shouldGetMosaicGlobalRestrictions() throws Exception {
+    MosaicId mosaicId = MapperUtils.toMosaicId("123");
 
-        MosaicId mosaicId = MapperUtils.toMosaicId("123");
+    MosaicGlobalRestrictionDTO dto = new MosaicGlobalRestrictionDTO();
+    MosaicGlobalRestrictionEntryWrapperDTO wrapperDTO =
+        new MosaicGlobalRestrictionEntryWrapperDTO();
+    dto.setMosaicRestrictionEntry(wrapperDTO);
 
-        MosaicGlobalRestrictionDTO dto = new MosaicGlobalRestrictionDTO();
-        MosaicGlobalRestrictionEntryWrapperDTO wrapperDTO = new MosaicGlobalRestrictionEntryWrapperDTO();
-        dto.setMosaicRestrictionEntry(wrapperDTO);
+    MosaicGlobalRestrictionEntryDTO entryDTO = new MosaicGlobalRestrictionEntryDTO();
+    entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
+    MosaicGlobalRestrictionEntryRestrictionDTO entryRestrictionDto =
+        new MosaicGlobalRestrictionEntryRestrictionDTO();
+    entryRestrictionDto.setRestrictionType(MosaicRestrictionTypeEnum.NUMBER_5);
+    entryRestrictionDto.setReferenceMosaicId("456");
+    entryRestrictionDto.setRestrictionValue(BigInteger.valueOf(3333));
+    entryDTO.setRestriction(entryRestrictionDto);
+    List<MosaicGlobalRestrictionEntryDTO> restrictions = new ArrayList<>();
+    restrictions.add(entryDTO);
 
-        MosaicGlobalRestrictionEntryDTO entryDTO = new MosaicGlobalRestrictionEntryDTO();
-        entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
-        MosaicGlobalRestrictionEntryRestrictionDTO entryRestrictionDto = new MosaicGlobalRestrictionEntryRestrictionDTO();
-        entryRestrictionDto.setRestrictionType(MosaicRestrictionTypeEnum.NUMBER_5);
-        entryRestrictionDto.setReferenceMosaicId("456");
-        entryRestrictionDto.setRestrictionValue(BigInteger.valueOf(3333));
-        entryDTO.setRestriction(entryRestrictionDto);
-        List<MosaicGlobalRestrictionEntryDTO> restrictions = new ArrayList<>();
-        restrictions.add(entryDTO);
+    wrapperDTO.setCompositeHash("compositeHash");
+    wrapperDTO.setMosaicId(mosaicId.getIdAsHex());
+    wrapperDTO.setRestrictions(restrictions);
+    wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_1);
 
-        wrapperDTO.setCompositeHash("compositeHash");
-        wrapperDTO.setMosaicId(mosaicId.getIdAsHex());
-        wrapperDTO.setRestrictions(restrictions);
-        wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_1);
+    List<MosaicGlobalRestrictionDTO> list = new ArrayList<>();
+    list.add(dto);
 
-        List<MosaicGlobalRestrictionDTO> list = new ArrayList<>();
-        list.add(dto);
+    mockRemoteCall(list);
 
-        mockRemoteCall(list);
-
-        List<MosaicGlobalRestriction> mosaicGlobalRestrictions = repository
-            .getMosaicGlobalRestrictions(Collections.singletonList(mosaicId)).toFuture()
+    List<MosaicGlobalRestriction> mosaicGlobalRestrictions =
+        repository
+            .getMosaicGlobalRestrictions(Collections.singletonList(mosaicId))
+            .toFuture()
             .get();
 
-        Assertions.assertEquals(1, mosaicGlobalRestrictions.size());
-        MosaicGlobalRestriction mosaicGlobalRestriction = mosaicGlobalRestrictions.get(0);
+    Assertions.assertEquals(1, mosaicGlobalRestrictions.size());
+    MosaicGlobalRestriction mosaicGlobalRestriction = mosaicGlobalRestrictions.get(0);
 
-        Assertions.assertEquals(wrapperDTO.getCompositeHash(),
-            mosaicGlobalRestriction.getCompositeHash());
+    Assertions.assertEquals(
+        wrapperDTO.getCompositeHash(), mosaicGlobalRestriction.getCompositeHash());
 
-        Assertions.assertEquals(MosaicRestrictionEntryType.GLOBAL,
-            mosaicGlobalRestriction.getEntryType());
+    Assertions.assertEquals(
+        MosaicRestrictionEntryType.GLOBAL, mosaicGlobalRestriction.getEntryType());
 
-        Assertions.assertEquals(mosaicId, mosaicGlobalRestriction.getMosaicId());
-        Assertions.assertEquals(1, mosaicGlobalRestriction.getRestrictions().size());
-        Assertions
-            .assertEquals(BigInteger.valueOf(3333),
-                mosaicGlobalRestriction.getRestrictions().get(BigInteger.valueOf(1111))
-                    .getRestrictionValue());
-        Assertions
-            .assertEquals("0000000000000456",
-                mosaicGlobalRestriction.getRestrictions().get(BigInteger.valueOf(1111))
-                    .getReferenceMosaicId()
-                    .getIdAsHex());
-        Assertions
-            .assertEquals(MosaicRestrictionType.GT,
-                mosaicGlobalRestriction.getRestrictions().get(BigInteger.valueOf(1111))
-                    .getRestrictionType());
+    Assertions.assertEquals(mosaicId, mosaicGlobalRestriction.getMosaicId());
+    Assertions.assertEquals(1, mosaicGlobalRestriction.getRestrictions().size());
+    Assertions.assertEquals(
+        BigInteger.valueOf(3333),
+        mosaicGlobalRestriction
+            .getRestrictions()
+            .get(BigInteger.valueOf(1111))
+            .getRestrictionValue());
+    Assertions.assertEquals(
+        "0000000000000456",
+        mosaicGlobalRestriction
+            .getRestrictions()
+            .get(BigInteger.valueOf(1111))
+            .getReferenceMosaicId()
+            .getIdAsHex());
+    Assertions.assertEquals(
+        MosaicRestrictionType.GT,
+        mosaicGlobalRestriction
+            .getRestrictions()
+            .get(BigInteger.valueOf(1111))
+            .getRestrictionType());
+  }
 
-    }
+  @Test
+  public void shouldMosaicGlobalRestriction() throws Exception {
 
-    @Test
-    public void shouldMosaicGlobalRestriction() throws Exception {
+    MosaicId mosaicId = MapperUtils.toMosaicId("123");
 
-        MosaicId mosaicId = MapperUtils.toMosaicId("123");
+    MosaicGlobalRestrictionDTO dto = new MosaicGlobalRestrictionDTO();
+    MosaicGlobalRestrictionEntryWrapperDTO wrapperDTO =
+        new MosaicGlobalRestrictionEntryWrapperDTO();
+    dto.setMosaicRestrictionEntry(wrapperDTO);
 
-        MosaicGlobalRestrictionDTO dto = new MosaicGlobalRestrictionDTO();
-        MosaicGlobalRestrictionEntryWrapperDTO wrapperDTO = new MosaicGlobalRestrictionEntryWrapperDTO();
-        dto.setMosaicRestrictionEntry(wrapperDTO);
+    MosaicGlobalRestrictionEntryDTO entryDTO = new MosaicGlobalRestrictionEntryDTO();
+    entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
+    MosaicGlobalRestrictionEntryRestrictionDTO entryRestrictionDto =
+        new MosaicGlobalRestrictionEntryRestrictionDTO();
+    entryRestrictionDto.setRestrictionType(MosaicRestrictionTypeEnum.NUMBER_5);
+    entryRestrictionDto.setReferenceMosaicId("456");
+    entryRestrictionDto.setRestrictionValue(BigInteger.valueOf(3333));
+    entryDTO.setRestriction(entryRestrictionDto);
+    List<MosaicGlobalRestrictionEntryDTO> restrictions = new ArrayList<>();
+    restrictions.add(entryDTO);
 
-        MosaicGlobalRestrictionEntryDTO entryDTO = new MosaicGlobalRestrictionEntryDTO();
-        entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
-        MosaicGlobalRestrictionEntryRestrictionDTO entryRestrictionDto = new MosaicGlobalRestrictionEntryRestrictionDTO();
-        entryRestrictionDto.setRestrictionType(MosaicRestrictionTypeEnum.NUMBER_5);
-        entryRestrictionDto.setReferenceMosaicId("456");
-        entryRestrictionDto.setRestrictionValue(BigInteger.valueOf(3333));
-        entryDTO.setRestriction(entryRestrictionDto);
-        List<MosaicGlobalRestrictionEntryDTO> restrictions = new ArrayList<>();
-        restrictions.add(entryDTO);
+    wrapperDTO.setCompositeHash("compositeHash");
+    wrapperDTO.setMosaicId(mosaicId.getIdAsHex());
+    wrapperDTO.setRestrictions(restrictions);
+    wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_1);
 
-        wrapperDTO.setCompositeHash("compositeHash");
-        wrapperDTO.setMosaicId(mosaicId.getIdAsHex());
-        wrapperDTO.setRestrictions(restrictions);
-        wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_1);
+    mockRemoteCall(dto);
 
-        mockRemoteCall(dto);
+    MosaicGlobalRestriction mosaicGlobalRestriction =
+        repository.getMosaicGlobalRestriction(mosaicId).toFuture().get();
 
-        MosaicGlobalRestriction mosaicGlobalRestriction = repository
-            .getMosaicGlobalRestriction(mosaicId).toFuture()
-            .get();
+    Assertions.assertEquals(
+        wrapperDTO.getCompositeHash(), mosaicGlobalRestriction.getCompositeHash());
 
-        Assertions.assertEquals(wrapperDTO.getCompositeHash(),
-            mosaicGlobalRestriction.getCompositeHash());
+    Assertions.assertEquals(
+        MosaicRestrictionEntryType.GLOBAL, mosaicGlobalRestriction.getEntryType());
 
-        Assertions.assertEquals(MosaicRestrictionEntryType.GLOBAL,
-            mosaicGlobalRestriction.getEntryType());
+    Assertions.assertEquals(mosaicId, mosaicGlobalRestriction.getMosaicId());
+    Assertions.assertEquals(1, mosaicGlobalRestriction.getRestrictions().size());
+    Assertions.assertEquals(
+        BigInteger.valueOf(3333),
+        mosaicGlobalRestriction
+            .getRestrictions()
+            .get(BigInteger.valueOf(1111))
+            .getRestrictionValue());
+    Assertions.assertEquals(
+        "0000000000000456",
+        mosaicGlobalRestriction
+            .getRestrictions()
+            .get(BigInteger.valueOf(1111))
+            .getReferenceMosaicId()
+            .getIdAsHex());
+    Assertions.assertEquals(
+        MosaicRestrictionType.GT,
+        mosaicGlobalRestriction
+            .getRestrictions()
+            .get(BigInteger.valueOf((1111)))
+            .getRestrictionType());
+  }
 
-        Assertions.assertEquals(mosaicId, mosaicGlobalRestriction.getMosaicId());
-        Assertions.assertEquals(1, mosaicGlobalRestriction.getRestrictions().size());
-        Assertions
-            .assertEquals(BigInteger.valueOf(3333),
-                mosaicGlobalRestriction.getRestrictions().get(BigInteger.valueOf(1111))
-                    .getRestrictionValue());
-        Assertions
-            .assertEquals("0000000000000456",
-                mosaicGlobalRestriction.getRestrictions().get(BigInteger.valueOf(1111))
-                    .getReferenceMosaicId()
-                    .getIdAsHex());
-        Assertions
-            .assertEquals(MosaicRestrictionType.GT,
-                mosaicGlobalRestriction.getRestrictions().get(BigInteger.valueOf((1111)))
-                    .getRestrictionType());
+  @Test
+  public void shouldGetMosaicAddressRestriction() throws Exception {
 
-    }
+    Address address = Address.generateRandom(networkType);
 
+    MosaicId mosaicId = MapperUtils.toMosaicId("123");
 
-    @Test
-    public void shouldGetMosaicAddressRestriction() throws Exception {
+    MosaicAddressRestrictionDTO dto = new MosaicAddressRestrictionDTO();
+    MosaicAddressRestrictionEntryWrapperDTO wrapperDTO =
+        new MosaicAddressRestrictionEntryWrapperDTO();
+    dto.setMosaicRestrictionEntry(wrapperDTO);
 
-        Address address = Address.generateRandom(networkType);
+    MosaicAddressRestrictionEntryDTO entryDTO = new MosaicAddressRestrictionEntryDTO();
+    entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
+    entryDTO.setValue("2222");
+    List<MosaicAddressRestrictionEntryDTO> restrictions = new ArrayList<>();
+    restrictions.add(entryDTO);
 
-        MosaicId mosaicId = MapperUtils.toMosaicId("123");
+    wrapperDTO.setCompositeHash("compositeHash");
+    wrapperDTO.setMosaicId(mosaicId.getIdAsHex());
+    wrapperDTO.setRestrictions(restrictions);
+    wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_0);
+    wrapperDTO.setTargetAddress(address.encoded());
 
-        MosaicAddressRestrictionDTO dto = new MosaicAddressRestrictionDTO();
-        MosaicAddressRestrictionEntryWrapperDTO wrapperDTO = new MosaicAddressRestrictionEntryWrapperDTO();
-        dto.setMosaicRestrictionEntry(wrapperDTO);
+    mockRemoteCall(dto);
 
-        MosaicAddressRestrictionEntryDTO entryDTO = new MosaicAddressRestrictionEntryDTO();
-        entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
-        entryDTO.setValue("2222");
-        List<MosaicAddressRestrictionEntryDTO> restrictions = new ArrayList<>();
-        restrictions.add(entryDTO);
+    MosaicAddressRestriction mosaicAddressRestriction =
+        repository.getMosaicAddressRestriction(mosaicId, address).toFuture().get();
 
-        wrapperDTO.setCompositeHash("compositeHash");
-        wrapperDTO.setMosaicId(mosaicId.getIdAsHex());
-        wrapperDTO.setRestrictions(restrictions);
-        wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_0);
-        wrapperDTO.setTargetAddress(address.encoded());
+    Assertions.assertEquals(
+        wrapperDTO.getCompositeHash(), mosaicAddressRestriction.getCompositeHash());
 
-        mockRemoteCall(dto);
+    Assertions.assertEquals(
+        MosaicRestrictionEntryType.ADDRESS, mosaicAddressRestriction.getEntryType());
 
-        MosaicAddressRestriction mosaicAddressRestriction = repository
-            .getMosaicAddressRestriction(mosaicId, address).toFuture()
-            .get();
+    Assertions.assertEquals(mosaicId, mosaicAddressRestriction.getMosaicId());
+    Assertions.assertEquals(address, mosaicAddressRestriction.getTargetAddress());
+    Assertions.assertEquals(1, mosaicAddressRestriction.getRestrictions().size());
+    Assertions.assertEquals(
+        BigInteger.valueOf(2222),
+        mosaicAddressRestriction.getRestrictions().get((BigInteger.valueOf(1111))));
+  }
 
-        Assertions.assertEquals(wrapperDTO.getCompositeHash(),
-            mosaicAddressRestriction.getCompositeHash());
-
-        Assertions.assertEquals(MosaicRestrictionEntryType.ADDRESS,
-            mosaicAddressRestriction.getEntryType());
-
-        Assertions.assertEquals(mosaicId, mosaicAddressRestriction.getMosaicId());
-        Assertions.assertEquals(address, mosaicAddressRestriction.getTargetAddress());
-        Assertions.assertEquals(1, mosaicAddressRestriction.getRestrictions().size());
-        Assertions
-            .assertEquals(BigInteger.valueOf(2222),
-                mosaicAddressRestriction.getRestrictions().get((BigInteger.valueOf(1111))));
-
-    }
-
-    @Override
-    public RestrictionMosaicRepositoryOkHttpImpl getRepository() {
-        return repository;
-    }
+  @Override
+  public RestrictionMosaicRepositoryOkHttpImpl getRepository() {
+    return repository;
+  }
 }

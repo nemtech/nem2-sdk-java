@@ -13,64 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.core.crypto.VotingKey;
 import java.math.BigInteger;
 
-/**
- * Voting key link transaction.
- */
+/** Voting key link transaction. */
 public class VotingKeyLinkTransaction extends Transaction {
 
-    /**
-     * The voting key.
-     */
-    private final VotingKey linkedPublicKey;
+  /** The voting key. */
+  private final VotingKey linkedPublicKey;
 
-    /**
-     * Start finalization point.
-     */
-    private final BigInteger startPoint;
+  /** Start finalization point. */
+  private final BigInteger startPoint;
 
-    /**
-     * End finalization point.
-     */
-    private final BigInteger endPoint;
+  /** End finalization point. */
+  private final BigInteger endPoint;
 
-    /**
-     * The link action.
-     */
-    private final LinkAction linkAction;
+  /** The link action. */
+  private final LinkAction linkAction;
 
-    /**
-     * Constructor
-     *
-     * @param factory the factory.
-     */
-    VotingKeyLinkTransaction(VotingKeyLinkTransactionFactory factory) {
-        super(factory);
-        this.linkedPublicKey = factory.getLinkedPublicKey();
-        this.startPoint  = factory.getStartPoint();
-        this.endPoint = factory.getEndPoint();
-        this.linkAction = factory.getLinkAction();
+  /**
+   * Constructor
+   *
+   * @param factory the factory.
+   */
+  VotingKeyLinkTransaction(VotingKeyLinkTransactionFactory factory) {
+    super(factory);
+    this.linkedPublicKey = factory.getLinkedPublicKey();
+    this.startPoint = factory.getStartPoint();
+    this.endPoint = factory.getEndPoint();
+    this.linkAction = factory.getLinkAction();
+  }
 
-    }
+  public VotingKey getLinkedPublicKey() {
+    return linkedPublicKey;
+  }
 
-    public VotingKey getLinkedPublicKey() {
-        return linkedPublicKey;
-    }
+  public LinkAction getLinkAction() {
+    return linkAction;
+  }
 
-    public LinkAction getLinkAction() {
-        return linkAction;
-    }
+  public BigInteger getStartPoint() {
+    return startPoint;
+  }
 
-    public BigInteger getStartPoint() {
-        return startPoint;
-    }
-
-    public BigInteger getEndPoint() {
-        return endPoint;
-    }
+  public BigInteger getEndPoint() {
+    return endPoint;
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.AliasService;
@@ -28,60 +27,64 @@ import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.reactivex.Observable;
 import org.apache.commons.lang3.Validate;
 
-/**
- * Implementation of the alias service.
- */
+/** Implementation of the alias service. */
 public class AliasServiceImpl implements AliasService {
 
-    private final NamespaceRepository namespaceRepository;
+  private final NamespaceRepository namespaceRepository;
 
-    /**
-     * Constructor
-     *
-     * @param repositoryFactory repository factory.
-     */
-    public AliasServiceImpl(RepositoryFactory repositoryFactory) {
-        this.namespaceRepository = repositoryFactory.createNamespaceRepository();
-    }
+  /**
+   * Constructor
+   *
+   * @param repositoryFactory repository factory.
+   */
+  public AliasServiceImpl(RepositoryFactory repositoryFactory) {
+    this.namespaceRepository = repositoryFactory.createNamespaceRepository();
+  }
 
-    @Override
-    public Observable<MosaicId> resolveMosaicId(UnresolvedMosaicId unresolvedMosaicId) {
-        if (unresolvedMosaicId instanceof NamespaceId) {
-            NamespaceId alias = (NamespaceId) unresolvedMosaicId;
-            return namespaceRepository.getNamespace(alias)
-                .map(namespaceInfo -> {
-                    Validate.isTrue(namespaceInfo.getAlias().getType() == AliasType.MOSAIC,
-                        "Alias is not Mosaic");
-                    return (MosaicId) namespaceInfo.getAlias().getAliasValue();
-                })
-                .onErrorResumeNext(e -> {
-                    return Observable.error(new IllegalArgumentException(
+  @Override
+  public Observable<MosaicId> resolveMosaicId(UnresolvedMosaicId unresolvedMosaicId) {
+    if (unresolvedMosaicId instanceof NamespaceId) {
+      NamespaceId alias = (NamespaceId) unresolvedMosaicId;
+      return namespaceRepository
+          .getNamespace(alias)
+          .map(
+              namespaceInfo -> {
+                Validate.isTrue(
+                    namespaceInfo.getAlias().getType() == AliasType.MOSAIC, "Alias is not Mosaic");
+                return (MosaicId) namespaceInfo.getAlias().getAliasValue();
+              })
+          .onErrorResumeNext(
+              e -> {
+                return Observable.error(
+                    new IllegalArgumentException(
                         "MosaicId could not be resolved from alias " + alias.getIdAsHex(), e));
-                });
-        } else {
-            return Observable.just((MosaicId) unresolvedMosaicId);
-        }
-
+              });
+    } else {
+      return Observable.just((MosaicId) unresolvedMosaicId);
     }
+  }
 
-    @Override
-    public Observable<Address> resolveAddress(UnresolvedAddress unresolvedAddress) {
-        if (unresolvedAddress instanceof NamespaceId) {
-            NamespaceId alias = (NamespaceId) unresolvedAddress;
-            return namespaceRepository.getNamespace(alias)
-                .map(namespaceInfo -> {
-                    Validate.isTrue(namespaceInfo.getAlias().getType() == AliasType.ADDRESS,
-                        "Alias is not address");
-                    return (Address) namespaceInfo.getAlias().getAliasValue();
-                })
-                .onErrorResumeNext(e -> {
-                    return Observable.error(new IllegalArgumentException(
+  @Override
+  public Observable<Address> resolveAddress(UnresolvedAddress unresolvedAddress) {
+    if (unresolvedAddress instanceof NamespaceId) {
+      NamespaceId alias = (NamespaceId) unresolvedAddress;
+      return namespaceRepository
+          .getNamespace(alias)
+          .map(
+              namespaceInfo -> {
+                Validate.isTrue(
+                    namespaceInfo.getAlias().getType() == AliasType.ADDRESS,
+                    "Alias is not address");
+                return (Address) namespaceInfo.getAlias().getAliasValue();
+              })
+          .onErrorResumeNext(
+              e -> {
+                return Observable.error(
+                    new IllegalArgumentException(
                         "Address could not be resolved from alias " + alias.getIdAsHex(), e));
-                });
-        } else {
-            return Observable.just((Address) unresolvedAddress);
-        }
-
+              });
+    } else {
+      return Observable.just((Address) unresolvedAddress);
     }
-
+  }
 }

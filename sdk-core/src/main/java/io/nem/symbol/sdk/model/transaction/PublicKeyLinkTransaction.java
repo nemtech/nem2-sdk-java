@@ -13,28 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.core.crypto.PublicKey;
 
-/**
- * A Transaction operation related to a {@link PublicKey}.
- */
+/** A Transaction operation related to a {@link PublicKey}. */
 public interface PublicKeyLinkTransaction {
 
-    /**
-     * Gets the linked public key.
-     *
-     * @return Public key.
-     */
-    PublicKey getLinkedPublicKey();
+  /**
+   * Gets the linked public key.
+   *
+   * @return Public key.
+   */
+  PublicKey getLinkedPublicKey();
 
-    /**
-     * Gets the link action.
-     *
-     * @return Link action.
-     */
-    LinkAction getLinkAction();
-
+  /**
+   * Gets the link action.
+   *
+   * @return Link action.
+   */
+  LinkAction getLinkAction();
 }

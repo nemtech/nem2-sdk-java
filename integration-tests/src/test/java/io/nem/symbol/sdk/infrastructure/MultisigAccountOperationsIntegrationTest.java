@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.model.account.Account;
@@ -38,40 +37,56 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTest {
 
-    private Account multisigAccount;
-    private Account cosignatoryAccount;
+  private Account multisigAccount;
+  private Account cosignatoryAccount;
 
+  @BeforeEach
+  void setup() {
+    multisigAccount = config().getMultisigAccount();
+    cosignatoryAccount = config().getCosignatoryAccount();
+  }
 
-    @BeforeEach
-    void setup() {
-        multisigAccount = config().getMultisigAccount();
-        cosignatoryAccount = config().getCosignatoryAccount();
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void cosignatureTransactionOnSign(RepositoryType type) {
+    Address recipient = getRecipient();
+    TransferTransaction transferTransaction =
+        TransferTransactionFactory.create(
+                getNetworkType(),
+                recipient,
+                Collections.singletonList(
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
+                PlainMessage.create("test-message"))
+            .maxFee(this.maxFee)
+            .build();
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void cosignatureTransactionOnSign(RepositoryType type) {
-        Address recipient = getRecipient();
-        TransferTransaction transferTransaction = TransferTransactionFactory.create(getNetworkType(), recipient,
-            Collections.singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-            PlainMessage.create("test-message")).maxFee(this.maxFee).build();
+    AggregateTransaction aggregateTransaction =
+        AggregateTransactionFactory.createBonded(
+                getNetworkType(),
+                Collections.singletonList(
+                    transferTransaction.toAggregate(this.multisigAccount.getPublicAccount())))
+            .maxFee(this.maxFee)
+            .build();
 
-        AggregateTransaction aggregateTransaction = AggregateTransactionFactory.createBonded(getNetworkType(),
-            Collections.singletonList(transferTransaction.toAggregate(this.multisigAccount.getPublicAccount())))
-            .maxFee(this.maxFee).build();
+    SignedTransaction signedTransaction =
+        this.cosignatoryAccount.sign(aggregateTransaction, getGenerationHash());
 
-        SignedTransaction signedTransaction = this.cosignatoryAccount.sign(aggregateTransaction, getGenerationHash());
+    TransactionFactory<HashLockTransaction> hashLockTransaction =
+        HashLockTransactionFactory.create(
+                getNetworkType(),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
+                BigInteger.valueOf(100),
+                signedTransaction)
+            .maxFee(this.maxFee);
+    SignedTransaction signedHashLockTransaction =
+        hashLockTransaction.build().signWith(this.cosignatoryAccount, getGenerationHash());
 
-        TransactionFactory<HashLockTransaction> hashLockTransaction = HashLockTransactionFactory
-            .create(getNetworkType(), getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
-                BigInteger.valueOf(100), signedTransaction).maxFee(this.maxFee);
-        SignedTransaction signedHashLockTransaction = hashLockTransaction.build()
-            .signWith(this.cosignatoryAccount, getGenerationHash());
-
-        AggregateTransaction finalTransaction = getTransactionOrFail(getTransactionService(type)
-                .announceHashLockAggregateBonded(getListener(type), signedHashLockTransaction, signedTransaction),
+    AggregateTransaction finalTransaction =
+        getTransactionOrFail(
+            getTransactionService(type)
+                .announceHashLockAggregateBonded(
+                    getListener(type), signedHashLockTransaction, signedTransaction),
             aggregateTransaction);
-        Assertions.assertNotNull(finalTransaction);
-    }
-
+    Assertions.assertNotNull(finalTransaction);
+  }
 }

@@ -19,39 +19,33 @@ import java.util.List;
 
 public class AccountOperationRestrictionTransaction extends Transaction {
 
-    private final AccountOperationRestrictionFlags restrictionFlags;
-    private final List<TransactionType> restrictionAdditions;
-    private final List<TransactionType> restrictionDeletions;
+  private final AccountOperationRestrictionFlags restrictionFlags;
+  private final List<TransactionType> restrictionAdditions;
+  private final List<TransactionType> restrictionDeletions;
 
-    AccountOperationRestrictionTransaction(
-        AccountOperationRestrictionTransactionFactory factory) {
-        super(factory);
-        this.restrictionFlags = factory.getRestrictionFlags();
-        this.restrictionAdditions = factory.getRestrictionAdditions();
-        this.restrictionDeletions = factory.getRestrictionDeletions();
-    }
+  AccountOperationRestrictionTransaction(AccountOperationRestrictionTransactionFactory factory) {
+    super(factory);
+    this.restrictionFlags = factory.getRestrictionFlags();
+    this.restrictionAdditions = factory.getRestrictionAdditions();
+    this.restrictionDeletions = factory.getRestrictionDeletions();
+  }
 
-    /**
-     * Get account restriction flags
-     *
-     * @return {@link AccountOperationRestrictionFlags}
-     */
-    public AccountOperationRestrictionFlags getRestrictionFlags() {
-        return this.restrictionFlags;
-    }
+  /**
+   * Get account restriction flags
+   *
+   * @return {@link AccountOperationRestrictionFlags}
+   */
+  public AccountOperationRestrictionFlags getRestrictionFlags() {
+    return this.restrictionFlags;
+  }
 
+  /** @return List of transaction types that are going to be added to the restriction. */
+  public List<TransactionType> getRestrictionAdditions() {
+    return restrictionAdditions;
+  }
 
-    /**
-     * @return List of transaction types that are going to be added to the restriction.
-     */
-    public List<TransactionType> getRestrictionAdditions() {
-        return restrictionAdditions;
-    }
-
-    /**
-     * @return List of transaction types that are going to be removed from the restriction.
-     */
-    public List<TransactionType> getRestrictionDeletions() {
-        return restrictionDeletions;
-    }
+  /** @return List of transaction types that are going to be removed from the restriction. */
+  public List<TransactionType> getRestrictionDeletions() {
+    return restrictionDeletions;
+  }
 }

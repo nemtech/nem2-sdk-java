@@ -1,11 +1,24 @@
+/*
+ * Copyright 2020 NEM
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.sdk.api.TransactionStatusRepository;
-import io.nem.symbol.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.TransactionState;
 import io.nem.symbol.sdk.model.transaction.TransactionStatus;
-import io.nem.symbol.sdk.openapi.okhttp_gson.api.TransactionRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.TransactionStatusRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionHashes;
@@ -14,48 +27,47 @@ import io.reactivex.Observable;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-/**
- * Implementation of {@link io.nem.symbol.sdk.api.TransactionStatusRepository}
- */
-public class TransactionStatusRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements TransactionStatusRepository {
+/** Implementation of {@link io.nem.symbol.sdk.api.TransactionStatusRepository} */
+public class TransactionStatusRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
+    implements TransactionStatusRepository {
 
-    private final TransactionStatusRoutesApi client;
+  private final TransactionStatusRoutesApi client;
 
+  public TransactionStatusRepositoryOkHttpImpl(ApiClient apiClient) {
+    super(apiClient);
+    this.client = new TransactionStatusRoutesApi(apiClient);
+  }
 
-    public TransactionStatusRepositoryOkHttpImpl(ApiClient apiClient) {
-        super(apiClient);
-        this.client = new TransactionStatusRoutesApi(apiClient);
-    }
+  @Override
+  public Observable<TransactionStatus> getTransactionStatus(String transactionHash) {
+    Callable<TransactionStatusDTO> callback =
+        () -> getClient().getTransactionStatus(transactionHash);
+    return exceptionHandling(call(callback).map(this::toTransactionStatus));
+  }
 
-    @Override
-    public Observable<TransactionStatus> getTransactionStatus(String transactionHash) {
-        Callable<TransactionStatusDTO> callback = () -> getClient()
-            .getTransactionStatus(transactionHash);
-        return exceptionHandling(call(callback).map(this::toTransactionStatus));
-    }
+  private TransactionStatus toTransactionStatus(TransactionStatusDTO transactionStatusDTO) {
+    return new TransactionStatus(
+        TransactionState.valueOf(transactionStatusDTO.getGroup().name()),
+        transactionStatusDTO.getCode() == null ? null : transactionStatusDTO.getCode().getValue(),
+        transactionStatusDTO.getHash(),
+        new Deadline((transactionStatusDTO.getDeadline())),
+        (transactionStatusDTO.getHeight()));
+  }
 
-    private TransactionStatus toTransactionStatus(TransactionStatusDTO transactionStatusDTO) {
-        return new TransactionStatus(
-            TransactionState.valueOf(transactionStatusDTO.getGroup().name()),
-            transactionStatusDTO.getCode() == null ? null
-                : transactionStatusDTO.getCode().getValue(),
-            transactionStatusDTO.getHash(),
-            new Deadline((transactionStatusDTO.getDeadline())),
-            (transactionStatusDTO.getHeight()));
-    }
+  @Override
+  public Observable<List<TransactionStatus>> getTransactionStatuses(
+      List<String> transactionHashes) {
+    Callable<List<TransactionStatusDTO>> callback =
+        () -> getClient().getTransactionStatuses(new TransactionHashes().hashes(transactionHashes));
+    return exceptionHandling(
+        call(callback)
+            .flatMapIterable(item -> item)
+            .map(this::toTransactionStatus)
+            .toList()
+            .toObservable());
+  }
 
-    @Override
-    public Observable<List<TransactionStatus>> getTransactionStatuses(
-        List<String> transactionHashes) {
-        Callable<List<TransactionStatusDTO>> callback = () ->
-            getClient().getTransactionStatuses(new TransactionHashes().hashes(transactionHashes));
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toTransactionStatus).toList()
-                .toObservable());
-
-    }
-
-    public TransactionStatusRoutesApi getClient() {
-        return client;
-    }
+  public TransactionStatusRoutesApi getClient() {
+    return client;
+  }
 }

@@ -13,33 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
-
 package io.nem.symbol.sdk.model.network;
-
-/**
- * SecretLockNetworkProperties
- */
+/** SecretLockNetworkProperties */
 public class SecretLockNetworkProperties {
 
-    /**
-     * Maximum number of blocks for which a secret lock can exist.
-     **/
-    private final String maxSecretLockDuration;
-    /**
-     * Minimum size of a proof in bytes.
-     **/
-    private final String minProofSize;
+  /** Maximum number of blocks for which a secret lock can exist. */
+  private final String maxSecretLockDuration;
+  /** Minimum size of a proof in bytes. */
+  private final String minProofSize;
 
-    /**
-     * Maximum size of a proof in bytes.
-     **/
-    private final String maxProofSize;
+  /** Maximum size of a proof in bytes. */
+  private final String maxProofSize;
 
-  public SecretLockNetworkProperties(String maxSecretLockDuration, String minProofSize,
-      String maxProofSize) {
+  public SecretLockNetworkProperties(
+      String maxSecretLockDuration, String minProofSize, String maxProofSize) {
     this.maxSecretLockDuration = maxSecretLockDuration;
     this.minProofSize = minProofSize;
     this.maxProofSize = maxProofSize;
@@ -57,4 +44,3 @@ public class SecretLockNetworkProperties {
     return maxProofSize;
   }
 }
-

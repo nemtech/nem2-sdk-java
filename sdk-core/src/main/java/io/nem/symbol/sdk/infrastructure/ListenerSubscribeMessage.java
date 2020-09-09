@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 public class ListenerSubscribeMessage {
 
-    private final String uid;
-    private final String subscribe;
+  private final String uid;
+  private final String subscribe;
 
-    public ListenerSubscribeMessage(String uid, String subscribe) {
-        this.uid = uid;
-        this.subscribe = subscribe;
-    }
+  public ListenerSubscribeMessage(String uid, String subscribe) {
+    this.uid = uid;
+    this.subscribe = subscribe;
+  }
 
-    public String getUid() {
-        return uid;
-    }
+  public String getUid() {
+    return uid;
+  }
 
-    public String getSubscribe() {
-        return subscribe;
-    }
+  public String getSubscribe() {
+    return subscribe;
+  }
 }

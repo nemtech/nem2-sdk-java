@@ -13,70 +13,65 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Merkle hash builder.
- */
+/** Merkle hash builder. */
 public class MerkleHashBuilder {
 
-    private final List<byte[]> hashes;
+  private final List<byte[]> hashes;
 
-    /**
-     * Constructor.
-     */
-    public MerkleHashBuilder() {
-        this.hashes = new ArrayList<>();
+  /** Constructor. */
+  public MerkleHashBuilder() {
+    this.hashes = new ArrayList<>();
+  }
+
+  private byte[] getRootHash(List<byte[]> hashes) {
+    if (hashes.isEmpty()) {
+      return new byte[32];
     }
 
-    private byte[] getRootHash(List<byte[]> hashes) {
-        if (hashes.isEmpty()) {
-            return new byte[32];
+    // build the merkle tree
+    int numRemainingHashes = hashes.size();
+
+    Hasher hasher = Hashes::sha3_256;
+    while (numRemainingHashes > 1) {
+
+      for (int i = 0; i < numRemainingHashes; i += 2) {
+        if (i + 1 < numRemainingHashes) {
+          hashes.add(i / 2, hasher.hash(hashes.get(i), hashes.get(i + 1)));
+          continue;
         }
 
-        // build the merkle tree
-        int numRemainingHashes = hashes.size();
+        // if there is an odd number of hashes, duplicate the last one
+        hashes.add(i / 2, hasher.hash(hashes.get(i), hashes.get(i)));
+        ++numRemainingHashes;
+      }
 
-        Hasher hasher = Hashes::sha3_256;
-        while (numRemainingHashes > 1) {
-
-            for (int i = 0; i < numRemainingHashes; i += 2) {
-                if (i + 1 < numRemainingHashes) {
-                    hashes.add(i / 2, hasher.hash(hashes.get(i), hashes.get(i + 1)));
-                    continue;
-                }
-
-                // if there is an odd number of hashes, duplicate the last one
-                hashes.add(i / 2, hasher.hash(hashes.get(i), hashes.get(i)));
-                ++numRemainingHashes;
-            }
-
-            numRemainingHashes /= 2;
-        }
-
-        return hashes.get(0);
+      numRemainingHashes /= 2;
     }
 
-    /**
-     * Get the merkle tree root hash.
-     *
-     * @return Root hash.
-     */
-    public byte[] getRootHash() {
-        // build the merkle root
-        return getRootHash(hashes);
-    }
+    return hashes.get(0);
+  }
 
-    /**
-     * Add a new hash to the tree.
-     *
-     * @param hash Hash to add.
-     */
-    public void update(final byte[] hash) {
-        hashes.add(hash);
-    }
+  /**
+   * Get the merkle tree root hash.
+   *
+   * @return Root hash.
+   */
+  public byte[] getRootHash() {
+    // build the merkle root
+    return getRootHash(hashes);
+  }
+
+  /**
+   * Add a new hash to the tree.
+   *
+   * @param hash Hash to add.
+   */
+  public void update(final byte[] hash) {
+    hashes.add(hash);
+  }
 }

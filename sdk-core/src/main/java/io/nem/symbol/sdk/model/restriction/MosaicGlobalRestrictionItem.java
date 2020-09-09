@@ -13,49 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.restriction;
 
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
 import java.math.BigInteger;
 
-/**
- * Mosaic global restriction item structure .
- */
+/** Mosaic global restriction item structure . */
 public class MosaicGlobalRestrictionItem {
 
+  /** Reference mosaic identifier */
+  private final MosaicId referenceMosaicId;
+  /** Mosaic restriction value. */
+  private final BigInteger restrictionValue;
 
-    /**
-     * Reference mosaic identifier
-     */
-    private final MosaicId referenceMosaicId;
-    /**
-     * Mosaic restriction value.
-     */
-    private final BigInteger restrictionValue;
+  /** Mosaic restriction type. */
+  private final MosaicRestrictionType restrictionType;
 
-    /**
-     * Mosaic restriction type.
-     */
-    private final MosaicRestrictionType restrictionType;
+  public MosaicGlobalRestrictionItem(
+      MosaicId referenceMosaicId,
+      BigInteger restrictionValue,
+      MosaicRestrictionType restrictionType) {
+    this.referenceMosaicId = referenceMosaicId;
+    this.restrictionValue = restrictionValue;
+    this.restrictionType = restrictionType;
+  }
 
-    public MosaicGlobalRestrictionItem(MosaicId referenceMosaicId,
-        BigInteger restrictionValue, MosaicRestrictionType restrictionType) {
-        this.referenceMosaicId = referenceMosaicId;
-        this.restrictionValue = restrictionValue;
-        this.restrictionType = restrictionType;
-    }
+  public MosaicId getReferenceMosaicId() {
+    return referenceMosaicId;
+  }
 
-    public MosaicId getReferenceMosaicId() {
-        return referenceMosaicId;
-    }
+  public BigInteger getRestrictionValue() {
+    return restrictionValue;
+  }
 
-    public BigInteger getRestrictionValue() {
-        return restrictionValue;
-    }
-
-    public MosaicRestrictionType getRestrictionType() {
-        return restrictionType;
-    }
+  public MosaicRestrictionType getRestrictionType() {
+    return restrictionType;
+  }
 }

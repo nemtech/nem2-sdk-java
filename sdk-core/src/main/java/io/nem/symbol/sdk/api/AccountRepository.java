@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.account.AccountInfo;
@@ -28,20 +27,19 @@ import java.util.List;
  */
 public interface AccountRepository extends Searcher<AccountInfo, AccountSearchCriteria> {
 
-    /**
-     * Gets an AccountInfo for an account.
-     *
-     * @param address Address
-     * @return Observable {@link AccountInfo}
-     */
-    Observable<AccountInfo> getAccountInfo(Address address);
+  /**
+   * Gets an AccountInfo for an account.
+   *
+   * @param address Address
+   * @return Observable {@link AccountInfo}
+   */
+  Observable<AccountInfo> getAccountInfo(Address address);
 
-    /**
-     * Gets AccountsInfo for different accounts based on their addresses.
-     *
-     * @param addresses {@link List} of {@link Address}
-     * @return Observable {@link List} of {@link AccountInfo}
-     */
-    Observable<List<AccountInfo>> getAccountsInfo(List<Address> addresses);
-
+  /**
+   * Gets AccountsInfo for different accounts based on their addresses.
+   *
+   * @param addresses {@link List} of {@link Address}
+   * @return Observable {@link List} of {@link AccountInfo}
+   */
+  Observable<List<AccountInfo>> getAccountsInfo(List<Address> addresses);
 }

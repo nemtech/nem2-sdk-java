@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.message;
 
 import io.nem.symbol.core.crypto.BlockCipher;
@@ -28,92 +27,97 @@ import org.apache.commons.lang3.Validate;
 
 public class PersistentHarvestingDelegationMessage extends Message {
 
-    /**
-     * When decrypting, the message is converted back to the 2 original private keys.
-     */
-    public static class HarvestingKeys {
+  /** When decrypting, the message is converted back to the 2 original private keys. */
+  public static class HarvestingKeys {
 
-        private final PrivateKey signingPrivateKey;
-        private final PrivateKey vrfPrivateKey;
+    private final PrivateKey signingPrivateKey;
+    private final PrivateKey vrfPrivateKey;
 
-        private HarvestingKeys(PrivateKey signingPrivateKey, PrivateKey vrfPrivateKey) {
-            Validate.notNull(signingPrivateKey, "signingPrivateKey is required");
-            Validate.notNull(vrfPrivateKey, "vrfPrivateKey is required");
-            this.signingPrivateKey = signingPrivateKey;
-            this.vrfPrivateKey = vrfPrivateKey;
-        }
-
-        public PrivateKey getSigningPrivateKey() {
-            return signingPrivateKey;
-        }
-
-        public PrivateKey getVrfPrivateKey() {
-            return vrfPrivateKey;
-        }
+    private HarvestingKeys(PrivateKey signingPrivateKey, PrivateKey vrfPrivateKey) {
+      Validate.notNull(signingPrivateKey, "signingPrivateKey is required");
+      Validate.notNull(vrfPrivateKey, "vrfPrivateKey is required");
+      this.signingPrivateKey = signingPrivateKey;
+      this.vrfPrivateKey = vrfPrivateKey;
     }
 
-    public PersistentHarvestingDelegationMessage(String payload) {
-        super(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE, payload);
+    public PrivateKey getSigningPrivateKey() {
+      return signingPrivateKey;
     }
 
-    /**
-     * Helper constructor that allow users to create an encrypted Persistent Harvesting Delegation Message
-     *
-     * Note, the strategy to encrypt and decrypt should be shared between the different SDKs. A client may send a
-     * transaction using a sdk and the recipient may be using a different one.
-     *
-     * The strategy is:
-     *
-     * "plain text" string - utf8 byte array - encrypted byte array - hex string (the encrypted message string)
-     *
-     * @param signingPrivateKey Remote harvester signing private key linked to the main account
-     * @param vrfPrivateKey VRF private key linked to the main account
-     * @param nodePublicKey Recipient public key
-     * @return {@link PersistentHarvestingDelegationMessage}
-     */
-    public static PersistentHarvestingDelegationMessage create(PrivateKey signingPrivateKey, PrivateKey vrfPrivateKey,
-        PublicKey nodePublicKey) {
-
-        KeyPair ephemeralKeyPair = KeyPair.random();
-
-        CryptoEngine engine = CryptoEngines.defaultEngine();
-
-        KeyPair recipient = KeyPair.onlyPublic(nodePublicKey, engine);
-        BlockCipher blockCipher = engine.createBlockCipher(ephemeralKeyPair, recipient);
-
-        String payload =
-            MessageMarker.PERSISTENT_DELEGATION_UNLOCK + ephemeralKeyPair.getPublicKey().toHex() + ConvertUtils
-                .toHex(blockCipher.encrypt(StringEncoder.getBytes(signingPrivateKey.toHex() + vrfPrivateKey.toHex())));
-
-        return new PersistentHarvestingDelegationMessage(payload.toUpperCase());
+    public PrivateKey getVrfPrivateKey() {
+      return vrfPrivateKey;
     }
+  }
 
+  public PersistentHarvestingDelegationMessage(String payload) {
+    super(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE, payload);
+  }
 
-    /**
-     * Utility method that allow users to decrypt a message if it was created using the Java SDK or the Typescript SDK.
-     *
-     * @param recipientPrivateKey Recipient private key
-     * @return the 2 private keys
-     */
-    public HarvestingKeys decryptPayload(PrivateKey recipientPrivateKey) {
+  /**
+   * Helper constructor that allow users to create an encrypted Persistent Harvesting Delegation
+   * Message
+   *
+   * <p>Note, the strategy to encrypt and decrypt should be shared between the different SDKs. A
+   * client may send a transaction using a sdk and the recipient may be using a different one.
+   *
+   * <p>The strategy is:
+   *
+   * <p>"plain text" string - utf8 byte array - encrypted byte array - hex string (the encrypted
+   * message string)
+   *
+   * @param signingPrivateKey Remote harvester signing private key linked to the main account
+   * @param vrfPrivateKey VRF private key linked to the main account
+   * @param nodePublicKey Recipient public key
+   * @return {@link PersistentHarvestingDelegationMessage}
+   */
+  public static PersistentHarvestingDelegationMessage create(
+      PrivateKey signingPrivateKey, PrivateKey vrfPrivateKey, PublicKey nodePublicKey) {
 
-        int markerLength = MessageMarker.PERSISTENT_DELEGATION_UNLOCK.length();
-        int publicKeyHexSize = PublicKey.SIZE * 2;
-        PublicKey senderPublicKey = PublicKey
-            .fromHexString(getPayload().substring(markerLength, markerLength + publicKeyHexSize));
+    KeyPair ephemeralKeyPair = KeyPair.random();
 
-        String encryptedPayload = getPayload().substring(markerLength + publicKeyHexSize);
+    CryptoEngine engine = CryptoEngines.defaultEngine();
 
-        CryptoEngine engine = CryptoEngines.defaultEngine();
-        KeyPair sender = KeyPair.onlyPublic(senderPublicKey, engine);
-        KeyPair recipient = KeyPair.fromPrivate(recipientPrivateKey);
-        BlockCipher blockCipher = engine.createBlockCipher(sender, recipient);
+    KeyPair recipient = KeyPair.onlyPublic(nodePublicKey, engine);
+    BlockCipher blockCipher = engine.createBlockCipher(ephemeralKeyPair, recipient);
 
-        String doubleKey = StringEncoder.getString(blockCipher.decrypt(ConvertUtils.fromHexToBytes(encryptedPayload)))
+    String payload =
+        MessageMarker.PERSISTENT_DELEGATION_UNLOCK
+            + ephemeralKeyPair.getPublicKey().toHex()
+            + ConvertUtils.toHex(
+                blockCipher.encrypt(
+                    StringEncoder.getBytes(signingPrivateKey.toHex() + vrfPrivateKey.toHex())));
+
+    return new PersistentHarvestingDelegationMessage(payload.toUpperCase());
+  }
+
+  /**
+   * Utility method that allow users to decrypt a message if it was created using the Java SDK or
+   * the Typescript SDK.
+   *
+   * @param recipientPrivateKey Recipient private key
+   * @return the 2 private keys
+   */
+  public HarvestingKeys decryptPayload(PrivateKey recipientPrivateKey) {
+
+    int markerLength = MessageMarker.PERSISTENT_DELEGATION_UNLOCK.length();
+    int publicKeyHexSize = PublicKey.SIZE * 2;
+    PublicKey senderPublicKey =
+        PublicKey.fromHexString(
+            getPayload().substring(markerLength, markerLength + publicKeyHexSize));
+
+    String encryptedPayload = getPayload().substring(markerLength + publicKeyHexSize);
+
+    CryptoEngine engine = CryptoEngines.defaultEngine();
+    KeyPair sender = KeyPair.onlyPublic(senderPublicKey, engine);
+    KeyPair recipient = KeyPair.fromPrivate(recipientPrivateKey);
+    BlockCipher blockCipher = engine.createBlockCipher(sender, recipient);
+
+    String doubleKey =
+        StringEncoder.getString(blockCipher.decrypt(ConvertUtils.fromHexToBytes(encryptedPayload)))
             .toUpperCase();
-        PrivateKey signingPrivateKey = PrivateKey.fromHexString(doubleKey.substring(0, publicKeyHexSize));
-        PrivateKey vrfPrivateKey = PrivateKey.fromHexString(doubleKey.substring(publicKeyHexSize));
-        return new HarvestingKeys(signingPrivateKey, vrfPrivateKey);
-    }
-
+    PrivateKey signingPrivateKey =
+        PrivateKey.fromHexString(doubleKey.substring(0, publicKeyHexSize));
+    PrivateKey vrfPrivateKey = PrivateKey.fromHexString(doubleKey.substring(publicKeyHexSize));
+    return new HarvestingKeys(signingPrivateKey, vrfPrivateKey);
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,52 +25,46 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests for the {@link MosaicAliasTransaction} and the factory.
- **/
+/** Tests for the {@link MosaicAliasTransaction} and the factory. */
 public class MosaicAliasTransactionTest extends AbstractTransactionTester {
 
-    private static Account account =
-        new Account(
-            "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
-            NetworkType.MIJIN_TEST);
+  private static Account account =
+      new Account(
+          "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
+          NetworkType.MIJIN_TEST);
 
-    @Test
-    void shouldBuild() {
-        MosaicId mosaicId = new MosaicId(BigInteger.TEN);
-        NamespaceId namespaceId = NamespaceId.createFromName("anamespaced");
-        MosaicAliasTransaction transaction =
-            MosaicAliasTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                AliasAction.LINK,
-                namespaceId,
-                mosaicId
-            ).build();
+  @Test
+  void shouldBuild() {
+    MosaicId mosaicId = new MosaicId(BigInteger.TEN);
+    NamespaceId namespaceId = NamespaceId.createFromName("anamespaced");
+    MosaicAliasTransaction transaction =
+        MosaicAliasTransactionFactory.create(
+                NetworkType.MIJIN_TEST, AliasAction.LINK, namespaceId, mosaicId)
+            .build();
 
-        assertEquals(NetworkType.MIJIN_TEST, transaction.getNetworkType());
-        assertEquals(AliasAction.LINK, transaction.getAliasAction());
-        assertEquals(mosaicId, transaction.getMosaicId());
-        assertEquals(namespaceId, transaction.getNamespaceId());
+    assertEquals(NetworkType.MIJIN_TEST, transaction.getNetworkType());
+    assertEquals(AliasAction.LINK, transaction.getAliasAction());
+    assertEquals(mosaicId, transaction.getMosaicId());
+    assertEquals(namespaceId, transaction.getNamespaceId());
+  }
 
-    }
+  @Test
+  void serialize() {
+    MosaicId mosaicId = new MosaicId(BigInteger.TEN);
+    NamespaceId namespaceId = NamespaceId.createFromName("anamespaced");
+    MosaicAliasTransaction transaction =
+        MosaicAliasTransactionFactory.create(
+                NetworkType.MIJIN_TEST, AliasAction.LINK, namespaceId, mosaicId)
+            .signer(account.getPublicAccount())
+            .deadline(new FakeDeadline())
+            .build();
 
-    @Test
-    void serialize() {
-        MosaicId mosaicId = new MosaicId(BigInteger.TEN);
-        NamespaceId namespaceId = NamespaceId.createFromName("anamespaced");
-        MosaicAliasTransaction transaction =
-            MosaicAliasTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                AliasAction.LINK,
-                namespaceId,
-                mosaicId
-            ).signer(account.getPublicAccount()).deadline(new FakeDeadline()).build();
+    String expectedHash =
+        "910000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001904e4300000000000000000100000000000000a487791451fdf1b60a0000000000000001";
+    assertSerialization(expectedHash, transaction);
 
-        String expectedHash = "910000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001904e4300000000000000000100000000000000a487791451fdf1b60a0000000000000001";
-        assertSerialization(expectedHash, transaction);
-
-        String expectedEmbeddedHash = "4100000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001904e43a487791451fdf1b60a0000000000000001";
-        assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
-
-    }
+    String expectedEmbeddedHash =
+        "4100000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001904e43a487791451fdf1b60a0000000000000001";
+    assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.mosaic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,59 +25,64 @@ import org.junit.jupiter.api.Test;
 
 class NetworkCurrencyTest {
 
-    @Test
-    @SuppressWarnings("squid:S3415")
-    void shouldAssertEquals() {
-        assertNotEquals(NetworkCurrency.CAT_HARVEST, NetworkCurrency.CAT_CURRENCY);
-        assertNotEquals(NetworkCurrency.SYMBOL_XYM, NetworkCurrency.CAT_CURRENCY);
-        assertEquals(NetworkCurrency.CAT_CURRENCY, NetworkCurrency.CAT_CURRENCY);
-    }
+  @Test
+  @SuppressWarnings("squid:S3415")
+  void shouldAssertEquals() {
+    assertNotEquals(NetworkCurrency.CAT_HARVEST, NetworkCurrency.CAT_CURRENCY);
+    assertNotEquals(NetworkCurrency.SYMBOL_XYM, NetworkCurrency.CAT_CURRENCY);
+    assertEquals(NetworkCurrency.CAT_CURRENCY, NetworkCurrency.CAT_CURRENCY);
+  }
 
-    @Test
-    @SuppressWarnings("squid:S3415")
-    void souldAssertHashCodeEquals() {
-        assertNotEquals(NetworkCurrency.CAT_HARVEST.hashCode(),
-            NetworkCurrency.CAT_CURRENCY.hashCode());
-        assertNotEquals(NetworkCurrency.SYMBOL_XYM.hashCode(),
-            NetworkCurrency.CAT_CURRENCY.hashCode());
-        assertEquals(NetworkCurrency.CAT_CURRENCY.hashCode(),
-            NetworkCurrency.CAT_CURRENCY.hashCode());
-    }
+  @Test
+  @SuppressWarnings("squid:S3415")
+  void souldAssertHashCodeEquals() {
+    assertNotEquals(
+        NetworkCurrency.CAT_HARVEST.hashCode(), NetworkCurrency.CAT_CURRENCY.hashCode());
+    assertNotEquals(NetworkCurrency.SYMBOL_XYM.hashCode(), NetworkCurrency.CAT_CURRENCY.hashCode());
+    assertEquals(NetworkCurrency.CAT_CURRENCY.hashCode(), NetworkCurrency.CAT_CURRENCY.hashCode());
+  }
 
-    @Test
-    void assertCreatedUsingMosaicId() {
-        MosaicId mosaicId = new MosaicId(BigInteger.TEN);
-        NetworkCurrency networkCurrency = new NetworkCurrencyBuilder(
-            mosaicId, 6).withSupplyMutable(false)
-            .withTransferable(true).build();
-
-        assertEquals(mosaicId, networkCurrency.getMosaicId().get());
-        assertEquals(mosaicId, networkCurrency.getUnresolvedMosaicId());
-        Assertions.assertFalse(networkCurrency.getNamespaceId().isPresent());
-    }
-
-    @Test
-    void assertCreatedUsingNamespaceId() {
-        NamespaceId namespaceId = NamespaceId.createFromName("mycurrency");
-        NetworkCurrency networkCurrency = new NetworkCurrencyBuilder(namespaceId, 6)
+  @Test
+  void assertCreatedUsingMosaicId() {
+    MosaicId mosaicId = new MosaicId(BigInteger.TEN);
+    NetworkCurrency networkCurrency =
+        new NetworkCurrencyBuilder(mosaicId, 6)
             .withSupplyMutable(false)
-            .withTransferable(true).build();
+            .withTransferable(true)
+            .build();
 
-        Assertions.assertEquals(namespaceId, networkCurrency.getNamespaceId().get());
-        Assertions.assertEquals(namespaceId, networkCurrency.getUnresolvedMosaicId());
-        Assertions.assertFalse(networkCurrency.getMosaicId().isPresent());
-    }
+    assertEquals(mosaicId, networkCurrency.getMosaicId().get());
+    assertEquals(mosaicId, networkCurrency.getUnresolvedMosaicId());
+    Assertions.assertFalse(networkCurrency.getNamespaceId().isPresent());
+  }
 
-    @Test
-    void assertCreatedUsingNamespaceIdAndSettingMosaicId() {
-        MosaicId mosaicId = new MosaicId(BigInteger.TEN);
-        NamespaceId namespaceId = NamespaceId.createFromName("mycurrency");
-        NetworkCurrency networkCurrency = new NetworkCurrencyBuilder(
-            namespaceId, 6).withSupplyMutable(false)
-            .withTransferable(true).withMosaicId(mosaicId).build();
+  @Test
+  void assertCreatedUsingNamespaceId() {
+    NamespaceId namespaceId = NamespaceId.createFromName("mycurrency");
+    NetworkCurrency networkCurrency =
+        new NetworkCurrencyBuilder(namespaceId, 6)
+            .withSupplyMutable(false)
+            .withTransferable(true)
+            .build();
 
-        Assertions.assertEquals(namespaceId, networkCurrency.getNamespaceId().get());
-        Assertions.assertEquals(namespaceId, networkCurrency.getUnresolvedMosaicId());
-        assertEquals(mosaicId, networkCurrency.getMosaicId().get());
-    }
+    Assertions.assertEquals(namespaceId, networkCurrency.getNamespaceId().get());
+    Assertions.assertEquals(namespaceId, networkCurrency.getUnresolvedMosaicId());
+    Assertions.assertFalse(networkCurrency.getMosaicId().isPresent());
+  }
+
+  @Test
+  void assertCreatedUsingNamespaceIdAndSettingMosaicId() {
+    MosaicId mosaicId = new MosaicId(BigInteger.TEN);
+    NamespaceId namespaceId = NamespaceId.createFromName("mycurrency");
+    NetworkCurrency networkCurrency =
+        new NetworkCurrencyBuilder(namespaceId, 6)
+            .withSupplyMutable(false)
+            .withTransferable(true)
+            .withMosaicId(mosaicId)
+            .build();
+
+    Assertions.assertEquals(namespaceId, networkCurrency.getNamespaceId().get());
+    Assertions.assertEquals(namespaceId, networkCurrency.getUnresolvedMosaicId());
+    assertEquals(mosaicId, networkCurrency.getMosaicId().get());
+  }
 }

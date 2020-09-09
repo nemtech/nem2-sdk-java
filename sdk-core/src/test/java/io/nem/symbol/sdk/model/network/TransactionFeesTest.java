@@ -13,29 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.network;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of {@link TransactionFees}
- */
+/** Test of {@link TransactionFees} */
 class TransactionFeesTest {
 
+  @Test
+  void createTransactionFees() {
 
-    @Test
-    void createTransactionFees() {
+    TransactionFees info = new TransactionFees(1L, 2L, 3L, 4L);
 
-        TransactionFees info = new TransactionFees(1L, 2L, 3L, 4L);
+    Assertions.assertNotNull(info);
 
-        Assertions.assertNotNull(info);
-
-        Assertions.assertEquals(1L, info.getAverageFeeMultiplier());
-        Assertions.assertEquals(2L, info.getMedianFeeMultiplier());
-        Assertions.assertEquals(3L, info.getLowestFeeMultiplier());
-        Assertions.assertEquals(4L, info.getHighestFeeMultiplier());
-
-    }
+    Assertions.assertEquals(1L, info.getAverageFeeMultiplier());
+    Assertions.assertEquals(2L, info.getMedianFeeMultiplier());
+    Assertions.assertEquals(3L, info.getLowestFeeMultiplier());
+    Assertions.assertEquals(4L, info.getHighestFeeMultiplier());
+  }
 }

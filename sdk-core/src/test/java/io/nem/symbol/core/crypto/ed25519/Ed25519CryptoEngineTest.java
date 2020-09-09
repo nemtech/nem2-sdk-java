@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto.ed25519;
 
 import io.nem.symbol.core.crypto.CryptoEngine;
@@ -22,8 +21,8 @@ import io.nem.symbol.core.crypto.CryptoEngines;
 
 public class Ed25519CryptoEngineTest extends CryptoEngineTest {
 
-    @Override
-    protected CryptoEngine getCryptoEngine() {
-        return CryptoEngines.ed25519Engine();
-    }
+  @Override
+  protected CryptoEngine getCryptoEngine() {
+    return CryptoEngines.ed25519Engine();
+  }
 }

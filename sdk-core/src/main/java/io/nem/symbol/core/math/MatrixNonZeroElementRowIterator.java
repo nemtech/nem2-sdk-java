@@ -13,25 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.math;
-
-/**
- * Interface for iterating through the nonzero elements of a matrix row.
- */
+/** Interface for iterating through the nonzero elements of a matrix row. */
 public interface MatrixNonZeroElementRowIterator {
 
-    /**
-     * Gets a value indicating whether or not the matrix row has more non-zero elements.
-     *
-     * @return true if the matrix row has more non-zero elements, false otherwise.
-     */
-    boolean hasNext();
+  /**
+   * Gets a value indicating whether or not the matrix row has more non-zero elements.
+   *
+   * @return true if the matrix row has more non-zero elements, false otherwise.
+   */
+  boolean hasNext();
 
-    /**
-     * Gets the next non-zero matrix row element.
-     *
-     * @return The next non-zero matrix element of the row.
-     */
-    MatrixElement next();
+  /**
+   * Gets the next non-zero matrix row element.
+   *
+   * @return The next non-zero matrix element of the row.
+   */
+  MatrixElement next();
 }

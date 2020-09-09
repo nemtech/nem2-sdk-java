@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import static org.mockito.Mockito.mock;
@@ -41,132 +40,144 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-/**
- * Tests of {@link AliasServiceImpl}
- */
+/** Tests of {@link AliasServiceImpl} */
 public class AliasServiceTest {
 
+  private NetworkType networkType = NetworkType.MIJIN_TEST;
+  private AliasServiceImpl service;
 
-    private NetworkType networkType = NetworkType.MIJIN_TEST;
-    private AliasServiceImpl service;
+  private NamespaceRepository namespaceRepository;
 
-    private NamespaceRepository namespaceRepository;
+  private Account account1 = Account.generateNewAccount(networkType);
+  private Account account2 = Account.generateNewAccount(networkType);
+  private NamespaceId accountAlias1 = NamespaceId.createFromName("accountAlias1".toLowerCase());
+  private NamespaceId accountAlias2 = NamespaceId.createFromName("accountAlias2".toLowerCase());
 
-    private Account account1 = Account.generateNewAccount(networkType);
-    private Account account2 = Account.generateNewAccount(networkType);
-    private NamespaceId accountAlias1 = NamespaceId.createFromName("accountAlias1".toLowerCase());
-    private NamespaceId accountAlias2 = NamespaceId.createFromName("accountAlias2".toLowerCase());
+  private MosaicId mosaicId1 =
+      MosaicId.createFromNonce(MosaicNonce.createRandom(), account1.getPublicAccount());
+  private MosaicId mosaicId2 =
+      MosaicId.createFromNonce(MosaicNonce.createRandom(), account2.getPublicAccount());
 
+  private NamespaceId mosaicAlias1 = NamespaceId.createFromName("mosaicAlias1".toLowerCase());
+  private NamespaceId mosaicAlias2 = NamespaceId.createFromName("mosaicAlias2".toLowerCase());
 
-    private MosaicId mosaicId1 = MosaicId
-        .createFromNonce(MosaicNonce.createRandom(), account1.getPublicAccount());
-    private MosaicId mosaicId2 = MosaicId
-        .createFromNonce(MosaicNonce.createRandom(), account2.getPublicAccount());
+  @BeforeEach
+  void setup() {
 
-    private NamespaceId mosaicAlias1 = NamespaceId.createFromName("mosaicAlias1".toLowerCase());
-    private NamespaceId mosaicAlias2 = NamespaceId.createFromName("mosaicAlias2".toLowerCase());
+    RepositoryFactory factory = mock(RepositoryFactory.class);
 
+    namespaceRepository = mock(NamespaceRepository.class);
+    when(factory.createNamespaceRepository()).thenReturn(namespaceRepository);
 
-    @BeforeEach
-    void setup() {
+    when(factory.getNetworkType()).thenReturn(Observable.just(networkType));
+    service = new AliasServiceImpl(factory);
 
-        RepositoryFactory factory = mock(RepositoryFactory.class);
+    when(namespaceRepository.getNamespace(Mockito.any()))
+        .thenReturn(Observable.error(new IllegalStateException("Alias does not exist")));
 
-        namespaceRepository = mock(NamespaceRepository.class);
-        when(factory.createNamespaceRepository()).thenReturn(namespaceRepository);
+    when(namespaceRepository.getNamespace(accountAlias1))
+        .thenReturn(Observable.just(createAlias(account1.getAddress())));
 
-        when(factory.getNetworkType()).thenReturn(Observable.just(networkType));
-        service = new AliasServiceImpl(factory);
+    when(namespaceRepository.getNamespace(accountAlias2))
+        .thenReturn(Observable.just(createAlias(account2.getAddress())));
 
-        when(namespaceRepository.getNamespace(Mockito.any()))
-            .thenReturn(Observable.error(new IllegalStateException("Alias does not exist")));
+    when(namespaceRepository.getNamespace(mosaicAlias1))
+        .thenReturn(Observable.just(createAlias(mosaicId1)));
 
-        when(namespaceRepository.getNamespace(accountAlias1))
-            .thenReturn(Observable.just(createAlias(account1.getAddress())));
+    when(namespaceRepository.getNamespace(mosaicAlias2))
+        .thenReturn(Observable.just(createAlias(mosaicId2)));
+  }
 
-        when(namespaceRepository.getNamespace(accountAlias2))
-            .thenReturn(Observable.just(createAlias(account2.getAddress())));
+  private NamespaceInfo createAlias(Address address) {
 
-        when(namespaceRepository.getNamespace(mosaicAlias1))
-            .thenReturn(Observable.just(createAlias(mosaicId1)));
+    return new NamespaceInfo(
+        "abc",
+        true,
+        0,
+        "metadaId",
+        NamespaceRegistrationType.ROOT_NAMESPACE,
+        1,
+        Collections.emptyList(),
+        null,
+        null,
+        BigInteger.ONE,
+        BigInteger.TEN,
+        new AddressAlias(address));
+  }
 
-        when(namespaceRepository.getNamespace(mosaicAlias2))
-            .thenReturn(Observable.just(createAlias(mosaicId2)));
+  private NamespaceInfo createAlias(MosaicId mosaicId) {
 
-    }
+    return new NamespaceInfo(
+        "abc",
+        true,
+        0,
+        "metadaId",
+        NamespaceRegistrationType.ROOT_NAMESPACE,
+        1,
+        Collections.emptyList(),
+        null,
+        null,
+        BigInteger.ONE,
+        BigInteger.TEN,
+        new MosaicAlias(mosaicId));
+  }
 
-    private NamespaceInfo createAlias(Address address) {
+  @Test
+  void resolveAddress() throws ExecutionException, InterruptedException {
 
-        return new NamespaceInfo("abc", true, 0, "metadaId", NamespaceRegistrationType.ROOT_NAMESPACE, 1,
-            Collections.emptyList(), null, null, BigInteger.ONE, BigInteger.TEN, new AddressAlias(address));
-    }
+    Assertions.assertEquals(
+        account1.getAddress(), service.resolveAddress(accountAlias1).toFuture().get());
 
-    private NamespaceInfo createAlias(MosaicId mosaicId) {
+    Assertions.assertEquals(
+        account2.getAddress(), service.resolveAddress(accountAlias2).toFuture().get());
 
-        return new NamespaceInfo("abc", true, 0, "metadaId", NamespaceRegistrationType.ROOT_NAMESPACE, 1,
-            Collections.emptyList(), null, null, BigInteger.ONE, BigInteger.TEN, new MosaicAlias(mosaicId));
-    }
+    Assertions.assertEquals(
+        account1.getAddress(), service.resolveAddress(account1.getAddress()).toFuture().get());
+  }
 
-    @Test
-    void resolveAddress() throws ExecutionException, InterruptedException {
+  @Test
+  void resolveMosaicId() throws ExecutionException, InterruptedException {
 
-        Assertions.assertEquals(account1.getAddress(), service
-            .resolveAddress(accountAlias1).toFuture()
-            .get());
+    Assertions.assertEquals(mosaicId1, service.resolveMosaicId(mosaicAlias1).toFuture().get());
 
-        Assertions.assertEquals(account2.getAddress(), service
-            .resolveAddress(accountAlias2).toFuture()
-            .get());
+    Assertions.assertEquals(mosaicId2, service.resolveMosaicId(mosaicAlias2).toFuture().get());
 
-        Assertions.assertEquals(account1.getAddress(), service
-            .resolveAddress(account1.getAddress()).toFuture()
-            .get());
+    Assertions.assertEquals(mosaicId1, service.resolveMosaicId(mosaicId1).toFuture().get());
+  }
 
-    }
+  @Test
+  void resolveAddressWhenDoesNotExist() {
 
-    @Test
-    void resolveMosaicId() throws ExecutionException, InterruptedException {
+    IllegalArgumentException exception =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                ExceptionUtils.propagate(
+                    () ->
+                        service
+                            .resolveAddress(NamespaceId.createFromName("invalidaddressaslias"))
+                            .toFuture()
+                            .get()));
 
-        Assertions.assertEquals(mosaicId1, service
-            .resolveMosaicId(mosaicAlias1).toFuture()
-            .get());
+    Assertions.assertEquals(
+        "Address could not be resolved from alias 98CC55CCA3F13503", exception.getMessage());
+  }
 
-        Assertions.assertEquals(mosaicId2, service
-            .resolveMosaicId(mosaicAlias2).toFuture()
-            .get());
+  @Test
+  void resolveMosaicIdWhenDoesNotExist() {
 
-        Assertions.assertEquals(mosaicId1, service
-            .resolveMosaicId(mosaicId1).toFuture()
-            .get());
+    IllegalArgumentException exception =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                ExceptionUtils.propagate(
+                    () ->
+                        service
+                            .resolveMosaicId(NamespaceId.createFromName("invalidaddressaslias"))
+                            .toFuture()
+                            .get()));
 
-    }
-
-    @Test
-    void resolveAddressWhenDoesNotExist() {
-
-        IllegalArgumentException exception = Assertions
-            .assertThrows(IllegalArgumentException.class, () -> ExceptionUtils.propagate(() ->
-                service
-                    .resolveAddress(NamespaceId.createFromName("invalidaddressaslias")).toFuture()
-                    .get()));
-
-        Assertions.assertEquals("Address could not be resolved from alias 98CC55CCA3F13503",
-            exception.getMessage());
-
-    }
-
-    @Test
-    void resolveMosaicIdWhenDoesNotExist() {
-
-        IllegalArgumentException exception = Assertions
-            .assertThrows(IllegalArgumentException.class, () -> ExceptionUtils.propagate(() ->
-                service
-                    .resolveMosaicId(NamespaceId.createFromName("invalidaddressaslias")).toFuture()
-                    .get()));
-
-        Assertions.assertEquals("MosaicId could not be resolved from alias 98CC55CCA3F13503",
-            exception.getMessage());
-
-    }
-
+    Assertions.assertEquals(
+        "MosaicId could not be resolved from alias 98CC55CCA3F13503", exception.getMessage());
+  }
 }

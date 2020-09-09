@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.sdk.api.NodeRepository;
@@ -42,124 +41,120 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-/**
- * Node http repository.
- */
-public class NodeRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements
-    NodeRepository {
+/** Node http repository. */
+public class NodeRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements NodeRepository {
 
-    private final NodeRoutesApi client;
+  private final NodeRoutesApi client;
 
-    public NodeRepositoryVertxImpl(ApiClient apiClient) {
-        super(apiClient);
-        client = new NodeRoutesApiImpl(apiClient);
-    }
+  public NodeRepositoryVertxImpl(ApiClient apiClient) {
+    super(apiClient);
+    client = new NodeRoutesApiImpl(apiClient);
+  }
 
+  public NodeRoutesApi getClient() {
+    return client;
+  }
 
-    public NodeRoutesApi getClient() {
-        return client;
-    }
+  /**
+   * Get node info
+   *
+   * @return Observable of NodeTime
+   */
+  public Observable<NodeInfo> getNodeInfo() {
+    Consumer<Handler<AsyncResult<NodeInfoDTO>>> callback =
+        handler -> getClient().getNodeInfo(handler);
+    return exceptionHandling(call(callback).map(this::toNodeInfo));
+  }
 
-    /**
-     * Get node info
-     *
-     * @return Observable of NodeTime
-     */
-    public Observable<NodeInfo> getNodeInfo() {
-        Consumer<Handler<AsyncResult<NodeInfoDTO>>> callback = handler -> getClient()
-            .getNodeInfo(handler);
-        return exceptionHandling(
-            call(callback).map(this::toNodeInfo));
-    }
+  /**
+   * Get node info of the pears visible by the node.
+   *
+   * @return {@link Observable} of a list of {@link NodeInfo}
+   */
+  @Override
+  public Observable<List<NodeInfo>> getNodePeers() {
+    Consumer<Handler<AsyncResult<List<NodeInfoDTO>>>> callback =
+        handler -> getClient().getNodePeers(handler);
+    return exceptionHandling(
+        call(callback).map(l -> l.stream().map(this::toNodeInfo).collect(Collectors.toList())));
+  }
 
-    /**
-     * Get node info of the pears visible by the node.
-     *
-     * @return {@link Observable} of a list of {@link NodeInfo}
-     */
-    @Override
-    public Observable<List<NodeInfo>> getNodePeers() {
-        Consumer<Handler<AsyncResult<List<NodeInfoDTO>>>> callback = handler -> getClient()
-            .getNodePeers(handler);
-        return exceptionHandling(
-            call(callback).map(l -> l.stream().map(this::toNodeInfo).collect(
-                Collectors.toList())));
-    }
+  private NodeInfo toNodeInfo(NodeInfoDTO nodeInfoDTO) {
+    return new NodeInfo(
+        nodeInfoDTO.getPublicKey(),
+        nodeInfoDTO.getPort(),
+        NetworkType.rawValueOf(nodeInfoDTO.getNetworkIdentifier()),
+        nodeInfoDTO.getVersion(),
+        RoleType.rawValueOf(nodeInfoDTO.getRoles().getValue()),
+        nodeInfoDTO.getHost(),
+        nodeInfoDTO.getFriendlyName(),
+        nodeInfoDTO.getNetworkGenerationHashSeed());
+  }
 
-    private NodeInfo toNodeInfo(NodeInfoDTO nodeInfoDTO) {
-        return new NodeInfo(
-            nodeInfoDTO.getPublicKey(),
-            nodeInfoDTO.getPort(),
-            NetworkType.rawValueOf(nodeInfoDTO.getNetworkIdentifier()),
-            nodeInfoDTO.getVersion(),
-            RoleType.rawValueOf(nodeInfoDTO.getRoles().getValue()),
-            nodeInfoDTO.getHost(),
-            nodeInfoDTO.getFriendlyName(), nodeInfoDTO.getNetworkGenerationHashSeed());
-    }
+  /**
+   * Get node time
+   *
+   * @return Observable of NodeTime
+   */
+  public Observable<NodeTime> getNodeTime() {
+    Consumer<Handler<AsyncResult<NodeTimeDTO>>> callback =
+        handler -> getClient().getNodeTime(handler);
+    return exceptionHandling(call(callback).map(this::toNodeTime));
+  }
 
-    /**
-     * Get node time
-     *
-     * @return Observable of NodeTime
-     */
-    public Observable<NodeTime> getNodeTime() {
-        Consumer<Handler<AsyncResult<NodeTimeDTO>>> callback = handler -> getClient()
-            .getNodeTime(handler);
-        return exceptionHandling(
-            call(callback).map(this::toNodeTime));
-    }
+  private NodeTime toNodeTime(NodeTimeDTO nodeTimeDTO) {
+    BigInteger sendTimestamp = nodeTimeDTO.getCommunicationTimestamps().getSendTimestamp();
+    BigInteger receiveTimestamp = nodeTimeDTO.getCommunicationTimestamps().getReceiveTimestamp();
+    return new NodeTime(sendTimestamp, receiveTimestamp);
+  }
 
-    private NodeTime toNodeTime(NodeTimeDTO nodeTimeDTO) {
-        BigInteger sendTimestamp = nodeTimeDTO.getCommunicationTimestamps().getSendTimestamp();
-        BigInteger receiveTimestamp = nodeTimeDTO.getCommunicationTimestamps()
-            .getReceiveTimestamp();
-        return new NodeTime(sendTimestamp, receiveTimestamp);
-    }
+  /**
+   * Get storage info
+   *
+   * @return io.reactivex.Observable of {@link StorageInfo}
+   */
+  @Override
+  public Observable<StorageInfo> getNodeStorage() {
+    Consumer<Handler<AsyncResult<StorageInfoDTO>>> callback = getClient()::getNodeStorage;
+    return exceptionHandling(call(callback).map(this::toStorageInfo));
+  }
 
-    /**
-     * Get storage info
-     *
-     * @return io.reactivex.Observable of {@link StorageInfo}
-     */
-    @Override
-    public Observable<StorageInfo> getNodeStorage() {
-        Consumer<Handler<AsyncResult<StorageInfoDTO>>> callback = getClient()::getNodeStorage;
-        return exceptionHandling(call(callback).map(this::toStorageInfo));
-    }
+  private StorageInfo toStorageInfo(StorageInfoDTO storageInfoDTO) {
+    return new StorageInfo(
+        storageInfoDTO.getNumAccounts(),
+        storageInfoDTO.getNumBlocks(),
+        storageInfoDTO.getNumTransactions());
+  }
 
-    private StorageInfo toStorageInfo(StorageInfoDTO storageInfoDTO) {
-        return new StorageInfo(
-            storageInfoDTO.getNumAccounts(),
-            storageInfoDTO.getNumBlocks(),
-            storageInfoDTO.getNumTransactions());
-    }
+  /**
+   * Get node health information
+   *
+   * @return {@link NodeHealth} of NodeHealth
+   */
+  @Override
+  public Observable<NodeHealth> getNodeHealth() {
+    Consumer<Handler<AsyncResult<NodeHealthInfoDTO>>> callback = getClient()::getNodeHealth;
+    return exceptionHandling(
+        call(callback)
+            .map(
+                dto ->
+                    new NodeHealth(
+                        NodeStatus.rawValueOf(dto.getStatus().getApiNode().getValue()),
+                        NodeStatus.rawValueOf(dto.getStatus().getDb().getValue()))));
+  }
 
-    /**
-     * Get node health information
-     *
-     * @return {@link NodeHealth} of NodeHealth
-     */
-    @Override
-    public Observable<NodeHealth> getNodeHealth() {
-        Consumer<Handler<AsyncResult<NodeHealthInfoDTO>>> callback = getClient()::getNodeHealth;
-        return exceptionHandling(call(callback).map(dto -> new NodeHealth(
-            NodeStatus.rawValueOf(dto.getStatus().getApiNode().getValue()),
-            NodeStatus.rawValueOf(dto.getStatus().getDb().getValue()))));
-    }
+  /**
+   * Get server info
+   *
+   * @return Observable of {@link ServerInfo}
+   */
+  public Observable<ServerInfo> getServerInfo() {
+    Consumer<Handler<AsyncResult<ServerInfoDTO>>> callback = getClient()::getServerInfo;
+    return exceptionHandling(
+        call(callback).map(ServerInfoDTO::getServerInfo).map(this::toServerInfo));
+  }
 
-    /**
-     * Get server info
-     *
-     * @return Observable of {@link ServerInfo}
-     */
-    public Observable<ServerInfo> getServerInfo() {
-        Consumer<Handler<AsyncResult<ServerInfoDTO>>> callback = getClient()::getServerInfo;
-        return exceptionHandling(
-            call(callback).map(ServerInfoDTO::getServerInfo).map(this::toServerInfo));
-    }
-
-    private ServerInfo toServerInfo(ServerDTO serverInfoDTO) {
-        return new ServerInfo(serverInfoDTO.getRestVersion(), serverInfoDTO.getSdkVersion());
-    }
-
+  private ServerInfo toServerInfo(ServerDTO serverInfoDTO) {
+    return new ServerInfo(serverInfoDTO.getRestVersion(), serverInfoDTO.getSdkVersion());
+  }
 }

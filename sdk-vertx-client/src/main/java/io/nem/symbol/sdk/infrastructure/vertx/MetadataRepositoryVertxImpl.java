@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.core.utils.ConvertUtils;
@@ -40,60 +39,80 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+/** Implementation of {@link MetadataRepository} */
+public class MetadataRepositoryVertxImpl extends AbstractRepositoryVertxImpl
+    implements MetadataRepository {
 
-/**
- * Implementation of {@link MetadataRepository}
- */
-public class MetadataRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements MetadataRepository {
+  private final MetadataRoutesApi client;
 
-    private final MetadataRoutesApi client;
+  public MetadataRepositoryVertxImpl(ApiClient apiClient) {
+    super(apiClient);
+    client = new MetadataRoutesApiImpl(apiClient);
+  }
 
-    public MetadataRepositoryVertxImpl(ApiClient apiClient) {
-        super(apiClient);
-        client = new MetadataRoutesApiImpl(apiClient);
-    }
+  @Override
+  public Observable<Page<Metadata>> search(MetadataSearchCriteria criteria) {
 
-    @Override
-    public Observable<Page<Metadata>> search(MetadataSearchCriteria criteria) {
-
-        String sourceAddress = toDto(criteria.getSourceAddress());
-        String targetAddress = toDto(criteria.getTargetAddress());
-        String scopedMetadataKey = toDto(criteria.getScopedMetadataKey());
-        String targetId = criteria.getTargetId();
-        MetadataTypeEnum metadataType = criteria.getMetadataType() == null ? null
+    String sourceAddress = toDto(criteria.getSourceAddress());
+    String targetAddress = toDto(criteria.getTargetAddress());
+    String scopedMetadataKey = toDto(criteria.getScopedMetadataKey());
+    String targetId = criteria.getTargetId();
+    MetadataTypeEnum metadataType =
+        criteria.getMetadataType() == null
+            ? null
             : MetadataTypeEnum.fromValue(criteria.getMetadataType().getValue());
-        String offset = criteria.getOffset();
-        Integer pageSize = criteria.getPageSize();
-        Integer pageNumber = criteria.getPageNumber();
-        Order order = toDto(criteria.getOrder());
+    String offset = criteria.getOffset();
+    Integer pageSize = criteria.getPageSize();
+    Integer pageNumber = criteria.getPageNumber();
+    Order order = toDto(criteria.getOrder());
 
-        Consumer<Handler<AsyncResult<MetadataPage>>> callback = handler -> getClient()
-            .searchMetadataEntries(sourceAddress, targetAddress, scopedMetadataKey, targetId, metadataType, pageSize,
-                pageNumber, offset, order, handler);
+    Consumer<Handler<AsyncResult<MetadataPage>>> callback =
+        handler ->
+            getClient()
+                .searchMetadataEntries(
+                    sourceAddress,
+                    targetAddress,
+                    scopedMetadataKey,
+                    targetId,
+                    metadataType,
+                    pageSize,
+                    pageNumber,
+                    offset,
+                    order,
+                    handler);
 
-        return exceptionHandling(call(callback).map(page -> this
-            .toPage(page.getPagination(), page.getData().stream().map(this::toMetadata).collect(Collectors.toList()))));
-    }
+    return exceptionHandling(
+        call(callback)
+            .map(
+                page ->
+                    this.toPage(
+                        page.getPagination(),
+                        page.getData().stream()
+                            .map(this::toMetadata)
+                            .collect(Collectors.toList()))));
+  }
 
-    public MetadataRoutesApi getClient() {
-        return client;
-    }
+  public MetadataRoutesApi getClient() {
+    return client;
+  }
 
-    /**
-     * It converts the {@link MetadataInfoDTO} into a model {@link Metadata}.
-     *
-     * @param dto the {@link MetadataInfoDTO}
-     * @return the {@link Metadata}
-     */
-    private Metadata toMetadata(MetadataInfoDTO dto) {
+  /**
+   * It converts the {@link MetadataInfoDTO} into a model {@link Metadata}.
+   *
+   * @param dto the {@link MetadataInfoDTO}
+   * @return the {@link Metadata}
+   */
+  private Metadata toMetadata(MetadataInfoDTO dto) {
 
-        MetadataEntryDTO entryDto = dto.getMetadataEntry();
-        return new Metadata(dto.getId(), entryDto.getCompositeHash(),
-            MapperUtils.toAddress(entryDto.getSourceAddress()), MapperUtils.toAddress(entryDto.getTargetAddress()),
-            new BigInteger(entryDto.getScopedMetadataKey(), 16),
-            MetadataType.rawValueOf(entryDto.getMetadataType().getValue()),
-            ConvertUtils.fromHexToString(entryDto.getValue()),
-            Optional.ofNullable(Objects.toString(entryDto.getTargetId(), null)));
-    }
-
+    MetadataEntryDTO entryDto = dto.getMetadataEntry();
+    return new Metadata(
+        dto.getId(),
+        entryDto.getCompositeHash(),
+        MapperUtils.toAddress(entryDto.getSourceAddress()),
+        MapperUtils.toAddress(entryDto.getTargetAddress()),
+        new BigInteger(entryDto.getScopedMetadataKey(), 16),
+        MetadataType.rawValueOf(entryDto.getMetadataType().getValue()),
+        ConvertUtils.fromHexToString(entryDto.getValue()),
+        Optional.ofNullable(Objects.toString(entryDto.getTargetId(), null)));
+  }
 }

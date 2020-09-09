@@ -13,60 +13,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import org.apache.commons.lang3.Validate;
 
-/**
- * Factory of {@link NamespaceMetadataTransaction}
- */
-public class NamespaceMetadataTransactionFactory extends
-    MetadataTransactionFactory<NamespaceMetadataTransaction> {
+/** Factory of {@link NamespaceMetadataTransaction} */
+public class NamespaceMetadataTransactionFactory
+    extends MetadataTransactionFactory<NamespaceMetadataTransaction> {
 
-    /**
-     * Metadata target Namespace id.
-     */
-    private final NamespaceId targetNamespaceId;
+  /** Metadata target Namespace id. */
+  private final NamespaceId targetNamespaceId;
 
-    private NamespaceMetadataTransactionFactory(
-        NetworkType networkType,
-        UnresolvedAddress targetAddress,
-        NamespaceId targetNamespaceId,
-        BigInteger scopedMetadataKey,
-        String value) {
-        super(TransactionType.NAMESPACE_METADATA, networkType, targetAddress,
-            scopedMetadataKey, value);
-        Validate.notNull(targetNamespaceId, "TargetNamespaceId must not be null");
-        this.targetNamespaceId = targetNamespaceId;
-    }
+  private NamespaceMetadataTransactionFactory(
+      NetworkType networkType,
+      UnresolvedAddress targetAddress,
+      NamespaceId targetNamespaceId,
+      BigInteger scopedMetadataKey,
+      String value) {
+    super(TransactionType.NAMESPACE_METADATA, networkType, targetAddress, scopedMetadataKey, value);
+    Validate.notNull(targetNamespaceId, "TargetNamespaceId must not be null");
+    this.targetNamespaceId = targetNamespaceId;
+  }
 
-    /**
-     * Static create method for factory.
-     *
-     * @param networkType Network type.
-     * @param targetAddress Target address.
-     * @param targetNamespaceId Target namespace id.
-     * @param scopedMetadataKey Scoped metadata key.
-     * @param value Value.
-     * @return Namespace metadata transaction.
-     */
-    public static NamespaceMetadataTransactionFactory create(NetworkType networkType,
-        UnresolvedAddress targetAddress, NamespaceId targetNamespaceId, BigInteger scopedMetadataKey, String value) {
-        return new NamespaceMetadataTransactionFactory(networkType, targetAddress, targetNamespaceId, scopedMetadataKey, value);
-    }
+  /**
+   * Static create method for factory.
+   *
+   * @param networkType Network type.
+   * @param targetAddress Target address.
+   * @param targetNamespaceId Target namespace id.
+   * @param scopedMetadataKey Scoped metadata key.
+   * @param value Value.
+   * @return Namespace metadata transaction.
+   */
+  public static NamespaceMetadataTransactionFactory create(
+      NetworkType networkType,
+      UnresolvedAddress targetAddress,
+      NamespaceId targetNamespaceId,
+      BigInteger scopedMetadataKey,
+      String value) {
+    return new NamespaceMetadataTransactionFactory(
+        networkType, targetAddress, targetNamespaceId, scopedMetadataKey, value);
+  }
 
-    public NamespaceId getTargetNamespaceId() {
-        return targetNamespaceId;
-    }
+  public NamespaceId getTargetNamespaceId() {
+    return targetNamespaceId;
+  }
 
-    @Override
-    public NamespaceMetadataTransaction build() {
-        return new NamespaceMetadataTransaction(this);
-    }
+  @Override
+  public NamespaceMetadataTransaction build() {
+    return new NamespaceMetadataTransaction(this);
+  }
 }

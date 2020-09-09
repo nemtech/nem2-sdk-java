@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.sdk.api.Page;
@@ -36,83 +35,116 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+/** OkHttp implementation of {@link ReceiptRepository}. */
+public class ReceiptRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
+    implements ReceiptRepository {
 
-/**
- * OkHttp implementation of {@link ReceiptRepository}.
- */
-public class ReceiptRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements ReceiptRepository {
+  private final ReceiptRoutesApi client;
 
-    private final ReceiptRoutesApi client;
+  private final ReceiptMappingOkHttp mapper;
 
-    private final ReceiptMappingOkHttp mapper;
+  public ReceiptRepositoryOkHttpImpl(ApiClient apiClient) {
+    super(apiClient);
+    this.client = new ReceiptRoutesApi(apiClient);
+    this.mapper = new ReceiptMappingOkHttp(getJsonHelper());
+  }
 
-    public ReceiptRepositoryOkHttpImpl(ApiClient apiClient) {
-        super(apiClient);
-        this.client = new ReceiptRoutesApi(apiClient);
-        this.mapper = new ReceiptMappingOkHttp(getJsonHelper());
-    }
+  @Override
+  public Observable<Page<TransactionStatement>> searchReceipts(
+      TransactionStatementSearchCriteria criteria) {
 
-    @Override
-    public Observable<Page<TransactionStatement>> searchReceipts(TransactionStatementSearchCriteria criteria) {
+    BigInteger height = criteria.getHeight();
+    List<ReceiptTypeEnum> receiptTypes = toDto(criteria.getReceiptTypes());
+    String recipientAddress = toDto(criteria.getRecipientAddress());
+    String senderAddress = toDto(criteria.getSenderAddress());
+    String targetAddress = toDto(criteria.getTargetAddress());
+    String artifactId = criteria.getArtifactId();
+    Integer pageSize = criteria.getPageSize();
+    Integer pageNumber = criteria.getPageNumber();
+    String offset = criteria.getOffset();
+    Order order = toDto(criteria.getOrder());
 
-        BigInteger height = criteria.getHeight();
-        List<ReceiptTypeEnum> receiptTypes = toDto(criteria.getReceiptTypes());
-        String recipientAddress = toDto(criteria.getRecipientAddress());
-        String senderAddress = toDto(criteria.getSenderAddress());
-        String targetAddress = toDto(criteria.getTargetAddress());
-        String artifactId = criteria.getArtifactId();
-        Integer pageSize = criteria.getPageSize();
-        Integer pageNumber = criteria.getPageNumber();
-        String offset = criteria.getOffset();
-        Order order = toDto(criteria.getOrder());
+    Callable<TransactionStatementPage> callback =
+        () ->
+            getClient()
+                .searchReceipts(
+                    height,
+                    receiptTypes,
+                    recipientAddress,
+                    senderAddress,
+                    targetAddress,
+                    artifactId,
+                    pageSize,
+                    pageNumber,
+                    offset,
+                    order);
 
-        Callable<TransactionStatementPage> callback = () -> getClient()
-            .searchReceipts(height, receiptTypes, recipientAddress, senderAddress, targetAddress, artifactId, pageSize,
-                pageNumber, offset, order);
+    return exceptionHandling(
+        call(callback)
+            .map(
+                page ->
+                    this.toPage(
+                        page.getPagination(),
+                        page.getData().stream()
+                            .map(mapper::createTransactionStatement)
+                            .collect(Collectors.toList()))));
+  }
 
-        return exceptionHandling(call(callback).map(page -> this.toPage(page.getPagination(),
-            page.getData().stream().map(mapper::createTransactionStatement).collect(Collectors.toList()))));
+  @Override
+  public Observable<Page<AddressResolutionStatement>> searchAddressResolutionStatements(
+      ResolutionStatementSearchCriteria criteria) {
+    BigInteger height = criteria.getHeight();
+    Integer pageSize = criteria.getPageSize();
+    Integer pageNumber = criteria.getPageNumber();
+    String offset = criteria.getOffset();
+    Order order = toDto(criteria.getOrder());
+    Callable<ResolutionStatementPage> callback =
+        () ->
+            getClient()
+                .searchAddressResolutionStatements(height, pageSize, pageNumber, offset, order);
+    return exceptionHandling(
+        call(callback)
+            .map(
+                page ->
+                    this.toPage(
+                        page.getPagination(),
+                        page.getData().stream()
+                            .map(mapper::createAddressResolutionStatementFromDto)
+                            .collect(Collectors.toList()))));
+  }
 
-    }
+  @Override
+  public Observable<Page<MosaicResolutionStatement>> searchMosaicResolutionStatements(
+      ResolutionStatementSearchCriteria criteria) {
+    BigInteger height = criteria.getHeight();
+    Integer pageSize = criteria.getPageSize();
+    Integer pageNumber = criteria.getPageNumber();
+    String offset = criteria.getOffset();
+    Order order = toDto(criteria.getOrder());
+    Callable<ResolutionStatementPage> callback =
+        () ->
+            getClient()
+                .searchMosaicResolutionStatements(height, pageSize, pageNumber, offset, order);
+    return exceptionHandling(
+        call(callback)
+            .map(
+                page ->
+                    this.toPage(
+                        page.getPagination(),
+                        page.getData().stream()
+                            .map(mapper::createMosaicResolutionStatementFromDto)
+                            .collect(Collectors.toList()))));
+  }
 
-    @Override
-    public Observable<Page<AddressResolutionStatement>> searchAddressResolutionStatements(
-        ResolutionStatementSearchCriteria criteria) {
-        BigInteger height = criteria.getHeight();
-        Integer pageSize = criteria.getPageSize();
-        Integer pageNumber = criteria.getPageNumber();
-        String offset = criteria.getOffset();
-        Order order = toDto(criteria.getOrder());
-        Callable<ResolutionStatementPage> callback = () -> getClient()
-            .searchAddressResolutionStatements(height, pageSize, pageNumber, offset, order);
-        return exceptionHandling(call(callback).map(page -> this.toPage(page.getPagination(),
-            page.getData().stream().map(mapper::createAddressResolutionStatementFromDto)
-                .collect(Collectors.toList()))));
+  private List<ReceiptTypeEnum> toDto(List<ReceiptType> values) {
+    return values == null
+        ? null
+        : values.stream()
+            .map(e -> ReceiptTypeEnum.fromValue(e.getValue()))
+            .collect(Collectors.toList());
+  }
 
-    }
-
-
-    @Override
-    public Observable<Page<MosaicResolutionStatement>> searchMosaicResolutionStatements(
-        ResolutionStatementSearchCriteria criteria) {
-        BigInteger height = criteria.getHeight();
-        Integer pageSize = criteria.getPageSize();
-        Integer pageNumber = criteria.getPageNumber();
-        String offset = criteria.getOffset();
-        Order order = toDto(criteria.getOrder());
-        Callable<ResolutionStatementPage> callback = () -> getClient()
-            .searchMosaicResolutionStatements(height, pageSize, pageNumber, offset, order);
-        return exceptionHandling(call(callback).map(page -> this.toPage(page.getPagination(),
-            page.getData().stream().map(mapper::createMosaicResolutionStatementFromDto).collect(Collectors.toList()))));
-
-    }
-
-    private List<ReceiptTypeEnum> toDto(List<ReceiptType> values) {
-        return values == null ? null
-            : values.stream().map(e -> ReceiptTypeEnum.fromValue(e.getValue())).collect(Collectors.toList());
-    }
-
-    public ReceiptRoutesApi getClient() {
-        return client;
-    }
+  public ReceiptRoutesApi getClient() {
+    return client;
+  }
 }

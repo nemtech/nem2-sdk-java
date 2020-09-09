@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.core.utils.ConvertUtils;
@@ -43,76 +42,118 @@ import java.util.function.BiFunction;
  */
 public class MetadataTransactionServiceImpl implements MetadataTransactionService {
 
-    private final MetadataRepository metadataRepository;
+  private final MetadataRepository metadataRepository;
 
-    private final Observable<NetworkType> networkTypeObservable;
+  private final Observable<NetworkType> networkTypeObservable;
 
-    private final AliasService aliasService;
+  private final AliasService aliasService;
 
-    public MetadataTransactionServiceImpl(RepositoryFactory factory) {
-        this.metadataRepository = factory.createMetadataRepository();
-        this.networkTypeObservable = factory.getNetworkType();
-        this.aliasService = new AliasServiceImpl(factory);
-    }
+  public MetadataTransactionServiceImpl(RepositoryFactory factory) {
+    this.metadataRepository = factory.createMetadataRepository();
+    this.networkTypeObservable = factory.getNetworkType();
+    this.aliasService = new AliasServiceImpl(factory);
+  }
 
-    @Override
-    public Observable<AccountMetadataTransactionFactory> createAccountMetadataTransactionFactory(Address targetAddress,
-        BigInteger key, String value, Address sourceAddress) {
-        BiFunction<String, NetworkType, AccountMetadataTransactionFactory> factory = (newValue, networkType) -> AccountMetadataTransactionFactory
-            .create(networkType, targetAddress, key, newValue);
+  @Override
+  public Observable<AccountMetadataTransactionFactory> createAccountMetadataTransactionFactory(
+      Address targetAddress, BigInteger key, String value, Address sourceAddress) {
+    BiFunction<String, NetworkType, AccountMetadataTransactionFactory> factory =
+        (newValue, networkType) ->
+            AccountMetadataTransactionFactory.create(networkType, targetAddress, key, newValue);
 
-        return processMetadata(new MetadataSearchCriteria().targetAddress(targetAddress).scopedMetadataKey(key)
-            .sourceAddress(sourceAddress).metadataType(MetadataType.ACCOUNT), factory, value);
-    }
+    return processMetadata(
+        new MetadataSearchCriteria()
+            .targetAddress(targetAddress)
+            .scopedMetadataKey(key)
+            .sourceAddress(sourceAddress)
+            .metadataType(MetadataType.ACCOUNT),
+        factory,
+        value);
+  }
 
-    @Override
-    public Observable<MosaicMetadataTransactionFactory> createMosaicMetadataTransactionFactory(Address targetAddress,
-        BigInteger key, String value, Address sourceAddress, UnresolvedMosaicId unresolvedTargetId) {
+  @Override
+  public Observable<MosaicMetadataTransactionFactory> createMosaicMetadataTransactionFactory(
+      Address targetAddress,
+      BigInteger key,
+      String value,
+      Address sourceAddress,
+      UnresolvedMosaicId unresolvedTargetId) {
 
-        return aliasService.resolveMosaicId(unresolvedTargetId).flatMap(targetId -> {
-            BiFunction<String, NetworkType, MosaicMetadataTransactionFactory> factory = (newValue, networkType) -> MosaicMetadataTransactionFactory
-                .create(networkType, targetAddress, unresolvedTargetId, key, newValue);
+    return aliasService
+        .resolveMosaicId(unresolvedTargetId)
+        .flatMap(
+            targetId -> {
+              BiFunction<String, NetworkType, MosaicMetadataTransactionFactory> factory =
+                  (newValue, networkType) ->
+                      MosaicMetadataTransactionFactory.create(
+                          networkType, targetAddress, unresolvedTargetId, key, newValue);
 
-            return processMetadata(
-                new MetadataSearchCriteria().targetId(targetId).scopedMetadataKey(key).sourceAddress(sourceAddress)
-                    .metadataType(MetadataType.MOSAIC), factory, value);
-        });
-    }
+              return processMetadata(
+                  new MetadataSearchCriteria()
+                      .targetId(targetId)
+                      .scopedMetadataKey(key)
+                      .sourceAddress(sourceAddress)
+                      .metadataType(MetadataType.MOSAIC),
+                  factory,
+                  value);
+            });
+  }
 
-    @Override
-    public Observable<NamespaceMetadataTransactionFactory> createNamespaceMetadataTransactionFactory(
-        Address targetAddress, BigInteger key, String value, Address sourceAddress, NamespaceId targetId) {
-        BiFunction<String, NetworkType, NamespaceMetadataTransactionFactory> factory = (newValue, networkType) -> NamespaceMetadataTransactionFactory
-            .create(networkType, targetAddress, targetId, key, newValue);
-        return processMetadata(
-            new MetadataSearchCriteria().targetId(targetId).scopedMetadataKey(key).sourceAddress(sourceAddress)
-                .metadataType(MetadataType.NAMESPACE), factory, value);
-    }
+  @Override
+  public Observable<NamespaceMetadataTransactionFactory> createNamespaceMetadataTransactionFactory(
+      Address targetAddress,
+      BigInteger key,
+      String value,
+      Address sourceAddress,
+      NamespaceId targetId) {
+    BiFunction<String, NetworkType, NamespaceMetadataTransactionFactory> factory =
+        (newValue, networkType) ->
+            NamespaceMetadataTransactionFactory.create(
+                networkType, targetAddress, targetId, key, newValue);
+    return processMetadata(
+        new MetadataSearchCriteria()
+            .targetId(targetId)
+            .scopedMetadataKey(key)
+            .sourceAddress(sourceAddress)
+            .metadataType(MetadataType.NAMESPACE),
+        factory,
+        value);
+  }
 
-    /**
-     * Generic way of processing a metadata entity and creating a new metadata transaction factory depending on the
-     * existing metadata value. This works for Account, Mosaic and Namespace metadata.
-     *
-     * @param criteria the criteria
-     * @param transactionFactory the function that creates a transaction factory
-     * @param newValue the new value you want to set.
-     * @param <T> the type of the transaction factory.
-     * @return an Observable of a transaction factory.
-     */
-    private <T extends MetadataTransactionFactory> Observable<T> processMetadata(MetadataSearchCriteria criteria,
-        BiFunction<String, NetworkType, T> transactionFactory, String newValue) {
-        return networkTypeObservable.flatMap(networkType -> metadataRepository.search(criteria).map(page -> {
-            if (page.getData().isEmpty()) {
-                return transactionFactory.apply(newValue, networkType);
-            } else {
-                byte[] currentValueBytes = StringEncoder.getBytes(page.getData().get(0).getValue());
-                byte[] newValueBytes = StringEncoder.getBytes(newValue);
-                String xorValue = StringEncoder.getString(ConvertUtils.xor(currentValueBytes, newValueBytes));
-                T factory = transactionFactory.apply(xorValue, networkType);
-                factory.valueSizeDelta(newValueBytes.length - currentValueBytes.length);
-                return factory;
-            }
-        }));
-    }
-
+  /**
+   * Generic way of processing a metadata entity and creating a new metadata transaction factory
+   * depending on the existing metadata value. This works for Account, Mosaic and Namespace
+   * metadata.
+   *
+   * @param criteria the criteria
+   * @param transactionFactory the function that creates a transaction factory
+   * @param newValue the new value you want to set.
+   * @param <T> the type of the transaction factory.
+   * @return an Observable of a transaction factory.
+   */
+  private <T extends MetadataTransactionFactory> Observable<T> processMetadata(
+      MetadataSearchCriteria criteria,
+      BiFunction<String, NetworkType, T> transactionFactory,
+      String newValue) {
+    return networkTypeObservable.flatMap(
+        networkType ->
+            metadataRepository
+                .search(criteria)
+                .map(
+                    page -> {
+                      if (page.getData().isEmpty()) {
+                        return transactionFactory.apply(newValue, networkType);
+                      } else {
+                        byte[] currentValueBytes =
+                            StringEncoder.getBytes(page.getData().get(0).getValue());
+                        byte[] newValueBytes = StringEncoder.getBytes(newValue);
+                        String xorValue =
+                            StringEncoder.getString(
+                                ConvertUtils.xor(currentValueBytes, newValueBytes));
+                        T factory = transactionFactory.apply(xorValue, networkType);
+                        factory.valueSizeDelta(newValueBytes.length - currentValueBytes.length);
+                        return factory;
+                      }
+                    }));
+  }
 }

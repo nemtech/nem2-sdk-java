@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.sdk.model.transaction.TransactionStatus;
@@ -33,67 +32,64 @@ import org.junit.jupiter.api.Test;
  */
 public class TransactionStatusRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
 
-    private TransactionStatusRepositoryVertxImpl repository;
+  private TransactionStatusRepositoryVertxImpl repository;
 
+  @BeforeEach
+  public void setUp() {
+    super.setUp();
+    repository = new TransactionStatusRepositoryVertxImpl(apiClientMock);
+  }
 
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-        repository = new TransactionStatusRepositoryVertxImpl(apiClientMock);
-    }
+  @Test
+  public void shouldGetTransactionStatus() throws Exception {
 
+    TransactionStatusDTO transactionStatusDTO = new TransactionStatusDTO();
+    transactionStatusDTO.setGroup(TransactionGroupEnum.FAILED);
+    transactionStatusDTO.setDeadline(BigInteger.valueOf(5));
+    transactionStatusDTO.setHeight(BigInteger.valueOf(6));
+    transactionStatusDTO.setCode(TransactionStatusEnum.FAILURE_ACCOUNTLINK_LINK_ALREADY_EXISTS);
+    transactionStatusDTO.setHash("someHash");
+    mockRemoteCall(transactionStatusDTO);
 
-    @Test
-    public void shouldGetTransactionStatus() throws Exception {
+    TransactionStatus transaction =
+        repository.getTransactionStatus(transactionStatusDTO.getHash()).toFuture().get();
 
-        TransactionStatusDTO transactionStatusDTO = new TransactionStatusDTO();
-        transactionStatusDTO.setGroup(TransactionGroupEnum.FAILED);
-        transactionStatusDTO.setDeadline(BigInteger.valueOf(5));
-        transactionStatusDTO.setHeight(BigInteger.valueOf(6));
-        transactionStatusDTO
-            .setCode(TransactionStatusEnum.FAILURE_ACCOUNTLINK_LINK_ALREADY_EXISTS);
-        transactionStatusDTO.setHash("someHash");
-        mockRemoteCall(transactionStatusDTO);
+    Assertions.assertNotNull(transaction);
 
-        TransactionStatus transaction = repository
-            .getTransactionStatus(transactionStatusDTO.getHash()).toFuture().get();
+    Assertions.assertEquals(transactionStatusDTO.getHash(), transaction.getHash());
+    Assertions.assertEquals(5L, transaction.getDeadline().getInstant());
+    Assertions.assertEquals(BigInteger.valueOf(6L), transaction.getHeight());
+    Assertions.assertEquals("Failure_AccountLink_Link_Already_Exists", transaction.getCode());
+    Assertions.assertEquals(
+        transaction.getGroup().getValue(), transactionStatusDTO.getGroup().getValue());
+  }
 
-        Assertions.assertNotNull(transaction);
+  @Test
+  public void shouldGetTransactionStatuses() throws Exception {
 
-        Assertions.assertEquals(transactionStatusDTO.getHash(), transaction.getHash());
-        Assertions.assertEquals(5L, transaction.getDeadline().getInstant());
-        Assertions.assertEquals(BigInteger.valueOf(6L), transaction.getHeight());
-        Assertions.assertEquals("Failure_AccountLink_Link_Already_Exists", transaction.getCode());
-        Assertions.assertEquals(transaction.getGroup().getValue(),
-            transactionStatusDTO.getGroup().getValue());
-    }
+    TransactionStatusDTO transactionStatusDTO = new TransactionStatusDTO();
 
-    @Test
-    public void shouldGetTransactionStatuses() throws Exception {
+    transactionStatusDTO.setGroup(TransactionGroupEnum.FAILED);
+    transactionStatusDTO.setDeadline(BigInteger.valueOf(5));
+    transactionStatusDTO.setHeight(BigInteger.valueOf(6));
+    transactionStatusDTO.setCode(TransactionStatusEnum.FAILURE_ACCOUNTLINK_LINK_ALREADY_EXISTS);
+    transactionStatusDTO.setHash("someHash");
+    mockRemoteCall(Collections.singletonList(transactionStatusDTO));
 
-        TransactionStatusDTO transactionStatusDTO = new TransactionStatusDTO();
-
-        transactionStatusDTO.setGroup(TransactionGroupEnum.FAILED);
-        transactionStatusDTO.setDeadline(BigInteger.valueOf(5));
-        transactionStatusDTO.setHeight(BigInteger.valueOf(6));
-        transactionStatusDTO
-            .setCode(TransactionStatusEnum.FAILURE_ACCOUNTLINK_LINK_ALREADY_EXISTS);
-        transactionStatusDTO.setHash("someHash");
-        mockRemoteCall(Collections.singletonList(transactionStatusDTO));
-
-        TransactionStatus transaction = repository
+    TransactionStatus transaction =
+        repository
             .getTransactionStatuses(Collections.singletonList(transactionStatusDTO.getHash()))
-            .toFuture().get().get(0);
+            .toFuture()
+            .get()
+            .get(0);
 
-        Assertions.assertNotNull(transaction);
+    Assertions.assertNotNull(transaction);
 
-        Assertions.assertEquals(transactionStatusDTO.getHash(), transaction.getHash());
-        Assertions.assertEquals(5L, transaction.getDeadline().getInstant());
-        Assertions.assertEquals(BigInteger.valueOf(6L), transaction.getHeight());
-        Assertions.assertEquals("Failure_AccountLink_Link_Already_Exists", transaction.getCode());
-        Assertions.assertEquals(transaction.getGroup().getValue(),
-            transactionStatusDTO.getGroup().getValue());
-    }
-
-
+    Assertions.assertEquals(transactionStatusDTO.getHash(), transaction.getHash());
+    Assertions.assertEquals(5L, transaction.getDeadline().getInstant());
+    Assertions.assertEquals(BigInteger.valueOf(6L), transaction.getHeight());
+    Assertions.assertEquals("Failure_AccountLink_Link_Already_Exists", transaction.getCode());
+    Assertions.assertEquals(
+        transaction.getGroup().getValue(), transactionStatusDTO.getGroup().getValue());
+  }
 }

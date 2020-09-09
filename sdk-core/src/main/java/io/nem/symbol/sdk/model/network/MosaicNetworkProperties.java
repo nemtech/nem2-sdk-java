@@ -13,42 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package io.nem.symbol.sdk.model.network;
-
-/**
- * MosaicNetworkProperties
- */
+/** MosaicNetworkProperties */
 public class MosaicNetworkProperties {
 
-    /**
-     * Maximum number of mosaics that an account can own.
-     **/
-    private final String maxMosaicsPerAccount;
+  /** Maximum number of mosaics that an account can own. */
+  private final String maxMosaicsPerAccount;
 
-    /**
-     * Maximum mosaic duration.
-     **/
-    private final String maxMosaicDuration;
+  /** Maximum mosaic duration. */
+  private final String maxMosaicDuration;
 
-    /**
-     * Maximum mosaic divisibility.
-     **/
-    private final String maxMosaicDivisibility;
+  /** Maximum mosaic divisibility. */
+  private final String maxMosaicDivisibility;
 
-    /**
-     * Public key.
-     **/
-    private final String mosaicRentalFeeSinkAddress;
+  /** Public key. */
+  private final String mosaicRentalFeeSinkAddress;
 
-    /**
-     * Mosaic rental fee.
-     **/
-    private final String mosaicRentalFee;
+  /** Mosaic rental fee. */
+  private final String mosaicRentalFee;
 
-  public MosaicNetworkProperties(String maxMosaicsPerAccount, String maxMosaicDuration,
-      String maxMosaicDivisibility, String mosaicRentalFeeSinkAddress,
+  public MosaicNetworkProperties(
+      String maxMosaicsPerAccount,
+      String maxMosaicDuration,
+      String maxMosaicDivisibility,
+      String mosaicRentalFeeSinkAddress,
       String mosaicRentalFee) {
     this.maxMosaicsPerAccount = maxMosaicsPerAccount;
     this.maxMosaicDuration = maxMosaicDuration;
@@ -77,4 +65,3 @@ public class MosaicNetworkProperties {
     return mosaicRentalFee;
   }
 }
-

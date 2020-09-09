@@ -17,37 +17,35 @@ package io.nem.symbol.sdk.model.transaction;
 
 import java.util.Arrays;
 
-/**
- * State of the transaction.
- */
+/** State of the transaction. */
 public enum TransactionState {
+  CONFIRMED("confirmed"),
 
-    CONFIRMED("confirmed"),
+  UNCONFIRMED("unconfirmed"),
 
-    UNCONFIRMED("unconfirmed"),
+  FAILED("failed"),
 
-    FAILED("failed"),
+  PARTIAL("partial");
 
-    PARTIAL("partial");
+  private final String value;
 
-    private final String value;
+  TransactionState(String value) {
+    this.value = value;
+  }
 
-    TransactionState(String value) {
-        this.value = value;
-    }
+  public String getValue() {
+    return value;
+  }
 
-    public String getValue() {
-        return value;
-    }
+  @Override
+  public String toString() {
+    return String.valueOf(value);
+  }
 
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
-
-    public static TransactionState rawValueOf(String value) {
-        return Arrays.stream(values()).filter(e -> e.value.equals(value)).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
+  public static TransactionState rawValueOf(String value) {
+    return Arrays.stream(values())
+        .filter(e -> e.value.equals(value))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 }
-

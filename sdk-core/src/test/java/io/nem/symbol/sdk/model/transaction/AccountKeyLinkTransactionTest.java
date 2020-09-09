@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,43 +24,45 @@ import org.junit.jupiter.api.Test;
 
 public class AccountKeyLinkTransactionTest extends AbstractTransactionTester {
 
-    static Account account;
+  static Account account;
 
-    @BeforeAll
-    public static void setup() {
-        account =
-            new Account(
-                "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
-                NetworkType.MIJIN_TEST);
-    }
+  @BeforeAll
+  public static void setup() {
+    account =
+        new Account(
+            "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
+            NetworkType.MIJIN_TEST);
+  }
 
-    @Test
-    void create() {
-        AccountKeyLinkTransaction transaction =
-            AccountKeyLinkTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                account.getPublicAccount().getPublicKey(),
-                LinkAction.LINK).deadline(new FakeDeadline()).build();
-        assertEquals(LinkAction.LINK, transaction.getLinkAction());
-        assertEquals(
-            "F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E6",
-            transaction.getLinkedPublicKey().toHex());
-    }
+  @Test
+  void create() {
+    AccountKeyLinkTransaction transaction =
+        AccountKeyLinkTransactionFactory.create(
+                NetworkType.MIJIN_TEST, account.getPublicAccount().getPublicKey(), LinkAction.LINK)
+            .deadline(new FakeDeadline())
+            .build();
+    assertEquals(LinkAction.LINK, transaction.getLinkAction());
+    assertEquals(
+        "F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E6",
+        transaction.getLinkedPublicKey().toHex());
+  }
 
-    @Test
-    void shouldGenerateBytes() {
+  @Test
+  void shouldGenerateBytes() {
 
-        AccountKeyLinkTransaction transaction =
-            AccountKeyLinkTransactionFactory.create(
-                NetworkType.MIJIN_TEST,
-                account.getPublicAccount().getPublicKey(),
-                LinkAction.LINK).signer(account.getPublicAccount())
-                .deadline(new FakeDeadline()).build();
+    AccountKeyLinkTransaction transaction =
+        AccountKeyLinkTransactionFactory.create(
+                NetworkType.MIJIN_TEST, account.getPublicAccount().getPublicKey(), LinkAction.LINK)
+            .signer(account.getPublicAccount())
+            .deadline(new FakeDeadline())
+            .build();
 
-        String expected = "A10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E60000000001904C4100000000000000000100000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E601";
-        assertSerialization(expected, transaction);
+    String expected =
+        "A10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E60000000001904C4100000000000000000100000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E601";
+    assertSerialization(expected, transaction);
 
-        String expectedEmbeddedHash = "5100000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001904c41f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e601";
-        assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
-    }
+    String expectedEmbeddedHash =
+        "5100000000000000f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e60000000001904c41f6503f78fbf99544b906872ddb392f4be707180d285e7919dbacef2e9573b1e601";
+    assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
+  }
 }

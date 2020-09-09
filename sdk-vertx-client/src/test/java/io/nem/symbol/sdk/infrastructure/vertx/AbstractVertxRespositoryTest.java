@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,102 +45,121 @@ import org.mockito.stubbing.Answer;
  */
 public abstract class AbstractVertxRespositoryTest {
 
+  protected ApiClient apiClientMock;
 
-    protected ApiClient apiClientMock;
+  protected JsonHelper jsonHelper;
 
-    protected JsonHelper jsonHelper;
+  protected final NetworkType networkType = NetworkType.MIJIN_TEST;
 
-    protected final NetworkType networkType = NetworkType.MIJIN_TEST;
+  protected final Observable<NetworkType> networkTypeObservable = Observable.just(networkType);
 
-    protected final Observable<NetworkType> networkTypeObservable = Observable.just(networkType);
+  @BeforeEach
+  public void setUp() {
+    apiClientMock = Mockito.mock(ApiClient.class);
+    ObjectMapper objectMapper = JsonHelperJackson2.configureMapper(new ObjectMapper());
+    jsonHelper = new JsonHelperJackson2(objectMapper);
+    Mockito.when(apiClientMock.getObjectMapper()).thenReturn(objectMapper);
+  }
 
-    @BeforeEach
-    public void setUp() {
-        apiClientMock = Mockito.mock(ApiClient.class);
-        ObjectMapper objectMapper = JsonHelperJackson2.configureMapper(new ObjectMapper());
-        jsonHelper = new JsonHelperJackson2(objectMapper);
-        Mockito.when(apiClientMock.getObjectMapper()).thenReturn(objectMapper);
-    }
+  protected String encodeAddress(Address address) {
+    return address.encoded();
+  }
 
-    protected String encodeAddress(Address address) {
-        return address.encoded();
-    }
+  /**
+   * Mocks the api client telling what would it be the next response when any remote call is
+   * executed.
+   *
+   * @param <T> tye type of the remote response.
+   * @param value the next mocked remote call response
+   */
+  protected <T> ArgumentCaptor<Object> mockRemoteCall(T value) {
+    ArgumentCaptor<Object> argument = ArgumentCaptor.forClass(Object.class);
+    Mockito.doAnswer(
+            (Answer<Object>)
+                invocationOnMock -> {
+                  Handler<AsyncResult<T>> resultHandler =
+                      (Handler<AsyncResult<T>>)
+                          invocationOnMock
+                              .getArguments()[invocationOnMock.getArguments().length - 1];
+                  resultHandler.handle(Future.succeededFuture(value));
 
-    /**
-     * Mocks the api client telling what would it be the next response when any remote call is
-     * executed.
-     *
-     * @param <T> tye type of the remote response.
-     * @param value the next mocked remote call response
-     */
-    protected <T> ArgumentCaptor<Object> mockRemoteCall(T value) {
-        ArgumentCaptor<Object> argument = ArgumentCaptor.forClass(Object.class);
-        Mockito.doAnswer((Answer<Object>) invocationOnMock -> {
+                  Object params = invocationOnMock.getArguments()[3];
+                  return params;
+                })
+        .when(apiClientMock)
+        .invokeAPI(
+            Mockito.anyString(),
+            Mockito.anyString(),
+            Mockito.anyListOf(Pair.class),
+            argument.capture(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any());
+    return argument;
+  }
 
-            Handler<AsyncResult<T>> resultHandler = (Handler<AsyncResult<T>>) invocationOnMock
-                .getArguments()[invocationOnMock.getArguments().length - 1];
-            resultHandler.handle(Future.succeededFuture(value));
+  /**
+   * Mocks the api client telling that the next time there is remote call, an error should be
+   * returned. The mocked response body is the expected json from the catapult rest error handler.
+   *
+   * @param statusCode the status code of the response (404 for example)
+   * @param message the error message that will be returned in the body.
+   */
+  protected void mockErrorCode(final int statusCode, final String message) {
+    Map<String, String> errorBody = new HashMap<>();
 
-            Object params = invocationOnMock.getArguments()[3];
-            return params;
-        }).when(apiClientMock)
-            .invokeAPI(Mockito.anyString(), Mockito.anyString(), Mockito.anyListOf(Pair.class),
-                argument.capture(),
-                Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
-                Mockito.any(), Mockito.any(), Mockito.any());
-        return argument;
+    String reasonPhrase = HttpStatus.valueOf(statusCode).getReasonPhrase();
+    errorBody.put("code", "Code " + reasonPhrase);
+    errorBody.put("message", message);
+    String errorResponse = jsonHelper.print(errorBody);
+    mockErrorCodeRawResponse(statusCode, errorResponse);
+  }
 
-    }
+  /**
+   * Mocks the api client telling that the next time there is remote call, an error should be
+   * returned.
+   *
+   * @param statusCode the status code of the response (404 for example)
+   * @param errorResponse the raw response, it may or may not be a json string.
+   */
+  protected void mockErrorCodeRawResponse(int statusCode, String errorResponse) {
+    String reasonPhrase = HttpStatus.valueOf(statusCode).getReasonPhrase();
+    VertxHttpHeaders headers = new VertxHttpHeaders();
+    ApiException exception = new ApiException(reasonPhrase, statusCode, headers, errorResponse);
 
+    Mockito.doAnswer(
+            (Answer<Void>)
+                invocationOnMock -> {
+                  Handler<AsyncResult<Object>> resultHandler =
+                      (Handler<AsyncResult<Object>>)
+                          invocationOnMock
+                              .getArguments()[invocationOnMock.getArguments().length - 1];
+                  resultHandler.handle(Future.failedFuture(exception));
 
-    /**
-     * Mocks the api client telling that the next time there is remote call, an error should be
-     * returned. The mocked response body is the expected json from the catapult rest error
-     * handler.
-     *
-     * @param statusCode the status code of the response (404 for example)
-     * @param message the error message that will be returned in the body.
-     */
-    protected void mockErrorCode(final int statusCode, final String message) {
-        Map<String, String> errorBody = new HashMap<>();
+                  return null;
+                })
+        .when(apiClientMock)
+        .invokeAPI(
+            Mockito.anyString(),
+            Mockito.anyString(),
+            Mockito.anyList(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any());
+  }
 
-        String reasonPhrase = HttpStatus.valueOf(statusCode).getReasonPhrase();
-        errorBody.put("code", "Code " + reasonPhrase);
-        errorBody.put("message", message);
-        String errorResponse = jsonHelper.print(errorBody);
-        mockErrorCodeRawResponse(statusCode, errorResponse);
-    }
-
-    /**
-     * Mocks the api client telling that the next time there is remote call, an error should be
-     * returned.
-     *
-     * @param statusCode the status code of the response (404 for example)
-     * @param errorResponse the raw response, it may or may not be a json string.
-     */
-    protected void mockErrorCodeRawResponse(int statusCode, String errorResponse) {
-        String reasonPhrase = HttpStatus.valueOf(statusCode).getReasonPhrase();
-        VertxHttpHeaders headers = new VertxHttpHeaders();
-        ApiException exception = new ApiException(reasonPhrase, statusCode, headers,
-            errorResponse);
-
-        Mockito.doAnswer((Answer<Void>) invocationOnMock -> {
-
-            Handler<AsyncResult<Object>> resultHandler = (Handler<AsyncResult<Object>>) invocationOnMock
-                .getArguments()[invocationOnMock.getArguments().length - 1];
-            resultHandler.handle(Future.failedFuture(exception));
-
-            return null;
-        }).when(apiClientMock)
-            .invokeAPI(Mockito.anyString(), Mockito.anyString(), Mockito.anyList(), Mockito.any(),
-                Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
-                Mockito.any(), Mockito.any(), Mockito.any());
-    }
-
-    protected Mosaic createAbsolute(BigInteger amount) {
-        return new Mosaic(NamespaceId.createFromName("xem.currency"),
-            amount);
-    }
-
-
+  protected Mosaic createAbsolute(BigInteger amount) {
+    return new Mosaic(NamespaceId.createFromName("xem.currency"), amount);
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.Account;
@@ -25,39 +24,52 @@ import org.junit.jupiter.api.Test;
 
 public class AccountOperationRestrictionTransactionTest extends AbstractTransactionTester {
 
-    static Account account = new Account(
-        "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
-        NetworkType.MIJIN_TEST);
+  static Account account =
+      new Account(
+          "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
+          NetworkType.MIJIN_TEST);
 
-    @Test
-    void create() {
-        List<TransactionType> additions = Collections.singletonList(TransactionType.SECRET_PROOF);
-        List<TransactionType> deletions = Collections.singletonList(TransactionType.TRANSFER);
+  @Test
+  void create() {
+    List<TransactionType> additions = Collections.singletonList(TransactionType.SECRET_PROOF);
+    List<TransactionType> deletions = Collections.singletonList(TransactionType.TRANSFER);
 
-        AccountOperationRestrictionTransaction transaction =
-            AccountOperationRestrictionTransactionFactory.create(NetworkType.MIJIN_TEST,
-                AccountOperationRestrictionFlags.ALLOW_OUTGOING_TRANSACTION_TYPE, additions, deletions).deadline(new FakeDeadline()).build();
-        Assertions.assertEquals(AccountOperationRestrictionFlags.ALLOW_OUTGOING_TRANSACTION_TYPE,
-            transaction.getRestrictionFlags());
-        Assertions.assertEquals(additions, transaction.getRestrictionAdditions());
-        Assertions.assertEquals(deletions, transaction.getRestrictionDeletions());
-    }
+    AccountOperationRestrictionTransaction transaction =
+        AccountOperationRestrictionTransactionFactory.create(
+                NetworkType.MIJIN_TEST,
+                AccountOperationRestrictionFlags.ALLOW_OUTGOING_TRANSACTION_TYPE,
+                additions,
+                deletions)
+            .deadline(new FakeDeadline())
+            .build();
+    Assertions.assertEquals(
+        AccountOperationRestrictionFlags.ALLOW_OUTGOING_TRANSACTION_TYPE,
+        transaction.getRestrictionFlags());
+    Assertions.assertEquals(additions, transaction.getRestrictionAdditions());
+    Assertions.assertEquals(deletions, transaction.getRestrictionDeletions());
+  }
 
-    @Test
-    void shouldGenerateBytes() {
+  @Test
+  void shouldGenerateBytes() {
 
-        List<TransactionType> additions = Collections.singletonList(TransactionType.SECRET_PROOF);
-        List<TransactionType> deletions = Collections.singletonList(TransactionType.TRANSFER);
-        AccountOperationRestrictionTransaction transaction =
-            AccountOperationRestrictionTransactionFactory.create(NetworkType.MIJIN_TEST,
-                AccountOperationRestrictionFlags.ALLOW_OUTGOING_TRANSACTION_TYPE, additions, deletions).signer(account.getPublicAccount())
-                .deadline(new FakeDeadline())
-                .build();
+    List<TransactionType> additions = Collections.singletonList(TransactionType.SECRET_PROOF);
+    List<TransactionType> deletions = Collections.singletonList(TransactionType.TRANSFER);
+    AccountOperationRestrictionTransaction transaction =
+        AccountOperationRestrictionTransactionFactory.create(
+                NetworkType.MIJIN_TEST,
+                AccountOperationRestrictionFlags.ALLOW_OUTGOING_TRANSACTION_TYPE,
+                additions,
+                deletions)
+            .signer(account.getPublicAccount())
+            .deadline(new FakeDeadline())
+            .build();
 
-        String expected = "8C0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E6000000000190504300000000000000000100000000000000044001010000000052425441";
-        assertSerialization(expected, transaction);
+    String expected =
+        "8C0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E6000000000190504300000000000000000100000000000000044001010000000052425441";
+    assertSerialization(expected, transaction);
 
-        String expectedEmbeddedHash = "3C00000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E60000000001905043044001010000000052425441";
-        assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
-    }
+    String expectedEmbeddedHash =
+        "3C00000000000000F6503F78FBF99544B906872DDB392F4BE707180D285E7919DBACEF2E9573B1E60000000001905043044001010000000052425441";
+    assertEmbeddedSerialization(expectedEmbeddedHash, transaction);
+  }
 }

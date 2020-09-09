@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.core.utils.ConvertUtils;
@@ -34,68 +33,72 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-/**
- * This class tests how open api json transactions are serialized from and to models.
- */
+/** This class tests how open api json transactions are serialized from and to models. */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TransactionMapperSerializationOkHttpTest {
 
-    private final JsonHelper jsonHelper = new JsonHelperGson();
+  private final JsonHelper jsonHelper = new JsonHelperGson();
 
-    private final GeneralTransactionMapper transactionMapper = new GeneralTransactionMapper(jsonHelper);
+  private final GeneralTransactionMapper transactionMapper =
+      new GeneralTransactionMapper(jsonHelper);
 
-    private static List<String> transactionJsonFiles() {
-        return Arrays.stream(getResourceFolderFiles("json")).filter(f -> f.getName().startsWith("transaction-"))
-            .map(File::getName).collect(Collectors.toList());
+  private static List<String> transactionJsonFiles() {
+    return Arrays.stream(getResourceFolderFiles("json"))
+        .filter(f -> f.getName().startsWith("transaction-"))
+        .map(File::getName)
+        .collect(Collectors.toList());
+  }
+
+  private static File[] getResourceFolderFiles(String folder) {
+    ClassLoader loader = Thread.currentThread().getContextClassLoader();
+    URL url = loader.getResource(folder);
+    String path = url.getPath();
+    return new File(path).listFiles();
+  }
+
+  @ParameterizedTest
+  @MethodSource("transactionJsonFiles")
+  void testDtoToModelMapping(String jsonFilename) {
+
+    String json = TestHelperOkHttp.loadResource(jsonFilename);
+
+    TransactionInfoDTO originalTransactionInfo = jsonHelper.parse(json, TransactionInfoDTO.class);
+
+    Transaction transactionModel = transactionMapper.mapFromDto(originalTransactionInfo);
+    Assertions.assertNotNull(transactionModel);
+
+    TransactionInfoDTO mappedTransactionInfo =
+        (TransactionInfoDTO) transactionMapper.mapToDto(transactionModel);
+
+    Map<String, Object> transactionMap =
+        jsonHelper.convert(mappedTransactionInfo.getTransaction(), Map.class);
+
+    Map<String, Object> originalTransactionMap =
+        jsonHelper.convert(originalTransactionInfo.getTransaction(), Map.class);
+    originalTransactionMap.put("size", transactionModel.getSize());
+    originalTransactionInfo.setTransaction(originalTransactionMap);
+
+    // Patching the sort
+    mappedTransactionInfo.setTransaction(transactionMap);
+    mappedTransactionInfo.setMeta(jsonHelper.convert(mappedTransactionInfo.getMeta(), Map.class));
+
+    Assertions.assertEquals(
+        jsonHelper.prettyPrint(originalTransactionInfo),
+        jsonHelper.prettyPrint(mappedTransactionInfo));
+
+    BinarySerialization serialization = new BinarySerializationImpl();
+    Assertions.assertEquals(
+        ConvertUtils.toHex(serialization.serialize(transactionModel)),
+        ConvertUtils.toHex(
+            serialization.serialize(transactionMapper.mapFromDto(mappedTransactionInfo))));
+
+    originalTransactionInfo.setMeta(null);
+    Map<String, Object> transactionJson =
+        (Map<String, Object>) originalTransactionInfo.getTransaction();
+    if (transactionJson.containsKey("transactions")) {
+      List<Map<String, Object>> transactionsJson =
+          (List<Map<String, Object>>) transactionJson.get("transactions");
+      transactionsJson.forEach(t -> t.remove("meta"));
     }
-
-    private static File[] getResourceFolderFiles(String folder) {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        URL url = loader.getResource(folder);
-        String path = url.getPath();
-        return new File(path).listFiles();
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionJsonFiles")
-    void testDtoToModelMapping(String jsonFilename) {
-
-        String json = TestHelperOkHttp.loadResource(jsonFilename);
-
-        TransactionInfoDTO originalTransactionInfo = jsonHelper.parse(json, TransactionInfoDTO.class);
-
-        Transaction transactionModel = transactionMapper.mapFromDto(originalTransactionInfo);
-        Assertions.assertNotNull(transactionModel);
-
-        TransactionInfoDTO mappedTransactionInfo = (TransactionInfoDTO) transactionMapper.mapToDto(transactionModel);
-
-        Map<String, Object> transactionMap = jsonHelper.convert(mappedTransactionInfo.getTransaction(), Map.class);
-
-        Map<String, Object> originalTransactionMap = jsonHelper
-            .convert(originalTransactionInfo.getTransaction(), Map.class);
-        originalTransactionMap.put("size", transactionModel.getSize());
-        originalTransactionInfo.setTransaction(originalTransactionMap);
-
-        //Patching the sort
-        mappedTransactionInfo.setTransaction(transactionMap);
-        mappedTransactionInfo.setMeta(jsonHelper.convert(mappedTransactionInfo.getMeta(), Map.class));
-
-        Assertions.assertEquals(jsonHelper.prettyPrint(originalTransactionInfo),
-            jsonHelper.prettyPrint(mappedTransactionInfo));
-
-        BinarySerialization serialization = new BinarySerializationImpl();
-        Assertions.assertEquals(ConvertUtils.toHex(serialization.serialize(transactionModel)),
-            ConvertUtils.toHex(serialization.serialize(transactionMapper.mapFromDto(mappedTransactionInfo))));
-
-        originalTransactionInfo.setMeta(null);
-        Map<String, Object> transactionJson = (Map<String, Object>) originalTransactionInfo.getTransaction();
-        if (transactionJson.containsKey("transactions")) {
-            List<Map<String, Object>> transactionsJson = (List<Map<String, Object>>) transactionJson
-                .get("transactions");
-            transactionsJson.forEach(t -> t.remove("meta"));
-        }
-
-
-    }
-
+  }
 }

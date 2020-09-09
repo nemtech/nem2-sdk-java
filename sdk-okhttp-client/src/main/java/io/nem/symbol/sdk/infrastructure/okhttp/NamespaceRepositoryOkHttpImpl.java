@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import static io.nem.symbol.core.utils.MapperUtils.toNamespaceId;
@@ -63,212 +62,250 @@ import java.util.stream.Collectors;
  *
  * @since 1.0
  */
-public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements NamespaceRepository {
+public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
+    implements NamespaceRepository {
 
-    private final NamespaceRoutesApi client;
+  private final NamespaceRoutesApi client;
 
+  public NamespaceRepositoryOkHttpImpl(ApiClient apiClient) {
+    super(apiClient);
+    this.client = new NamespaceRoutesApi(apiClient);
+  }
 
-    public NamespaceRepositoryOkHttpImpl(ApiClient apiClient) {
-        super(apiClient);
-        this.client = new NamespaceRoutesApi(apiClient);
-    }
+  public NamespaceRoutesApi getClient() {
+    return client;
+  }
 
-    public NamespaceRoutesApi getClient() {
-        return client;
-    }
+  @Override
+  public Observable<NamespaceInfo> getNamespace(NamespaceId namespaceId) {
+    Callable<NamespaceInfoDTO> callback = () -> getClient().getNamespace(namespaceId.getIdAsHex());
+    return exceptionHandling(call(callback).map(this::toNamespaceInfo));
+  }
 
-    @Override
-    public Observable<NamespaceInfo> getNamespace(NamespaceId namespaceId) {
-        Callable<NamespaceInfoDTO> callback = () -> getClient().getNamespace(namespaceId.getIdAsHex());
-        return exceptionHandling(call(callback).map(this::toNamespaceInfo));
-    }
+  @Override
+  public Observable<Page<NamespaceInfo>> search(NamespaceSearchCriteria criteria) {
 
-    @Override
-    public Observable<Page<NamespaceInfo>> search(NamespaceSearchCriteria criteria) {
-
-        String ownerAddress = toDto(criteria.getOwnerAddress());
-        NamespaceRegistrationTypeEnum registrationType = criteria.getRegistrationType() == null ? null
+    String ownerAddress = toDto(criteria.getOwnerAddress());
+    NamespaceRegistrationTypeEnum registrationType =
+        criteria.getRegistrationType() == null
+            ? null
             : NamespaceRegistrationTypeEnum.fromValue(criteria.getRegistrationType().getValue());
-        String level0 = criteria.getLevel0();
-        AliasTypeEnum aliasType =
-            criteria.getAliasType() == null ? null : AliasTypeEnum.fromValue(criteria.getAliasType().getValue());
-        Integer pageSize = criteria.getPageSize();
-        Integer pageNumber = criteria.getPageNumber();
-        String offset = criteria.getOffset();
-        Order order = toDto(criteria.getOrder());
-        Callable<NamespacePage> callback = () -> getClient()
-            .searchNamespaces(ownerAddress, registrationType, level0, aliasType, pageSize, pageNumber, offset, order);
+    String level0 = criteria.getLevel0();
+    AliasTypeEnum aliasType =
+        criteria.getAliasType() == null
+            ? null
+            : AliasTypeEnum.fromValue(criteria.getAliasType().getValue());
+    Integer pageSize = criteria.getPageSize();
+    Integer pageNumber = criteria.getPageNumber();
+    String offset = criteria.getOffset();
+    Order order = toDto(criteria.getOrder());
+    Callable<NamespacePage> callback =
+        () ->
+            getClient()
+                .searchNamespaces(
+                    ownerAddress,
+                    registrationType,
+                    level0,
+                    aliasType,
+                    pageSize,
+                    pageNumber,
+                    offset,
+                    order);
 
-        return exceptionHandling(call(callback).map(page -> this.toPage(page.getPagination(),
-            page.getData().stream().map(this::toNamespaceInfo).collect(Collectors.toList()))));
-    }
+    return exceptionHandling(
+        call(callback)
+            .map(
+                page ->
+                    this.toPage(
+                        page.getPagination(),
+                        page.getData().stream()
+                            .map(this::toNamespaceInfo)
+                            .collect(Collectors.toList()))));
+  }
 
-    @Override
-    public Observable<List<NamespaceName>> getNamespaceNames(List<NamespaceId> namespaceIds) {
+  @Override
+  public Observable<List<NamespaceName>> getNamespaceNames(List<NamespaceId> namespaceIds) {
 
-        NamespaceIds ids = new NamespaceIds()
-            .namespaceIds(namespaceIds.stream().map(NamespaceId::getIdAsHex).collect(Collectors.toList()));
+    NamespaceIds ids =
+        new NamespaceIds()
+            .namespaceIds(
+                namespaceIds.stream().map(NamespaceId::getIdAsHex).collect(Collectors.toList()));
 
-        Callable<List<NamespaceNameDTO>> callback = () -> getClient().getNamespacesNames(ids);
+    Callable<List<NamespaceNameDTO>> callback = () -> getClient().getNamespacesNames(ids);
 
-        return exceptionHandling(
-            call(callback).flatMapIterable(item -> item).map(this::toNamespaceName).toList().toObservable());
-    }
+    return exceptionHandling(
+        call(callback)
+            .flatMapIterable(item -> item)
+            .map(this::toNamespaceName)
+            .toList()
+            .toObservable());
+  }
 
-    private NamespaceName toNamespaceName(NamespaceNameDTO dto) {
-        return new NamespaceName(toNamespaceId(dto.getId()), dto.getName(),
-            Optional.ofNullable(toNamespaceId(dto.getParentId())));
-    }
+  private NamespaceName toNamespaceName(NamespaceNameDTO dto) {
+    return new NamespaceName(
+        toNamespaceId(dto.getId()),
+        dto.getName(),
+        Optional.ofNullable(toNamespaceId(dto.getParentId())));
+  }
 
+  /**
+   * Gets the MosaicId from a MosaicAlias
+   *
+   * @param namespaceId - the namespaceId of the namespace
+   * @return Observable of {@link MosaicId}
+   */
+  @Override
+  public Observable<MosaicId> getLinkedMosaicId(NamespaceId namespaceId) {
+    Callable<NamespaceInfoDTO> callback = () -> getClient().getNamespace(namespaceId.getIdAsHex());
+    return exceptionHandling(
+        call(callback).map(namespaceInfoDTO -> this.toMosaicId(namespaceInfoDTO.getNamespace())));
+  }
 
-    /**
-     * Gets the MosaicId from a MosaicAlias
-     *
-     * @param namespaceId - the namespaceId of the namespace
-     * @return Observable of {@link MosaicId}
-     */
-    @Override
-    public Observable<MosaicId> getLinkedMosaicId(NamespaceId namespaceId) {
-        Callable<NamespaceInfoDTO> callback = () -> getClient().getNamespace(namespaceId.getIdAsHex());
-        return exceptionHandling(
-            call(callback).map(namespaceInfoDTO -> this.toMosaicId(namespaceInfoDTO.getNamespace())));
-    }
+  /**
+   * Gets the Address from a AddressAlias
+   *
+   * @param namespaceId - the namespaceId of the namespace
+   * @return Observable of {@link MosaicId}
+   */
+  @Override
+  public Observable<Address> getLinkedAddress(NamespaceId namespaceId) {
+    Callable<NamespaceInfoDTO> callback = () -> getClient().getNamespace(namespaceId.getIdAsHex());
+    return exceptionHandling(
+        call(callback).map(namespaceInfoDTO -> this.toAddress(namespaceInfoDTO.getNamespace())));
+  }
 
-    /**
-     * Gets the Address from a AddressAlias
-     *
-     * @param namespaceId - the namespaceId of the namespace
-     * @return Observable of {@link MosaicId}
-     */
-    @Override
-    public Observable<Address> getLinkedAddress(NamespaceId namespaceId) {
-        Callable<NamespaceInfoDTO> callback = () -> getClient().getNamespace(namespaceId.getIdAsHex());
-        return exceptionHandling(
-            call(callback).map(namespaceInfoDTO -> this.toAddress(namespaceInfoDTO.getNamespace())));
-    }
-
-
-    @Override
-    public Observable<List<AccountNames>> getAccountsNames(List<Address> addresses) {
-        Addresses addressesDto = new Addresses()
+  @Override
+  public Observable<List<AccountNames>> getAccountsNames(List<Address> addresses) {
+    Addresses addressesDto =
+        new Addresses()
             .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-        return getAccountNames(addressesDto);
+    return getAccountNames(addressesDto);
+  }
+
+  private Observable<List<AccountNames>> getAccountNames(Addresses accountIds) {
+    Callable<AccountsNamesDTO> callback = () -> getClient().getAccountsNames(accountIds);
+    return exceptionHandling(
+        call(callback)
+            .map(AccountsNamesDTO::getAccountNames)
+            .flatMapIterable(item -> item)
+            .map(this::toAccountNames)
+            .toList()
+            .toObservable());
+  }
+
+  /**
+   * Converts a {@link AccountNamesDTO} into a {@link AccountNames}
+   *
+   * @param dto {@link AccountNamesDTO}
+   * @return {@link AccountNames}
+   */
+  private AccountNames toAccountNames(AccountNamesDTO dto) {
+    return new AccountNames(
+        MapperUtils.toAddress(dto.getAddress()),
+        dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
+  }
+
+  @Override
+  public Observable<List<MosaicNames>> getMosaicsNames(List<MosaicId> ids) {
+    MosaicIds mosaicIds = new MosaicIds();
+    mosaicIds.mosaicIds(ids.stream().map(MosaicId::getIdAsHex).collect(Collectors.toList()));
+    Callable<MosaicsNamesDTO> callback = () -> getClient().getMosaicsNames(mosaicIds);
+    return exceptionHandling(
+        call(callback)
+            .map(MosaicsNamesDTO::getMosaicNames)
+            .flatMapIterable(item -> item)
+            .map(this::toMosaicNames)
+            .toList()
+            .toObservable());
+  }
+
+  /**
+   * Converts a {@link MosaicNamesDTO} into a {@link MosaicNames}
+   *
+   * @param dto {@link MosaicNamesDTO}
+   * @return {@link MosaicNames}
+   */
+  private MosaicNames toMosaicNames(MosaicNamesDTO dto) {
+    return new MosaicNames(
+        MapperUtils.toMosaicId(dto.getMosaicId()),
+        dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
+  }
+
+  /**
+   * Create a NamespaceInfo from a NamespaceInfoDTO and a NetworkType
+   *
+   * @param namespaceInfoDTO, networkType
+   */
+  private NamespaceInfo toNamespaceInfo(NamespaceInfoDTO namespaceInfoDTO) {
+    return new NamespaceInfo(
+        namespaceInfoDTO.getId(),
+        namespaceInfoDTO.getMeta().getActive(),
+        namespaceInfoDTO.getMeta().getIndex(),
+        namespaceInfoDTO.getMeta().getId(),
+        NamespaceRegistrationType.rawValueOf(
+            namespaceInfoDTO.getNamespace().getRegistrationType().getValue()),
+        namespaceInfoDTO.getNamespace().getDepth(),
+        this.extractLevels(namespaceInfoDTO),
+        toNamespaceId(namespaceInfoDTO.getNamespace().getParentId()),
+        MapperUtils.toAddress(namespaceInfoDTO.getNamespace().getOwnerAddress()),
+        namespaceInfoDTO.getNamespace().getStartHeight(),
+        namespaceInfoDTO.getNamespace().getEndHeight(),
+        this.extractAlias(namespaceInfoDTO.getNamespace()));
+  }
+
+  /** Extract a list of NamespaceId levels from a NamespaceInfoDTO */
+  private List<NamespaceId> extractLevels(NamespaceInfoDTO namespaceInfoDTO) {
+    List<NamespaceId> levels = new ArrayList<>();
+    if (namespaceInfoDTO.getNamespace().getLevel0() != null) {
+      levels.add(toNamespaceId(namespaceInfoDTO.getNamespace().getLevel0()));
     }
 
-    private Observable<List<AccountNames>> getAccountNames(Addresses accountIds) {
-        Callable<AccountsNamesDTO> callback = () -> getClient().getAccountsNames(accountIds);
-        return exceptionHandling(call(callback).map(AccountsNamesDTO::getAccountNames).flatMapIterable(item -> item)
-            .map(this::toAccountNames).toList().toObservable());
+    if (namespaceInfoDTO.getNamespace().getLevel1() != null) {
+      levels.add(toNamespaceId(namespaceInfoDTO.getNamespace().getLevel1()));
     }
 
-    /**
-     * Converts a {@link AccountNamesDTO} into a {@link AccountNames}
-     *
-     * @param dto {@link AccountNamesDTO}
-     * @return {@link AccountNames}
-     */
-    private AccountNames toAccountNames(AccountNamesDTO dto) {
-        return new AccountNames(MapperUtils.toAddress(dto.getAddress()),
-            dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
+    if (namespaceInfoDTO.getNamespace().getLevel2() != null) {
+      levels.add(toNamespaceId(namespaceInfoDTO.getNamespace().getLevel2()));
     }
 
+    return levels;
+  }
 
-    @Override
-    public Observable<List<MosaicNames>> getMosaicsNames(List<MosaicId> ids) {
-        MosaicIds mosaicIds = new MosaicIds();
-        mosaicIds.mosaicIds(ids.stream().map(MosaicId::getIdAsHex).collect(Collectors.toList()));
-        Callable<MosaicsNamesDTO> callback = () -> getClient().getMosaicsNames(mosaicIds);
-        return exceptionHandling(
-            call(callback).map(MosaicsNamesDTO::getMosaicNames).flatMapIterable(item -> item).map(this::toMosaicNames)
-                .toList().toObservable());
+  /** Extract the alias from a NamespaceDTO */
+  private Alias extractAlias(NamespaceDTO namespaceDTO) {
+
+    Alias alias = new EmptyAlias();
+    if (namespaceDTO.getAlias() != null) {
+      if (namespaceDTO.getAlias().getType().getValue().equals(AliasType.MOSAIC.getValue())) {
+        return new MosaicAlias(toMosaicId(namespaceDTO));
+      } else if (namespaceDTO
+          .getAlias()
+          .getType()
+          .getValue()
+          .equals(AliasType.ADDRESS.getValue())) {
+        return new AddressAlias(toAddress(namespaceDTO));
+      }
     }
+    return alias;
+  }
 
-    /**
-     * Converts a {@link MosaicNamesDTO} into a {@link MosaicNames}
-     *
-     * @param dto {@link MosaicNamesDTO}
-     * @return {@link MosaicNames}
-     */
-    private MosaicNames toMosaicNames(MosaicNamesDTO dto) {
-        return new MosaicNames(MapperUtils.toMosaicId(dto.getMosaicId()),
-            dto.getNames().stream().map(NamespaceName::new).collect(Collectors.toList()));
+  /** Create a MosaicId from a NamespaceDTO */
+  private MosaicId toMosaicId(NamespaceDTO namespaceDTO) {
+    if (namespaceDTO.getAlias() != null
+        && AliasType.MOSAIC.getValue().equals(namespaceDTO.getAlias().getType().getValue())) {
+      return MapperUtils.toMosaicId(namespaceDTO.getAlias().getMosaicId());
+    } else {
+      return null;
     }
+  }
 
-    /**
-     * Create a NamespaceInfo from a NamespaceInfoDTO and a NetworkType
-     *
-     * @param namespaceInfoDTO, networkType
-     */
-    private NamespaceInfo toNamespaceInfo(NamespaceInfoDTO namespaceInfoDTO) {
-        return new NamespaceInfo(namespaceInfoDTO.getId(), namespaceInfoDTO.getMeta().getActive(),
-            namespaceInfoDTO.getMeta().getIndex(), namespaceInfoDTO.getMeta().getId(),
-            NamespaceRegistrationType.rawValueOf(namespaceInfoDTO.getNamespace().getRegistrationType().getValue()),
-            namespaceInfoDTO.getNamespace().getDepth(), this.extractLevels(namespaceInfoDTO),
-            toNamespaceId(namespaceInfoDTO.getNamespace().getParentId()),
-            MapperUtils.toAddress(namespaceInfoDTO.getNamespace().getOwnerAddress()),
-            namespaceInfoDTO.getNamespace().getStartHeight(), namespaceInfoDTO.getNamespace().getEndHeight(),
-            this.extractAlias(namespaceInfoDTO.getNamespace()));
+  /** Create a Address from a NamespaceDTO */
+  private Address toAddress(NamespaceDTO namespaceDTO) {
+    if (namespaceDTO.getAlias() != null
+        && AliasType.ADDRESS.getValue().equals(namespaceDTO.getAlias().getType().getValue())) {
+      return MapperUtils.toAddress(namespaceDTO.getAlias().getAddress());
+    } else {
+      return null;
     }
-
-
-    /**
-     * Extract a list of NamespaceId levels from a NamespaceInfoDTO
-     */
-    private List<NamespaceId> extractLevels(NamespaceInfoDTO namespaceInfoDTO) {
-        List<NamespaceId> levels = new ArrayList<>();
-        if (namespaceInfoDTO.getNamespace().getLevel0() != null) {
-            levels.add(toNamespaceId(namespaceInfoDTO.getNamespace().getLevel0()));
-        }
-
-        if (namespaceInfoDTO.getNamespace().getLevel1() != null) {
-            levels.add(toNamespaceId(namespaceInfoDTO.getNamespace().getLevel1()));
-        }
-
-        if (namespaceInfoDTO.getNamespace().getLevel2() != null) {
-            levels.add(toNamespaceId(namespaceInfoDTO.getNamespace().getLevel2()));
-        }
-
-        return levels;
-    }
-
-    /**
-     * Extract the alias from a NamespaceDTO
-     */
-    private Alias extractAlias(NamespaceDTO namespaceDTO) {
-
-        Alias alias = new EmptyAlias();
-        if (namespaceDTO.getAlias() != null) {
-            if (namespaceDTO.getAlias().getType().getValue().equals(AliasType.MOSAIC.getValue())) {
-                return new MosaicAlias(toMosaicId(namespaceDTO));
-            } else if (namespaceDTO.getAlias().getType().getValue().equals(AliasType.ADDRESS.getValue())) {
-                return new AddressAlias(toAddress(namespaceDTO));
-            }
-        }
-        return alias;
-    }
-
-    /**
-     * Create a MosaicId from a NamespaceDTO
-     */
-    private MosaicId toMosaicId(NamespaceDTO namespaceDTO) {
-        if (namespaceDTO.getAlias() != null && AliasType.MOSAIC.getValue()
-            .equals(namespaceDTO.getAlias().getType().getValue())) {
-            return MapperUtils.toMosaicId(namespaceDTO.getAlias().getMosaicId());
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Create a Address from a NamespaceDTO
-     */
-    private Address toAddress(NamespaceDTO namespaceDTO) {
-        if (namespaceDTO.getAlias() != null && AliasType.ADDRESS.getValue()
-            .equals(namespaceDTO.getAlias().getType().getValue())) {
-            return MapperUtils.toAddress(namespaceDTO.getAlias().getAddress());
-        } else {
-            return null;
-        }
-    }
-
+  }
 }

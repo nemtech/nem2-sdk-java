@@ -13,60 +13,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.Address;
 
-/**
- * The transaction status error model returned by listeners.
- */
+/** The transaction status error model returned by listeners. */
 public class TransactionStatusError {
 
-    private final Address address;
-    private final String hash;
-    private final String status;
-    private final Deadline deadline;
+  private final Address address;
+  private final String hash;
+  private final String status;
+  private final Deadline deadline;
 
-    public TransactionStatusError(Address address, String hash, String status, Deadline deadline) {
-        this.address = address;
-        this.hash = hash;
-        this.status = status;
-        this.deadline = deadline;
-    }
+  public TransactionStatusError(Address address, String hash, String status, Deadline deadline) {
+    this.address = address;
+    this.hash = hash;
+    this.status = status;
+    this.deadline = deadline;
+  }
 
+  /** @return the address that fires the transaction status error. */
+  public Address getAddress() {
+    return address;
+  }
 
-    /**
-     * @return the address that fires the transaction status error.
-     */
-    public Address getAddress() {
-        return address;
-    }
+  /**
+   * Returns transaction hash.
+   *
+   * @return transaction hash
+   */
+  public String getHash() {
+    return hash;
+  }
 
-    /**
-     * Returns transaction hash.
-     *
-     * @return transaction hash
-     */
-    public String getHash() {
-        return hash;
-    }
+  /**
+   * Returns transaction status error when transaction fails.
+   *
+   * @return transaction status error
+   */
+  public String getStatus() {
+    return status;
+  }
 
-    /**
-     * Returns transaction status error when transaction fails.
-     *
-     * @return transaction status error
-     */
-    public String getStatus() {
-        return status;
-    }
-
-    /**
-     * Returns transaction deadline.
-     *
-     * @return transaction deadline
-     */
-    public Deadline getDeadline() {
-        return deadline;
-    }
+  /**
+   * Returns transaction deadline.
+   *
+   * @return transaction deadline
+   */
+  public Deadline getDeadline() {
+    return deadline;
+  }
 }

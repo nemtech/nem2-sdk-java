@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import io.nem.symbol.sdk.model.namespace.NamespaceName;
@@ -26,30 +25,26 @@ import java.util.List;
  */
 public class AccountNames {
 
-    /**
-     * The address of the account.
-     */
-    private final Address address;
+  /** The address of the account. */
+  private final Address address;
 
-    /**
-     * The names.
-     */
-    private final List<NamespaceName> names;
+  /** The names. */
+  private final List<NamespaceName> names;
 
-    /**
-     * @param address the account address
-     * @param names the names.
-     */
-    public AccountNames(Address address, List<NamespaceName> names) {
-        this.address = address;
-        this.names = names;
-    }
+  /**
+   * @param address the account address
+   * @param names the names.
+   */
+  public AccountNames(Address address, List<NamespaceName> names) {
+    this.address = address;
+    this.names = names;
+  }
 
-    public Address getAddress() {
-        return address;
-    }
+  public Address getAddress() {
+    return address;
+  }
 
-    public List<NamespaceName> getNames() {
-        return names;
-    }
+  public List<NamespaceName> getNames() {
+    return names;
+  }
 }

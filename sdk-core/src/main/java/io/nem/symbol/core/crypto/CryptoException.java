@@ -13,30 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto;
-
-/**
- * Exception that is used when a cryptographic operation fails.
- */
+/** Exception that is used when a cryptographic operation fails. */
 public class CryptoException extends RuntimeException {
 
-    /**
-     * Creates a new crypto exception.
-     *
-     * @param message The exception message.
-     */
-    public CryptoException(final String message) {
-        this(message, null);
-    }
+  /**
+   * Creates a new crypto exception.
+   *
+   * @param message The exception message.
+   */
+  public CryptoException(final String message) {
+    this(message, null);
+  }
 
-    /**
-     * Creates a new crypto exception.
-     *
-     * @param message The exception message.
-     * @param cause The exception cause.
-     */
-    public CryptoException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
+  /**
+   * Creates a new crypto exception.
+   *
+   * @param message The exception message.
+   * @param cause The exception cause.
+   */
+  public CryptoException(final String message, final Throwable cause) {
+    super(message, cause);
+  }
 }

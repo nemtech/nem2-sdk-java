@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.ReceiptRepository;
@@ -26,52 +25,50 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ReceiptRepositoryAddressSearchIntegrationTest extends BaseIntegrationTest {
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearch(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(null);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearch(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(null);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearchSize50(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(50);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearchSize50(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(50);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearchTransaction(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(null);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearchTransaction(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(null);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearchTransactionPageSize50(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(50);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearchTransactionPageSize50(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(50);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void searchOrderByIdAsc(RepositoryType type) {
-        getPaginationTester(type).searchOrderByIdAsc();
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchOrderByIdAsc(RepositoryType type) {
+    getPaginationTester(type).searchOrderByIdAsc();
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void searchOrderByIdDesc(RepositoryType type) {
-        getPaginationTester(type).searchOrderByIdDesc();
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchOrderByIdDesc(RepositoryType type) {
+    getPaginationTester(type).searchOrderByIdDesc();
+  }
 
+  private ReceiptRepository getReceiptRepository(RepositoryType type) {
+    return getRepositoryFactory(type).createReceiptRepository();
+  }
 
-    private ReceiptRepository getReceiptRepository(RepositoryType type) {
-        return getRepositoryFactory(type).createReceiptRepository();
-    }
-
-
-    private PaginationTester<AddressResolutionStatement, ResolutionStatementSearchCriteria> getPaginationTester(
-        RepositoryType type) {
-        return new PaginationTester<>(ResolutionStatementSearchCriteria::new,
-            getReceiptRepository(type)::searchAddressResolutionStatements);
-    }
-
+  private PaginationTester<AddressResolutionStatement, ResolutionStatementSearchCriteria>
+      getPaginationTester(RepositoryType type) {
+    return new PaginationTester<>(
+        ResolutionStatementSearchCriteria::new,
+        getReceiptRepository(type)::searchAddressResolutionStatements);
+  }
 }

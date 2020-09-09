@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,14 +21,16 @@ import org.junit.jupiter.api.Test;
 
 public class CosignatureSignedTransactionTest {
 
-    @Test
-    void createACosignatureSignedTransactionViaConstructor() {
-        CosignatureSignedTransaction cosignatureSignedTransaction =
-            new CosignatureSignedTransaction(AggregateTransactionCosignature.DEFAULT_VERSION, "parentHash", "signature", "signer");
+  @Test
+  void createACosignatureSignedTransactionViaConstructor() {
+    CosignatureSignedTransaction cosignatureSignedTransaction =
+        new CosignatureSignedTransaction(
+            AggregateTransactionCosignature.DEFAULT_VERSION, "parentHash", "signature", "signer");
 
-        assertEquals(AggregateTransactionCosignature.DEFAULT_VERSION, cosignatureSignedTransaction.getVersion());
-        assertEquals("parentHash", cosignatureSignedTransaction.getParentHash());
-        assertEquals("signature", cosignatureSignedTransaction.getSignature());
-        assertEquals("signer", cosignatureSignedTransaction.getSignerPublicKey());
-    }
+    assertEquals(
+        AggregateTransactionCosignature.DEFAULT_VERSION, cosignatureSignedTransaction.getVersion());
+    assertEquals("parentHash", cosignatureSignedTransaction.getParentHash());
+    assertEquals("signature", cosignatureSignedTransaction.getSignature());
+    assertEquals("signer", cosignatureSignedTransaction.getSignerPublicKey());
+  }
 }

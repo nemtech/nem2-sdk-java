@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.sdk.api.AccountRepository;
@@ -48,133 +47,132 @@ import io.vertx.ext.web.client.WebClient;
  *
  * @author Fernando Boucquez
  */
-
 public class RepositoryFactoryVertxImpl extends RepositoryFactoryBase {
 
-    private final ApiClient apiClient;
+  private final ApiClient apiClient;
 
-    private final WebClient webClient;
+  private final WebClient webClient;
 
-    private final Vertx vertx;
+  private final Vertx vertx;
 
-    public RepositoryFactoryVertxImpl(String baseUrl) {
-        this(new RepositoryFactoryConfiguration(baseUrl));
-    }
+  public RepositoryFactoryVertxImpl(String baseUrl) {
+    this(new RepositoryFactoryConfiguration(baseUrl));
+  }
 
-    public RepositoryFactoryVertxImpl(RepositoryFactoryConfiguration configuration) {
-        super(configuration);
-        vertx = Vertx.vertx();
-        webClient = WebClient.create(vertx);
-        this.apiClient = new ApiClient(vertx, new JsonObject().put("basePath", getBaseUrl())) {
-            @Override
-            public synchronized WebClient getWebClient() {
-                return webClient;
-            }
+  public RepositoryFactoryVertxImpl(RepositoryFactoryConfiguration configuration) {
+    super(configuration);
+    vertx = Vertx.vertx();
+    webClient = WebClient.create(vertx);
+    this.apiClient =
+        new ApiClient(vertx, new JsonObject().put("basePath", getBaseUrl())) {
+          @Override
+          public synchronized WebClient getWebClient() {
+            return webClient;
+          }
         };
-        //Note: For some reason the generated code use to mapper instances.
-        JsonHelperJackson2.configureMapper(apiClient.getObjectMapper());
-        JsonHelperJackson2.configureMapper(Json.mapper);
+    // Note: For some reason the generated code use to mapper instances.
+    JsonHelperJackson2.configureMapper(apiClient.getObjectMapper());
+    JsonHelperJackson2.configureMapper(Json.mapper);
+  }
+
+  @Override
+  public AccountRepository createAccountRepository() {
+    return new AccountRepositoryVertxImpl(apiClient);
+  }
+
+  @Override
+  public MultisigRepository createMultisigRepository() {
+    return new MultisigRepositoryVertxImpl(apiClient, getNetworkType());
+  }
+
+  @Override
+  public BlockRepository createBlockRepository() {
+    return new BlockRepositoryVertxImpl(apiClient);
+  }
+
+  @Override
+  public ReceiptRepository createReceiptRepository() {
+    return new ReceiptRepositoryVertxImpl(apiClient);
+  }
+
+  @Override
+  public ChainRepository createChainRepository() {
+    return new ChainRepositoryVertxImpl(apiClient);
+  }
+
+  @Override
+  public MosaicRepository createMosaicRepository() {
+    return new MosaicRepositoryVertxImpl(apiClient, getNetworkType());
+  }
+
+  @Override
+  public NamespaceRepository createNamespaceRepository() {
+    return new NamespaceRepositoryVertxImpl(apiClient);
+  }
+
+  @Override
+  public NetworkRepository createNetworkRepository() {
+    return new NetworkRepositoryVertxImpl(apiClient);
+  }
+
+  @Override
+  public NodeRepository createNodeRepository() {
+    return new NodeRepositoryVertxImpl(apiClient);
+  }
+
+  @Override
+  public TransactionRepository createTransactionRepository() {
+    return new TransactionRepositoryVertxImpl(apiClient);
+  }
+
+  @Override
+  public TransactionStatusRepository createTransactionStatusRepository() {
+    return new TransactionStatusRepositoryVertxImpl(apiClient);
+  }
+
+  @Override
+  public MetadataRepository createMetadataRepository() {
+    return new MetadataRepositoryVertxImpl(apiClient);
+  }
+
+  @Override
+  public RestrictionAccountRepository createRestrictionAccountRepository() {
+    return new RestrictionAccountRepositoryVertxImpl(apiClient);
+  }
+
+  @Override
+  public RestrictionMosaicRepository createRestrictionMosaicRepository() {
+    return new RestrictionMosaicRepositoryVertxImpl(apiClient);
+  }
+
+  @Override
+  public HashLockRepository createHashLockRepository() {
+    return new HashLockRepositoryVertxImpl(apiClient);
+  }
+
+  @Override
+  public SecretLockRepository createSecretLockRepository() {
+    return new SecretLockRepositoryVertxImpl(apiClient);
+  }
+
+  @Override
+  public Listener createListener() {
+    return new ListenerVertx(vertx.createHttpClient(), getBaseUrl(), createNamespaceRepository());
+  }
+
+  @Override
+  public JsonSerialization createJsonSerialization() {
+    return new JsonSerializationVertx(apiClient.getObjectMapper());
+  }
+
+  @Override
+  public void close() {
+
+    vertx.close();
+    try {
+      webClient.close();
+    } catch (IllegalStateException e) {
+      // Failing quietly
     }
-
-
-    @Override
-    public AccountRepository createAccountRepository() {
-        return new AccountRepositoryVertxImpl(apiClient);
-    }
-
-    @Override
-    public MultisigRepository createMultisigRepository() {
-        return new MultisigRepositoryVertxImpl(apiClient, getNetworkType());
-    }
-
-    @Override
-    public BlockRepository createBlockRepository() {
-        return new BlockRepositoryVertxImpl(apiClient);
-    }
-
-    @Override
-    public ReceiptRepository createReceiptRepository() {
-        return new ReceiptRepositoryVertxImpl(apiClient);
-    }
-
-    @Override
-    public ChainRepository createChainRepository() {
-        return new ChainRepositoryVertxImpl(apiClient);
-    }
-
-    @Override
-    public MosaicRepository createMosaicRepository() {
-        return new MosaicRepositoryVertxImpl(apiClient, getNetworkType());
-    }
-
-    @Override
-    public NamespaceRepository createNamespaceRepository() {
-        return new NamespaceRepositoryVertxImpl(apiClient);
-    }
-
-    @Override
-    public NetworkRepository createNetworkRepository() {
-        return new NetworkRepositoryVertxImpl(apiClient);
-    }
-
-    @Override
-    public NodeRepository createNodeRepository() {
-        return new NodeRepositoryVertxImpl(apiClient);
-    }
-
-    @Override
-    public TransactionRepository createTransactionRepository() {
-        return new TransactionRepositoryVertxImpl(apiClient);
-    }
-
-    @Override
-    public TransactionStatusRepository createTransactionStatusRepository() {
-        return new TransactionStatusRepositoryVertxImpl(apiClient);
-    }
-
-    @Override
-    public MetadataRepository createMetadataRepository() {
-        return new MetadataRepositoryVertxImpl(apiClient);
-    }
-
-    @Override
-    public RestrictionAccountRepository createRestrictionAccountRepository() {
-        return new RestrictionAccountRepositoryVertxImpl(apiClient);
-    }
-
-    @Override
-    public RestrictionMosaicRepository createRestrictionMosaicRepository() {
-        return new RestrictionMosaicRepositoryVertxImpl(apiClient);
-    }
-
-    @Override
-    public HashLockRepository createHashLockRepository() {
-        return new HashLockRepositoryVertxImpl(apiClient);
-    }
-
-    @Override
-    public SecretLockRepository createSecretLockRepository() {
-        return new SecretLockRepositoryVertxImpl(apiClient);
-    }
-
-    @Override
-    public Listener createListener() {
-        return new ListenerVertx(vertx.createHttpClient(), getBaseUrl(), createNamespaceRepository());
-    }
-
-    @Override
-    public JsonSerialization createJsonSerialization() {
-        return new JsonSerializationVertx(apiClient.getObjectMapper());
-    }
-
-    @Override
-    public void close() {
-
-        vertx.close();
-        try {
-            webClient.close();
-        } catch (IllegalStateException e) {
-            //Failing quietly
-        }
-    }
+  }
 }

@@ -13,31 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
-
-/**
- * The transaction response of an announce transaction.
- */
+/** The transaction response of an announce transaction. */
 public class TransactionAnnounceResponse {
 
-    private final String message;
+  private final String message;
 
-    /**
-     * Constructor
-     *
-     * @param message Success or error message.
-     */
-    public TransactionAnnounceResponse(String message) {
-        this.message = message;
-    }
+  /**
+   * Constructor
+   *
+   * @param message Success or error message.
+   */
+  public TransactionAnnounceResponse(String message) {
+    this.message = message;
+  }
 
-    /**
-     * Returns success or error message.
-     *
-     * @return transaction response message
-     */
-    public String getMessage() {
-        return message;
-    }
+  /**
+   * Returns success or error message.
+   *
+   * @return transaction response message
+   */
+  public String getMessage() {
+    return message;
+  }
 }

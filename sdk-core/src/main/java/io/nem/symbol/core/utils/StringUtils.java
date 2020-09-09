@@ -13,82 +13,75 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.utils;
 
 import java.util.Optional;
 
-/**
- * Static class that contains string utility functions.
- */
+/** Static class that contains string utility functions. */
 public class StringUtils {
 
-    /**
-     * Private constructor for this utility class.
-     */
-    private StringUtils() {
+  /** Private constructor for this utility class. */
+  private StringUtils() {}
+
+  /**
+   * Determines if the specified string is null or empty.
+   *
+   * @param str The string.
+   * @return true if the string is null or empty.
+   */
+  public static boolean isNullOrEmpty(final String str) {
+    return null == str || str.isEmpty();
+  }
+
+  /**
+   * Determines if the specified string is null or whitespace.
+   *
+   * @param str The string.
+   * @return true if the string is null or whitespace.
+   */
+  public static boolean isNullOrWhitespace(final String str) {
+    if (isNullOrEmpty(str)) {
+      return true;
     }
 
-    /**
-     * Determines if the specified string is null or empty.
-     *
-     * @param str The string.
-     * @return true if the string is null or empty.
-     */
-    public static boolean isNullOrEmpty(final String str) {
-        return null == str || str.isEmpty();
+    for (int i = 0; i < str.length(); i++) {
+      if (!Character.isWhitespace(str.charAt(i))) {
+        return false;
+      }
     }
 
-    /**
-     * Determines if the specified string is null or whitespace.
-     *
-     * @param str The string.
-     * @return true if the string is null or whitespace.
-     */
-    public static boolean isNullOrWhitespace(final String str) {
-        if (isNullOrEmpty(str)) {
-            return true;
-        }
+    return true;
+  }
 
-        for (int i = 0; i < str.length(); i++) {
-            if (!Character.isWhitespace(str.charAt(i))) {
-                return false;
-            }
-        }
+  /**
+   * Replaces a variable contained in a string with a value. A variable is defined as ${variable}.
+   * This pattern is replaced by the given value.
+   *
+   * @param string String that contains variables.
+   * @param name Name of the variable to be replaced with its value.
+   * @param value Value that will replace the variable.
+   * @return string with value replacing the variable with the given name
+   */
+  public static String replaceVariable(final String string, final String name, final String value) {
+    return string.replace(String.format("${%s}", name), value);
+  }
 
-        return true;
+  /**
+   * Returns if both strings in the optionals exit and are the case insensitive equals. If one
+   * optional is not present, the result is false;
+   *
+   * @param optionalString1 the first optional
+   * @param optionalString2 the second optional
+   * @return if both strings in the optionals exit and are the case insensitive equals. If one
+   *     optional is not present, the result is false;
+   */
+  public static boolean equalsIgnoreCase(
+      Optional<String> optionalString1, Optional<String> optionalString2) {
+    if (!optionalString1.isPresent() || !optionalString2.isPresent()) {
+      return false;
     }
-
-    /**
-     * Replaces a variable contained in a string with a value. A variable is defined as ${variable}.
-     * This pattern is replaced by the given value.
-     *
-     * @param string String that contains variables.
-     * @param name Name of the variable to be replaced with its value.
-     * @param value Value that will replace the variable.
-     * @return string with value replacing the variable with the given name
-     */
-    public static String replaceVariable(final String string, final String name,
-        final String value) {
-        return string.replace(String.format("${%s}", name), value);
-    }
-
-    /**
-     * Returns if both strings in the optionals exit and are the case insensitive equals. If one
-     * optional is not present, the result is false;
-     *
-     * @param optionalString1 the first optional
-     * @param optionalString2 the second optional
-     * @return if both strings in the optionals exit and are the case insensitive equals.  If one
-     * optional is not present, the result is false;
-     */
-    public static boolean equalsIgnoreCase(Optional<String> optionalString1,
-        Optional<String> optionalString2) {
-        if (!optionalString1.isPresent() || !optionalString2.isPresent()) {
-            return false;
-        }
-        return optionalString1.flatMap(
-            string1 -> optionalString2.filter(string1::equalsIgnoreCase))
-            .isPresent();
-    }
+    return optionalString1
+        .flatMap(string1 -> optionalString2.filter(string1::equalsIgnoreCase))
+        .isPresent();
+  }
 }

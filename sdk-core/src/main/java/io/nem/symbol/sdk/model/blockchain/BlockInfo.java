@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.blockchain;
 
 import io.nem.symbol.sdk.model.Stored;
@@ -24,304 +23,317 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * The block info structure describes basic information of a block.
- */
+/** The block info structure describes basic information of a block. */
 public class BlockInfo implements Stored {
 
-    private final String recordId;
-    private final Long size;
-    private final String hash;
-    private final String generationHash;
-    private final BigInteger totalFee;
-    private final List<String> stateHashSubCacheMerkleRoots;
-    private final Integer numTransactions;
-    private final Optional<Integer> numStatements;
-    private final List<String> subCacheMerkleRoots;
-    private final String signature;
-    private final PublicAccount signerPublicAccount;
-    private final NetworkType networkType;
-    private final Integer version;
-    private final int type;
-    private final BigInteger height;
-    private final BigInteger timestamp;
-    private final BigInteger difficulty;
-    private final Long feeMultiplier;
-    private final String previousBlockHash;
-    private final String blockTransactionsHash;
-    private final String blockReceiptsHash;
-    private final String stateHash;
-    private final String proofGamma;
-    private final String proofScalar;
-    private final String proofVerificationHash;
-    private final Address beneficiaryAddress;
+  private final String recordId;
+  private final Long size;
+  private final String hash;
+  private final String generationHash;
+  private final BigInteger totalFee;
+  private final List<String> stateHashSubCacheMerkleRoots;
+  private final Integer numTransactions;
+  private final Optional<Integer> numStatements;
+  private final List<String> subCacheMerkleRoots;
+  private final String signature;
+  private final PublicAccount signerPublicAccount;
+  private final NetworkType networkType;
+  private final Integer version;
+  private final int type;
+  private final BigInteger height;
+  private final BigInteger timestamp;
+  private final BigInteger difficulty;
+  private final Long feeMultiplier;
+  private final String previousBlockHash;
+  private final String blockTransactionsHash;
+  private final String blockReceiptsHash;
+  private final String stateHash;
+  private final String proofGamma;
+  private final String proofScalar;
+  private final String proofVerificationHash;
+  private final Address beneficiaryAddress;
 
-    @SuppressWarnings("squid:S00107")
-    public BlockInfo(String recordId, Long size, String hash, String generationHash, BigInteger totalFee,
-        List<String> stateHashSubCacheMerkleRoots, Integer numTransactions, Optional<Integer> numStatements, List<String> subCacheMerkleRoots, String signature,
-        PublicAccount signerPublicAccount, NetworkType networkType, Integer version, int type, BigInteger height,
-        BigInteger timestamp, BigInteger difficulty, Long feeMultiplier, String previousBlockHash,
-        String blockTransactionsHash, String blockReceiptsHash, String stateHash, String proofGamma, String proofScalar,
-        String proofVerificationHash, Address beneficiaryAddress) {
-        this.recordId = recordId;
-        this.size = size;
-        this.hash = hash;
-        this.generationHash = generationHash;
-        this.totalFee = totalFee;
-        this.stateHashSubCacheMerkleRoots = stateHashSubCacheMerkleRoots;
-        this.numTransactions = numTransactions;
-        this.numStatements = numStatements;
-        this.subCacheMerkleRoots = subCacheMerkleRoots;
-        this.signature = signature;
-        this.signerPublicAccount = signerPublicAccount;
-        this.networkType = networkType;
-        this.version = version;
-        this.type = type;
-        this.height = height;
-        this.timestamp = timestamp;
-        this.difficulty = difficulty;
-        this.feeMultiplier = feeMultiplier;
-        this.previousBlockHash = previousBlockHash;
-        this.blockTransactionsHash = blockTransactionsHash;
-        this.blockReceiptsHash = blockReceiptsHash;
-        this.stateHash = stateHash;
-        this.proofGamma = proofGamma;
-        this.proofScalar = proofScalar;
-        this.proofVerificationHash = proofVerificationHash;
-        this.beneficiaryAddress = beneficiaryAddress;
-    }
+  @SuppressWarnings("squid:S00107")
+  public BlockInfo(
+      String recordId,
+      Long size,
+      String hash,
+      String generationHash,
+      BigInteger totalFee,
+      List<String> stateHashSubCacheMerkleRoots,
+      Integer numTransactions,
+      Optional<Integer> numStatements,
+      List<String> subCacheMerkleRoots,
+      String signature,
+      PublicAccount signerPublicAccount,
+      NetworkType networkType,
+      Integer version,
+      int type,
+      BigInteger height,
+      BigInteger timestamp,
+      BigInteger difficulty,
+      Long feeMultiplier,
+      String previousBlockHash,
+      String blockTransactionsHash,
+      String blockReceiptsHash,
+      String stateHash,
+      String proofGamma,
+      String proofScalar,
+      String proofVerificationHash,
+      Address beneficiaryAddress) {
+    this.recordId = recordId;
+    this.size = size;
+    this.hash = hash;
+    this.generationHash = generationHash;
+    this.totalFee = totalFee;
+    this.stateHashSubCacheMerkleRoots = stateHashSubCacheMerkleRoots;
+    this.numTransactions = numTransactions;
+    this.numStatements = numStatements;
+    this.subCacheMerkleRoots = subCacheMerkleRoots;
+    this.signature = signature;
+    this.signerPublicAccount = signerPublicAccount;
+    this.networkType = networkType;
+    this.version = version;
+    this.type = type;
+    this.height = height;
+    this.timestamp = timestamp;
+    this.difficulty = difficulty;
+    this.feeMultiplier = feeMultiplier;
+    this.previousBlockHash = previousBlockHash;
+    this.blockTransactionsHash = blockTransactionsHash;
+    this.blockReceiptsHash = blockReceiptsHash;
+    this.stateHash = stateHash;
+    this.proofGamma = proofGamma;
+    this.proofScalar = proofScalar;
+    this.proofVerificationHash = proofVerificationHash;
+    this.beneficiaryAddress = beneficiaryAddress;
+  }
 
-    /**
-     * Returns the size of the block
-     *
-     * @return the size
-     */
-    public Long getSize() {
-        return size;
-    }
+  /**
+   * Returns the size of the block
+   *
+   * @return the size
+   */
+  public Long getSize() {
+    return size;
+  }
 
-    /**
-     * Returns block hash.
-     *
-     * @return String
-     */
-    public String getHash() {
-        return hash;
-    }
+  /**
+   * Returns block hash.
+   *
+   * @return String
+   */
+  public String getHash() {
+    return hash;
+  }
 
-    /**
-     * Returns block generation hash.
-     *
-     * @return String
-     */
-    public String getGenerationHash() {
-        return generationHash;
-    }
+  /**
+   * Returns block generation hash.
+   *
+   * @return String
+   */
+  public String getGenerationHash() {
+    return generationHash;
+  }
 
-    /**
-     * Returns total fee paid to the account harvesting the block.
-     *
-     * @return Integer
-     */
-    public BigInteger getTotalFee() {
-        return totalFee;
-    }
+  /**
+   * Returns total fee paid to the account harvesting the block.
+   *
+   * @return Integer
+   */
+  public BigInteger getTotalFee() {
+    return totalFee;
+  }
 
-    /**
-     * Returns number of transactions included the block.
-     *
-     * @return Integer
-     */
-    public Integer getNumTransactions() {
-        return numTransactions;
-    }
+  /**
+   * Returns number of transactions included the block.
+   *
+   * @return Integer
+   */
+  public Integer getNumTransactions() {
+    return numTransactions;
+  }
 
-    /**
-     * Returns number of statements included the block.
-     *
-     * @return optional of Integer
-     */
-    public Optional<Integer> getNumStatements() {
-        return numStatements;
-    }
+  /**
+   * Returns number of statements included the block.
+   *
+   * @return optional of Integer
+   */
+  public Optional<Integer> getNumStatements() {
+    return numStatements;
+  }
 
-    /**
-     *
-     * @return list of SubCache Merkle Root.
-     */
-    public List<String> getSubCacheMerkleRoots() {
-        return subCacheMerkleRoots;
-    }
+  /** @return list of SubCache Merkle Root. */
+  public List<String> getSubCacheMerkleRoots() {
+    return subCacheMerkleRoots;
+  }
 
-    /**
-     * The signature was generated by the signerPublicAccount and can be used to validate that the blockchain data was
-     * not modified by a node.
-     *
-     * @return Block signature.
-     */
-    public String getSignature() {
-        return signature;
-    }
+  /**
+   * The signature was generated by the signerPublicAccount and can be used to validate that the
+   * blockchain data was not modified by a node.
+   *
+   * @return Block signature.
+   */
+  public String getSignature() {
+    return signature;
+  }
 
-    /**
-     * Returns public account of block harvester.
-     *
-     * @return {@link PublicAccount}
-     */
-    public PublicAccount getSignerPublicAccount() {
-        return signerPublicAccount;
-    }
+  /**
+   * Returns public account of block harvester.
+   *
+   * @return {@link PublicAccount}
+   */
+  public PublicAccount getSignerPublicAccount() {
+    return signerPublicAccount;
+  }
 
-    /**
-     * Returns network type.
-     *
-     * @return {@link NetworkType}
-     */
-    public NetworkType getNetworkType() {
-        return networkType;
-    }
+  /**
+   * Returns network type.
+   *
+   * @return {@link NetworkType}
+   */
+  public NetworkType getNetworkType() {
+    return networkType;
+  }
 
-    /**
-     * Returns block transaction version.
-     *
-     * @return Integer
-     */
-    public Integer getVersion() {
-        return version;
-    }
+  /**
+   * Returns block transaction version.
+   *
+   * @return Integer
+   */
+  public Integer getVersion() {
+    return version;
+  }
 
-    /**
-     * Returns block transaction type.
-     *
-     * @return int
-     */
-    public int getType() {
-        return type;
-    }
+  /**
+   * Returns block transaction type.
+   *
+   * @return int
+   */
+  public int getType() {
+    return type;
+  }
 
-    /**
-     * Returns height of which the block was confirmed. Each block has a unique height. Subsequent blocks differ in
-     * height by 1.
-     *
-     * @return BigInteger
-     */
-    public BigInteger getHeight() {
-        return height;
-    }
+  /**
+   * Returns height of which the block was confirmed. Each block has a unique height. Subsequent
+   * blocks differ in height by 1.
+   *
+   * @return BigInteger
+   */
+  public BigInteger getHeight() {
+    return height;
+  }
 
-    /**
-     * Returns the number of seconds elapsed since the creation of the nemesis blockchain.
-     *
-     * @return BigInteger
-     */
-    public BigInteger getTimestamp() {
-        return timestamp;
-    }
+  /**
+   * Returns the number of seconds elapsed since the creation of the nemesis blockchain.
+   *
+   * @return BigInteger
+   */
+  public BigInteger getTimestamp() {
+    return timestamp;
+  }
 
-    /**
-     * Returns POI difficulty to harvest a block.
-     *
-     * @return BigInteger
-     */
-    public BigInteger getDifficulty() {
-        return difficulty;
-    }
+  /**
+   * Returns POI difficulty to harvest a block.
+   *
+   * @return BigInteger
+   */
+  public BigInteger getDifficulty() {
+    return difficulty;
+  }
 
-    /**
-     * Returns the feeMultiplier defined by the harvester.
-     *
-     * @return Long
-     */
-    public Long getFeeMultiplier() {
-        return feeMultiplier;
-    }
+  /**
+   * Returns the feeMultiplier defined by the harvester.
+   *
+   * @return Long
+   */
+  public Long getFeeMultiplier() {
+    return feeMultiplier;
+  }
 
-    /**
-     * Returns the last block hash.
-     *
-     * @return String
-     */
-    public String getPreviousBlockHash() {
-        return previousBlockHash;
-    }
+  /**
+   * Returns the last block hash.
+   *
+   * @return String
+   */
+  public String getPreviousBlockHash() {
+    return previousBlockHash;
+  }
 
-    /**
-     * Returns the block transaction hash.
-     *
-     * @return String
-     */
-    public String getBlockTransactionsHash() {
-        return blockTransactionsHash;
-    }
+  /**
+   * Returns the block transaction hash.
+   *
+   * @return String
+   */
+  public String getBlockTransactionsHash() {
+    return blockTransactionsHash;
+  }
 
-    /**
-     * Returns the block receipts hash.
-     *
-     * @return String
-     */
-    public String getBlockReceiptsHash() {
-        return blockReceiptsHash;
-    }
+  /**
+   * Returns the block receipts hash.
+   *
+   * @return String
+   */
+  public String getBlockReceiptsHash() {
+    return blockReceiptsHash;
+  }
 
-    /**
-     * Returns the block state hash.
-     *
-     * @return String
-     */
-    public String getStateHash() {
-        return stateHash;
-    }
+  /**
+   * Returns the block state hash.
+   *
+   * @return String
+   */
+  public String getStateHash() {
+    return stateHash;
+  }
 
-    /**
-     * Returns the beneficiary address.
-     *
-     * @return PublicAccount
-     */
-    public Address getBeneficiaryAddress() {
-        return beneficiaryAddress;
-    }
+  /**
+   * Returns the beneficiary address.
+   *
+   * @return PublicAccount
+   */
+  public Address getBeneficiaryAddress() {
+    return beneficiaryAddress;
+  }
 
-    /**
-     * Returns The proof gamma.
-     *
-     * @return The proof gamma.
-     */
-    public String getProofGamma() {
-        return proofGamma;
-    }
+  /**
+   * Returns The proof gamma.
+   *
+   * @return The proof gamma.
+   */
+  public String getProofGamma() {
+    return proofGamma;
+  }
 
-    /**
-     * Returns the proof scalar.
-     *
-     * @return The proof scalar.
-     */
-    public String getProofScalar() {
-        return proofScalar;
-    }
+  /**
+   * Returns the proof scalar.
+   *
+   * @return The proof scalar.
+   */
+  public String getProofScalar() {
+    return proofScalar;
+  }
 
-    /**
-     * Returns the proof verification hash.
-     *
-     * @return The proof verification hash.
-     */
-    public String getProofVerificationHash() {
-        return proofVerificationHash;
-    }
+  /**
+   * Returns the proof verification hash.
+   *
+   * @return The proof verification hash.
+   */
+  public String getProofVerificationHash() {
+    return proofVerificationHash;
+  }
 
-    /**
-     * Returns database id of the block
-     *
-     * @return The database id of the block.
-     */
-    public Optional<String> getRecordId() {
-        return Optional.ofNullable(recordId);
-    }
+  /**
+   * Returns database id of the block
+   *
+   * @return The database id of the block.
+   */
+  public Optional<String> getRecordId() {
+    return Optional.ofNullable(recordId);
+  }
 
-    /**
-     *
-     * @return state Hash Sub Cache Merkle Roots ahses
-     */
-    public List<String> getStateHashSubCacheMerkleRoots() {
-        return stateHashSubCacheMerkleRoots;
-    }
+  /** @return state Hash Sub Cache Merkle Roots ahses */
+  public List<String> getStateHashSubCacheMerkleRoots() {
+    return stateHashSubCacheMerkleRoots;
+  }
 }

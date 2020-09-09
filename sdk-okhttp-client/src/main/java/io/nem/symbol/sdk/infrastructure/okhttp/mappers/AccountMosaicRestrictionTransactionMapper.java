@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
 import io.nem.symbol.core.utils.MapperUtils;
@@ -29,43 +28,54 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionFlagsEnum;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * DTO mapper of {@link AccountMosaicRestrictionTransaction}.
- */
-public class AccountMosaicRestrictionTransactionMapper extends
-    AbstractTransactionMapper<AccountMosaicRestrictionTransactionDTO, AccountMosaicRestrictionTransaction> {
+/** DTO mapper of {@link AccountMosaicRestrictionTransaction}. */
+public class AccountMosaicRestrictionTransactionMapper
+    extends AbstractTransactionMapper<
+        AccountMosaicRestrictionTransactionDTO, AccountMosaicRestrictionTransaction> {
 
-    public AccountMosaicRestrictionTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.ACCOUNT_MOSAIC_RESTRICTION, AccountMosaicRestrictionTransactionDTO.class);
-    }
+  public AccountMosaicRestrictionTransactionMapper(JsonHelper jsonHelper) {
+    super(
+        jsonHelper,
+        TransactionType.ACCOUNT_MOSAIC_RESTRICTION,
+        AccountMosaicRestrictionTransactionDTO.class);
+  }
 
-    @Override
-    protected AccountMosaicRestrictionTransactionFactory createFactory(NetworkType networkType,
-        AccountMosaicRestrictionTransactionDTO transaction) {
-        AccountMosaicRestrictionFlags restrictionFlags = AccountMosaicRestrictionFlags
-            .rawValueOf(transaction.getRestrictionFlags().getValue());
+  @Override
+  protected AccountMosaicRestrictionTransactionFactory createFactory(
+      NetworkType networkType, AccountMosaicRestrictionTransactionDTO transaction) {
+    AccountMosaicRestrictionFlags restrictionFlags =
+        AccountMosaicRestrictionFlags.rawValueOf(transaction.getRestrictionFlags().getValue());
 
-        List<UnresolvedMosaicId> additions = transaction.getRestrictionAdditions().stream()
-            .map(MapperUtils::toUnresolvedMosaicId).collect(Collectors.toList());
-
-        List<UnresolvedMosaicId> deletions = transaction.getRestrictionDeletions().stream()
-            .map(MapperUtils::toUnresolvedMosaicId).collect(Collectors.toList());
-        return AccountMosaicRestrictionTransactionFactory.create(networkType, restrictionFlags, additions, deletions);
-    }
-
-    @Override
-    protected void copyToDto(AccountMosaicRestrictionTransaction transaction,
-        AccountMosaicRestrictionTransactionDTO dto) {
-        dto.setRestrictionFlags(AccountRestrictionFlagsEnum.fromValue(transaction.getRestrictionFlags().getValue()));
-
-        List<String> additions = transaction.getRestrictionAdditions().stream().map(MapperUtils::getIdAsHex)
+    List<UnresolvedMosaicId> additions =
+        transaction.getRestrictionAdditions().stream()
+            .map(MapperUtils::toUnresolvedMosaicId)
             .collect(Collectors.toList());
 
-        List<String> deletions = transaction.getRestrictionDeletions().stream().map(MapperUtils::getIdAsHex)
+    List<UnresolvedMosaicId> deletions =
+        transaction.getRestrictionDeletions().stream()
+            .map(MapperUtils::toUnresolvedMosaicId)
+            .collect(Collectors.toList());
+    return AccountMosaicRestrictionTransactionFactory.create(
+        networkType, restrictionFlags, additions, deletions);
+  }
+
+  @Override
+  protected void copyToDto(
+      AccountMosaicRestrictionTransaction transaction, AccountMosaicRestrictionTransactionDTO dto) {
+    dto.setRestrictionFlags(
+        AccountRestrictionFlagsEnum.fromValue(transaction.getRestrictionFlags().getValue()));
+
+    List<String> additions =
+        transaction.getRestrictionAdditions().stream()
+            .map(MapperUtils::getIdAsHex)
             .collect(Collectors.toList());
 
-        dto.setRestrictionAdditions(additions);
-        dto.setRestrictionDeletions(deletions);
-    }
+    List<String> deletions =
+        transaction.getRestrictionDeletions().stream()
+            .map(MapperUtils::getIdAsHex)
+            .collect(Collectors.toList());
 
+    dto.setRestrictionAdditions(additions);
+    dto.setRestrictionDeletions(deletions);
+  }
 }

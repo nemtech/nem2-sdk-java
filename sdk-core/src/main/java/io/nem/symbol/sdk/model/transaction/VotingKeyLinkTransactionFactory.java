@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.core.crypto.VotingKey;
@@ -22,88 +21,86 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import org.apache.commons.lang3.Validate;
 
-/**
- * Vrf key link transaction factory.
- */
+/** Vrf key link transaction factory. */
 public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKeyLinkTransaction> {
 
-    /**
-     * The voting key.
-     */
-    private final VotingKey linkedPublicKey;
-    /**
-     * Start finalization point.
-     */
-    private final BigInteger startPoint;
+  /** The voting key. */
+  private final VotingKey linkedPublicKey;
+  /** Start finalization point. */
+  private final BigInteger startPoint;
 
-    /**
-     * End finalization point.
-     */
-    private final BigInteger endPoint;
+  /** End finalization point. */
+  private final BigInteger endPoint;
 
-    /**
-     * The link action.
-     */
-    private final LinkAction linkAction;
+  /** The link action. */
+  private final LinkAction linkAction;
 
-    /**
-     * The factory constructor for {@link VotingKeyLinkTransactionFactory}
-     *
-     * @param networkType the network type of this transaction.
-     * @param linkedPublicKey the voting key.
-     * @param startPoint Start finalization point.
-     * @param endPoint End finalization point.
-     * @param linkAction the link action.
-     */
-    private VotingKeyLinkTransactionFactory(final NetworkType networkType, final VotingKey linkedPublicKey,
-        BigInteger startPoint, BigInteger endPoint, final LinkAction linkAction) {
-        super(TransactionType.VOTING_KEY_LINK, networkType);
-        Validate.notNull(linkedPublicKey, "linkedPublicKey must not be null");
-        Validate.notNull(startPoint, "startPoint must not be null");
-        Validate.notNull(endPoint, "endPoint must not be null");
-        Validate.notNull(linkAction, "linkAction must not be null");
-        ConvertUtils.validateNotNegative(startPoint);
-        ConvertUtils.validateNotNegative(endPoint);
-        this.linkedPublicKey = linkedPublicKey;
-        this.startPoint = startPoint;
-        this.endPoint = endPoint;
-        this.linkAction = linkAction;
-    }
+  /**
+   * The factory constructor for {@link VotingKeyLinkTransactionFactory}
+   *
+   * @param networkType the network type of this transaction.
+   * @param linkedPublicKey the voting key.
+   * @param startPoint Start finalization point.
+   * @param endPoint End finalization point.
+   * @param linkAction the link action.
+   */
+  private VotingKeyLinkTransactionFactory(
+      final NetworkType networkType,
+      final VotingKey linkedPublicKey,
+      BigInteger startPoint,
+      BigInteger endPoint,
+      final LinkAction linkAction) {
+    super(TransactionType.VOTING_KEY_LINK, networkType);
+    Validate.notNull(linkedPublicKey, "linkedPublicKey must not be null");
+    Validate.notNull(startPoint, "startPoint must not be null");
+    Validate.notNull(endPoint, "endPoint must not be null");
+    Validate.notNull(linkAction, "linkAction must not be null");
+    ConvertUtils.validateNotNegative(startPoint);
+    ConvertUtils.validateNotNegative(endPoint);
+    this.linkedPublicKey = linkedPublicKey;
+    this.startPoint = startPoint;
+    this.endPoint = endPoint;
+    this.linkAction = linkAction;
+  }
 
-    /**
-     * Create method factory for {@link VotingKeyLinkTransactionFactory}
-     *
-     * @param networkType the network type of this transaction.
-     * @param linkedPublicKey the voting key.
-     * @param startPoint Start finalization point.
-     * @param endPoint End finalization point.
-     * @param linkAction the link action.
-     * @return a new factory for {@link VotingKeyLinkTransactionFactory}
-     */
-    public static VotingKeyLinkTransactionFactory create(final NetworkType networkType, final VotingKey linkedPublicKey,
-        BigInteger startPoint, BigInteger endPoint, final LinkAction linkAction) {
-        return new VotingKeyLinkTransactionFactory(networkType, linkedPublicKey, startPoint, endPoint, linkAction);
-    }
+  /**
+   * Create method factory for {@link VotingKeyLinkTransactionFactory}
+   *
+   * @param networkType the network type of this transaction.
+   * @param linkedPublicKey the voting key.
+   * @param startPoint Start finalization point.
+   * @param endPoint End finalization point.
+   * @param linkAction the link action.
+   * @return a new factory for {@link VotingKeyLinkTransactionFactory}
+   */
+  public static VotingKeyLinkTransactionFactory create(
+      final NetworkType networkType,
+      final VotingKey linkedPublicKey,
+      BigInteger startPoint,
+      BigInteger endPoint,
+      final LinkAction linkAction) {
+    return new VotingKeyLinkTransactionFactory(
+        networkType, linkedPublicKey, startPoint, endPoint, linkAction);
+  }
 
+  @Override
+  public VotingKeyLinkTransaction build() {
+    return new VotingKeyLinkTransaction(this);
+  }
 
-    @Override
-    public VotingKeyLinkTransaction build() {
-        return new VotingKeyLinkTransaction(this);
-    }
+  public VotingKey getLinkedPublicKey() {
+    return linkedPublicKey;
+  }
 
-    public VotingKey getLinkedPublicKey() {
-        return linkedPublicKey;
-    }
+  public LinkAction getLinkAction() {
+    return linkAction;
+  }
 
-    public LinkAction getLinkAction() {
-        return linkAction;
-    }
+  public BigInteger getStartPoint() {
+    return startPoint;
+  }
 
-    public BigInteger getStartPoint() {
-        return startPoint;
-    }
-
-    public BigInteger getEndPoint() {
-        return endPoint;
-    }
+  public BigInteger getEndPoint() {
+    return endPoint;
+  }
 }

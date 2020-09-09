@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import java.util.Arrays;
@@ -22,69 +21,66 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * The valid combinations of {@link AccountRestrictionFlag} that creates any {@link AccountRestrictionFlags}.
+ * The valid combinations of {@link AccountRestrictionFlag} that creates any {@link
+ * AccountRestrictionFlags}.
  *
- * Type of account restriction types:
+ * <p>Type of account restriction types:
  *
- * 0x0001 (1 decimal) - Allow only incoming transactions from a given address.
+ * <p>0x0001 (1 decimal) - Allow only incoming transactions from a given address.
  *
- * 0x0002 (2 decimal) - Allow only incoming transactions containing a given mosaic identifier.
+ * <p>0x0002 (2 decimal) - Allow only incoming transactions containing a given mosaic identifier.
  *
- * 0x4001 (16385 decimal) - Allow only outgoing transactions to a given address.
+ * <p>0x4001 (16385 decimal) - Allow only outgoing transactions to a given address.
  *
- * 0x4004 (16388 decimal) - Allow only outgoing transactions with a given transaction type.
+ * <p>0x4004 (16388 decimal) - Allow only outgoing transactions with a given transaction type.
  *
- * 0x8001 (32769 decimal) - Block incoming transactions from a given address.
+ * <p>0x8001 (32769 decimal) - Block incoming transactions from a given address.
  *
- * 0x8002 (32770 decimal) - Block incoming transactions containing a given mosaic identifier.
+ * <p>0x8002 (32770 decimal) - Block incoming transactions containing a given mosaic identifier.
  *
- * 0xC001 (49153 decimal) - Block outgoing transactions to a given address.
+ * <p>0xC001 (49153 decimal) - Block outgoing transactions to a given address.
  *
- * 0xC004 (49156 decimal) - Block outgoing transactions with a given transaction type.
+ * <p>0xC004 (49156 decimal) - Block outgoing transactions with a given transaction type.
  */
 public interface AccountRestrictionFlags {
 
+  /**
+   * Returns enum value.
+   *
+   * @return byte
+   */
+  int getValue();
 
-    /**
-     * Returns enum value.
-     *
-     * @return byte
-     */
-    int getValue();
+  /** @return the enum name. */
+  String name();
 
-    /**
-     * @return the enum name.
-     */
-    String name();
+  /** @return a list with the individual flags. */
+  List<AccountRestrictionFlag> getFlags();
 
-    /**
-     * @return a list with the individual flags.
-     */
-    List<AccountRestrictionFlag> getFlags();
+  /** @return the target type. */
+  AccountRestrictionTargetType getTargetType();
 
-    /**
-     * @return the target type.
-     */
-    AccountRestrictionTargetType getTargetType();
+  /**
+   * Search for all the possible AccountRestrictionFlags
+   *
+   * @param value Raw value of the enum.
+   * @return Enum value.
+   */
+  static AccountRestrictionFlags rawValueOf(final int value) {
+    return values().stream()
+        .filter(e -> e.getValue() == value)
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 
-    /**
-     * Search for all the possible AccountRestrictionFlags
-     *
-     * @param value Raw value of the enum.
-     * @return Enum value.
-     */
-    static AccountRestrictionFlags rawValueOf(final int value) {
-        return values().stream().filter(e -> e.getValue() == value).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
-
-    /**
-     * @return all the possible AccountRestrictionFlags values.
-     */
-    static List<? extends AccountRestrictionFlags> values() {
-        Stream<AccountAddressRestrictionFlags> stream1 = Arrays.stream(AccountAddressRestrictionFlags.values());
-        Stream<AccountOperationRestrictionFlags> stream2 = Arrays.stream(AccountOperationRestrictionFlags.values());
-        Stream<AccountMosaicRestrictionFlags> stream3 = Arrays.stream(AccountMosaicRestrictionFlags.values());
-        return Stream.of(stream1, stream2, stream3).flatMap(i -> i).collect(Collectors.toList());
-    }
+  /** @return all the possible AccountRestrictionFlags values. */
+  static List<? extends AccountRestrictionFlags> values() {
+    Stream<AccountAddressRestrictionFlags> stream1 =
+        Arrays.stream(AccountAddressRestrictionFlags.values());
+    Stream<AccountOperationRestrictionFlags> stream2 =
+        Arrays.stream(AccountOperationRestrictionFlags.values());
+    Stream<AccountMosaicRestrictionFlags> stream3 =
+        Arrays.stream(AccountMosaicRestrictionFlags.values());
+    return Stream.of(stream1, stream2, stream3).flatMap(i -> i).collect(Collectors.toList());
+  }
 }

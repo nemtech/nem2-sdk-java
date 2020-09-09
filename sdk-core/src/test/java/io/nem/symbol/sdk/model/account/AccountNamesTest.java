@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,13 +25,13 @@ import org.junit.jupiter.api.Test;
 
 class AccountNamesTest {
 
-    @Test
-    void createAccountNames() {
-        Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
-        List<NamespaceName> namespaceNames = Arrays
-            .asList(new NamespaceName("accountalias"), new NamespaceName("anotheralias"));
-        AccountNames names = new AccountNames(address, namespaceNames);
-        assertEquals(address, names.getAddress());
-        assertEquals(namespaceNames, names.getNames());
-    }
+  @Test
+  void createAccountNames() {
+    Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
+    List<NamespaceName> namespaceNames =
+        Arrays.asList(new NamespaceName("accountalias"), new NamespaceName("anotheralias"));
+    AccountNames names = new AccountNames(address, namespaceNames);
+    assertEquals(address, names.getAddress());
+    assertEquals(namespaceNames, names.getNames());
+  }
 }

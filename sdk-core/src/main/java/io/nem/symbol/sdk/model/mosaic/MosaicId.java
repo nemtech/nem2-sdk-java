@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.mosaic;
 
 import io.nem.symbol.core.utils.Base32Encoder;
@@ -32,124 +31,119 @@ import java.util.Objects;
  */
 public class MosaicId implements UnresolvedMosaicId {
 
-    private final BigInteger id;
+  private final BigInteger id;
 
+  /**
+   * Create MosaicId from mosaic Hex string
+   *
+   * @param hex the hex value.
+   * @throws IllegalIdentifierException MosaicId identifier
+   */
+  public MosaicId(String hex) {
+    ConvertUtils.validateIsHexString(hex, 16);
+    this.id = new BigInteger(hex, 16);
+  }
 
-    /**
-     * Create MosaicId from mosaic Hex string
-     *
-     * @param hex the hex value.
-     * @throws IllegalIdentifierException MosaicId identifier
-     */
-    public MosaicId(String hex) {
-        ConvertUtils.validateIsHexString(hex, 16);
-        this.id = new BigInteger(hex, 16);
+  /**
+   * Create MosaicId from BigInteger id
+   *
+   * @param id the mosaic id as {@link BigInteger}.
+   */
+  public MosaicId(BigInteger id) {
+    this.id = id;
+  }
+
+  /**
+   * Create MosaicId from a MosaicNonce and an Address
+   *
+   * @param mosaicNonce the mosaic nonce.
+   * @param owner the address of the owner
+   */
+  public MosaicId(MosaicNonce mosaicNonce, Address owner) {
+    this.id =
+        IdGenerator.generateMosaicId(mosaicNonce.getNonce(), Base32Encoder.getBytes(owner.plain()));
+  }
+
+  /**
+   * Create MosaicId from a MosaicNonce and a PublicAccount
+   *
+   * @param mosaicNonce the mosaic nonce.
+   * @param owner the public account.
+   */
+  public MosaicId(MosaicNonce mosaicNonce, PublicAccount owner) {
+    this(mosaicNonce, owner.getAddress());
+  }
+
+  /**
+   * Create MosaicId from a MosaicNonce and the owner Address
+   *
+   * @param mosaicNonce the mosaic nonce
+   * @param owner thw account owner.
+   * @return the created {@link MosaicId}.
+   */
+  public static MosaicId createFromNonce(MosaicNonce mosaicNonce, Address owner) {
+    return new MosaicId(mosaicNonce, owner);
+  }
+
+  /**
+   * Create MosaicId from a MosaicNonce and the owner PublicAccount
+   *
+   * @param mosaicNonce the mosaic nonce
+   * @param owner thw account owner.
+   * @return the created {@link MosaicId}.
+   */
+  public static MosaicId createFromNonce(MosaicNonce mosaicNonce, PublicAccount owner) {
+    return new MosaicId(mosaicNonce, owner);
+  }
+
+  /**
+   * Returns mosaic BigInteger id
+   *
+   * @return mosaic BigInteger id
+   */
+  public BigInteger getId() {
+    return id;
+  }
+
+  /**
+   * Returns mosaic id as a long
+   *
+   * @return id long
+   */
+  public long getIdAsLong() {
+    return this.id.longValue();
+  }
+
+  /**
+   * Compares mosaicIds for equality.
+   *
+   * @return boolean
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    /**
-     * Create MosaicId from BigInteger id
-     *
-     * @param id the mosaic id as {@link BigInteger}.
-     */
-    public MosaicId(BigInteger id) {
-        this.id = id;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
+    MosaicId mosaicId = (MosaicId) o;
+    return Objects.equals(id, mosaicId.id);
+  }
 
-    /**
-     * Create MosaicId from a MosaicNonce and an Address
-     *
-     * @param mosaicNonce the mosaic nonce.
-     * @param owner the address of the owner
-     */
-    public MosaicId(MosaicNonce mosaicNonce, Address owner) {
-        this.id = IdGenerator
-            .generateMosaicId(mosaicNonce.getNonce(), Base32Encoder.getBytes(owner.plain()));
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 
-    /**
-     * Create MosaicId from a MosaicNonce and a PublicAccount
-     *
-     * @param mosaicNonce the mosaic nonce.
-     * @param owner the public account.
-     */
-    public MosaicId(MosaicNonce mosaicNonce, PublicAccount owner) {
-        this(mosaicNonce, owner.getAddress());
-    }
-
-    /**
-     * Create MosaicId from a MosaicNonce and the owner Address
-     *
-     * @param mosaicNonce the mosaic nonce
-     * @param owner thw account owner.
-     * @return the created {@link MosaicId}.
-     */
-    public static MosaicId createFromNonce(MosaicNonce mosaicNonce, Address owner) {
-        return new MosaicId(mosaicNonce, owner);
-    }
-
-    /**
-     * Create MosaicId from a MosaicNonce and the owner PublicAccount
-     *
-     * @param mosaicNonce the mosaic nonce
-     * @param owner thw account owner.
-     * @return the created {@link MosaicId}.
-     */
-    public static MosaicId createFromNonce(MosaicNonce mosaicNonce, PublicAccount owner) {
-        return new MosaicId(mosaicNonce, owner);
-    }
-
-    /**
-     * Returns mosaic BigInteger id
-     *
-     * @return mosaic BigInteger id
-     */
-    public BigInteger getId() {
-        return id;
-    }
-
-    /**
-     * Returns mosaic id as a long
-     *
-     * @return id long
-     */
-    public long getIdAsLong() {
-        return this.id.longValue();
-    }
-
-
-    /**
-     * Compares mosaicIds for equality.
-     *
-     * @return boolean
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        MosaicId mosaicId = (MosaicId) o;
-        return Objects.equals(id, mosaicId.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    /**
-     * Gets the id as a hexadecimal string.
-     *
-     * @return Hex id.
-     */
-    @Override
-    public String getIdAsHex() {
-        byte[] bytes = ByteUtils.bigIntToBytes(getId());
-        return ConvertUtils.toHex(bytes);
-    }
-
+  /**
+   * Gets the id as a hexadecimal string.
+   *
+   * @return Hex id.
+   */
+  @Override
+  public String getIdAsHex() {
+    byte[] bytes = ByteUtils.bigIntToBytes(getId());
+    return ConvertUtils.toHex(bytes);
+  }
 }
-
-

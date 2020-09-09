@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
 import static io.nem.symbol.core.utils.MapperUtils.toUnresolvedAddress;
@@ -41,70 +40,64 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Transfer transaction mapper.
- */
-class TransferTransactionMapper extends
-    AbstractTransactionMapper<TransferTransactionDTO, TransferTransaction> {
+/** Transfer transaction mapper. */
+class TransferTransactionMapper
+    extends AbstractTransactionMapper<TransferTransactionDTO, TransferTransaction> {
 
-    public TransferTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.TRANSFER, TransferTransactionDTO.class);
+  public TransferTransactionMapper(JsonHelper jsonHelper) {
+    super(jsonHelper, TransactionType.TRANSFER, TransferTransactionDTO.class);
+  }
+
+  @Override
+  protected TransactionFactory<TransferTransaction> createFactory(
+      NetworkType networkType, TransferTransactionDTO transaction) {
+    List<Mosaic> mosaics = new ArrayList<>();
+    if (transaction.getMosaics() != null) {
+      mosaics =
+          transaction.getMosaics().stream()
+              .map(mosaic -> new Mosaic(toUnresolvedMosaicId(mosaic.getId()), mosaic.getAmount()))
+              .collect(Collectors.toList());
     }
 
-    @Override
-    protected TransactionFactory<TransferTransaction> createFactory(NetworkType networkType,
-        TransferTransactionDTO transaction) {
-        List<Mosaic> mosaics = new ArrayList<>();
-        if (transaction.getMosaics() != null) {
-            mosaics =
-                transaction.getMosaics().stream()
-                    .map(
-                        mosaic ->
-                            new Mosaic(
-                                toUnresolvedMosaicId(mosaic.getId()),
-                                mosaic.getAmount()))
-                    .collect(Collectors.toList());
-        }
+    Message message =
+        Optional.ofNullable(transaction.getMessage())
+            .map(
+                m ->
+                    Message.createFromPayload(
+                        MessageType.rawValueOf(m.getType().getValue()), m.getPayload()))
+            .orElse(PlainMessage.Empty);
 
-        Message message = Optional.ofNullable(transaction.getMessage())
-            .map(m -> Message.createFromPayload(
-                MessageType.rawValueOf(m.getType().getValue()),
-                m.getPayload())).orElse(PlainMessage.Empty);
+    return TransferTransactionFactory.create(
+        networkType, toUnresolvedAddress(transaction.getRecipientAddress()), mosaics, message);
+  }
 
-        return TransferTransactionFactory.create(networkType,
-            toUnresolvedAddress(transaction.getRecipientAddress()),
-            mosaics,
-            message);
+  @Override
+  protected void copyToDto(TransferTransaction transaction, TransferTransactionDTO dto) {
+    List<UnresolvedMosaic> mosaics = new ArrayList<>();
+    if (transaction.getMosaics() != null) {
+      mosaics =
+          transaction.getMosaics().stream()
+              .map(
+                  mosaic -> {
+                    io.nem.symbol.sdk.openapi.vertx.model.UnresolvedMosaic mosaicDto =
+                        new io.nem.symbol.sdk.openapi.vertx.model.UnresolvedMosaic();
+                    mosaicDto.setAmount(mosaic.getAmount());
+                    mosaicDto.setId(MapperUtils.getIdAsHex(mosaic.getId()));
+                    return mosaicDto;
+                  })
+              .collect(Collectors.toList());
     }
 
-    @Override
-    protected void copyToDto(TransferTransaction transaction, TransferTransactionDTO dto) {
-        List<UnresolvedMosaic> mosaics = new ArrayList<>();
-        if (transaction.getMosaics() != null) {
-            mosaics =
-                transaction.getMosaics().stream()
-                    .map(
-                        mosaic -> {
-                            io.nem.symbol.sdk.openapi.vertx.model.UnresolvedMosaic mosaicDto = new io.nem.symbol.sdk.openapi.vertx.model.UnresolvedMosaic();
-                            mosaicDto.setAmount(mosaic.getAmount());
-                            mosaicDto.setId(MapperUtils.getIdAsHex(mosaic.getId()));
-                            return mosaicDto;
-                        })
-                    .collect(Collectors.toList());
-        }
-
-        MessageDTO message = null;
-        if (transaction.getMessage() != null) {
-            message = new MessageDTO();
-            message.setType(MessageTypeEnum.NUMBER_0);
-            message.setPayload(ConvertUtils
-                .toHex(transaction.getMessage().getPayload().getBytes(StandardCharsets.UTF_8)));
-
-        }
-        dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));
-        dto.setMosaics(mosaics);
-        dto.setMessage(message);
-
+    MessageDTO message = null;
+    if (transaction.getMessage() != null) {
+      message = new MessageDTO();
+      message.setType(MessageTypeEnum.NUMBER_0);
+      message.setPayload(
+          ConvertUtils.toHex(
+              transaction.getMessage().getPayload().getBytes(StandardCharsets.UTF_8)));
     }
-
+    dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));
+    dto.setMosaics(mosaics);
+    dto.setMessage(message);
+  }
 }

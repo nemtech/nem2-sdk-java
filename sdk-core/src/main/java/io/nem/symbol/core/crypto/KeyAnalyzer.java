@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto;
-
-/**
- * Interface to analyze keys.
- */
+/** Interface to analyze keys. */
 public interface KeyAnalyzer {
 
-    /**
-     * Gets a value indicating whether or not the public key is compressed.
-     *
-     * @param publicKey The public key.
-     * @return true if the public key is compressed, false otherwise.
-     */
-    boolean isKeyCompressed(final Key publicKey);
-
-
+  /**
+   * Gets a value indicating whether or not the public key is compressed.
+   *
+   * @param publicKey The public key.
+   * @return true if the public key is compressed, false otherwise.
+   */
+  boolean isKeyCompressed(final Key publicKey);
 }

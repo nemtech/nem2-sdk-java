@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.mosaic;
 
 import java.util.Arrays;
@@ -24,27 +23,25 @@ import java.util.Arrays;
  * @since 1.0
  */
 public enum MosaicSupplyChangeActionType {
-    /**
-     * Decrease the supply.
-     */
-    DECREASE(0),
-    /**
-     * Increase the supply.
-     */
-    INCREASE(1);
+  /** Decrease the supply. */
+  DECREASE(0),
+  /** Increase the supply. */
+  INCREASE(1);
 
-    private final int value;
+  private final int value;
 
-    MosaicSupplyChangeActionType(int value) {
-        this.value = value;
-    }
+  MosaicSupplyChangeActionType(int value) {
+    this.value = value;
+  }
 
-    public static MosaicSupplyChangeActionType rawValueOf(int value) {
-        return Arrays.stream(values()).filter(e -> e.value == value).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
+  public static MosaicSupplyChangeActionType rawValueOf(int value) {
+    return Arrays.stream(values())
+        .filter(e -> e.value == value)
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 
-    public int getValue() {
-        return value;
-    }
+  public int getValue() {
+    return value;
+  }
 }

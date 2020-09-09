@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.message;
 
 import java.util.Arrays;
@@ -23,37 +22,37 @@ import java.util.Arrays;
  * Persistent harvesting delegation.
  */
 public enum MessageType {
+  PLAIN_MESSAGE(0),
 
-    PLAIN_MESSAGE(0),
+  ENCRYPTED_MESSAGE(1),
 
-    ENCRYPTED_MESSAGE(1),
+  PERSISTENT_HARVESTING_DELEGATION_MESSAGE(254);
 
-    PERSISTENT_HARVESTING_DELEGATION_MESSAGE(254);
+  private final int value;
 
-    private final int value;
+  MessageType(int value) {
+    this.value = value;
+  }
 
-    MessageType(int value) {
-        this.value = value;
-    }
+  /**
+   * Gets enum value based on the int value.
+   *
+   * @param value Raw value of the enum.
+   * @return Enum value.
+   */
+  public static MessageType rawValueOf(final int value) {
+    return Arrays.stream(values())
+        .filter(e -> e.value == value)
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 
-
-    /**
-     * Gets enum value based on the int value.
-     *
-     * @param value Raw value of the enum.
-     * @return Enum value.
-     */
-    public static MessageType rawValueOf(final int value) {
-        return Arrays.stream(values()).filter(e -> e.value == value).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
-
-    /**
-     * Returns enum value.
-     *
-     * @return int
-     */
-    public int getValue() {
-        return value;
-    }
+  /**
+   * Returns enum value.
+   *
+   * @return int
+   */
+  public int getValue() {
+    return value;
+  }
 }

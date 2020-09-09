@@ -13,54 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.restriction;
 
 import java.util.Arrays;
 
 public enum MosaicRestrictionEntryType {
 
-    /**
-     * Mosaic address restriction
-     */
-    ADDRESS(0),
+  /** Mosaic address restriction */
+  ADDRESS(0),
 
-    /**
-     * Mosaic global restriction
-     */
-    GLOBAL(1);
+  /** Mosaic global restriction */
+  GLOBAL(1);
 
-    /**
-     * The int representation
-     */
-    private int value;
+  /** The int representation */
+  private int value;
 
-    /**
-     * Constructor.
-     *
-     * @param value Enum value.
-     */
-    MosaicRestrictionEntryType(int value) {
-        this.value = value;
-    }
+  /**
+   * Constructor.
+   *
+   * @param value Enum value.
+   */
+  MosaicRestrictionEntryType(int value) {
+    this.value = value;
+  }
 
-    /**
-     * Gets enum value.
-     *
-     * @param value Raw value of the enum.
-     * @return Enum value.
-     */
-    public static MosaicRestrictionEntryType rawValueOf(final int value) {
-        return Arrays.stream(values()).filter(e -> e.value == value).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
+  /**
+   * Gets enum value.
+   *
+   * @param value Raw value of the enum.
+   * @return Enum value.
+   */
+  public static MosaicRestrictionEntryType rawValueOf(final int value) {
+    return Arrays.stream(values())
+        .filter(e -> e.value == value)
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 
-    /**
-     * Returns enum value.
-     *
-     * @return byte
-     */
-    public int getValue() {
-        return value;
-    }
+  /**
+   * Returns enum value.
+   *
+   * @return byte
+   */
+  public int getValue() {
+    return value;
+  }
 }

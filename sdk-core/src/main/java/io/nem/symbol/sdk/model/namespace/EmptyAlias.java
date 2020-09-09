@@ -13,19 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.namespace;
-
-/**
- * Empty alias
- */
+/** Empty alias */
 public class EmptyAlias extends AliasBase<Object> {
 
-    /**
-     * Create AddressAlias from address
-     */
-    public EmptyAlias() {
-        super(AliasType.NONE, null);
-    }
-
+  /** Create AddressAlias from address */
+  public EmptyAlias() {
+    super(AliasType.NONE, null);
+  }
 }

@@ -13,48 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.utils;
-
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests of {@link HttpStatus}
- */
+/** Tests of {@link HttpStatus} */
 public class HttpStatusTest {
 
-    @Test
-    void testAllTheValues() {
-        Assertions.assertEquals(66, HttpStatus.values().length);
-    }
+  @Test
+  void testAllTheValues() {
+    Assertions.assertEquals(66, HttpStatus.values().length);
+  }
 
-    @Test
-    void testGetReasonPhrase() {
-        Assertions.assertEquals("Accepted", HttpStatus.ACCEPTED.getReasonPhrase());
-    }
+  @Test
+  void testGetReasonPhrase() {
+    Assertions.assertEquals("Accepted", HttpStatus.ACCEPTED.getReasonPhrase());
+  }
 
-    @Test
-    void testValue() {
-        Assertions.assertEquals(404, HttpStatus.NOT_FOUND.value());
-    }
+  @Test
+  void testValue() {
+    Assertions.assertEquals(404, HttpStatus.NOT_FOUND.value());
+  }
 
-    @Test
-    void testValueOfInvalidValue() {
-        Assertions.assertEquals("No matching constant for [10]",
-            Assertions.assertThrows(IllegalArgumentException.class, () -> HttpStatus.valueOf(10))
-                .getMessage());
-    }
+  @Test
+  void testValueOfInvalidValue() {
+    Assertions.assertEquals(
+        "No matching constant for [10]",
+        Assertions.assertThrows(IllegalArgumentException.class, () -> HttpStatus.valueOf(10))
+            .getMessage());
+  }
 
-    @Test
-    void testValueOf() {
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, HttpStatus.valueOf(404));
-    }
+  @Test
+  void testValueOf() {
+    Assertions.assertEquals(HttpStatus.NOT_FOUND, HttpStatus.valueOf(404));
+  }
 
-    @Test
-    void testToString() {
-        Assertions.assertEquals("404", HttpStatus.valueOf(404).toString());
-    }
-
+  @Test
+  void testToString() {
+    Assertions.assertEquals("404", HttpStatus.valueOf(404).toString());
+  }
 }

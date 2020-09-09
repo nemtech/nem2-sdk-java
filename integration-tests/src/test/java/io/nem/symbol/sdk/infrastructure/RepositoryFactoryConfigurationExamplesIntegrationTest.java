@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.RepositoryFactory;
@@ -35,83 +34,84 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-
-/**
- * Samples about how to create repository factories.
- */
+/** Samples about how to create repository factories. */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Disabled
 public class RepositoryFactoryConfigurationExamplesIntegrationTest {
 
-    @Test
-    void bootAppFullyOffline() throws ExecutionException, InterruptedException {
+  @Test
+  void bootAppFullyOffline() throws ExecutionException, InterruptedException {
 
-        //Option 1) Client app boot time. The clients defines the configuration to work offline.
-        RepositoryFactoryConfiguration configuration = new RepositoryFactoryConfiguration(
-            "http://localhost:3000");
-        configuration.withNetworkType(NetworkType.MAIN_NET);
-        configuration.withGenerationHash("abc");
-        configuration.withNetworkCurrency(
-            new NetworkCurrencyBuilder(NamespaceId.createFromName("my.custom.currency"), 6)
-                .build());
+    // Option 1) Client app boot time. The clients defines the configuration to work
+    // offline.
+    RepositoryFactoryConfiguration configuration =
+        new RepositoryFactoryConfiguration("http://localhost:3000");
+    configuration.withNetworkType(NetworkType.MAIN_NET);
+    configuration.withGenerationHash("abc");
+    configuration.withNetworkCurrency(
+        new NetworkCurrencyBuilder(NamespaceId.createFromName("my.custom.currency"), 6).build());
 
-        configuration.withHarvestCurrency(
-            new NetworkCurrencyBuilder(NamespaceId.createFromName("my.custom.harvest"), 3)
-                .build());
+    configuration.withHarvestCurrency(
+        new NetworkCurrencyBuilder(NamespaceId.createFromName("my.custom.harvest"), 3).build());
 
-        try (RepositoryFactory repositoryFactory = new RepositoryFactoryVertxImpl(configuration)) {
-            appDoSomeStuff(repositoryFactory);
-        }
+    try (RepositoryFactory repositoryFactory = new RepositoryFactoryVertxImpl(configuration)) {
+      appDoSomeStuff(repositoryFactory);
     }
+  }
 
-    @Test
-    void bootAppUsingRestConfiguration() throws ExecutionException, InterruptedException {
+  @Test
+  void bootAppUsingRestConfiguration() throws ExecutionException, InterruptedException {
 
-        //Option 2) Client app boot time relaying on the rest configuration:
-        RepositoryFactoryConfiguration configuration = new RepositoryFactoryConfiguration(
-            "http://localhost:3000");
+    // Option 2) Client app boot time relaying on the rest configuration:
+    RepositoryFactoryConfiguration configuration =
+        new RepositoryFactoryConfiguration("http://localhost:3000");
 
-        try (RepositoryFactory repositoryFactory = new RepositoryFactoryVertxImpl(configuration)) {
-            appDoSomeStuff(repositoryFactory);
-        }
+    try (RepositoryFactory repositoryFactory = new RepositoryFactoryVertxImpl(configuration)) {
+      appDoSomeStuff(repositoryFactory);
     }
+  }
 
+  @Test
+  void bootAppUsingLegacyHardcodedCurrencies() throws ExecutionException, InterruptedException {
 
-    @Test
-    void bootAppUsingLegacyHardcodedCurrencies() throws ExecutionException, InterruptedException {
+    // Option 3) Client app boot time relaying on some of the rest configuration.
+    // User uses the
+    // legacy hardcoded sdk currencies
+    RepositoryFactoryConfiguration configuration =
+        new RepositoryFactoryConfiguration("http://localhost:3000");
 
-        //Option 3) Client app boot time relaying on some of the rest configuration. User uses the legacy hardcoded sdk currencies
-        RepositoryFactoryConfiguration configuration = new RepositoryFactoryConfiguration(
-            "http://localhost:3000");
+    configuration.withNetworkCurrency(NetworkCurrency.CAT_CURRENCY);
+    configuration.withHarvestCurrency(NetworkCurrency.CAT_HARVEST);
 
-        configuration.withNetworkCurrency(NetworkCurrency.CAT_CURRENCY);
-        configuration.withHarvestCurrency(NetworkCurrency.CAT_HARVEST);
-
-        try (RepositoryFactory repositoryFactory = new RepositoryFactoryVertxImpl(configuration)) {
-            appDoSomeStuff(repositoryFactory);
-        }
+    try (RepositoryFactory repositoryFactory = new RepositoryFactoryVertxImpl(configuration)) {
+      appDoSomeStuff(repositoryFactory);
     }
+  }
 
-    public void appDoSomeStuff(RepositoryFactory repositoryFactory)
-        throws ExecutionException, InterruptedException {
-        //The application logic is exactly  the same regardless of how the repository factory was set
+  public void appDoSomeStuff(RepositoryFactory repositoryFactory)
+      throws ExecutionException, InterruptedException {
+    // The application logic is exactly the same regardless of how the repository
+    // factory was
+    // set
 
-        //Note: if rest is used, these values are cached form rest
-        NetworkCurrency currency = repositoryFactory.getNetworkCurrency().toFuture().get();
-        String generationHash = repositoryFactory.getGenerationHash().toFuture().get();
-        NetworkType networkType = repositoryFactory.getNetworkType().toFuture().get();
+    // Note: if rest is used, these values are cached form rest
+    NetworkCurrency currency = repositoryFactory.getNetworkCurrency().toFuture().get();
+    String generationHash = repositoryFactory.getGenerationHash().toFuture().get();
+    NetworkType networkType = repositoryFactory.getNetworkType().toFuture().get();
 
-        Account sender = Account.generateNewAccount(networkType);
-        Account recipient = Account.generateNewAccount(networkType);
+    Account sender = Account.generateNewAccount(networkType);
+    Account recipient = Account.generateNewAccount(networkType);
 
-        TransferTransaction transferTransaction = TransferTransactionFactory
-            .create(networkType, recipient.getAddress(),
-                Collections.singletonList(currency.createRelative(
-                    BigInteger.TEN)), PlainMessage.Empty).build();
+    TransferTransaction transferTransaction =
+        TransferTransactionFactory.create(
+                networkType,
+                recipient.getAddress(),
+                Collections.singletonList(currency.createRelative(BigInteger.TEN)),
+                PlainMessage.Empty)
+            .build();
 
-        SignedTransaction signedTransaction = transferTransaction.signWith(sender, generationHash);
-        //Announce or store somewhere....
+    SignedTransaction signedTransaction = transferTransaction.signWith(sender, generationHash);
+    // Announce or store somewhere....
 
-    }
-
+  }
 }

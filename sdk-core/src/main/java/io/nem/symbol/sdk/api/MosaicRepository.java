@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -28,20 +27,19 @@ import java.util.List;
  */
 public interface MosaicRepository extends Searcher<MosaicInfo, MosaicSearchCriteria> {
 
-    /**
-     * Gets a MosaicInfo for a given mosaicId
-     *
-     * @param mosaicId {@link MosaicId}
-     * @return Observable of {@link MosaicInfo}
-     */
-    Observable<MosaicInfo> getMosaic(MosaicId mosaicId);
+  /**
+   * Gets a MosaicInfo for a given mosaicId
+   *
+   * @param mosaicId {@link MosaicId}
+   * @return Observable of {@link MosaicInfo}
+   */
+  Observable<MosaicInfo> getMosaic(MosaicId mosaicId);
 
-    /**
-     * Gets MosaicInfo for different mosaicIds.
-     *
-     * @param mosaicIds {@link List} of {@link MosaicId}
-     * @return {@link Observable} of {@link MosaicInfo} List
-     */
-    Observable<List<MosaicInfo>> getMosaics(List<MosaicId> mosaicIds);
-
+  /**
+   * Gets MosaicInfo for different mosaicIds.
+   *
+   * @param mosaicIds {@link List} of {@link MosaicId}
+   * @return {@link Observable} of {@link MosaicInfo} List
+   */
+  Observable<List<MosaicInfo>> getMosaics(List<MosaicId> mosaicIds);
 }

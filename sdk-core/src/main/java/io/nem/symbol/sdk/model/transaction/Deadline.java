@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import java.math.BigInteger;
@@ -31,86 +30,81 @@ import java.time.temporal.ChronoUnit;
  */
 public class Deadline {
 
-    /**
-     * Nemesis block timestamp.
-     */
-    private static final Instant TIMESTAMP_NEMESIS_BLOCK = Instant.ofEpochSecond(1573430400);
+  /** Nemesis block timestamp. */
+  private static final Instant TIMESTAMP_NEMESIS_BLOCK = Instant.ofEpochSecond(1573430400);
 
-    private final Instant instant;
+  private final Instant instant;
 
-    /**
-     * Constructor
-     *
-     * @param units int
-     * @param chronoUnit Chrono unit
-     */
-    public Deadline(int units, ChronoUnit chronoUnit) {
-        instant = Instant.now().plus(units, chronoUnit);
-    }
+  /**
+   * Constructor
+   *
+   * @param units int
+   * @param chronoUnit Chrono unit
+   */
+  public Deadline(int units, ChronoUnit chronoUnit) {
+    instant = Instant.now().plus(units, chronoUnit);
+  }
 
-    /**
-     * Constructor
-     *
-     * @param input Deadline in BigInteger format
-     */
-    public Deadline(BigInteger input) {
-        instant =
-            Instant
-                .ofEpochMilli(input.longValue() + Deadline.TIMESTAMP_NEMESIS_BLOCK.toEpochMilli());
-    }
+  /**
+   * Constructor
+   *
+   * @param input Deadline in BigInteger format
+   */
+  public Deadline(BigInteger input) {
+    instant =
+        Instant.ofEpochMilli(input.longValue() + Deadline.TIMESTAMP_NEMESIS_BLOCK.toEpochMilli());
+  }
 
-    /**
-     * @return the BigInteger representation of the duration.
-     */
-    public BigInteger toBigInteger() {
-        return BigInteger.valueOf(getInstant());
-    }
+  /** @return the BigInteger representation of the duration. */
+  public BigInteger toBigInteger() {
+    return BigInteger.valueOf(getInstant());
+  }
 
-    /**
-     * Create deadline model.
-     *
-     * @param units int
-     * @param chronoUnit Chrono unit
-     * @return {@link Deadline}
-     */
-    public static Deadline create(int units, ChronoUnit chronoUnit) {
-        return new Deadline(units, chronoUnit);
-    }
+  /**
+   * Create deadline model.
+   *
+   * @param units int
+   * @param chronoUnit Chrono unit
+   * @return {@link Deadline}
+   */
+  public static Deadline create(int units, ChronoUnit chronoUnit) {
+    return new Deadline(units, chronoUnit);
+  }
 
-    /**
-     * Create the default deadline of 2 hours.
-     *
-     * @return {@link Deadline}
-     */
-    public static Deadline create() {
-        return new Deadline(2, ChronoUnit.HOURS);
-    }
+  /**
+   * Create the default deadline of 2 hours.
+   *
+   * @return {@link Deadline}
+   */
+  public static Deadline create() {
+    return new Deadline(2, ChronoUnit.HOURS);
+  }
 
-    /**
-     * Returns number of seconds elapsed since the creation of the nemesis block.
-     *
-     * @return long
-     */
-    public long getInstant() {
-        return instant.toEpochMilli() - Deadline.TIMESTAMP_NEMESIS_BLOCK.toEpochMilli();
-    }
+  /**
+   * Returns number of seconds elapsed since the creation of the nemesis block.
+   *
+   * @return long
+   */
+  public long getInstant() {
+    return instant.toEpochMilli() - Deadline.TIMESTAMP_NEMESIS_BLOCK.toEpochMilli();
+  }
 
-    /**
-     * Returns deadline as local date time in a given timezone.
-     *
-     * @param zoneId Timezone
-     * @return LocalDateTime
-     */
-    public LocalDateTime getLocalDateTime(ZoneId zoneId) {
-        return LocalDateTime.ofInstant(instant, zoneId);
-    }
+  /**
+   * Returns deadline as local date time in a given timezone.
+   *
+   * @param zoneId Timezone
+   * @return LocalDateTime
+   */
+  public LocalDateTime getLocalDateTime(ZoneId zoneId) {
+    return LocalDateTime.ofInstant(instant, zoneId);
+  }
 
-    /**
-     * Returns deadline as local date time.
-     *
-     * @return LocalDateTime
-     */
-    public LocalDateTime getLocalDateTime() {
-        return getLocalDateTime(ZoneId.systemDefault());
-    }
+  /**
+   * Returns deadline as local date time.
+   *
+   * @return LocalDateTime
+   */
+  public LocalDateTime getLocalDateTime() {
+    return getLocalDateTime(ZoneId.systemDefault());
+  }
 }

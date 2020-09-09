@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.network.NetworkType;
 
 public class FakeTransferTransactionFactory extends TransactionFactory<FakeTransferTransaction> {
 
-    public FakeTransferTransactionFactory(
-        NetworkType networkType) {
-        super(
-            TransactionType.TRANSFER,
-            networkType);
-    }
+  public FakeTransferTransactionFactory(NetworkType networkType) {
+    super(TransactionType.TRANSFER, networkType);
+  }
 
-    @Override
-    public FakeTransferTransaction build() {
-        return new FakeTransferTransaction(this);
-    }
+  @Override
+  public FakeTransferTransaction build() {
+    return new FakeTransferTransaction(this);
+  }
 }

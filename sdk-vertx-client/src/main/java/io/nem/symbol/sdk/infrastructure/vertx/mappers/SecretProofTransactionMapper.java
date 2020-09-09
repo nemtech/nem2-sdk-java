@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
 import io.nem.symbol.core.utils.MapperUtils;
@@ -27,31 +26,30 @@ import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.SecretHashAlgorithmEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.SecretProofTransactionDTO;
 
-/**
- * Secret proof transaction mapper.
- */
-class SecretProofTransactionMapper extends
-    AbstractTransactionMapper<SecretProofTransactionDTO, SecretProofTransaction> {
+/** Secret proof transaction mapper. */
+class SecretProofTransactionMapper
+    extends AbstractTransactionMapper<SecretProofTransactionDTO, SecretProofTransaction> {
 
-    public SecretProofTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.SECRET_PROOF, SecretProofTransactionDTO.class);
-    }
+  public SecretProofTransactionMapper(JsonHelper jsonHelper) {
+    super(jsonHelper, TransactionType.SECRET_PROOF, SecretProofTransactionDTO.class);
+  }
 
-    @Override
-    protected TransactionFactory<SecretProofTransaction> createFactory(NetworkType networkType,
-        SecretProofTransactionDTO transaction) {
-        return SecretProofTransactionFactory.create(networkType,
-            SecretHashAlgorithm.rawValueOf(transaction.getHashAlgorithm().getValue()),
-            MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()), transaction.getSecret(),
-            transaction.getProof());
-    }
+  @Override
+  protected TransactionFactory<SecretProofTransaction> createFactory(
+      NetworkType networkType, SecretProofTransactionDTO transaction) {
+    return SecretProofTransactionFactory.create(
+        networkType,
+        SecretHashAlgorithm.rawValueOf(transaction.getHashAlgorithm().getValue()),
+        MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()),
+        transaction.getSecret(),
+        transaction.getProof());
+  }
 
-    @Override
-    protected void copyToDto(SecretProofTransaction transaction, SecretProofTransactionDTO dto) {
-        dto.setHashAlgorithm(SecretHashAlgorithmEnum.fromValue(transaction.getHashType().getValue()));
-        dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));
-        dto.setSecret(transaction.getSecret());
-        dto.setProof(transaction.getProof());
-    }
-
+  @Override
+  protected void copyToDto(SecretProofTransaction transaction, SecretProofTransactionDTO dto) {
+    dto.setHashAlgorithm(SecretHashAlgorithmEnum.fromValue(transaction.getHashType().getValue()));
+    dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));
+    dto.setSecret(transaction.getSecret());
+    dto.setProof(transaction.getProof());
+  }
 }

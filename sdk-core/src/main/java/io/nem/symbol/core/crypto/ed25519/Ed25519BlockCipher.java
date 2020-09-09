@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto.ed25519;
 
 import static io.nem.symbol.core.crypto.ed25519.AESGCM.IV_LENGTH;
@@ -30,68 +29,74 @@ import io.nem.symbol.core.crypto.ed25519.arithmetic.Ed25519GroupElement;
 import io.nem.symbol.core.utils.ArrayUtils;
 import java.util.Arrays;
 
-/**
- * Implementation of the block cipher for Ed25519.
- */
+/** Implementation of the block cipher for Ed25519. */
 public class Ed25519BlockCipher implements BlockCipher {
 
-    private final KeyPair senderKeyPair;
+  private final KeyPair senderKeyPair;
 
-    private final KeyPair recipientKeyPair;
+  private final KeyPair recipientKeyPair;
 
-    public Ed25519BlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
-        this.senderKeyPair = senderKeyPair;
-        this.recipientKeyPair = recipientKeyPair;
+  public Ed25519BlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
+    this.senderKeyPair = senderKeyPair;
+    this.recipientKeyPair = recipientKeyPair;
+  }
+
+  @Override
+  public byte[] encrypt(final byte[] plainText) {
+    return encrypt(plainText, AESGCM.generateIV());
+  }
+
+  public byte[] encrypt(final byte[] plainText, final byte[] ivData) {
+    AuthenticatedCipherText encryptResult = encode(plainText, ivData);
+    byte[] authTag = encryptResult.getAuthenticationTag();
+    byte[] cipherText = encryptResult.getCipherText();
+    return ArrayUtils.concat(authTag, encryptResult.getIv(), cipherText);
+  }
+
+  public AuthenticatedCipherText encode(final byte[] plainText, final byte[] ivData) {
+    // Derive shared key.
+    final byte[] sharedKey =
+        getSharedKey(this.senderKeyPair.getPrivateKey(), this.recipientKeyPair.getPublicKey());
+    return AESGCM.encrypt(sharedKey, ivData, plainText);
+  }
+
+  @Override
+  public byte[] decrypt(final byte[] input) {
+    if (input == null) {
+      throw new CryptoException("Cannot decrypt. Input is required.");
     }
-
-    @Override
-    public byte[] encrypt(final byte[] plainText) {
-        return encrypt(plainText, AESGCM.generateIV());
+    int minSize = TAG_LENGTH + IV_LENGTH;
+    if (input.length < minSize) {
+      throw new CryptoException(
+          "Cannot decrypt input. Size is "
+              + input.length
+              + " when at least "
+              + minSize
+              + " is expected.");
     }
+    final byte[] authTag = Arrays.copyOfRange(input, 0, TAG_LENGTH);
+    final byte[] ivData = Arrays.copyOfRange(input, TAG_LENGTH, IV_LENGTH + TAG_LENGTH);
+    final byte[] cypherText = Arrays.copyOfRange(input, TAG_LENGTH + IV_LENGTH, input.length);
+    return decode(authTag, ivData, cypherText);
+  }
 
-    public byte[] encrypt(final byte[] plainText, final byte[] ivData) {
-        AuthenticatedCipherText encryptResult = encode(plainText, ivData);
-        byte[] authTag = encryptResult.getAuthenticationTag();
-        byte[] cipherText = encryptResult.getCipherText();
-        return ArrayUtils.concat(authTag, encryptResult.getIv(), cipherText);
-    }
+  public byte[] decode(byte[] authTag, byte[] ivData, byte[] cypherText) {
+    final byte[] sharedKey =
+        getSharedKey(this.recipientKeyPair.getPrivateKey(), this.senderKeyPair.getPublicKey());
+    return AESGCM.decrypt(sharedKey, ivData, cypherText, authTag);
+  }
 
-    public AuthenticatedCipherText encode(final byte[] plainText, final byte[] ivData) {
-        // Derive shared key.
-        final byte[] sharedKey = getSharedKey(this.senderKeyPair.getPrivateKey(), this.recipientKeyPair.getPublicKey());
-        return AESGCM.encrypt(sharedKey, ivData, plainText);
-    }
+  public static byte[] getSharedKey(final PrivateKey privateKey, final PublicKey publicKey) {
+    return Hashes.sha256ForSharedKey(getSharedSecret(privateKey, publicKey));
+  }
 
-    @Override
-    public byte[] decrypt(final byte[] input) {
-        if (input == null) {
-            throw new CryptoException("Cannot decrypt. Input is required.");
-        }
-        int minSize = TAG_LENGTH + IV_LENGTH;
-        if (input.length < minSize) {
-            throw new CryptoException(
-                "Cannot decrypt input. Size is " + input.length + " when at least " + minSize + " is expected.");
-        }
-        final byte[] authTag = Arrays.copyOfRange(input, 0, TAG_LENGTH);
-        final byte[] ivData = Arrays.copyOfRange(input, TAG_LENGTH, IV_LENGTH + TAG_LENGTH);
-        final byte[] cypherText = Arrays.copyOfRange(input, TAG_LENGTH + IV_LENGTH, input.length);
-        return decode(authTag, ivData, cypherText);
-
-    }
-
-    public byte[] decode(byte[] authTag, byte[] ivData, byte[] cypherText) {
-        final byte[] sharedKey = getSharedKey(this.recipientKeyPair.getPrivateKey(), this.senderKeyPair.getPublicKey());
-        return AESGCM.decrypt(sharedKey, ivData, cypherText, authTag);
-    }
-
-
-    public static byte[] getSharedKey(final PrivateKey privateKey, final PublicKey publicKey) {
-        return Hashes.sha256ForSharedKey(getSharedSecret(privateKey, publicKey));
-    }
-
-    public static byte[] getSharedSecret(final PrivateKey privateKey, final PublicKey publicKey) {
-        final Ed25519GroupElement senderA = new Ed25519EncodedGroupElement(publicKey.getBytes()).decode();
-        senderA.precomputeForScalarMultiplication();
-        return senderA.scalarMultiply(Ed25519Utils.prepareForScalarMultiply(privateKey)).encode().getRaw();
-    }
+  public static byte[] getSharedSecret(final PrivateKey privateKey, final PublicKey publicKey) {
+    final Ed25519GroupElement senderA =
+        new Ed25519EncodedGroupElement(publicKey.getBytes()).decode();
+    senderA.precomputeForScalarMultiplication();
+    return senderA
+        .scalarMultiply(Ed25519Utils.prepareForScalarMultiply(privateKey))
+        .encode()
+        .getRaw();
+  }
 }

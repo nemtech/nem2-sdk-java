@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import java.util.List;
@@ -28,27 +27,27 @@ import java.util.Set;
  */
 public class MultisigAccountGraphInfo {
 
-    private final Map<Integer, List<MultisigAccountInfo>> multisigEntries;
+  private final Map<Integer, List<MultisigAccountInfo>> multisigEntries;
 
-    public MultisigAccountGraphInfo(Map<Integer, List<MultisigAccountInfo>> multisigEntries) {
-        this.multisigEntries = multisigEntries;
-    }
+  public MultisigAccountGraphInfo(Map<Integer, List<MultisigAccountInfo>> multisigEntries) {
+    this.multisigEntries = multisigEntries;
+  }
 
-    /**
-     * Returns multisig accounts levels number.
-     *
-     * @return {@link Set} of Integer
-     */
-    public Set<Integer> getLevelsNumber() {
-        return this.multisigEntries.keySet();
-    }
+  /**
+   * Returns multisig accounts levels number.
+   *
+   * @return {@link Set} of Integer
+   */
+  public Set<Integer> getLevelsNumber() {
+    return this.multisigEntries.keySet();
+  }
 
-    /**
-     * Returns multisig accounts.
-     *
-     * @return a {@link Map} of {@link Integer} to {@link List} of {@link MultisigAccountInfo}
-     */
-    public Map<Integer, List<MultisigAccountInfo>> getMultisigEntries() {
-        return multisigEntries;
-    }
+  /**
+   * Returns multisig accounts.
+   *
+   * @return a {@link Map} of {@link Integer} to {@link List} of {@link MultisigAccountInfo}
+   */
+  public Map<Integer, List<MultisigAccountInfo>> getMultisigEntries() {
+    return multisigEntries;
+  }
 }

@@ -13,47 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
-
 package io.nem.symbol.sdk.model.network;
-
-/**
- * AggregateNetworkProperties
- */
+/** AggregateNetworkProperties */
 public class AggregateNetworkProperties {
 
-    /**
-     * Maximum number of transactions per aggregate.
-     */
-    private final String maxTransactionsPerAggregate;
+  /** Maximum number of transactions per aggregate. */
+  private final String maxTransactionsPerAggregate;
 
-    /**
-     * Maximum number of cosignatures per aggregate.
-     */
-    private final String maxCosignaturesPerAggregate;
+  /** Maximum number of cosignatures per aggregate. */
+  private final String maxCosignaturesPerAggregate;
 
-    /**
-     * Set to true if cosignatures must exactly match component signers. Set to false if
-     * cosignatures should be validated externally.
-     */
-    private final Boolean enableStrictCosignatureCheck;
+  /**
+   * Set to true if cosignatures must exactly match component signers. Set to false if cosignatures
+   * should be validated externally.
+   */
+  private final Boolean enableStrictCosignatureCheck;
 
-    /**
-     * Set to true if bonded aggregates should be allowed. Set to false if bonded aggregates should
-     * be rejected.
-     */
-    private final Boolean enableBondedAggregateSupport;
+  /**
+   * Set to true if bonded aggregates should be allowed. Set to false if bonded aggregates should be
+   * rejected.
+   */
+  private final Boolean enableBondedAggregateSupport;
 
-    /**
-     * Maximum lifetime a bonded transaction can have before it expires.
-     */
-    private final String maxBondedTransactionLifetime;
+  /** Maximum lifetime a bonded transaction can have before it expires. */
+  private final String maxBondedTransactionLifetime;
 
-  public AggregateNetworkProperties(String maxTransactionsPerAggregate,
-      String maxCosignaturesPerAggregate, Boolean enableStrictCosignatureCheck,
-      Boolean enableBondedAggregateSupport, String maxBondedTransactionLifetime) {
+  public AggregateNetworkProperties(
+      String maxTransactionsPerAggregate,
+      String maxCosignaturesPerAggregate,
+      Boolean enableStrictCosignatureCheck,
+      Boolean enableBondedAggregateSupport,
+      String maxBondedTransactionLifetime) {
     this.maxTransactionsPerAggregate = maxTransactionsPerAggregate;
     this.maxCosignaturesPerAggregate = maxCosignaturesPerAggregate;
     this.enableStrictCosignatureCheck = enableStrictCosignatureCheck;
@@ -81,4 +71,3 @@ public class AggregateNetworkProperties {
     return maxBondedTransactionLifetime;
   }
 }
-

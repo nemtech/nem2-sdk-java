@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.AccountOrderBy;
@@ -34,80 +33,95 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AccountSearchRepositoryIntegrationTest extends BaseIntegrationTest {
 
-    public AccountRepository getAccountRepository(RepositoryType type) {
-        return getRepositoryFactory(type).createAccountRepository();
-    }
+  public AccountRepository getAccountRepository(RepositoryType type) {
+    return getRepositoryFactory(type).createAccountRepository();
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void searchNoMosaicIdProvided(RepositoryType type) {
-        RepositoryCallException exception = Assertions.assertThrows(RepositoryCallException.class, () -> get(
-            this.getAccountRepository(type).search(new AccountSearchCriteria().orderBy(AccountOrderBy.BALANCE))));
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchNoMosaicIdProvided(RepositoryType type) {
+    RepositoryCallException exception =
+        Assertions.assertThrows(
+            RepositoryCallException.class,
+            () ->
+                get(
+                    this.getAccountRepository(type)
+                        .search(new AccountSearchCriteria().orderBy(AccountOrderBy.BALANCE))));
 
-        Assertions.assertEquals(
-            "ApiException: Conflict - 409 - InvalidArgument - mosaicId must be provided when sorting by balance",
-            exception.getMessage());
-    }
+    Assertions.assertEquals(
+        "ApiException: Conflict - 409 - InvalidArgument - mosaicId must be provided when sorting by balance",
+        exception.getMessage());
+  }
 
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchMosaicIdProvided(
+      RepositoryType type, Function<MosaicId, AccountSearchCriteria> function) {
+    AccountPaginationStreamer streamer =
+        new AccountPaginationStreamer(this.getAccountRepository(type));
+    MosaicId mosaicId =
+        get(
+            getRepositoryFactory(type)
+                .createNamespaceRepository()
+                .getLinkedMosaicId(NetworkCurrency.CAT_CURRENCY.getNamespaceId().get()));
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void searchMosaicIdProvided(RepositoryType type, Function<MosaicId, AccountSearchCriteria> function) {
-        AccountPaginationStreamer streamer = new AccountPaginationStreamer(this.getAccountRepository(type));
-        MosaicId mosaicId = get(getRepositoryFactory(type).createNamespaceRepository()
-            .getLinkedMosaicId(NetworkCurrency.CAT_CURRENCY.getNamespaceId().get()));
+    AccountSearchCriteria criteria = function.apply(mosaicId);
+    List<AccountInfo> accounts = get(streamer.search(criteria).toList().toObservable());
 
-        AccountSearchCriteria criteria = function.apply(mosaicId);
-        List<AccountInfo> accounts = get(streamer.search(criteria).toList().toObservable());
-
-        Assertions.assertFalse(accounts.isEmpty());
-        System.out.println(toJson(accounts));
-        accounts.forEach(a -> {
-            Assertions.assertTrue(
-                a.getMosaics().stream().filter(m -> m.getId().equals(mosaicId)).findFirst().get().getAmount()
-                    .longValue() > 0);
+    Assertions.assertFalse(accounts.isEmpty());
+    System.out.println(toJson(accounts));
+    accounts.forEach(
+        a -> {
+          Assertions.assertTrue(
+              a.getMosaics().stream()
+                      .filter(m -> m.getId().equals(mosaicId))
+                      .findFirst()
+                      .get()
+                      .getAmount()
+                      .longValue()
+                  > 0);
         });
-    }
+  }
 
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearch(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(null);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearch(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(null);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearchSize50(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(50);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearchSize50(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(50);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearchTransaction(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(null);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearchTransaction(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(null);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void defaultSearchTransactionPageSize50(RepositoryType type) {
+    getPaginationTester(type).basicTestSearch(50);
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void defaultSearchTransactionPageSize50(RepositoryType type) {
-        getPaginationTester(type).basicTestSearch(50);
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchOrderByIdAsc(RepositoryType type) {
+    getPaginationTester(type).searchOrderByIdAsc();
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void searchOrderByIdAsc(RepositoryType type) {
-        getPaginationTester(type).searchOrderByIdAsc();
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchOrderByIdDesc(RepositoryType type) {
+    getPaginationTester(type).searchOrderByIdDesc();
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void searchOrderByIdDesc(RepositoryType type) {
-        getPaginationTester(type).searchOrderByIdDesc();
-    }
-
-    private PaginationTester<AccountInfo, AccountSearchCriteria> getPaginationTester(RepositoryType type) {
-        return new PaginationTester<>(() -> new AccountSearchCriteria(), getAccountRepository(type)::search);
-    }
-
+  private PaginationTester<AccountInfo, AccountSearchCriteria> getPaginationTester(
+      RepositoryType type) {
+    return new PaginationTester<>(
+        () -> new AccountSearchCriteria(), getAccountRepository(type)::search);
+  }
 }

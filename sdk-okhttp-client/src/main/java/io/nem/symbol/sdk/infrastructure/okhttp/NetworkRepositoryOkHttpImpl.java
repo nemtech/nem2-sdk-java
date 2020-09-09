@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.sdk.api.NetworkRepository;
@@ -61,138 +60,201 @@ import io.reactivex.Observable;
  *
  * @author Fernando Boucquez
  */
-public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements NetworkRepository {
+public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
+    implements NetworkRepository {
 
-    private final NetworkRoutesApi networkRoutesApi;
+  private final NetworkRoutesApi networkRoutesApi;
 
-    private final NodeRoutesApi nodeRoutesApi;
+  private final NodeRoutesApi nodeRoutesApi;
 
-    public NetworkRepositoryOkHttpImpl(ApiClient apiClient) {
-        super(apiClient);
-        networkRoutesApi = new NetworkRoutesApi(apiClient);
-        nodeRoutesApi = new NodeRoutesApi(apiClient);
-    }
+  public NetworkRepositoryOkHttpImpl(ApiClient apiClient) {
+    super(apiClient);
+    networkRoutesApi = new NetworkRoutesApi(apiClient);
+    nodeRoutesApi = new NodeRoutesApi(apiClient);
+  }
 
-    @Override
-    public Observable<NetworkType> getNetworkType() {
-        return exceptionHandling(
-            call(getNodeRoutesApi()::getNodeInfo).map(info -> NetworkType.rawValueOf(info.getNetworkIdentifier())));
-    }
+  @Override
+  public Observable<NetworkType> getNetworkType() {
+    return exceptionHandling(
+        call(getNodeRoutesApi()::getNodeInfo)
+            .map(info -> NetworkType.rawValueOf(info.getNetworkIdentifier())));
+  }
 
-    @Override
-    public Observable<NetworkInfo> getNetworkInfo() {
-        return exceptionHandling(call(getNetworkRoutesApi()::getNetworkType)
+  @Override
+  public Observable<NetworkInfo> getNetworkInfo() {
+    return exceptionHandling(
+        call(getNetworkRoutesApi()::getNetworkType)
             .map(info -> new NetworkInfo(info.getName(), info.getDescription())));
-    }
+  }
 
-    @Override
-    public Observable<TransactionFees> getTransactionFees() {
-        return exceptionHandling(call(getNetworkRoutesApi()::getTransactionFees).map(
-            info -> new TransactionFees(info.getAverageFeeMultiplier(), info.getMedianFeeMultiplier(),
-                info.getLowestFeeMultiplier(), info.getHighestFeeMultiplier())));
-    }
+  @Override
+  public Observable<TransactionFees> getTransactionFees() {
+    return exceptionHandling(
+        call(getNetworkRoutesApi()::getTransactionFees)
+            .map(
+                info ->
+                    new TransactionFees(
+                        info.getAverageFeeMultiplier(),
+                        info.getMedianFeeMultiplier(),
+                        info.getLowestFeeMultiplier(),
+                        info.getHighestFeeMultiplier())));
+  }
 
-    @Override
-    public Observable<RentalFees> getRentalFees() {
-        return exceptionHandling(call(getNetworkRoutesApi()::getRentalFees).map(
-            info -> new RentalFees(info.getEffectiveRootNamespaceRentalFeePerBlock(),
-                info.getEffectiveChildNamespaceRentalFee(), info.getEffectiveMosaicRentalFee())));
-    }
+  @Override
+  public Observable<RentalFees> getRentalFees() {
+    return exceptionHandling(
+        call(getNetworkRoutesApi()::getRentalFees)
+            .map(
+                info ->
+                    new RentalFees(
+                        info.getEffectiveRootNamespaceRentalFeePerBlock(),
+                        info.getEffectiveChildNamespaceRentalFee(),
+                        info.getEffectiveMosaicRentalFee())));
+  }
 
+  @Override
+  public Observable<NetworkConfiguration> getNetworkProperties() {
+    return call(getNetworkRoutesApi()::getNetworkProperties)
+        .map(
+            info ->
+                new NetworkConfiguration(
+                    toNetworkProperties(info.getNetwork()),
+                    toChainProperties(info.getChain()),
+                    toPluginsProperties(info.getPlugins())));
+  }
 
-    @Override
-    public Observable<NetworkConfiguration> getNetworkProperties() {
-        return call(getNetworkRoutesApi()::getNetworkProperties).map(
-            info -> new NetworkConfiguration(toNetworkProperties(info.getNetwork()), toChainProperties(info.getChain()),
-                toPluginsProperties(info.getPlugins())));
-    }
+  private NetworkProperties toNetworkProperties(NetworkPropertiesDTO dto) {
+    return new NetworkProperties(
+        dto.getIdentifier(),
+        NodeIdentityEqualityStrategy.rawValueOf(dto.getNodeEqualityStrategy().getValue()),
+        dto.getNemesisSignerPublicKey(),
+        dto.getGenerationHashSeed(),
+        dto.getEpochAdjustment());
+  }
 
-    private NetworkProperties toNetworkProperties(NetworkPropertiesDTO dto) {
-        return new NetworkProperties(dto.getIdentifier(),
-            NodeIdentityEqualityStrategy.rawValueOf(dto.getNodeEqualityStrategy().getValue()),
-            dto.getNemesisSignerPublicKey(), dto.getGenerationHashSeed(), dto.getEpochAdjustment());
-    }
+  private ChainProperties toChainProperties(ChainPropertiesDTO dto) {
+    return new ChainProperties(
+        dto.getEnableVerifiableState(),
+        dto.getEnableVerifiableReceipts(),
+        dto.getCurrencyMosaicId(),
+        dto.getHarvestingMosaicId(),
+        dto.getBlockGenerationTargetTime(),
+        dto.getBlockTimeSmoothingFactor(),
+        dto.getBlockFinalizationInterval(),
+        dto.getImportanceGrouping(),
+        dto.getImportanceActivityPercentage(),
+        dto.getMaxRollbackBlocks(),
+        dto.getMaxDifficultyBlocks(),
+        dto.getDefaultDynamicFeeMultiplier(),
+        dto.getMaxTransactionLifetime(),
+        dto.getMaxBlockFutureTime(),
+        dto.getInitialCurrencyAtomicUnits(),
+        dto.getMaxMosaicAtomicUnits(),
+        dto.getTotalChainImportance(),
+        dto.getMinHarvesterBalance(),
+        dto.getMaxHarvesterBalance(),
+        dto.getMinVoterBalance(),
+        dto.getMaxVotingKeysPerAccount(),
+        dto.getMinVotingKeyLifetime(),
+        dto.getMaxVotingKeyLifetime(),
+        dto.getHarvestBeneficiaryPercentage(),
+        dto.getHarvestNetworkPercentage(),
+        dto.getHarvestNetworkFeeSinkAddress(),
+        dto.getBlockPruneInterval(),
+        dto.getMaxTransactionsPerBlock());
+  }
 
-    private ChainProperties toChainProperties(ChainPropertiesDTO dto) {
-        return new ChainProperties(dto.getEnableVerifiableState(), dto.getEnableVerifiableReceipts(),
-            dto.getCurrencyMosaicId(), dto.getHarvestingMosaicId(), dto.getBlockGenerationTargetTime(),
-            dto.getBlockTimeSmoothingFactor(), dto.getBlockFinalizationInterval(), dto.getImportanceGrouping(),
-            dto.getImportanceActivityPercentage(), dto.getMaxRollbackBlocks(), dto.getMaxDifficultyBlocks(),
-            dto.getDefaultDynamicFeeMultiplier(), dto.getMaxTransactionLifetime(), dto.getMaxBlockFutureTime(),
-            dto.getInitialCurrencyAtomicUnits(), dto.getMaxMosaicAtomicUnits(), dto.getTotalChainImportance(),
-            dto.getMinHarvesterBalance(), dto.getMaxHarvesterBalance(), dto.getMinVoterBalance(),
-            dto.getMaxVotingKeysPerAccount(), dto.getMinVotingKeyLifetime(), dto.getMaxVotingKeyLifetime(),
-            dto.getHarvestBeneficiaryPercentage(), dto.getHarvestNetworkPercentage(),
-            dto.getHarvestNetworkFeeSinkAddress(), dto.getBlockPruneInterval(), dto.getMaxTransactionsPerBlock());
-    }
+  private PluginsProperties toPluginsProperties(PluginsPropertiesDTO dto) {
+    return new PluginsProperties(
+        toAccountlink(dto.getAccountlink()),
+        toAggregate(dto.getAggregate()),
+        toLockhash(dto.getLockhash()),
+        toLocksecret(dto.getLocksecret()),
+        toMetadata(dto.getMetadata()),
+        toMosaic(dto.getMosaic()),
+        toMultisig(dto.getMultisig()),
+        toNamespace(dto.getNamespace()),
+        toRestrictionaccount(dto.getRestrictionaccount()),
+        toRestrictionmosaic(dto.getRestrictionmosaic()),
+        toTransfer(dto.getTransfer()));
+  }
 
-    private PluginsProperties toPluginsProperties(PluginsPropertiesDTO dto) {
-        return new PluginsProperties(toAccountlink(dto.getAccountlink()), toAggregate(dto.getAggregate()),
-            toLockhash(dto.getLockhash()), toLocksecret(dto.getLocksecret()), toMetadata(dto.getMetadata()),
-            toMosaic(dto.getMosaic()), toMultisig(dto.getMultisig()), toNamespace(dto.getNamespace()),
-            toRestrictionaccount(dto.getRestrictionaccount()), toRestrictionmosaic(dto.getRestrictionmosaic()),
-            toTransfer(dto.getTransfer()));
-    }
+  private AccountLinkNetworkProperties toAccountlink(AccountKeyLinkNetworkPropertiesDTO dto) {
+    return new AccountLinkNetworkProperties(dto.getDummy());
+  }
 
-    private AccountLinkNetworkProperties toAccountlink(AccountKeyLinkNetworkPropertiesDTO dto) {
-        return new AccountLinkNetworkProperties(dto.getDummy());
-    }
+  private AggregateNetworkProperties toAggregate(AggregateNetworkPropertiesDTO dto) {
+    return new AggregateNetworkProperties(
+        dto.getMaxTransactionsPerAggregate(),
+        dto.getMaxCosignaturesPerAggregate(),
+        dto.getEnableStrictCosignatureCheck(),
+        dto.getEnableBondedAggregateSupport(),
+        dto.getMaxBondedTransactionLifetime());
+  }
 
-    private AggregateNetworkProperties toAggregate(AggregateNetworkPropertiesDTO dto) {
-        return new AggregateNetworkProperties(dto.getMaxTransactionsPerAggregate(),
-            dto.getMaxCosignaturesPerAggregate(), dto.getEnableStrictCosignatureCheck(),
-            dto.getEnableBondedAggregateSupport(), dto.getMaxBondedTransactionLifetime());
-    }
+  private HashLockNetworkProperties toLockhash(HashLockNetworkPropertiesDTO dto) {
+    return new HashLockNetworkProperties(
+        dto.getLockedFundsPerAggregate(), dto.getMaxHashLockDuration());
+  }
 
-    private HashLockNetworkProperties toLockhash(HashLockNetworkPropertiesDTO dto) {
-        return new HashLockNetworkProperties(dto.getLockedFundsPerAggregate(), dto.getMaxHashLockDuration());
-    }
+  private SecretLockNetworkProperties toLocksecret(SecretLockNetworkPropertiesDTO dto) {
+    return new SecretLockNetworkProperties(
+        dto.getMaxSecretLockDuration(), dto.getMinProofSize(), dto.getMaxProofSize());
+  }
 
-    private SecretLockNetworkProperties toLocksecret(SecretLockNetworkPropertiesDTO dto) {
-        return new SecretLockNetworkProperties(dto.getMaxSecretLockDuration(), dto.getMinProofSize(),
-            dto.getMaxProofSize());
-    }
+  private MetadataNetworkProperties toMetadata(MetadataNetworkPropertiesDTO dto) {
+    return new MetadataNetworkProperties(dto.getMaxValueSize());
+  }
 
-    private MetadataNetworkProperties toMetadata(MetadataNetworkPropertiesDTO dto) {
-        return new MetadataNetworkProperties(dto.getMaxValueSize());
-    }
+  private MosaicNetworkProperties toMosaic(MosaicNetworkPropertiesDTO dto) {
+    return new MosaicNetworkProperties(
+        dto.getMaxMosaicsPerAccount(),
+        dto.getMaxMosaicDuration(),
+        dto.getMaxMosaicDivisibility(),
+        dto.getMosaicRentalFeeSinkAddress(),
+        dto.getMosaicRentalFee());
+  }
 
-    private MosaicNetworkProperties toMosaic(MosaicNetworkPropertiesDTO dto) {
-        return new MosaicNetworkProperties(dto.getMaxMosaicsPerAccount(), dto.getMaxMosaicDuration(),
-            dto.getMaxMosaicDivisibility(), dto.getMosaicRentalFeeSinkAddress(), dto.getMosaicRentalFee());
-    }
+  private MultisigNetworkProperties toMultisig(MultisigNetworkPropertiesDTO dto) {
+    return new MultisigNetworkProperties(
+        dto.getMaxMultisigDepth(),
+        dto.getMaxCosignatoriesPerAccount(),
+        dto.getMaxCosignedAccountsPerAccount());
+  }
 
-    private MultisigNetworkProperties toMultisig(MultisigNetworkPropertiesDTO dto) {
-        return new MultisigNetworkProperties(dto.getMaxMultisigDepth(), dto.getMaxCosignatoriesPerAccount(),
-            dto.getMaxCosignedAccountsPerAccount());
-    }
+  private NamespaceNetworkProperties toNamespace(NamespaceNetworkPropertiesDTO dto) {
+    return new NamespaceNetworkProperties(
+        dto.getMaxNameSize(),
+        dto.getMaxChildNamespaces(),
+        dto.getMaxNamespaceDepth(),
+        dto.getMinNamespaceDuration(),
+        dto.getMaxNamespaceDuration(),
+        dto.getNamespaceGracePeriodDuration(),
+        dto.getReservedRootNamespaceNames(),
+        dto.getNamespaceRentalFeeSinkAddress(),
+        dto.getRootNamespaceRentalFeePerBlock(),
+        dto.getChildNamespaceRentalFee());
+  }
 
-    private NamespaceNetworkProperties toNamespace(NamespaceNetworkPropertiesDTO dto) {
-        return new NamespaceNetworkProperties(dto.getMaxNameSize(), dto.getMaxChildNamespaces(),
-            dto.getMaxNamespaceDepth(), dto.getMinNamespaceDuration(), dto.getMaxNamespaceDuration(),
-            dto.getNamespaceGracePeriodDuration(), dto.getReservedRootNamespaceNames(),
-            dto.getNamespaceRentalFeeSinkAddress(), dto.getRootNamespaceRentalFeePerBlock(),
-            dto.getChildNamespaceRentalFee());
-    }
+  private AccountRestrictionNetworkProperties toRestrictionaccount(
+      AccountRestrictionNetworkPropertiesDTO dto) {
+    return new AccountRestrictionNetworkProperties(dto.getMaxAccountRestrictionValues());
+  }
 
-    private AccountRestrictionNetworkProperties toRestrictionaccount(AccountRestrictionNetworkPropertiesDTO dto) {
-        return new AccountRestrictionNetworkProperties(dto.getMaxAccountRestrictionValues());
-    }
+  private MosaicRestrictionNetworkProperties toRestrictionmosaic(
+      MosaicRestrictionNetworkPropertiesDTO dto) {
+    return new MosaicRestrictionNetworkProperties(dto.getMaxMosaicRestrictionValues());
+  }
 
-    private MosaicRestrictionNetworkProperties toRestrictionmosaic(MosaicRestrictionNetworkPropertiesDTO dto) {
-        return new MosaicRestrictionNetworkProperties(dto.getMaxMosaicRestrictionValues());
-    }
+  private TransferNetworkProperties toTransfer(TransferNetworkPropertiesDTO dto) {
+    return new TransferNetworkProperties(dto.getMaxMessageSize());
+  }
 
-    private TransferNetworkProperties toTransfer(TransferNetworkPropertiesDTO dto) {
-        return new TransferNetworkProperties(dto.getMaxMessageSize());
-    }
+  public NetworkRoutesApi getNetworkRoutesApi() {
+    return networkRoutesApi;
+  }
 
-
-    public NetworkRoutesApi getNetworkRoutesApi() {
-        return networkRoutesApi;
-    }
-
-    public NodeRoutesApi getNodeRoutesApi() {
-        return nodeRoutesApi;
-    }
+  public NodeRoutesApi getNodeRoutesApi() {
+    return nodeRoutesApi;
+  }
 }

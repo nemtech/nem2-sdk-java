@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto;
 
 import org.hamcrest.MatcherAssert;
@@ -24,50 +23,47 @@ import org.junit.jupiter.api.Test;
 
 public abstract class KeyGeneratorTest {
 
-    @Test
-    public void generateKeyPairReturnsNewKeyPair() {
-        // Arrange:
-        final KeyGenerator generator = this.getKeyGenerator();
+  @Test
+  public void generateKeyPairReturnsNewKeyPair() {
+    // Arrange:
+    final KeyGenerator generator = this.getKeyGenerator();
 
-        // Act:
-        final KeyPair kp = generator.generateKeyPair();
+    // Act:
+    final KeyPair kp = generator.generateKeyPair();
 
-        // Assert:
-        MatcherAssert.assertThat(kp.getPrivateKey(), IsNull.notNullValue());
-        MatcherAssert.assertThat(kp.getPublicKey(), IsNull.notNullValue());
-    }
+    // Assert:
+    MatcherAssert.assertThat(kp.getPrivateKey(), IsNull.notNullValue());
+    MatcherAssert.assertThat(kp.getPublicKey(), IsNull.notNullValue());
+  }
 
-    @Test
-    public void derivePublicKeyReturnsPublicKey() {
-        // Arrange:
-        final KeyGenerator generator = this.getKeyGenerator();
-        final KeyPair kp = generator.generateKeyPair();
+  @Test
+  public void derivePublicKeyReturnsPublicKey() {
+    // Arrange:
+    final KeyGenerator generator = this.getKeyGenerator();
+    final KeyPair kp = generator.generateKeyPair();
 
-        // Act:
-        final PublicKey publicKey = generator.derivePublicKey(kp.getPrivateKey());
+    // Act:
+    final PublicKey publicKey = generator.derivePublicKey(kp.getPrivateKey());
 
-        // Assert:
-        MatcherAssert.assertThat(publicKey, IsNull.notNullValue());
-        MatcherAssert
-            .assertThat(publicKey.getBytes(), IsEqual.equalTo(kp.getPublicKey().getBytes()));
-    }
+    // Assert:
+    MatcherAssert.assertThat(publicKey, IsNull.notNullValue());
+    MatcherAssert.assertThat(publicKey.getBytes(), IsEqual.equalTo(kp.getPublicKey().getBytes()));
+  }
 
-    @Test
-    public void generateKeyPairCreatesDifferentInstancesWithDifferentKeys() {
-        // Act:
-        final KeyPair kp1 = this.getKeyGenerator().generateKeyPair();
-        final KeyPair kp2 = this.getKeyGenerator().generateKeyPair();
+  @Test
+  public void generateKeyPairCreatesDifferentInstancesWithDifferentKeys() {
+    // Act:
+    final KeyPair kp1 = this.getKeyGenerator().generateKeyPair();
+    final KeyPair kp2 = this.getKeyGenerator().generateKeyPair();
 
-        // Assert:
-        MatcherAssert
-            .assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));
-        MatcherAssert
-            .assertThat(kp2.getPublicKey(), IsNot.not(IsEqual.equalTo(kp1.getPublicKey())));
-    }
+    // Assert:
+    MatcherAssert.assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));
+    MatcherAssert.assertThat(kp2.getPublicKey(), IsNot.not(IsEqual.equalTo(kp1.getPublicKey())));
+  }
 
-    protected KeyGenerator getKeyGenerator() {
-        return this.getCryptoEngine().createKeyGenerator();
-    }
+  protected KeyGenerator getKeyGenerator() {
+    return this.getCryptoEngine().createKeyGenerator();
+  }
 
-    protected abstract CryptoEngine getCryptoEngine();
+  protected abstract CryptoEngine getCryptoEngine();
 }

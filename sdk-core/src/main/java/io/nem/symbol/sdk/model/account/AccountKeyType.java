@@ -13,55 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import java.util.Arrays;
 
-
 /**
- * Type of account key: * 0 - Unset. * 1 - Linked account public key. * 2 - Node public key on which remote is allowed
- * to harvest. * 4 - VRF public key.
+ * Type of account key: * 0 - Unset. * 1 - Linked account public key. * 2 - Node public key on which
+ * remote is allowed to harvest. * 4 - VRF public key.
  */
 public enum AccountKeyType {
 
-    /**
-     * unset key.
-     */
-    UNSET(0),
+  /** unset key. */
+  UNSET(0),
 
-    /**
-     * linked account public key \note this can be either a remote or main account public key depending on context.
-     */
-    LINKED(1),
+  /**
+   * linked account public key \note this can be either a remote or main account public key
+   * depending on context.
+   */
+  LINKED(1),
 
-    /**
-     * node public key on which remote is allowed to harvest.
-     */
-    NODE(2),
+  /** node public key on which remote is allowed to harvest. */
+  NODE(2),
 
-    /**
-     * VRF public key.
-     */
-    VRF(4);
+  /** VRF public key. */
+  VRF(4);
 
-    private final int value;
+  private final int value;
 
-    AccountKeyType(int value) {
-        this.value = value;
-    }
+  AccountKeyType(int value) {
+    this.value = value;
+  }
 
-    public int getValue() {
-        return value;
-    }
+  public int getValue() {
+    return value;
+  }
 
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
+  @Override
+  public String toString() {
+    return String.valueOf(value);
+  }
 
-    public static AccountKeyType rawValueOf(int value) {
-        return Arrays.stream(values()).filter(e -> e.value == value).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
+  public static AccountKeyType rawValueOf(int value) {
+    return Arrays.stream(values())
+        .filter(e -> e.value == value)
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 }

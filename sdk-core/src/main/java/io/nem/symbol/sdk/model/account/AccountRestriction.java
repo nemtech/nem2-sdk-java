@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -21,33 +20,28 @@ import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import java.util.List;
 
-/**
- * It defines one account restriction.
- */
+/** It defines one account restriction. */
 public class AccountRestriction {
 
-    /**
-     * The restriction type.
-     */
-    private final AccountRestrictionFlags restrictionFlags;
+  /** The restriction type. */
+  private final AccountRestrictionFlags restrictionFlags;
 
-    /**
-     * The list of model objects referencing the restricted value. It can be a {@link
-     * MosaicId}, an {@link Address} or a {@link
-     * TransactionType} depending on the target of the restrictionFlags
-     */
-    private final List<Object> values;
+  /**
+   * The list of model objects referencing the restricted value. It can be a {@link MosaicId}, an
+   * {@link Address} or a {@link TransactionType} depending on the target of the restrictionFlags
+   */
+  private final List<Object> values;
 
-    public AccountRestriction(AccountRestrictionFlags restrictionFlags, List<Object> values) {
-        this.restrictionFlags = restrictionFlags;
-        this.values = values;
-    }
+  public AccountRestriction(AccountRestrictionFlags restrictionFlags, List<Object> values) {
+    this.restrictionFlags = restrictionFlags;
+    this.values = values;
+  }
 
-    public AccountRestrictionFlags getRestrictionFlags() {
-        return restrictionFlags;
-    }
+  public AccountRestrictionFlags getRestrictionFlags() {
+    return restrictionFlags;
+  }
 
-    public List<Object> getValues() {
-        return values;
-    }
+  public List<Object> getValues() {
+    return values;
+  }
 }

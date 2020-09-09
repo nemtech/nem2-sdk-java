@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import static org.mockito.Mockito.mock;
@@ -42,182 +41,222 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-/**
- * Tests of {@link NetworkCurrencyServiceImpl}
- */
+/** Tests of {@link NetworkCurrencyServiceImpl} */
 class NetworkCurrencyServiceTest {
 
-    private NamespaceRepository namespaceRepository;
-    private MosaicRepository mosaicRepository;
-    private NetworkCurrencyService service;
+  private NamespaceRepository namespaceRepository;
+  private MosaicRepository mosaicRepository;
+  private NetworkCurrencyService service;
 
-    @BeforeEach
-    void setup() {
+  @BeforeEach
+  void setup() {
 
-        RepositoryFactory factory = mock(RepositoryFactory.class);
+    RepositoryFactory factory = mock(RepositoryFactory.class);
 
-        namespaceRepository = mock(NamespaceRepository.class);
-        when(factory.createNamespaceRepository()).thenReturn(namespaceRepository);
+    namespaceRepository = mock(NamespaceRepository.class);
+    when(factory.createNamespaceRepository()).thenReturn(namespaceRepository);
 
-        mosaicRepository = mock(MosaicRepository.class);
-        when(factory.createMosaicRepository()).thenReturn(mosaicRepository);
+    mosaicRepository = mock(MosaicRepository.class);
+    when(factory.createMosaicRepository()).thenReturn(mosaicRepository);
 
-        service = new NetworkCurrencyServiceImpl(factory);
-    }
+    service = new NetworkCurrencyServiceImpl(factory);
+  }
 
-    @Test
-    void getNetworkCurrencyFromMosaicIdWhenNoNamespaceError() throws Exception {
-        MosaicId mosaicId = new MosaicId(BigInteger.TEN);
-        Account account = Account.generateNewAccount(NetworkType.MAIN_NET);
-        BigInteger supply = BigInteger.valueOf(12);
+  @Test
+  void getNetworkCurrencyFromMosaicIdWhenNoNamespaceError() throws Exception {
+    MosaicId mosaicId = new MosaicId(BigInteger.TEN);
+    Account account = Account.generateNewAccount(NetworkType.MAIN_NET);
+    BigInteger supply = BigInteger.valueOf(12);
 
-        MosaicInfo mosaicInfo = new MosaicInfo("abc",mosaicId, supply, BigInteger.ONE,
-            account.getAddress(), 4L, MosaicFlags.create(true, true, true), 10,
+    MosaicInfo mosaicInfo =
+        new MosaicInfo(
+            "abc",
+            mosaicId,
+            supply,
+            BigInteger.ONE,
+            account.getAddress(),
+            4L,
+            MosaicFlags.create(true, true, true),
+            10,
             BigInteger.TEN);
 
-        Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
-            .thenReturn(Observable.just(mosaicInfo));
+    Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
+        .thenReturn(Observable.just(mosaicInfo));
 
-        Mockito.when(
+    Mockito.when(
             namespaceRepository.getMosaicsNames(Mockito.eq(Collections.singletonList(mosaicId))))
-            .thenReturn(Observable.error(new RepositoryCallException("Not found", 404, null)));
+        .thenReturn(Observable.error(new RepositoryCallException("Not found", 404, null)));
 
-        NetworkCurrency networkCurrency = service.getNetworkCurrencyFromMosaicId(mosaicId)
-            .toFuture().get();
+    NetworkCurrency networkCurrency =
+        service.getNetworkCurrencyFromMosaicId(mosaicId).toFuture().get();
 
-        Assertions.assertEquals(10, networkCurrency.getDivisibility());
-        Assertions.assertEquals(mosaicId, networkCurrency.getUnresolvedMosaicId());
-        Assertions.assertEquals(mosaicId, networkCurrency.getMosaicId().get());
-        Assertions.assertFalse(networkCurrency.getNamespaceId().isPresent());
-        Assertions.assertTrue(networkCurrency.isTransferable());
-        Assertions.assertTrue(networkCurrency.isSupplyMutable());
-    }
+    Assertions.assertEquals(10, networkCurrency.getDivisibility());
+    Assertions.assertEquals(mosaicId, networkCurrency.getUnresolvedMosaicId());
+    Assertions.assertEquals(mosaicId, networkCurrency.getMosaicId().get());
+    Assertions.assertFalse(networkCurrency.getNamespaceId().isPresent());
+    Assertions.assertTrue(networkCurrency.isTransferable());
+    Assertions.assertTrue(networkCurrency.isSupplyMutable());
+  }
 
-    @Test
-    void getNetworkCurrencyFromMosaicIdWhenNoNamespace() throws Exception {
-        MosaicId mosaicId = new MosaicId(BigInteger.TEN);
-        Account account = Account.generateNewAccount(NetworkType.MAIN_NET);
-        BigInteger supply = BigInteger.valueOf(12);
+  @Test
+  void getNetworkCurrencyFromMosaicIdWhenNoNamespace() throws Exception {
+    MosaicId mosaicId = new MosaicId(BigInteger.TEN);
+    Account account = Account.generateNewAccount(NetworkType.MAIN_NET);
+    BigInteger supply = BigInteger.valueOf(12);
 
-        MosaicInfo mosaicInfo = new MosaicInfo("abc",mosaicId, supply, BigInteger.ONE,
-            account.getAddress(), 4L, MosaicFlags.create(true, true, true), 10,
+    MosaicInfo mosaicInfo =
+        new MosaicInfo(
+            "abc",
+            mosaicId,
+            supply,
+            BigInteger.ONE,
+            account.getAddress(),
+            4L,
+            MosaicFlags.create(true, true, true),
+            10,
             BigInteger.TEN);
 
-        Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
-            .thenReturn(Observable.just(mosaicInfo));
+    Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
+        .thenReturn(Observable.just(mosaicInfo));
 
-        Mockito.when(
+    Mockito.when(
             namespaceRepository.getMosaicsNames(Mockito.eq(Collections.singletonList(mosaicId))))
-            .thenReturn(Observable.just(Collections.emptyList()));
+        .thenReturn(Observable.just(Collections.emptyList()));
 
-        NetworkCurrency networkCurrency = service.getNetworkCurrencyFromMosaicId(mosaicId)
-            .toFuture().get();
+    NetworkCurrency networkCurrency =
+        service.getNetworkCurrencyFromMosaicId(mosaicId).toFuture().get();
 
-        Assertions.assertEquals(10, networkCurrency.getDivisibility());
-        Assertions.assertEquals(mosaicId, networkCurrency.getUnresolvedMosaicId());
-        Assertions.assertEquals(mosaicId, networkCurrency.getMosaicId().get());
-        Assertions.assertFalse(networkCurrency.getNamespaceId().isPresent());
-        Assertions.assertTrue(networkCurrency.isTransferable());
-        Assertions.assertTrue(networkCurrency.isSupplyMutable());
-    }
+    Assertions.assertEquals(10, networkCurrency.getDivisibility());
+    Assertions.assertEquals(mosaicId, networkCurrency.getUnresolvedMosaicId());
+    Assertions.assertEquals(mosaicId, networkCurrency.getMosaicId().get());
+    Assertions.assertFalse(networkCurrency.getNamespaceId().isPresent());
+    Assertions.assertTrue(networkCurrency.isTransferable());
+    Assertions.assertTrue(networkCurrency.isSupplyMutable());
+  }
 
-    @Test
-    void getNetworkCurrencyFromMosaicIdWhenEmptyNames() throws Exception {
-        MosaicId mosaicId = new MosaicId(BigInteger.TEN);
-        Account account = Account.generateNewAccount(NetworkType.MAIN_NET);
-        BigInteger supply = BigInteger.valueOf(12);
+  @Test
+  void getNetworkCurrencyFromMosaicIdWhenEmptyNames() throws Exception {
+    MosaicId mosaicId = new MosaicId(BigInteger.TEN);
+    Account account = Account.generateNewAccount(NetworkType.MAIN_NET);
+    BigInteger supply = BigInteger.valueOf(12);
 
-        MosaicInfo mosaicInfo = new MosaicInfo("abc",mosaicId, supply, BigInteger.ONE,
-            account.getAddress(), 4L, MosaicFlags.create(true, true, true), 10,
+    MosaicInfo mosaicInfo =
+        new MosaicInfo(
+            "abc",
+            mosaicId,
+            supply,
+            BigInteger.ONE,
+            account.getAddress(),
+            4L,
+            MosaicFlags.create(true, true, true),
+            10,
             BigInteger.TEN);
 
-        Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
-            .thenReturn(Observable.just(mosaicInfo));
+    Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
+        .thenReturn(Observable.just(mosaicInfo));
 
-        Mockito.when(
+    Mockito.when(
             namespaceRepository.getMosaicsNames(Mockito.eq(Collections.singletonList(mosaicId))))
-            .thenReturn(Observable.just(
+        .thenReturn(
+            Observable.just(
                 Collections.singletonList(new MosaicNames(mosaicId, Collections.emptyList()))));
 
-        NetworkCurrency networkCurrency = service.getNetworkCurrencyFromMosaicId(mosaicId)
-            .toFuture().get();
+    NetworkCurrency networkCurrency =
+        service.getNetworkCurrencyFromMosaicId(mosaicId).toFuture().get();
 
-        Assertions.assertEquals(10, networkCurrency.getDivisibility());
-        Assertions.assertEquals(mosaicId, networkCurrency.getUnresolvedMosaicId());
-        Assertions.assertEquals(mosaicId, networkCurrency.getMosaicId().get());
-        Assertions.assertFalse(networkCurrency.getNamespaceId().isPresent());
-        Assertions.assertTrue(networkCurrency.isTransferable());
-        Assertions.assertTrue(networkCurrency.isSupplyMutable());
-    }
+    Assertions.assertEquals(10, networkCurrency.getDivisibility());
+    Assertions.assertEquals(mosaicId, networkCurrency.getUnresolvedMosaicId());
+    Assertions.assertEquals(mosaicId, networkCurrency.getMosaicId().get());
+    Assertions.assertFalse(networkCurrency.getNamespaceId().isPresent());
+    Assertions.assertTrue(networkCurrency.isTransferable());
+    Assertions.assertTrue(networkCurrency.isSupplyMutable());
+  }
 
-    @Test
-    void getNetworkCurrencyFromMosaicIdWhenNamespaceIsPresent() throws Exception {
-        MosaicId mosaicId = new MosaicId(BigInteger.TEN);
-        Account account = Account.generateNewAccount(NetworkType.MAIN_NET);
-        BigInteger supply = BigInteger.valueOf(12);
+  @Test
+  void getNetworkCurrencyFromMosaicIdWhenNamespaceIsPresent() throws Exception {
+    MosaicId mosaicId = new MosaicId(BigInteger.TEN);
+    Account account = Account.generateNewAccount(NetworkType.MAIN_NET);
+    BigInteger supply = BigInteger.valueOf(12);
 
-        MosaicInfo mosaicInfo = new MosaicInfo("abc",mosaicId, supply, BigInteger.ONE,
-            account.getAddress(), 4L, MosaicFlags.create(true, true, true), 10,
+    MosaicInfo mosaicInfo =
+        new MosaicInfo(
+            "abc",
+            mosaicId,
+            supply,
+            BigInteger.ONE,
+            account.getAddress(),
+            4L,
+            MosaicFlags.create(true, true, true),
+            10,
             BigInteger.TEN);
 
-        Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
-            .thenReturn(Observable.just(mosaicInfo));
+    Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
+        .thenReturn(Observable.just(mosaicInfo));
 
-        String name = "some.alias";
-        NamespaceId namespaceId = NamespaceId.createFromName(name);
-        MosaicNames mosaicNames = new MosaicNames(mosaicId, Arrays.asList(new NamespaceName(
-            name), new NamespaceName("some.alias2")));
+    String name = "some.alias";
+    NamespaceId namespaceId = NamespaceId.createFromName(name);
+    MosaicNames mosaicNames =
+        new MosaicNames(
+            mosaicId, Arrays.asList(new NamespaceName(name), new NamespaceName("some.alias2")));
 
-        MosaicNames mosaicNames2 = new MosaicNames(mosaicId, Arrays.asList(new NamespaceName(
-            "some.alias2"), new NamespaceName("some.alias3")));
+    MosaicNames mosaicNames2 =
+        new MosaicNames(
+            mosaicId,
+            Arrays.asList(new NamespaceName("some.alias2"), new NamespaceName("some.alias3")));
 
-        Mockito.when(
+    Mockito.when(
             namespaceRepository.getMosaicsNames(Mockito.eq(Collections.singletonList(mosaicId))))
-            .thenReturn(Observable.just(Arrays.asList(mosaicNames, mosaicNames2)));
+        .thenReturn(Observable.just(Arrays.asList(mosaicNames, mosaicNames2)));
 
-        NetworkCurrency networkCurrency = service.getNetworkCurrencyFromMosaicId(mosaicId)
-            .toFuture().get();
+    NetworkCurrency networkCurrency =
+        service.getNetworkCurrencyFromMosaicId(mosaicId).toFuture().get();
 
-        Assertions.assertEquals(10, networkCurrency.getDivisibility());
-        Assertions.assertEquals(mosaicId, networkCurrency.getUnresolvedMosaicId());
-        Assertions.assertEquals(mosaicId, networkCurrency.getMosaicId().get());
-        Assertions.assertEquals(namespaceId, networkCurrency.getNamespaceId()
-            .get());
-        Assertions.assertTrue(networkCurrency.isTransferable());
-        Assertions.assertTrue(networkCurrency.isSupplyMutable());
-    }
+    Assertions.assertEquals(10, networkCurrency.getDivisibility());
+    Assertions.assertEquals(mosaicId, networkCurrency.getUnresolvedMosaicId());
+    Assertions.assertEquals(mosaicId, networkCurrency.getMosaicId().get());
+    Assertions.assertEquals(namespaceId, networkCurrency.getNamespaceId().get());
+    Assertions.assertTrue(networkCurrency.isTransferable());
+    Assertions.assertTrue(networkCurrency.isSupplyMutable());
+  }
 
+  @Test
+  void getNetworkCurrencyFromNamespaceId() throws Exception {
+    MosaicId mosaicId = new MosaicId(BigInteger.TEN);
+    Account account = Account.generateNewAccount(NetworkType.MAIN_NET);
+    BigInteger supply = BigInteger.valueOf(12);
 
-    @Test
-    void getNetworkCurrencyFromNamespaceId() throws Exception {
-        MosaicId mosaicId = new MosaicId(BigInteger.TEN);
-        Account account = Account.generateNewAccount(NetworkType.MAIN_NET);
-        BigInteger supply = BigInteger.valueOf(12);
-
-        MosaicInfo mosaicInfo = new MosaicInfo("abc",mosaicId, supply, BigInteger.ONE,
-            account.getAddress(), 4L, MosaicFlags.create(true, true, true), 10,
+    MosaicInfo mosaicInfo =
+        new MosaicInfo(
+            "abc",
+            mosaicId,
+            supply,
+            BigInteger.ONE,
+            account.getAddress(),
+            4L,
+            MosaicFlags.create(true, true, true),
+            10,
             BigInteger.TEN);
 
-        Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
-            .thenReturn(Observable.just(mosaicInfo));
+    Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
+        .thenReturn(Observable.just(mosaicInfo));
 
-        String name = "some.alias";
-        NamespaceId namespaceId = NamespaceId.createFromName(name);
+    String name = "some.alias";
+    NamespaceId namespaceId = NamespaceId.createFromName(name);
 
-        Mockito.when(namespaceRepository.getLinkedMosaicId(Mockito.eq(namespaceId)))
-            .thenReturn(Observable.just(mosaicId));
+    Mockito.when(namespaceRepository.getLinkedMosaicId(Mockito.eq(namespaceId)))
+        .thenReturn(Observable.just(mosaicId));
 
-        Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
-            .thenReturn(Observable.just(mosaicInfo));
+    Mockito.when(mosaicRepository.getMosaic(Mockito.eq(mosaicId)))
+        .thenReturn(Observable.just(mosaicInfo));
 
-        NetworkCurrency networkCurrency = service.getNetworkCurrencyFromNamespaceId(namespaceId)
-            .toFuture().get();
+    NetworkCurrency networkCurrency =
+        service.getNetworkCurrencyFromNamespaceId(namespaceId).toFuture().get();
 
-        Assertions.assertEquals(10, networkCurrency.getDivisibility());
-        Assertions.assertEquals(mosaicId, networkCurrency.getUnresolvedMosaicId());
-        Assertions.assertEquals(mosaicId, networkCurrency.getMosaicId().get());
-        Assertions.assertEquals(namespaceId, networkCurrency.getNamespaceId().get());
-        Assertions.assertTrue(networkCurrency.isTransferable());
-        Assertions.assertTrue(networkCurrency.isSupplyMutable());
-    }
+    Assertions.assertEquals(10, networkCurrency.getDivisibility());
+    Assertions.assertEquals(mosaicId, networkCurrency.getUnresolvedMosaicId());
+    Assertions.assertEquals(mosaicId, networkCurrency.getMosaicId().get());
+    Assertions.assertEquals(namespaceId, networkCurrency.getNamespaceId().get());
+    Assertions.assertTrue(networkCurrency.isTransferable());
+    Assertions.assertTrue(networkCurrency.isSupplyMutable());
+  }
 }

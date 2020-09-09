@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import com.google.gson.JsonArray;
@@ -30,20 +29,18 @@ import java.util.Collection;
  */
 public class CollectionAdapter implements JsonSerializer<Collection<?>> {
 
-    @Override
-    public JsonElement serialize(Collection<?> src, Type typeOfSrc,
-        JsonSerializationContext context) {
-        if (src == null || src.isEmpty()) {
-            return null;
-        }
-
-        JsonArray array = new JsonArray();
-        for (Object child : src) {
-            JsonElement element = context.serialize(child);
-            array.add(element);
-        }
-        return array;
+  @Override
+  public JsonElement serialize(
+      Collection<?> src, Type typeOfSrc, JsonSerializationContext context) {
+    if (src == null || src.isEmpty()) {
+      return null;
     }
 
-
+    JsonArray array = new JsonArray();
+    for (Object child : src) {
+      JsonElement element = context.serialize(child);
+      array.add(element);
+    }
+    return array;
+  }
 }

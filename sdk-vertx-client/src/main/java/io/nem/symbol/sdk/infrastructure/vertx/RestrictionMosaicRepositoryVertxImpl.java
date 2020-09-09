@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.core.utils.MapperUtils;
@@ -43,101 +42,113 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class RestrictionMosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements
-    RestrictionMosaicRepository {
+public class RestrictionMosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl
+    implements RestrictionMosaicRepository {
 
-    private final RestrictionMosaicRoutesApi client;
+  private final RestrictionMosaicRoutesApi client;
 
-    public RestrictionMosaicRepositoryVertxImpl(ApiClient apiClient) {
-        super(apiClient);
-        this.client = new RestrictionMosaicRoutesApiImpl(apiClient);
-    }
+  public RestrictionMosaicRepositoryVertxImpl(ApiClient apiClient) {
+    super(apiClient);
+    this.client = new RestrictionMosaicRoutesApiImpl(apiClient);
+  }
 
-
-    @Override
-    public Observable<MosaicAddressRestriction> getMosaicAddressRestriction(MosaicId mosaicId,
-        Address address) {
-        return exceptionHandling(call(
-            (Handler<AsyncResult<MosaicAddressRestrictionDTO>> handler) -> getClient()
-                .getMosaicAddressRestriction(mosaicId.getIdAsHex(), address.plain(), handler))
+  @Override
+  public Observable<MosaicAddressRestriction> getMosaicAddressRestriction(
+      MosaicId mosaicId, Address address) {
+    return exceptionHandling(
+        call((Handler<AsyncResult<MosaicAddressRestrictionDTO>> handler) ->
+                getClient()
+                    .getMosaicAddressRestriction(mosaicId.getIdAsHex(), address.plain(), handler))
             .map(this::toMosaicAddressRestriction));
-    }
+  }
 
-    @Override
-    public Observable<List<MosaicAddressRestriction>> getMosaicAddressRestrictions(
-        MosaicId mosaicId, List<Address> addresses) {
-        AccountIds accountIds = new AccountIds()
+  @Override
+  public Observable<List<MosaicAddressRestriction>> getMosaicAddressRestrictions(
+      MosaicId mosaicId, List<Address> addresses) {
+    AccountIds accountIds =
+        new AccountIds()
             .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-        return exceptionHandling(call(
-            (Handler<AsyncResult<List<MosaicAddressRestrictionDTO>>> handler) -> getClient()
-                .getMosaicAddressRestrictions(mosaicId.getIdAsHex(), accountIds, handler))
-            .flatMapIterable(item -> item).map(this::toMosaicAddressRestriction)).toList()
-            .toObservable();
-    }
+    return exceptionHandling(
+            call((Handler<AsyncResult<List<MosaicAddressRestrictionDTO>>> handler) ->
+                    getClient()
+                        .getMosaicAddressRestrictions(mosaicId.getIdAsHex(), accountIds, handler))
+                .flatMapIterable(item -> item)
+                .map(this::toMosaicAddressRestriction))
+        .toList()
+        .toObservable();
+  }
 
-    @Override
-    public Observable<MosaicGlobalRestriction> getMosaicGlobalRestriction(MosaicId mosaicId) {
-        return exceptionHandling(call(
-            (Handler<AsyncResult<MosaicGlobalRestrictionDTO>> handler) -> getClient()
-                .getMosaicGlobalRestriction(mosaicId.getIdAsHex(), handler))
+  @Override
+  public Observable<MosaicGlobalRestriction> getMosaicGlobalRestriction(MosaicId mosaicId) {
+    return exceptionHandling(
+        call((Handler<AsyncResult<MosaicGlobalRestrictionDTO>> handler) ->
+                getClient().getMosaicGlobalRestriction(mosaicId.getIdAsHex(), handler))
             .map(this::toMosaicGlobalRestriction));
-    }
+  }
 
-    @Override
-    public Observable<List<MosaicGlobalRestriction>> getMosaicGlobalRestrictions(
-        List<MosaicId> mosaicIds) {
-        MosaicIds mosaicIdsParmas = new MosaicIds()
+  @Override
+  public Observable<List<MosaicGlobalRestriction>> getMosaicGlobalRestrictions(
+      List<MosaicId> mosaicIds) {
+    MosaicIds mosaicIdsParmas =
+        new MosaicIds()
             .mosaicIds(mosaicIds.stream().map(MosaicId::getIdAsHex).collect(Collectors.toList()));
-        return exceptionHandling(call(
-            (Handler<AsyncResult<List<MosaicGlobalRestrictionDTO>>> handler) -> getClient()
-                .getMosaicGlobalRestrictions(mosaicIdsParmas, handler))
-            .flatMapIterable(item -> item).map(this::toMosaicGlobalRestriction)).toList()
-            .toObservable();
-    }
+    return exceptionHandling(
+            call((Handler<AsyncResult<List<MosaicGlobalRestrictionDTO>>> handler) ->
+                    getClient().getMosaicGlobalRestrictions(mosaicIdsParmas, handler))
+                .flatMapIterable(item -> item)
+                .map(this::toMosaicGlobalRestriction))
+        .toList()
+        .toObservable();
+  }
 
+  private MosaicGlobalRestriction toMosaicGlobalRestriction(
+      MosaicGlobalRestrictionDTO mosaicGlobalRestrictionDTO) {
+    MosaicGlobalRestrictionEntryWrapperDTO dto =
+        mosaicGlobalRestrictionDTO.getMosaicRestrictionEntry();
+    Map<BigInteger, MosaicGlobalRestrictionItem> restrictions =
+        dto.getRestrictions().stream()
+            .collect(
+                Collectors.toMap(
+                    e -> new BigInteger(e.getKey()),
+                    e -> toMosaicGlobalRestrictionItem(e.getRestriction())));
 
-    private MosaicGlobalRestriction toMosaicGlobalRestriction(
-        MosaicGlobalRestrictionDTO mosaicGlobalRestrictionDTO) {
-        MosaicGlobalRestrictionEntryWrapperDTO dto = mosaicGlobalRestrictionDTO
-            .getMosaicRestrictionEntry();
-        Map<BigInteger, MosaicGlobalRestrictionItem> restrictions = dto.getRestrictions().stream()
-            .collect(Collectors.toMap(e -> new BigInteger(e.getKey()),
-                e -> toMosaicGlobalRestrictionItem(e.getRestriction())));
+    return new MosaicGlobalRestriction(
+        dto.getCompositeHash(),
+        MosaicRestrictionEntryType.rawValueOf(dto.getEntryType().getValue()),
+        MapperUtils.toMosaicId(dto.getMosaicId()),
+        restrictions);
+  }
 
-        return new MosaicGlobalRestriction(dto.getCompositeHash(),
-            MosaicRestrictionEntryType.rawValueOf(dto.getEntryType().getValue()),
-            MapperUtils.toMosaicId(dto.getMosaicId()),
-            restrictions);
-    }
+  private MosaicGlobalRestrictionItem toMosaicGlobalRestrictionItem(
+      MosaicGlobalRestrictionEntryRestrictionDTO dto) {
+    return new MosaicGlobalRestrictionItem(
+        MapperUtils.toMosaicId(dto.getReferenceMosaicId()),
+        dto.getRestrictionValue(),
+        MosaicRestrictionType.rawValueOf(dto.getRestrictionType().getValue().byteValue()));
+  }
 
-    private MosaicGlobalRestrictionItem toMosaicGlobalRestrictionItem(
-        MosaicGlobalRestrictionEntryRestrictionDTO dto) {
-        return new MosaicGlobalRestrictionItem(MapperUtils.toMosaicId(dto.getReferenceMosaicId()),
-            dto.getRestrictionValue(),
-            MosaicRestrictionType.rawValueOf(dto.getRestrictionType().getValue().byteValue()));
-    }
+  private MosaicAddressRestriction toMosaicAddressRestriction(
+      MosaicAddressRestrictionDTO mosaicAddressRestrictionDTO) {
+    MosaicAddressRestrictionEntryWrapperDTO dto =
+        mosaicAddressRestrictionDTO.getMosaicRestrictionEntry();
+    Map<BigInteger, BigInteger> restrictions =
+        dto.getRestrictions().stream()
+            .collect(
+                Collectors.toMap(e -> new BigInteger(e.getKey()), e -> toBigInteger(e.getValue())));
 
-    private MosaicAddressRestriction toMosaicAddressRestriction(
-        MosaicAddressRestrictionDTO mosaicAddressRestrictionDTO) {
-        MosaicAddressRestrictionEntryWrapperDTO dto = mosaicAddressRestrictionDTO
-            .getMosaicRestrictionEntry();
-        Map<BigInteger, BigInteger> restrictions = dto.getRestrictions().stream()
-            .collect(Collectors.toMap(e -> new BigInteger(e.getKey()),
-                e -> toBigInteger(e.getValue())));
+    return new MosaicAddressRestriction(
+        dto.getCompositeHash(),
+        MosaicRestrictionEntryType.rawValueOf(dto.getEntryType().getValue()),
+        MapperUtils.toMosaicId(dto.getMosaicId()),
+        MapperUtils.toAddress(dto.getTargetAddress()),
+        restrictions);
+  }
 
-        return new MosaicAddressRestriction(dto.getCompositeHash(),
-            MosaicRestrictionEntryType.rawValueOf(dto.getEntryType().getValue()),
-            MapperUtils.toMosaicId(dto.getMosaicId()), MapperUtils
-            .toAddress(dto.getTargetAddress()),
-            restrictions);
-    }
+  private BigInteger toBigInteger(String value) {
+    return new BigInteger(value);
+  }
 
-
-    private BigInteger toBigInteger(String value) {
-        return new BigInteger(value);
-    }
-
-    public RestrictionMosaicRoutesApi getClient() {
-        return client;
-    }
+  public RestrictionMosaicRoutesApi getClient() {
+    return client;
+  }
 }

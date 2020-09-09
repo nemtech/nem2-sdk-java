@@ -13,66 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
-
 package io.nem.symbol.sdk.model.network;
-
-/**
- * NamespaceNetworkProperties
- */
+/** NamespaceNetworkProperties */
 public class NamespaceNetworkProperties {
 
-    /**
-     * Maximum namespace name size.
-     **/
-    private final String maxNameSize;
-    /**
-     * Maximum number of children for a root namespace.
-     **/
-    private final String maxChildNamespaces;
+  /** Maximum namespace name size. */
+  private final String maxNameSize;
+  /** Maximum number of children for a root namespace. */
+  private final String maxChildNamespaces;
 
-    /**
-     * Maximum namespace depth.
-     **/
-    private final String maxNamespaceDepth;
-    /**
-     * Minimum namespace duration.
-     **/
-    private final String minNamespaceDuration;
-    /**
-     * Maximum namespace duration.
-     **/
-    private final String maxNamespaceDuration;
-    /**
-     * Grace period during which time only the previous owner can renew an expired namespace.
-     **/
-    private final String namespaceGracePeriodDuration;
-    /**
-     * Reserved root namespaces that cannot be claimed.
-     **/
-    private final String reservedRootNamespaceNames;
-    /**
-     * Public key.
-     **/
-    private final String namespaceRentalFeeSinkAddress;
+  /** Maximum namespace depth. */
+  private final String maxNamespaceDepth;
+  /** Minimum namespace duration. */
+  private final String minNamespaceDuration;
+  /** Maximum namespace duration. */
+  private final String maxNamespaceDuration;
+  /** Grace period during which time only the previous owner can renew an expired namespace. */
+  private final String namespaceGracePeriodDuration;
+  /** Reserved root namespaces that cannot be claimed. */
+  private final String reservedRootNamespaceNames;
+  /** Public key. */
+  private final String namespaceRentalFeeSinkAddress;
 
-    /**
-     * Root namespace rental fee per block.
-     **/
-    private final String rootNamespaceRentalFeePerBlock;
+  /** Root namespace rental fee per block. */
+  private final String rootNamespaceRentalFeePerBlock;
 
-    /**
-     * Child namespace rental fee.
-     **/
-    private final String childNamespaceRentalFee;
+  /** Child namespace rental fee. */
+  private final String childNamespaceRentalFee;
 
-
-  public NamespaceNetworkProperties(String maxNameSize, String maxChildNamespaces,
-      String maxNamespaceDepth, String minNamespaceDuration, String maxNamespaceDuration,
-      String namespaceGracePeriodDuration, String reservedRootNamespaceNames,
-      String namespaceRentalFeeSinkAddress, String rootNamespaceRentalFeePerBlock,
+  public NamespaceNetworkProperties(
+      String maxNameSize,
+      String maxChildNamespaces,
+      String maxNamespaceDepth,
+      String minNamespaceDuration,
+      String maxNamespaceDuration,
+      String namespaceGracePeriodDuration,
+      String reservedRootNamespaceNames,
+      String namespaceRentalFeeSinkAddress,
+      String rootNamespaceRentalFeePerBlock,
       String childNamespaceRentalFee) {
     this.maxNameSize = maxNameSize;
     this.maxChildNamespaces = maxChildNamespaces;
@@ -126,4 +104,3 @@ public class NamespaceNetworkProperties {
     return childNamespaceRentalFee;
   }
 }
-

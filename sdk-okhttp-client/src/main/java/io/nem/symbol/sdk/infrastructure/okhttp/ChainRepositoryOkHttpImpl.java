@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.sdk.api.ChainRepository;
@@ -26,46 +25,44 @@ import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.concurrent.Callable;
 
-/**
- * Chain http repository.
- */
-public class ChainRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl implements
-    ChainRepository {
+/** Chain http repository. */
+public class ChainRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
+    implements ChainRepository {
 
-    private final ChainRoutesApi client;
+  private final ChainRoutesApi client;
 
-    public ChainRepositoryOkHttpImpl(ApiClient apiClient) {
-        super(apiClient);
-        client = new ChainRoutesApi(apiClient);
-    }
+  public ChainRepositoryOkHttpImpl(ApiClient apiClient) {
+    super(apiClient);
+    client = new ChainRoutesApi(apiClient);
+  }
 
-    public ChainRoutesApi getClient() {
-        return client;
-    }
+  public ChainRoutesApi getClient() {
+    return client;
+  }
 
-    /**
-     * Get Block chain height
-     *
-     * @return io.reactivex.Observable of {@link BigInteger}
-     */
-    public Observable<BigInteger> getBlockchainHeight() {
+  /**
+   * Get Block chain height
+   *
+   * @return io.reactivex.Observable of {@link BigInteger}
+   */
+  public Observable<BigInteger> getBlockchainHeight() {
 
-        Callable<HeightInfoDTO> callback = getClient()::getChainHeight;
-        return exceptionHandling(call(callback).map(HeightInfoDTO::getHeight));
+    Callable<HeightInfoDTO> callback = getClient()::getChainHeight;
+    return exceptionHandling(call(callback).map(HeightInfoDTO::getHeight));
+  }
 
-    }
-
-    /**
-     * Get Block chain score
-     *
-     * @return io.reactivex.Observable of {@link BigInteger}
-     */
-    public Observable<BlockchainScore> getChainScore() {
-        Callable<ChainScoreDTO> callback = getClient()::getChainScore;
-        return exceptionHandling(call(callback).map(
-            blockchainScoreDTO ->
-                new BlockchainScore(
-                    (blockchainScoreDTO.getScoreLow()),
-                    (blockchainScoreDTO.getScoreHigh()))));
-    }
+  /**
+   * Get Block chain score
+   *
+   * @return io.reactivex.Observable of {@link BigInteger}
+   */
+  public Observable<BlockchainScore> getChainScore() {
+    Callable<ChainScoreDTO> callback = getClient()::getChainScore;
+    return exceptionHandling(
+        call(callback)
+            .map(
+                blockchainScoreDTO ->
+                    new BlockchainScore(
+                        (blockchainScoreDTO.getScoreLow()), (blockchainScoreDTO.getScoreHigh()))));
+  }
 }

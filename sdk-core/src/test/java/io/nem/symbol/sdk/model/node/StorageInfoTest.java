@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.node;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,11 +21,11 @@ import org.junit.jupiter.api.Test;
 
 class StorageInfoTest {
 
-    @Test
-    void createStorageInfo() {
-        StorageInfo storageInfo = new StorageInfo(1, 2, 3);
-        assertEquals(1, storageInfo.getNumAccounts());
-        assertEquals(2, storageInfo.getNumBlocks());
-        assertEquals(3, storageInfo.getNumTransactions());
-    }
+  @Test
+  void createStorageInfo() {
+    StorageInfo storageInfo = new StorageInfo(1, 2, 3);
+    assertEquals(1, storageInfo.getNumAccounts());
+    assertEquals(2, storageInfo.getNumBlocks());
+    assertEquals(3, storageInfo.getNumTransactions());
+  }
 }

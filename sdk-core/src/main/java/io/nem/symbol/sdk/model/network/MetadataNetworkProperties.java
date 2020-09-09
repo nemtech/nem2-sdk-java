@@ -13,28 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
-
 package io.nem.symbol.sdk.model.network;
-
-/**
- * MetadataNetworkProperties
- */
+/** MetadataNetworkProperties */
 public class MetadataNetworkProperties {
 
-    /**
-     * Maximum metadata value size.
-     */
-    private final String maxValueSize;
+  /** Maximum metadata value size. */
+  private final String maxValueSize;
 
-    public MetadataNetworkProperties(String maxValueSize) {
-        this.maxValueSize = maxValueSize;
-    }
+  public MetadataNetworkProperties(String maxValueSize) {
+    this.maxValueSize = maxValueSize;
+  }
 
-    public String getMaxValueSize() {
-        return maxValueSize;
-    }
+  public String getMaxValueSize() {
+    return maxValueSize;
+  }
 }
-

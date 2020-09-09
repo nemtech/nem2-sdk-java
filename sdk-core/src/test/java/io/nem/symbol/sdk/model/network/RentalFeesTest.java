@@ -13,29 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.network;
 
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of {@link RentalFees}
- */
+/** Test of {@link RentalFees} */
 class RentalFeesTest {
 
+  @Test
+  void createRentalFees() {
 
-    @Test
-    void createRentalFees() {
+    RentalFees info =
+        new RentalFees(BigInteger.valueOf(1), BigInteger.valueOf(2), BigInteger.valueOf(3));
 
-        RentalFees info = new RentalFees(BigInteger.valueOf(1), BigInteger.valueOf(2), BigInteger.valueOf(3));
+    Assertions.assertNotNull(info);
 
-        Assertions.assertNotNull(info);
-
-        Assertions.assertEquals(1, info.getEffectiveRootNamespaceRentalFeePerBlock().intValue());
-        Assertions.assertEquals(2, info.getEffectiveChildNamespaceRentalFee().intValue());
-        Assertions.assertEquals(3, info.getEffectiveMosaicRentalFee().intValue());
-
-    }
+    Assertions.assertEquals(1, info.getEffectiveRootNamespaceRentalFeePerBlock().intValue());
+    Assertions.assertEquals(2, info.getEffectiveChildNamespaceRentalFee().intValue());
+    Assertions.assertEquals(3, info.getEffectiveMosaicRentalFee().intValue());
+  }
 }

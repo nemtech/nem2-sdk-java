@@ -13,21 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.test;
-
-/**
- * Test utilities for testing verifiable entities.
- */
+/** Test utilities for testing verifiable entities. */
 public class VerifiableEntityUtils {
 
-    /**
-     * The version corresponding to 1.
-     */
-    public static final int VERSION_ONE = 0x98000000 | 1;
+  /** The version corresponding to 1. */
+  public static final int VERSION_ONE = 0x98000000 | 1;
 
-    /**
-     * The version corresponding to 2.
-     */
-    public static final int VERSION_TWO = 0x98000000 | 2;
+  /** The version corresponding to 2. */
+  public static final int VERSION_TWO = 0x98000000 | 2;
 }

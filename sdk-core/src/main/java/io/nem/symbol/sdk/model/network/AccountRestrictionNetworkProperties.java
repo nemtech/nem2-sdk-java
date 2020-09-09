@@ -13,28 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
-
 package io.nem.symbol.sdk.model.network;
-
-/**
- * AccountRestrictionNetworkPropertiesDTO
- */
+/** AccountRestrictionNetworkPropertiesDTO */
 public class AccountRestrictionNetworkProperties {
 
-    /**
-     * Maximum number of account restriction values.
-     **/
-    private final String maxAccountRestrictionValues;
+  /** Maximum number of account restriction values. */
+  private final String maxAccountRestrictionValues;
 
-    public AccountRestrictionNetworkProperties(String maxAccountRestrictionValues) {
-        this.maxAccountRestrictionValues = maxAccountRestrictionValues;
-    }
+  public AccountRestrictionNetworkProperties(String maxAccountRestrictionValues) {
+    this.maxAccountRestrictionValues = maxAccountRestrictionValues;
+  }
 
-    public String getMaxAccountRestrictionValues() {
-        return maxAccountRestrictionValues;
-    }
+  public String getMaxAccountRestrictionValues() {
+    return maxAccountRestrictionValues;
+  }
 }
-

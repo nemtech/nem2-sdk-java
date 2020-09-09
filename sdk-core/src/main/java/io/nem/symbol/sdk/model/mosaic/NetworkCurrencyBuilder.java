@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.mosaic;
 
 import io.nem.symbol.sdk.api.RepositoryFactoryConfiguration;
@@ -27,126 +26,120 @@ import org.apache.commons.lang3.Validate;
  */
 public final class NetworkCurrencyBuilder {
 
-    /**
-     * The selected unresolved mosaic id the {@link NetworkCurrency} uses when creating {@link
-     * Mosaic}. This could either be the Namespace or the Mosaic id.
-     */
-    private final UnresolvedMosaicId unresolvedMosaicId;
+  /**
+   * The selected unresolved mosaic id the {@link NetworkCurrency} uses when creating {@link
+   * Mosaic}. This could either be the Namespace or the Mosaic id.
+   */
+  private final UnresolvedMosaicId unresolvedMosaicId;
 
-    /**
-     * Divisibility of the currency, required to create Mosaic from relative amounts.
-     */
-    private final int divisibility;
+  /** Divisibility of the currency, required to create Mosaic from relative amounts. */
+  private final int divisibility;
 
-    /**
-     * Mosaic id of this currency. This value is optional if the user only wants to provide the
-     * mosaic id. This value will be set if it's loaded by rest.
-     */
-    private Optional<MosaicId> mosaicId = Optional.empty();
-    /**
-     * The Namespace id of this currency. This value is option if the user only wants to provide the
-     * namespace id. This value will be set if it's loaded by rest.
-     */
-    private Optional<NamespaceId> namespaceId = Optional.empty();
+  /**
+   * Mosaic id of this currency. This value is optional if the user only wants to provide the mosaic
+   * id. This value will be set if it's loaded by rest.
+   */
+  private Optional<MosaicId> mosaicId = Optional.empty();
+  /**
+   * The Namespace id of this currency. This value is option if the user only wants to provide the
+   * namespace id. This value will be set if it's loaded by rest.
+   */
+  private Optional<NamespaceId> namespaceId = Optional.empty();
 
-    /**
-     * Is the currency transferable.
-     */
-    private boolean transferable = true;
+  /** Is the currency transferable. */
+  private boolean transferable = true;
 
-    /**
-     * Is this currency supply mutable.
-     */
-    private boolean supplyMutable = false;
+  /** Is this currency supply mutable. */
+  private boolean supplyMutable = false;
 
-    public NetworkCurrencyBuilder(UnresolvedMosaicId unresolvedMosaicId, int divisibility) {
-        Validate.notNull(unresolvedMosaicId, "unresolvedMosaicId must not be null");
-        Validate.isTrue(divisibility > 0, "divisibility must be greater than 0");
-        this.unresolvedMosaicId = unresolvedMosaicId;
-        this.divisibility = divisibility;
-        if (unresolvedMosaicId instanceof NamespaceId) {
-            withNamespaceId((NamespaceId) unresolvedMosaicId);
-        } else {
-            withMosaicId((MosaicId) unresolvedMosaicId);
-        }
+  public NetworkCurrencyBuilder(UnresolvedMosaicId unresolvedMosaicId, int divisibility) {
+    Validate.notNull(unresolvedMosaicId, "unresolvedMosaicId must not be null");
+    Validate.isTrue(divisibility > 0, "divisibility must be greater than 0");
+    this.unresolvedMosaicId = unresolvedMosaicId;
+    this.divisibility = divisibility;
+    if (unresolvedMosaicId instanceof NamespaceId) {
+      withNamespaceId((NamespaceId) unresolvedMosaicId);
+    } else {
+      withMosaicId((MosaicId) unresolvedMosaicId);
     }
+  }
 
-    /**
-     * Helper method to setup the mosiac id.
-     *
-     * @param mosaicId the mosaic id
-     * @return this builder.
-     */
-    public NetworkCurrencyBuilder withMosaicId(MosaicId mosaicId) {
-        Validate.notNull(mosaicId, "mosaicId must not be null");
-        this.mosaicId = Optional.of(mosaicId);
-        return this;
-    }
+  /**
+   * Helper method to setup the mosiac id.
+   *
+   * @param mosaicId the mosaic id
+   * @return this builder.
+   */
+  public NetworkCurrencyBuilder withMosaicId(MosaicId mosaicId) {
+    Validate.notNull(mosaicId, "mosaicId must not be null");
+    this.mosaicId = Optional.of(mosaicId);
+    return this;
+  }
 
-    /**
-     * Helper method to setup the namespace id.
-     *
-     * @param namespaceId the namespace id
-     * @return this builder.
-     */
-    public NetworkCurrencyBuilder withNamespaceId(NamespaceId namespaceId) {
-        Validate.notNull(namespaceId, "namespaceId must not be null");
-        this.namespaceId = Optional.of(namespaceId);
-        return this;
-    }
+  /**
+   * Helper method to setup the namespace id.
+   *
+   * @param namespaceId the namespace id
+   * @return this builder.
+   */
+  public NetworkCurrencyBuilder withNamespaceId(NamespaceId namespaceId) {
+    Validate.notNull(namespaceId, "namespaceId must not be null");
+    this.namespaceId = Optional.of(namespaceId);
+    return this;
+  }
 
-    /**
-     * Helper method to setup the transferable flag.
-     *
-     * @param transferable the transferable
-     * @return this builder.
-     */
-    public NetworkCurrencyBuilder withTransferable(boolean transferable) {
-        this.transferable = transferable;
-        return this;
-    }
+  /**
+   * Helper method to setup the transferable flag.
+   *
+   * @param transferable the transferable
+   * @return this builder.
+   */
+  public NetworkCurrencyBuilder withTransferable(boolean transferable) {
+    this.transferable = transferable;
+    return this;
+  }
 
-    /**
-     * Helper method to setup the supplyMutable flag.
-     *
-     * @param supplyMutable the supplyMutable
-     * @return this builder.
-     */
-    public NetworkCurrencyBuilder withSupplyMutable(boolean supplyMutable) {
-        this.supplyMutable = supplyMutable;
-        return this;
-    }
+  /**
+   * Helper method to setup the supplyMutable flag.
+   *
+   * @param supplyMutable the supplyMutable
+   * @return this builder.
+   */
+  public NetworkCurrencyBuilder withSupplyMutable(boolean supplyMutable) {
+    this.supplyMutable = supplyMutable;
+    return this;
+  }
 
-    /**
-     * Once the builder is configured, call this method to create the {@link NetworkCurrency}
-     *
-     * @return the network currency.
-     */
-    public NetworkCurrency build() {
-        return new NetworkCurrency(this);
-    }
+  /**
+   * Once the builder is configured, call this method to create the {@link NetworkCurrency}
+   *
+   * @return the network currency.
+   */
+  public NetworkCurrency build() {
+    return new NetworkCurrency(this);
+  }
 
-    public UnresolvedMosaicId getUnresolvedMosaicId() {
-        return unresolvedMosaicId;
-    }
+  public UnresolvedMosaicId getUnresolvedMosaicId() {
+    return unresolvedMosaicId;
+  }
 
-    public int getDivisibility() {
-        return divisibility;
-    }
+  public int getDivisibility() {
+    return divisibility;
+  }
 
-    public Optional<MosaicId> getMosaicId() {
-        return mosaicId;
-    }
+  public Optional<MosaicId> getMosaicId() {
+    return mosaicId;
+  }
 
-    public Optional<NamespaceId> getNamespaceId() {
-        return namespaceId;
-    }
+  public Optional<NamespaceId> getNamespaceId() {
+    return namespaceId;
+  }
 
-    public boolean isTransferable() {
-        return transferable;
-    }
+  public boolean isTransferable() {
+    return transferable;
+  }
 
-    public boolean isSupplyMutable() {
-        return supplyMutable;
-    }
+  public boolean isSupplyMutable() {
+    return supplyMutable;
+  }
 }

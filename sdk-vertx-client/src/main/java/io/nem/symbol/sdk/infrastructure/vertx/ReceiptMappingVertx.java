@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import static io.nem.symbol.core.utils.MapperUtils.toAddress;
@@ -46,96 +45,126 @@ import io.nem.symbol.sdk.openapi.vertx.model.ResolutionStatementInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionStatementInfoDTO;
 import java.util.stream.Collectors;
 
-
 public class ReceiptMappingVertx {
 
-    private final JsonHelper jsonHelper;
+  private final JsonHelper jsonHelper;
 
-    public ReceiptMappingVertx(JsonHelper jsonHelper) {
-        this.jsonHelper = jsonHelper;
-    }
+  public ReceiptMappingVertx(JsonHelper jsonHelper) {
+    this.jsonHelper = jsonHelper;
+  }
 
-    public AddressResolutionStatement createAddressResolutionStatementFromDto(ResolutionStatementInfoDTO receiptDto) {
-        ResolutionStatementDTO statement = receiptDto.getStatement();
-        return new AddressResolutionStatement(receiptDto.getId(), statement.getHeight(),
-            MapperUtils.toUnresolvedAddress(statement.getUnresolved()), statement.getResolutionEntries().stream().map(
-            entry -> ResolutionEntry.forAddress(toAddress(entry.getResolved()),
-                new ReceiptSource(entry.getSource().getPrimaryId(), entry.getSource().getSecondaryId())))
+  public AddressResolutionStatement createAddressResolutionStatementFromDto(
+      ResolutionStatementInfoDTO receiptDto) {
+    ResolutionStatementDTO statement = receiptDto.getStatement();
+    return new AddressResolutionStatement(
+        receiptDto.getId(),
+        statement.getHeight(),
+        MapperUtils.toUnresolvedAddress(statement.getUnresolved()),
+        statement.getResolutionEntries().stream()
+            .map(
+                entry ->
+                    ResolutionEntry.forAddress(
+                        toAddress(entry.getResolved()),
+                        new ReceiptSource(
+                            entry.getSource().getPrimaryId(), entry.getSource().getSecondaryId())))
             .collect(Collectors.toList()));
-    }
+  }
 
-    public MosaicResolutionStatement createMosaicResolutionStatementFromDto(ResolutionStatementInfoDTO receiptDto) {
-        ResolutionStatementDTO statement = receiptDto.getStatement();
-        return new MosaicResolutionStatement(receiptDto.getId(), statement.getHeight(),
-            MapperUtils.toUnresolvedMosaicId(statement.getUnresolved()), statement.getResolutionEntries().stream().map(
-            entry -> ResolutionEntry.forMosaicId(toMosaicId(entry.getResolved()),
-                new ReceiptSource(entry.getSource().getPrimaryId(), entry.getSource().getSecondaryId())))
+  public MosaicResolutionStatement createMosaicResolutionStatementFromDto(
+      ResolutionStatementInfoDTO receiptDto) {
+    ResolutionStatementDTO statement = receiptDto.getStatement();
+    return new MosaicResolutionStatement(
+        receiptDto.getId(),
+        statement.getHeight(),
+        MapperUtils.toUnresolvedMosaicId(statement.getUnresolved()),
+        statement.getResolutionEntries().stream()
+            .map(
+                entry ->
+                    ResolutionEntry.forMosaicId(
+                        toMosaicId(entry.getResolved()),
+                        new ReceiptSource(
+                            entry.getSource().getPrimaryId(), entry.getSource().getSecondaryId())))
             .collect(Collectors.toList()));
+  }
+
+  public TransactionStatement createTransactionStatement(TransactionStatementInfoDTO input) {
+    return new TransactionStatement(
+        input.getId(),
+        input.getStatement().getHeight(),
+        new ReceiptSource(
+            input.getStatement().getSource().getPrimaryId(),
+            input.getStatement().getSource().getSecondaryId()),
+        input.getStatement().getReceipts().stream()
+            .map(this::createReceiptFromDto)
+            .collect(Collectors.toList()));
+  }
+
+  public Receipt createReceiptFromDto(Object receiptDto) {
+    ReceiptType type = ReceiptType.rawValueOf(jsonHelper.getInteger(receiptDto, "type"));
+    switch (type) {
+      case HARVEST_FEE:
+      case LOCK_HASH_CREATED:
+      case LOCK_HASH_COMPLETED:
+      case LOCK_HASH_EXPIRED:
+      case LOCK_SECRET_CREATED:
+      case LOCK_SECRET_COMPLETED:
+      case LOCK_SECRET_EXPIRED:
+        return createBalanceChangeReceipt(
+            jsonHelper.convert(receiptDto, BalanceChangeReceiptDTO.class));
+      case MOSAIC_RENTAL_FEE:
+      case NAMESPACE_RENTAL_FEE:
+        return createBalanceTransferRecipient(
+            jsonHelper.convert(receiptDto, BalanceTransferReceiptDTO.class));
+      case MOSAIC_EXPIRED:
+        return createArtifactExpiryReceipt(
+            jsonHelper.convert(receiptDto, MosaicExpiryReceiptDTO.class), type);
+      case NAMESPACE_EXPIRED:
+      case NAMESPACE_DELETED:
+        return createArtifactExpiryReceipt(
+            jsonHelper.convert(receiptDto, NamespaceExpiryReceiptDTO.class), type);
+      case INFLATION:
+        return createInflationReceipt(jsonHelper.convert(receiptDto, InflationReceiptDTO.class));
+      default:
+        throw new IllegalArgumentException("Receipt type: " + type.name() + " not valid");
     }
+  }
 
+  public ArtifactExpiryReceipt<NamespaceId> createArtifactExpiryReceipt(
+      NamespaceExpiryReceiptDTO receipt, ReceiptType type) {
+    return new ArtifactExpiryReceipt<>(
+        MapperUtils.toNamespaceId(receipt.getArtifactId()), type, ReceiptVersion.ARTIFACT_EXPIRY);
+  }
 
-    public TransactionStatement createTransactionStatement(TransactionStatementInfoDTO input) {
-        return new TransactionStatement(input.getId(), input.getStatement().getHeight(),
-            new ReceiptSource(input.getStatement().getSource().getPrimaryId(),
-                input.getStatement().getSource().getSecondaryId()),
-            input.getStatement().getReceipts().stream().map(this::createReceiptFromDto).collect(Collectors.toList()));
-    }
+  public ArtifactExpiryReceipt<MosaicId> createArtifactExpiryReceipt(
+      MosaicExpiryReceiptDTO receipt, ReceiptType type) {
+    return new ArtifactExpiryReceipt<>(
+        MapperUtils.toMosaicId(receipt.getArtifactId()), type, ReceiptVersion.ARTIFACT_EXPIRY);
+  }
 
-    public Receipt createReceiptFromDto(Object receiptDto) {
-        ReceiptType type = ReceiptType.rawValueOf(jsonHelper.getInteger(receiptDto, "type"));
-        switch (type) {
-            case HARVEST_FEE:
-            case LOCK_HASH_CREATED:
-            case LOCK_HASH_COMPLETED:
-            case LOCK_HASH_EXPIRED:
-            case LOCK_SECRET_CREATED:
-            case LOCK_SECRET_COMPLETED:
-            case LOCK_SECRET_EXPIRED:
-                return createBalanceChangeReceipt(jsonHelper.convert(receiptDto, BalanceChangeReceiptDTO.class));
-            case MOSAIC_RENTAL_FEE:
-            case NAMESPACE_RENTAL_FEE:
-                return createBalanceTransferRecipient(jsonHelper.convert(receiptDto, BalanceTransferReceiptDTO.class));
-            case MOSAIC_EXPIRED:
-                return createArtifactExpiryReceipt(jsonHelper.convert(receiptDto, MosaicExpiryReceiptDTO.class), type);
-            case NAMESPACE_EXPIRED:
-            case NAMESPACE_DELETED:
-                return createArtifactExpiryReceipt(jsonHelper.convert(receiptDto, NamespaceExpiryReceiptDTO.class),
-                    type);
-            case INFLATION:
-                return createInflationReceipt(jsonHelper.convert(receiptDto, InflationReceiptDTO.class));
-            default:
-                throw new IllegalArgumentException("Receipt type: " + type.name() + " not valid");
-        }
-    }
+  public BalanceChangeReceipt createBalanceChangeReceipt(BalanceChangeReceiptDTO receipt) {
+    return new BalanceChangeReceipt(
+        MapperUtils.toAddress(receipt.getTargetAddress()),
+        new MosaicId(receipt.getMosaicId()),
+        receipt.getAmount(),
+        ReceiptType.rawValueOf(receipt.getType().getValue()),
+        ReceiptVersion.BALANCE_CHANGE);
+  }
 
-    public ArtifactExpiryReceipt<NamespaceId> createArtifactExpiryReceipt(NamespaceExpiryReceiptDTO receipt,
-        ReceiptType type) {
-        return new ArtifactExpiryReceipt<>(MapperUtils.toNamespaceId(receipt.getArtifactId()), type,
-            ReceiptVersion.ARTIFACT_EXPIRY);
-    }
+  public BalanceTransferReceipt createBalanceTransferRecipient(BalanceTransferReceiptDTO receipt) {
+    return new BalanceTransferReceipt(
+        MapperUtils.toAddress(receipt.getSenderAddress()),
+        Address.createFromEncoded(receipt.getRecipientAddress()),
+        new MosaicId(receipt.getMosaicId()),
+        receipt.getAmount(),
+        ReceiptType.rawValueOf(receipt.getType().getValue()),
+        ReceiptVersion.BALANCE_TRANSFER);
+  }
 
-    public ArtifactExpiryReceipt<MosaicId> createArtifactExpiryReceipt(MosaicExpiryReceiptDTO receipt,
-        ReceiptType type) {
-        return new ArtifactExpiryReceipt<>(MapperUtils.toMosaicId(receipt.getArtifactId()), type,
-            ReceiptVersion.ARTIFACT_EXPIRY);
-    }
-
-
-    public BalanceChangeReceipt createBalanceChangeReceipt(BalanceChangeReceiptDTO receipt) {
-        return new BalanceChangeReceipt(MapperUtils.toAddress(receipt.getTargetAddress()),
-            new MosaicId(receipt.getMosaicId()), receipt.getAmount(),
-            ReceiptType.rawValueOf(receipt.getType().getValue()), ReceiptVersion.BALANCE_CHANGE);
-    }
-
-    public BalanceTransferReceipt createBalanceTransferRecipient(BalanceTransferReceiptDTO receipt) {
-        return new BalanceTransferReceipt(MapperUtils.toAddress(receipt.getSenderAddress()),
-            Address.createFromEncoded(receipt.getRecipientAddress()), new MosaicId(receipt.getMosaicId()),
-            receipt.getAmount(), ReceiptType.rawValueOf(receipt.getType().getValue()), ReceiptVersion.BALANCE_TRANSFER);
-    }
-
-    public InflationReceipt createInflationReceipt(InflationReceiptDTO receipt) {
-        return new InflationReceipt(new MosaicId(receipt.getMosaicId()), receipt.getAmount(),
-            ReceiptType.rawValueOf(receipt.getType().getValue()), ReceiptVersion.INFLATION_RECEIPT);
-    }
-
+  public InflationReceipt createInflationReceipt(InflationReceiptDTO receipt) {
+    return new InflationReceipt(
+        new MosaicId(receipt.getMosaicId()),
+        receipt.getAmount(),
+        ReceiptType.rawValueOf(receipt.getType().getValue()),
+        ReceiptVersion.INFLATION_RECEIPT);
+  }
 }

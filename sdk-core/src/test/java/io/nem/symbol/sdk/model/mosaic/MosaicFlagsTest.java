@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.mosaic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,30 +23,28 @@ import org.junit.jupiter.api.Test;
 
 class MosaicFlagsTest {
 
-    @Test
-    void shouldCreateMosaicFlagsViaConstructor() {
-        MosaicFlags mosaicFlags =
-            MosaicFlags.create(true, true, true);
-        assertTrue(mosaicFlags.isSupplyMutable());
-        assertTrue(mosaicFlags.isTransferable());
-        assertTrue(mosaicFlags.isRestrictable());
-        assertEquals(7, mosaicFlags.getValue());
-    }
+  @Test
+  void shouldCreateMosaicFlagsViaConstructor() {
+    MosaicFlags mosaicFlags = MosaicFlags.create(true, true, true);
+    assertTrue(mosaicFlags.isSupplyMutable());
+    assertTrue(mosaicFlags.isTransferable());
+    assertTrue(mosaicFlags.isRestrictable());
+    assertEquals(7, mosaicFlags.getValue());
+  }
 
-    @Test
-    void shouldCreateMosaicFlagsWithDefaultValuesViaConstructor() {
-        MosaicFlags mosaicFlags =
-            MosaicFlags.create(true, true);
-        assertTrue(mosaicFlags.isSupplyMutable());
-        assertTrue(mosaicFlags.isTransferable());
-        assertFalse(mosaicFlags.isRestrictable());
-        assertEquals(3, mosaicFlags.getValue());
-    }
+  @Test
+  void shouldCreateMosaicFlagsWithDefaultValuesViaConstructor() {
+    MosaicFlags mosaicFlags = MosaicFlags.create(true, true);
+    assertTrue(mosaicFlags.isSupplyMutable());
+    assertTrue(mosaicFlags.isTransferable());
+    assertFalse(mosaicFlags.isRestrictable());
+    assertEquals(3, mosaicFlags.getValue());
+  }
 
-    @Test
-    void shouldParseIntFlagValue() {
-        for (int i = 0; i < 8; i++) {
-            assertEquals(i, MosaicFlags.create(i).getValue());
-        }
+  @Test
+  void shouldParseIntFlagValue() {
+    for (int i = 0; i < 8; i++) {
+      assertEquals(i, MosaicFlags.create(i).getValue());
     }
+  }
 }

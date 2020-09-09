@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import static io.nem.symbol.sdk.infrastructure.okhttp.TestHelperOkHttp.loadTransactionInfoDTO;
@@ -57,237 +56,259 @@ import org.mockito.ArgumentCaptor;
  */
 public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest {
 
-    private TransactionRepositoryOkHttpImpl repository;
+  private TransactionRepositoryOkHttpImpl repository;
 
+  @BeforeEach
+  public void setUp() {
+    super.setUp();
+    repository = new TransactionRepositoryOkHttpImpl(apiClientMock);
+  }
 
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-        repository = new TransactionRepositoryOkHttpImpl(apiClientMock);
-    }
+  @Test
+  public void shouldGetTransaction() throws Exception {
 
-    @Test
-    public void shouldGetTransaction() throws Exception {
+    TransactionInfoDTO transactionInfoDTO =
+        loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
 
-        TransactionInfoDTO transactionInfoDTO = loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json",
-            TransactionInfoDTO.class);
+    String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
+    mockRemoteCall(transactionInfoDTO);
 
-        String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
-        mockRemoteCall(transactionInfoDTO);
+    Transaction transaction =
+        repository.getTransaction(TransactionGroup.CONFIRMED, hash).toFuture().get();
 
-        Transaction transaction = repository.getTransaction(TransactionGroup.CONFIRMED, hash).toFuture().get();
+    Assertions.assertNotNull(transaction);
 
-        Assertions.assertNotNull(transaction);
+    Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
+    Assertions.assertEquals(TransactionGroup.CONFIRMED, transaction.getGroup().get());
+  }
 
-        Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
-        Assertions.assertEquals(TransactionGroup.CONFIRMED, transaction.getGroup().get());
-    }
+  @Test
+  public void shouldGetTransactionPartial() throws Exception {
 
-    @Test
-    public void shouldGetTransactionPartial() throws Exception {
+    TransactionInfoDTO transactionInfoDTO =
+        loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
 
-        TransactionInfoDTO transactionInfoDTO = loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json",
-            TransactionInfoDTO.class);
+    String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
+    mockRemoteCall(transactionInfoDTO);
 
-        String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
-        mockRemoteCall(transactionInfoDTO);
+    Transaction transaction =
+        repository.getTransaction(TransactionGroup.PARTIAL, hash).toFuture().get();
 
-        Transaction transaction = repository.getTransaction(TransactionGroup.PARTIAL, hash).toFuture().get();
+    Assertions.assertNotNull(transaction);
 
-        Assertions.assertNotNull(transaction);
+    Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
+    Assertions.assertEquals(TransactionGroup.PARTIAL, transaction.getGroup().get());
+  }
 
-        Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
-        Assertions.assertEquals(TransactionGroup.PARTIAL, transaction.getGroup().get());
-    }
+  @Test
+  public void shouldGetTransactionUnconfirmed() throws Exception {
 
-    @Test
-    public void shouldGetTransactionUnconfirmed() throws Exception {
+    TransactionInfoDTO transactionInfoDTO =
+        loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
 
-        TransactionInfoDTO transactionInfoDTO = loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json",
-            TransactionInfoDTO.class);
+    String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
+    mockRemoteCall(transactionInfoDTO);
 
-        String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
-        mockRemoteCall(transactionInfoDTO);
+    Transaction transaction =
+        repository.getTransaction(TransactionGroup.UNCONFIRMED, hash).toFuture().get();
 
-        Transaction transaction = repository.getTransaction(TransactionGroup.UNCONFIRMED, hash).toFuture().get();
+    Assertions.assertNotNull(transaction);
 
-        Assertions.assertNotNull(transaction);
+    Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
+    Assertions.assertEquals(TransactionGroup.UNCONFIRMED, transaction.getGroup().get());
+  }
 
-        Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
-        Assertions.assertEquals(TransactionGroup.UNCONFIRMED, transaction.getGroup().get());
-    }
+  @Test
+  public void shouldGetTransactions() throws Exception {
 
-    @Test
-    public void shouldGetTransactions() throws Exception {
+    TransactionInfoDTO transactionInfoDTO =
+        loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json", TransactionInfoDTO.class);
+    String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
+    mockRemoteCall(Collections.singletonList(transactionInfoDTO));
+    Transaction transaction =
+        repository
+            .getTransactions(TransactionGroup.CONFIRMED, Collections.singletonList(hash))
+            .toFuture()
+            .get()
+            .get(0);
+    Assertions.assertNotNull(transaction);
+    Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
+    Assertions.assertEquals(TransactionGroup.CONFIRMED, transaction.getGroup().get());
+  }
 
-        TransactionInfoDTO transactionInfoDTO = loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json",
-            TransactionInfoDTO.class);
-        String hash = jsonHelper.getString(transactionInfoDTO, "meta", "hash");
-        mockRemoteCall(Collections.singletonList(transactionInfoDTO));
-        Transaction transaction = repository.getTransactions(TransactionGroup.CONFIRMED, Collections.singletonList(hash)).toFuture().get().get(0);
-        Assertions.assertNotNull(transaction);
-        Assertions.assertEquals(hash, transaction.getTransactionInfo().get().getHash().get());
-        Assertions.assertEquals(TransactionGroup.CONFIRMED, transaction.getGroup().get());
-    }
+  @Test
+  public void shouldAnnounce() throws Exception {
+    SignedTransaction signedTransaction = getSignedTransaction();
+    AnnounceTransactionInfoDTO announceTransactionInfoDTO = new AnnounceTransactionInfoDTO();
+    announceTransactionInfoDTO.setMessage("SomeMessage");
+    mockRemoteCall(announceTransactionInfoDTO);
+    TransactionAnnounceResponse response = repository.announce(signedTransaction).toFuture().get();
+    Assertions.assertNotNull(response);
+    Assertions.assertEquals(
+        announceTransactionInfoDTO.getMessage(), announceTransactionInfoDTO.getMessage());
+  }
 
+  private SignedTransaction getSignedTransaction() {
 
-    @Test
-    public void shouldAnnounce() throws Exception {
-        SignedTransaction signedTransaction = getSignedTransaction();
-        AnnounceTransactionInfoDTO announceTransactionInfoDTO = new AnnounceTransactionInfoDTO();
-        announceTransactionInfoDTO.setMessage("SomeMessage");
-        mockRemoteCall(announceTransactionInfoDTO);
-        TransactionAnnounceResponse response = repository.announce(signedTransaction).toFuture().get();
-        Assertions.assertNotNull(response);
-        Assertions.assertEquals(announceTransactionInfoDTO.getMessage(), announceTransactionInfoDTO.getMessage());
-    }
+    String generationHash = "A94B1BE81F1D4C95D6D252AD7BA3FFFB1674991FD880B7A57DC3180AF8D69C32";
 
-    private SignedTransaction getSignedTransaction() {
+    Account account =
+        Account.createFromPrivateKey(
+            "063F36659A8BB01D5685826C19E2C2CA9D281465B642BD5E43CB69510408ECF7", networkType);
 
-        String generationHash = "A94B1BE81F1D4C95D6D252AD7BA3FFFB1674991FD880B7A57DC3180AF8D69C32";
+    Address address = Address.generateRandom(networkType);
 
-        Account account = Account
-            .createFromPrivateKey("063F36659A8BB01D5685826C19E2C2CA9D281465B642BD5E43CB69510408ECF7", networkType);
+    TransferTransaction transferTransaction =
+        TransferTransactionFactory.create(
+                NetworkType.MIJIN_TEST,
+                address,
+                Collections.singletonList(createAbsolute(BigInteger.valueOf(1))),
+                new PlainMessage("E2ETest:standaloneTransferTransaction:message"))
+            .build();
 
-        Address address = Address.generateRandom(networkType);
+    SignedTransaction signedTransaction = account.sign(transferTransaction, generationHash);
+    String payload = signedTransaction.getPayload();
+    assertEquals(444, payload.length());
+    return signedTransaction;
+  }
 
-        TransferTransaction transferTransaction = TransferTransactionFactory
-            .create(NetworkType.MIJIN_TEST, address, Collections.singletonList(createAbsolute(BigInteger.valueOf(1))),
-                new PlainMessage("E2ETest:standaloneTransferTransaction:message")).build();
+  protected Mosaic createAbsolute(BigInteger amount) {
+    return new Mosaic(NamespaceId.createFromName("cat.currency"), amount);
+  }
 
-        SignedTransaction signedTransaction = account.sign(transferTransaction, generationHash);
-        String payload = signedTransaction.getPayload();
-        assertEquals(444, payload.length());
-        return signedTransaction;
-    }
+  @Test
+  public void shouldAnnounceAggregateBonded() throws Exception {
 
-    protected Mosaic createAbsolute(BigInteger amount) {
-        return new Mosaic(NamespaceId.createFromName("cat.currency"), amount);
-    }
+    SignedTransaction signedTransaction = getSignedTransaction();
 
-    @Test
-    public void shouldAnnounceAggregateBonded() throws Exception {
+    AnnounceTransactionInfoDTO announceTransactionInfoDTO = new AnnounceTransactionInfoDTO();
+    announceTransactionInfoDTO.setMessage("SomeMessage");
+    mockRemoteCall(announceTransactionInfoDTO);
 
-        SignedTransaction signedTransaction = getSignedTransaction();
+    TransactionAnnounceResponse response =
+        repository.announceAggregateBonded(signedTransaction).toFuture().get();
 
-        AnnounceTransactionInfoDTO announceTransactionInfoDTO = new AnnounceTransactionInfoDTO();
-        announceTransactionInfoDTO.setMessage("SomeMessage");
-        mockRemoteCall(announceTransactionInfoDTO);
+    Assertions.assertNotNull(response);
 
-        TransactionAnnounceResponse response = repository.announceAggregateBonded(signedTransaction).toFuture().get();
+    Assertions.assertEquals(
+        announceTransactionInfoDTO.getMessage(), announceTransactionInfoDTO.getMessage());
+  }
 
-        Assertions.assertNotNull(response);
+  @Test
+  public void announceAggregateBondedCosignature() throws Exception {
 
-        Assertions.assertEquals(announceTransactionInfoDTO.getMessage(), announceTransactionInfoDTO.getMessage());
-    }
+    BigInteger version = AggregateTransactionCosignature.DEFAULT_VERSION;
+    CosignatureSignedTransaction signedTransaction =
+        new CosignatureSignedTransaction(version, "aParentHash", "aSignature", "aSigner");
 
-    @Test
-    public void announceAggregateBondedCosignature() throws Exception {
+    AnnounceTransactionInfoDTO announceTransactionInfoDTO = new AnnounceTransactionInfoDTO();
+    announceTransactionInfoDTO.setMessage("SomeMessage");
+    ArgumentCaptor<Object> parameter = mockRemoteCall(announceTransactionInfoDTO);
 
-        BigInteger version = AggregateTransactionCosignature.DEFAULT_VERSION;
-        CosignatureSignedTransaction signedTransaction = new CosignatureSignedTransaction(version, "aParentHash", "aSignature",
-            "aSigner");
+    TransactionAnnounceResponse response =
+        repository.announceAggregateBondedCosignature(signedTransaction).toFuture().get();
 
-        AnnounceTransactionInfoDTO announceTransactionInfoDTO = new AnnounceTransactionInfoDTO();
-        announceTransactionInfoDTO.setMessage("SomeMessage");
-        ArgumentCaptor<Object> parameter = mockRemoteCall(announceTransactionInfoDTO);
+    Assertions.assertNotNull(response);
 
-        TransactionAnnounceResponse response = repository.announceAggregateBondedCosignature(signedTransaction)
-            .toFuture().get();
+    Assertions.assertEquals(
+        announceTransactionInfoDTO.getMessage(), announceTransactionInfoDTO.getMessage());
 
-        Assertions.assertNotNull(response);
+    Cosignature cosignature = (Cosignature) parameter.getValue();
 
-        Assertions.assertEquals(announceTransactionInfoDTO.getMessage(), announceTransactionInfoDTO.getMessage());
+    Assertions.assertEquals(signedTransaction.getParentHash(), cosignature.getParentHash());
+    Assertions.assertEquals(signedTransaction.getSignature(), cosignature.getSignature());
+    Assertions.assertEquals(
+        signedTransaction.getSignerPublicKey(), cosignature.getSignerPublicKey());
+  }
 
-        Cosignature cosignature = (Cosignature) parameter.getValue();
+  @Test
+  public void searchTransactions() throws Exception {
 
-        Assertions.assertEquals(signedTransaction.getParentHash(), cosignature.getParentHash());
-        Assertions.assertEquals(signedTransaction.getSignature(), cosignature.getSignature());
-        Assertions.assertEquals(signedTransaction.getSignerPublicKey(), cosignature.getSignerPublicKey());
-    }
+    BigInteger version = AggregateTransactionCosignature.DEFAULT_VERSION;
+    TransactionInfoDTO transferTransactionDTO =
+        loadTransactionInfoDTO("standaloneTransferTransaction.json", TransactionInfoDTO.class);
 
+    PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
-    @Test
-    public void searchTransactions() throws Exception {
+    mockRemoteCall(toPage(transferTransactionDTO));
 
-        BigInteger version = AggregateTransactionCosignature.DEFAULT_VERSION;
-        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO("standaloneTransferTransaction.json",
-            TransactionInfoDTO.class);
-
-        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
-
-        mockRemoteCall(toPage(transferTransactionDTO));
-
-        Page<Transaction> transactions = repository.search(
-            new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED).signerPublicKey(publicAccount.getPublicKey()))
-            .toFuture().get();
-        Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
-        Assertions.assertEquals(TransactionGroup.UNCONFIRMED, transactions.getData().get(0).getGroup().get());
-        Assertions.assertEquals(1, transactions.getData().size());
-        Assertions.assertEquals(1, transactions.getPageNumber());
-        Assertions.assertEquals(2, transactions.getPageSize());
-
-
-    }
-
-    @Test
-    public void searchTransactionsTransactionTypes() throws Exception {
-
-        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO("standaloneTransferTransaction.json",
-            TransactionInfoDTO.class);
-
-        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
-
-        mockRemoteCall(toPage(transferTransactionDTO));
-
-        TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
-            .transactionTypes(Arrays.asList(TransactionType.NAMESPACE_METADATA, TransactionType.AGGREGATE_COMPLETE));
-
-        Page<Transaction> transactions = repository.search(criteria.address(publicAccount.getAddress())).toFuture()
+    Page<Transaction> transactions =
+        repository
+            .search(
+                new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED)
+                    .signerPublicKey(publicAccount.getPublicKey()))
+            .toFuture()
             .get();
-        Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
-        Assertions.assertEquals(TransactionGroup.CONFIRMED, transactions.getData().get(0).getGroup().get());
-        Assertions.assertEquals(1, transactions.getData().size());
-        Assertions.assertEquals(1, transactions.getPageNumber());
-        Assertions.assertEquals(2, transactions.getPageSize());
+    Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
+    Assertions.assertEquals(
+        TransactionGroup.UNCONFIRMED, transactions.getData().get(0).getGroup().get());
+    Assertions.assertEquals(1, transactions.getData().size());
+    Assertions.assertEquals(1, transactions.getPageNumber());
+    Assertions.assertEquals(2, transactions.getPageSize());
+  }
 
+  @Test
+  public void searchTransactionsTransactionTypes() throws Exception {
 
-    }
+    TransactionInfoDTO transferTransactionDTO =
+        loadTransactionInfoDTO("standaloneTransferTransaction.json", TransactionInfoDTO.class);
 
-    @Test
-    public void searchTransactionsTransactionTypesPartial() throws Exception {
+    PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
-        TransactionInfoDTO transferTransactionDTO = loadTransactionInfoDTO("standaloneTransferTransaction.json",
-            TransactionInfoDTO.class);
+    mockRemoteCall(toPage(transferTransactionDTO));
 
-        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
+    TransactionSearchCriteria criteria =
+        new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
+            .transactionTypes(
+                Arrays.asList(
+                    TransactionType.NAMESPACE_METADATA, TransactionType.AGGREGATE_COMPLETE));
 
-        mockRemoteCall(toPage(transferTransactionDTO));
+    Page<Transaction> transactions =
+        repository.search(criteria.address(publicAccount.getAddress())).toFuture().get();
+    Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
+    Assertions.assertEquals(
+        TransactionGroup.CONFIRMED, transactions.getData().get(0).getGroup().get());
+    Assertions.assertEquals(1, transactions.getData().size());
+    Assertions.assertEquals(1, transactions.getPageNumber());
+    Assertions.assertEquals(2, transactions.getPageSize());
+  }
 
-        TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.PARTIAL)
-            .transactionTypes(Arrays.asList(TransactionType.NAMESPACE_METADATA, TransactionType.AGGREGATE_COMPLETE));
+  @Test
+  public void searchTransactionsTransactionTypesPartial() throws Exception {
 
-        Page<Transaction> transactions = repository.search(criteria.address(publicAccount.getAddress())).toFuture()
-            .get();
-        Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
-        Assertions.assertEquals(TransactionGroup.PARTIAL, transactions.getData().get(0).getGroup().get());
-        Assertions.assertEquals(1, transactions.getData().size());
-        Assertions.assertEquals(1, transactions.getPageNumber());
-        Assertions.assertEquals(2, transactions.getPageSize());
+    TransactionInfoDTO transferTransactionDTO =
+        loadTransactionInfoDTO("standaloneTransferTransaction.json", TransactionInfoDTO.class);
 
+    PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
-    }
+    mockRemoteCall(toPage(transferTransactionDTO));
 
-    private TransactionPage toPage(TransactionInfoDTO dto) {
-        return new TransactionPage()
-            .data(Collections.singletonList(jsonHelper.parse(jsonHelper.print(dto), TransactionInfoDTO.class)))
-            .pagination(new Pagination().pageNumber(1).pageSize(2));
-    }
+    TransactionSearchCriteria criteria =
+        new TransactionSearchCriteria(TransactionGroup.PARTIAL)
+            .transactionTypes(
+                Arrays.asList(
+                    TransactionType.NAMESPACE_METADATA, TransactionType.AGGREGATE_COMPLETE));
 
+    Page<Transaction> transactions =
+        repository.search(criteria.address(publicAccount.getAddress())).toFuture().get();
+    Assertions.assertEquals(TransactionType.TRANSFER, transactions.getData().get(0).getType());
+    Assertions.assertEquals(
+        TransactionGroup.PARTIAL, transactions.getData().get(0).getGroup().get());
+    Assertions.assertEquals(1, transactions.getData().size());
+    Assertions.assertEquals(1, transactions.getPageNumber());
+    Assertions.assertEquals(2, transactions.getPageSize());
+  }
 
-    @Override
-    public TransactionRepositoryOkHttpImpl getRepository() {
-        return repository;
-    }
+  private TransactionPage toPage(TransactionInfoDTO dto) {
+    return new TransactionPage()
+        .data(
+            Collections.singletonList(
+                jsonHelper.parse(jsonHelper.print(dto), TransactionInfoDTO.class)))
+        .pagination(new Pagination().pageNumber(1).pageSize(2));
+  }
 
+  @Override
+  public TransactionRepositoryOkHttpImpl getRepository() {
+    return repository;
+  }
 }

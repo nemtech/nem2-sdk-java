@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,86 +41,97 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AddressAliasTransactionIntegrationTest extends BaseIntegrationTest {
 
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void sendAddressAliasTransactionAggregate(RepositoryType type) {
+    Account account = config().getDefaultAccount();
+    String namespaceName =
+        "test-root-namespace-aggregate-for-address-alias-"
+            + Double.valueOf(Math.floor(Math.random() * 10000)).intValue();
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void sendAddressAliasTransactionAggregate(RepositoryType type) {
-        Account account = config().getDefaultAccount();
-        String namespaceName =
-            "test-root-namespace-aggregate-for-address-alias-" + Double.valueOf(Math.floor(Math.random() * 10000))
-                .intValue();
+    NamespaceRegistrationTransaction namespaceRegistrationTransaction =
+        NamespaceRegistrationTransactionFactory.createRootNamespace(
+                getNetworkType(), namespaceName, BigInteger.valueOf(100))
+            .maxFee(this.maxFee)
+            .build();
 
-        NamespaceRegistrationTransaction namespaceRegistrationTransaction =
-            NamespaceRegistrationTransactionFactory.createRootNamespace(
-                getNetworkType(),
-                namespaceName,
-                BigInteger.valueOf(100)).maxFee(this.maxFee).build();
-
-        NamespaceId rootNamespaceId = announceAggregateAndValidate(type,
-            namespaceRegistrationTransaction, account
-        ).getLeft().getNamespaceId();
-
-        AddressAliasTransaction addressAliasTransaction =
-            AddressAliasTransactionFactory.create(getNetworkType(),
-                AliasAction.LINK,
-                rootNamespaceId,
-                account.getAddress()
-            ).maxFee(this.maxFee).build();
-
-        AggregateTransaction aggregateTransaction2 =
-            AggregateTransactionFactory.createComplete(
-                getNetworkType(),
-                Collections.singletonList(
-                    addressAliasTransaction.toAggregate(account.getPublicAccount()))
-            ).maxFee(this.maxFee).build();
-
-        announceAndValidate(type, account, aggregateTransaction2);
-        sleep(1000);
-        List<AccountNames> accountNames = get(getRepositoryFactory(type).createNamespaceRepository()
-            .getAccountsNames(Collections.singletonList(account.getAddress())));
-
-        Assertions.assertEquals(1, accountNames.size());
-
-        assertEquals(1, accountNames.size());
-        assertEquals(account.getAddress(), accountNames.get(0).getAddress());
-        assertTrue(accountNames.get(0).getNames().stream().map(NamespaceName::getName).collect(
-            Collectors.toList()).contains(namespaceName));
-    }
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void sendAddressAliasTransaction(RepositoryType type) {
-        Account account = config().getDefaultAccount();
-        String namespaceName =
-            "test-root-namespace-for-address-alias-" + Double.valueOf(Math.floor(Math.random() * 10000))
-                .intValue();
-
-        NamespaceRegistrationTransaction namespaceRegistrationTransaction =
-            NamespaceRegistrationTransactionFactory.createRootNamespace(
-                getNetworkType(),
-                namespaceName,
-                BigInteger.valueOf(100)).maxFee(this.maxFee).build();
-
-        NamespaceId rootNamespaceId = announceAndValidate(type, account, namespaceRegistrationTransaction)
+    NamespaceId rootNamespaceId =
+        announceAggregateAndValidate(type, namespaceRegistrationTransaction, account)
+            .getLeft()
             .getNamespaceId();
 
-        AddressAliasTransaction addressAliasTransaction =
-            AddressAliasTransactionFactory.create(getNetworkType(),
-                AliasAction.LINK,
-                rootNamespaceId,
-                account.getAddress()
-            ).maxFee(this.maxFee).build();
+    AddressAliasTransaction addressAliasTransaction =
+        AddressAliasTransactionFactory.create(
+                getNetworkType(), AliasAction.LINK, rootNamespaceId, account.getAddress())
+            .maxFee(this.maxFee)
+            .build();
 
-        announceAndValidate(type, account, addressAliasTransaction);
-        sleep(1000);
-        List<AccountNames> accountNames = get(getRepositoryFactory(type).createNamespaceRepository()
-            .getAccountsNames(Collections.singletonList(account.getAddress())));
+    AggregateTransaction aggregateTransaction2 =
+        AggregateTransactionFactory.createComplete(
+                getNetworkType(),
+                Collections.singletonList(
+                    addressAliasTransaction.toAggregate(account.getPublicAccount())))
+            .maxFee(this.maxFee)
+            .build();
 
-        Assertions.assertEquals(1, accountNames.size());
+    announceAndValidate(type, account, aggregateTransaction2);
+    sleep(1000);
+    List<AccountNames> accountNames =
+        get(
+            getRepositoryFactory(type)
+                .createNamespaceRepository()
+                .getAccountsNames(Collections.singletonList(account.getAddress())));
 
-        assertEquals(1, accountNames.size());
-        assertEquals(account.getAddress(), accountNames.get(0).getAddress());
-        assertTrue(accountNames.get(0).getNames().stream().map(NamespaceName::getName).collect(
-            Collectors.toList()).contains(namespaceName));
-    }
+    Assertions.assertEquals(1, accountNames.size());
+
+    assertEquals(1, accountNames.size());
+    assertEquals(account.getAddress(), accountNames.get(0).getAddress());
+    assertTrue(
+        accountNames.get(0).getNames().stream()
+            .map(NamespaceName::getName)
+            .collect(Collectors.toList())
+            .contains(namespaceName));
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void sendAddressAliasTransaction(RepositoryType type) {
+    Account account = config().getDefaultAccount();
+    String namespaceName =
+        "test-root-namespace-for-address-alias-"
+            + Double.valueOf(Math.floor(Math.random() * 10000)).intValue();
+
+    NamespaceRegistrationTransaction namespaceRegistrationTransaction =
+        NamespaceRegistrationTransactionFactory.createRootNamespace(
+                getNetworkType(), namespaceName, BigInteger.valueOf(100))
+            .maxFee(this.maxFee)
+            .build();
+
+    NamespaceId rootNamespaceId =
+        announceAndValidate(type, account, namespaceRegistrationTransaction).getNamespaceId();
+
+    AddressAliasTransaction addressAliasTransaction =
+        AddressAliasTransactionFactory.create(
+                getNetworkType(), AliasAction.LINK, rootNamespaceId, account.getAddress())
+            .maxFee(this.maxFee)
+            .build();
+
+    announceAndValidate(type, account, addressAliasTransaction);
+    sleep(1000);
+    List<AccountNames> accountNames =
+        get(
+            getRepositoryFactory(type)
+                .createNamespaceRepository()
+                .getAccountsNames(Collections.singletonList(account.getAddress())));
+
+    Assertions.assertEquals(1, accountNames.size());
+
+    assertEquals(1, accountNames.size());
+    assertEquals(account.getAddress(), accountNames.get(0).getAddress());
+    assertTrue(
+        accountNames.get(0).getNames().stream()
+            .map(NamespaceName::getName)
+            .collect(Collectors.toList())
+            .contains(namespaceName));
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.core.utils.MapperUtils;
@@ -36,63 +35,66 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class RestrictionAccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl implements
-    RestrictionAccountRepository {
+public class RestrictionAccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl
+    implements RestrictionAccountRepository {
 
-    private final RestrictionAccountRoutesApi client;
+  private final RestrictionAccountRoutesApi client;
 
-    public RestrictionAccountRepositoryVertxImpl(ApiClient apiClient) {
-        super(apiClient);
-        this.client = new RestrictionAccountRoutesApiImpl(apiClient);
-    }
+  public RestrictionAccountRepositoryVertxImpl(ApiClient apiClient) {
+    super(apiClient);
+    this.client = new RestrictionAccountRoutesApiImpl(apiClient);
+  }
 
+  @Override
+  public Observable<AccountRestrictions> getAccountRestrictions(Address address) {
 
-    @Override
-    public Observable<AccountRestrictions> getAccountRestrictions(Address address) {
-
-        return exceptionHandling(call(
-            (Handler<AsyncResult<AccountRestrictionsInfoDTO>> handler) -> getClient()
-                .getAccountRestrictions(address.plain(), handler))
+    return exceptionHandling(
+        call((Handler<AsyncResult<AccountRestrictionsInfoDTO>> handler) ->
+                getClient().getAccountRestrictions(address.plain(), handler))
             .map(AccountRestrictionsInfoDTO::getAccountRestrictions)
             .map(this::toAccountRestrictions));
-    }
+  }
 
-    @Override
-    public Observable<List<AccountRestrictions>> getAccountsRestrictions(
-        List<Address> addresses) {
-        AccountIds accountIds = new AccountIds()
+  @Override
+  public Observable<List<AccountRestrictions>> getAccountsRestrictions(List<Address> addresses) {
+    AccountIds accountIds =
+        new AccountIds()
             .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-        return getAccountsRestrictions(accountIds);
-    }
+    return getAccountsRestrictions(accountIds);
+  }
 
+  private Observable<List<AccountRestrictions>> getAccountsRestrictions(AccountIds accountIds) {
+    return exceptionHandling(
+            call((Handler<AsyncResult<List<AccountRestrictionsInfoDTO>>> handler) ->
+                    getClient().getAccountRestrictionsFromAccounts(accountIds, handler))
+                .flatMapIterable(item -> item)
+                .map(AccountRestrictionsInfoDTO::getAccountRestrictions)
+                .map(this::toAccountRestrictions))
+        .toList()
+        .toObservable();
+  }
 
-    private Observable<List<AccountRestrictions>> getAccountsRestrictions(AccountIds accountIds) {
-        return exceptionHandling(call(
-            (Handler<AsyncResult<List<AccountRestrictionsInfoDTO>>> handler) -> getClient()
-                .getAccountRestrictionsFromAccounts(accountIds, handler))
-            .flatMapIterable(item -> item)
-            .map(AccountRestrictionsInfoDTO::getAccountRestrictions)
-            .map(this::toAccountRestrictions)).toList().toObservable();
-    }
+  private AccountRestrictions toAccountRestrictions(AccountRestrictionsDTO dto) {
+    return new AccountRestrictions(
+        MapperUtils.toAddress(dto.getAddress()),
+        dto.getRestrictions().stream()
+            .map(this::toAccountRestriction)
+            .collect(Collectors.toList()));
+  }
 
+  private AccountRestriction toAccountRestriction(AccountRestrictionDTO dto) {
+    AccountRestrictionFlags restrictionFlags =
+        AccountRestrictionFlags.rawValueOf(dto.getRestrictionFlags().getValue());
+    return new AccountRestriction(
+        restrictionFlags,
+        dto.getValues().stream()
+            .filter(Objects::nonNull)
+            .map(Object::toString)
+            .map(restrictionFlags.getTargetType()::fromString)
+            .collect(Collectors.toList()));
+  }
 
-    private AccountRestrictions toAccountRestrictions(AccountRestrictionsDTO dto) {
-        return new AccountRestrictions(MapperUtils.toAddress(dto.getAddress()),
-            dto.getRestrictions().stream().map(this::toAccountRestriction).collect(
-                Collectors.toList()));
-    }
-
-    private AccountRestriction toAccountRestriction(AccountRestrictionDTO dto) {
-        AccountRestrictionFlags restrictionFlags = AccountRestrictionFlags
-            .rawValueOf(dto.getRestrictionFlags().getValue());
-        return new AccountRestriction(
-            restrictionFlags,
-            dto.getValues().stream().filter(Objects::nonNull).map(Object::toString)
-                .map(restrictionFlags.getTargetType()::fromString).collect(
-                Collectors.toList()));
-    }
-
-    public RestrictionAccountRoutesApi getClient() {
-        return client;
-    }
+  public RestrictionAccountRoutesApi getClient() {
+    return client;
+  }
 }

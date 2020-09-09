@@ -30,6 +30,7 @@ plugins {
     id 'org.ajoberstar.git-publish' version '0.3.3'
     id "de.marcphilipp.nexus-publish" version "0.4.0"
     id 'io.codearte.nexus-staging' version '0.21.1'
+    id "com.diffplug.spotless" version "5.4.0"
     id 'jacoco'
     id 'signing'
     id 'java-library'
@@ -81,8 +82,8 @@ allprojects {
     ext."signing.keyId" = signingKeyId
     ext."signing.secretKeyRingFile" = signingSecretKeyRingFile
     ext."signing.password" = signingPassword
-}
 
+}
 
 subprojects {
     apply plugin: 'java'
@@ -92,9 +93,18 @@ subprojects {
     apply plugin: 'org.sonarqube'
     apply plugin: 'de.marcphilipp.nexus-publish'
     apply plugin: 'project-report'
-
+    apply plugin: 'com.diffplug.spotless'
 
     group 'io.nem'
+
+    spotless {
+        java {
+            importOrder()
+            removeUnusedImports()
+            googleJavaFormat('1.7')
+            licenseHeaderFile '../LICENSE_HEADER'
+        }
+    }
 
     java {
         sourceCompatibility = JavaVersion.VERSION_1_8

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import com.google.gson.Gson;
@@ -46,91 +45,92 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  */
 public class ListenerOkHttp extends ListenerBase implements Listener {
 
-    private final URL url;
+  private final URL url;
 
-    private final OkHttpClient httpClient;
+  private final OkHttpClient httpClient;
 
-    private final TransactionMapper transactionMapper;
+  private final TransactionMapper transactionMapper;
 
-    private WebSocket webSocket;
+  private WebSocket webSocket;
 
-    /**
-     * @param httpClient the ok http client
-     * @param url nis host
-     * @param gson gson's gson.
-     * @param namespaceRepository the namespace repository used to resolve alias.
-     */
-    public ListenerOkHttp(OkHttpClient httpClient, String url, Gson gson, NamespaceRepository namespaceRepository) {
-        super(new JsonHelperGson(gson), namespaceRepository);
-        try {
-            this.url = new URL(url);
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException(
-                "Parameter '" + url + "' is not a valid URL. " + ExceptionUtils.getMessage(e));
-        }
-        this.httpClient = httpClient;
-        this.transactionMapper = new GeneralTransactionMapper(getJsonHelper());
+  /**
+   * @param httpClient the ok http client
+   * @param url nis host
+   * @param gson gson's gson.
+   * @param namespaceRepository the namespace repository used to resolve alias.
+   */
+  public ListenerOkHttp(
+      OkHttpClient httpClient, String url, Gson gson, NamespaceRepository namespaceRepository) {
+    super(new JsonHelperGson(gson), namespaceRepository);
+    try {
+      this.url = new URL(url);
+    } catch (MalformedURLException e) {
+      throw new IllegalArgumentException(
+          "Parameter '" + url + "' is not a valid URL. " + ExceptionUtils.getMessage(e));
     }
+    this.httpClient = httpClient;
+    this.transactionMapper = new GeneralTransactionMapper(getJsonHelper());
+  }
 
-    /**
-     * @return a {@link CompletableFuture} that resolves when the websocket connection is opened
-     */
-    @Override
-    public CompletableFuture<Void> open() {
+  /** @return a {@link CompletableFuture} that resolves when the websocket connection is opened */
+  @Override
+  public CompletableFuture<Void> open() {
 
-        CompletableFuture<Void> future = new CompletableFuture<>();
-        if (this.webSocket != null) {
-            return CompletableFuture.completedFuture(null);
-        }
-        Request webSocketRequest = new Request.Builder().url(checkTrailingSlash(url.toString()) + "ws").build();
-        WebSocketListener webSocketListener = new WebSocketListener() {
-            @Override
-            public void onMessage(WebSocket webSocket, String text) {
-                handle(getJsonHelper().parse(text, JsonObject.class), future);
-            }
+    CompletableFuture<Void> future = new CompletableFuture<>();
+    if (this.webSocket != null) {
+      return CompletableFuture.completedFuture(null);
+    }
+    Request webSocketRequest =
+        new Request.Builder().url(checkTrailingSlash(url.toString()) + "ws").build();
+    WebSocketListener webSocketListener =
+        new WebSocketListener() {
+          @Override
+          public void onMessage(WebSocket webSocket, String text) {
+            handle(getJsonHelper().parse(text, JsonObject.class), future);
+          }
         };
-        this.webSocket = httpClient.newWebSocket(webSocketRequest, webSocketListener);
-        return future;
+    this.webSocket = httpClient.newWebSocket(webSocketRequest, webSocketListener);
+    return future;
+  }
+
+  private String checkTrailingSlash(String url) {
+    return url.endsWith("/") ? url : url + "/";
+  }
+
+  @Override
+  protected BlockInfo toBlockInfo(Object blockInfoDTO) {
+    return BlockRepositoryOkHttpImpl.toBlockInfo(
+        getJsonHelper().convert(blockInfoDTO, BlockInfoDTO.class));
+  }
+
+  @Override
+  protected Transaction toTransaction(TransactionGroup group, Object transactionInfo) {
+    return transactionMapper.mapToFactoryFromDto(transactionInfo).group(group).build();
+  }
+
+  @Override
+  protected CosignatureSignedTransaction toCosignatureSignedTransaction(Object cosignatureJson) {
+    Cosignature cosignature = getJsonHelper().convert(cosignatureJson, Cosignature.class);
+    return new CosignatureSignedTransaction(
+        cosignature.getVersion(),
+        cosignature.getParentHash(),
+        cosignature.getSignature(),
+        cosignature.getSignerPublicKey());
+  }
+
+  /** Close webSocket connection */
+  @Override
+  public void close() {
+    if (this.webSocket != null) {
+      setUid(null);
+      this.webSocket.close(1000, null);
+      this.webSocket = null;
     }
+  }
 
-    private String checkTrailingSlash(String url) {
-        return url.endsWith("/") ? url : url + "/";
-    }
-
-
-    @Override
-    protected BlockInfo toBlockInfo(Object blockInfoDTO) {
-        return BlockRepositoryOkHttpImpl.toBlockInfo(getJsonHelper().convert(blockInfoDTO, BlockInfoDTO.class));
-    }
-
-    @Override
-    protected Transaction toTransaction(TransactionGroup group, Object transactionInfo) {
-        return transactionMapper.mapToFactoryFromDto(transactionInfo).group(group).build();
-    }
-
-    @Override
-    protected CosignatureSignedTransaction toCosignatureSignedTransaction(Object cosignatureJson) {
-        Cosignature cosignature = getJsonHelper().convert(cosignatureJson, Cosignature.class);
-        return new CosignatureSignedTransaction(cosignature.getVersion(), cosignature.getParentHash(),
-            cosignature.getSignature(), cosignature.getSignerPublicKey());
-    }
-
-
-    /**
-     * Close webSocket connection
-     */
-    @Override
-    public void close() {
-        if (this.webSocket != null) {
-            setUid(null);
-            this.webSocket.close(1000, null);
-            this.webSocket = null;
-        }
-    }
-
-    protected void subscribeTo(String channel) {
-        final ListenerSubscribeMessage subscribeMessage = new ListenerSubscribeMessage(this.getUid(), channel);
-        this.webSocket.send(getJsonHelper().print(subscribeMessage));
-    }
-
+  protected void subscribeTo(String channel) {
+    final ListenerSubscribeMessage subscribeMessage =
+        new ListenerSubscribeMessage(this.getUid(), channel);
+    this.webSocket.send(getJsonHelper().print(subscribeMessage));
+  }
 }

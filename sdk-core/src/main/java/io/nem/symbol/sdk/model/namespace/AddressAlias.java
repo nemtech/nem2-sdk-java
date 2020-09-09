@@ -13,26 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/**
- * The AddressAlias structure describes address aliases
- */
 package io.nem.symbol.sdk.model.namespace;
 
 import io.nem.symbol.sdk.model.account.Address;
 
-/**
- * Address alias.
- */
+/** Address alias. */
 public class AddressAlias extends AliasBase<Address> {
 
-    /**
-     * Create AddressAlias from address
-     *
-     * @param address the original address
-     */
-    public AddressAlias(Address address) {
-        super(AliasType.ADDRESS, address);
-    }
-
+  /**
+   * Create AddressAlias from address
+   *
+   * @param address the original address
+   */
+  public AddressAlias(Address address) {
+    super(AliasType.ADDRESS, address);
+  }
 }

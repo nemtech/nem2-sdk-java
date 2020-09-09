@@ -13,46 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.metadata;
 
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import java.util.Arrays;
 
-/**
- * Possible metadata entry types.
- */
+/** Possible metadata entry types. */
 public enum MetadataType {
+  ACCOUNT(0),
 
-    ACCOUNT(0),
+  MOSAIC(1),
 
-    MOSAIC(1),
+  NAMESPACE(2);
 
-    NAMESPACE(2);
+  private final int value;
 
-    private final int value;
+  MetadataType(int value) {
+    this.value = value;
+  }
 
-    MetadataType(int value) {
-        this.value = value;
-    }
+  /**
+   * Static constructor converting metadata type raw value to enum instance.
+   *
+   * @param value the low level int value.
+   * @return {@link TransactionType}
+   */
+  public static MetadataType rawValueOf(int value) {
+    return Arrays.stream(values())
+        .filter(e -> e.value == value)
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 
-    /**
-     * Static constructor converting metadata type raw value to enum instance.
-     *
-     * @param value the low level int value.
-     * @return {@link TransactionType}
-     */
-    public static MetadataType rawValueOf(int value) {
-        return Arrays.stream(values()).filter(e -> e.value == value).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
-
-    /**
-     * Returns enum value.
-     *
-     * @return enum value
-     */
-    public int getValue() {
-        return this.value;
-    }
+  /**
+   * Returns enum value.
+   *
+   * @return enum value
+   */
+  public int getValue() {
+    return this.value;
+  }
 }

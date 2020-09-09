@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import java.time.temporal.ChronoUnit;
 
 public class FakeDeadline extends Deadline {
 
-    public FakeDeadline() {
-        super(1, ChronoUnit.HOURS);
-    }
+  public FakeDeadline() {
+    super(1, ChronoUnit.HOURS);
+  }
 
-    @Override
-    public long getInstant() {
-        return 1;
-    }
+  @Override
+  public long getInstant() {
+    return 1;
+  }
 }

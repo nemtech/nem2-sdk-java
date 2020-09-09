@@ -13,52 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.namespace;
 
 import java.util.Arrays;
 
-/**
- * The alias action.
- */
+/** The alias action. */
 public enum AliasAction {
-    /**
-     * Link an alias.
-     */
-    LINK((byte) 1),
-    /**
-     * Unlink an alias.
-     */
-    UNLINK((byte) 0);
+  /** Link an alias. */
+  LINK((byte) 1),
+  /** Unlink an alias. */
+  UNLINK((byte) 0);
 
-    private byte value;
+  private byte value;
 
-    /**
-     * Constructor.
-     *
-     * @param value Enum value.
-     */
-    AliasAction(final byte value) {
-        this.value = value;
-    }
+  /**
+   * Constructor.
+   *
+   * @param value Enum value.
+   */
+  AliasAction(final byte value) {
+    this.value = value;
+  }
 
-    /**
-     * Gets the alias action from raw value.
-     *
-     * @param value Raw value.
-     * @return Alias action.
-     */
-    public static AliasAction rawValueOf(final byte value) {
-        return Arrays.stream(values()).filter(e -> e.value == value).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
+  /**
+   * Gets the alias action from raw value.
+   *
+   * @param value Raw value.
+   * @return Alias action.
+   */
+  public static AliasAction rawValueOf(final byte value) {
+    return Arrays.stream(values())
+        .filter(e -> e.value == value)
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 
-    /**
-     * Returns enum value.
-     *
-     * @return enum value
-     */
-    public byte getValue() {
-        return this.value;
-    }
+  /**
+   * Returns enum value.
+   *
+   * @return enum value
+   */
+  public byte getValue() {
+    return this.value;
+  }
 }

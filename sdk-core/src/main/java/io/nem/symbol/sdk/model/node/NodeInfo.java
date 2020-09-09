@@ -19,103 +19,103 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 
 public class NodeInfo {
 
-    private final String publicKey;
-    private final int port;
-    private final NetworkType networkIdentifier;
-    private final int version;
-    private final RoleType roles;
-    private final String host;
-    private final String friendlyName;
-    private final String networkGenerationHashSeed;
+  private final String publicKey;
+  private final int port;
+  private final NetworkType networkIdentifier;
+  private final int version;
+  private final RoleType roles;
+  private final String host;
+  private final String friendlyName;
+  private final String networkGenerationHashSeed;
 
-    public NodeInfo(
-        String publicKey,
-        int port,
-        NetworkType networkIdentifier,
-        int version,
-        RoleType roles,
-        String host,
-        String friendlyName, String networkGenerationHashSeed) {
-        this.friendlyName = friendlyName;
-        this.host = host;
-        this.networkIdentifier = networkIdentifier;
-        this.publicKey = publicKey;
-        this.port = port;
-        this.version = version;
-        this.roles = roles;
-        this.networkGenerationHashSeed = networkGenerationHashSeed;
-    }
+  public NodeInfo(
+      String publicKey,
+      int port,
+      NetworkType networkIdentifier,
+      int version,
+      RoleType roles,
+      String host,
+      String friendlyName,
+      String networkGenerationHashSeed) {
+    this.friendlyName = friendlyName;
+    this.host = host;
+    this.networkIdentifier = networkIdentifier;
+    this.publicKey = publicKey;
+    this.port = port;
+    this.version = version;
+    this.roles = roles;
+    this.networkGenerationHashSeed = networkGenerationHashSeed;
+  }
 
-    /**
-     * The port used for the communication.
-     *
-     * @return int
-     */
-    public int getPort() {
-        return port;
-    }
+  /**
+   * The port used for the communication.
+   *
+   * @return int
+   */
+  public int getPort() {
+    return port;
+  }
 
-    /**
-     * The version of the application.
-     *
-     * @return int
-     */
-    public int getVersion() {
-        return version;
-    }
+  /**
+   * The version of the application.
+   *
+   * @return int
+   */
+  public int getVersion() {
+    return version;
+  }
 
-    /**
-     * The network identifier.
-     *
-     * @return {@link NetworkType}
-     */
-    public NetworkType getNetworkIdentifier() {
-        return networkIdentifier;
-    }
+  /**
+   * The network identifier.
+   *
+   * @return {@link NetworkType}
+   */
+  public NetworkType getNetworkIdentifier() {
+    return networkIdentifier;
+  }
 
-    /**
-     * The roles of the application.
-     *
-     * @return {@link RoleType}
-     */
-    public RoleType getRoles() {
-        return roles;
-    }
+  /**
+   * The roles of the application.
+   *
+   * @return {@link RoleType}
+   */
+  public RoleType getRoles() {
+    return roles;
+  }
 
-    /**
-     * The name of the node.
-     *
-     * @return String
-     */
-    public String getFriendlyName() {
-        return friendlyName;
-    }
+  /**
+   * The name of the node.
+   *
+   * @return String
+   */
+  public String getFriendlyName() {
+    return friendlyName;
+  }
 
-    /**
-     * The public key used to identify the node.
-     *
-     * @return String
-     */
-    public String getPublicKey() {
-        return publicKey;
-    }
+  /**
+   * The public key used to identify the node.
+   *
+   * @return String
+   */
+  public String getPublicKey() {
+    return publicKey;
+  }
 
-    /**
-     * The IP address of the endpoint.
-     *
-     * @return String
-     */
-    public String getHost() {
-        return host;
-    }
+  /**
+   * The IP address of the endpoint.
+   *
+   * @return String
+   */
+  public String getHost() {
+    return host;
+  }
 
-
-    /**
-     * The network generation hash (block/1 generation hash)
-     *
-     * @return The network generation hash (block/1 generation hash)
-     */
-    public String getNetworkGenerationHashSeed() {
-        return networkGenerationHashSeed;
-    }
+  /**
+   * The network generation hash (block/1 generation hash)
+   *
+   * @return The network generation hash (block/1 generation hash)
+   */
+  public String getNetworkGenerationHashSeed() {
+    return networkGenerationHashSeed;
+  }
 }

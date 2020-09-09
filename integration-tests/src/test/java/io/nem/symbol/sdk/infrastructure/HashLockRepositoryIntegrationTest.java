@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.HashLockRepository;
@@ -30,43 +29,46 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class HashLockRepositoryIntegrationTest extends BaseIntegrationTest {
 
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getHashLockWhenDoesNotExist(RepositoryType type) {
+    HashLockRepository HashLockRepository = getRepositoryFactory(type).createHashLockRepository();
+    String hash = "671653C94E2254F2A23EFEDB15D67C38332AED1FBD24B063C0A8E675582B6A96";
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getHashLockWhenDoesNotExist(RepositoryType type) {
-        HashLockRepository HashLockRepository = getRepositoryFactory(type).createHashLockRepository();
-        String hash = "671653C94E2254F2A23EFEDB15D67C38332AED1FBD24B063C0A8E675582B6A96";
+    RepositoryCallException exception =
+        Assertions.assertThrows(
+            RepositoryCallException.class, () -> get(HashLockRepository.getHashLock(hash)));
 
-        RepositoryCallException exception = Assertions
-            .assertThrows(RepositoryCallException.class, () -> get(HashLockRepository.getHashLock(hash)));
+    Assertions.assertTrue(
+        exception
+            .getMessage()
+            .contains(
+                "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id"));
+  }
 
-        Assertions.assertTrue(exception.getMessage()
-            .contains("ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id"));
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getHashLockWhenInvalid(RepositoryType type) {
+    HashLockRepository HashLockRepository = getRepositoryFactory(type).createHashLockRepository();
+    String hash = "invalid!";
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getHashLockWhenInvalid(RepositoryType type) {
-        HashLockRepository HashLockRepository = getRepositoryFactory(type).createHashLockRepository();
-        String hash = "invalid!";
+    RepositoryCallException exception =
+        Assertions.assertThrows(
+            RepositoryCallException.class, () -> get(HashLockRepository.getHashLock(hash)));
 
-        RepositoryCallException exception = Assertions
-            .assertThrows(RepositoryCallException.class, () -> get(HashLockRepository.getHashLock(hash)));
+    Assertions.assertEquals(
+        "ApiException: Conflict - 409 - InvalidArgument - hash has an invalid format",
+        exception.getMessage());
+  }
 
-        Assertions.assertEquals("ApiException: Conflict - 409 - InvalidArgument - hash has an invalid format",
-            exception.getMessage());
-    }
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void searchWhenInvalidAddress(RepositoryType type) {
-        HashLockRepository repository = getRepositoryFactory(type).createHashLockRepository();
-        Address address = Address.generateRandom(getNetworkType());
-        Page<HashLockInfo> page = get(repository.search(new HashLockSearchCriteria(address)));
-        Assertions.assertTrue(page.isLast());
-        Assertions.assertTrue(page.getData().isEmpty());
-        Assertions.assertEquals(20, page.getPageSize());
-    }
-
-
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchWhenInvalidAddress(RepositoryType type) {
+    HashLockRepository repository = getRepositoryFactory(type).createHashLockRepository();
+    Address address = Address.generateRandom(getNetworkType());
+    Page<HashLockInfo> page = get(repository.search(new HashLockSearchCriteria(address)));
+    Assertions.assertTrue(page.isLast());
+    Assertions.assertTrue(page.getData().isEmpty());
+    Assertions.assertEquals(20, page.getPageSize());
+  }
 }

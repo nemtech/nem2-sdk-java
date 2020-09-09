@@ -13,40 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
-
 /**
  * General exception raised when there is an error during a repository call (like a rest call
  * exception)
  *
- * This exception hides the implementation specific exception (like jersey2, vertx or okhttp
+ * <p>This exception hides the implementation specific exception (like jersey2, vertx or okhttp
  * exceptions). The original exception will be part of the cause.
  *
  * @author Fernando Boucquez
  */
 public class RepositoryCallException extends RuntimeException {
 
-    /**
-     * The http status error code.
-     */
-    private final int statusCode;
+  /** The http status error code. */
+  private final int statusCode;
 
-    /**
-     * @param message the message. It may be resolved from the response body an status of a failed
-     * request.
-     * @param statusCode the http status code (like 404 or 500).
-     * @param cause the original exception, probably linked to the specific implementation.
-     */
-    public RepositoryCallException(String message, int statusCode, Throwable cause) {
-        super(message, cause);
-        this.statusCode = statusCode;
-    }
+  /**
+   * @param message the message. It may be resolved from the response body an status of a failed
+   *     request.
+   * @param statusCode the http status code (like 404 or 500).
+   * @param cause the original exception, probably linked to the specific implementation.
+   */
+  public RepositoryCallException(String message, int statusCode, Throwable cause) {
+    super(message, cause);
+    this.statusCode = statusCode;
+  }
 
-    /**
-     * @return the http status code error.
-     */
-    public int getStatusCode() {
-        return statusCode;
-    }
+  /** @return the http status code error. */
+  public int getStatusCode() {
+    return statusCode;
+  }
 }

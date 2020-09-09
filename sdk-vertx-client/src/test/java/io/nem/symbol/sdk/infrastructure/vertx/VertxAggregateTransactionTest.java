@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,141 +48,136 @@ import org.junit.jupiter.api.Test;
 
 public class VertxAggregateTransactionTest {
 
-    private final String generationHash =
-        "57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6";
+  private final String generationHash =
+      "57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6";
 
-    private final JsonHelper jsonHelper = new JsonHelperJackson2(
-        JsonHelperJackson2.configureMapper(Json.mapper));
+  private final JsonHelper jsonHelper =
+      new JsonHelperJackson2(JsonHelperJackson2.configureMapper(Json.mapper));
 
-    private NetworkType networkType = NetworkType.MIJIN_TEST;
+  private NetworkType networkType = NetworkType.MIJIN_TEST;
 
-    @Test
-    void createAAggregateTransactionViaStaticConstructor() {
+  @Test
+  void createAAggregateTransactionViaStaticConstructor() {
 
-        Address recipient = Address.generateRandom(networkType);
-        TransferTransaction transferTx =
-            TransferTransactionFactory.create(NetworkType.MIJIN_TEST,
-                recipient,
-                Collections.emptyList(),
-                PlainMessage.Empty).build();
+    Address recipient = Address.generateRandom(networkType);
+    TransferTransaction transferTx =
+        TransferTransactionFactory.create(
+                NetworkType.MIJIN_TEST, recipient, Collections.emptyList(), PlainMessage.Empty)
+            .build();
 
-        AggregateTransaction aggregateTx =
-            AggregateTransactionFactory.createComplete(
+    AggregateTransaction aggregateTx =
+        AggregateTransactionFactory.createComplete(
                 NetworkType.MIJIN_TEST,
                 Collections.singletonList(
                     transferTx.toAggregate(
                         new PublicAccount(
                             "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
-                            NetworkType.MIJIN_TEST)))
-            ).build();
+                            NetworkType.MIJIN_TEST))))
+            .build();
 
-        assertEquals(NetworkType.MIJIN_TEST, aggregateTx.getNetworkType());
-        assertEquals(1, (int) aggregateTx.getVersion());
-        assertTrue(LocalDateTime.now().isBefore(aggregateTx.getDeadline().getLocalDateTime()));
-        assertEquals(BigInteger.valueOf(0), aggregateTx.getMaxFee());
-        assertEquals(1, aggregateTx.getInnerTransactions().size());
-    }
+    assertEquals(NetworkType.MIJIN_TEST, aggregateTx.getNetworkType());
+    assertEquals(1, (int) aggregateTx.getVersion());
+    assertTrue(LocalDateTime.now().isBefore(aggregateTx.getDeadline().getLocalDateTime()));
+    assertEquals(BigInteger.valueOf(0), aggregateTx.getMaxFee());
+    assertEquals(1, aggregateTx.getInnerTransactions().size());
+  }
 
-    @Test
-    @DisplayName("Serialization")
-    void serialization() {
-        Address address = Address.generateRandom(networkType);
-        TransferTransaction transferTx =
-            TransferTransactionFactory.create(
+  @Test
+  @DisplayName("Serialization")
+  void serialization() {
+    Address address = Address.generateRandom(networkType);
+    TransferTransaction transferTx =
+        TransferTransactionFactory.create(
                 networkType,
                 address,
-                Collections.singletonList(
-                    createAbsolute(BigInteger.valueOf(10000000))),
-                PlainMessage.Empty).deadline(new VertxFakeDeadline()).build();
+                Collections.singletonList(createAbsolute(BigInteger.valueOf(10000000))),
+                PlainMessage.Empty)
+            .deadline(new VertxFakeDeadline())
+            .build();
 
-        PublicAccount signer = Account.generateNewAccount(networkType).getPublicAccount();
-        AggregateTransaction aggregateTx =
-            AggregateTransactionFactory.createComplete(
+    PublicAccount signer = Account.generateNewAccount(networkType).getPublicAccount();
+    AggregateTransaction aggregateTx =
+        AggregateTransactionFactory.createComplete(
+                networkType, Collections.singletonList(transferTx.toAggregate(signer)))
+            .deadline(new VertxFakeDeadline())
+            .build();
+
+    byte[] actual = aggregateTx.serialize();
+
+    BinarySerialization serialization = BinarySerializationImpl.INSTANCE;
+    AggregateTransaction deserialized = (AggregateTransaction) serialization.deserialize(actual);
+
+    assertEquals(signer, deserialized.getInnerTransactions().get(0).getSigner().get());
+  }
+
+  protected Mosaic createAbsolute(BigInteger amount) {
+    return new Mosaic(NamespaceId.createFromName("cat.currency"), amount);
+  }
+
+  @Test
+  void shouldCreateAggregateTransactionAndSignWithMultipleCosignatories() {
+
+    Address address = Address.generateRandom(networkType);
+    TransferTransaction transferTx =
+        TransferTransactionFactory.create(
+                networkType, address, Collections.emptyList(), new PlainMessage("test-message"))
+            .build();
+
+    AggregateTransaction aggregateTx =
+        AggregateTransactionFactory.createComplete(
                 networkType,
-                Collections.singletonList(
-                    transferTx.toAggregate(
-                        signer))).deadline(new VertxFakeDeadline()).build();
-
-        byte[] actual = aggregateTx.serialize();
-
-        BinarySerialization serialization = BinarySerializationImpl.INSTANCE;
-        AggregateTransaction deserialized = (AggregateTransaction) serialization.deserialize(actual);
-
-        assertEquals(signer, deserialized.getInnerTransactions().get(0).getSigner().get());
-    }
-
-    protected Mosaic createAbsolute(BigInteger amount) {
-        return new Mosaic(NamespaceId.createFromName("cat.currency"),
-            amount);
-    }
-
-    @Test
-    void shouldCreateAggregateTransactionAndSignWithMultipleCosignatories() {
-
-        Address address = Address.generateRandom(networkType);
-        TransferTransaction transferTx =
-            TransferTransactionFactory.create(
-                networkType,
-                address,
-                Collections.emptyList(),
-                new PlainMessage("test-message")
-            ).build();
-
-        AggregateTransaction aggregateTx =
-            AggregateTransactionFactory.createComplete(networkType,
                 Collections.singletonList(
                     transferTx.toAggregate(
                         new PublicAccount(
                             "B694186EE4AB0558CA4AFCFDD43B42114AE71094F5A1FC4A913FE9971CACD21D",
-                            networkType)))
-            ).deadline(new VertxFakeDeadline()).build();
+                            networkType))))
+            .deadline(new VertxFakeDeadline())
+            .build();
 
-        Account cosignatoryAccount = Account.generateNewAccount(this.networkType);
-        Account cosignatoryAccount2 = Account.generateNewAccount(this.networkType);
-        Account cosignatoryAccount3 = Account.generateNewAccount(this.networkType);
+    Account cosignatoryAccount = Account.generateNewAccount(this.networkType);
+    Account cosignatoryAccount2 = Account.generateNewAccount(this.networkType);
+    Account cosignatoryAccount3 = Account.generateNewAccount(this.networkType);
 
-        SignedTransaction signedTransaction =
-            cosignatoryAccount.signTransactionWithCosignatories(
-                aggregateTx, Arrays.asList(cosignatoryAccount2, cosignatoryAccount3), generationHash);
+    SignedTransaction signedTransaction =
+        cosignatoryAccount.signTransactionWithCosignatories(
+            aggregateTx, Arrays.asList(cosignatoryAccount2, cosignatoryAccount3), generationHash);
 
-        BinarySerialization serialization = BinarySerializationImpl.INSTANCE;
-        AggregateTransaction deserialized = (AggregateTransaction) serialization
-            .deserialize(ConvertUtils.fromHexToBytes(signedTransaction.getPayload()));
+    BinarySerialization serialization = BinarySerializationImpl.INSTANCE;
+    AggregateTransaction deserialized =
+        (AggregateTransaction)
+            serialization.deserialize(ConvertUtils.fromHexToBytes(signedTransaction.getPayload()));
 
-        Assertions.assertEquals(2, deserialized.getCosignatures().size());
+    Assertions.assertEquals(2, deserialized.getCosignatures().size());
 
-        Assertions
-            .assertEquals(cosignatoryAccount2.getPublicAccount(), deserialized.getCosignatures().get(0).getSigner());
-        Assertions
-            .assertEquals(cosignatoryAccount3.getPublicAccount(), deserialized.getCosignatures().get(1).getSigner());
-    }
+    Assertions.assertEquals(
+        cosignatoryAccount2.getPublicAccount(), deserialized.getCosignatures().get(0).getSigner());
+    Assertions.assertEquals(
+        cosignatoryAccount3.getPublicAccount(), deserialized.getCosignatures().get(1).getSigner());
+  }
 
-    @Test
-    void shouldFindAccountInAsASignerOfTheTransaction() {
-        TransactionInfoDTO aggregateTransferTransactionDTO = TestHelperVertx
-            .loadTransactionInfoDTO(
-                "accountInAsASignerOfTheTransaction.json");
+  @Test
+  void shouldFindAccountInAsASignerOfTheTransaction() {
+    TransactionInfoDTO aggregateTransferTransactionDTO =
+        TestHelperVertx.loadTransactionInfoDTO("accountInAsASignerOfTheTransaction.json");
 
-        AggregateTransaction aggregateTransferTransaction =
-            (AggregateTransaction) new GeneralTransactionMapper(jsonHelper)
-                .mapFromDto(aggregateTransferTransactionDTO);
+    AggregateTransaction aggregateTransferTransaction =
+        (AggregateTransaction)
+            new GeneralTransactionMapper(jsonHelper).mapFromDto(aggregateTransferTransactionDTO);
 
-        assertTrue(
-            aggregateTransferTransaction.signedByAccount(
-                PublicAccount.createFromPublicKey(
-                    "A5F82EC8EBB341427B6785C8111906CD0DF18838FB11B51CE0E18B5E79DFF630",
-                    NetworkType.MIJIN_TEST)));
-        assertTrue(
-            aggregateTransferTransaction.signedByAccount(
-                PublicAccount.createFromPublicKey(
-                    "7681ED5023141D9CDCF184E5A7B60B7D466739918ED5DA30F7E71EA7B86EFF2D",
-                    NetworkType.MIJIN_TEST)));
-        assertFalse(
-            aggregateTransferTransaction.signedByAccount(
-                PublicAccount.createFromPublicKey(
-                    "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                    NetworkType.MIJIN_TEST)));
-    }
-
-
+    assertTrue(
+        aggregateTransferTransaction.signedByAccount(
+            PublicAccount.createFromPublicKey(
+                "A5F82EC8EBB341427B6785C8111906CD0DF18838FB11B51CE0E18B5E79DFF630",
+                NetworkType.MIJIN_TEST)));
+    assertTrue(
+        aggregateTransferTransaction.signedByAccount(
+            PublicAccount.createFromPublicKey(
+                "7681ED5023141D9CDCF184E5A7B60B7D466739918ED5DA30F7E71EA7B86EFF2D",
+                NetworkType.MIJIN_TEST)));
+    assertFalse(
+        aggregateTransferTransaction.signedByAccount(
+            PublicAccount.createFromPublicKey(
+                "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
+                NetworkType.MIJIN_TEST)));
+  }
 }

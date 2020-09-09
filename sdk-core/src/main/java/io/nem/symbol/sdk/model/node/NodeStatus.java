@@ -13,46 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.node;
 
 import java.util.Arrays;
 
-/**
- * Node status.
- */
+/** Node status. */
 public enum NodeStatus {
-    /**
-     * Node is up.
-     */
-    UP("up"),
+  /** Node is up. */
+  UP("up"),
 
-    /**
-     * Node is down.
-     */
-    DOWN("down");
+  /** Node is down. */
+  DOWN("down");
 
-    private final String value;
+  private final String value;
 
-    NodeStatus(String value) {
-        this.value = value;
-    }
+  NodeStatus(String value) {
+    this.value = value;
+  }
 
-    /**
-     * @return the json value.
-     */
-    public String getValue() {
-        return value;
-    }
+  /** @return the json value. */
+  public String getValue() {
+    return value;
+  }
 
-    /**
-     * Static constructor converting receipt type raw value to enum instance.
-     *
-     * @param value the low level string value.
-     * @return {@link NodeStatus}
-     */
-    public static NodeStatus rawValueOf(String value) {
-        return Arrays.stream(values()).filter(e -> e.value.equals(value)).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
+  /**
+   * Static constructor converting receipt type raw value to enum instance.
+   *
+   * @param value the low level string value.
+   * @return {@link NodeStatus}
+   */
+  public static NodeStatus rawValueOf(String value) {
+    return Arrays.stream(values())
+        .filter(e -> e.value.equals(value))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 }

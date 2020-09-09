@@ -13,67 +13,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
-
 package io.nem.symbol.sdk.model.network;
 
 public class NetworkProperties {
 
-    /**
-     * Network identifier.
-     */
-    private final String identifier;
+  /** Network identifier. */
+  private final String identifier;
 
-    /**
-     * Get nodeEqualityStrategy
-     */
-    private final NodeIdentityEqualityStrategy nodeEqualityStrategy;
+  /** Get nodeEqualityStrategy */
+  private final NodeIdentityEqualityStrategy nodeEqualityStrategy;
 
-    /**
-     * Public key.
-     */
-    private final String nemesisSignerPublicKey;
+  /** Public key. */
+  private final String nemesisSignerPublicKey;
 
-    /**
-     * Get generationHash
-     */
-    private final String generationHashSeed;
+  /** Get generationHash */
+  private final String generationHashSeed;
 
-    /**
-     * Nemesis epoch time adjustment.
-     */
-    private final String epochAdjustment;
+  /** Nemesis epoch time adjustment. */
+  private final String epochAdjustment;
 
-    public NetworkProperties(String identifier,
-        NodeIdentityEqualityStrategy nodeEqualityStrategy, String nemesisSignerPublicKey,
-        String generationHashSeed, String epochAdjustment) {
-        this.identifier = identifier;
-        this.nodeEqualityStrategy = nodeEqualityStrategy;
-        this.nemesisSignerPublicKey = nemesisSignerPublicKey;
-        this.generationHashSeed = generationHashSeed;
-        this.epochAdjustment = epochAdjustment;
-    }
+  public NetworkProperties(
+      String identifier,
+      NodeIdentityEqualityStrategy nodeEqualityStrategy,
+      String nemesisSignerPublicKey,
+      String generationHashSeed,
+      String epochAdjustment) {
+    this.identifier = identifier;
+    this.nodeEqualityStrategy = nodeEqualityStrategy;
+    this.nemesisSignerPublicKey = nemesisSignerPublicKey;
+    this.generationHashSeed = generationHashSeed;
+    this.epochAdjustment = epochAdjustment;
+  }
 
-    public String getIdentifier() {
-        return identifier;
-    }
+  public String getIdentifier() {
+    return identifier;
+  }
 
-    public String getNemesisSignerPublicKey() {
-        return nemesisSignerPublicKey;
-    }
+  public String getNemesisSignerPublicKey() {
+    return nemesisSignerPublicKey;
+  }
 
-    public NodeIdentityEqualityStrategy getNodeEqualityStrategy() {
-        return nodeEqualityStrategy;
-    }
+  public NodeIdentityEqualityStrategy getNodeEqualityStrategy() {
+    return nodeEqualityStrategy;
+  }
 
-    public String getGenerationHashSeed() {
-        return generationHashSeed;
-    }
+  public String getGenerationHashSeed() {
+    return generationHashSeed;
+  }
 
-    public String getEpochAdjustment() {
-        return epochAdjustment;
-    }
+  public String getEpochAdjustment() {
+    return epochAdjustment;
+  }
 }
-

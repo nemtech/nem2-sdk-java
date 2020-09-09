@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,21 +24,28 @@ import org.junit.jupiter.api.Test;
 
 public class AccountRestrictionsInfoTest {
 
-    @Test
-    void shouldCreateAccountRestrictionsInfoViaConstructor() {
-        String metaId = "12345";
-        Address address = Address.createFromEncoded("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1");
-        AccountRestriction accountRestriction = new AccountRestriction(
+  @Test
+  void shouldCreateAccountRestrictionsInfoViaConstructor() {
+    String metaId = "12345";
+    Address address = Address.createFromEncoded("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1");
+    AccountRestriction accountRestriction =
+        new AccountRestriction(
             AccountAddressRestrictionFlags.ALLOW_OUTGOING_ADDRESS,
             Collections.singletonList("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQM"));
-        AccountRestrictions accountRestrictions = new AccountRestrictions(address, Arrays.asList(accountRestriction));
-        AccountPropertiesInfo accountPropertiesInfo =
-            new AccountPropertiesInfo(metaId, accountRestrictions);
+    AccountRestrictions accountRestrictions =
+        new AccountRestrictions(address, Arrays.asList(accountRestriction));
+    AccountPropertiesInfo accountPropertiesInfo =
+        new AccountPropertiesInfo(metaId, accountRestrictions);
 
-        assertEquals(metaId, accountPropertiesInfo.getMetaId());
-        assertEquals(address, accountPropertiesInfo.getAccountRestrictions().getAddress());
-        assertEquals(1, accountPropertiesInfo.getAccountRestrictions().getRestrictions().size());
-        assertEquals(AccountAddressRestrictionFlags.ALLOW_OUTGOING_ADDRESS,
-            accountPropertiesInfo.getAccountRestrictions().getRestrictions().get(0).getRestrictionFlags());
-    }
+    assertEquals(metaId, accountPropertiesInfo.getMetaId());
+    assertEquals(address, accountPropertiesInfo.getAccountRestrictions().getAddress());
+    assertEquals(1, accountPropertiesInfo.getAccountRestrictions().getRestrictions().size());
+    assertEquals(
+        AccountAddressRestrictionFlags.ALLOW_OUTGOING_ADDRESS,
+        accountPropertiesInfo
+            .getAccountRestrictions()
+            .getRestrictions()
+            .get(0)
+            .getRestrictionFlags());
+  }
 }

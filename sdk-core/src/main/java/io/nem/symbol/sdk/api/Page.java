@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
 
 import java.util.List;
@@ -25,88 +24,70 @@ import java.util.List;
  */
 public class Page<E> {
 
-    /**
-     * The page's entities.
-     */
-    private final List<E> data;
+  /** The page's entities. */
+  private final List<E> data;
 
-    /**
-     * The current page number. 1 means first page
-     */
-    private final Integer pageNumber;
+  /** The current page number. 1 means first page */
+  private final Integer pageNumber;
 
-    /**
-     * The page size.
-     */
-    private final Integer pageSize;
+  /** The page size. */
+  private final Integer pageSize;
 
-    /**
-     * If it's the last page.
-     */
-    private final boolean last;
+  /** If it's the last page. */
+  private final boolean last;
 
+  /**
+   * Constructor.
+   *
+   * @param data the page data
+   * @param pageNumber the current page number starting from 1.
+   * @param pageSize the page size.
+   * @param last if it's the last page.
+   */
+  public Page(List<E> data, Integer pageNumber, Integer pageSize, boolean last) {
+    this.data = data;
+    this.pageNumber = pageNumber;
+    this.pageSize = pageSize;
+    this.last = last;
+  }
 
-    /**
-     * Constructor.
-     *
-     * @param data the page data
-     * @param pageNumber the current page number starting from 1.
-     * @param pageSize the page size.
-     * @param last if it's the last page.
-     */
-    public Page(List<E> data, Integer pageNumber, Integer pageSize, boolean last) {
-        this.data = data;
-        this.pageNumber = pageNumber;
-        this.pageSize = pageSize;
-        this.last = last;
-    }
+  /**
+   * Constructor.
+   *
+   * @param data the page data
+   * @param pageNumber the current page number starting from 1.
+   * @param pageSize the page size.
+   */
+  public Page(List<E> data, Integer pageNumber, Integer pageSize) {
+    this(data, pageNumber, pageSize, data.isEmpty() || pageSize > data.size());
+  }
 
-    /**
-     * Constructor.
-     *
-     * @param data the page data
-     * @param pageNumber the current page number starting from 1.
-     * @param pageSize the page size.
-     */
-    public Page(List<E> data, Integer pageNumber, Integer pageSize) {
-        this(data, pageNumber, pageSize, data.isEmpty() || pageSize > data.size());
-    }
+  /**
+   * Constructor single page
+   *
+   * @param data the page data
+   */
+  public Page(List<E> data) {
+    this(data, 1, data.size(), true);
+  }
 
-    /**
-     * Constructor single page
-     *
-     * @param data the page data
-     */
-    public Page(List<E> data) {
-        this(data, 1, data.size(), true);
-    }
+  /** @return The page data. */
+  public List<E> getData() {
+    return data;
+  }
 
-    /**
-     * @return The page data.
-     */
-    public List<E> getData() {
-        return data;
-    }
+  /** @return the current page number starting from 1. */
+  public Integer getPageNumber() {
+    return pageNumber;
+  }
 
-    /**
-     * @return the current page number starting from 1.
-     */
-    public Integer getPageNumber() {
-        return pageNumber;
-    }
+  /** @return the page size. */
+  public Integer getPageSize() {
+    return pageSize;
+  }
 
-    /**
-     * @return the page size.
-     */
-    public Integer getPageSize() {
-        return pageSize;
-    }
-
-
-    /**
-     * @return if this page is the last one.
-     */
-    public boolean isLast() {
-        return last;
-    }
+  /** @return if this page is the last one. */
+  public boolean isLast() {
+    return last;
+  }
 }

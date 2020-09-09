@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import java.util.Arrays;
@@ -27,23 +26,16 @@ import org.junit.jupiter.api.Test;
  */
 public class AccountTypeTest {
 
-    @Test
-    public void rawValueOf() {
-        Assertions
-            .assertEquals(AccountType.MAIN,
-                AccountType.rawValueOf(
-                    AccountType.MAIN
-                        .getValue()));
+  @Test
+  public void rawValueOf() {
+    Assertions.assertEquals(AccountType.MAIN, AccountType.rawValueOf(AccountType.MAIN.getValue()));
 
-        Arrays.stream(AccountType.values())
-            .forEach(t -> Assertions.assertEquals(t, AccountType.rawValueOf(t.getValue())));
-    }
+    Arrays.stream(AccountType.values())
+        .forEach(t -> Assertions.assertEquals(t, AccountType.rawValueOf(t.getValue())));
+  }
 
-
-    @Test
-    public void rawValueOfNotExist() {
-        Assertions
-            .assertThrows(IllegalArgumentException.class, () -> AccountType.rawValueOf(-1));
-    }
-
+  @Test
+  public void rawValueOfNotExist() {
+    Assertions.assertThrows(IllegalArgumentException.class, () -> AccountType.rawValueOf(-1));
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import static io.nem.symbol.sdk.infrastructure.okhttp.TestHelperOkHttp.loadResource;
@@ -43,72 +42,73 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-/**
- * Tests of {@link NetworkCurrencyServiceImpl}
- */
+/** Tests of {@link NetworkCurrencyServiceImpl} */
 public class NetworkCurrencyServiceFromOkHttpGsonTest {
 
-    private NamespaceRepository namespaceRepository;
-    private TransactionRepository transactionRepository;
-    private MosaicRepository mosaicRepository;
-    private NetworkCurrencyService service;
+  private NamespaceRepository namespaceRepository;
+  private TransactionRepository transactionRepository;
+  private MosaicRepository mosaicRepository;
+  private NetworkCurrencyService service;
 
-    @BeforeEach
-    void setup() {
+  @BeforeEach
+  void setup() {
 
-        RepositoryFactory factory = mock(RepositoryFactory.class);
+    RepositoryFactory factory = mock(RepositoryFactory.class);
 
-        namespaceRepository = mock(NamespaceRepository.class);
-        when(factory.createNamespaceRepository()).thenReturn(namespaceRepository);
+    namespaceRepository = mock(NamespaceRepository.class);
+    when(factory.createNamespaceRepository()).thenReturn(namespaceRepository);
 
-        transactionRepository = mock(TransactionRepository.class);
-        when(factory.createTransactionRepository()).thenReturn(transactionRepository);
+    transactionRepository = mock(TransactionRepository.class);
+    when(factory.createTransactionRepository()).thenReturn(transactionRepository);
 
-        mosaicRepository = mock(MosaicRepository.class);
-        when(factory.createMosaicRepository()).thenReturn(mosaicRepository);
+    mosaicRepository = mock(MosaicRepository.class);
+    when(factory.createMosaicRepository()).thenReturn(mosaicRepository);
 
-        service = new NetworkCurrencyServiceImpl(factory);
-    }
+    service = new NetworkCurrencyServiceImpl(factory);
+  }
 
-    @Test
-    void getBlockTransactions() throws Exception {
+  @Test
+  void getBlockTransactions() throws Exception {
 
-        String transactionJsonList = loadResource("nemesis-transactions.json");
-        Gson gson = JsonHelperGson.creatGson(false);
+    String transactionJsonList = loadResource("nemesis-transactions.json");
+    Gson gson = JsonHelperGson.creatGson(false);
 
-        JsonSerialization serialization = new JsonSerializationOkHttp(gson);
-        Stream<String> stream = gson.fromJson(transactionJsonList, List.class).stream().map(Object::toString);
-        List<Transaction> transactions = stream.map(serialization::jsonToTransaction)
-            .collect(Collectors.toList());
+    JsonSerialization serialization = new JsonSerializationOkHttp(gson);
+    Stream<String> stream =
+        gson.fromJson(transactionJsonList, List.class).stream().map(Object::toString);
+    List<Transaction> transactions =
+        stream.map(serialization::jsonToTransaction).collect(Collectors.toList());
 
-        TransactionSearchCriteria ctieria = new TransactionSearchCriteria(TransactionGroup.CONFIRMED).height(BigInteger.ONE)
+    TransactionSearchCriteria ctieria =
+        new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
+            .height(BigInteger.ONE)
             .pageNumber(1);
 
-        when(transactionRepository.search(Mockito.eq(ctieria)))
-            .thenReturn(Observable.just(new Page<>(transactions, 1, 1)));
+    when(transactionRepository.search(Mockito.eq(ctieria)))
+        .thenReturn(Observable.just(new Page<>(transactions, 1, 1)));
 
-        List<NetworkCurrency> networkCurrencies = service.getNetworkCurrenciesFromNemesis()
-            .toFuture().get();
+    List<NetworkCurrency> networkCurrencies =
+        service.getNetworkCurrenciesFromNemesis().toFuture().get();
 
-        Assertions.assertEquals(2, networkCurrencies.size());
+    Assertions.assertEquals(2, networkCurrencies.size());
 
-        NetworkCurrency networkCurrency1 = networkCurrencies.get(0);
-        NetworkCurrency networkCurrency2 = networkCurrencies.get(1);
+    NetworkCurrency networkCurrency1 = networkCurrencies.get(0);
+    NetworkCurrency networkCurrency2 = networkCurrencies.get(1);
 
-        Assertions.assertEquals(networkCurrency1.getMosaicId().get(),
-            networkCurrency1.getUnresolvedMosaicId());
-        Assertions.assertEquals("cat.harvest",
-            networkCurrency1.getNamespaceId().get().getFullName().get());
+    Assertions.assertEquals(
+        networkCurrency1.getMosaicId().get(), networkCurrency1.getUnresolvedMosaicId());
+    Assertions.assertEquals(
+        "cat.harvest", networkCurrency1.getNamespaceId().get().getFullName().get());
 
-        Assertions.assertEquals(3, networkCurrency1.getDivisibility());
-        Assertions.assertTrue(networkCurrency1.isSupplyMutable());
-        Assertions.assertTrue(networkCurrency1.isTransferable());
+    Assertions.assertEquals(3, networkCurrency1.getDivisibility());
+    Assertions.assertTrue(networkCurrency1.isSupplyMutable());
+    Assertions.assertTrue(networkCurrency1.isTransferable());
 
-        Assertions.assertEquals(networkCurrency2.getMosaicId().get(),
-            networkCurrency2.getUnresolvedMosaicId());
-        Assertions.assertEquals("cat.currency",
-            networkCurrency2.getNamespaceId().get().getFullName().get());
-        Assertions.assertFalse(networkCurrency2.isSupplyMutable());
-        Assertions.assertTrue(networkCurrency2.isTransferable());
-    }
+    Assertions.assertEquals(
+        networkCurrency2.getMosaicId().get(), networkCurrency2.getUnresolvedMosaicId());
+    Assertions.assertEquals(
+        "cat.currency", networkCurrency2.getNamespaceId().get().getFullName().get());
+    Assertions.assertFalse(networkCurrency2.isSupplyMutable());
+    Assertions.assertTrue(networkCurrency2.isTransferable());
+  }
 }

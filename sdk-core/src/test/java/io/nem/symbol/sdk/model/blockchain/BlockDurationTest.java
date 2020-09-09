@@ -13,47 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.blockchain;
 
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * {@link BlockDuration} tests
- */
+/** {@link BlockDuration} tests */
 public class BlockDurationTest {
 
+  @Test
+  void shouldConstruct() {
+    long value = 10L;
+    BlockDuration blockDuration = new BlockDuration(value);
+    Assertions.assertEquals(value, blockDuration.getDuration());
+    Assertions.assertEquals("10", blockDuration.toString());
+  }
 
-    @Test
-    void shouldConstruct() {
-        long value = 10L;
-        BlockDuration blockDuration = new BlockDuration(value);
-        Assertions.assertEquals(value, blockDuration.getDuration());
-        Assertions.assertEquals("10", blockDuration.toString());
-    }
+  @Test
+  void shouldConstructBigInteger() {
+    long value = 10L;
+    BlockDuration blockDuration = new BlockDuration(BigInteger.valueOf(value));
+    Assertions.assertEquals(value, blockDuration.getDuration());
+    Assertions.assertEquals("10", blockDuration.toString());
+  }
 
-    @Test
-    void shouldConstructBigInteger() {
-        long value = 10L;
-        BlockDuration blockDuration = new BlockDuration(BigInteger.valueOf(value));
-        Assertions.assertEquals(value, blockDuration.getDuration());
-        Assertions.assertEquals("10", blockDuration.toString());
-    }
-
-    @Test
-    void shouldEquals() {
-        BlockDuration blockDuration1 = new BlockDuration(BigInteger.valueOf(10));
-        BlockDuration blockDuration2 = new BlockDuration(BigInteger.valueOf(10));
-        BlockDuration blockDuration3 = new BlockDuration(BigInteger.valueOf(30));
-        Assertions.assertEquals(blockDuration2, blockDuration1);
-        Assertions.assertNotEquals(blockDuration3, blockDuration1);
-        Assertions.assertEquals(blockDuration1, blockDuration2);
-        Assertions.assertNotEquals(blockDuration1, blockDuration3);
-        Assertions.assertNotEquals(BigInteger.valueOf(30), blockDuration3);
-        Assertions.assertNotEquals(blockDuration3, BigInteger.valueOf(30) );
-        Assertions.assertEquals(41, blockDuration1.hashCode());
-    }
-
+  @Test
+  void shouldEquals() {
+    BlockDuration blockDuration1 = new BlockDuration(BigInteger.valueOf(10));
+    BlockDuration blockDuration2 = new BlockDuration(BigInteger.valueOf(10));
+    BlockDuration blockDuration3 = new BlockDuration(BigInteger.valueOf(30));
+    Assertions.assertEquals(blockDuration2, blockDuration1);
+    Assertions.assertNotEquals(blockDuration3, blockDuration1);
+    Assertions.assertEquals(blockDuration1, blockDuration2);
+    Assertions.assertNotEquals(blockDuration1, blockDuration3);
+    Assertions.assertNotEquals(BigInteger.valueOf(30), blockDuration3);
+    Assertions.assertNotEquals(blockDuration3, BigInteger.valueOf(30));
+    Assertions.assertEquals(41, blockDuration1.hashCode());
+  }
 }

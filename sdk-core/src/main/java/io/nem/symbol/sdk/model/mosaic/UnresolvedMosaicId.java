@@ -13,35 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.mosaic;
 
 import java.math.BigInteger;
 
-/**
- * This interface is used when a NamespaceId can be provided as an alias of a Mosaic Id.
- */
+/** This interface is used when a NamespaceId can be provided as an alias of a Mosaic Id. */
 public interface UnresolvedMosaicId {
 
-    /**
-     * Gets the MosaicId/NamespaceId as a long number. It may be negative is it's overflowed.
-     *
-     * @return Long id.
-     */
-    long getIdAsLong();
+  /**
+   * Gets the MosaicId/NamespaceId as a long number. It may be negative is it's overflowed.
+   *
+   * @return Long id.
+   */
+  long getIdAsLong();
 
-    /**
-     * Gets the MosaicId/NamespaceId as an hex string.
-     *
-     * @return the  hex string.
-     */
-    String getIdAsHex();
+  /**
+   * Gets the MosaicId/NamespaceId as an hex string.
+   *
+   * @return the hex string.
+   */
+  String getIdAsHex();
 
-    /**
-     * Gets the MosaicId/NamespaceId as a {@link BigInteger}.
-     *
-     * @return Long id.
-     */
-    BigInteger getId();
-
+  /**
+   * Gets the MosaicId/NamespaceId as a {@link BigInteger}.
+   *
+   * @return Long id.
+   */
+  BigInteger getId();
 }

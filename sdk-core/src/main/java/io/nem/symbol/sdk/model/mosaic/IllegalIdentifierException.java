@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.mosaic;
-
 /**
  * IllegalIdentifierException is thrown when a Namespace Name or Mosaic Name is not valid.
  *
@@ -23,11 +21,11 @@ package io.nem.symbol.sdk.model.mosaic;
  */
 public class IllegalIdentifierException extends RuntimeException {
 
-    public IllegalIdentifierException(String s) {
-        super(s);
-    }
+  public IllegalIdentifierException(String s) {
+    super(s);
+  }
 
-    public IllegalIdentifierException(String s, Throwable throwable) {
-        super(s, throwable);
-    }
+  public IllegalIdentifierException(String s, Throwable throwable) {
+    super(s, throwable);
+  }
 }

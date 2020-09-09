@@ -27,47 +27,46 @@ import java.math.BigInteger;
  */
 public class HashLockTransaction extends Transaction {
 
-    private final Mosaic mosaic;
-    private final BigInteger duration;
-    private final String hash;
+  private final Mosaic mosaic;
+  private final BigInteger duration;
+  private final String hash;
 
-    /**
-     * It creates a {@link HashLockTransaction} based on the factory.
-     *
-     * @param factory the factory with the configured information.
-     */
-    HashLockTransaction(HashLockTransactionFactory factory) {
-        super(factory);
-        this.mosaic = factory.getMosaic();
-        this.duration = factory.getDuration();
-        this.hash = factory.getHash();
-    }
+  /**
+   * It creates a {@link HashLockTransaction} based on the factory.
+   *
+   * @param factory the factory with the configured information.
+   */
+  HashLockTransaction(HashLockTransactionFactory factory) {
+    super(factory);
+    this.mosaic = factory.getMosaic();
+    this.duration = factory.getDuration();
+    this.hash = factory.getHash();
+  }
 
-    /**
-     * Returns locked mosaic.
-     *
-     * @return locked mosaic.
-     */
-    public Mosaic getMosaic() {
-        return mosaic;
-    }
+  /**
+   * Returns locked mosaic.
+   *
+   * @return locked mosaic.
+   */
+  public Mosaic getMosaic() {
+    return mosaic;
+  }
 
-    /**
-     * Returns funds lock duration in number of blocks.
-     *
-     * @return funds lock duration in number of blocks.
-     */
-    public BigInteger getDuration() {
-        return duration;
-    }
+  /**
+   * Returns funds lock duration in number of blocks.
+   *
+   * @return funds lock duration in number of blocks.
+   */
+  public BigInteger getDuration() {
+    return duration;
+  }
 
-    /**
-     * Returns signed transaction hash for which funds are locked.
-     *
-     * @return signed transaction hash for which funds are locked.
-     */
-    public String getHash() {
-        return hash;
-    }
-
+  /**
+   * Returns signed transaction hash for which funds are locked.
+   *
+   * @return signed transaction hash for which funds are locked.
+   */
+  public String getHash() {
+    return hash;
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import com.google.gson.Gson;
@@ -47,30 +46,30 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  */
 public class JsonHelperGson implements JsonHelper {
 
-    private final Gson objectMapper;
-    private final Gson prettyObjectMapper;
+  private final Gson objectMapper;
+  private final Gson prettyObjectMapper;
 
-    public JsonHelperGson() {
-        this(JsonHelperGson.creatGson(false), JsonHelperGson.creatGson(true));
-    }
+  public JsonHelperGson() {
+    this(JsonHelperGson.creatGson(false), JsonHelperGson.creatGson(true));
+  }
 
-    public JsonHelperGson(Gson objectMapper) {
-        this(objectMapper, JsonHelperGson.creatGson(true));
-    }
+  public JsonHelperGson(Gson objectMapper) {
+    this(objectMapper, JsonHelperGson.creatGson(true));
+  }
 
-    public JsonHelperGson(Gson objectMapper, Gson prettyObjectMapper) {
-        this.objectMapper = objectMapper;
-        this.prettyObjectMapper = prettyObjectMapper;
-    }
+  public JsonHelperGson(Gson objectMapper, Gson prettyObjectMapper) {
+    this.objectMapper = objectMapper;
+    this.prettyObjectMapper = prettyObjectMapper;
+  }
 
-
-    public static final Gson creatGson(boolean pretty) {
-        JSON json = new JSON();
-        DateTypeAdapter dateTypeAdapter = new DateTypeAdapter();
-        SqlDateTypeAdapter sqlDateTypeAdapter = new SqlDateTypeAdapter();
-        ByteArrayAdapter byteArrayAdapter = json.new ByteArrayAdapter();
-        GsonBuilder builder = JSON.createGson().registerTypeHierarchyAdapter(
-            Collection.class, new CollectionAdapter())
+  public static final Gson creatGson(boolean pretty) {
+    JSON json = new JSON();
+    DateTypeAdapter dateTypeAdapter = new DateTypeAdapter();
+    SqlDateTypeAdapter sqlDateTypeAdapter = new SqlDateTypeAdapter();
+    ByteArrayAdapter byteArrayAdapter = json.new ByteArrayAdapter();
+    GsonBuilder builder =
+        JSON.createGson()
+            .registerTypeHierarchyAdapter(Collection.class, new CollectionAdapter())
             .registerTypeAdapter(LinkedTreeMap.class, new SortedJsonSerializer())
             .registerTypeAdapter(BigInteger.class, new BigIntegerJsonSerializer())
             .registerTypeAdapter(Double.class, new DoubleJsonSerializer())
@@ -78,213 +77,206 @@ public class JsonHelperGson implements JsonHelper {
             .registerTypeAdapter(java.sql.Date.class, sqlDateTypeAdapter)
             .registerTypeAdapter(byte[].class, byteArrayAdapter)
             .registerTypeAdapterFactory(new GsonJava8TypeAdapterFactory());
-        if (pretty) {
-            builder.setPrettyPrinting();
-        }
-        return builder.create();
+    if (pretty) {
+      builder.setPrettyPrinting();
     }
+    return builder.create();
+  }
+
+  @Override
+  public <T> T parse(final String string, final Class<T> clazz) {
+    try {
+      if (StringUtils.isEmpty(string)) {
+        return null;
+      }
+      return objectMapper.fromJson(string, clazz);
+    } catch (Exception e) {
+      throw handleException(e, "Json payload: " + string);
+    }
+  }
+
+  @Override
+  public Object parse(String string) {
+    return parse(string, JsonObject.class);
+  }
+
+  @Override
+  public <T> List<T> parseList(String string, Class<T> clazz) {
+    try {
+      if (StringUtils.isEmpty(string)) {
+        return null;
+      }
+      Type listType = TypeToken.getParameterized(List.class, clazz).getType();
+      return objectMapper.fromJson(string, listType);
+    } catch (Exception e) {
+      throw handleException(e, "Json payload: " + string);
+    }
+  }
+
+  @Override
+  public String print(final Object object) {
+    try {
+      if (object == null) {
+        return null;
+      }
+      return objectMapper.toJson(object);
+    } catch (Exception e) {
+      throw new IllegalArgumentException(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public String prettyPrint(Object object) {
+    try {
+      if (object == null) {
+        return null;
+      }
+      return prettyObjectMapper.toJson(object);
+    } catch (Exception e) {
+      throw new IllegalArgumentException(e.getMessage(), e);
+    }
+  }
+
+  private static IllegalArgumentException handleException(Exception e, String extraMessage) {
+    String message = ExceptionUtils.getMessage(e);
+    if (StringUtils.isNotBlank(extraMessage)) {
+      message += ". " + extraMessage;
+    }
+    return new IllegalArgumentException(message, e);
+  }
+
+  @Override
+  public <T> T convert(Object object, Class<T> instanceClass, String... path) {
+    Object child = path.length == 0 ? object : getNode(convert(object, JsonObject.class), path);
+    if (child == null) {
+      return null;
+    }
+    if (instanceClass.isInstance(child)) {
+      return (T) child;
+    }
+    return parse(print(child), instanceClass);
+  }
+
+  @Override
+  public Integer getInteger(Object object, String... path) {
+    JsonElement child = getNode(convert(object, JsonObject.class), path);
+    if (child == null || child.isJsonNull()) {
+      return null;
+    }
+    if (child.isJsonObject()) {
+      throw new IllegalArgumentException("Cannot extract a Integer from an json object");
+    }
+    return (int) child.getAsDouble();
+  }
+
+  @Override
+  public String getString(Object object, String... path) {
+    JsonElement child = getNode(convert(object, JsonObject.class), path);
+    if (child == null || child.isJsonNull()) {
+      return null;
+    }
+    if (child.isJsonObject()) {
+      throw new IllegalArgumentException("Cannot extract a String from an json object");
+    }
+    return child.getAsString();
+  }
+
+  @Override
+  public Long getLong(Object object, String... path) {
+    JsonElement child = getNode(convert(object, JsonObject.class), path);
+    if (child == null || child.isJsonNull()) {
+      return null;
+    }
+    if (child.isJsonObject()) {
+      throw new IllegalArgumentException("Cannot extract a Long from an json object");
+    }
+    return (long) child.getAsDouble();
+  }
+
+  @Override
+  @SuppressWarnings("squid:S2447")
+  public Boolean getBoolean(Object object, String... path) {
+    JsonElement child = getNode(convert(object, JsonObject.class), path);
+    if (child == null || child.isJsonNull()) {
+      return null;
+    }
+    if (child.isJsonObject()) {
+      throw new IllegalArgumentException("Cannot extract a Boolean from an json object");
+    }
+    return child.getAsBoolean();
+  }
+
+  @Override
+  public BigInteger getBigInteger(Object object, String... path) {
+    String string = getString(object, path);
+    if (string == null) {
+      return null;
+    }
+    return new BigInteger(string);
+  }
+
+  @Override
+  public boolean contains(Object object, String... path) {
+    JsonElement child = getNode(convert(object, JsonObject.class), path);
+    return child != null && !child.isJsonNull();
+  }
+
+  @Override
+  public Object getObject(Object object, String... path) {
+    return getNode(convert(object, JsonObject.class), path);
+  }
+
+  private JsonElement getNode(final JsonObject parent, final String... path) {
+    JsonElement child = parent;
+    if (child == null) {
+      return null;
+    }
+    if (path.length == 0) {
+      return child;
+    }
+    if (!child.isJsonObject()) {
+      return null;
+    }
+    int index = 0;
+    for (String attribute : path) {
+      child = ((JsonObject) child).get(attribute);
+      if (child == null) {
+        return null;
+      }
+      index++;
+      if (index < path.length && !child.isJsonObject()) {
+        return null;
+      }
+    }
+    return child;
+  }
+
+  private static class BigIntegerJsonSerializer implements JsonSerializer<BigInteger> {
 
     @Override
-    public <T> T parse(final String string, final Class<T> clazz) {
-        try {
-            if (StringUtils.isEmpty(string)) {
-                return null;
-            }
-            return objectMapper.fromJson(string, clazz);
-        } catch (Exception e) {
-            throw handleException(e, "Json payload: " + string);
-        }
+    public JsonElement serialize(BigInteger src, Type typeOfSrc, JsonSerializationContext context) {
+      return new JsonPrimitive(src.toString());
     }
+  }
+
+  private static class DoubleJsonSerializer implements JsonSerializer<Double> {
 
     @Override
-    public Object parse(String string) {
-        return parse(string, JsonObject.class);
+    public JsonElement serialize(Double src, Type typeOfSrc, JsonSerializationContext context) {
+      return new JsonPrimitive(src.longValue());
     }
+  }
+
+  private static class SortedJsonSerializer implements JsonSerializer<LinkedTreeMap> {
 
     @Override
-    public <T> List<T> parseList(String string, Class<T> clazz) {
-        try {
-            if (StringUtils.isEmpty(string)) {
-                return null;
-            }
-            Type listType = TypeToken.getParameterized(List.class, clazz).getType();
-            return objectMapper.fromJson(string, listType);
-        } catch (Exception e) {
-            throw handleException(e, "Json payload: " + string);
-        }
+    public JsonElement serialize(LinkedTreeMap foo, Type type, JsonSerializationContext context) {
+      JsonObject object = new JsonObject();
+      TreeSet sorted = new TreeSet(foo.keySet());
+      for (Object key : sorted) {
+        object.add((String) key, context.serialize(foo.get(key)));
+      }
+      return object;
     }
-
-    @Override
-    public String print(final Object object) {
-        try {
-            if (object == null) {
-                return null;
-            }
-            return objectMapper.toJson(object);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public String prettyPrint(Object object) {
-        try {
-            if (object == null) {
-                return null;
-            }
-            return prettyObjectMapper.toJson(object);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e.getMessage(), e);
-        }
-    }
-
-
-    private static IllegalArgumentException handleException(Exception e, String extraMessage) {
-        String message = ExceptionUtils.getMessage(e);
-        if (StringUtils.isNotBlank(extraMessage)) {
-            message += ". " + extraMessage;
-        }
-        return new IllegalArgumentException(message, e);
-    }
-
-    @Override
-    public <T> T convert(Object object, Class<T> instanceClass, String... path) {
-        Object child = path.length == 0 ? object : getNode(convert(object, JsonObject.class), path);
-        if (child == null) {
-            return null;
-        }
-        if (instanceClass.isInstance(child)) {
-            return (T) child;
-        }
-        return parse(print(child), instanceClass);
-    }
-
-    @Override
-    public Integer getInteger(Object object, String... path) {
-        JsonElement child = getNode(convert(object, JsonObject.class), path);
-        if (child == null || child.isJsonNull()) {
-            return null;
-        }
-        if (child.isJsonObject()) {
-            throw new IllegalArgumentException("Cannot extract a Integer from an json object");
-        }
-        return (int) child.getAsDouble();
-    }
-
-    @Override
-    public String getString(Object object, String... path) {
-        JsonElement child = getNode(convert(object, JsonObject.class), path);
-        if (child == null || child.isJsonNull()) {
-            return null;
-        }
-        if (child.isJsonObject()) {
-            throw new IllegalArgumentException("Cannot extract a String from an json object");
-        }
-        return child.getAsString();
-    }
-
-    @Override
-    public Long getLong(Object object, String... path) {
-        JsonElement child = getNode(convert(object, JsonObject.class), path);
-        if (child == null || child.isJsonNull()) {
-            return null;
-        }
-        if (child.isJsonObject()) {
-            throw new IllegalArgumentException("Cannot extract a Long from an json object");
-        }
-        return (long) child.getAsDouble();
-    }
-
-    @Override
-    @SuppressWarnings("squid:S2447")
-    public Boolean getBoolean(Object object, String... path) {
-        JsonElement child = getNode(convert(object, JsonObject.class), path);
-        if (child == null || child.isJsonNull()) {
-            return null;
-        }
-        if (child.isJsonObject()) {
-            throw new IllegalArgumentException("Cannot extract a Boolean from an json object");
-        }
-        return child.getAsBoolean();
-    }
-
-    @Override
-    public BigInteger getBigInteger(Object object, String... path) {
-        String string = getString(object, path);
-        if (string == null) {
-            return null;
-        }
-        return new BigInteger(string);
-    }
-
-    @Override
-    public boolean contains(Object object, String... path) {
-        JsonElement child = getNode(convert(object, JsonObject.class), path);
-        return child != null && !child.isJsonNull();
-    }
-
-
-    @Override
-    public Object getObject(Object object, String... path) {
-        return getNode(convert(object, JsonObject.class), path);
-    }
-
-
-    private JsonElement getNode(final JsonObject parent, final String... path) {
-        JsonElement child = parent;
-        if (child == null) {
-            return null;
-        }
-        if (path.length == 0) {
-            return child;
-        }
-        if (!child.isJsonObject()) {
-            return null;
-        }
-        int index = 0;
-        for (String attribute : path) {
-            child = ((JsonObject) child).get(attribute);
-            if (child == null) {
-                return null;
-            }
-            index++;
-            if (index < path.length && !child.isJsonObject()) {
-                return null;
-            }
-        }
-        return child;
-    }
-
-    private static class BigIntegerJsonSerializer implements JsonSerializer<BigInteger> {
-
-        @Override
-        public JsonElement serialize(BigInteger src, Type typeOfSrc,
-            JsonSerializationContext context) {
-            return new JsonPrimitive(src.toString());
-        }
-    }
-
-    private static class DoubleJsonSerializer implements JsonSerializer<Double> {
-
-        @Override
-        public JsonElement serialize(Double src, Type typeOfSrc,
-            JsonSerializationContext context) {
-            return new JsonPrimitive(src.longValue());
-        }
-    }
-
-
-    private static class SortedJsonSerializer implements JsonSerializer<LinkedTreeMap> {
-
-        @Override
-        public JsonElement serialize(LinkedTreeMap foo, Type type,
-            JsonSerializationContext context) {
-            JsonObject object = new JsonObject();
-            TreeSet sorted = new TreeSet(foo.keySet());
-            for (Object key : sorted) {
-                object.add((String) key, context.serialize(foo.get(key)));
-            }
-            return object;
-        }
-    }
+  }
 }

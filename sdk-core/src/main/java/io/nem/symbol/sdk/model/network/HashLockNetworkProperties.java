@@ -13,40 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
-
 package io.nem.symbol.sdk.model.network;
-
-/**
- * HashLockNetworkProperties
- */
+/** HashLockNetworkProperties */
 public class HashLockNetworkProperties {
 
-    /**
-     * Amount that has to be locked per aggregate in partial cache.
-     */
-    private final String lockedFundsPerAggregate;
+  /** Amount that has to be locked per aggregate in partial cache. */
+  private final String lockedFundsPerAggregate;
 
-    /**
-     * Maximum number of blocks for which a hash lock can exist.
-     */
-    private final String maxHashLockDuration;
+  /** Maximum number of blocks for which a hash lock can exist. */
+  private final String maxHashLockDuration;
 
+  public HashLockNetworkProperties(String lockedFundsPerAggregate, String maxHashLockDuration) {
+    this.lockedFundsPerAggregate = lockedFundsPerAggregate;
+    this.maxHashLockDuration = maxHashLockDuration;
+  }
 
-    public HashLockNetworkProperties(String lockedFundsPerAggregate,
-        String maxHashLockDuration) {
-        this.lockedFundsPerAggregate = lockedFundsPerAggregate;
-        this.maxHashLockDuration = maxHashLockDuration;
-    }
+  public String getLockedFundsPerAggregate() {
+    return lockedFundsPerAggregate;
+  }
 
-    public String getLockedFundsPerAggregate() {
-        return lockedFundsPerAggregate;
-    }
-
-    public String getMaxHashLockDuration() {
-        return maxHashLockDuration;
-    }
+  public String getMaxHashLockDuration() {
+    return maxHashLockDuration;
+  }
 }
-

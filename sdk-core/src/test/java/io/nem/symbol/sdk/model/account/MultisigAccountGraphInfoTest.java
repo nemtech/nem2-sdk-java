@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,26 +28,27 @@ import org.junit.jupiter.api.Test;
 
 class MultisigAccountGraphInfoTest {
 
-    @Test
-    void returnTheLevels() {
-        Map<Integer, List<MultisigAccountInfo>> info = new HashMap<>();
-        MultisigAccountInfo multisigAccountInfo =
-            new MultisigAccountInfo(
-                new PublicAccount(
+  @Test
+  void returnTheLevels() {
+    Map<Integer, List<MultisigAccountInfo>> info = new HashMap<>();
+    MultisigAccountInfo multisigAccountInfo =
+        new MultisigAccountInfo(
+            new PublicAccount(
                     "5D58EC16F07BF00BDE9B040E7451A37F9908C59E143A01438C04345D8E9DDF39",
-                    NetworkType.MIJIN_TEST).getAddress(),
-                1,
-                1,
-                Collections.singletonList(
-                    new PublicAccount(
+                    NetworkType.MIJIN_TEST)
+                .getAddress(),
+            1,
+            1,
+            Collections.singletonList(
+                new PublicAccount(
                         "1674016C27FE2C2EB5DFA73996FA54A183B38AED0AA64F756A3918BAF08E061B",
-                        NetworkType.MIJIN_TEST).getAddress()),
-                Collections.EMPTY_LIST);
-        info.put(-3, Collections.singletonList(multisigAccountInfo));
-        MultisigAccountGraphInfo multisigAccountGraphInfo = new MultisigAccountGraphInfo(info);
-        assertEquals(
-            Stream.of(-3).collect(Collectors.toSet()), multisigAccountGraphInfo.getLevelsNumber());
-        assertEquals(
-            multisigAccountInfo, multisigAccountGraphInfo.getMultisigEntries().get(-3).get(0));
-    }
+                        NetworkType.MIJIN_TEST)
+                    .getAddress()),
+            Collections.EMPTY_LIST);
+    info.put(-3, Collections.singletonList(multisigAccountInfo));
+    MultisigAccountGraphInfo multisigAccountGraphInfo = new MultisigAccountGraphInfo(info);
+    assertEquals(
+        Stream.of(-3).collect(Collectors.toSet()), multisigAccountGraphInfo.getLevelsNumber());
+    assertEquals(multisigAccountInfo, multisigAccountGraphInfo.getMultisigEntries().get(-3).get(0));
+  }
 }

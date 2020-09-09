@@ -13,40 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.blockchain;
 
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.util.Arrays;
 
-/**
- * Position relative to the proofHash being evaluated.
- */
+/** Position relative to the proofHash being evaluated. */
 public enum Position {
+  LEFT("left"),
 
-    LEFT("left"),
+  RIGHT("right");
 
-    RIGHT("right");
+  private String value;
 
-    private String value;
+  Position(String value) {
+    this.value = value;
+  }
 
-    Position(String value) {
-        this.value = value;
-    }
+  public String getValue() {
+    return value;
+  }
 
-    public String getValue() {
-        return value;
-    }
-
-    /**
-     * Static constructor converting {@link Position} to enum instance.
-     *
-     * @param value the low level int value.
-     * @return {@link NetworkType}
-     */
-    public static Position rawValueOf(String value) {
-        return Arrays.stream(values()).filter(e -> e.value.equals(value)).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
-
+  /**
+   * Static constructor converting {@link Position} to enum instance.
+   *
+   * @param value the low level int value.
+   * @return {@link NetworkType}
+   */
+  public static Position rawValueOf(String value) {
+    return Arrays.stream(values())
+        .filter(e -> e.value.equals(value))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 }

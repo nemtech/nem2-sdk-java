@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.sdk.model.account.Account;
@@ -36,102 +35,88 @@ import org.junit.jupiter.api.Test;
  */
 public class MultisigRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest {
 
-    private MultisigRepositoryOkHttpImpl repository;
-    private final Account account = Account.generateNewAccount(networkType);
-    private final Account account1 = Account.generateNewAccount(networkType);
-    private final Account account2 = Account.generateNewAccount(networkType);
-    private final Account account3 = Account.generateNewAccount(networkType);
+  private MultisigRepositoryOkHttpImpl repository;
+  private final Account account = Account.generateNewAccount(networkType);
+  private final Account account1 = Account.generateNewAccount(networkType);
+  private final Account account2 = Account.generateNewAccount(networkType);
+  private final Account account3 = Account.generateNewAccount(networkType);
 
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-        repository = new MultisigRepositoryOkHttpImpl(apiClientMock, networkTypeObservable);
-    }
+  @BeforeEach
+  public void setUp() {
+    super.setUp();
+    repository = new MultisigRepositoryOkHttpImpl(apiClientMock, networkTypeObservable);
+  }
 
-    @Test
-    void getMultisigAccountInfo() throws Exception {
+  @Test
+  void getMultisigAccountInfo() throws Exception {
 
-        MultisigAccountInfoDTO dto = createMultisigAccountInfoDTO();
+    MultisigAccountInfoDTO dto = createMultisigAccountInfoDTO();
 
-        mockRemoteCall(dto);
+    mockRemoteCall(dto);
 
-        MultisigAccountInfo multisigAccountInfo = repository
-            .getMultisigAccountInfo(account.getAddress())
-            .toFuture().get();
+    MultisigAccountInfo multisigAccountInfo =
+        repository.getMultisigAccountInfo(account.getAddress()).toFuture().get();
 
-        assertMultisignAccountInfo(multisigAccountInfo);
+    assertMultisignAccountInfo(multisigAccountInfo);
+  }
 
-    }
+  private void assertMultisignAccountInfo(MultisigAccountInfo multisigAccountInfo) {
+    Assertions.assertEquals(
+        Arrays.asList(account1.getAddress(), account2.getAddress()),
+        multisigAccountInfo.getCosignatoryAddresses());
 
-    private void assertMultisignAccountInfo(MultisigAccountInfo multisigAccountInfo) {
-        Assertions
-            .assertEquals(Arrays.asList(account1.getAddress(), account2.getAddress()),
-                multisigAccountInfo.getCosignatoryAddresses());
+    Assertions.assertEquals(
+        Arrays.asList(account2.getAddress(), account3.getAddress()),
+        multisigAccountInfo.getMultisigAddresses());
 
-        Assertions
-            .assertEquals(Arrays.asList(account2.getAddress(), account3.getAddress()),
-                multisigAccountInfo.getMultisigAddresses());
+    Assertions.assertEquals(1, multisigAccountInfo.getMinApproval());
 
-        Assertions
-            .assertEquals(1,
-                multisigAccountInfo.getMinApproval());
+    Assertions.assertEquals(2, multisigAccountInfo.getMinRemoval());
 
-        Assertions
-            .assertEquals(2,
-                multisigAccountInfo.getMinRemoval());
+    Assertions.assertEquals(account.getAddress(), multisigAccountInfo.getAccountAddress());
+  }
 
-        Assertions
-            .assertEquals(account.getAddress(),
-                multisigAccountInfo.getAccountAddress());
-    }
+  @Test
+  void getMultisigAccountGraphInfo() throws Exception {
 
-    @Test
-    void getMultisigAccountGraphInfo() throws Exception {
+    MultisigAccountGraphInfoDTO dto = new MultisigAccountGraphInfoDTO();
+    dto.setLevel(10);
+    dto.setMultisigEntries(new ArrayList<>());
+    dto.getMultisigEntries().add(createMultisigAccountInfoDTO());
 
-        MultisigAccountGraphInfoDTO dto = new MultisigAccountGraphInfoDTO();
-        dto.setLevel(10);
-        dto.setMultisigEntries(new ArrayList<>());
-        dto.getMultisigEntries().add(createMultisigAccountInfoDTO());
+    List<MultisigAccountGraphInfoDTO> dtos = new ArrayList<>();
+    dtos.add(dto);
 
-        List<MultisigAccountGraphInfoDTO> dtos = new ArrayList<>();
-        dtos.add(dto);
+    mockRemoteCall(dtos);
 
-        mockRemoteCall(dtos);
+    MultisigAccountGraphInfo multisigAccountInfo =
+        repository.getMultisigAccountGraphInfo(account.getAddress()).toFuture().get();
 
-        MultisigAccountGraphInfo multisigAccountInfo = repository
-            .getMultisigAccountGraphInfo(account.getAddress())
-            .toFuture().get();
+    Assertions.assertEquals(1, multisigAccountInfo.getMultisigEntries().size());
+    List<MultisigAccountInfo> multisigAccountInfos =
+        multisigAccountInfo.getMultisigEntries().get(10);
+    Assertions.assertEquals(1, multisigAccountInfos.size());
 
-        Assertions.assertEquals(1, multisigAccountInfo.getMultisigEntries().size());
-        List<MultisigAccountInfo> multisigAccountInfos = multisigAccountInfo.getMultisigEntries()
-            .get(10);
-        Assertions.assertEquals(1, multisigAccountInfos.size());
+    assertMultisignAccountInfo(multisigAccountInfos.get(0));
+  }
 
-        assertMultisignAccountInfo(multisigAccountInfos.get(0));
+  private MultisigAccountInfoDTO createMultisigAccountInfoDTO() {
+    MultisigAccountInfoDTO dto = new MultisigAccountInfoDTO();
 
+    MultisigDTO multisigDto = new MultisigDTO();
+    multisigDto.setAccountAddress(account.getAddress().encoded());
+    multisigDto.setMinApproval(1L);
+    multisigDto.setMinRemoval(2L);
+    multisigDto.setCosignatoryAddresses(
+        Arrays.asList(account1.getAddress().encoded(), account2.getAddress().encoded()));
+    multisigDto.setMultisigAddresses(
+        Arrays.asList(account2.getAddress().encoded(), account3.getAddress().encoded()));
+    dto.setMultisig(multisigDto);
+    return dto;
+  }
 
-    }
-
-
-    private MultisigAccountInfoDTO createMultisigAccountInfoDTO() {
-        MultisigAccountInfoDTO dto = new MultisigAccountInfoDTO();
-
-        MultisigDTO multisigDto = new MultisigDTO();
-        multisigDto.setAccountAddress(account.getAddress().encoded());
-        multisigDto.setMinApproval(1L);
-        multisigDto.setMinRemoval(2L);
-        multisigDto.setCosignatoryAddresses(
-            Arrays.asList(account1.getAddress().encoded(), account2.getAddress().encoded()));
-        multisigDto
-            .setMultisigAddresses(Arrays.asList(account2.getAddress().encoded(), account3.getAddress().encoded()));
-        dto.setMultisig(multisigDto);
-        return dto;
-    }
-
-
-    @Override
-    protected AbstractRepositoryOkHttpImpl getRepository() {
-        return repository;
-    }
-
+  @Override
+  protected AbstractRepositoryOkHttpImpl getRepository() {
+    return repository;
+  }
 }

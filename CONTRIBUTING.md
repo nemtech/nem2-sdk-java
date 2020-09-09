@@ -58,9 +58,19 @@ We enjoy working with contributors to get their code accepted. There are many ap
 important to find the best approach before writing too much code.
 
 ### Code styles
-This SDK project applies modified [Google Code Style](https://google.github.io/styleguide/javaguide.html) with all indentations set to `4` spaces.
+This SDK project applies [Google Code Style](https://source.android.com/setup/contribute/code-style).
 
-IntelliJ users can find the code style import xml from `resources/GoogleStyle_IntelliJ.xml`
+Intellij users can use [google-java-format](https://plugins.jetbrains.com/plugin/8527-google-java-format) plugin. Remember to enable it.
+
+You can also check or apply the style with [spotless](https://github.com/diffplug/spotless/blob/main/plugin-gradle/README.md) from command line:
+
+````
+./gradlew spotlessCheck
+````
+
+````
+./gradlew spotlessApply
+````
 
 ### Contributing License Notice
 

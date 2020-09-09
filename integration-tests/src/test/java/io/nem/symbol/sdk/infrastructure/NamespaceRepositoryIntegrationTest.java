@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,66 +36,73 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NamespaceRepositoryIntegrationTest extends BaseIntegrationTest {
 
-    private NamespaceId namespaceId;
+  private NamespaceId namespaceId;
 
-    @BeforeAll
-    void setup() {
-        namespaceId = getNetworkCurrency().getNamespaceId().orElseThrow(() ->
-            new IllegalStateException(
-                "Network currency namespace id must be provided must be provided"));
-    }
+  @BeforeAll
+  void setup() {
+    namespaceId =
+        getNetworkCurrency()
+            .getNamespaceId()
+            .orElseThrow(
+                () ->
+                    new IllegalStateException(
+                        "Network currency namespace id must be provided must be provided"));
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getNamespace(RepositoryType type) {
-        NamespaceInfo namespaceInfo = get(getNamespaceRepository(type).getNamespace(namespaceId));
-        assertEquals(new BigInteger("1"), namespaceInfo.getStartHeight());
-        assertEquals(namespaceId, namespaceInfo.getId());
-        assertEquals(namespaceId, namespaceInfo.getLevels().get(1));
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getNamespace(RepositoryType type) {
+    NamespaceInfo namespaceInfo = get(getNamespaceRepository(type).getNamespace(namespaceId));
+    assertEquals(new BigInteger("1"), namespaceInfo.getStartHeight());
+    assertEquals(namespaceId, namespaceInfo.getId());
+    assertEquals(namespaceId, namespaceInfo.getLevels().get(1));
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getNamespacesFromAccount(RepositoryType type) {
-        Account account = config().getDefaultAccount();
-        List<NamespaceInfo> namespacesInfo = get(
-            getNamespaceRepository(type).search(new NamespaceSearchCriteria().ownerAddress(account.getAddress())))
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getNamespacesFromAccount(RepositoryType type) {
+    Account account = config().getDefaultAccount();
+    List<NamespaceInfo> namespacesInfo =
+        get(getNamespaceRepository(type)
+                .search(new NamespaceSearchCriteria().ownerAddress(account.getAddress())))
             .getData();
 
-        namespacesInfo.forEach(n -> {
-            Assertions.assertEquals(account.getAddress(), n.getOwnerAddress());
+    namespacesInfo.forEach(
+        n -> {
+          Assertions.assertEquals(account.getAddress(), n.getOwnerAddress());
         });
-    }
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void getNamespaceNames(RepositoryType type) {
-        List<NamespaceName> namespaceNames =
-            get(getNamespaceRepository(type)
-                .getNamespaceNames(Collections.singletonList(namespaceId)));
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getNamespaceNames(RepositoryType type) {
+    List<NamespaceName> namespaceNames =
+        get(getNamespaceRepository(type).getNamespaceNames(Collections.singletonList(namespaceId)));
 
-        Assertions.assertEquals(2, namespaceNames.size());
-        Assertions.assertEquals("currency", namespaceNames.get(0).getName());
-        Assertions.assertTrue(namespaceNames.get(0).getParentId().isPresent());
+    Assertions.assertEquals(2, namespaceNames.size());
+    Assertions.assertEquals("currency", namespaceNames.get(0).getName());
+    Assertions.assertTrue(namespaceNames.get(0).getParentId().isPresent());
 
-        Assertions.assertEquals("cat", namespaceNames.get(1).getName());
-        Assertions.assertFalse(namespaceNames.get(1).getParentId().isPresent());
+    Assertions.assertEquals("cat", namespaceNames.get(1).getName());
+    Assertions.assertFalse(namespaceNames.get(1).getParentId().isPresent());
+  }
 
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void throwExceptionWhenNamespaceDoesNotExists(RepositoryType type) {
+    RepositoryCallException exception =
+        Assertions.assertThrows(
+            RepositoryCallException.class,
+            () ->
+                get(
+                    getNamespaceRepository(type)
+                        .getNamespace(NamespaceId.createFromName("nonregisterednamespace"))));
+    Assertions.assertEquals(
+        "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'F75CF605C224A9E7'",
+        exception.getMessage());
+  }
 
-    }
-
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void throwExceptionWhenNamespaceDoesNotExists(RepositoryType type) {
-        RepositoryCallException exception = Assertions
-            .assertThrows(RepositoryCallException.class, () -> get(getNamespaceRepository(type)
-                .getNamespace(NamespaceId.createFromName("nonregisterednamespace"))));
-        Assertions.assertEquals(
-            "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'F75CF605C224A9E7'",
-            exception.getMessage());
-    }
-
-    private NamespaceRepository getNamespaceRepository(RepositoryType type) {
-        return getRepositoryFactory(type).createNamespaceRepository();
-    }
+  private NamespaceRepository getNamespaceRepository(RepositoryType type) {
+    return getRepositoryFactory(type).createNamespaceRepository();
+  }
 }

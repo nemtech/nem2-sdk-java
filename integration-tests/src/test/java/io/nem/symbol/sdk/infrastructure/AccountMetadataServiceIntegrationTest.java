@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.MetadataRepository;
@@ -30,58 +29,61 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-/**
- * Integration tests around account metadata service.
- */
+/** Integration tests around account metadata service. */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
-    private Account signerAccount;
+  private Account signerAccount;
 
-    private Account targetAccount;
+  private Account targetAccount;
 
-    @BeforeEach
-    void setup() {
-        signerAccount = config().getDefaultAccount();
-        targetAccount = config().getDefaultAccount();
-    }
+  @BeforeEach
+  void setup() {
+    signerAccount = config().getDefaultAccount();
+    targetAccount = config().getDefaultAccount();
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void setAndUpdateAccountMetadata(RepositoryType type) {
-        BigInteger key = BigInteger.valueOf(RandomUtils.generateRandomInt(100000));
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void setAndUpdateAccountMetadata(RepositoryType type) {
+    BigInteger key = BigInteger.valueOf(RandomUtils.generateRandomInt(100000));
 
-        String originalMessage = "The original message";
-        String newMessage = "The new Message";
+    String originalMessage = "The original message";
+    String newMessage = "The new Message";
 
-        RepositoryFactory repositoryFactory = getRepositoryFactory(type);
-        MetadataRepository metadataRepository = repositoryFactory.createMetadataRepository();
+    RepositoryFactory repositoryFactory = getRepositoryFactory(type);
+    MetadataRepository metadataRepository = repositoryFactory.createMetadataRepository();
 
-        MetadataTransactionService service = new MetadataTransactionServiceImpl(repositoryFactory);
+    MetadataTransactionService service = new MetadataTransactionServiceImpl(repositoryFactory);
 
-        AccountMetadataTransaction originalTransaction = get(service
-            .createAccountMetadataTransactionFactory(targetAccount.getAddress(), key, originalMessage,
-                signerAccount.getAddress())).maxFee(this.maxFee).build();
+    AccountMetadataTransaction originalTransaction =
+        get(service.createAccountMetadataTransactionFactory(
+                targetAccount.getAddress(), key, originalMessage, signerAccount.getAddress()))
+            .maxFee(this.maxFee)
+            .build();
 
-        announceAggregateAndValidate(type, originalTransaction, signerAccount);
-        sleep(1000);
+    announceAggregateAndValidate(type, originalTransaction, signerAccount);
+    sleep(1000);
 
-        assertMetadata(key, originalMessage, metadataRepository);
+    assertMetadata(key, originalMessage, metadataRepository);
 
-        AccountMetadataTransaction updateTransaction = get(service
-            .createAccountMetadataTransactionFactory(targetAccount.getAddress(), key, newMessage,
-                signerAccount.getAddress())).maxFee(this.maxFee).build();
+    AccountMetadataTransaction updateTransaction =
+        get(service.createAccountMetadataTransactionFactory(
+                targetAccount.getAddress(), key, newMessage, signerAccount.getAddress()))
+            .maxFee(this.maxFee)
+            .build();
 
-        announceAggregateAndValidate(type, updateTransaction, signerAccount);
-        sleep(1000);
-        assertMetadata(key, newMessage, metadataRepository);
-    }
+    announceAggregateAndValidate(type, updateTransaction, signerAccount);
+    sleep(1000);
+    assertMetadata(key, newMessage, metadataRepository);
+  }
 
-
-    private void assertMetadata(BigInteger key, String value, MetadataRepository metadataRepository) {
-        MetadataSearchCriteria criteria = new MetadataSearchCriteria().scopedMetadataKey(key)
+  private void assertMetadata(BigInteger key, String value, MetadataRepository metadataRepository) {
+    MetadataSearchCriteria criteria =
+        new MetadataSearchCriteria()
+            .scopedMetadataKey(key)
             .sourceAddress(signerAccount.getAddress());
-        Metadata originalMetadata = get(metadataRepository.search(criteria)).getData().get(0);
-        Assertions.assertEquals(value, originalMetadata.getValue());
-    }
+    Metadata originalMetadata = get(metadataRepository.search(criteria)).getData().get(0);
+    Assertions.assertEquals(value, originalMetadata.getValue());
+  }
 }

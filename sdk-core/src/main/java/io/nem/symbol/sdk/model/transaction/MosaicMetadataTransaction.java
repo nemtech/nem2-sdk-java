@@ -13,34 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
 
-/**
- * Announce an MosaicMetadataTransaction to associate a key-value state to an mosaic.
- */
+/** Announce an MosaicMetadataTransaction to associate a key-value state to an mosaic. */
 public class MosaicMetadataTransaction extends MetadataTransaction {
 
-    /**
-     * Metadata target mosaic id.
-     */
-    private final UnresolvedMosaicId targetMosaicId;
+  /** Metadata target mosaic id. */
+  private final UnresolvedMosaicId targetMosaicId;
 
-    /**
-     * Constructor
-     *
-     * @param factory the factory with the configured data.
-     */
-    MosaicMetadataTransaction(MosaicMetadataTransactionFactory factory) {
-        super(factory);
-        this.targetMosaicId = factory.getTargetMosaicId();
-    }
+  /**
+   * Constructor
+   *
+   * @param factory the factory with the configured data.
+   */
+  MosaicMetadataTransaction(MosaicMetadataTransactionFactory factory) {
+    super(factory);
+    this.targetMosaicId = factory.getTargetMosaicId();
+  }
 
-
-    public UnresolvedMosaicId getTargetMosaicId() {
-        return targetMosaicId;
-    }
-
+  public UnresolvedMosaicId getTargetMosaicId() {
+    return targetMosaicId;
+  }
 }

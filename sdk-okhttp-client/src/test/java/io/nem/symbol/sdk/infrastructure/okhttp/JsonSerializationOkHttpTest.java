@@ -13,33 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
-
 
 import io.nem.symbol.sdk.api.JsonSerialization;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of {@link JsonSerialization}
- */
+/** Test of {@link JsonSerialization} */
 public class JsonSerializationOkHttpTest {
 
-    private final JsonSerialization jsonSerialization = new JsonSerializationOkHttp(
-        JsonHelperGson.creatGson(false));
+  private final JsonSerialization jsonSerialization =
+      new JsonSerializationOkHttp(JsonHelperGson.creatGson(false));
 
-    @Test
-    public void jsonToTransaction() {
-        String json = TestHelperOkHttp.loadResource(
-            "transaction-aggregateTransferTransaction.json"
-        );
-        Transaction transaction = jsonSerialization.jsonToTransaction(json);
-        Assertions.assertNotNull(transaction);
+  @Test
+  public void jsonToTransaction() {
+    String json = TestHelperOkHttp.loadResource("transaction-aggregateTransferTransaction.json");
+    Transaction transaction = jsonSerialization.jsonToTransaction(json);
+    Assertions.assertNotNull(transaction);
 
-        String mappedJson = jsonSerialization.transactionToJson(transaction);
-        Assertions.assertNotNull(mappedJson);
-    }
-
+    String mappedJson = jsonSerialization.transactionToJson(transaction);
+    Assertions.assertNotNull(mappedJson);
+  }
 }

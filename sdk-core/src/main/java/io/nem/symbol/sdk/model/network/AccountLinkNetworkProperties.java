@@ -13,27 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package io.nem.symbol.sdk.model.network;
-
-/**
- * AccountLinkNetworkPropertiesDTO
- */
+/** AccountLinkNetworkPropertiesDTO */
 public class AccountLinkNetworkProperties {
 
-    /**
-     * to trigger plugin load
-     */
-    private final String dummy;
+  /** to trigger plugin load */
+  private final String dummy;
 
+  public AccountLinkNetworkProperties(String dummy) {
+    this.dummy = dummy;
+  }
 
-    public AccountLinkNetworkProperties(String dummy) {
-        this.dummy = dummy;
-    }
-
-    public String getDummy() {
-        return dummy;
-    }
+  public String getDummy() {
+    return dummy;
+  }
 }
-

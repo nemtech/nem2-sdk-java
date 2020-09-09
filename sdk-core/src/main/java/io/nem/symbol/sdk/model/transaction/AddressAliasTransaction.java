@@ -13,57 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 
-/**
- * Address alias transaction.
- */
+/** Address alias transaction. */
 public class AddressAliasTransaction extends Transaction {
 
-    private final AliasAction aliasAction;
-    private final NamespaceId namespaceId;
-    private final Address address;
+  private final AliasAction aliasAction;
+  private final NamespaceId namespaceId;
+  private final Address address;
 
-    /**
-     * Protected constructor. Use the factory to create a transaction.
-     */
-    AddressAliasTransaction(AddressAliasTransactionFactory factory) {
-        super(factory);
-        this.aliasAction = factory.getAliasAction();
-        this.namespaceId = factory.getNamespaceId();
-        this.address = factory.getAddress();
-    }
+  /** Protected constructor. Use the factory to create a transaction. */
+  AddressAliasTransaction(AddressAliasTransactionFactory factory) {
+    super(factory);
+    this.aliasAction = factory.getAliasAction();
+    this.namespaceId = factory.getNamespaceId();
+    this.address = factory.getAddress();
+  }
 
-    /**
-     * Gets the alias action.
-     *
-     * @return Alias Action.
-     */
-    public AliasAction getAliasAction() {
-        return this.aliasAction;
-    }
+  /**
+   * Gets the alias action.
+   *
+   * @return Alias Action.
+   */
+  public AliasAction getAliasAction() {
+    return this.aliasAction;
+  }
 
-    /**
-     * Gets the namespace id.
-     *
-     * @return Namespace id.
-     */
-    public NamespaceId getNamespaceId() {
-        return this.namespaceId;
-    }
+  /**
+   * Gets the namespace id.
+   *
+   * @return Namespace id.
+   */
+  public NamespaceId getNamespaceId() {
+    return this.namespaceId;
+  }
 
-    /**
-     * Gets the address.
-     *
-     * @return Address of the account.
-     */
-    public Address getAddress() {
-        return this.address;
-    }
-
+  /**
+   * Gets the address.
+   *
+   * @return Address of the account.
+   */
+  public Address getAddress() {
+    return this.address;
+  }
 }

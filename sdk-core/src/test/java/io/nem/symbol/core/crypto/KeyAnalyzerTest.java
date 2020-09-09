@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto;
 
 import org.hamcrest.MatcherAssert;
@@ -22,30 +21,31 @@ import org.junit.jupiter.api.Test;
 
 public abstract class KeyAnalyzerTest {
 
-    @Test
-    public void isKeyCompressedReturnsTrueForCompressedPublicKey() {
-        // Arrange:
-        final KeyAnalyzer analyzer = this.getKeyAnalyzer();
-        final KeyPair keyPair = this.getCryptoEngine().createKeyGenerator().generateKeyPair();
+  @Test
+  public void isKeyCompressedReturnsTrueForCompressedPublicKey() {
+    // Arrange:
+    final KeyAnalyzer analyzer = this.getKeyAnalyzer();
+    final KeyPair keyPair = this.getCryptoEngine().createKeyGenerator().generateKeyPair();
 
-        // Act + Assert:
-        MatcherAssert.assertThat(analyzer.isKeyCompressed(keyPair.getPublicKey()), IsEqual.equalTo(true));
-    }
+    // Act + Assert:
+    MatcherAssert.assertThat(
+        analyzer.isKeyCompressed(keyPair.getPublicKey()), IsEqual.equalTo(true));
+  }
 
-    @Test
-    public void isKeyCompressedReturnsFalseIfKeyHasWrongLength() {
-        // Arrange:
-        final KeyAnalyzer analyzer = this.getKeyAnalyzer();
-        final KeyPair keyPair = this.getCryptoEngine().createKeyGenerator().generateKeyPair();
-        final Key key = new Key(new byte[keyPair.getPublicKey().getBytes().length + 1], 33);
+  @Test
+  public void isKeyCompressedReturnsFalseIfKeyHasWrongLength() {
+    // Arrange:
+    final KeyAnalyzer analyzer = this.getKeyAnalyzer();
+    final KeyPair keyPair = this.getCryptoEngine().createKeyGenerator().generateKeyPair();
+    final Key key = new Key(new byte[keyPair.getPublicKey().getBytes().length + 1], 33);
 
-        // Act + Assert:
-        MatcherAssert.assertThat(analyzer.isKeyCompressed(key), IsEqual.equalTo(false));
-    }
+    // Act + Assert:
+    MatcherAssert.assertThat(analyzer.isKeyCompressed(key), IsEqual.equalTo(false));
+  }
 
-    protected KeyAnalyzer getKeyAnalyzer() {
-        return this.getCryptoEngine().createKeyAnalyzer();
-    }
+  protected KeyAnalyzer getKeyAnalyzer() {
+    return this.getCryptoEngine().createKeyAnalyzer();
+  }
 
-    protected abstract CryptoEngine getCryptoEngine();
+  protected abstract CryptoEngine getCryptoEngine();
 }

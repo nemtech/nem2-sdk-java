@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.utils;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,24 +27,25 @@ import org.junit.jupiter.api.Test;
  */
 public class SuppliersTest {
 
-    @Test
-    public void memoize() {
+  @Test
+  public void memoize() {
 
-        AtomicInteger calledTimes = new AtomicInteger();
-        Supplier<String> delegate = () -> {
-            calledTimes.incrementAndGet();
-            return "The value";
+    AtomicInteger calledTimes = new AtomicInteger();
+    Supplier<String> delegate =
+        () -> {
+          calledTimes.incrementAndGet();
+          return "The value";
         };
-        Supplier<String> memoize = Suppliers.memoize(delegate);
-        Assertions.assertEquals(0, calledTimes.get());
-        memoize.get();
-        Assertions.assertEquals(1, calledTimes.get());
-        memoize.get();
-        memoize.get();
-        Assertions.assertEquals(1, calledTimes.get());
-        memoize.get();
-        memoize.get();
-        memoize.get();
-        Assertions.assertEquals(1, calledTimes.get());
-    }
+    Supplier<String> memoize = Suppliers.memoize(delegate);
+    Assertions.assertEquals(0, calledTimes.get());
+    memoize.get();
+    Assertions.assertEquals(1, calledTimes.get());
+    memoize.get();
+    memoize.get();
+    Assertions.assertEquals(1, calledTimes.get());
+    memoize.get();
+    memoize.get();
+    memoize.get();
+    Assertions.assertEquals(1, calledTimes.get());
+  }
 }

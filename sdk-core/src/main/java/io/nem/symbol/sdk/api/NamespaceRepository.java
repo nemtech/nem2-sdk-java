@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.account.AccountNames;
@@ -33,56 +32,52 @@ import java.util.List;
  */
 public interface NamespaceRepository extends Searcher<NamespaceInfo, NamespaceSearchCriteria> {
 
-    /**
-     * Gets the NamespaceInfo for a given namespaceId.
-     *
-     * @param namespaceId NamespaceId
-     * @return {@link Observable} of {@link NamespaceInfo}
-     */
-    Observable<NamespaceInfo> getNamespace(NamespaceId namespaceId);
+  /**
+   * Gets the NamespaceInfo for a given namespaceId.
+   *
+   * @param namespaceId NamespaceId
+   * @return {@link Observable} of {@link NamespaceInfo}
+   */
+  Observable<NamespaceInfo> getNamespace(NamespaceId namespaceId);
 
-    /**
-     * Gets list of NamespaceName for different namespaceIds.
-     *
-     * @param namespaceIds List of NamespaceId
-     * @return {@link Observable} of {@link NamespaceName} List
-     */
-    Observable<List<NamespaceName>> getNamespaceNames(List<NamespaceId> namespaceIds);
+  /**
+   * Gets list of NamespaceName for different namespaceIds.
+   *
+   * @param namespaceIds List of NamespaceId
+   * @return {@link Observable} of {@link NamespaceName} List
+   */
+  Observable<List<NamespaceName>> getNamespaceNames(List<NamespaceId> namespaceIds);
 
-    /**
-     * Gets the MosaicId from a MosaicAlias
-     *
-     * @param namespaceId - the namespaceId of the namespace
-     * @return {@link Observable} of {@link MosaicId}
-     */
-    Observable<MosaicId> getLinkedMosaicId(NamespaceId namespaceId);
+  /**
+   * Gets the MosaicId from a MosaicAlias
+   *
+   * @param namespaceId - the namespaceId of the namespace
+   * @return {@link Observable} of {@link MosaicId}
+   */
+  Observable<MosaicId> getLinkedMosaicId(NamespaceId namespaceId);
 
-    /**
-     * Gets the Address from a AddressAlias
-     *
-     * @param namespaceId - the namespaceId of the namespace
-     * @return Observable of {@link Address}
-     */
-    Observable<Address> getLinkedAddress(NamespaceId namespaceId);
+  /**
+   * Gets the Address from a AddressAlias
+   *
+   * @param namespaceId - the namespaceId of the namespace
+   * @return Observable of {@link Address}
+   */
+  Observable<Address> getLinkedAddress(NamespaceId namespaceId);
 
+  /**
+   * Gets AccountNames for different accounts based on their addresses. The names are namespaces
+   * linked using address aliases.
+   *
+   * @param addresses {@link List} of {@link Address}
+   * @return Observable {@link List} of {@link AccountNames}
+   */
+  Observable<List<AccountNames>> getAccountsNames(List<Address> addresses);
 
-    /**
-     * Gets AccountNames for different accounts based on their addresses. The names are namespaces
-     * linked using address aliases.
-     *
-     * @param addresses {@link List} of {@link Address}
-     * @return Observable {@link List} of {@link AccountNames}
-     */
-    Observable<List<AccountNames>> getAccountsNames(List<Address> addresses);
-
-
-    /**
-     * Gets MosaicNames for different accounts. The names are namespaces linked using mosaic
-     * aliases.
-     *
-     * @param mosaicIds {@link List} of {@link MosaicId}
-     * @return {@link Observable} of {@link MosaicNames} List
-     */
-
-    Observable<List<MosaicNames>> getMosaicsNames(List<MosaicId> mosaicIds);
+  /**
+   * Gets MosaicNames for different accounts. The names are namespaces linked using mosaic aliases.
+   *
+   * @param mosaicIds {@link List} of {@link MosaicId}
+   * @return {@link Observable} of {@link MosaicNames} List
+   */
+  Observable<List<MosaicNames>> getMosaicsNames(List<MosaicId> mosaicIds);
 }

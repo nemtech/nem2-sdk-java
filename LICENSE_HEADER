@@ -13,28 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.nem.symbol.sdk.model.namespace;
-/** The alias structure defines an interface for Aliases */
-public interface Alias<T> {
-
-  /**
-   * Gets the alias type
-   *
-   * @return aliasType {@link AliasType}
-   */
-  AliasType getType();
-
-  /**
-   * Gets the alias.
-   *
-   * @return Alias of type T.
-   */
-  T getAliasValue();
-
-  /**
-   * Returns true if this alias is anEmptyAlias; false otherwise.
-   *
-   * @return true if alias is empty; false otherwise
-   */
-  boolean isEmpty();
-}

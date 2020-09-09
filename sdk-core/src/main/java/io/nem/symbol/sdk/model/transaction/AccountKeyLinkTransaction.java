@@ -13,42 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.core.crypto.PublicKey;
 
-/**
- *
- */
+/** */
 public class AccountKeyLinkTransaction extends Transaction implements PublicKeyLinkTransaction {
 
-    private final PublicKey linkedPublicKey;
+  private final PublicKey linkedPublicKey;
 
-    private final LinkAction linkAction;
+  private final LinkAction linkAction;
 
-    public AccountKeyLinkTransaction(AccountKeyLinkTransactionFactory factory) {
-        super(factory);
-        this.linkedPublicKey = factory.getLinkedPublicKey();
-        this.linkAction = factory.getLinkAction();
-    }
+  public AccountKeyLinkTransaction(AccountKeyLinkTransactionFactory factory) {
+    super(factory);
+    this.linkedPublicKey = factory.getLinkedPublicKey();
+    this.linkAction = factory.getLinkAction();
+  }
 
-    /**
-     * Gets the linked public key.
-     *
-     * @return Public key.
-     */
-    public PublicKey getLinkedPublicKey() {
-        return linkedPublicKey;
-    }
+  /**
+   * Gets the linked public key.
+   *
+   * @return Public key.
+   */
+  public PublicKey getLinkedPublicKey() {
+    return linkedPublicKey;
+  }
 
-    /**
-     * Gets the link action.
-     *
-     * @return Link action.
-     */
-    public LinkAction getLinkAction() {
-        return linkAction;
-    }
-
+  /**
+   * Gets the link action.
+   *
+   * @return Link action.
+   */
+  public LinkAction getLinkAction() {
+    return linkAction;
+  }
 }

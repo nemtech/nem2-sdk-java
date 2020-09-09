@@ -13,34 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.network;
-
-/**
- * It holds information about the catapult network.
- */
+/** It holds information about the catapult network. */
 public class NetworkInfo {
 
-    /**
-     * The name of the network.
-     */
-    private final String name;
+  /** The name of the network. */
+  private final String name;
 
-    /**
-     * The description of the network.
-     */
-    private final String description;
+  /** The description of the network. */
+  private final String description;
 
-    public NetworkInfo(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
+  public NetworkInfo(String name, String description) {
+    this.name = name;
+    this.description = description;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public String getDescription() {
+    return description;
+  }
 }

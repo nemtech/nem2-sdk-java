@@ -13,52 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import java.util.Arrays;
 
-/**
- * Link action.
- */
+/** Link action. */
 public enum LinkAction {
-    /**
-     * Link account.
-     */
-    LINK((byte) 1),
-    /**
-     * Unlink account.
-     */
-    UNLINK((byte) 0);
+  /** Link account. */
+  LINK((byte) 1),
+  /** Unlink account. */
+  UNLINK((byte) 0);
 
-    private final byte value;
+  private final byte value;
 
-    /**
-     * Constructor.
-     *
-     * @param value Link action value.
-     */
-    LinkAction(final byte value) {
-        this.value = value;
-    }
+  /**
+   * Constructor.
+   *
+   * @param value Link action value.
+   */
+  LinkAction(final byte value) {
+    this.value = value;
+  }
 
-    /**
-     * Gets enum value from raw.
-     *
-     * @param value Raw value.
-     * @return Enum value.
-     */
-    public static LinkAction rawValueOf(final int value) {
-        return Arrays.stream(values()).filter(e -> e.value == value).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
-    }
+  /**
+   * Gets enum value from raw.
+   *
+   * @param value Raw value.
+   * @return Enum value.
+   */
+  public static LinkAction rawValueOf(final int value) {
+    return Arrays.stream(values())
+        .filter(e -> e.value == value)
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
 
-    /**
-     * Gets the raw value.
-     *
-     * @return Ram value.
-     */
-    public byte getValue() {
-        return value;
-    }
+  /**
+   * Gets the raw value.
+   *
+   * @return Ram value.
+   */
+  public byte getValue() {
+    return value;
+  }
 }

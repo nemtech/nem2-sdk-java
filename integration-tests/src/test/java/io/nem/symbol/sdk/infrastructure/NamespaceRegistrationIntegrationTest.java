@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.model.account.Account;
@@ -32,89 +31,120 @@ import org.junit.jupiter.params.provider.EnumSource;
 @SuppressWarnings("squid:S2699")
 public class NamespaceRegistrationIntegrationTest extends BaseIntegrationTest {
 
-    private Account account;
+  private Account account;
 
-    @BeforeEach
-    void setup() {
-        account = config().getDefaultAccount();
-    }
+  @BeforeEach
+  void setup() {
+    account = config().getDefaultAccount();
+  }
 
-    NamespaceId rootNamespaceId;
+  NamespaceId rootNamespaceId;
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void standaloneRootRegisterNamespaceTransaction(RepositoryType type) {
-        String namespaceName = "test-root-namespace-" + Double.valueOf(Math.floor(Math.random() * 10000)).intValue();
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void standaloneRootRegisterNamespaceTransaction(RepositoryType type) {
+    String namespaceName =
+        "test-root-namespace-" + Double.valueOf(Math.floor(Math.random() * 10000)).intValue();
 
-        NamespaceRegistrationTransaction namespaceRegistrationTransaction = NamespaceRegistrationTransactionFactory
-            .createRootNamespace(getNetworkType(), namespaceName, BigInteger.valueOf(100)).maxFee(maxFee).build();
+    NamespaceRegistrationTransaction namespaceRegistrationTransaction =
+        NamespaceRegistrationTransactionFactory.createRootNamespace(
+                getNetworkType(), namespaceName, BigInteger.valueOf(100))
+            .maxFee(maxFee)
+            .build();
 
-        announceAndValidate(type, this.account, namespaceRegistrationTransaction);
-        rootNamespaceId = namespaceRegistrationTransaction.getNamespaceId();
+    announceAndValidate(type, this.account, namespaceRegistrationTransaction);
+    rootNamespaceId = namespaceRegistrationTransaction.getNamespaceId();
 
-        sleep(1000);
-        NamespaceInfo namespaceInfo = get(getRepositoryFactory(type).createNamespaceRepository()
-            .getNamespace(namespaceRegistrationTransaction.getNamespaceId()));
-        Assertions.assertEquals(this.account.getAddress(), namespaceInfo.getOwnerAddress());
-        Assertions.assertEquals(namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getId());
-    }
+    sleep(1000);
+    NamespaceInfo namespaceInfo =
+        get(
+            getRepositoryFactory(type)
+                .createNamespaceRepository()
+                .getNamespace(namespaceRegistrationTransaction.getNamespaceId()));
+    Assertions.assertEquals(this.account.getAddress(), namespaceInfo.getOwnerAddress());
+    Assertions.assertEquals(
+        namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getId());
+  }
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void aggregateRootRegisterNamespaceTransaction(RepositoryType type) {
-        String namespaceName = "test-root-namespace-" + Double.valueOf(Math.floor(Math.random() * 10000)).intValue();
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void aggregateRootRegisterNamespaceTransaction(RepositoryType type) {
+    String namespaceName =
+        "test-root-namespace-" + Double.valueOf(Math.floor(Math.random() * 10000)).intValue();
 
-        NamespaceRegistrationTransaction namespaceRegistrationTransaction = NamespaceRegistrationTransactionFactory
-            .createRootNamespace(getNetworkType(), namespaceName, BigInteger.valueOf(100)).maxFee(maxFee).build();
+    NamespaceRegistrationTransaction namespaceRegistrationTransaction =
+        NamespaceRegistrationTransactionFactory.createRootNamespace(
+                getNetworkType(), namespaceName, BigInteger.valueOf(100))
+            .maxFee(maxFee)
+            .build();
 
-        announceAggregateAndValidate(type, namespaceRegistrationTransaction, this.account);
-        rootNamespaceId = namespaceRegistrationTransaction.getNamespaceId();
+    announceAggregateAndValidate(type, namespaceRegistrationTransaction, this.account);
+    rootNamespaceId = namespaceRegistrationTransaction.getNamespaceId();
 
-        sleep(1000);
-        NamespaceInfo namespaceInfo = get(getRepositoryFactory(type).createNamespaceRepository()
-            .getNamespace(namespaceRegistrationTransaction.getNamespaceId()));
-        Assertions.assertEquals(this.account.getAddress(), namespaceInfo.getOwnerAddress());
-        Assertions.assertEquals(namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getId());
-    }
+    sleep(1000);
+    NamespaceInfo namespaceInfo =
+        get(
+            getRepositoryFactory(type)
+                .createNamespaceRepository()
+                .getNamespace(namespaceRegistrationTransaction.getNamespaceId()));
+    Assertions.assertEquals(this.account.getAddress(), namespaceInfo.getOwnerAddress());
+    Assertions.assertEquals(
+        namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getId());
+  }
 
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void standaloneSubNamespaceRegisterNamespaceTransaction(RepositoryType type) {
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void standaloneSubNamespaceRegisterNamespaceTransaction(RepositoryType type) {
+    this.standaloneRootRegisterNamespaceTransaction(type);
 
-        this.standaloneRootRegisterNamespaceTransaction(type);
+    String namespaceName =
+        "test-sub-namespace-" + Double.valueOf(Math.floor(Math.random() * 10000)).intValue();
 
-        String namespaceName = "test-sub-namespace-" + Double.valueOf(Math.floor(Math.random() * 10000)).intValue();
+    NamespaceRegistrationTransaction namespaceRegistrationTransaction =
+        NamespaceRegistrationTransactionFactory.createSubNamespace(
+                getNetworkType(), namespaceName, this.rootNamespaceId)
+            .maxFee(maxFee)
+            .build();
 
-        NamespaceRegistrationTransaction namespaceRegistrationTransaction = NamespaceRegistrationTransactionFactory
-            .createSubNamespace(getNetworkType(), namespaceName, this.rootNamespaceId).maxFee(maxFee).build();
+    announceAndValidate(type, this.account, namespaceRegistrationTransaction);
 
-        announceAndValidate(type, this.account, namespaceRegistrationTransaction);
+    sleep(1000);
+    NamespaceInfo namespaceInfo =
+        get(
+            getRepositoryFactory(type)
+                .createNamespaceRepository()
+                .getNamespace(namespaceRegistrationTransaction.getNamespaceId()));
+    Assertions.assertEquals(this.account.getAddress(), namespaceInfo.getOwnerAddress());
+    Assertions.assertEquals(
+        namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getId());
+  }
 
-        sleep(1000);
-        NamespaceInfo namespaceInfo = get(getRepositoryFactory(type).createNamespaceRepository()
-            .getNamespace(namespaceRegistrationTransaction.getNamespaceId()));
-        Assertions.assertEquals(this.account.getAddress(), namespaceInfo.getOwnerAddress());
-        Assertions.assertEquals(namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getId());
-    }
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void aggregateSubNamespaceRegisterNamespaceTransaction(RepositoryType type) {
 
-    @ParameterizedTest
-    @EnumSource(RepositoryType.class)
-    void aggregateSubNamespaceRegisterNamespaceTransaction(RepositoryType type) {
+    this.aggregateRootRegisterNamespaceTransaction(type);
 
-        this.aggregateRootRegisterNamespaceTransaction(type);
+    String namespaceName =
+        "test-sub-namespace-" + Double.valueOf(Math.floor(Math.random() * 10000)).intValue();
 
-        String namespaceName = "test-sub-namespace-" + Double.valueOf(Math.floor(Math.random() * 10000)).intValue();
+    NamespaceRegistrationTransaction namespaceRegistrationTransaction =
+        NamespaceRegistrationTransactionFactory.createSubNamespace(
+                getNetworkType(), namespaceName, this.rootNamespaceId)
+            .maxFee(maxFee)
+            .build();
 
-        NamespaceRegistrationTransaction namespaceRegistrationTransaction = NamespaceRegistrationTransactionFactory
-            .createSubNamespace(getNetworkType(), namespaceName, this.rootNamespaceId).maxFee(maxFee).build();
+    announceAggregateAndValidate(type, namespaceRegistrationTransaction, this.account);
 
-        announceAggregateAndValidate(type, namespaceRegistrationTransaction, this.account);
-
-        sleep(1000);
-        NamespaceInfo namespaceInfo = get(getRepositoryFactory(type).createNamespaceRepository()
-            .getNamespace(namespaceRegistrationTransaction.getNamespaceId()));
-        Assertions.assertEquals(this.account.getAddress(), namespaceInfo.getOwnerAddress());
-        Assertions.assertEquals(namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getId());
-    }
+    sleep(1000);
+    NamespaceInfo namespaceInfo =
+        get(
+            getRepositoryFactory(type)
+                .createNamespaceRepository()
+                .getNamespace(namespaceRegistrationTransaction.getNamespaceId()));
+    Assertions.assertEquals(this.account.getAddress(), namespaceInfo.getOwnerAddress());
+    Assertions.assertEquals(
+        namespaceRegistrationTransaction.getNamespaceId(), namespaceInfo.getId());
+  }
 }

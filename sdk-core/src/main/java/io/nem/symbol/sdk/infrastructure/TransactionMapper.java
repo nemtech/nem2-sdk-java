@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.model.transaction.Transaction;
@@ -21,50 +20,50 @@ import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 
 /**
- * A transaction mapper knows how to map DTO for standard and embedded transactions into a {@link Transaction} object.
+ * A transaction mapper knows how to map DTO for standard and embedded transactions into a {@link
+ * Transaction} object.
  */
 public interface TransactionMapper {
 
-    /**
-     * It maps an embedded or top level transaction
-     *
-     * @param transactionDto the transaction
-     * @return the {@link Transaction}
-     */
-    Transaction mapFromDto(Object transactionDto);
+  /**
+   * It maps an embedded or top level transaction
+   *
+   * @param transactionDto the transaction
+   * @return the {@link Transaction}
+   */
+  Transaction mapFromDto(Object transactionDto);
 
-    /**
-     * It maps an embedded or top level transaction to a factory.
-     *
-     * @param transactionDto the transaction
-     * @return the {@link TransactionFactory}
-     */
-    TransactionFactory<?> mapToFactoryFromDto(Object transactionDto);
+  /**
+   * It maps an embedded or top level transaction to a factory.
+   *
+   * @param transactionDto the transaction
+   * @return the {@link TransactionFactory}
+   */
+  TransactionFactory<?> mapToFactoryFromDto(Object transactionDto);
 
-    /**
-     * It maps an transaction to an DTO transaction.
-     *
-     * @param transaction the the general transaction
-     * @return the {@link Object}
-     */
-    default Object mapToDto(Transaction transaction) {
-        return this.mapToDto(transaction, null);
-    }
+  /**
+   * It maps an transaction to an DTO transaction.
+   *
+   * @param transaction the the general transaction
+   * @return the {@link Object}
+   */
+  default Object mapToDto(Transaction transaction) {
+    return this.mapToDto(transaction, null);
+  }
 
-    /**
-     * It maps an transaction to an DTO transaction.
-     *
-     * @param transaction the the general transaction
-     * @param embedded if it's known to be embedded.
-     * @return the {@link Object}
-     */
-    Object mapToDto(Transaction transaction, Boolean embedded);
+  /**
+   * It maps an transaction to an DTO transaction.
+   *
+   * @param transaction the the general transaction
+   * @param embedded if it's known to be embedded.
+   * @return the {@link Object}
+   */
+  Object mapToDto(Transaction transaction, Boolean embedded);
 
-    /**
-     * The type of transactions this mapper supports.
-     *
-     * @return the supported transaction type or null if supports all.
-     */
-    TransactionType getTransactionType();
-
+  /**
+   * The type of transactions this mapper supports.
+   *
+   * @return the supported transaction type or null if supports all.
+   */
+  TransactionType getTransactionType();
 }

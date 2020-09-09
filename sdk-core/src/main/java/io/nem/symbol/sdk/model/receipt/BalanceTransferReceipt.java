@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.receipt;
 
 import io.nem.symbol.catapult.builders.AddressDto;
@@ -32,145 +31,142 @@ import org.apache.commons.lang3.Validate;
 
 public class BalanceTransferReceipt extends Receipt {
 
-    private final Address senderAddress;
-    private final Address recipientAddress;
-    private final MosaicId mosaicId;
-    private final BigInteger amount;
+  private final Address senderAddress;
+  private final Address recipientAddress;
+  private final MosaicId mosaicId;
+  private final BigInteger amount;
 
-    /**
-     * Constructor
-     *
-     * @param senderAddress Sender's Address
-     * @param recipientAddress Recipient Address
-     * @param mosaicId Mosaic Id
-     * @param amount Amount
-     * @param type Receipt Type
-     * @param version Receipt Version
-     * @param size Receipt Size
-     */
-    public BalanceTransferReceipt(
-        Address senderAddress,
-        Address recipientAddress,
-        MosaicId mosaicId,
-        BigInteger amount,
-        ReceiptType type,
-        ReceiptVersion version,
-        Optional<Integer> size) {
-        super(type, version, size);
-        Validate.notNull(senderAddress, "sender must not be null");
-        Validate.notNull(recipientAddress, "recipient must not be null");
-        Validate.notNull(amount, "amount must not be null");
-        Validate.notNull(mosaicId, "mosaicId must not be null");
-        this.senderAddress = senderAddress;
-        this.recipientAddress = recipientAddress;
-        this.amount = amount;
-        this.mosaicId = mosaicId;
-        this.validateRecipientType();
-        this.validateReceiptType(type);
-    }
+  /**
+   * Constructor
+   *
+   * @param senderAddress Sender's Address
+   * @param recipientAddress Recipient Address
+   * @param mosaicId Mosaic Id
+   * @param amount Amount
+   * @param type Receipt Type
+   * @param version Receipt Version
+   * @param size Receipt Size
+   */
+  public BalanceTransferReceipt(
+      Address senderAddress,
+      Address recipientAddress,
+      MosaicId mosaicId,
+      BigInteger amount,
+      ReceiptType type,
+      ReceiptVersion version,
+      Optional<Integer> size) {
+    super(type, version, size);
+    Validate.notNull(senderAddress, "sender must not be null");
+    Validate.notNull(recipientAddress, "recipient must not be null");
+    Validate.notNull(amount, "amount must not be null");
+    Validate.notNull(mosaicId, "mosaicId must not be null");
+    this.senderAddress = senderAddress;
+    this.recipientAddress = recipientAddress;
+    this.amount = amount;
+    this.mosaicId = mosaicId;
+    this.validateRecipientType();
+    this.validateReceiptType(type);
+  }
 
-    /**
-     * Constructor BalanceTransferReceipt
-     *
-     * @param senderAddress Sender's Public Account
-     * @param recipientAddress Recipient Address
-     * @param mosaicId Mosaic Id
-     * @param amount Amount
-     * @param type Receipt Type
-     * @param version Receipt Version
-     */
-    public BalanceTransferReceipt(
-        Address senderAddress,
-        Address recipientAddress,
-        MosaicId mosaicId,
-        BigInteger amount,
-        ReceiptType type,
-        ReceiptVersion version) {
-        this(senderAddress, recipientAddress,
-            mosaicId,
-            amount,
-            type,
-            version, Optional.empty());
-    }
+  /**
+   * Constructor BalanceTransferReceipt
+   *
+   * @param senderAddress Sender's Public Account
+   * @param recipientAddress Recipient Address
+   * @param mosaicId Mosaic Id
+   * @param amount Amount
+   * @param type Receipt Type
+   * @param version Receipt Version
+   */
+  public BalanceTransferReceipt(
+      Address senderAddress,
+      Address recipientAddress,
+      MosaicId mosaicId,
+      BigInteger amount,
+      ReceiptType type,
+      ReceiptVersion version) {
+    this(senderAddress, recipientAddress, mosaicId, amount, type, version, Optional.empty());
+  }
 
-    /**
-     * Returns sender's Public Account
-     *
-     * @return sender's Public Account
-     */
-    public Address getSenderAddress() {
-        return this.senderAddress;
-    }
+  /**
+   * Returns sender's Public Account
+   *
+   * @return sender's Public Account
+   */
+  public Address getSenderAddress() {
+    return this.senderAddress;
+  }
 
-    /**
-     * Returns recipient's address or addressAlias
-     *
-     * @return recipient's address or addressAlias
-     */
-    public Address getRecipientAddress() {
-        return this.recipientAddress;
-    }
+  /**
+   * Returns recipient's address or addressAlias
+   *
+   * @return recipient's address or addressAlias
+   */
+  public Address getRecipientAddress() {
+    return this.recipientAddress;
+  }
 
-    /**
-     * Returns mosaicId
-     *
-     * @return account
-     */
-    public MosaicId getMosaicId() {
-        return this.mosaicId;
-    }
+  /**
+   * Returns mosaicId
+   *
+   * @return account
+   */
+  public MosaicId getMosaicId() {
+    return this.mosaicId;
+  }
 
-    /**
-     * Returns amount
-     *
-     * @return amount
-     */
-    public BigInteger getAmount() {
-        return this.amount;
-    }
+  /**
+   * Returns amount
+   *
+   * @return amount
+   */
+  public BigInteger getAmount() {
+    return this.amount;
+  }
 
-    /**
-     * Serialize receipt and returns receipt bytes
-     *
-     * @return receipt bytes
-     */
-    @Override
-    public byte[] serialize() {
-        final short version = (short) getVersion().getValue();
-        final ReceiptTypeDto type = ReceiptTypeDto.rawValueOf((short) getType().getValue());
-        final MosaicBuilder mosaic = MosaicBuilder
-            .create(new MosaicIdDto(getMosaicId().getIdAsLong()),
-                new AmountDto(getAmount().longValue()));
-        final AddressDto senderAddress = SerializationUtils.toAddressDto(getSenderAddress());
-        final AddressDto recipientAddress = SerializationUtils.toAddressDto(getRecipientAddress());
-        return BalanceTransferReceiptBuilder
-            .create(version, type, mosaic, senderAddress, recipientAddress).serialize();
-    }
+  /**
+   * Serialize receipt and returns receipt bytes
+   *
+   * @return receipt bytes
+   */
+  @Override
+  public byte[] serialize() {
+    final short version = (short) getVersion().getValue();
+    final ReceiptTypeDto type = ReceiptTypeDto.rawValueOf((short) getType().getValue());
+    final MosaicBuilder mosaic =
+        MosaicBuilder.create(
+            new MosaicIdDto(getMosaicId().getIdAsLong()), new AmountDto(getAmount().longValue()));
+    final AddressDto senderAddress = SerializationUtils.toAddressDto(getSenderAddress());
+    final AddressDto recipientAddress = SerializationUtils.toAddressDto(getRecipientAddress());
+    return BalanceTransferReceiptBuilder.create(
+            version, type, mosaic, senderAddress, recipientAddress)
+        .serialize();
+  }
 
-    /**
-     * Validate receipt type
-     *
-     * @return void
-     */
-    private void validateReceiptType(ReceiptType type) {
-        if (!ReceiptType.BALANCE_TRANSFER.contains(type)) {
-            throw new IllegalArgumentException("Receipt type: [" + type.name() + "] is not valid.");
-        }
+  /**
+   * Validate receipt type
+   *
+   * @return void
+   */
+  private void validateReceiptType(ReceiptType type) {
+    if (!ReceiptType.BALANCE_TRANSFER.contains(type)) {
+      throw new IllegalArgumentException("Receipt type: [" + type.name() + "] is not valid.");
     }
+  }
 
-    /**
-     * Validate recipient type (MosaicId | NamespaceId)
-     *
-     * @return void
-     */
-    private void validateRecipientType() {
-        Class recipientClass = this.recipientAddress.getClass();
-        if (!Address.class.isAssignableFrom(recipientClass)
-            && !AddressAlias.class.isAssignableFrom(recipientClass)) {
-            throw new IllegalArgumentException(
-                "Recipient type: ["
-                    + recipientClass.getName()
-                    + "] is not valid for BalanceTransferReceipt");
-        }
+  /**
+   * Validate recipient type (MosaicId | NamespaceId)
+   *
+   * @return void
+   */
+  private void validateRecipientType() {
+    Class recipientClass = this.recipientAddress.getClass();
+    if (!Address.class.isAssignableFrom(recipientClass)
+        && !AddressAlias.class.isAssignableFrom(recipientClass)) {
+      throw new IllegalArgumentException(
+          "Recipient type: ["
+              + recipientClass.getName()
+              + "] is not valid for BalanceTransferReceipt");
     }
+  }
 }

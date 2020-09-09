@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,19 +23,20 @@ import org.junit.jupiter.api.Test;
 
 public class AccountRestrictionsTest {
 
-    @Test
-    void shouldCreateAccountRestrictionsViaConstructor() {
-        Address address =
-            Address.createFromEncoded("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1");
-        AccountRestriction accountRestriction =
-            new AccountRestriction(AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
-                Arrays.asList("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQM"));
-        AccountRestrictions accountRestrictions =
-            new AccountRestrictions(address, Arrays.asList(accountRestriction));
+  @Test
+  void shouldCreateAccountRestrictionsViaConstructor() {
+    Address address = Address.createFromEncoded("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1");
+    AccountRestriction accountRestriction =
+        new AccountRestriction(
+            AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
+            Arrays.asList("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQM"));
+    AccountRestrictions accountRestrictions =
+        new AccountRestrictions(address, Arrays.asList(accountRestriction));
 
-        assertEquals(address, accountRestrictions.getAddress());
-        assertEquals(1, accountRestrictions.getRestrictions().size());
-        assertEquals(AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
-            accountRestrictions.getRestrictions().get(0).getRestrictionFlags());
-    }
+    assertEquals(address, accountRestrictions.getAddress());
+    assertEquals(1, accountRestrictions.getRestrictions().size());
+    assertEquals(
+        AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
+        accountRestrictions.getRestrictions().get(0).getRestrictionFlags());
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import com.google.gson.JsonObject;
@@ -39,120 +38,114 @@ import org.junit.jupiter.api.Test;
  */
 public class NetworkRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest {
 
-    private NetworkRepositoryOkHttpImpl repository;
+  private NetworkRepositoryOkHttpImpl repository;
 
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-        repository = new NetworkRepositoryOkHttpImpl(apiClientMock);
-    }
+  @BeforeEach
+  public void setUp() {
+    super.setUp();
+    repository = new NetworkRepositoryOkHttpImpl(apiClientMock);
+  }
 
-    @Test
-    void shouldGetNetworkType() throws Exception {
+  @Test
+  void shouldGetNetworkType() throws Exception {
 
-        NodeInfoDTO dto = new NodeInfoDTO();
-        dto.setNetworkIdentifier(NetworkType.MIJIN_TEST.getValue());
+    NodeInfoDTO dto = new NodeInfoDTO();
+    dto.setNetworkIdentifier(NetworkType.MIJIN_TEST.getValue());
 
-        mockRemoteCall(dto);
+    mockRemoteCall(dto);
 
-        NetworkType info = repository.getNetworkType().toFuture().get();
+    NetworkType info = repository.getNetworkType().toFuture().get();
 
-        Assertions.assertNotNull(info);
+    Assertions.assertNotNull(info);
 
-        Assertions.assertEquals(NetworkType.MIJIN_TEST, info);
+    Assertions.assertEquals(NetworkType.MIJIN_TEST, info);
+  }
 
-    }
+  @Test
+  void shouldGetNetworkInfo() throws Exception {
 
-    @Test
-    void shouldGetNetworkInfo() throws Exception {
+    NetworkTypeDTO networkTypeDTO = new NetworkTypeDTO();
+    networkTypeDTO.setName("mijinTest");
+    networkTypeDTO.setDescription("some description");
 
-        NetworkTypeDTO networkTypeDTO = new NetworkTypeDTO();
-        networkTypeDTO.setName("mijinTest");
-        networkTypeDTO.setDescription("some description");
+    mockRemoteCall(networkTypeDTO);
 
-        mockRemoteCall(networkTypeDTO);
+    NetworkInfo info = repository.getNetworkInfo().toFuture().get();
 
-        NetworkInfo info = repository.getNetworkInfo().toFuture().get();
+    Assertions.assertNotNull(info);
 
-        Assertions.assertNotNull(info);
+    Assertions.assertEquals("mijinTest", info.getName());
+    Assertions.assertEquals("some description", info.getDescription());
+  }
 
-        Assertions.assertEquals("mijinTest", info.getName());
-        Assertions.assertEquals("some description", info.getDescription());
+  @Test
+  void getTransactionFees() throws Exception {
 
-    }
+    TransactionFeesDTO dto = new TransactionFeesDTO();
+    dto.setAverageFeeMultiplier(1L);
+    dto.setMedianFeeMultiplier(2L);
+    dto.setLowestFeeMultiplier(3L);
+    dto.setHighestFeeMultiplier(4L);
 
-    @Test
-    void getTransactionFees() throws Exception {
+    mockRemoteCall(dto);
 
-        TransactionFeesDTO dto = new TransactionFeesDTO();
-        dto.setAverageFeeMultiplier(1L);
-        dto.setMedianFeeMultiplier(2L);
-        dto.setLowestFeeMultiplier(3L);
-        dto.setHighestFeeMultiplier(4L);
+    TransactionFees info = repository.getTransactionFees().toFuture().get();
 
-        mockRemoteCall(dto);
+    Assertions.assertNotNull(info);
 
-        TransactionFees info = repository.getTransactionFees().toFuture().get();
+    Assertions.assertEquals(dto.getAverageFeeMultiplier(), info.getAverageFeeMultiplier());
+    Assertions.assertEquals(dto.getMedianFeeMultiplier(), info.getMedianFeeMultiplier());
+    Assertions.assertEquals(dto.getLowestFeeMultiplier(), info.getLowestFeeMultiplier());
+    Assertions.assertEquals(dto.getHighestFeeMultiplier(), info.getHighestFeeMultiplier());
+  }
 
-        Assertions.assertNotNull(info);
+  @Test
+  void getRentalFees() throws Exception {
 
-        Assertions.assertEquals(dto.getAverageFeeMultiplier(), info.getAverageFeeMultiplier());
-        Assertions.assertEquals(dto.getMedianFeeMultiplier(), info.getMedianFeeMultiplier());
-        Assertions.assertEquals(dto.getLowestFeeMultiplier(), info.getLowestFeeMultiplier());
-        Assertions.assertEquals(dto.getHighestFeeMultiplier(), info.getHighestFeeMultiplier());
+    RentalFeesDTO dto = new RentalFeesDTO();
+    dto.setEffectiveChildNamespaceRentalFee(BigInteger.valueOf(1));
+    dto.setEffectiveMosaicRentalFee(BigInteger.valueOf(2));
+    dto.setEffectiveRootNamespaceRentalFeePerBlock(BigInteger.valueOf(3));
 
-    }
+    mockRemoteCall(dto);
 
-    @Test
-    void getRentalFees() throws Exception {
+    RentalFees info = repository.getRentalFees().toFuture().get();
 
-        RentalFeesDTO dto = new RentalFeesDTO();
-        dto.setEffectiveChildNamespaceRentalFee(BigInteger.valueOf(1));
-        dto.setEffectiveMosaicRentalFee(BigInteger.valueOf(2));
-        dto.setEffectiveRootNamespaceRentalFeePerBlock(BigInteger.valueOf(3));
+    Assertions.assertNotNull(info);
 
-        mockRemoteCall(dto);
+    Assertions.assertEquals(
+        dto.getEffectiveChildNamespaceRentalFee(), info.getEffectiveChildNamespaceRentalFee());
+    Assertions.assertEquals(dto.getEffectiveMosaicRentalFee(), info.getEffectiveMosaicRentalFee());
+    Assertions.assertEquals(
+        dto.getEffectiveRootNamespaceRentalFeePerBlock(),
+        info.getEffectiveRootNamespaceRentalFeePerBlock());
+  }
 
-        RentalFees info = repository.getRentalFees().toFuture().get();
+  @Test
+  void getNetworkProperties() throws Exception {
 
-        Assertions.assertNotNull(info);
+    NetworkConfigurationDTO dto =
+        TestHelperOkHttp.loadResource("network-configuration.json", NetworkConfigurationDTO.class);
+    Assertions.assertNotNull(dto);
 
-        Assertions.assertEquals(dto.getEffectiveChildNamespaceRentalFee(),
-            info.getEffectiveChildNamespaceRentalFee());
-        Assertions
-            .assertEquals(dto.getEffectiveMosaicRentalFee(), info.getEffectiveMosaicRentalFee());
-        Assertions.assertEquals(dto.getEffectiveRootNamespaceRentalFeePerBlock(),
-            info.getEffectiveRootNamespaceRentalFeePerBlock());
+    JsonObject plain =
+        TestHelperOkHttp.loadResource("network-configuration.json", JsonObject.class);
+    Assertions.assertNotNull(plain);
 
-    }
+    Assertions.assertEquals(jsonHelper.prettyPrint(dto), jsonHelper.prettyPrint(plain));
 
-    @Test
-    void getNetworkProperties() throws Exception {
+    mockRemoteCall(dto);
 
-        NetworkConfigurationDTO dto = TestHelperOkHttp
-            .loadResource("network-configuration.json", NetworkConfigurationDTO.class);
-        Assertions.assertNotNull(dto);
+    NetworkConfiguration configuration = repository.getNetworkProperties().toFuture().get();
 
-        JsonObject plain = TestHelperOkHttp
-            .loadResource("network-configuration.json", JsonObject.class);
-        Assertions.assertNotNull(plain);
+    Assertions.assertNotNull(configuration);
 
-        Assertions.assertEquals(jsonHelper.prettyPrint(dto), jsonHelper.prettyPrint(plain));
+    plain.get("network").getAsJsonObject().addProperty("nodeEqualityStrategy", "PUBLIC_KEY");
+    Assertions.assertEquals(jsonHelper.prettyPrint(plain), jsonHelper.prettyPrint(configuration));
+  }
 
-        mockRemoteCall(dto);
-
-        NetworkConfiguration configuration = repository.getNetworkProperties().toFuture().get();
-
-        Assertions.assertNotNull(configuration);
-
-        plain.get("network").getAsJsonObject().addProperty("nodeEqualityStrategy", "PUBLIC_KEY");
-        Assertions
-            .assertEquals(jsonHelper.prettyPrint(plain), jsonHelper.prettyPrint(configuration));
-
-    }
-
-    @Override
-    public NetworkRepositoryOkHttpImpl getRepository() {
-        return repository;
-    }
+  @Override
+  public NetworkRepositoryOkHttpImpl getRepository() {
+    return repository;
+  }
 }

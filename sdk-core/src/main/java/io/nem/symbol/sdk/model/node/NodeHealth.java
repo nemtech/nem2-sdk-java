@@ -13,34 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.node;
-
-/**
- * Object that holds the node health.
- */
+/** Object that holds the node health. */
 public class NodeHealth {
 
-    /**
-     * Is the api up or down?
-     */
-    private final NodeStatus apiNode;
+  /** Is the api up or down? */
+  private final NodeStatus apiNode;
 
-    /**
-     * Is the database up or down?
-     */
-    private final NodeStatus db;
+  /** Is the database up or down? */
+  private final NodeStatus db;
 
-    public NodeHealth(NodeStatus apiNode, NodeStatus db) {
-        this.apiNode = apiNode;
-        this.db = db;
-    }
+  public NodeHealth(NodeStatus apiNode, NodeStatus db) {
+    this.apiNode = apiNode;
+    this.db = db;
+  }
 
-    public NodeStatus getApiNode() {
-        return apiNode;
-    }
+  public NodeStatus getApiNode() {
+    return apiNode;
+  }
 
-    public NodeStatus getDb() {
-        return db;
-    }
+  public NodeStatus getDb() {
+    return db;
+  }
 }

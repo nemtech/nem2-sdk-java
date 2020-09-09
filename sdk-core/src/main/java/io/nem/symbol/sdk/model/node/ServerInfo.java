@@ -14,41 +14,38 @@
  * limitations under the License.
  */
 package io.nem.symbol.sdk.model.node;
-
-/**
- * Server info class
- */
+/** Server info class */
 public class ServerInfo {
 
-    private final String restVersion;
-    private final String sdkVersion;
+  private final String restVersion;
+  private final String sdkVersion;
 
-    /**
-     * Constructor
-     *
-     * @param restVersion the rest version
-     * @param sdkVersion the sdk version
-     */
-    public ServerInfo(String restVersion, String sdkVersion) {
-        this.restVersion = restVersion;
-        this.sdkVersion = sdkVersion;
-    }
+  /**
+   * Constructor
+   *
+   * @param restVersion the rest version
+   * @param sdkVersion the sdk version
+   */
+  public ServerInfo(String restVersion, String sdkVersion) {
+    this.restVersion = restVersion;
+    this.sdkVersion = sdkVersion;
+  }
 
-    /**
-     * Return server rest version
-     *
-     * @return server rest version
-     */
-    public String getRestVersion() {
-        return this.restVersion;
-    }
+  /**
+   * Return server rest version
+   *
+   * @return server rest version
+   */
+  public String getRestVersion() {
+    return this.restVersion;
+  }
 
-    /**
-     * Return server sdk version
-     *
-     * @return sdk version
-     */
-    public String getSdkVersion() {
-        return this.sdkVersion;
-    }
+  /**
+   * Return server sdk version
+   *
+   * @return sdk version
+   */
+  public String getSdkVersion() {
+    return this.sdkVersion;
+  }
 }

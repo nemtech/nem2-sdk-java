@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.TransactionService;
@@ -38,67 +37,80 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class CreatingAnEscrowContractWithAggregateBondedTransactionIntegrationTest extends
-    BaseIntegrationTest {
+public class CreatingAnEscrowContractWithAggregateBondedTransactionIntegrationTest
+    extends BaseIntegrationTest {
 
-    @Test
-    @Disabled
-    void executeTransfer() {
+  @Test
+  @Disabled
+  void executeTransfer() {
 
-        Account ticketDistributorAccount = this.config().getTestAccount();
-        Account aliceAccount = this.config().getTestAccount2();
-        RepositoryType type = DEFAULT_REPOSITORY_TYPE;
+    Account ticketDistributorAccount = this.config().getTestAccount();
+    Account aliceAccount = this.config().getTestAccount2();
+    RepositoryType type = DEFAULT_REPOSITORY_TYPE;
 
-        MosaicId mosaicId = createMosaic(ticketDistributorAccount, type, BigInteger.ZERO, null);
+    MosaicId mosaicId = createMosaic(ticketDistributorAccount, type, BigInteger.ZERO, null);
 
-        TransferTransaction aliceToTicketDistributorTx = TransferTransactionFactory.create(
-            getNetworkType(),
-            ticketDistributorAccount.getAddress(),
-            Collections.singletonList(
-                getNetworkCurrency().createRelative(BigInteger.valueOf(100))),
-            PlainMessage.create("send 100 cat.currency to distributor")).maxFee(this.maxFee)
+    TransferTransaction aliceToTicketDistributorTx =
+        TransferTransactionFactory.create(
+                getNetworkType(),
+                ticketDistributorAccount.getAddress(),
+                Collections.singletonList(
+                    getNetworkCurrency().createRelative(BigInteger.valueOf(100))),
+                PlainMessage.create("send 100 cat.currency to distributor"))
+            .maxFee(this.maxFee)
             .build();
 
-        TransferTransaction ticketDistributorToAliceTx = TransferTransactionFactory.create(
-            getNetworkType(),
-            aliceAccount.getAddress(),
-            Collections.singletonList(new Mosaic(mosaicId, BigInteger.ONE)),
-            PlainMessage.create("send 1 museum ticket to alice")).maxFee(this.maxFee).build();
+    TransferTransaction ticketDistributorToAliceTx =
+        TransferTransactionFactory.create(
+                getNetworkType(),
+                aliceAccount.getAddress(),
+                Collections.singletonList(new Mosaic(mosaicId, BigInteger.ONE)),
+                PlainMessage.create("send 1 museum ticket to alice"))
+            .maxFee(this.maxFee)
+            .build();
 
-        /* end block 01 */
+    /* end block 01 */
 
-        /* start block 02 */
-        AggregateTransaction aggregateTransaction = AggregateTransactionFactory
-            .createBonded(getNetworkType(), Arrays
-                .asList(aliceToTicketDistributorTx.toAggregate(aliceAccount.getPublicAccount()),
-                    ticketDistributorToAliceTx
-                        .toAggregate(ticketDistributorAccount.getPublicAccount())))
-            .maxFee(this.maxFee).build();
+    /* start block 02 */
+    AggregateTransaction aggregateTransaction =
+        AggregateTransactionFactory.createBonded(
+                getNetworkType(),
+                Arrays.asList(
+                    aliceToTicketDistributorTx.toAggregate(aliceAccount.getPublicAccount()),
+                    ticketDistributorToAliceTx.toAggregate(
+                        ticketDistributorAccount.getPublicAccount())))
+            .maxFee(this.maxFee)
+            .build();
 
-        String networkGenerationHash = getGenerationHash();
+    String networkGenerationHash = getGenerationHash();
 
-        SignedTransaction signedTransaction = aliceAccount
-            .sign(aggregateTransaction, networkGenerationHash);
-        System.out.println("Aggregate Transaction Hash: " + signedTransaction.getHash());
-        /* end block 02 */
+    SignedTransaction signedTransaction =
+        aliceAccount.sign(aggregateTransaction, networkGenerationHash);
+    System.out.println("Aggregate Transaction Hash: " + signedTransaction.getHash());
+    /* end block 02 */
 
-        /* start block 03 */
-        HashLockTransaction hashLockTransaction = HashLockTransactionFactory
-            .create(getNetworkType(), getNetworkCurrency().createRelative(BigInteger.TEN),
-                BigInteger.valueOf(480), signedTransaction).maxFee(this.maxFee).build();
+    /* start block 03 */
+    HashLockTransaction hashLockTransaction =
+        HashLockTransactionFactory.create(
+                getNetworkType(),
+                getNetworkCurrency().createRelative(BigInteger.TEN),
+                BigInteger.valueOf(480),
+                signedTransaction)
+            .maxFee(this.maxFee)
+            .build();
 
-        SignedTransaction signedHashLockTransaction = aliceAccount
-            .sign(hashLockTransaction, networkGenerationHash);
+    SignedTransaction signedHashLockTransaction =
+        aliceAccount.sign(hashLockTransaction, networkGenerationHash);
 
-        System.out.println("Hash Transaction Hash: " + hashLockTransaction.getHash());
+    System.out.println("Hash Transaction Hash: " + hashLockTransaction.getHash());
 
-        TransactionService transactionService = getTransactionService(type);
+    TransactionService transactionService = getTransactionService(type);
 
-        Transaction transaction = get(transactionService
-            .announceHashLockAggregateBonded(getListener(type), signedHashLockTransaction,
-                signedTransaction));
+    Transaction transaction =
+        get(
+            transactionService.announceHashLockAggregateBonded(
+                getListener(type), signedHashLockTransaction, signedTransaction));
 
-        Assertions.assertNotNull(transaction);
-
-    }
+    Assertions.assertNotNull(transaction);
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.blockchain.BlockchainScore;
@@ -22,17 +21,17 @@ import java.math.BigInteger;
 
 public interface ChainRepository {
 
-    /**
-     * Gets current blockchain height.
-     *
-     * @return Observable of BigInteger
-     */
-    Observable<BigInteger> getBlockchainHeight();
+  /**
+   * Gets current blockchain height.
+   *
+   * @return Observable of BigInteger
+   */
+  Observable<BigInteger> getBlockchainHeight();
 
-    /**
-     * Gets current blockchain score.
-     *
-     * @return Observable of BigInteger
-     */
-    Observable<BlockchainScore> getChainScore();
+  /**
+   * Gets current blockchain score.
+   *
+   * @return Observable of BigInteger
+   */
+  Observable<BlockchainScore> getChainScore();
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.core.utils.ExceptionUtils;
@@ -45,192 +44,225 @@ import org.junit.jupiter.api.Test;
  */
 public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest {
 
-    private AccountRepositoryOkHttpImpl repository;
+  private AccountRepositoryOkHttpImpl repository;
 
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-        repository = new AccountRepositoryOkHttpImpl(apiClientMock);
-    }
+  @BeforeEach
+  public void setUp() {
+    super.setUp();
+    repository = new AccountRepositoryOkHttpImpl(apiClientMock);
+  }
 
-    @Test
-    public void shouldGetAccountInfo() throws Exception {
+  @Test
+  public void shouldGetAccountInfo() throws Exception {
 
-        Address address = Address.generateRandom(networkType);
+    Address address = Address.generateRandom(networkType);
 
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
-        accountDTO.setAddress(encodeAddress(address));
-        accountDTO.setSupplementalPublicKeys(
-            new SupplementalPublicKeysDTO().linked(new AccountLinkPublicKeyDTO().publicKey("abc")));
+    AccountDTO accountDTO = new AccountDTO();
+    accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
+    accountDTO.setAddress(encodeAddress(address));
+    accountDTO.setSupplementalPublicKeys(
+        new SupplementalPublicKeysDTO().linked(new AccountLinkPublicKeyDTO().publicKey("abc")));
 
-        AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
-        accountInfoDTO.setAccount(accountDTO);
+    AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
+    accountInfoDTO.setAccount(accountDTO);
 
-        BigInteger startHeight = BigInteger.ONE;
-        BigInteger totalFeesPaid = BigInteger.valueOf(2);
-        long beneficiaryCount = 3;
-        BigInteger rawScore = BigInteger.valueOf(4);
-        accountDTO.addActivityBucketsItem(new ActivityBucketDTO().startHeight(startHeight).totalFeesPaid(totalFeesPaid)
-            .beneficiaryCount(beneficiaryCount).rawScore(rawScore));
+    BigInteger startHeight = BigInteger.ONE;
+    BigInteger totalFeesPaid = BigInteger.valueOf(2);
+    long beneficiaryCount = 3;
+    BigInteger rawScore = BigInteger.valueOf(4);
+    accountDTO.addActivityBucketsItem(
+        new ActivityBucketDTO()
+            .startHeight(startHeight)
+            .totalFeesPaid(totalFeesPaid)
+            .beneficiaryCount(beneficiaryCount)
+            .rawScore(rawScore));
 
-        mockRemoteCall(Collections.singletonList(accountInfoDTO));
+    mockRemoteCall(Collections.singletonList(accountInfoDTO));
 
-        List<AccountInfo> resolvedAccountInfos = repository.getAccountsInfo(Collections.singletonList(address))
-            .toFuture().get();
+    List<AccountInfo> resolvedAccountInfos =
+        repository.getAccountsInfo(Collections.singletonList(address)).toFuture().get();
 
-        Assertions.assertEquals(1, resolvedAccountInfos.size());
+    Assertions.assertEquals(1, resolvedAccountInfos.size());
 
-        AccountInfo resolvedAccountInfo = resolvedAccountInfos.get(0);
+    AccountInfo resolvedAccountInfo = resolvedAccountInfos.get(0);
 
-        Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
-        Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
-        Assertions.assertEquals("abc", resolvedAccountInfo.getSupplementalAccountKeys().getLinked().get());
+    Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
+    Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
+    Assertions.assertEquals(
+        "abc", resolvedAccountInfo.getSupplementalAccountKeys().getLinked().get());
 
-        Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
-        Assertions.assertEquals(startHeight, resolvedAccountInfo.getActivityBuckets().get(0).getStartHeight());
-        Assertions.assertEquals(totalFeesPaid, resolvedAccountInfo.getActivityBuckets().get(0).getTotalFeesPaid());
-        Assertions
-            .assertEquals(beneficiaryCount, resolvedAccountInfo.getActivityBuckets().get(0).getBeneficiaryCount());
-        Assertions.assertEquals(rawScore, resolvedAccountInfo.getActivityBuckets().get(0).getRawScore());
-    }
+    Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
+    Assertions.assertEquals(
+        startHeight, resolvedAccountInfo.getActivityBuckets().get(0).getStartHeight());
+    Assertions.assertEquals(
+        totalFeesPaid, resolvedAccountInfo.getActivityBuckets().get(0).getTotalFeesPaid());
+    Assertions.assertEquals(
+        beneficiaryCount, resolvedAccountInfo.getActivityBuckets().get(0).getBeneficiaryCount());
+    Assertions.assertEquals(
+        rawScore, resolvedAccountInfo.getActivityBuckets().get(0).getRawScore());
+  }
 
+  @Test
+  public void shouldGetAccountsInfoFromAddresses() throws Exception {
 
-    @Test
-    public void shouldGetAccountsInfoFromAddresses() throws Exception {
+    Address address = Address.generateRandom(networkType);
 
-        Address address = Address.generateRandom(networkType);
+    AccountDTO accountDTO = new AccountDTO();
+    accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
+    accountDTO.setAddress(encodeAddress(address));
+    accountDTO.setSupplementalPublicKeys(
+        new SupplementalPublicKeysDTO().node(new AccountLinkPublicKeyDTO().publicKey("abc")));
 
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
-        accountDTO.setAddress(encodeAddress(address));
-        accountDTO.setSupplementalPublicKeys(
-            new SupplementalPublicKeysDTO().node(new AccountLinkPublicKeyDTO().publicKey("abc")));
+    AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
+    accountInfoDTO.setAccount(accountDTO);
 
-        AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
-        accountInfoDTO.setAccount(accountDTO);
+    BigInteger startHeight = BigInteger.ONE;
+    BigInteger totalFeesPaid = BigInteger.valueOf(2);
+    long beneficiaryCount = 3;
+    BigInteger rawScore = BigInteger.valueOf(4);
+    accountDTO.addActivityBucketsItem(
+        new ActivityBucketDTO()
+            .startHeight(startHeight)
+            .totalFeesPaid(totalFeesPaid)
+            .beneficiaryCount(beneficiaryCount)
+            .rawScore(rawScore));
 
-        BigInteger startHeight = BigInteger.ONE;
-        BigInteger totalFeesPaid = BigInteger.valueOf(2);
-        long beneficiaryCount = 3;
-        BigInteger rawScore = BigInteger.valueOf(4);
-        accountDTO.addActivityBucketsItem(new ActivityBucketDTO().startHeight(startHeight).totalFeesPaid(totalFeesPaid)
-            .beneficiaryCount(beneficiaryCount).rawScore(rawScore));
+    mockRemoteCall(Collections.singletonList(accountInfoDTO));
 
-        mockRemoteCall(Collections.singletonList(accountInfoDTO));
+    List<AccountInfo> resolvedAccountInfos =
+        repository.getAccountsInfo(Collections.singletonList(address)).toFuture().get();
 
-        List<AccountInfo> resolvedAccountInfos = repository.getAccountsInfo(Collections.singletonList(address))
-            .toFuture().get();
+    Assertions.assertEquals(1, resolvedAccountInfos.size());
 
-        Assertions.assertEquals(1, resolvedAccountInfos.size());
+    AccountInfo resolvedAccountInfo = resolvedAccountInfos.get(0);
 
-        AccountInfo resolvedAccountInfo = resolvedAccountInfos.get(0);
+    Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
+    Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
+    Assertions.assertEquals(
+        "abc", resolvedAccountInfo.getSupplementalAccountKeys().getNode().get());
 
-        Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
-        Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
-        Assertions.assertEquals("abc", resolvedAccountInfo.getSupplementalAccountKeys().getNode().get());
+    Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
+    Assertions.assertEquals(
+        startHeight, resolvedAccountInfo.getActivityBuckets().get(0).getStartHeight());
+    Assertions.assertEquals(
+        totalFeesPaid, resolvedAccountInfo.getActivityBuckets().get(0).getTotalFeesPaid());
+    Assertions.assertEquals(
+        beneficiaryCount, resolvedAccountInfo.getActivityBuckets().get(0).getBeneficiaryCount());
+    Assertions.assertEquals(
+        rawScore, resolvedAccountInfo.getActivityBuckets().get(0).getRawScore());
+  }
 
-        Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
-        Assertions.assertEquals(startHeight, resolvedAccountInfo.getActivityBuckets().get(0).getStartHeight());
-        Assertions.assertEquals(totalFeesPaid, resolvedAccountInfo.getActivityBuckets().get(0).getTotalFeesPaid());
-        Assertions
-            .assertEquals(beneficiaryCount, resolvedAccountInfo.getActivityBuckets().get(0).getBeneficiaryCount());
-        Assertions.assertEquals(rawScore, resolvedAccountInfo.getActivityBuckets().get(0).getRawScore());
+  @Test
+  public void shouldProcessExceptionWhenNotFound() throws Exception {
 
-    }
+    Address address = Address.generateRandom(networkType);
 
-    @Test
-    public void shouldProcessExceptionWhenNotFound() throws Exception {
+    AccountDTO accountDTO = new AccountDTO();
+    accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
+    accountDTO.setAddress(encodeAddress(address));
 
-        Address address = Address.generateRandom(networkType);
+    AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
+    accountInfoDTO.setAccount(accountDTO);
 
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
-        accountDTO.setAddress(encodeAddress(address));
+    mockErrorCode(404, "Account not found!");
 
-        AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
-        accountInfoDTO.setAccount(accountDTO);
+    Assertions.assertEquals(
+        "ApiException: Not Found - 404 - Code Not Found - Account not found!",
+        Assertions.assertThrows(
+                RepositoryCallException.class,
+                () -> {
+                  ExceptionUtils.propagate(
+                      () -> repository.getAccountInfo(address).toFuture().get());
+                })
+            .getMessage());
+  }
 
-        mockErrorCode(404, "Account not found!");
+  @Test
+  public void shouldProcessExceptionWhenNotFoundInvalidResponse() throws Exception {
 
-        Assertions.assertEquals("ApiException: Not Found - 404 - Code Not Found - Account not found!",
-            Assertions.assertThrows(RepositoryCallException.class, () -> {
-                ExceptionUtils.propagate(() -> repository.getAccountInfo(address).toFuture().get());
-            }).getMessage());
+    Address address = Address.generateRandom(networkType);
 
-    }
+    AccountDTO accountDTO = new AccountDTO();
+    accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
+    accountDTO.setAddress(encodeAddress(address));
 
-    @Test
-    public void shouldProcessExceptionWhenNotFoundInvalidResponse() throws Exception {
+    AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
+    accountInfoDTO.setAccount(accountDTO);
 
-        Address address = Address.generateRandom(networkType);
+    mockErrorCodeRawResponse(400, "I'm a raw error, not json");
 
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
-        accountDTO.setAddress(encodeAddress(address));
+    Assertions.assertEquals(
+        "ApiException: Bad Request - 400 - I'm a raw error, not json",
+        Assertions.assertThrows(
+                RepositoryCallException.class,
+                () -> {
+                  ExceptionUtils.propagate(
+                      () -> repository.getAccountInfo(address).toFuture().get());
+                })
+            .getMessage());
+  }
 
-        AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
-        accountInfoDTO.setAccount(accountDTO);
+  @Override
+  public AccountRepositoryOkHttpImpl getRepository() {
+    return repository;
+  }
 
-        mockErrorCodeRawResponse(400, "I'm a raw error, not json");
+  @Test
+  public void search() throws Exception {
+    Address address = Address.generateRandom(this.networkType);
 
-        Assertions.assertEquals("ApiException: Bad Request - 400 - I'm a raw error, not json",
-            Assertions.assertThrows(RepositoryCallException.class, () -> {
-                ExceptionUtils.propagate(() -> repository.getAccountInfo(address).toFuture().get());
-            }).getMessage());
-    }
+    AccountDTO accountDTO = new AccountDTO();
+    accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
+    accountDTO.setAddress(encodeAddress(address));
+    accountDTO.setSupplementalPublicKeys(
+        new SupplementalPublicKeysDTO().node(new AccountLinkPublicKeyDTO().publicKey("abc")));
 
+    AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
+    accountInfoDTO.setAccount(accountDTO);
 
-    @Override
-    public AccountRepositoryOkHttpImpl getRepository() {
-        return repository;
-    }
+    BigInteger startHeight = BigInteger.ONE;
+    BigInteger totalFeesPaid = BigInteger.valueOf(2);
+    long beneficiaryCount = 3;
+    BigInteger rawScore = BigInteger.valueOf(4);
+    accountDTO.addActivityBucketsItem(
+        new ActivityBucketDTO()
+            .startHeight(startHeight)
+            .totalFeesPaid(totalFeesPaid)
+            .beneficiaryCount(beneficiaryCount)
+            .rawScore(rawScore));
 
-    @Test
-    public void search() throws Exception {
-        Address address = Address.generateRandom(this.networkType);
+    mockRemoteCall(toPage(accountInfoDTO));
 
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
-        accountDTO.setAddress(encodeAddress(address));
-        accountDTO.setSupplementalPublicKeys(
-            new SupplementalPublicKeysDTO().node(new AccountLinkPublicKeyDTO().publicKey("abc")));
+    List<AccountInfo> resolvedAccountInfos =
+        repository
+            .search(new AccountSearchCriteria().orderBy(AccountOrderBy.BALANCE))
+            .toFuture()
+            .get()
+            .getData();
 
-        AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
-        accountInfoDTO.setAccount(accountDTO);
+    Assertions.assertEquals(1, resolvedAccountInfos.size());
 
-        BigInteger startHeight = BigInteger.ONE;
-        BigInteger totalFeesPaid = BigInteger.valueOf(2);
-        long beneficiaryCount = 3;
-        BigInteger rawScore = BigInteger.valueOf(4);
-        accountDTO.addActivityBucketsItem(new ActivityBucketDTO().startHeight(startHeight).totalFeesPaid(totalFeesPaid)
-            .beneficiaryCount(beneficiaryCount).rawScore(rawScore));
+    AccountInfo resolvedAccountInfo = resolvedAccountInfos.get(0);
 
-        mockRemoteCall(toPage(accountInfoDTO));
+    Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
+    Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
+    Assertions.assertEquals(
+        "abc", resolvedAccountInfo.getSupplementalAccountKeys().getNode().get());
 
-        List<AccountInfo> resolvedAccountInfos = repository
-            .search(new AccountSearchCriteria().orderBy(AccountOrderBy.BALANCE)).toFuture().get().getData();
+    Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
+    Assertions.assertEquals(
+        startHeight, resolvedAccountInfo.getActivityBuckets().get(0).getStartHeight());
+    Assertions.assertEquals(
+        totalFeesPaid, resolvedAccountInfo.getActivityBuckets().get(0).getTotalFeesPaid());
+    Assertions.assertEquals(
+        beneficiaryCount, resolvedAccountInfo.getActivityBuckets().get(0).getBeneficiaryCount());
+    Assertions.assertEquals(
+        rawScore, resolvedAccountInfo.getActivityBuckets().get(0).getRawScore());
+  }
 
-        Assertions.assertEquals(1, resolvedAccountInfos.size());
-
-        AccountInfo resolvedAccountInfo = resolvedAccountInfos.get(0);
-
-        Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
-        Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
-        Assertions.assertEquals("abc", resolvedAccountInfo.getSupplementalAccountKeys().getNode().get());
-
-        Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
-        Assertions.assertEquals(startHeight, resolvedAccountInfo.getActivityBuckets().get(0).getStartHeight());
-        Assertions.assertEquals(totalFeesPaid, resolvedAccountInfo.getActivityBuckets().get(0).getTotalFeesPaid());
-        Assertions
-            .assertEquals(beneficiaryCount, resolvedAccountInfo.getActivityBuckets().get(0).getBeneficiaryCount());
-        Assertions.assertEquals(rawScore, resolvedAccountInfo.getActivityBuckets().get(0).getRawScore());
-
-    }
-
-
-    private AccountPage toPage(AccountInfoDTO dto) {
-        return new AccountPage().data(Collections.singletonList(dto))
-            .pagination(new Pagination().pageNumber(1).pageSize(2));
-    }
+  private AccountPage toPage(AccountInfoDTO dto) {
+    return new AccountPage()
+        .data(Collections.singletonList(dto))
+        .pagination(new Pagination().pageNumber(1).pageSize(2));
+  }
 }

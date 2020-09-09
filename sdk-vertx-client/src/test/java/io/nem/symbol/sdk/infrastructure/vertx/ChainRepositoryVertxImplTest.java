@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.sdk.model.blockchain.BlockchainScore;
@@ -31,33 +30,31 @@ import org.junit.jupiter.api.Test;
  */
 public class ChainRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
 
-    private ChainRepositoryVertxImpl repository;
+  private ChainRepositoryVertxImpl repository;
 
+  @BeforeEach
+  public void setUp() {
+    super.setUp();
+    repository = new ChainRepositoryVertxImpl(apiClientMock);
+  }
 
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-        repository = new ChainRepositoryVertxImpl(apiClientMock);
-    }
+  @Test
+  public void shouldGetBlockchainHeight() throws Exception {
+    HeightInfoDTO dto = new HeightInfoDTO();
+    dto.setHeight(BigInteger.valueOf(8));
+    mockRemoteCall(dto);
+    BigInteger blockchainHeight = repository.getBlockchainHeight().toFuture().get();
+    Assertions.assertEquals((dto.getHeight()), blockchainHeight);
+  }
 
-    @Test
-    public void shouldGetBlockchainHeight() throws Exception {
-        HeightInfoDTO dto = new HeightInfoDTO();
-        dto.setHeight(BigInteger.valueOf(8));
-        mockRemoteCall(dto);
-        BigInteger blockchainHeight = repository.getBlockchainHeight().toFuture().get();
-        Assertions.assertEquals((dto.getHeight()), blockchainHeight);
-    }
-
-    @Test
-    public void shouldGetBlockchainScore() throws Exception {
-        ChainScoreDTO dto = new ChainScoreDTO();
-        dto.setScoreLow(BigInteger.valueOf(3));
-        dto.setScoreHigh(BigInteger.valueOf(5));
-        mockRemoteCall(dto);
-        BlockchainScore blockchainScore = repository.getChainScore().toFuture().get();
-        Assertions.assertEquals((dto.getScoreLow()), blockchainScore.getScoreLow());
-        Assertions.assertEquals((dto.getScoreHigh()), blockchainScore.getScoreHigh());
-    }
-
+  @Test
+  public void shouldGetBlockchainScore() throws Exception {
+    ChainScoreDTO dto = new ChainScoreDTO();
+    dto.setScoreLow(BigInteger.valueOf(3));
+    dto.setScoreHigh(BigInteger.valueOf(5));
+    mockRemoteCall(dto);
+    BlockchainScore blockchainScore = repository.getChainScore().toFuture().get();
+    Assertions.assertEquals((dto.getScoreLow()), blockchainScore.getScoreLow());
+    Assertions.assertEquals((dto.getScoreHigh()), blockchainScore.getScoreHigh());
+  }
 }

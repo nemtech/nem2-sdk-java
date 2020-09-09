@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.core.utils.MapperUtils;
@@ -56,258 +55,267 @@ import org.junit.jupiter.api.Test;
  */
 public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest {
 
-    private NamespaceRepositoryOkHttpImpl repository;
+  private NamespaceRepositoryOkHttpImpl repository;
 
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-        repository = new NamespaceRepositoryOkHttpImpl(apiClientMock);
-    }
+  @BeforeEach
+  public void setUp() {
+    super.setUp();
+    repository = new NamespaceRepositoryOkHttpImpl(apiClientMock);
+  }
 
+  @Test
+  public void shouldGetNamespace() throws Exception {
 
-    @Test
-    public void shouldGetNamespace() throws Exception {
+    Address ownerAccount = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
 
-        Address ownerAccount = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
+    NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
+
+    NamespaceInfoDTO dto = new NamespaceInfoDTO();
+    NamespaceMetaDTO meta = new NamespaceMetaDTO();
+    meta.setActive(true);
+    meta.setId("SomeId");
+    meta.setIndex(123);
+    dto.setMeta(meta);
 
-        NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
+    NamespaceDTO namespace = new NamespaceDTO();
+    namespace.setDepth(111);
+    namespace.setStartHeight(BigInteger.valueOf(4));
+    namespace.setEndHeight(BigInteger.valueOf(5));
+    namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
+    namespace.setOwnerAddress(ownerAccount.encoded());
 
-        NamespaceInfoDTO dto = new NamespaceInfoDTO();
-        NamespaceMetaDTO meta = new NamespaceMetaDTO();
-        meta.setActive(true);
-        meta.setId("SomeId");
-        meta.setIndex(123);
-        dto.setMeta(meta);
+    AliasDTO alias = new AliasDTO();
+    alias.setType(AliasTypeEnum.NUMBER_1);
+    alias.setMosaicId("123");
+    namespace.setAlias(alias);
+
+    dto.setNamespace(namespace);
+
+    mockRemoteCall(dto);
+
+    NamespaceInfo info = repository.getNamespace(namespaceId).toFuture().get();
+
+    Assertions.assertNotNull(info);
+
+    Assertions.assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
+
+    Assertions.assertEquals(meta.getId(), info.getMetaId());
+    Assertions.assertEquals(meta.getIndex(), info.getIndex());
+    Assertions.assertEquals(meta.getActive(), info.isActive());
+
+    Assertions.assertEquals(BigInteger.valueOf(4), info.getStartHeight());
+    Assertions.assertEquals(BigInteger.valueOf(5), info.getEndHeight());
+  }
+
+  @Test
+  public void search() throws Exception {
+    Address address = Address.generateRandom(networkType);
+    Address ownerAccount = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
+
+    NamespaceInfoDTO dto = new NamespaceInfoDTO();
+    NamespaceMetaDTO meta = new NamespaceMetaDTO();
+    meta.setActive(true);
+    meta.setId("SomeId");
+    meta.setIndex(123);
+    dto.setMeta(meta);
+
+    NamespaceDTO namespace = new NamespaceDTO();
+    namespace.setDepth(111);
+    namespace.setStartHeight(BigInteger.valueOf(4));
+    namespace.setEndHeight(BigInteger.valueOf(5));
+    namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
+    namespace.setOwnerAddress(ownerAccount.encoded());
+
+    AliasDTO alias = new AliasDTO();
+    alias.setType(AliasTypeEnum.NUMBER_2);
+    alias.setAddress(address.encoded());
+    namespace.setAlias(alias);
+
+    dto.setNamespace(namespace);
+
+    mockRemoteCall(toPage(dto));
 
-        NamespaceDTO namespace = new NamespaceDTO();
-        namespace.setDepth(111);
-        namespace.setStartHeight(BigInteger.valueOf(4));
-        namespace.setEndHeight(BigInteger.valueOf(5));
-        namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
-        namespace.setOwnerAddress(ownerAccount.encoded());
+    NamespaceInfo info =
+        repository
+            .search(new NamespaceSearchCriteria().ownerAddress(address))
+            .toFuture()
+            .get()
+            .getData()
+            .get(0);
+
+    Assertions.assertNotNull(info);
+
+    Assertions.assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
+
+    Assertions.assertEquals(meta.getId(), info.getMetaId());
+    Assertions.assertEquals(meta.getIndex(), info.getIndex());
+    Assertions.assertEquals(meta.getActive(), info.isActive());
+
+    Assertions.assertEquals(BigInteger.valueOf(4), info.getStartHeight());
+    Assertions.assertEquals(BigInteger.valueOf(5), info.getEndHeight());
+  }
+
+  private NamespacePage toPage(NamespaceInfoDTO dto) {
+    return new NamespacePage()
+        .data(Collections.singletonList(dto))
+        .pagination(new Pagination().pageNumber(1).pageSize(2));
+  }
+
+  @Test
+  public void shouldGetNamespaceNames() throws Exception {
+
+    NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
+    NamespaceNameDTO dto1 = new NamespaceNameDTO();
+    dto1.setName("someName1");
+    dto1.setId("1");
+    dto1.setParentId("2");
+
+    NamespaceNameDTO dto2 = new NamespaceNameDTO();
+    dto2.setName("someName2");
+    dto2.setId("3");
+
+    mockRemoteCall(Arrays.asList(dto1, dto2));
 
-        AliasDTO alias = new AliasDTO();
-        alias.setType(AliasTypeEnum.NUMBER_1);
-        alias.setMosaicId("123");
-        namespace.setAlias(alias);
+    List<NamespaceName> names =
+        repository.getNamespaceNames(Arrays.asList(namespaceId)).toFuture().get();
 
-        dto.setNamespace(namespace);
+    Assertions.assertNotNull(names);
+    Assertions.assertEquals(2, names.size());
+    Assertions.assertEquals("someName1", names.get(0).getName());
+    Assertions.assertEquals(BigInteger.valueOf(1L), names.get(0).getNamespaceId().getId());
+    Assertions.assertEquals(
+        BigInteger.valueOf(2L),
+        names
+            .get(0)
+            .getParentId()
+            .orElseThrow(() -> new IllegalStateException("No parent id"))
+            .getId());
 
-        mockRemoteCall(dto);
+    Assertions.assertEquals("someName2", names.get(1).getName());
+    Assertions.assertEquals(BigInteger.valueOf(3L), names.get(1).getNamespaceId().getId());
+    Assertions.assertFalse(names.get(1).getParentId().isPresent());
+  }
 
-        NamespaceInfo info = repository.getNamespace(namespaceId).toFuture().get();
+  @Test
+  public void shouldGetLinkedAddress() throws Exception {
+    Address address = Address.generateRandom(networkType);
 
-        Assertions.assertNotNull(info);
+    NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
+    Address ownerAccount = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
 
-        Assertions.assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
+    NamespaceInfoDTO dto = new NamespaceInfoDTO();
+    NamespaceMetaDTO meta = new NamespaceMetaDTO();
+    meta.setActive(true);
+    meta.setId("SomeId");
+    meta.setIndex(123);
+    dto.setMeta(meta);
 
-        Assertions.assertEquals(meta.getId(), info.getMetaId());
-        Assertions.assertEquals(meta.getIndex(), info.getIndex());
-        Assertions.assertEquals(meta.getActive(), info.isActive());
+    NamespaceDTO namespace = new NamespaceDTO();
+    namespace.setDepth(111);
+    namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_0);
+    namespace.setOwnerAddress(ownerAccount.encoded());
 
-        Assertions.assertEquals(BigInteger.valueOf(4), info.getStartHeight());
-        Assertions.assertEquals(BigInteger.valueOf(5), info.getEndHeight());
-    }
+    AliasDTO alias = new AliasDTO();
+    alias.setType(AliasTypeEnum.NUMBER_2);
+    alias.setAddress(address.encoded());
+    namespace.setAlias(alias);
 
-    @Test
-    public void search() throws Exception {
-        Address address = Address.generateRandom(networkType);
-        Address ownerAccount = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
+    dto.setNamespace(namespace);
 
-        NamespaceInfoDTO dto = new NamespaceInfoDTO();
-        NamespaceMetaDTO meta = new NamespaceMetaDTO();
-        meta.setActive(true);
-        meta.setId("SomeId");
-        meta.setIndex(123);
-        dto.setMeta(meta);
+    mockRemoteCall(dto);
 
-        NamespaceDTO namespace = new NamespaceDTO();
-        namespace.setDepth(111);
-        namespace.setStartHeight(BigInteger.valueOf(4));
-        namespace.setEndHeight(BigInteger.valueOf(5));
-        namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
-        namespace.setOwnerAddress(ownerAccount.encoded());
+    Address linkedAddress = repository.getLinkedAddress(namespaceId).toFuture().get();
 
-        AliasDTO alias = new AliasDTO();
-        alias.setType(AliasTypeEnum.NUMBER_2);
-        alias.setAddress(address.encoded());
-        namespace.setAlias(alias);
+    Assertions.assertNotNull(linkedAddress);
 
-        dto.setNamespace(namespace);
+    Assertions.assertEquals(address, linkedAddress);
+  }
 
-        mockRemoteCall(toPage(dto));
+  @Test
+  public void shouldGetLinkedMosaicId() throws Exception {
 
-        NamespaceInfo info = repository.search(new NamespaceSearchCriteria().ownerAddress(address)).toFuture().get()
-            .getData().get(0);
+    Address ownerAccount = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
+    NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
+    NamespaceInfoDTO dto = new NamespaceInfoDTO();
+    NamespaceMetaDTO meta = new NamespaceMetaDTO();
+    meta.setActive(true);
+    meta.setId("SomeId");
+    meta.setIndex(123);
+    dto.setMeta(meta);
 
-        Assertions.assertNotNull(info);
+    NamespaceDTO namespace = new NamespaceDTO();
+    namespace.setDepth(111);
+    namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_0);
+    namespace.setOwnerAddress(ownerAccount.encoded());
 
-        Assertions.assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
+    AliasDTO alias = new AliasDTO();
+    alias.setType(AliasTypeEnum.NUMBER_1);
+    alias.setMosaicId("528280977531AAA");
+    namespace.setAlias(alias);
 
-        Assertions.assertEquals(meta.getId(), info.getMetaId());
-        Assertions.assertEquals(meta.getIndex(), info.getIndex());
-        Assertions.assertEquals(meta.getActive(), info.isActive());
+    dto.setNamespace(namespace);
 
-        Assertions.assertEquals(BigInteger.valueOf(4), info.getStartHeight());
-        Assertions.assertEquals(BigInteger.valueOf(5), info.getEndHeight());
-    }
+    mockRemoteCall(dto);
 
+    MosaicId linkedMosaicId = repository.getLinkedMosaicId(namespaceId).toFuture().get();
 
-    private NamespacePage toPage(NamespaceInfoDTO dto) {
-        return new NamespacePage().data(Collections.singletonList(dto))
-            .pagination(new Pagination().pageNumber(1).pageSize(2));
-    }
+    Assertions.assertNotNull(linkedMosaicId);
 
+    Assertions.assertEquals(
+        MapperUtils.fromHexToBigInteger("528280977531AAA"), linkedMosaicId.getId());
+  }
 
-    @Test
-    public void shouldGetNamespaceNames() throws Exception {
+  @Test
+  public void shouldGetMosaicsNamesFromPublicKeys() throws Exception {
 
-        NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
-        NamespaceNameDTO dto1 = new NamespaceNameDTO();
-        dto1.setName("someName1");
-        dto1.setId("1");
-        dto1.setParentId("2");
+    MosaicId mosaicId = MapperUtils.toMosaicId("99262122238339734");
 
-        NamespaceNameDTO dto2 = new NamespaceNameDTO();
-        dto2.setName("someName2");
-        dto2.setId("3");
+    MosaicNamesDTO dto = new MosaicNamesDTO();
+    dto.setMosaicId("99262122238339734");
+    dto.setNames(Collections.singletonList("accountalias"));
 
-        mockRemoteCall(Arrays.asList(dto1, dto2));
+    MosaicsNamesDTO accountsNamesDTO = new MosaicsNamesDTO();
+    accountsNamesDTO.setMosaicNames(Collections.singletonList(dto));
 
-        List<NamespaceName> names = repository.getNamespaceNames(Arrays.asList(namespaceId)).toFuture().get();
+    mockRemoteCall(accountsNamesDTO);
 
-        Assertions.assertNotNull(names);
-        Assertions.assertEquals(2, names.size());
-        Assertions.assertEquals("someName1", names.get(0).getName());
-        Assertions.assertEquals(BigInteger.valueOf(1L), names.get(0).getNamespaceId().getId());
-        Assertions.assertEquals(BigInteger.valueOf(2L),
-            names.get(0).getParentId().orElseThrow(() -> new IllegalStateException("No parent id")).getId());
+    List<MosaicNames> resolvedList =
+        repository.getMosaicsNames(Collections.singletonList(mosaicId)).toFuture().get();
 
-        Assertions.assertEquals("someName2", names.get(1).getName());
-        Assertions.assertEquals(BigInteger.valueOf(3L), names.get(1).getNamespaceId().getId());
-        Assertions.assertFalse(names.get(1).getParentId().isPresent());
-    }
+    Assertions.assertEquals(1, resolvedList.size());
 
-    @Test
-    public void shouldGetLinkedAddress() throws Exception {
-        Address address = Address.generateRandom(networkType);
+    MosaicNames accountNames = resolvedList.get(0);
 
-        NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
-        Address ownerAccount = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
+    Assertions.assertEquals(mosaicId, accountNames.getMosaicId());
+    Assertions.assertEquals("accountalias", accountNames.getNames().get(0).getName());
+  }
 
-        NamespaceInfoDTO dto = new NamespaceInfoDTO();
-        NamespaceMetaDTO meta = new NamespaceMetaDTO();
-        meta.setActive(true);
-        meta.setId("SomeId");
-        meta.setIndex(123);
-        dto.setMeta(meta);
+  @Test
+  public void shouldGetAccountsNamesFromAddresses() throws Exception {
+    Address address = Address.generateRandom(networkType);
 
-        NamespaceDTO namespace = new NamespaceDTO();
-        namespace.setDepth(111);
-        namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_0);
-        namespace.setOwnerAddress(ownerAccount.encoded());
+    AccountNamesDTO dto = new AccountNamesDTO();
+    dto.setAddress(encodeAddress(address));
+    dto.setNames(Collections.singletonList("accountalias"));
 
-        AliasDTO alias = new AliasDTO();
-        alias.setType(AliasTypeEnum.NUMBER_2);
-        alias.setAddress(address.encoded());
-        namespace.setAlias(alias);
+    AccountsNamesDTO accountsNamesDTO = new AccountsNamesDTO();
+    accountsNamesDTO.setAccountNames(Collections.singletonList(dto));
 
-        dto.setNamespace(namespace);
+    mockRemoteCall(accountsNamesDTO);
 
-        mockRemoteCall(dto);
+    List<AccountNames> resolvedList =
+        repository.getAccountsNames(Collections.singletonList(address)).toFuture().get();
 
-        Address linkedAddress = repository.getLinkedAddress(namespaceId).toFuture().get();
+    Assertions.assertEquals(1, resolvedList.size());
 
-        Assertions.assertNotNull(linkedAddress);
+    AccountNames accountNames = resolvedList.get(0);
 
-        Assertions.assertEquals(address, linkedAddress);
-    }
+    Assertions.assertEquals(address, accountNames.getAddress());
+    Assertions.assertEquals("accountalias", accountNames.getNames().get(0).getName());
+  }
 
-    @Test
-    public void shouldGetLinkedMosaicId() throws Exception {
-
-        Address ownerAccount = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
-        NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
-        NamespaceInfoDTO dto = new NamespaceInfoDTO();
-        NamespaceMetaDTO meta = new NamespaceMetaDTO();
-        meta.setActive(true);
-        meta.setId("SomeId");
-        meta.setIndex(123);
-        dto.setMeta(meta);
-
-        NamespaceDTO namespace = new NamespaceDTO();
-        namespace.setDepth(111);
-        namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_0);
-        namespace.setOwnerAddress(ownerAccount.encoded());
-
-        AliasDTO alias = new AliasDTO();
-        alias.setType(AliasTypeEnum.NUMBER_1);
-        alias.setMosaicId("528280977531AAA");
-        namespace.setAlias(alias);
-
-        dto.setNamespace(namespace);
-
-        mockRemoteCall(dto);
-
-        MosaicId linkedMosaicId = repository.getLinkedMosaicId(namespaceId).toFuture().get();
-
-        Assertions.assertNotNull(linkedMosaicId);
-
-        Assertions.assertEquals(MapperUtils.fromHexToBigInteger("528280977531AAA"), linkedMosaicId.getId());
-    }
-
-    @Test
-    public void shouldGetMosaicsNamesFromPublicKeys() throws Exception {
-
-        MosaicId mosaicId = MapperUtils.toMosaicId("99262122238339734");
-
-        MosaicNamesDTO dto = new MosaicNamesDTO();
-        dto.setMosaicId("99262122238339734");
-        dto.setNames(Collections.singletonList("accountalias"));
-
-        MosaicsNamesDTO accountsNamesDTO = new MosaicsNamesDTO();
-        accountsNamesDTO.setMosaicNames(Collections.singletonList(dto));
-
-        mockRemoteCall(accountsNamesDTO);
-
-        List<MosaicNames> resolvedList = repository.getMosaicsNames(Collections.singletonList(mosaicId)).toFuture()
-            .get();
-
-        Assertions.assertEquals(1, resolvedList.size());
-
-        MosaicNames accountNames = resolvedList.get(0);
-
-        Assertions.assertEquals(mosaicId, accountNames.getMosaicId());
-        Assertions.assertEquals("accountalias", accountNames.getNames().get(0).getName());
-    }
-
-
-    @Test
-    public void shouldGetAccountsNamesFromAddresses() throws Exception {
-        Address address = Address.generateRandom(networkType);
-
-        AccountNamesDTO dto = new AccountNamesDTO();
-        dto.setAddress(encodeAddress(address));
-        dto.setNames(Collections.singletonList("accountalias"));
-
-        AccountsNamesDTO accountsNamesDTO = new AccountsNamesDTO();
-        accountsNamesDTO.setAccountNames(Collections.singletonList(dto));
-
-        mockRemoteCall(accountsNamesDTO);
-
-        List<AccountNames> resolvedList = repository.getAccountsNames(Collections.singletonList(address)).toFuture()
-            .get();
-
-        Assertions.assertEquals(1, resolvedList.size());
-
-        AccountNames accountNames = resolvedList.get(0);
-
-        Assertions.assertEquals(address, accountNames.getAddress());
-        Assertions.assertEquals("accountalias", accountNames.getNames().get(0).getName());
-    }
-
-    @Override
-    public NamespaceRepositoryOkHttpImpl getRepository() {
-        return repository;
-    }
+  @Override
+  public NamespaceRepositoryOkHttpImpl getRepository() {
+    return repository;
+  }
 }

@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure;
-
 
 import io.nem.symbol.core.crypto.Hashes;
 import io.nem.symbol.core.utils.ConvertUtils;
@@ -32,68 +30,68 @@ import java.math.BigInteger;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 
-/**
- * Implementation of {@link BlockService}
- */
+/** Implementation of {@link BlockService} */
 public class BlockServiceImpl implements BlockService {
 
-    /**
-     * The block repository.
-     */
-    private final BlockRepository blockRepository;
+  /** The block repository. */
+  private final BlockRepository blockRepository;
 
-    /**
-     * @param repositoryFactory the repository factory.
-     */
-    public BlockServiceImpl(RepositoryFactory repositoryFactory) {
-        this.blockRepository = repositoryFactory.createBlockRepository();
-    }
+  /** @param repositoryFactory the repository factory. */
+  public BlockServiceImpl(RepositoryFactory repositoryFactory) {
+    this.blockRepository = repositoryFactory.createBlockRepository();
+  }
 
-    @Override
-    public Observable<Boolean> isValidTransactionInBlock(BigInteger height,
-        String transactionHash) {
-        Validate.notNull(height, "height is required");
-        Validate.notNull(transactionHash, "transactionHash is required");
-        return getBooleanObservable(
-            blockRepository.getBlockByHeight(height).map(BlockInfo::getBlockTransactionsHash),
-            transactionHash, blockRepository
-                .getMerkleTransaction(height, transactionHash));
-    }
+  @Override
+  public Observable<Boolean> isValidTransactionInBlock(BigInteger height, String transactionHash) {
+    Validate.notNull(height, "height is required");
+    Validate.notNull(transactionHash, "transactionHash is required");
+    return getBooleanObservable(
+        blockRepository.getBlockByHeight(height).map(BlockInfo::getBlockTransactionsHash),
+        transactionHash,
+        blockRepository.getMerkleTransaction(height, transactionHash));
+  }
 
-    @Override
-    public Observable<Boolean> isValidStatementInBlock(BigInteger height, String statementHash) {
-        Validate.notNull(height, "height is required");
-        Validate.notNull(statementHash, "statementHash is required");
-        return getBooleanObservable(
-            blockRepository.getBlockByHeight(height).map(BlockInfo::getBlockReceiptsHash),
-            statementHash, blockRepository
-                .getMerkleReceipts(height, statementHash));
-    }
+  @Override
+  public Observable<Boolean> isValidStatementInBlock(BigInteger height, String statementHash) {
+    Validate.notNull(height, "height is required");
+    Validate.notNull(statementHash, "statementHash is required");
+    return getBooleanObservable(
+        blockRepository.getBlockByHeight(height).map(BlockInfo::getBlockReceiptsHash),
+        statementHash,
+        blockRepository.getMerkleReceipts(height, statementHash));
+  }
 
-    private Observable<Boolean> getBooleanObservable(Observable<String> rootObservable, String leaf,
-        Observable<MerkleProofInfo> merkleTransactionObservable) {
+  private Observable<Boolean> getBooleanObservable(
+      Observable<String> rootObservable,
+      String leaf,
+      Observable<MerkleProofInfo> merkleTransactionObservable) {
 
-        BiFunction<String, MerkleProofInfo, Boolean> zipper = (root, merkleProofInfo) -> {
-            List<MerklePathItem> merklePath = merkleProofInfo.getMerklePath();
-            if (merklePath.isEmpty()) {
-                // Single item tree, so leaf = HRoot0
-                return leaf.equalsIgnoreCase(root);
-            }
+    BiFunction<String, MerkleProofInfo, Boolean> zipper =
+        (root, merkleProofInfo) -> {
+          List<MerklePathItem> merklePath = merkleProofInfo.getMerklePath();
+          if (merklePath.isEmpty()) {
+            // Single item tree, so leaf = HRoot0
+            return leaf.equalsIgnoreCase(root);
+          }
 
-            // 1 is left
-            java.util.function.BiFunction<String, MerklePathItem, String> accumulator = (proofHash, pathItem) -> ConvertUtils
-                .toHex(Hashes
-                    .sha3_256(ConvertUtils
-                        .fromHexToBytes(
-                            pathItem.getPosition() == Position.LEFT ? pathItem.getHash() + proofHash
-                                : proofHash + pathItem.getHash())));
+          // 1 is left
+          java.util.function.BiFunction<String, MerklePathItem, String> accumulator =
+              (proofHash, pathItem) ->
+                  ConvertUtils.toHex(
+                      Hashes.sha3_256(
+                          ConvertUtils.fromHexToBytes(
+                              pathItem.getPosition() == Position.LEFT
+                                  ? pathItem.getHash() + proofHash
+                                  : proofHash + pathItem.getHash())));
 
-            String hroot0 = merklePath.stream().reduce(leaf, accumulator, (s1, s2) -> s1);
-            return root.equalsIgnoreCase(hroot0);
+          String hroot0 = merklePath.stream().reduce(leaf, accumulator, (s1, s2) -> s1);
+          return root.equalsIgnoreCase(hroot0);
         };
-        return Observable.zip(rootObservable, merkleTransactionObservable, zipper).onErrorReturn((e) -> {
-            e.printStackTrace();
-            return false;
-        });
-    }
+    return Observable.zip(rootObservable, merkleTransactionObservable, zipper)
+        .onErrorReturn(
+            (e) -> {
+              e.printStackTrace();
+              return false;
+            });
+  }
 }

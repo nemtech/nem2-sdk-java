@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.mosaic;
 
 import io.nem.symbol.sdk.model.Stored;
@@ -28,128 +27,132 @@ import java.util.Optional;
  */
 public class MosaicInfo implements Stored {
 
-    /**
-     * The database id.
-     */
-    private final String recordId;
-    private final MosaicId mosaicId;
-    private final BigInteger supply;
-    private final BigInteger startHeight;
-    private final Address ownerAddress;
-    private final Long revision;
-    private final MosaicFlags mosaicFlags;
-    private final int divisibility;
-    private final BigInteger duration;
+  /** The database id. */
+  private final String recordId;
 
-    @SuppressWarnings("squid:S00107")
-    public MosaicInfo(final String recordId, final MosaicId mosaicId, final BigInteger supply,
-        final BigInteger startHeight, final Address ownerAddress, final Long revision,
-        final MosaicFlags mosaicFlags, final int divisibility, final BigInteger duration) {
-        this.recordId = recordId;
-        this.mosaicId = mosaicId;
-        this.supply = supply;
-        this.startHeight = startHeight;
-        this.ownerAddress = ownerAddress;
-        this.revision = revision;
-        this.mosaicFlags = mosaicFlags;
-        this.divisibility = divisibility;
-        this.duration = duration;
-    }
+  private final MosaicId mosaicId;
+  private final BigInteger supply;
+  private final BigInteger startHeight;
+  private final Address ownerAddress;
+  private final Long revision;
+  private final MosaicFlags mosaicFlags;
+  private final int divisibility;
+  private final BigInteger duration;
 
-    /**
-     * Returns the mosaic id
-     *
-     * @return mosaic id
-     */
-    public MosaicId getMosaicId() {
-        return mosaicId;
-    }
+  @SuppressWarnings("squid:S00107")
+  public MosaicInfo(
+      final String recordId,
+      final MosaicId mosaicId,
+      final BigInteger supply,
+      final BigInteger startHeight,
+      final Address ownerAddress,
+      final Long revision,
+      final MosaicFlags mosaicFlags,
+      final int divisibility,
+      final BigInteger duration) {
+    this.recordId = recordId;
+    this.mosaicId = mosaicId;
+    this.supply = supply;
+    this.startHeight = startHeight;
+    this.ownerAddress = ownerAddress;
+    this.revision = revision;
+    this.mosaicFlags = mosaicFlags;
+    this.divisibility = divisibility;
+    this.duration = duration;
+  }
 
-    /**
-     * Returns the total mosaic supply
-     *
-     * @return total mosaic supply
-     */
-    public BigInteger getSupply() {
-        return supply;
-    }
+  /**
+   * Returns the mosaic id
+   *
+   * @return mosaic id
+   */
+  public MosaicId getMosaicId() {
+    return mosaicId;
+  }
 
-    /**
-     * Returns the block height it was created
-     *
-     * @return height it was created
-     */
-    public BigInteger getStartHeight() {
-        return startHeight;
-    }
+  /**
+   * Returns the total mosaic supply
+   *
+   * @return total mosaic supply
+   */
+  public BigInteger getSupply() {
+    return supply;
+  }
 
-    /**
-     * Returns the mosaic account address
-     *
-     * @return mosaic account owner
-     */
-    public UnresolvedAddress getOwnerAddress() {
-        return ownerAddress;
-    }
+  /**
+   * Returns the block height it was created
+   *
+   * @return height it was created
+   */
+  public BigInteger getStartHeight() {
+    return startHeight;
+  }
 
-    /**
-     * Returns the revision number
-     *
-     * @return revision
-     */
-    public Long getRevision() {
-        return revision;
-    }
+  /**
+   * Returns the mosaic account address
+   *
+   * @return mosaic account owner
+   */
+  public UnresolvedAddress getOwnerAddress() {
+    return ownerAddress;
+  }
 
-    /**
-     * Returns true if the supply is mutable
-     *
-     * @return if supply is mutable
-     */
-    public boolean isSupplyMutable() {
-        return mosaicFlags.isSupplyMutable();
-    }
+  /**
+   * Returns the revision number
+   *
+   * @return revision
+   */
+  public Long getRevision() {
+    return revision;
+  }
 
-    /**
-     * Returns tue if the mosaic is transferable between non-owner accounts
-     *
-     * @return if the mosaic is transferable between non-owner accounts
-     */
-    public boolean isTransferable() {
-        return mosaicFlags.isTransferable();
-    }
+  /**
+   * Returns true if the supply is mutable
+   *
+   * @return if supply is mutable
+   */
+  public boolean isSupplyMutable() {
+    return mosaicFlags.isSupplyMutable();
+  }
 
-    /**
-     * Returns tue if the mosaic is restrictable between non-owner accounts
-     *
-     * @return if the mosaic is restrictable between non-owner accounts
-     */
-    public boolean isRestrictable() {
-        return mosaicFlags.isRestrictable();
-    }
+  /**
+   * Returns tue if the mosaic is transferable between non-owner accounts
+   *
+   * @return if the mosaic is transferable between non-owner accounts
+   */
+  public boolean isTransferable() {
+    return mosaicFlags.isTransferable();
+  }
 
-    /**
-     * Returns the mosaic divisibility
-     *
-     * @return mosaic divisibility
-     */
-    public int getDivisibility() {
-        return divisibility;
-    }
+  /**
+   * Returns tue if the mosaic is restrictable between non-owner accounts
+   *
+   * @return if the mosaic is restrictable between non-owner accounts
+   */
+  public boolean isRestrictable() {
+    return mosaicFlags.isRestrictable();
+  }
 
-    /**
-     * Return the number of blocks from height it will be active
-     *
-     * @return the number of blocks from height it will be active
-     */
-    public BigInteger getDuration() {
-        return duration;
-    }
+  /**
+   * Returns the mosaic divisibility
+   *
+   * @return mosaic divisibility
+   */
+  public int getDivisibility() {
+    return divisibility;
+  }
 
-    /**
-     * @return the internal database id.
-     */
-    public Optional<String> getRecordId() {
-        return Optional.ofNullable(recordId);
-    }
+  /**
+   * Return the number of blocks from height it will be active
+   *
+   * @return the number of blocks from height it will be active
+   */
+  public BigInteger getDuration() {
+    return duration;
+  }
+
+  /** @return the internal database id. */
+  public Optional<String> getRecordId() {
+    return Optional.ofNullable(recordId);
+  }
 }

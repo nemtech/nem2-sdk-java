@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
@@ -29,68 +28,65 @@ import java.util.Optional;
  */
 public class NamespaceRegistrationTransaction extends Transaction {
 
-    private final String namespaceName;
-    private final NamespaceId namespaceId;
-    private final Optional<BigInteger> duration;
-    private final Optional<NamespaceId> parentId;
-    private final NamespaceRegistrationType namespaceRegistrationType;
+  private final String namespaceName;
+  private final NamespaceId namespaceId;
+  private final Optional<BigInteger> duration;
+  private final Optional<NamespaceId> parentId;
+  private final NamespaceRegistrationType namespaceRegistrationType;
 
-    /**
-     * @param factory the factory with the configured fields.
-     */
-    NamespaceRegistrationTransaction(NamespaceRegistrationTransactionFactory factory) {
-        super(factory);
-        this.namespaceName = factory.getNamespaceName();
-        this.namespaceRegistrationType = factory.getNamespaceRegistrationType();
-        this.namespaceId = factory.getNamespaceId();
-        this.duration = factory.getDuration();
-        this.parentId = factory.getParentId();
-    }
+  /** @param factory the factory with the configured fields. */
+  NamespaceRegistrationTransaction(NamespaceRegistrationTransactionFactory factory) {
+    super(factory);
+    this.namespaceName = factory.getNamespaceName();
+    this.namespaceRegistrationType = factory.getNamespaceRegistrationType();
+    this.namespaceId = factory.getNamespaceId();
+    this.duration = factory.getDuration();
+    this.parentId = factory.getParentId();
+  }
 
-    /**
-     * Returns namespace name.
-     *
-     * @return namespace name
-     */
-    public String getNamespaceName() {
-        return namespaceName;
-    }
+  /**
+   * Returns namespace name.
+   *
+   * @return namespace name
+   */
+  public String getNamespaceName() {
+    return namespaceName;
+  }
 
-    /**
-     * Returns id of the namespace derived from namespaceName. When creating a sub namespace the
-     * namespaceId is derived from namespaceName and parentId.
-     *
-     * @return namespace id
-     */
-    public NamespaceId getNamespaceId() {
-        return namespaceId;
-    }
+  /**
+   * Returns id of the namespace derived from namespaceName. When creating a sub namespace the
+   * namespaceId is derived from namespaceName and parentId.
+   *
+   * @return namespace id
+   */
+  public NamespaceId getNamespaceId() {
+    return namespaceId;
+  }
 
-    /**
-     * Returns number of blocks a namespace is active.
-     *
-     * @return namespace renting duration
-     */
-    public Optional<BigInteger> getDuration() {
-        return duration;
-    }
+  /**
+   * Returns number of blocks a namespace is active.
+   *
+   * @return namespace renting duration
+   */
+  public Optional<BigInteger> getDuration() {
+    return duration;
+  }
 
-    /**
-     * The id of the parent sub namespace.
-     *
-     * @return sub namespace
-     */
-    public Optional<NamespaceId> getParentId() {
-        return parentId;
-    }
+  /**
+   * The id of the parent sub namespace.
+   *
+   * @return sub namespace
+   */
+  public Optional<NamespaceId> getParentId() {
+    return parentId;
+  }
 
-    /**
-     * Returns namespace type either RootNamespace or SubNamespace.
-     *
-     * @return namespace type
-     */
-    public NamespaceRegistrationType getNamespaceRegistrationType() {
-        return namespaceRegistrationType;
-    }
-
+  /**
+   * Returns namespace type either RootNamespace or SubNamespace.
+   *
+   * @return namespace type
+   */
+  public NamespaceRegistrationType getNamespaceRegistrationType() {
+    return namespaceRegistrationType;
+  }
 }

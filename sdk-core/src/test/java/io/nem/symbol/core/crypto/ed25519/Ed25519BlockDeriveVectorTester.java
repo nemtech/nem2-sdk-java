@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.core.crypto.ed25519;
 
 import io.nem.symbol.core.crypto.PrivateKey;
@@ -31,41 +30,35 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class Ed25519BlockDeriveVectorTester extends AbstractVectorTester {
 
-    private static Stream<Arguments> testResolveSharedKey() {
-        return createArguments("3.test-derive.json",
-            Ed25519BlockDeriveVectorTester::extractArguments, 30
-        );
-    }
+  private static Stream<Arguments> testResolveSharedKey() {
+    return createArguments(
+        "3.test-derive.json", Ed25519BlockDeriveVectorTester::extractArguments, 30);
+  }
 
-    private static List<Arguments> extractArguments(
-        Map<String, String> entry) {
-        return Collections
-            .singletonList(Arguments.of(
-                entry.get("privateKey"),
-                entry.get("otherPublicKey"),
-                entry.get("scalarMulResult"),
-                entry.get("sharedKey")));
-    }
+  private static List<Arguments> extractArguments(Map<String, String> entry) {
+    return Collections.singletonList(
+        Arguments.of(
+            entry.get("privateKey"),
+            entry.get("otherPublicKey"),
+            entry.get("scalarMulResult"),
+            entry.get("sharedKey")));
+  }
 
-    @ParameterizedTest
-    @MethodSource("testResolveSharedKey")
-    void testResolveSharedKey(String privateKey,
-        String otherPublicKey, String scalarMulResult, String sharedKey) {
-        PrivateKey privateKeyObject = PrivateKey.fromHexString(privateKey);
-        PublicKey otherPublicKeyObject = PublicKey.fromHexString(otherPublicKey);
-        byte[] resolvedSharedKey = Ed25519BlockCipher.getSharedKey(
-            privateKeyObject,
-            otherPublicKeyObject
-        );
+  @ParameterizedTest
+  @MethodSource("testResolveSharedKey")
+  void testResolveSharedKey(
+      String privateKey, String otherPublicKey, String scalarMulResult, String sharedKey) {
+    PrivateKey privateKeyObject = PrivateKey.fromHexString(privateKey);
+    PublicKey otherPublicKeyObject = PublicKey.fromHexString(otherPublicKey);
+    byte[] resolvedSharedKey =
+        Ed25519BlockCipher.getSharedKey(privateKeyObject, otherPublicKeyObject);
 
-        byte[] resolvedSharedSecret = Ed25519BlockCipher.getSharedSecret(
-            privateKeyObject,
-            otherPublicKeyObject
-        );
+    byte[] resolvedSharedSecret =
+        Ed25519BlockCipher.getSharedSecret(privateKeyObject, otherPublicKeyObject);
 
-        Assertions.assertEquals(sharedKey.toUpperCase(),
-            ConvertUtils.toHex(resolvedSharedKey).toUpperCase());
-        Assertions.assertEquals(scalarMulResult.toUpperCase(),
-            ConvertUtils.toHex(resolvedSharedSecret).toUpperCase());
-    }
+    Assertions.assertEquals(
+        sharedKey.toUpperCase(), ConvertUtils.toHex(resolvedSharedKey).toUpperCase());
+    Assertions.assertEquals(
+        scalarMulResult.toUpperCase(), ConvertUtils.toHex(resolvedSharedSecret).toUpperCase());
+  }
 }

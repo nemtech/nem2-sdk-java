@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
-
 
 import io.nem.symbol.sdk.model.account.AccountRestrictions;
 import io.nem.symbol.sdk.model.account.Address;
@@ -29,20 +27,19 @@ import java.util.List;
  */
 public interface RestrictionAccountRepository {
 
-    /**
-     * Returns the account restrictions for a given account.
-     *
-     * @param address the address
-     * @return Observable of {@link AccountRestrictions}
-     */
-    Observable<AccountRestrictions> getAccountRestrictions(Address address);
+  /**
+   * Returns the account restrictions for a given account.
+   *
+   * @param address the address
+   * @return Observable of {@link AccountRestrictions}
+   */
+  Observable<AccountRestrictions> getAccountRestrictions(Address address);
 
-    /**
-     * Returns the account restrictions for a given array of addresses.
-     *
-     * @param addresses {@link List} of {@link Address}
-     * @return Observable {@link List} of {@link AccountRestrictions}
-     */
-    Observable<List<AccountRestrictions>> getAccountsRestrictions(List<Address> addresses);
-
+  /**
+   * Returns the account restrictions for a given array of addresses.
+   *
+   * @param addresses {@link List} of {@link Address}
+   * @return Observable {@link List} of {@link AccountRestrictions}
+   */
+  Observable<List<AccountRestrictions>> getAccountsRestrictions(List<Address> addresses);
 }

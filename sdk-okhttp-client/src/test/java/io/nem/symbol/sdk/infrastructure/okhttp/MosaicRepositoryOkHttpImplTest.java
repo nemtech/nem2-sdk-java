@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.core.utils.MapperUtils;
@@ -41,127 +40,125 @@ import org.junit.jupiter.api.Test;
  */
 public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest {
 
-    private MosaicRepositoryOkHttpImpl repository;
+  private MosaicRepositoryOkHttpImpl repository;
 
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-        repository = new MosaicRepositoryOkHttpImpl(apiClientMock, networkTypeObservable);
-    }
+  @BeforeEach
+  public void setUp() {
+    super.setUp();
+    repository = new MosaicRepositoryOkHttpImpl(apiClientMock, networkTypeObservable);
+  }
 
-    @Test
-    public void shouldGetMosaics() throws Exception {
-        MosaicId mosaicId = MapperUtils.toMosaicId("481110499AAA");
-        Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
-        MosaicDTO mosaicDto = new MosaicDTO();
-        MosaicInfoDTO mosaicInfoDto = new MosaicInfoDTO();
+  @Test
+  public void shouldGetMosaics() throws Exception {
+    MosaicId mosaicId = MapperUtils.toMosaicId("481110499AAA");
+    Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
+    MosaicDTO mosaicDto = new MosaicDTO();
+    MosaicInfoDTO mosaicInfoDto = new MosaicInfoDTO();
 
-        mosaicDto.setOwnerAddress(ownerAddress.encoded());
-        mosaicDto.setId("481110499AAA");
-        mosaicDto.setRevision(123L);
+    mosaicDto.setOwnerAddress(ownerAddress.encoded());
+    mosaicDto.setId("481110499AAA");
+    mosaicDto.setRevision(123L);
 
-        mosaicDto.setFlags(5);
-        mosaicDto.setDivisibility(6);
-        mosaicDto.setDuration(BigInteger.valueOf(7));
+    mosaicDto.setFlags(5);
+    mosaicDto.setDivisibility(6);
+    mosaicDto.setDuration(BigInteger.valueOf(7));
 
-        mosaicInfoDto.setMosaic(mosaicDto);
-        mockRemoteCall(Collections.singletonList(mosaicInfoDto));
+    mosaicInfoDto.setMosaic(mosaicDto);
+    mockRemoteCall(Collections.singletonList(mosaicInfoDto));
 
-        List<MosaicInfo> resolvedList = repository
-            .getMosaics(Collections.singletonList(mosaicId))
-            .toFuture().get();
+    List<MosaicInfo> resolvedList =
+        repository.getMosaics(Collections.singletonList(mosaicId)).toFuture().get();
 
-        Assertions.assertEquals(1, resolvedList.size());
+    Assertions.assertEquals(1, resolvedList.size());
 
-        MosaicInfo mosaicInfo = resolvedList.get(0);
-        Assertions.assertEquals(mosaicId, mosaicInfo.getMosaicId());
-        Assertions.assertEquals(mosaicDto.getRevision(), mosaicInfo.getRevision());
-        Assertions
-            .assertEquals(mosaicDto.getOwnerAddress(),
-                mosaicInfo.getOwnerAddress().encoded(networkType));
+    MosaicInfo mosaicInfo = resolvedList.get(0);
+    Assertions.assertEquals(mosaicId, mosaicInfo.getMosaicId());
+    Assertions.assertEquals(mosaicDto.getRevision(), mosaicInfo.getRevision());
+    Assertions.assertEquals(
+        mosaicDto.getOwnerAddress(), mosaicInfo.getOwnerAddress().encoded(networkType));
 
-        Assertions.assertFalse(mosaicInfo.isTransferable());
-        Assertions.assertEquals(6, mosaicInfo.getDivisibility());
-        Assertions.assertEquals(BigInteger.valueOf(7), mosaicInfo.getDuration());
-    }
+    Assertions.assertFalse(mosaicInfo.isTransferable());
+    Assertions.assertEquals(6, mosaicInfo.getDivisibility());
+    Assertions.assertEquals(BigInteger.valueOf(7), mosaicInfo.getDuration());
+  }
 
-    @Test
-    public void shouldGetMosaic() throws Exception {
+  @Test
+  public void shouldGetMosaic() throws Exception {
 
-        MosaicId mosaicId = MapperUtils.toMosaicId("481110499AAA");
+    MosaicId mosaicId = MapperUtils.toMosaicId("481110499AAA");
 
-        Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
-        MosaicDTO mosaicDto = new MosaicDTO();
-        MosaicInfoDTO mosaicInfoDto = new MosaicInfoDTO();
-        mosaicDto.setOwnerAddress(ownerAddress.encoded());
-        mosaicDto.setId("481110499AAA");
-        mosaicDto.setRevision(123L);
+    Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
+    MosaicDTO mosaicDto = new MosaicDTO();
+    MosaicInfoDTO mosaicInfoDto = new MosaicInfoDTO();
+    mosaicDto.setOwnerAddress(ownerAddress.encoded());
+    mosaicDto.setId("481110499AAA");
+    mosaicDto.setRevision(123L);
 
-        mosaicDto.setFlags(5);
-        mosaicDto.setDivisibility(6);
-        mosaicDto.setDuration(BigInteger.valueOf(7));
+    mosaicDto.setFlags(5);
+    mosaicDto.setDivisibility(6);
+    mosaicDto.setDuration(BigInteger.valueOf(7));
 
-        mosaicInfoDto.setMosaic(mosaicDto);
-        mockRemoteCall(mosaicInfoDto);
+    mosaicInfoDto.setMosaic(mosaicDto);
+    mockRemoteCall(mosaicInfoDto);
 
-        MosaicInfo mosaicInfo = repository
-            .getMosaic(mosaicId)
-            .toFuture().get();
+    MosaicInfo mosaicInfo = repository.getMosaic(mosaicId).toFuture().get();
 
-        Assertions.assertEquals(mosaicId, mosaicInfo.getMosaicId());
-        Assertions.assertEquals(mosaicDto.getRevision(), mosaicInfo.getRevision());
-        Assertions
-            .assertEquals(mosaicDto.getOwnerAddress(),
-                mosaicInfo.getOwnerAddress().encoded(networkType));
+    Assertions.assertEquals(mosaicId, mosaicInfo.getMosaicId());
+    Assertions.assertEquals(mosaicDto.getRevision(), mosaicInfo.getRevision());
+    Assertions.assertEquals(
+        mosaicDto.getOwnerAddress(), mosaicInfo.getOwnerAddress().encoded(networkType));
 
-        Assertions.assertFalse(mosaicInfo.isTransferable());
-        Assertions.assertEquals(6, mosaicInfo.getDivisibility());
-        Assertions.assertEquals(BigInteger.valueOf(7), mosaicInfo.getDuration());
-    }
+    Assertions.assertFalse(mosaicInfo.isTransferable());
+    Assertions.assertEquals(6, mosaicInfo.getDivisibility());
+    Assertions.assertEquals(BigInteger.valueOf(7), mosaicInfo.getDuration());
+  }
 
-    @Test
-    public void shouldGetMosaicsFromAccount() throws Exception {
+  @Test
+  public void shouldGetMosaicsFromAccount() throws Exception {
 
-        PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
+    PublicAccount publicAccount = Account.generateNewAccount(networkType).getPublicAccount();
 
-        MosaicId mosaicId = MapperUtils.toMosaicId("481110499AAA");
-        Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
-        MosaicDTO mosaicDto = new MosaicDTO();
-        mosaicDto.setOwnerAddress(ownerAddress.encoded());
-        mosaicDto.setId("481110499AAA");
-        mosaicDto.setRevision(123L);
+    MosaicId mosaicId = MapperUtils.toMosaicId("481110499AAA");
+    Address ownerAddress = Account.generateNewAccount(networkType).getAddress();
+    MosaicDTO mosaicDto = new MosaicDTO();
+    mosaicDto.setOwnerAddress(ownerAddress.encoded());
+    mosaicDto.setId("481110499AAA");
+    mosaicDto.setRevision(123L);
 
-        mosaicDto.setFlags(5);
-        mosaicDto.setDivisibility(6);
-        mosaicDto.setDuration(BigInteger.valueOf(7));
+    mosaicDto.setFlags(5);
+    mosaicDto.setDivisibility(6);
+    mosaicDto.setDuration(BigInteger.valueOf(7));
 
-        mockRemoteCall(toPage(new MosaicInfoDTO().mosaic(mosaicDto).id("ABC")));
+    mockRemoteCall(toPage(new MosaicInfoDTO().mosaic(mosaicDto).id("ABC")));
 
-        List<MosaicInfo> resolvedList = repository
-            .search(new MosaicSearchCriteria().ownerAddress(publicAccount.getAddress())).toFuture().get()
+    List<MosaicInfo> resolvedList =
+        repository
+            .search(new MosaicSearchCriteria().ownerAddress(publicAccount.getAddress()))
+            .toFuture()
+            .get()
             .getData();
 
-        Assertions.assertEquals(1, resolvedList.size());
+    Assertions.assertEquals(1, resolvedList.size());
 
-        MosaicInfo mosaicInfo = resolvedList.get(0);
-        Assertions.assertEquals(mosaicId, mosaicInfo.getMosaicId());
-        Assertions.assertEquals(mosaicDto.getRevision(), mosaicInfo.getRevision());
-        Assertions
-            .assertEquals(mosaicDto.getOwnerAddress(),
-                mosaicInfo.getOwnerAddress().encoded(networkType));
+    MosaicInfo mosaicInfo = resolvedList.get(0);
+    Assertions.assertEquals(mosaicId, mosaicInfo.getMosaicId());
+    Assertions.assertEquals(mosaicDto.getRevision(), mosaicInfo.getRevision());
+    Assertions.assertEquals(
+        mosaicDto.getOwnerAddress(), mosaicInfo.getOwnerAddress().encoded(networkType));
 
-        Assertions.assertFalse(mosaicInfo.isTransferable());
-        Assertions.assertEquals(6, mosaicInfo.getDivisibility());
-        Assertions.assertEquals(BigInteger.valueOf(7), mosaicInfo.getDuration());
-    }
+    Assertions.assertFalse(mosaicInfo.isTransferable());
+    Assertions.assertEquals(6, mosaicInfo.getDivisibility());
+    Assertions.assertEquals(BigInteger.valueOf(7), mosaicInfo.getDuration());
+  }
 
-    private MosaicPage toPage(MosaicInfoDTO dto) {
-        return new MosaicPage().data(Collections.singletonList(dto))
-            .pagination(new Pagination().pageNumber(1).pageSize(2));
-    }
+  private MosaicPage toPage(MosaicInfoDTO dto) {
+    return new MosaicPage()
+        .data(Collections.singletonList(dto))
+        .pagination(new Pagination().pageNumber(1).pageSize(2));
+  }
 
-    @Override
-    public MosaicRepositoryOkHttpImpl getRepository() {
-        return repository;
-    }
+  @Override
+  public MosaicRepositoryOkHttpImpl getRepository() {
+    return repository;
+  }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.model.mosaic;
 
 import io.nem.symbol.core.utils.ConvertUtils;
@@ -28,44 +27,43 @@ import org.apache.commons.lang3.Validate;
  */
 public class Mosaic {
 
-    private final UnresolvedMosaicId id;
+  private final UnresolvedMosaicId id;
 
-    private final BigInteger amount;
+  private final BigInteger amount;
 
-    public Mosaic(UnresolvedMosaicId id, BigInteger amount) {
-        Validate.notNull(id, "Id must not be null");
-        Validate.notNull(amount, "Amount must not be null");
-        ConvertUtils.validateNotNegative(amount);
-        this.id = id;
-        this.amount = amount;
-    }
+  public Mosaic(UnresolvedMosaicId id, BigInteger amount) {
+    Validate.notNull(id, "Id must not be null");
+    Validate.notNull(amount, "Amount must not be null");
+    ConvertUtils.validateNotNegative(amount);
+    this.id = id;
+    this.amount = amount;
+  }
 
-    /**
-     * Returns the mosaic identifier
-     *
-     * @return mosaic identifier
-     */
-    public UnresolvedMosaicId getId() {
-        return id;
-    }
+  /**
+   * Returns the mosaic identifier
+   *
+   * @return mosaic identifier
+   */
+  public UnresolvedMosaicId getId() {
+    return id;
+  }
 
-    /**
-     * Returns mosaic id as a hexadecimal string
-     *
-     * @return id hex string
-     */
-    public String getIdAsHex() {
-        return id.getIdAsHex();
-    }
+  /**
+   * Returns mosaic id as a hexadecimal string
+   *
+   * @return id hex string
+   */
+  public String getIdAsHex() {
+    return id.getIdAsHex();
+  }
 
-    /**
-     * Return mosaic amount. The quantity is always given in smallest units for the mosaic i.e. if
-     * it has a divisibility of 3 the quantity is given in millis.
-     *
-     * @return amount of mosaic
-     */
-    public BigInteger getAmount() {
-        return amount;
-    }
-
+  /**
+   * Return mosaic amount. The quantity is always given in smallest units for the mosaic i.e. if it
+   * has a divisibility of 3 the quantity is given in millis.
+   *
+   * @return amount of mosaic
+   */
+  public BigInteger getAmount() {
+    return amount;
+  }
 }

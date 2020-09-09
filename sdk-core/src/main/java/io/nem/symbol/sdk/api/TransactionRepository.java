@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
@@ -31,47 +30,48 @@ import java.util.List;
  */
 public interface TransactionRepository extends Searcher<Transaction, TransactionSearchCriteria> {
 
-    /**
-     * Gets a transaction for a given hash.
-     *
-     * @param group the group the transaction belongs.
-     * @param transactionHash String
-     * @return Observable of {@link Transaction}
-     */
-    Observable<Transaction> getTransaction(TransactionGroup group, String transactionHash);
+  /**
+   * Gets a transaction for a given hash.
+   *
+   * @param group the group the transaction belongs.
+   * @param transactionHash String
+   * @return Observable of {@link Transaction}
+   */
+  Observable<Transaction> getTransaction(TransactionGroup group, String transactionHash);
 
-    /**
-     * Gets an list of transactions for different transaction hashes.
-     *
-     * @param group the group the transaction belongs.
-     * @param transactionHashes List of String
-     * @return {@link Observable} of {@link Transaction} List
-     */
-    Observable<List<Transaction>> getTransactions(TransactionGroup group, List<String> transactionHashes);
+  /**
+   * Gets an list of transactions for different transaction hashes.
+   *
+   * @param group the group the transaction belongs.
+   * @param transactionHashes List of String
+   * @return {@link Observable} of {@link Transaction} List
+   */
+  Observable<List<Transaction>> getTransactions(
+      TransactionGroup group, List<String> transactionHashes);
 
-    /**
-     * Send a signed transaction.
-     *
-     * @param signedTransaction SignedTransaction
-     * @return Observable of TransactionAnnounceResponse
-     */
-    Observable<TransactionAnnounceResponse> announce(SignedTransaction signedTransaction);
+  /**
+   * Send a signed transaction.
+   *
+   * @param signedTransaction SignedTransaction
+   * @return Observable of TransactionAnnounceResponse
+   */
+  Observable<TransactionAnnounceResponse> announce(SignedTransaction signedTransaction);
 
-    /**
-     * Send a signed transaction with missing signatures.
-     *
-     * @param signedTransaction SignedTransaction
-     * @return Observable of TransactionAnnounceResponse
-     */
-    Observable<TransactionAnnounceResponse> announceAggregateBonded(SignedTransaction signedTransaction);
+  /**
+   * Send a signed transaction with missing signatures.
+   *
+   * @param signedTransaction SignedTransaction
+   * @return Observable of TransactionAnnounceResponse
+   */
+  Observable<TransactionAnnounceResponse> announceAggregateBonded(
+      SignedTransaction signedTransaction);
 
-    /**
-     * Send a cosignature signed transaction of an already announced transaction.
-     *
-     * @param cosignatureSignedTransaction CosignatureSignedTransaction
-     * @return Observable of TransactionAnnounceResponse
-     */
-    Observable<TransactionAnnounceResponse> announceAggregateBondedCosignature(
-        CosignatureSignedTransaction cosignatureSignedTransaction);
-
+  /**
+   * Send a cosignature signed transaction of an already announced transaction.
+   *
+   * @param cosignatureSignedTransaction CosignatureSignedTransaction
+   * @return Observable of TransactionAnnounceResponse
+   */
+  Observable<TransactionAnnounceResponse> announceAggregateBondedCosignature(
+      CosignatureSignedTransaction cosignatureSignedTransaction);
 }

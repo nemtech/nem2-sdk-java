@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
 import static io.nem.symbol.core.utils.MapperUtils.getIdAsHex;
@@ -29,31 +28,30 @@ import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicSupplyChangeActionEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicSupplyChangeTransactionDTO;
 
-/**
- * Mosaic supply change transaction mapper.
- */
-class MosaicSupplyChangeTransactionMapper extends
-    AbstractTransactionMapper<MosaicSupplyChangeTransactionDTO, MosaicSupplyChangeTransaction> {
+/** Mosaic supply change transaction mapper. */
+class MosaicSupplyChangeTransactionMapper
+    extends AbstractTransactionMapper<
+        MosaicSupplyChangeTransactionDTO, MosaicSupplyChangeTransaction> {
 
-    public MosaicSupplyChangeTransactionMapper(JsonHelper jsonHelper) {
-        super(jsonHelper, TransactionType.MOSAIC_SUPPLY_CHANGE,
-            MosaicSupplyChangeTransactionDTO.class);
-    }
+  public MosaicSupplyChangeTransactionMapper(JsonHelper jsonHelper) {
+    super(jsonHelper, TransactionType.MOSAIC_SUPPLY_CHANGE, MosaicSupplyChangeTransactionDTO.class);
+  }
 
-    @Override
-    protected TransactionFactory<MosaicSupplyChangeTransaction> createFactory(
-        NetworkType networkType, MosaicSupplyChangeTransactionDTO transaction) {
-        return MosaicSupplyChangeTransactionFactory.create(networkType,
-            toUnresolvedMosaicId(transaction.getMosaicId()),
-            MosaicSupplyChangeActionType.rawValueOf(transaction.getAction().getValue()),
-            transaction.getDelta());
-    }
+  @Override
+  protected TransactionFactory<MosaicSupplyChangeTransaction> createFactory(
+      NetworkType networkType, MosaicSupplyChangeTransactionDTO transaction) {
+    return MosaicSupplyChangeTransactionFactory.create(
+        networkType,
+        toUnresolvedMosaicId(transaction.getMosaicId()),
+        MosaicSupplyChangeActionType.rawValueOf(transaction.getAction().getValue()),
+        transaction.getDelta());
+  }
 
-    @Override
-    protected void copyToDto(MosaicSupplyChangeTransaction transaction,
-        MosaicSupplyChangeTransactionDTO dto) {
-        dto.setDelta(transaction.getDelta());
-        dto.setMosaicId(getIdAsHex(transaction.getMosaicId()));
-        dto.setAction(MosaicSupplyChangeActionEnum.fromValue(transaction.getAction().getValue()));
-    }
+  @Override
+  protected void copyToDto(
+      MosaicSupplyChangeTransaction transaction, MosaicSupplyChangeTransactionDTO dto) {
+    dto.setDelta(transaction.getDelta());
+    dto.setMosaicId(getIdAsHex(transaction.getMosaicId()));
+    dto.setAction(MosaicSupplyChangeActionEnum.fromValue(transaction.getAction().getValue()));
+  }
 }

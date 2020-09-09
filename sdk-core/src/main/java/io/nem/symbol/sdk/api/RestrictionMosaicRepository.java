@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.nem.symbol.sdk.api;
-
 
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -31,39 +29,39 @@ import java.util.List;
  */
 public interface RestrictionMosaicRepository {
 
-    /**
-     * Get mosaic address restrictions for a given mosaic and account identifier.
-     *
-     * @param mosaicId Mosaic identifier.
-     * @param address address
-     * @return Observable of {@link MosaicAddressRestriction}
-     */
-    Observable<MosaicAddressRestriction> getMosaicAddressRestriction(MosaicId mosaicId,
-        Address address);
+  /**
+   * Get mosaic address restrictions for a given mosaic and account identifier.
+   *
+   * @param mosaicId Mosaic identifier.
+   * @param address address
+   * @return Observable of {@link MosaicAddressRestriction}
+   */
+  Observable<MosaicAddressRestriction> getMosaicAddressRestriction(
+      MosaicId mosaicId, Address address);
 
-    /**
-     * Get mosaic address restrictions for a given mosaic and account identifiers array
-     *
-     * @param mosaicId Mosaic identifier.
-     * @param addresses list of addresses
-     * @return Observable {@link List} of {@link MosaicAddressRestriction}.
-     */
-    Observable<List<MosaicAddressRestriction>> getMosaicAddressRestrictions(MosaicId mosaicId,
-        List<Address> addresses);
+  /**
+   * Get mosaic address restrictions for a given mosaic and account identifiers array
+   *
+   * @param mosaicId Mosaic identifier.
+   * @param addresses list of addresses
+   * @return Observable {@link List} of {@link MosaicAddressRestriction}.
+   */
+  Observable<List<MosaicAddressRestriction>> getMosaicAddressRestrictions(
+      MosaicId mosaicId, List<Address> addresses);
 
-    /**
-     * Get mosaic global restrictions for a given mosaic identifier.
-     *
-     * @param mosaicId Mosaic identifier.
-     * @return Observable of {@link MosaicGlobalRestriction}
-     */
-    Observable<MosaicGlobalRestriction> getMosaicGlobalRestriction(MosaicId mosaicId);
+  /**
+   * Get mosaic global restrictions for a given mosaic identifier.
+   *
+   * @param mosaicId Mosaic identifier.
+   * @return Observable of {@link MosaicGlobalRestriction}
+   */
+  Observable<MosaicGlobalRestriction> getMosaicGlobalRestriction(MosaicId mosaicId);
 
-    /**
-     * Get mosaic global restrictions for a given list of mosaics.
-     *
-     * @param mosaicIds List of mosaic identifier.
-     * @return Observable {@link List} of {@link MosaicGlobalRestriction}.
-     */
-    Observable<List<MosaicGlobalRestriction>> getMosaicGlobalRestrictions(List<MosaicId> mosaicIds);
+  /**
+   * Get mosaic global restrictions for a given list of mosaics.
+   *
+   * @param mosaicIds List of mosaic identifier.
+   * @return Observable {@link List} of {@link MosaicGlobalRestriction}.
+   */
+  Observable<List<MosaicGlobalRestriction>> getMosaicGlobalRestrictions(List<MosaicId> mosaicIds);
 }
