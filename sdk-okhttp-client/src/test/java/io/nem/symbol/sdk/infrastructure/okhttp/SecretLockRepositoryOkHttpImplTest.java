@@ -19,10 +19,10 @@ import io.nem.symbol.sdk.api.SecretLockSearchCriteria;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNonce;
-import io.nem.symbol.sdk.model.transaction.SecretHashAlgorithm;
+import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.LockHashAlgorithmEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Pagination;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretHashAlgorithmEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretLockEntryDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretLockInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretLockPage;
@@ -66,7 +66,7 @@ public class SecretLockRepositoryOkHttpImplTest extends AbstractOkHttpRespositor
     lockHashDto.setCompositeHash("ABC");
     lockHashDto.setMosaicId(mosaicId.getIdAsHex());
     lockHashDto.setRecipientAddress(encodeAddress(recipientAddress));
-    lockHashDto.setHashAlgorithm(SecretHashAlgorithmEnum.NUMBER_2);
+    lockHashDto.setHashAlgorithm(LockHashAlgorithmEnum.NUMBER_2);
     lockHashDto.setStatus(2);
 
     SecretLockInfoDTO hashLockInfoDTO = new SecretLockInfoDTO();
@@ -84,8 +84,7 @@ public class SecretLockRepositoryOkHttpImplTest extends AbstractOkHttpRespositor
         lockHashDto.getCompositeHash(), resolvedSecretLockInfo.getCompositeHash());
     Assertions.assertEquals(lockHashDto.getStatus(), resolvedSecretLockInfo.getStatus());
     Assertions.assertEquals(mosaicId, resolvedSecretLockInfo.getMosaicId());
-    Assertions.assertEquals(
-        SecretHashAlgorithm.HASH_256, resolvedSecretLockInfo.getHashAlgorithm());
+    Assertions.assertEquals(LockHashAlgorithm.HASH_256, resolvedSecretLockInfo.getHashAlgorithm());
     Assertions.assertEquals(lockHashDto.getAmount(), resolvedSecretLockInfo.getAmount());
     Assertions.assertEquals(lockHashDto.getEndHeight(), resolvedSecretLockInfo.getEndHeight());
   }
@@ -103,7 +102,7 @@ public class SecretLockRepositoryOkHttpImplTest extends AbstractOkHttpRespositor
     lockHashDto.setCompositeHash("ABC");
     lockHashDto.setMosaicId(mosaicId.getIdAsHex());
     lockHashDto.setRecipientAddress(encodeAddress(recipientAddress));
-    lockHashDto.setHashAlgorithm(SecretHashAlgorithmEnum.NUMBER_2);
+    lockHashDto.setHashAlgorithm(LockHashAlgorithmEnum.NUMBER_2);
     lockHashDto.setStatus(2);
 
     SecretLockInfoDTO hashLockInfoDTO = new SecretLockInfoDTO();
@@ -124,8 +123,7 @@ public class SecretLockRepositoryOkHttpImplTest extends AbstractOkHttpRespositor
         lockHashDto.getCompositeHash(), resolvedSecretLockInfo.getCompositeHash());
     Assertions.assertEquals(lockHashDto.getStatus(), resolvedSecretLockInfo.getStatus());
     Assertions.assertEquals(mosaicId, resolvedSecretLockInfo.getMosaicId());
-    Assertions.assertEquals(
-        SecretHashAlgorithm.HASH_256, resolvedSecretLockInfo.getHashAlgorithm());
+    Assertions.assertEquals(LockHashAlgorithm.HASH_256, resolvedSecretLockInfo.getHashAlgorithm());
     Assertions.assertEquals(lockHashDto.getAmount(), resolvedSecretLockInfo.getAmount());
     Assertions.assertEquals(lockHashDto.getEndHeight(), resolvedSecretLockInfo.getEndHeight());
   }

@@ -24,37 +24,37 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-class SecretHashAlgorithmTest {
+class LockHashAlgorithmTest {
 
   @ParameterizedTest
-  @EnumSource(value = SecretHashAlgorithm.class)
-  void shouldBeExactly64CharactersLength(SecretHashAlgorithm type) {
+  @EnumSource(value = LockHashAlgorithm.class)
+  void shouldBeExactly64CharactersLength(LockHashAlgorithm type) {
     byte[] secretBytes = RandomUtils.generateRandomBytes(20);
     byte[] result = type.hash(secretBytes);
     String secret = ConvertUtils.toHex(result);
-    assertTrue(SecretHashAlgorithm.validator(type, secret));
+    assertTrue(LockHashAlgorithm.validator(type, secret));
   }
 
   @ParameterizedTest
-  @EnumSource(value = SecretHashAlgorithm.class)
-  void shouldReturnFalseIfItIsNotAValidHash(SecretHashAlgorithm type) {
+  @EnumSource(value = LockHashAlgorithm.class)
+  void shouldReturnFalseIfItIsNotAValidHash(LockHashAlgorithm type) {
     byte[] secretBytes = RandomUtils.generateRandomBytes(20);
     byte[] result = type.hash(secretBytes);
     String secret = ConvertUtils.toHex(result) + "aaa";
-    assertFalse(SecretHashAlgorithm.validator(type, secret));
+    assertFalse(LockHashAlgorithm.validator(type, secret));
   }
 
   @Test
   void HASH_160ShouldReturnTrueIfItIsNot64Or40CharsLength() {
     assertFalse(
-        SecretHashAlgorithm.validator(
-            SecretHashAlgorithm.HASH_160,
+        LockHashAlgorithm.validator(
+            LockHashAlgorithm.HASH_160,
             "400C2CDA984F04D00C78417D2AED8443AF451E40D77721AC1F5E5334555F0"));
   }
 
   @Test
   void HASH_160ShouldReturnFalseIfItIsNotAValidHash() {
     String secret = "zyz6053bb910a6027f138ac5ebe92d43a9a18b7239b3c4d5ea69f1632e50aeef";
-    assertFalse(SecretHashAlgorithm.validator(SecretHashAlgorithm.HASH_160, secret));
+    assertFalse(LockHashAlgorithm.validator(LockHashAlgorithm.HASH_160, secret));
   }
 }

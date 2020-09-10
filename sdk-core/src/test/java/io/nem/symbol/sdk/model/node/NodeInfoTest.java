@@ -19,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -36,13 +38,14 @@ public class NodeInfoTest {
 
   @Test
   void shouldCreateNodeInfo() {
+    List<RoleType> roles = Arrays.asList(RoleType.API_NODE, RoleType.VOTING_NODE);
     NodeInfo nodeInfo =
         new NodeInfo(
             account.getPublicKey(),
             3000,
             NetworkType.MIJIN_TEST,
             0,
-            RoleType.API_NODE,
+            roles,
             "localhost",
             "test",
             "abc");
@@ -51,7 +54,7 @@ public class NodeInfoTest {
     assertEquals(3000, nodeInfo.getPort());
     assertEquals("test", nodeInfo.getFriendlyName());
     assertEquals(NetworkType.MIJIN_TEST, nodeInfo.getNetworkIdentifier());
-    assertEquals(2, nodeInfo.getRoles().getValue());
+    assertEquals(roles, nodeInfo.getRoles());
     assertEquals(nodeInfo.getPublicKey(), account.getPublicKey());
     assertEquals("abc", nodeInfo.getNetworkGenerationHashSeed());
   }

@@ -23,7 +23,7 @@ public class SecretLockTransaction extends Transaction implements RecipientTrans
 
   private final Mosaic mosaic;
   private final BigInteger duration;
-  private final SecretHashAlgorithm hashAlgorithm;
+  private final LockHashAlgorithm hashAlgorithm;
   private final String secret;
   private final UnresolvedAddress recipient;
 
@@ -64,7 +64,7 @@ public class SecretLockTransaction extends Transaction implements RecipientTrans
    *
    * @return the hash algorithm, secret is generated with.
    */
-  public SecretHashAlgorithm getHashAlgorithm() {
+  public LockHashAlgorithm getHashAlgorithm() {
     return hashAlgorithm;
   }
 

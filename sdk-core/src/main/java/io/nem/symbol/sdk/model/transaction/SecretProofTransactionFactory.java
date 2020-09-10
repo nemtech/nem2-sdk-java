@@ -22,14 +22,14 @@ import org.apache.commons.lang3.Validate;
 /** Factory of {@link SecretProofTransaction} */
 public class SecretProofTransactionFactory extends TransactionFactory<SecretProofTransaction> {
 
-  private final SecretHashAlgorithm hashType;
+  private final LockHashAlgorithm hashType;
   private final String secret;
   private final String proof;
   private final UnresolvedAddress recipient;
 
   private SecretProofTransactionFactory(
       final NetworkType networkType,
-      final SecretHashAlgorithm hashType,
+      final LockHashAlgorithm hashType,
       final UnresolvedAddress recipient,
       final String secret,
       final String proof) {
@@ -37,7 +37,7 @@ public class SecretProofTransactionFactory extends TransactionFactory<SecretProo
     Validate.notNull(secret, "Secret must not be null.");
     Validate.notNull(proof, "Proof must not be null.");
     Validate.notNull(recipient, "Recipient must not be null.");
-    if (!SecretHashAlgorithm.validator(hashType, secret)) {
+    if (!LockHashAlgorithm.validator(hashType, secret)) {
       throw new IllegalArgumentException(
           "HashType  "
               + hashType
@@ -61,7 +61,7 @@ public class SecretProofTransactionFactory extends TransactionFactory<SecretProo
    */
   public static SecretProofTransactionFactory create(
       NetworkType networkType,
-      SecretHashAlgorithm hashType,
+      LockHashAlgorithm hashType,
       UnresolvedAddress recipient,
       String secret,
       String proof) {
@@ -73,7 +73,7 @@ public class SecretProofTransactionFactory extends TransactionFactory<SecretProo
    *
    * @return the hash algorithm secret is generated with.
    */
-  public SecretHashAlgorithm getHashType() {
+  public LockHashAlgorithm getHashType() {
     return hashType;
   }
 

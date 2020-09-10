@@ -21,7 +21,7 @@ import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.SecretLockRepository;
 import io.nem.symbol.sdk.api.SecretLockSearchCriteria;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
-import io.nem.symbol.sdk.model.transaction.SecretHashAlgorithm;
+import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.SecretLockRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
@@ -55,7 +55,7 @@ public class SecretLockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
         () ->
             getClient()
                 .getSecretLock(
-                    ConvertUtils.padHex(secret, SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE));
+                    ConvertUtils.padHex(secret, LockHashAlgorithm.DEFAULT_SECRET_HEX_SIZE));
     return this.call(callback, this::toSecretLockInfo);
   }
 
@@ -69,7 +69,7 @@ public class SecretLockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
         lock.getAmount(),
         lock.getEndHeight(),
         lock.getStatus(),
-        SecretHashAlgorithm.rawValueOf(lock.getHashAlgorithm().getValue()),
+        LockHashAlgorithm.rawValueOf(lock.getHashAlgorithm().getValue()),
         lock.getSecret(),
         MapperUtils.toAddress(lock.getRecipientAddress()),
         lock.getCompositeHash());

@@ -24,7 +24,7 @@ import java.util.Arrays;
  *
  * @since 1.0
  */
-public enum SecretHashAlgorithm implements Hasher {
+public enum LockHashAlgorithm implements Hasher {
 
   /** hashed using SHA3-256 (Catapult Native) */
   SHA3_256(0, Hashes::sha3_256),
@@ -47,12 +47,12 @@ public enum SecretHashAlgorithm implements Hasher {
   /** The {@link Hasher} that should be used when hashing values for this given Algorithm Type */
   private final Hasher delegate;
 
-  SecretHashAlgorithm(int value, Hasher delegate) {
+  LockHashAlgorithm(int value, Hasher delegate) {
     this.value = value;
     this.delegate = delegate;
   }
 
-  public static SecretHashAlgorithm rawValueOf(int value) {
+  public static LockHashAlgorithm rawValueOf(int value) {
     return Arrays.stream(values())
         .filter(e -> e.value == value)
         .findFirst()
@@ -66,11 +66,11 @@ public enum SecretHashAlgorithm implements Hasher {
    * @param input Input hashed
    * @return boolean when format is correct
    */
-  public static boolean validator(SecretHashAlgorithm hashType, String input) {
+  public static boolean validator(LockHashAlgorithm hashType, String input) {
     if (!input.matches(VALIDATOR_REGEX)) {
       return false;
     }
-    if (hashType == SecretHashAlgorithm.HASH_160) {
+    if (hashType == LockHashAlgorithm.HASH_160) {
       return input.length() == DEFAULT_SECRET_HEX_SIZE || input.length() == 40;
     }
     return input.length() == DEFAULT_SECRET_HEX_SIZE;

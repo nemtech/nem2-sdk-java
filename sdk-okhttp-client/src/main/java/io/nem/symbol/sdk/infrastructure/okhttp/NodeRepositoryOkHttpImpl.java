@@ -68,7 +68,7 @@ public class NodeRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
         nodeInfoDTO.getPort(),
         NetworkType.rawValueOf(nodeInfoDTO.getNetworkIdentifier()),
         nodeInfoDTO.getVersion(),
-        RoleType.rawValueOf(nodeInfoDTO.getRoles().getValue()),
+        RoleType.toList(nodeInfoDTO.getRoles().getValue()),
         nodeInfoDTO.getHost(),
         nodeInfoDTO.getFriendlyName(),
         nodeInfoDTO.getNetworkGenerationHashSeed());

@@ -19,10 +19,10 @@ import io.nem.symbol.sdk.api.SecretLockSearchCriteria;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNonce;
-import io.nem.symbol.sdk.model.transaction.SecretHashAlgorithm;
+import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
+import io.nem.symbol.sdk.openapi.vertx.model.LockHashAlgorithmEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.Pagination;
-import io.nem.symbol.sdk.openapi.vertx.model.SecretHashAlgorithmEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.SecretLockEntryDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.SecretLockInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.SecretLockPage;
@@ -61,7 +61,7 @@ public class SecretLockRepositoryVertxImplTest extends AbstractVertxRespositoryT
     lockHashDto.setCompositeHash("ABC");
     lockHashDto.setMosaicId(mosaicId.getIdAsHex());
     lockHashDto.setRecipientAddress(encodeAddress(recipientAddress));
-    lockHashDto.setHashAlgorithm(SecretHashAlgorithmEnum.NUMBER_2);
+    lockHashDto.setHashAlgorithm(LockHashAlgorithmEnum.NUMBER_2);
     lockHashDto.setStatus(2);
 
     SecretLockInfoDTO hashLockInfoDTO = new SecretLockInfoDTO();
@@ -79,8 +79,7 @@ public class SecretLockRepositoryVertxImplTest extends AbstractVertxRespositoryT
         lockHashDto.getCompositeHash(), resolvedSecretLockInfo.getCompositeHash());
     Assertions.assertEquals(lockHashDto.getStatus(), resolvedSecretLockInfo.getStatus());
     Assertions.assertEquals(mosaicId, resolvedSecretLockInfo.getMosaicId());
-    Assertions.assertEquals(
-        SecretHashAlgorithm.HASH_256, resolvedSecretLockInfo.getHashAlgorithm());
+    Assertions.assertEquals(LockHashAlgorithm.HASH_256, resolvedSecretLockInfo.getHashAlgorithm());
     Assertions.assertEquals(lockHashDto.getAmount(), resolvedSecretLockInfo.getAmount());
     Assertions.assertEquals(lockHashDto.getEndHeight(), resolvedSecretLockInfo.getEndHeight());
   }
@@ -99,7 +98,7 @@ public class SecretLockRepositoryVertxImplTest extends AbstractVertxRespositoryT
     lockHashDto.setRecipientAddress(encodeAddress(recipientAddress));
     lockHashDto.setMosaicId(mosaicId.getIdAsHex());
     lockHashDto.setStatus(2);
-    lockHashDto.setHashAlgorithm(SecretHashAlgorithmEnum.NUMBER_2);
+    lockHashDto.setHashAlgorithm(LockHashAlgorithmEnum.NUMBER_2);
 
     SecretLockInfoDTO hashLockInfoDTO = new SecretLockInfoDTO();
     hashLockInfoDTO.setLock(lockHashDto);
@@ -115,8 +114,7 @@ public class SecretLockRepositoryVertxImplTest extends AbstractVertxRespositoryT
     Assertions.assertEquals(hashLockInfoDTO.getId(), resolvedSecretLockInfo.getRecordId().get());
     Assertions.assertEquals(address, resolvedSecretLockInfo.getOwnerAddress());
     Assertions.assertEquals(recipientAddress, resolvedSecretLockInfo.getRecipientAddress());
-    Assertions.assertEquals(
-        SecretHashAlgorithm.HASH_256, resolvedSecretLockInfo.getHashAlgorithm());
+    Assertions.assertEquals(LockHashAlgorithm.HASH_256, resolvedSecretLockInfo.getHashAlgorithm());
     Assertions.assertEquals(
         lockHashDto.getCompositeHash(), resolvedSecretLockInfo.getCompositeHash());
     Assertions.assertEquals(lockHashDto.getStatus(), resolvedSecretLockInfo.getStatus());

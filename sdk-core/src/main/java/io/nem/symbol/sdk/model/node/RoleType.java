@@ -15,12 +15,18 @@
  */
 package io.nem.symbol.sdk.model.node;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import org.apache.commons.lang3.Validate;
 
 public enum RoleType {
   PEER_NODE(1),
   API_NODE(2),
-  DUAL_NODE(3);
+  VOTING_NODE(4);
+
+  private static final int MAX_FLAG_VALUE =
+      Arrays.stream(RoleType.values()).mapToInt(RoleType::getValue).sum();
 
   private final int value;
 
@@ -29,16 +35,27 @@ public enum RoleType {
   }
 
   /**
-   * Static constructor converting role type raw value to enum instance.
+   * Creates a lit of roles based on the 1-7 bit bitwise value
    *
-   * @param value the low level int value.
-   * @return {@link RoleType}
+   * @param flags the flags
+   * @return the list of roles
    */
-  public static RoleType rawValueOf(int value) {
-    return Arrays.stream(values())
-        .filter(e -> e.value == value)
-        .findFirst()
-        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  public static List<RoleType> toList(int flags) {
+    Validate.isTrue(flags >= 0, "flags must be 0 or greater");
+    Validate.isTrue(flags <= MAX_FLAG_VALUE, "flags must be " + MAX_FLAG_VALUE + " or smaller");
+    List<RoleType> roles = new ArrayList<>();
+
+    int temp = flags;
+    int totalValues = RoleType.values().length;
+    for (int i = 0; i < totalValues; i++) {
+      RoleType roleType = RoleType.values()[totalValues - i - 1];
+      if (temp >= roleType.getValue()) {
+        temp = temp - roleType.getValue();
+        roles.add(0, roleType);
+      }
+    }
+
+    return roles;
   }
 
   /**

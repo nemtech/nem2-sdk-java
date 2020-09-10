@@ -24,7 +24,7 @@ import io.nem.symbol.sdk.api.SecretLockSearchCriteria;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
-import io.nem.symbol.sdk.model.transaction.SecretHashAlgorithm;
+import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransaction;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransactionFactory;
@@ -45,8 +45,8 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
   static List<Arguments> provider() {
     List<Arguments> arguments = new ArrayList<>();
     for (RepositoryType repositoryType : RepositoryType.values()) {
-      for (SecretHashAlgorithm secretHashAlgorithm : SecretHashAlgorithm.values()) {
-        arguments.add(Arguments.of(repositoryType, secretHashAlgorithm));
+      for (LockHashAlgorithm lockHashAlgorithm : LockHashAlgorithm.values()) {
+        arguments.add(Arguments.of(repositoryType, lockHashAlgorithm));
       }
     }
     return arguments;
@@ -54,18 +54,18 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
 
   @ParameterizedTest
   @MethodSource("provider")
-  void secretLockAndProofTransaction(RepositoryType type, SecretHashAlgorithm secretHashAlgorithm) {
+  void secretLockAndProofTransaction(RepositoryType type, LockHashAlgorithm lockHashAlgorithm) {
 
     RepositoryFactory repositoryFactory = getRepositoryFactory(type);
     byte[] secretSeed = RandomUtils.generateRandomBytes(20);
-    String secret = ConvertUtils.toHex(secretHashAlgorithm.hash(secretSeed));
-    String storedSecret = ConvertUtils.padHex(secret, SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE);
-    if (secretHashAlgorithm == SecretHashAlgorithm.HASH_160) {
-      Assertions.assertEquals(SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE, storedSecret.length());
+    String secret = ConvertUtils.toHex(lockHashAlgorithm.hash(secretSeed));
+    String storedSecret = ConvertUtils.padHex(secret, LockHashAlgorithm.DEFAULT_SECRET_HEX_SIZE);
+    if (lockHashAlgorithm == LockHashAlgorithm.HASH_160) {
+      Assertions.assertEquals(LockHashAlgorithm.DEFAULT_SECRET_HEX_SIZE, storedSecret.length());
       Assertions.assertEquals(40, secret.length());
     } else {
-      Assertions.assertEquals(SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE, storedSecret.length());
-      Assertions.assertEquals(SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE, secret.length());
+      Assertions.assertEquals(LockHashAlgorithm.DEFAULT_SECRET_HEX_SIZE, storedSecret.length());
+      Assertions.assertEquals(LockHashAlgorithm.DEFAULT_SECRET_HEX_SIZE, secret.length());
     }
     String proof = ConvertUtils.toHex(secretSeed);
 
@@ -79,7 +79,7 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 mosaic,
                 BigInteger.valueOf(100),
-                secretHashAlgorithm,
+                lockHashAlgorithm,
                 secret,
                 account2.getAddress())
             .maxFee(maxFee)
@@ -89,14 +89,14 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
 
     SecretProofTransaction secretProofTransaction =
         SecretProofTransactionFactory.create(
-                getNetworkType(), secretHashAlgorithm, account2.getAddress(), secret, proof)
+                getNetworkType(), lockHashAlgorithm, account2.getAddress(), secret, proof)
             .maxFee(maxFee)
             .build();
 
     SecretProofTransaction secretProofTransactionAnnounced =
         announceAndValidate(type, account, secretProofTransaction);
 
-    Assertions.assertEquals(secretHashAlgorithm, secretProofTransactionAnnounced.getHashType());
+    Assertions.assertEquals(lockHashAlgorithm, secretProofTransactionAnnounced.getHashType());
     Assertions.assertEquals(account2.getAddress(), secretProofTransactionAnnounced.getRecipient());
     Assertions.assertEquals(storedSecret, secretProofTransactionAnnounced.getSecret());
     Assertions.assertEquals(proof, secretProofTransactionAnnounced.getProof());
@@ -109,7 +109,7 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
     Assertions.assertEquals(account.getAddress(), info.getOwnerAddress());
     Assertions.assertEquals(account2.getAddress(), info.getRecipientAddress());
     Assertions.assertEquals(amount, info.getAmount());
-    Assertions.assertEquals(secretHashAlgorithm, info.getHashAlgorithm());
+    Assertions.assertEquals(lockHashAlgorithm, info.getHashAlgorithm());
     Assertions.assertEquals(1, info.getStatus());
     Assertions.assertEquals(storedSecret, info.getSecret());
 
@@ -128,7 +128,7 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
     Assertions.assertEquals(account.getAddress(), infoSearch.getOwnerAddress());
     Assertions.assertEquals(account2.getAddress(), infoSearch.getRecipientAddress());
     Assertions.assertEquals(amount, infoSearch.getAmount());
-    Assertions.assertEquals(secretHashAlgorithm, infoSearch.getHashAlgorithm());
+    Assertions.assertEquals(lockHashAlgorithm, infoSearch.getHashAlgorithm());
     Assertions.assertEquals(1, infoSearch.getStatus());
     Assertions.assertEquals(storedSecret, infoSearch.getSecret());
   }

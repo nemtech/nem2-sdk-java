@@ -111,6 +111,7 @@ import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.LinkAction;
+import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.MetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransactionFactory;
@@ -133,7 +134,6 @@ import io.nem.symbol.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.symbol.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.NodeKeyLinkTransaction;
 import io.nem.symbol.sdk.model.transaction.NodeKeyLinkTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.SecretHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransaction;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.SecretProofTransaction;
@@ -931,8 +931,8 @@ public class BinarySerializationImpl implements BinarySerialization {
       Mosaic mosaic = SerializationUtils.toMosaic(builder.getMosaic());
       BigInteger duration =
           SerializationUtils.toUnsignedBigInteger(builder.getDuration().getBlockDuration());
-      SecretHashAlgorithm hashAlgorithm =
-          SecretHashAlgorithm.rawValueOf(
+      LockHashAlgorithm hashAlgorithm =
+          LockHashAlgorithm.rawValueOf(
               SerializationUtils.byteToUnsignedInt(builder.getHashAlgorithm().getValue()));
       String secret = SerializationUtils.toHexString(builder.getSecret());
       UnresolvedAddress recipient =
@@ -991,8 +991,8 @@ public class BinarySerializationImpl implements BinarySerialization {
       SecretProofTransactionBodyBuilder builder =
           (SecretProofTransactionBodyBuilder) transactionBuilder;
 
-      SecretHashAlgorithm hashType =
-          SecretHashAlgorithm.rawValueOf(
+      LockHashAlgorithm hashType =
+          LockHashAlgorithm.rawValueOf(
               SerializationUtils.byteToUnsignedInt(builder.getHashAlgorithm().getValue()));
       UnresolvedAddress recipient =
           SerializationUtils.toUnresolvedAddress(builder.getRecipientAddress());

@@ -16,6 +16,7 @@
 package io.nem.symbol.sdk.model.node;
 
 import io.nem.symbol.sdk.model.network.NetworkType;
+import java.util.List;
 
 public class NodeInfo {
 
@@ -23,7 +24,7 @@ public class NodeInfo {
   private final int port;
   private final NetworkType networkIdentifier;
   private final int version;
-  private final RoleType roles;
+  private final List<RoleType> roles;
   private final String host;
   private final String friendlyName;
   private final String networkGenerationHashSeed;
@@ -33,7 +34,7 @@ public class NodeInfo {
       int port,
       NetworkType networkIdentifier,
       int version,
-      RoleType roles,
+      List<RoleType> roles,
       String host,
       String friendlyName,
       String networkGenerationHashSeed) {
@@ -79,7 +80,7 @@ public class NodeInfo {
    *
    * @return {@link RoleType}
    */
-  public RoleType getRoles() {
+  public List<RoleType> getRoles() {
     return roles;
   }
 

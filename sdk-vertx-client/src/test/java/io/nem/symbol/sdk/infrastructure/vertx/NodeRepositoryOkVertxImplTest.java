@@ -35,6 +35,7 @@ import io.nem.symbol.sdk.openapi.vertx.model.ServerInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.StorageInfoDTO;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,7 +79,7 @@ public class NodeRepositoryOkVertxImplTest extends AbstractVertxRespositoryTest 
     Assertions.assertEquals(dto.getPublicKey(), info.getPublicKey());
     Assertions.assertEquals(dto.getFriendlyName(), info.getFriendlyName());
     Assertions.assertEquals(NetworkType.MAIN_NET, info.getNetworkIdentifier());
-    Assertions.assertEquals(RoleType.API_NODE, info.getRoles());
+    Assertions.assertEquals(Collections.singletonList(RoleType.API_NODE), info.getRoles());
     Assertions.assertEquals(dto.getVersion().intValue(), info.getVersion());
     Assertions.assertEquals(
         dto.getNetworkGenerationHashSeed(), info.getNetworkGenerationHashSeed());
@@ -108,7 +109,7 @@ public class NodeRepositoryOkVertxImplTest extends AbstractVertxRespositoryTest 
     Assertions.assertEquals(dto.getPublicKey(), info.getPublicKey());
     Assertions.assertEquals(dto.getFriendlyName(), info.getFriendlyName());
     Assertions.assertEquals(NetworkType.MAIN_NET, info.getNetworkIdentifier());
-    Assertions.assertEquals(RoleType.API_NODE, info.getRoles());
+    Assertions.assertEquals(Collections.singletonList(RoleType.API_NODE), info.getRoles());
     Assertions.assertEquals(dto.getVersion().intValue(), info.getVersion());
     Assertions.assertEquals(
         dto.getNetworkGenerationHashSeed(), info.getNetworkGenerationHashSeed());

@@ -21,7 +21,7 @@ import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.SecretLockRepository;
 import io.nem.symbol.sdk.api.SecretLockSearchCriteria;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
-import io.nem.symbol.sdk.model.transaction.SecretHashAlgorithm;
+import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
 import io.nem.symbol.sdk.openapi.vertx.api.SecretLockRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.SecretLockRoutesApiImpl;
@@ -53,7 +53,7 @@ public class SecretLockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
         (h) ->
             getClient()
                 .getSecretLock(
-                    ConvertUtils.padHex(secret, SecretHashAlgorithm.DEFAULT_SECRET_HEX_SIZE), h),
+                    ConvertUtils.padHex(secret, LockHashAlgorithm.DEFAULT_SECRET_HEX_SIZE), h),
         this::toSecretLockInfo);
   }
 
@@ -67,7 +67,7 @@ public class SecretLockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
         lock.getAmount(),
         lock.getEndHeight(),
         lock.getStatus(),
-        SecretHashAlgorithm.rawValueOf(lock.getHashAlgorithm().getValue()),
+        LockHashAlgorithm.rawValueOf(lock.getHashAlgorithm().getValue()),
         lock.getSecret(),
         MapperUtils.toAddress(lock.getRecipientAddress()),
         lock.getCompositeHash());

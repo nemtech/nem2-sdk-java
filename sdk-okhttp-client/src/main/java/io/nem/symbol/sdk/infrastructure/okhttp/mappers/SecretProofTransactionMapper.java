@@ -18,12 +18,12 @@ package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
-import io.nem.symbol.sdk.model.transaction.SecretHashAlgorithm;
+import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretProofTransaction;
 import io.nem.symbol.sdk.model.transaction.SecretProofTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretHashAlgorithmEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.LockHashAlgorithmEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretProofTransactionDTO;
 
 /** Secret proof transaction mapper. */
@@ -39,7 +39,7 @@ class SecretProofTransactionMapper
       NetworkType networkType, SecretProofTransactionDTO transaction) {
     return SecretProofTransactionFactory.create(
         networkType,
-        SecretHashAlgorithm.rawValueOf(transaction.getHashAlgorithm().getValue()),
+        LockHashAlgorithm.rawValueOf(transaction.getHashAlgorithm().getValue()),
         MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()),
         transaction.getSecret(),
         transaction.getProof());
@@ -47,7 +47,7 @@ class SecretProofTransactionMapper
 
   @Override
   protected void copyToDto(SecretProofTransaction transaction, SecretProofTransactionDTO dto) {
-    dto.setHashAlgorithm(SecretHashAlgorithmEnum.fromValue(transaction.getHashType().getValue()));
+    dto.setHashAlgorithm(LockHashAlgorithmEnum.fromValue(transaction.getHashType().getValue()));
     dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));
     dto.setSecret(transaction.getSecret());
     dto.setProof(transaction.getProof());

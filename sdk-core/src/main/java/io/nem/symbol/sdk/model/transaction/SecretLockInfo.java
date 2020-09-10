@@ -45,7 +45,7 @@ public class SecretLockInfo implements Stored {
   private final Integer status;
 
   /** The hash algorithm used. */
-  private final SecretHashAlgorithm hashAlgorithm;
+  private final LockHashAlgorithm hashAlgorithm;
 
   /** The secret */
   private final String secret;
@@ -63,7 +63,7 @@ public class SecretLockInfo implements Stored {
       BigInteger amount,
       BigInteger endHeight,
       Integer status,
-      SecretHashAlgorithm hashAlgorithm,
+      LockHashAlgorithm hashAlgorithm,
       String secret,
       Address recipientAddress,
       String compositeHash) {
@@ -104,7 +104,7 @@ public class SecretLockInfo implements Stored {
     return status;
   }
 
-  public SecretHashAlgorithm getHashAlgorithm() {
+  public LockHashAlgorithm getHashAlgorithm() {
     return hashAlgorithm;
   }
 

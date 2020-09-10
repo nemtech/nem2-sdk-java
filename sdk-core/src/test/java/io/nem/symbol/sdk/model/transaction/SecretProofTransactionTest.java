@@ -51,7 +51,7 @@ class SecretProofTransactionTest extends AbstractTransactionTester {
     String secretSeed = "9a493664";
     SecretProofTransaction transaction =
         SecretProofTransactionFactory.create(
-                NetworkType.MIJIN_TEST, SecretHashAlgorithm.SHA3_256, recipient, secret, secretSeed)
+                NetworkType.MIJIN_TEST, LockHashAlgorithm.SHA3_256, recipient, secret, secretSeed)
             .deadline(new FakeDeadline())
             .build();
 
@@ -68,7 +68,7 @@ class SecretProofTransactionTest extends AbstractTransactionTester {
     String proof = "9a493664";
     SecretProofTransaction transaction =
         SecretProofTransactionFactory.create(
-                NetworkType.MIJIN_TEST, SecretHashAlgorithm.SHA3_256, recipient, secret, proof)
+                NetworkType.MIJIN_TEST, LockHashAlgorithm.SHA3_256, recipient, secret, proof)
             .deadline(new FakeDeadline())
             .build();
 
@@ -86,7 +86,7 @@ class SecretProofTransactionTest extends AbstractTransactionTester {
     String secretSeed = "9a493664";
     SecretProofTransaction transaction =
         SecretProofTransactionFactory.create(
-                NetworkType.MIJIN_TEST, SecretHashAlgorithm.SHA3_256, recipient, secret, secretSeed)
+                NetworkType.MIJIN_TEST, LockHashAlgorithm.SHA3_256, recipient, secret, secretSeed)
             .deadline(new FakeDeadline())
             .build();
     SignedTransaction signedTransaction = transaction.signWith(account, generationHash);
@@ -110,7 +110,7 @@ class SecretProofTransactionTest extends AbstractTransactionTester {
           SecretProofTransaction transaction =
               SecretProofTransactionFactory.create(
                       NetworkType.MIJIN_TEST,
-                      SecretHashAlgorithm.SHA3_256,
+                      LockHashAlgorithm.SHA3_256,
                       recipient,
                       "non valid hash",
                       proof)

@@ -21,12 +21,12 @@ import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
-import io.nem.symbol.sdk.model.transaction.SecretHashAlgorithm;
+import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransaction;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
-import io.nem.symbol.sdk.openapi.vertx.model.SecretHashAlgorithmEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.LockHashAlgorithmEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.SecretLockTransactionDTO;
 
 /** Secret lock transaction mapper. */
@@ -46,7 +46,7 @@ class SecretLockTransactionMapper
         networkType,
         mosaic,
         transaction.getDuration(),
-        SecretHashAlgorithm.rawValueOf(transaction.getHashAlgorithm().getValue()),
+        LockHashAlgorithm.rawValueOf(transaction.getHashAlgorithm().getValue()),
         transaction.getSecret(),
         MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()));
   }
@@ -57,7 +57,7 @@ class SecretLockTransactionMapper
     dto.setMosaicId(MapperUtils.getIdAsHex(transaction.getMosaic().getId()));
     dto.setDuration(transaction.getDuration());
     dto.setHashAlgorithm(
-        SecretHashAlgorithmEnum.fromValue(transaction.getHashAlgorithm().getValue()));
+        LockHashAlgorithmEnum.fromValue(transaction.getHashAlgorithm().getValue()));
     dto.setSecret(transaction.getSecret());
     dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));
   }

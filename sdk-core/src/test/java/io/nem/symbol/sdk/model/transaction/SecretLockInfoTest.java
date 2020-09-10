@@ -40,7 +40,7 @@ public class SecretLockInfoTest {
     Integer status = 3;
     String hash = "ABC";
 
-    SecretHashAlgorithm hashAlgorithm = SecretHashAlgorithm.HASH_256;
+    LockHashAlgorithm hashAlgorithm = LockHashAlgorithm.HASH_256;
     String secret = "SomeSecret";
 
     SecretLockInfo info =

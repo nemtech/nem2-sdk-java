@@ -48,7 +48,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
                 NetworkType.MIJIN_TEST,
                 NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
-                SecretHashAlgorithm.SHA3_256,
+                LockHashAlgorithm.SHA3_256,
                 secret,
                 Address.createFromRawAddress("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ"))
             .deadline(new FakeDeadline())
@@ -71,7 +71,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
                 NetworkType.MIJIN_TEST,
                 NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
-                SecretHashAlgorithm.SHA3_256,
+                LockHashAlgorithm.SHA3_256,
                 secret,
                 Address.createFromRawAddress("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ"))
             .deadline(new FakeDeadline())
@@ -97,7 +97,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
                 NetworkType.MIJIN_TEST,
                 NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
-                SecretHashAlgorithm.SHA3_256,
+                LockHashAlgorithm.SHA3_256,
                 secret,
                 Address.createFromRawAddress("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ"))
             .deadline(new FakeDeadline())
@@ -122,7 +122,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
                         NetworkType.MIJIN_TEST,
                         NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                         BigInteger.valueOf(100),
-                        SecretHashAlgorithm.SHA3_256,
+                        LockHashAlgorithm.SHA3_256,
                         "non valid hash",
                         Address.generateRandom(NetworkType.MIJIN_TEST))
                     .deadline(new FakeDeadline())

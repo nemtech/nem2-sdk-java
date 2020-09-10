@@ -51,6 +51,7 @@ import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.FakeDeadline;
 import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransaction;
@@ -62,7 +63,6 @@ import io.nem.symbol.sdk.model.transaction.MosaicMetadataTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
 import io.nem.symbol.sdk.model.transaction.MosaicSupplyChangeTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicSupplyChangeTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.SecretHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransaction;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.SecretProofTransaction;
@@ -428,7 +428,7 @@ class TransactionServiceTest {
                 NetworkType.MIJIN_TEST,
                 unresolvedMosaicId,
                 BigInteger.TEN,
-                SecretHashAlgorithm.SHA3_256,
+                LockHashAlgorithm.SHA3_256,
                 secret,
                 recipient)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
@@ -463,7 +463,7 @@ class TransactionServiceTest {
 
     TransactionFactory<SecretProofTransaction> factory =
         SecretProofTransactionFactory.create(
-                NetworkType.MIJIN_TEST, SecretHashAlgorithm.SHA3_256, recipient, secret, proof)
+                NetworkType.MIJIN_TEST, LockHashAlgorithm.SHA3_256, recipient, secret, proof)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
     simulateStatement(height, 1, 0);
