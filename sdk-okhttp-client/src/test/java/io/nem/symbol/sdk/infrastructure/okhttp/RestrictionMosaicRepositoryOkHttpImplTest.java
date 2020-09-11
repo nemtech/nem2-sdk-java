@@ -17,10 +17,12 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
+import io.nem.symbol.sdk.api.MosaicRestrictionSearchCriteria;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.restriction.MosaicAddressRestriction;
 import io.nem.symbol.sdk.model.restriction.MosaicGlobalRestriction;
+import io.nem.symbol.sdk.model.restriction.MosaicRestriction;
 import io.nem.symbol.sdk.model.restriction.MosaicRestrictionEntryType;
 import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicAddressRestrictionDTO;
@@ -32,6 +34,8 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicGlobalRestrictionEntryR
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicGlobalRestrictionEntryWrapperDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicRestrictionEntryTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicRestrictionTypeEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicRestrictionsPage;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.Pagination;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,9 +59,14 @@ public class RestrictionMosaicRepositoryOkHttpImplTest extends AbstractOkHttpRes
     repository = new RestrictionMosaicRepositoryOkHttpImpl(apiClientMock);
   }
 
+  @Override
+  protected AbstractRepositoryOkHttpImpl getRepository() {
+    return this.repository;
+  }
+
   @Test
   public void shouldGetMosaicAddressRestrictions() throws Exception {
-    Address address = Address.generateRandom(networkType);
+    Address address = Address.generateRandom(this.networkType);
 
     MosaicId mosaicId = MapperUtils.toMosaicId("123");
 
@@ -78,19 +87,14 @@ public class RestrictionMosaicRepositoryOkHttpImplTest extends AbstractOkHttpRes
     wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_0);
     wrapperDTO.setTargetAddress(address.encoded());
 
-    List<MosaicAddressRestrictionDTO> list = new ArrayList<>();
-    list.add(dto);
+    mockRemoteCall(toPage(dto));
 
-    mockRemoteCall(list);
-
-    List<MosaicAddressRestriction> mosaicAddressRestrictions =
-        repository
-            .getMosaicAddressRestrictions(mosaicId, Collections.singletonList(address))
-            .toFuture()
-            .get();
+    List<MosaicRestriction<?>> mosaicAddressRestrictions =
+        repository.search(new MosaicRestrictionSearchCriteria()).toFuture().get().getData();
 
     Assertions.assertEquals(1, mosaicAddressRestrictions.size());
-    MosaicAddressRestriction mosaicAddressRestriction = mosaicAddressRestrictions.get(0);
+    MosaicAddressRestriction mosaicAddressRestriction =
+        (MosaicAddressRestriction) mosaicAddressRestrictions.get(0);
 
     Assertions.assertEquals(
         wrapperDTO.getCompositeHash(), mosaicAddressRestriction.getCompositeHash());
@@ -132,19 +136,14 @@ public class RestrictionMosaicRepositoryOkHttpImplTest extends AbstractOkHttpRes
     wrapperDTO.setRestrictions(restrictions);
     wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_1);
 
-    List<MosaicGlobalRestrictionDTO> list = new ArrayList<>();
-    list.add(dto);
+    mockRemoteCall(toPage(dto));
 
-    mockRemoteCall(list);
-
-    List<MosaicGlobalRestriction> mosaicGlobalRestrictions =
-        repository
-            .getMosaicGlobalRestrictions(Collections.singletonList(mosaicId))
-            .toFuture()
-            .get();
+    List<MosaicRestriction<?>> mosaicGlobalRestrictions =
+        repository.search(new MosaicRestrictionSearchCriteria()).toFuture().get().getData();
 
     Assertions.assertEquals(1, mosaicGlobalRestrictions.size());
-    MosaicGlobalRestriction mosaicGlobalRestriction = mosaicGlobalRestrictions.get(0);
+    MosaicGlobalRestriction mosaicGlobalRestriction =
+        (MosaicGlobalRestriction) mosaicGlobalRestrictions.get(0);
 
     Assertions.assertEquals(
         wrapperDTO.getCompositeHash(), mosaicGlobalRestriction.getCompositeHash());
@@ -201,10 +200,16 @@ public class RestrictionMosaicRepositoryOkHttpImplTest extends AbstractOkHttpRes
     wrapperDTO.setRestrictions(restrictions);
     wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_1);
 
-    mockRemoteCall(dto);
+    mockRemoteCall(toPage(dto));
 
     MosaicGlobalRestriction mosaicGlobalRestriction =
-        repository.getMosaicGlobalRestriction(mosaicId).toFuture().get();
+        (MosaicGlobalRestriction)
+            repository
+                .search(new MosaicRestrictionSearchCriteria())
+                .toFuture()
+                .get()
+                .getData()
+                .get(0);
 
     Assertions.assertEquals(
         wrapperDTO.getCompositeHash(), mosaicGlobalRestriction.getCompositeHash());
@@ -237,8 +242,7 @@ public class RestrictionMosaicRepositoryOkHttpImplTest extends AbstractOkHttpRes
 
   @Test
   public void shouldGetMosaicAddressRestriction() throws Exception {
-
-    Address address = Address.generateRandom(networkType);
+    Address address = Address.generateRandom(this.networkType);
 
     MosaicId mosaicId = MapperUtils.toMosaicId("123");
 
@@ -259,10 +263,20 @@ public class RestrictionMosaicRepositoryOkHttpImplTest extends AbstractOkHttpRes
     wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_0);
     wrapperDTO.setTargetAddress(address.encoded());
 
-    mockRemoteCall(dto);
+    mockRemoteCall(toPage(dto));
 
     MosaicAddressRestriction mosaicAddressRestriction =
-        repository.getMosaicAddressRestriction(mosaicId, address).toFuture().get();
+        (MosaicAddressRestriction)
+            repository
+                .search(
+                    new MosaicRestrictionSearchCriteria()
+                        .targetAddress(address)
+                        .mosaicId(mosaicId)
+                        .entryType(MosaicRestrictionEntryType.ADDRESS))
+                .toFuture()
+                .get()
+                .getData()
+                .get(0);
 
     Assertions.assertEquals(
         wrapperDTO.getCompositeHash(), mosaicAddressRestriction.getCompositeHash());
@@ -278,8 +292,9 @@ public class RestrictionMosaicRepositoryOkHttpImplTest extends AbstractOkHttpRes
         mosaicAddressRestriction.getRestrictions().get((BigInteger.valueOf(1111))));
   }
 
-  @Override
-  public RestrictionMosaicRepositoryOkHttpImpl getRepository() {
-    return repository;
+  private MosaicRestrictionsPage toPage(Object dto) {
+    return new MosaicRestrictionsPage()
+        .data(Collections.singletonList(dto))
+        .pagination(new Pagination().pageNumber(1).pageSize(2));
   }
 }

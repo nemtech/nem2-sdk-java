@@ -20,8 +20,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import io.nem.symbol.core.utils.ExceptionUtils;
+import io.nem.symbol.sdk.api.MosaicRestrictionSearchCriteria;
 import io.nem.symbol.sdk.api.NamespaceRepository;
-import io.nem.symbol.sdk.api.RepositoryCallException;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.RestrictionMosaicRepository;
 import io.nem.symbol.sdk.model.account.Account;
@@ -43,7 +44,9 @@ import io.nem.symbol.sdk.model.transaction.MosaicGlobalRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
 import io.reactivex.Observable;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,29 +55,25 @@ import org.mockito.Mockito;
 /** Tests of {@link MosaicRestrictionTransactionServiceImpl} */
 public class MosaicRestrictionTransactionServiceTest {
 
-  private NetworkType networkType = NetworkType.MIJIN_TEST;
+  private final NetworkType networkType = NetworkType.MIJIN_TEST;
+  private final Account account1 = Account.generateNewAccount(networkType);
+  private final Account account2 = Account.generateNewAccount(networkType);
+  private final NamespaceId accountAlias1 =
+      NamespaceId.createFromName("accountAlias1".toLowerCase());
+  private final NamespaceId accountAlias2 =
+      NamespaceId.createFromName("accountAlias2".toLowerCase());
+  private final MosaicId mosaicId1 =
+      MosaicId.createFromNonce(MosaicNonce.createRandom(), account1.getPublicAccount());
+  private final MosaicId mosaicId2 =
+      MosaicId.createFromNonce(MosaicNonce.createRandom(), account2.getPublicAccount());
+  private final NamespaceId mosaicAlias1 = NamespaceId.createFromName("mosaicAlias1".toLowerCase());
+  private final NamespaceId mosaicAlias2 = NamespaceId.createFromName("mosaicAlias2".toLowerCase());
+  private final MosaicId mosaicIdWrongKey = new MosaicId("AAAAAAAAAAAAAAAA");
+  private final MosaicId mosaicIdNotFound = new MosaicId("BBBBBBBBBBBBBBBB");
+  private final BigInteger restrictionKey = BigInteger.TEN;
   private MosaicRestrictionTransactionServiceImpl service;
   private RestrictionMosaicRepository restrictionMosaicRepository;
-
   private NamespaceRepository namespaceRepository;
-
-  private Account account1 = Account.generateNewAccount(networkType);
-  private Account account2 = Account.generateNewAccount(networkType);
-  private NamespaceId accountAlias1 = NamespaceId.createFromName("accountAlias1".toLowerCase());
-  private NamespaceId accountAlias2 = NamespaceId.createFromName("accountAlias2".toLowerCase());
-
-  private MosaicId mosaicId1 =
-      MosaicId.createFromNonce(MosaicNonce.createRandom(), account1.getPublicAccount());
-  private MosaicId mosaicId2 =
-      MosaicId.createFromNonce(MosaicNonce.createRandom(), account2.getPublicAccount());
-
-  private NamespaceId mosaicAlias1 = NamespaceId.createFromName("mosaicAlias1".toLowerCase());
-  private NamespaceId mosaicAlias2 = NamespaceId.createFromName("mosaicAlias2".toLowerCase());
-
-  private MosaicId mosaicIdWrongKey = new MosaicId("AAAAAAAAAAAAAAAA");
-  private MosaicId mosaicIdNotFound = new MosaicId("BBBBBBBBBBBBBBBB");
-
-  private BigInteger restrictionKey = BigInteger.TEN;
 
   @BeforeEach
   void setup() {
@@ -89,39 +88,73 @@ public class MosaicRestrictionTransactionServiceTest {
     when(factory.getNetworkType()).thenReturn(Observable.just(networkType));
     service = new MosaicRestrictionTransactionServiceImpl(factory);
 
-    when(restrictionMosaicRepository.getMosaicGlobalRestriction(eq(mosaicId1)))
-        .thenReturn(Observable.just(mockGlobalRestriction()));
+    when(restrictionMosaicRepository.search(
+            eq(
+                new MosaicRestrictionSearchCriteria()
+                    .pageNumber(1)
+                    .mosaicId(mosaicId1)
+                    .entryType(MosaicRestrictionEntryType.GLOBAL))))
+        .thenReturn(Observable.just(toPage(mockGlobalRestriction())));
 
-    when(restrictionMosaicRepository.getMosaicGlobalRestriction(eq(mosaicId2)))
-        .thenReturn(Observable.just(mockGlobalRestriction()));
+    when(restrictionMosaicRepository.search(
+            eq(
+                new MosaicRestrictionSearchCriteria()
+                    .pageNumber(1)
+                    .mosaicId(mosaicId2)
+                    .entryType(MosaicRestrictionEntryType.GLOBAL))))
+        .thenReturn(Observable.just(toPage(mockGlobalRestriction())));
 
-    when(restrictionMosaicRepository.getMosaicGlobalRestriction(eq(mosaicIdWrongKey)))
+    when(restrictionMosaicRepository.search(
+            eq(
+                new MosaicRestrictionSearchCriteria()
+                    .pageNumber(1)
+                    .mosaicId(mosaicIdWrongKey)
+                    .entryType(MosaicRestrictionEntryType.GLOBAL))))
         .thenReturn(Observable.error(() -> new IllegalStateException("Not a nice mosaic id")));
 
-    when(restrictionMosaicRepository.getMosaicGlobalRestriction(eq(mosaicIdNotFound)))
-        .thenReturn(
-            Observable.error(
-                () -> new RepositoryCallException("NotFound", 404, new IllegalStateException())));
+    when(restrictionMosaicRepository.search(
+            eq(
+                new MosaicRestrictionSearchCriteria()
+                    .pageNumber(1)
+                    .mosaicId(mosaicIdNotFound)
+                    .entryType(MosaicRestrictionEntryType.GLOBAL))))
+        .thenReturn(Observable.just(toPage()));
 
-    when(restrictionMosaicRepository.getMosaicAddressRestriction(
-            eq(mosaicId1), eq(account1.getAddress())))
-        .thenReturn(Observable.just(mockAddressRestriction()));
+    when(restrictionMosaicRepository.search(
+            eq(
+                new MosaicRestrictionSearchCriteria()
+                    .pageNumber(1)
+                    .mosaicId(mosaicId1)
+                    .targetAddress(account1.getAddress())
+                    .entryType(MosaicRestrictionEntryType.ADDRESS))))
+        .thenReturn(Observable.just(toPage(mockAddressRestriction())));
 
-    when(restrictionMosaicRepository.getMosaicAddressRestriction(
-            eq(mosaicId2), eq(account1.getAddress())))
-        .thenReturn(
-            Observable.error(
-                () -> new RepositoryCallException("NotFound", 404, new IllegalStateException())));
+    when(restrictionMosaicRepository.search(
+            eq(
+                new MosaicRestrictionSearchCriteria()
+                    .pageNumber(1)
+                    .mosaicId(mosaicId2)
+                    .targetAddress(account1.getAddress())
+                    .entryType(MosaicRestrictionEntryType.ADDRESS))))
+        .thenReturn(Observable.just(toPage()));
 
-    when(restrictionMosaicRepository.getMosaicAddressRestriction(
-            eq(mosaicIdWrongKey), eq(account1.getAddress())))
+    when(restrictionMosaicRepository.search(
+            eq(
+                new MosaicRestrictionSearchCriteria()
+                    .pageNumber(1)
+                    .mosaicId(mosaicIdWrongKey)
+                    .targetAddress(account1.getAddress())
+                    .entryType(MosaicRestrictionEntryType.ADDRESS))))
         .thenReturn(Observable.error(() -> new IllegalStateException("Not a nice mosaic id")));
 
-    when(restrictionMosaicRepository.getMosaicAddressRestriction(
-            eq(mosaicIdNotFound), eq(account1.getAddress())))
-        .thenReturn(
-            Observable.error(
-                () -> new RepositoryCallException("NotFound", 404, new IllegalStateException())));
+    when(restrictionMosaicRepository.search(
+            eq(
+                new MosaicRestrictionSearchCriteria()
+                    .pageNumber(1)
+                    .mosaicId(mosaicIdNotFound)
+                    .targetAddress(account1.getAddress())
+                    .entryType(MosaicRestrictionEntryType.ADDRESS))))
+        .thenReturn(Observable.just(toPage()));
 
     when(namespaceRepository.getNamespace(Mockito.any()))
         .thenReturn(Observable.error(new IllegalStateException("Alias does not exist")));
@@ -425,14 +458,16 @@ public class MosaicRestrictionTransactionServiceTest {
   }
 
   private MosaicGlobalRestriction mockGlobalRestriction() {
-    return new MosaicGlobalRestriction(
-        "AAAA",
-        MosaicRestrictionEntryType.GLOBAL,
-        mosaicId1,
+    Map<BigInteger, MosaicGlobalRestrictionItem> map =
         Collections.singletonMap(
             restrictionKey,
             new MosaicGlobalRestrictionItem(
-                mosaicId1, BigInteger.valueOf(20), MosaicRestrictionType.EQ)));
+                mosaicId1, BigInteger.valueOf(20), MosaicRestrictionType.EQ));
+    return new MosaicGlobalRestriction("AAAA", MosaicRestrictionEntryType.GLOBAL, mosaicId1, map);
+  }
+
+  private <T> Page<T> toPage(T... entities) {
+    return new Page<>(Arrays.asList(entities));
   }
 
   private MosaicAddressRestriction mockAddressRestriction() {

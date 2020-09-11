@@ -15,35 +15,33 @@
  */
 package io.nem.symbol.sdk.model.account;
 
-import java.math.BigInteger;
-
 /** Account link voting key */
 public class AccountLinkVotingKey {
 
   /** Public Key. */
   private final String publicKey;
 
-  /** Start point. */
-  private final BigInteger startPoint;
+  /** Start epoch. */
+  private final long startEpoch;
 
-  /** End point. */
-  private final BigInteger endPoint;
+  /** End epoch. */
+  private final long endEpoch;
 
-  public AccountLinkVotingKey(String publicKey, BigInteger startPoint, BigInteger endPoint) {
+  public AccountLinkVotingKey(String publicKey, long startEpoch, long endEpoch) {
     this.publicKey = publicKey;
-    this.startPoint = startPoint;
-    this.endPoint = endPoint;
+    this.startEpoch = startEpoch;
+    this.endEpoch = endEpoch;
   }
 
   public String getPublicKey() {
     return publicKey;
   }
 
-  public BigInteger getStartPoint() {
-    return startPoint;
+  public long getStartEpoch() {
+    return startEpoch;
   }
 
-  public BigInteger getEndPoint() {
-    return endPoint;
+  public long getEndEpoch() {
+    return endEpoch;
   }
 }

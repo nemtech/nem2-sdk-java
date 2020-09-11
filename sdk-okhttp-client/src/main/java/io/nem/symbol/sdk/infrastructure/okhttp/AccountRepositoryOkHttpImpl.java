@@ -38,7 +38,6 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountPage;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Order;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.SupplementalPublicKeysDTO;
 import io.reactivex.Observable;
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -127,9 +126,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
                 .map(
                     p ->
                         new AccountLinkVotingKey(
-                            p.getPublicKey(),
-                            new BigInteger(p.getStartPoint()),
-                            new BigInteger(p.getEndPoint())))
+                            p.getPublicKey(), p.getStartEpoch(), p.getEndEpoch()))
                 .collect(Collectors.toList());
     return new SupplementalAccountKeys(linked, node, vrf, voting);
   }

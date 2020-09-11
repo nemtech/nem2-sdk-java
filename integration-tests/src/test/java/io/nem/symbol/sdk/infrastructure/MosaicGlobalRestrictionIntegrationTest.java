@@ -15,12 +15,13 @@
  */
 package io.nem.symbol.sdk.infrastructure;
 
-import io.nem.symbol.sdk.api.RepositoryCallException;
+import io.nem.symbol.sdk.api.MosaicRestrictionSearchCriteria;
 import io.nem.symbol.sdk.api.RestrictionMosaicRepository;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.restriction.MosaicGlobalRestriction;
+import io.nem.symbol.sdk.model.restriction.MosaicRestrictionEntryType;
 import io.nem.symbol.sdk.model.transaction.MosaicGlobalRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicGlobalRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
@@ -37,7 +38,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
 
   private Account testAccount;
 
-  private BigInteger restrictionKey = BigInteger.valueOf(11111);
+  private final BigInteger restrictionKey = BigInteger.valueOf(11111);
 
   @BeforeEach
   void setup() {
@@ -67,7 +68,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
                 restrictionKey,
                 originalValue,
                 originalRestrictionType)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     // 3) Announce the create restriction transaction
@@ -83,12 +84,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
         getRepositoryFactory(type).createRestrictionMosaicRepository();
 
     assertMosaicGlobalRestriction(
-        createTransaction, get(restrictionRepository.getMosaicGlobalRestriction(mosaicId)));
-
-    assertMosaicGlobalRestriction(
-        createTransaction,
-        get(restrictionRepository.getMosaicGlobalRestrictions(Collections.singletonList(mosaicId)))
-            .get(0));
+        createTransaction, getMosaicRestriction(mosaicId, restrictionRepository));
 
     // 6) Modifying the restriction by sending a new transaction with the previous values.
     MosaicGlobalRestrictionTransaction updateTransaction =
@@ -100,7 +96,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
                 MosaicRestrictionType.EQ)
             .previousRestrictionType(originalRestrictionType)
             .previousRestrictionValue(originalValue)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     // 7) Announcing the update restriction transaction and checking the processed one.
@@ -112,12 +108,18 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
     // 8) Validating that the endpoints show the new value and type.
 
     assertMosaicGlobalRestriction(
-        updateTransaction, get(restrictionRepository.getMosaicGlobalRestriction(mosaicId)));
+        updateTransaction, getMosaicRestriction(mosaicId, restrictionRepository));
+  }
 
-    assertMosaicGlobalRestriction(
-        updateTransaction,
-        get(restrictionRepository.getMosaicGlobalRestrictions(Collections.singletonList(mosaicId)))
-            .get(0));
+  private MosaicGlobalRestriction getMosaicRestriction(
+      MosaicId mosaicId, RestrictionMosaicRepository restrictionRepository) {
+    return (MosaicGlobalRestriction)
+        get(restrictionRepository.search(
+                new MosaicRestrictionSearchCriteria()
+                    .entryType(MosaicRestrictionEntryType.GLOBAL)
+                    .mosaicId(mosaicId)))
+            .getData()
+            .get(0);
   }
 
   private void assertTransaction(
@@ -174,35 +176,5 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
     Assertions.assertEquals(
         new MosaicId(BigInteger.ZERO),
         mosaicGlobalRestriction.getRestrictions().get(restrictionKey).getReferenceMosaicId());
-  }
-
-  @ParameterizedTest
-  @EnumSource(RepositoryType.class)
-  void getMosaicGlobalRestrictionWhenMosaicDoesNotExist(RepositoryType type) {
-    RestrictionMosaicRepository repository =
-        getRepositoryFactory(type).createRestrictionMosaicRepository();
-
-    RepositoryCallException exception =
-        Assertions.assertThrows(
-            RepositoryCallException.class,
-            () ->
-                get(
-                    repository.getMosaicGlobalRestriction(
-                        new MosaicId(BigInteger.valueOf(888888)))));
-    Assertions.assertEquals(
-        "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '00000000000D9038'",
-        exception.getMessage());
-  }
-
-  @ParameterizedTest
-  @EnumSource(RepositoryType.class)
-  void getMosaicGlobalRestrictionsWhenMosaicDoesNotExist(RepositoryType type) {
-    RestrictionMosaicRepository repository =
-        getRepositoryFactory(type).createRestrictionMosaicRepository();
-    Assertions.assertEquals(
-        0,
-        get(repository.getMosaicGlobalRestrictions(
-                Collections.singletonList(new MosaicId(BigInteger.valueOf(888888)))))
-            .size());
   }
 }

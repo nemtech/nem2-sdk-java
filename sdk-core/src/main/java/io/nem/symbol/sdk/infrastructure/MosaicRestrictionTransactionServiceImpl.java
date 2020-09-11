@@ -16,8 +16,9 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.AliasService;
+import io.nem.symbol.sdk.api.MosaicRestrictionPaginationStreamer;
+import io.nem.symbol.sdk.api.MosaicRestrictionSearchCriteria;
 import io.nem.symbol.sdk.api.MosaicRestrictionTransactionService;
-import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.RestrictionMosaicRepository;
 import io.nem.symbol.sdk.model.account.Address;
@@ -26,6 +27,7 @@ import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.restriction.MosaicGlobalRestrictionItem;
+import io.nem.symbol.sdk.model.restriction.MosaicRestrictionEntryType;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MosaicGlobalRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
@@ -108,9 +110,10 @@ public class MosaicRestrictionTransactionServiceImpl
                     .flatMap(
                         optional -> {
                           if (!optional.isPresent()) {
-                            throw new IllegalArgumentException(
-                                "Global restriction is not valid for RestrictionKey: "
-                                    + restrictionKey);
+                            return Observable.error(
+                                new IllegalArgumentException(
+                                    "Global restriction is not valid for RestrictionKey: "
+                                        + restrictionKey));
                           }
 
                           return getCurrentMosaicAddressRestrictionValue(
@@ -141,10 +144,18 @@ public class MosaicRestrictionTransactionServiceImpl
    */
   private Observable<Optional<BigInteger>> getCurrentMosaicAddressRestrictionValue(
       MosaicId mosaicId, Address targetAddress, BigInteger restrictionKey) {
-    return emptyOnNotFound(
-        this.repository
-            .getMosaicAddressRestriction(mosaicId, targetAddress)
-            .map(r -> Optional.ofNullable(r.getRestrictions().get(restrictionKey))));
+
+    MosaicRestrictionSearchCriteria criteria =
+        new MosaicRestrictionSearchCriteria()
+            .mosaicId(mosaicId)
+            .targetAddress(targetAddress)
+            .entryType(MosaicRestrictionEntryType.ADDRESS);
+
+    System.out.println(criteria);
+    return MosaicRestrictionPaginationStreamer.address(this.repository, criteria)
+        .map(r -> Optional.ofNullable(r.getRestrictions().get(restrictionKey)))
+        .first(Optional.empty())
+        .toObservable();
   }
 
   /**
@@ -156,29 +167,14 @@ public class MosaicRestrictionTransactionServiceImpl
    */
   private Observable<Optional<MosaicGlobalRestrictionItem>> getGlobalRestrictionEntry(
       MosaicId mosaicId, BigInteger restrictionKey) {
-    return emptyOnNotFound(
-        this.repository
-            .getMosaicGlobalRestriction(mosaicId)
-            .map(r -> Optional.ofNullable(r.getRestrictions().get(restrictionKey))));
-  }
+    MosaicRestrictionSearchCriteria criteria =
+        new MosaicRestrictionSearchCriteria()
+            .mosaicId(mosaicId)
+            .entryType(MosaicRestrictionEntryType.GLOBAL);
 
-  /**
-   * Utility wrapper that returns an empty object when the rest response returns 404.
-   *
-   * @param call the rest call
-   * @param <T> the type of the response
-   * @return the Observable that returns empty on 404. If there are other rest errors, the exception
-   *     is propagated.
-   */
-  private <T> Observable<Optional<T>> emptyOnNotFound(Observable<Optional<T>> call) {
-    return call.onErrorResumeNext(
-        exception -> {
-          if (exception instanceof RepositoryCallException
-              && ((RepositoryCallException) exception).getStatusCode() == 404) {
-            return Observable.just(Optional.empty());
-          } else {
-            return Observable.error(exception);
-          }
-        });
+    return MosaicRestrictionPaginationStreamer.global(this.repository, criteria)
+        .map(r -> Optional.ofNullable(r.getRestrictions().get(restrictionKey)))
+        .first(Optional.empty())
+        .toObservable();
   }
 }

@@ -18,7 +18,6 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.account.AccountRestrictions;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionFlags;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionFlagsEnum;
@@ -70,39 +69,6 @@ public class RestrictionAccountRepositoryOkHttpImplTest extends AbstractOkHttpRe
         accountRestrictions.getRestrictions().get(0).getRestrictionFlags());
     Assertions.assertEquals(
         Arrays.asList(MapperUtils.toMosaicId("9636553580561478212")),
-        accountRestrictions.getRestrictions().get(0).getValues());
-  }
-
-  @Test
-  public void shouldGetAccountsRestrictionsFromAddresses() throws Exception {
-    Address address = Address.generateRandom(networkType);
-
-    AccountRestrictionsDTO dto = new AccountRestrictionsDTO();
-    dto.setAddress(address.encoded());
-    AccountRestrictionDTO restriction = new AccountRestrictionDTO();
-    restriction.setRestrictionFlags(AccountRestrictionFlagsEnum.NUMBER_1);
-    restriction.setValues(Arrays.asList("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1"));
-    dto.setRestrictions(Collections.singletonList(restriction));
-
-    AccountRestrictionsInfoDTO info = new AccountRestrictionsInfoDTO();
-    info.setAccountRestrictions(dto);
-    mockRemoteCall(Collections.singletonList(info));
-
-    AccountRestrictions accountRestrictions =
-        repository
-            .getAccountsRestrictions(Collections.singletonList(address))
-            .toFuture()
-            .get()
-            .get(0);
-
-    Assertions.assertEquals(address, accountRestrictions.getAddress());
-    Assertions.assertEquals(1, accountRestrictions.getRestrictions().size());
-    Assertions.assertEquals(
-        AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
-        accountRestrictions.getRestrictions().get(0).getRestrictionFlags());
-    Assertions.assertEquals(
-        Collections.singletonList(
-            MapperUtils.toUnresolvedAddress("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1")),
         accountRestrictions.getRestrictions().get(0).getValues());
   }
 

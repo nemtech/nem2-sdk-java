@@ -16,7 +16,6 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.core.crypto.VotingKey;
-import java.math.BigInteger;
 
 /** Voting key link transaction. */
 public class VotingKeyLinkTransaction extends Transaction {
@@ -24,11 +23,11 @@ public class VotingKeyLinkTransaction extends Transaction {
   /** The voting key. */
   private final VotingKey linkedPublicKey;
 
-  /** Start finalization point. */
-  private final BigInteger startPoint;
+  /** Start finalization epoch. */
+  private final long startEpoch;
 
-  /** End finalization point. */
-  private final BigInteger endPoint;
+  /** End finalization epoch. */
+  private final long endEpoch;
 
   /** The link action. */
   private final LinkAction linkAction;
@@ -41,8 +40,8 @@ public class VotingKeyLinkTransaction extends Transaction {
   VotingKeyLinkTransaction(VotingKeyLinkTransactionFactory factory) {
     super(factory);
     this.linkedPublicKey = factory.getLinkedPublicKey();
-    this.startPoint = factory.getStartPoint();
-    this.endPoint = factory.getEndPoint();
+    this.startEpoch = factory.getStartEpoch();
+    this.endEpoch = factory.getEndEpoch();
     this.linkAction = factory.getLinkAction();
   }
 
@@ -54,11 +53,11 @@ public class VotingKeyLinkTransaction extends Transaction {
     return linkAction;
   }
 
-  public BigInteger getStartPoint() {
-    return startPoint;
+  public long getStartEpoch() {
+    return startEpoch;
   }
 
-  public BigInteger getEndPoint() {
-    return endPoint;
+  public long getEndEpoch() {
+    return endEpoch;
   }
 }

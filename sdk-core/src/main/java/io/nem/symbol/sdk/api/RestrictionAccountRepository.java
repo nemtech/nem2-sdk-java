@@ -18,7 +18,6 @@ package io.nem.symbol.sdk.api;
 import io.nem.symbol.sdk.model.account.AccountRestrictions;
 import io.nem.symbol.sdk.model.account.Address;
 import io.reactivex.Observable;
-import java.util.List;
 
 /**
  * Restriction interface repository.
@@ -34,12 +33,4 @@ public interface RestrictionAccountRepository {
    * @return Observable of {@link AccountRestrictions}
    */
   Observable<AccountRestrictions> getAccountRestrictions(Address address);
-
-  /**
-   * Returns the account restrictions for a given array of addresses.
-   *
-   * @param addresses {@link List} of {@link Address}
-   * @return Observable {@link List} of {@link AccountRestrictions}
-   */
-  Observable<List<AccountRestrictions>> getAccountsRestrictions(List<Address> addresses);
 }

@@ -23,12 +23,10 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.RestrictionAccountRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountIds;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionsDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionsInfoDTO;
 import io.reactivex.Observable;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -52,26 +50,6 @@ public class RestrictionAccountRepositoryOkHttpImpl extends AbstractRepositoryOk
         call(callback)
             .map(AccountRestrictionsInfoDTO::getAccountRestrictions)
             .map(this::toAccountRestrictions));
-  }
-
-  @Override
-  public Observable<List<AccountRestrictions>> getAccountsRestrictions(List<Address> addresses) {
-    AccountIds accountIds =
-        new AccountIds()
-            .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-    return getAccountsRestrictions(accountIds);
-  }
-
-  private Observable<List<AccountRestrictions>> getAccountsRestrictions(AccountIds accountIds) {
-    Callable<List<AccountRestrictionsInfoDTO>> callback =
-        () -> getClient().getAccountRestrictionsFromAccounts(accountIds);
-    return exceptionHandling(
-            call(callback)
-                .flatMapIterable(item -> item)
-                .map(AccountRestrictionsInfoDTO::getAccountRestrictions)
-                .map(this::toAccountRestrictions))
-        .toList()
-        .toObservable();
   }
 
   private AccountRestrictions toAccountRestrictions(AccountRestrictionsDTO dto) {

@@ -41,7 +41,6 @@ import io.nem.symbol.sdk.openapi.vertx.model.SupplementalPublicKeysDTO;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -162,9 +161,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl
                 .map(
                     p ->
                         new AccountLinkVotingKey(
-                            p.getPublicKey(),
-                            new BigInteger(p.getStartPoint()),
-                            new BigInteger(p.getEndPoint())))
+                            p.getPublicKey(), (p.getStartEpoch()), (p.getEndEpoch())))
                 .collect(Collectors.toList());
     return new SupplementalAccountKeys(linked, node, vrf, voting);
   }

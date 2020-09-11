@@ -56,4 +56,15 @@ public class SerializationUtilsTest {
             SerializationUtils.fromUnresolvedAddressToByteBuffer(namespaceId, NetworkType.MAIN_NET)
                 .array()));
   }
+
+  @Test
+  void intToUnsignedLong() {
+    Assertions.assertEquals(
+        ((long) Integer.MAX_VALUE) + 1,
+        SerializationUtils.intToUnsignedLong(Integer.MAX_VALUE + 1));
+
+    Assertions.assertEquals(10, SerializationUtils.intToUnsignedLong(10));
+
+    Assertions.assertEquals(4294967295L, SerializationUtils.intToUnsignedLong(-1));
+  }
 }

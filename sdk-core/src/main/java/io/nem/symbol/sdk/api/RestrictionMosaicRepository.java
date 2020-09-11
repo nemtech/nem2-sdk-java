@@ -15,53 +15,12 @@
  */
 package io.nem.symbol.sdk.api;
 
-import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.mosaic.MosaicId;
-import io.nem.symbol.sdk.model.restriction.MosaicAddressRestriction;
-import io.nem.symbol.sdk.model.restriction.MosaicGlobalRestriction;
-import io.reactivex.Observable;
-import java.util.List;
+import io.nem.symbol.sdk.model.restriction.MosaicRestriction;
 
 /**
  * Restriction interface repository.
  *
  * @since 1.0
  */
-public interface RestrictionMosaicRepository {
-
-  /**
-   * Get mosaic address restrictions for a given mosaic and account identifier.
-   *
-   * @param mosaicId Mosaic identifier.
-   * @param address address
-   * @return Observable of {@link MosaicAddressRestriction}
-   */
-  Observable<MosaicAddressRestriction> getMosaicAddressRestriction(
-      MosaicId mosaicId, Address address);
-
-  /**
-   * Get mosaic address restrictions for a given mosaic and account identifiers array
-   *
-   * @param mosaicId Mosaic identifier.
-   * @param addresses list of addresses
-   * @return Observable {@link List} of {@link MosaicAddressRestriction}.
-   */
-  Observable<List<MosaicAddressRestriction>> getMosaicAddressRestrictions(
-      MosaicId mosaicId, List<Address> addresses);
-
-  /**
-   * Get mosaic global restrictions for a given mosaic identifier.
-   *
-   * @param mosaicId Mosaic identifier.
-   * @return Observable of {@link MosaicGlobalRestriction}
-   */
-  Observable<MosaicGlobalRestriction> getMosaicGlobalRestriction(MosaicId mosaicId);
-
-  /**
-   * Get mosaic global restrictions for a given list of mosaics.
-   *
-   * @param mosaicIds List of mosaic identifier.
-   * @return Observable {@link List} of {@link MosaicGlobalRestriction}.
-   */
-  Observable<List<MosaicGlobalRestriction>> getMosaicGlobalRestrictions(List<MosaicId> mosaicIds);
-}
+public interface RestrictionMosaicRepository
+    extends Searcher<MosaicRestriction<?>, MosaicRestrictionSearchCriteria> {}

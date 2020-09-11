@@ -16,30 +16,32 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.core.utils.MapperUtils;
+import io.nem.symbol.sdk.api.MosaicRestrictionSearchCriteria;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RestrictionMosaicRepository;
-import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.restriction.MosaicAddressRestriction;
 import io.nem.symbol.sdk.model.restriction.MosaicGlobalRestriction;
 import io.nem.symbol.sdk.model.restriction.MosaicGlobalRestrictionItem;
+import io.nem.symbol.sdk.model.restriction.MosaicRestriction;
 import io.nem.symbol.sdk.model.restriction.MosaicRestrictionEntryType;
 import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
 import io.nem.symbol.sdk.openapi.vertx.api.RestrictionMosaicRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.RestrictionMosaicRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
-import io.nem.symbol.sdk.openapi.vertx.model.AccountIds;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicAddressRestrictionDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicAddressRestrictionEntryWrapperDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicGlobalRestrictionDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicGlobalRestrictionEntryRestrictionDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicGlobalRestrictionEntryWrapperDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.MosaicIds;
+import io.nem.symbol.sdk.openapi.vertx.model.MosaicRestrictionEntryTypeEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.MosaicRestrictionsPage;
+import io.nem.symbol.sdk.openapi.vertx.model.Order;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class RestrictionMosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl
@@ -50,55 +52,6 @@ public class RestrictionMosaicRepositoryVertxImpl extends AbstractRepositoryVert
   public RestrictionMosaicRepositoryVertxImpl(ApiClient apiClient) {
     super(apiClient);
     this.client = new RestrictionMosaicRoutesApiImpl(apiClient);
-  }
-
-  @Override
-  public Observable<MosaicAddressRestriction> getMosaicAddressRestriction(
-      MosaicId mosaicId, Address address) {
-    return exceptionHandling(
-        call((Handler<AsyncResult<MosaicAddressRestrictionDTO>> handler) ->
-                getClient()
-                    .getMosaicAddressRestriction(mosaicId.getIdAsHex(), address.plain(), handler))
-            .map(this::toMosaicAddressRestriction));
-  }
-
-  @Override
-  public Observable<List<MosaicAddressRestriction>> getMosaicAddressRestrictions(
-      MosaicId mosaicId, List<Address> addresses) {
-    AccountIds accountIds =
-        new AccountIds()
-            .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-    return exceptionHandling(
-            call((Handler<AsyncResult<List<MosaicAddressRestrictionDTO>>> handler) ->
-                    getClient()
-                        .getMosaicAddressRestrictions(mosaicId.getIdAsHex(), accountIds, handler))
-                .flatMapIterable(item -> item)
-                .map(this::toMosaicAddressRestriction))
-        .toList()
-        .toObservable();
-  }
-
-  @Override
-  public Observable<MosaicGlobalRestriction> getMosaicGlobalRestriction(MosaicId mosaicId) {
-    return exceptionHandling(
-        call((Handler<AsyncResult<MosaicGlobalRestrictionDTO>> handler) ->
-                getClient().getMosaicGlobalRestriction(mosaicId.getIdAsHex(), handler))
-            .map(this::toMosaicGlobalRestriction));
-  }
-
-  @Override
-  public Observable<List<MosaicGlobalRestriction>> getMosaicGlobalRestrictions(
-      List<MosaicId> mosaicIds) {
-    MosaicIds mosaicIdsParmas =
-        new MosaicIds()
-            .mosaicIds(mosaicIds.stream().map(MosaicId::getIdAsHex).collect(Collectors.toList()));
-    return exceptionHandling(
-            call((Handler<AsyncResult<List<MosaicGlobalRestrictionDTO>>> handler) ->
-                    getClient().getMosaicGlobalRestrictions(mosaicIdsParmas, handler))
-                .flatMapIterable(item -> item)
-                .map(this::toMosaicGlobalRestriction))
-        .toList()
-        .toObservable();
   }
 
   private MosaicGlobalRestriction toMosaicGlobalRestriction(
@@ -150,5 +103,50 @@ public class RestrictionMosaicRepositoryVertxImpl extends AbstractRepositoryVert
 
   public RestrictionMosaicRoutesApi getClient() {
     return client;
+  }
+
+  @Override
+  public Observable<Page<MosaicRestriction<?>>> search(MosaicRestrictionSearchCriteria criteria) {
+
+    String mosaicId = criteria.getMosaicId() == null ? null : criteria.getMosaicId().getIdAsHex();
+    MosaicRestrictionEntryTypeEnum entryType =
+        criteria.getEntryType() == null
+            ? null
+            : MosaicRestrictionEntryTypeEnum.fromValue(criteria.getEntryType().getValue());
+    String targetAddress = toDto(criteria.getTargetAddress());
+    Integer pageSize = criteria.getPageSize();
+    Integer pageNumber = criteria.getPageNumber();
+    String offset = criteria.getOffset();
+    Order order = toDto(criteria.getOrder());
+
+    Consumer<Handler<AsyncResult<MosaicRestrictionsPage>>> callback =
+        (h) ->
+            getClient()
+                .searchMosaicRestriction(
+                    mosaicId, entryType, targetAddress, pageSize, pageNumber, offset, order, h);
+
+    return call(
+        callback,
+        page ->
+            toPage(
+                page.getPagination(),
+                page.getData().stream()
+                    .map(this::toMosaicRestriction)
+                    .collect(Collectors.toList())));
+  }
+
+  private MosaicRestriction<?> toMosaicRestriction(Object restrictionObject) {
+    MosaicRestrictionEntryType thisEntryType =
+        MosaicRestrictionEntryType.rawValueOf(
+            getJsonHelper().getInteger(restrictionObject, "mosaicRestrictionEntry", "entryType"));
+    switch (thisEntryType) {
+      case ADDRESS:
+        return toMosaicAddressRestriction(
+            getJsonHelper().convert(restrictionObject, MosaicAddressRestrictionDTO.class));
+      case GLOBAL:
+        return toMosaicGlobalRestriction(
+            getJsonHelper().convert(restrictionObject, MosaicGlobalRestrictionDTO.class));
+    }
+    throw new IllegalStateException("Invalid entry type " + thisEntryType);
   }
 }

@@ -150,8 +150,8 @@ public class ConvertUtils {
    * @param number the number to be tested.
    * @throws IllegalArgumentException if the number is negative
    */
-  public static void validateNotNegative(final byte number) {
-    Validate.isTrue(number > -1, "BigInteger '" + number + "' must not be negative");
+  public static void validateNotNegative(final long number) {
+    Validate.isTrue(number > -1, "long '" + number + "' must not be negative");
   }
 
   /**

@@ -17,7 +17,7 @@ package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.catapult.builders.AddressDto;
 import io.nem.symbol.catapult.builders.AmountDto;
-import io.nem.symbol.catapult.builders.FinalizationPointDto;
+import io.nem.symbol.catapult.builders.FinalizationEpochDto;
 import io.nem.symbol.catapult.builders.GeneratorUtils;
 import io.nem.symbol.catapult.builders.Hash256Dto;
 import io.nem.symbol.catapult.builders.KeyDto;
@@ -211,6 +211,16 @@ public class SerializationUtils {
   }
 
   /**
+   * It converts a signed int to a positive long.
+   *
+   * @param value the int, it can be a overflowed negative int.
+   * @return the positive long.
+   */
+  public static long intToUnsignedLong(int value) {
+    return value & (-1L >>> 32);
+  }
+
+  /**
    * It creates a {@link DataInputStream} from a binary payload.
    *
    * @param payload the payload
@@ -392,10 +402,10 @@ public class SerializationUtils {
   }
 
   /**
-   * @param finalizationPoint the big int finalization point
-   * @return a new FinalizationPointDto from the big integer.
+   * @param finalizationEpoch the unit 32 long finalization epoch
+   * @return a new FinalizationEpochDto from the unit 32.
    */
-  public static FinalizationPointDto toFinalizationPointDto(BigInteger finalizationPoint) {
-    return new FinalizationPointDto(finalizationPoint.longValue());
+  public static FinalizationEpochDto toFinalizationEpochDto(long finalizationEpoch) {
+    return new FinalizationEpochDto((int) finalizationEpoch);
   }
 }

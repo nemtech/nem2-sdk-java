@@ -15,12 +15,17 @@
  */
 package io.nem.symbol.sdk.infrastructure;
 
+import io.nem.symbol.sdk.api.MosaicRestrictionSearchCriteria;
 import io.nem.symbol.sdk.api.MosaicRestrictionTransactionService;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RestrictionMosaicRepository;
 import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.restriction.MosaicGlobalRestriction;
+import io.nem.symbol.sdk.model.restriction.MosaicRestriction;
+import io.nem.symbol.sdk.model.restriction.MosaicRestrictionEntryType;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicGlobalRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
@@ -35,9 +40,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest {
 
+  private final BigInteger restrictionKey = BigInteger.valueOf(11111);
   private Account testAccount;
-
-  private BigInteger restrictionKey = BigInteger.valueOf(11111);
 
   @BeforeEach
   void setup() {
@@ -61,7 +65,7 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
     MosaicGlobalRestrictionTransaction createTransaction =
         get(restrictionService.createMosaicGlobalRestrictionTransactionFactory(
                 mosaicId, restrictionKey, originalValue, originalRestrictionType))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     // 3) Announce the create restriction transaction
@@ -77,18 +81,13 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
         getRepositoryFactory(type).createRestrictionMosaicRepository();
 
     assertMosaicGlobalRestriction(
-        createTransaction, get(restrictionRepository.getMosaicGlobalRestriction(mosaicId)));
-
-    assertMosaicGlobalRestriction(
-        createTransaction,
-        get(restrictionRepository.getMosaicGlobalRestrictions(Collections.singletonList(mosaicId)))
-            .get(0));
+        createTransaction, getMosaicGlobalRestriction(restrictionRepository, mosaicId));
 
     // 6) Modifying the restriction by sending a new transaction with the previous values.
     MosaicGlobalRestrictionTransaction updateTransaction =
         get(restrictionService.createMosaicGlobalRestrictionTransactionFactory(
                 mosaicId, restrictionKey, BigInteger.valueOf(40), MosaicRestrictionType.EQ))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     // 7) Announcing the update restriction transaction and checking the processed one.
@@ -100,12 +99,18 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
     // 8) Validating that the endpoints show the new value and type.
 
     assertMosaicGlobalRestriction(
-        updateTransaction, get(restrictionRepository.getMosaicGlobalRestriction(mosaicId)));
+        updateTransaction, getMosaicGlobalRestriction(restrictionRepository, mosaicId));
+  }
 
-    assertMosaicGlobalRestriction(
-        updateTransaction,
-        get(restrictionRepository.getMosaicGlobalRestrictions(Collections.singletonList(mosaicId)))
-            .get(0));
+  private MosaicGlobalRestriction getMosaicGlobalRestriction(
+      RestrictionMosaicRepository restrictionRepository, MosaicId mosaicId) {
+    return (MosaicGlobalRestriction)
+        get(restrictionRepository.search(
+                new MosaicRestrictionSearchCriteria()
+                    .mosaicId(mosaicId)
+                    .entryType(MosaicRestrictionEntryType.GLOBAL)))
+            .getData()
+            .get(0);
   }
 
   private void assertTransaction(
@@ -181,7 +186,7 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
     MosaicGlobalRestrictionTransaction createTransaction =
         get(restrictionService.createMosaicGlobalRestrictionTransactionFactory(
                 mosaicId, restrictionKey, originalValue, originalRestrictionType))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     // 3) Announce the create restriction transaction
@@ -197,18 +202,13 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
         getRepositoryFactory(type).createRestrictionMosaicRepository();
 
     assertMosaicGlobalRestriction(
-        createTransaction, get(restrictionRepository.getMosaicGlobalRestriction(mosaicId)));
-
-    assertMosaicGlobalRestriction(
-        createTransaction,
-        get(restrictionRepository.getMosaicGlobalRestrictions(Collections.singletonList(mosaicId)))
-            .get(0));
+        createTransaction, getMosaicGlobalRestriction(restrictionRepository, mosaicId));
 
     // 6) Create the restriction by sending a new transaction
     MosaicAddressRestrictionTransaction createAddressTransaction =
         get(restrictionService.createMosaicAddressRestrictionTransactionFactory(
                 mosaicId, restrictionKey, testAccount.getAddress(), BigInteger.valueOf(40)))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, testAccount, createAddressTransaction);
@@ -217,7 +217,7 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
     MosaicAddressRestrictionTransaction updateAddressTransaction =
         get(restrictionService.createMosaicAddressRestrictionTransactionFactory(
                 mosaicId, restrictionKey, testAccount.getAddress(), BigInteger.valueOf(50)))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     MosaicAddressRestrictionTransaction finalTransaction =
@@ -247,7 +247,7 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
     MosaicGlobalRestrictionTransaction createTransaction =
         get(restrictionService.createMosaicGlobalRestrictionTransactionFactory(
                 mosaicAlias, restrictionKey, originalValue, originalRestrictionType))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     // 3) Announce the create restriction transaction
@@ -263,18 +263,13 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
         getRepositoryFactory(type).createRestrictionMosaicRepository();
 
     assertMosaicGlobalRestriction(
-        createTransaction, get(restrictionRepository.getMosaicGlobalRestriction(mosaicId)));
-
-    assertMosaicGlobalRestriction(
-        createTransaction,
-        get(restrictionRepository.getMosaicGlobalRestrictions(Collections.singletonList(mosaicId)))
-            .get(0));
+        createTransaction, getMosaicGlobalRestriction(restrictionRepository, mosaicId));
 
     // 6) Create the restriction by sending a new transaction
     MosaicAddressRestrictionTransaction createAddressTransaction =
         get(restrictionService.createMosaicAddressRestrictionTransactionFactory(
                 mosaicAlias, restrictionKey, testAccount.getAddress(), BigInteger.valueOf(40)))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, testAccount, createAddressTransaction);
@@ -283,7 +278,7 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
     MosaicAddressRestrictionTransaction updateAddressTransaction =
         get(restrictionService.createMosaicAddressRestrictionTransactionFactory(
                 mosaicAlias, restrictionKey, testAccount.getAddress(), BigInteger.valueOf(50)))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     MosaicAddressRestrictionTransaction finalTransaction =
@@ -291,5 +286,25 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
 
     Assertions.assertEquals(BigInteger.valueOf(50), finalTransaction.getNewRestrictionValue());
     Assertions.assertEquals(BigInteger.valueOf(40), finalTransaction.getPreviousRestrictionValue());
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getMosaicGlobalRestrictionWhenMosaicDoesNotExist(RepositoryType type) {
+    RestrictionMosaicRepository repository =
+        getRepositoryFactory(type).createRestrictionMosaicRepository();
+
+    Address address =
+        Address.createFromPublicKey(
+            "67F69FA4BFCD158F6E1AF1ABC82F725F5C5C4710D6E29217B12BE66397435DFB", getNetworkType());
+
+    Page<MosaicRestriction<?>> page =
+        get(
+            repository.search(
+                new MosaicRestrictionSearchCriteria()
+                    .mosaicId(new MosaicId(BigInteger.valueOf(888888)))
+                    .targetAddress(address)
+                    .entryType(MosaicRestrictionEntryType.GLOBAL)));
+    Assertions.assertTrue(page.getData().isEmpty());
   }
 }

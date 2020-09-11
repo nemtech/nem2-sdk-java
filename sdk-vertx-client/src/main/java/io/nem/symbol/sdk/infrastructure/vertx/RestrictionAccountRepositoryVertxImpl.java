@@ -24,14 +24,12 @@ import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
 import io.nem.symbol.sdk.openapi.vertx.api.RestrictionAccountRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.RestrictionAccountRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
-import io.nem.symbol.sdk.openapi.vertx.model.AccountIds;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountRestrictionDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountRestrictionsDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountRestrictionsInfoDTO;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -53,25 +51,6 @@ public class RestrictionAccountRepositoryVertxImpl extends AbstractRepositoryVer
                 getClient().getAccountRestrictions(address.plain(), handler))
             .map(AccountRestrictionsInfoDTO::getAccountRestrictions)
             .map(this::toAccountRestrictions));
-  }
-
-  @Override
-  public Observable<List<AccountRestrictions>> getAccountsRestrictions(List<Address> addresses) {
-    AccountIds accountIds =
-        new AccountIds()
-            .addresses(addresses.stream().map(Address::plain).collect(Collectors.toList()));
-    return getAccountsRestrictions(accountIds);
-  }
-
-  private Observable<List<AccountRestrictions>> getAccountsRestrictions(AccountIds accountIds) {
-    return exceptionHandling(
-            call((Handler<AsyncResult<List<AccountRestrictionsInfoDTO>>> handler) ->
-                    getClient().getAccountRestrictionsFromAccounts(accountIds, handler))
-                .flatMapIterable(item -> item)
-                .map(AccountRestrictionsInfoDTO::getAccountRestrictions)
-                .map(this::toAccountRestrictions))
-        .toList()
-        .toObservable();
   }
 
   private AccountRestrictions toAccountRestrictions(AccountRestrictionsDTO dto) {

@@ -40,9 +40,7 @@ class AccountInfoTest {
             Optional.of("linkedKey"),
             Optional.of("nodeKey"),
             Optional.of("vrfKey"),
-            Collections.singletonList(
-                new AccountLinkVotingKey(
-                    "votingKey", BigInteger.valueOf(10), BigInteger.valueOf(20))));
+            Collections.singletonList(new AccountLinkVotingKey("votingKey", 10, 20)));
 
     BigInteger startHeight = BigInteger.ONE;
     BigInteger totalFeesPaid = BigInteger.valueOf(2);
@@ -88,8 +86,7 @@ class AccountInfoTest {
     assertEquals("nodeKey", supplementalAccountKeys.getNode().get());
     assertEquals("vrfKey", supplementalAccountKeys.getVrf().get());
     assertEquals("votingKey", supplementalAccountKeys.getVoting().get(0).getPublicKey());
-    assertEquals(
-        BigInteger.valueOf(10), supplementalAccountKeys.getVoting().get(0).getStartPoint());
-    assertEquals(BigInteger.valueOf(20), supplementalAccountKeys.getVoting().get(0).getEndPoint());
+    assertEquals(10, supplementalAccountKeys.getVoting().get(0).getStartEpoch());
+    assertEquals(20, supplementalAccountKeys.getVoting().get(0).getEndEpoch());
   }
 }

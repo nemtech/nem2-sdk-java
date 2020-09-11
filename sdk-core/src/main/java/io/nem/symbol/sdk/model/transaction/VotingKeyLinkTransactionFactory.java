@@ -18,7 +18,6 @@ package io.nem.symbol.sdk.model.transaction;
 import io.nem.symbol.core.crypto.VotingKey;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.network.NetworkType;
-import java.math.BigInteger;
 import org.apache.commons.lang3.Validate;
 
 /** Vrf key link transaction factory. */
@@ -26,11 +25,12 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
 
   /** The voting key. */
   private final VotingKey linkedPublicKey;
-  /** Start finalization point. */
-  private final BigInteger startPoint;
 
-  /** End finalization point. */
-  private final BigInteger endPoint;
+  /** Start finalization epoch. */
+  private final long startEpoch;
+
+  /** End finalization epoch. */
+  private final long endEpoch;
 
   /** The link action. */
   private final LinkAction linkAction;
@@ -40,26 +40,24 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
    *
    * @param networkType the network type of this transaction.
    * @param linkedPublicKey the voting key.
-   * @param startPoint Start finalization point.
-   * @param endPoint End finalization point.
+   * @param startEpoch Start finalization epoch.
+   * @param endEpoch End finalization epoch.
    * @param linkAction the link action.
    */
   private VotingKeyLinkTransactionFactory(
       final NetworkType networkType,
       final VotingKey linkedPublicKey,
-      BigInteger startPoint,
-      BigInteger endPoint,
+      long startEpoch,
+      long endEpoch,
       final LinkAction linkAction) {
     super(TransactionType.VOTING_KEY_LINK, networkType);
     Validate.notNull(linkedPublicKey, "linkedPublicKey must not be null");
-    Validate.notNull(startPoint, "startPoint must not be null");
-    Validate.notNull(endPoint, "endPoint must not be null");
     Validate.notNull(linkAction, "linkAction must not be null");
-    ConvertUtils.validateNotNegative(startPoint);
-    ConvertUtils.validateNotNegative(endPoint);
+    ConvertUtils.validateNotNegative(startEpoch);
+    ConvertUtils.validateNotNegative(endEpoch);
     this.linkedPublicKey = linkedPublicKey;
-    this.startPoint = startPoint;
-    this.endPoint = endPoint;
+    this.startEpoch = startEpoch;
+    this.endEpoch = endEpoch;
     this.linkAction = linkAction;
   }
 
@@ -68,19 +66,19 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
    *
    * @param networkType the network type of this transaction.
    * @param linkedPublicKey the voting key.
-   * @param startPoint Start finalization point.
-   * @param endPoint End finalization point.
+   * @param startEpoch Start finalization epoch.
+   * @param endEpoch End finalization epoch.
    * @param linkAction the link action.
    * @return a new factory for {@link VotingKeyLinkTransactionFactory}
    */
   public static VotingKeyLinkTransactionFactory create(
       final NetworkType networkType,
       final VotingKey linkedPublicKey,
-      BigInteger startPoint,
-      BigInteger endPoint,
+      long startEpoch,
+      long endEpoch,
       final LinkAction linkAction) {
     return new VotingKeyLinkTransactionFactory(
-        networkType, linkedPublicKey, startPoint, endPoint, linkAction);
+        networkType, linkedPublicKey, startEpoch, endEpoch, linkAction);
   }
 
   @Override
@@ -96,11 +94,11 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
     return linkAction;
   }
 
-  public BigInteger getStartPoint() {
-    return startPoint;
+  public long getStartEpoch() {
+    return startEpoch;
   }
 
-  public BigInteger getEndPoint() {
-    return endPoint;
+  public long getEndEpoch() {
+    return endEpoch;
   }
 }

@@ -15,7 +15,8 @@
  */
 package io.nem.symbol.sdk.infrastructure;
 
-import io.nem.symbol.sdk.api.RepositoryCallException;
+import io.nem.symbol.sdk.api.MosaicRestrictionSearchCriteria;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RestrictionMosaicRepository;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
@@ -25,6 +26,8 @@ import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNonce;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.restriction.MosaicAddressRestriction;
+import io.nem.symbol.sdk.model.restriction.MosaicRestriction;
+import io.nem.symbol.sdk.model.restriction.MosaicRestrictionEntryType;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransaction;
@@ -69,7 +72,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
                 restrictionKey,
                 BigInteger.valueOf(20),
                 MosaicRestrictionType.GE)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, testAccount, mosaicGlobalRestrictionTransaction);
@@ -88,7 +91,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
                 restrictionKey,
                 targetAddressAlias,
                 originalRestrictionValue)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     // 4)Announce and validate
@@ -108,21 +111,21 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
     assertMosaicAddressRestriction(
         targetAddress,
         createTransaction,
-        get(restrictionRepository.getMosaicAddressRestriction(mosaicId, targetAddress)));
-
-    assertMosaicAddressRestriction(
-        targetAddress,
-        createTransaction,
-        get(restrictionRepository.getMosaicAddressRestrictions(
-                mosaicId, Collections.singletonList(targetAddress)))
-            .get(0));
+        (MosaicAddressRestriction)
+            get(restrictionRepository.search(
+                    new MosaicRestrictionSearchCriteria()
+                        .entryType(MosaicRestrictionEntryType.ADDRESS)
+                        .targetAddress(targetAddress)
+                        .mosaicId(mosaicId)))
+                .getData()
+                .get(0));
 
     // 6) Update the restriction
     MosaicAddressRestrictionTransaction updateTransaction =
         MosaicAddressRestrictionTransactionFactory.create(
                 getNetworkType(), mosaicId, restrictionKey, targetAddress, BigInteger.valueOf(40))
             .previousRestrictionValue(originalRestrictionValue)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     // 7) Announce and validate.
@@ -136,14 +139,14 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
     assertMosaicAddressRestriction(
         targetAddress,
         updateTransaction,
-        get(restrictionRepository.getMosaicAddressRestriction(mosaicId, targetAddress)));
-
-    assertMosaicAddressRestriction(
-        targetAddress,
-        updateTransaction,
-        get(restrictionRepository.getMosaicAddressRestrictions(
-                mosaicId, Collections.singletonList(targetAddress)))
-            .get(0));
+        (MosaicAddressRestriction)
+            get(restrictionRepository.search(
+                    new MosaicRestrictionSearchCriteria()
+                        .entryType(MosaicRestrictionEntryType.ADDRESS)
+                        .targetAddress(targetAddress)
+                        .mosaicId(mosaicId)))
+                .getData()
+                .get(0));
   }
 
   private void assertTransaction(
@@ -199,7 +202,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
                 MosaicFlags.create(true, true, true),
                 4,
                 new BlockDuration(100))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     MosaicDefinitionTransaction validateTransaction =
@@ -218,34 +221,13 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
         Address.createFromPublicKey(
             "67F69FA4BFCD158F6E1AF1ABC82F725F5C5C4710D6E29217B12BE66397435DFB", getNetworkType());
 
-    RepositoryCallException exception =
-        Assertions.assertThrows(
-            RepositoryCallException.class,
-            () ->
-                get(
-                    repository.getMosaicAddressRestriction(
-                        new MosaicId(BigInteger.valueOf(888888)), address)));
-    Assertions.assertEquals(
-        "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '"
-            + address.plain()
-            + "'",
-        exception.getMessage());
-  }
-
-  @ParameterizedTest
-  @EnumSource(RepositoryType.class)
-  void getMosaicAddressRestrictionsWhenMosaicDoesNotExist(RepositoryType type) {
-
-    Address address =
-        Address.createFromPublicKey(
-            "67F69FA4BFCD158F6E1AF1ABC82F725F5C5C4710D6E29217B12BE66397435DFB", getNetworkType());
-
-    RestrictionMosaicRepository repository =
-        getRepositoryFactory(type).createRestrictionMosaicRepository();
-    Assertions.assertEquals(
-        0,
-        get(repository.getMosaicAddressRestrictions(
-                new MosaicId(BigInteger.valueOf(888888)), Collections.singletonList(address)))
-            .size());
+    Page<MosaicRestriction<?>> page =
+        get(
+            repository.search(
+                new MosaicRestrictionSearchCriteria()
+                    .mosaicId(new MosaicId(BigInteger.valueOf(888888)))
+                    .targetAddress(address)
+                    .entryType(MosaicRestrictionEntryType.ADDRESS)));
+    Assertions.assertTrue(page.getData().isEmpty());
   }
 }

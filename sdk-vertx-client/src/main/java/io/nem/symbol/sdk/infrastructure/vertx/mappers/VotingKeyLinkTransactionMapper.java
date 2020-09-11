@@ -42,8 +42,8 @@ public class VotingKeyLinkTransactionMapper
     return VotingKeyLinkTransactionFactory.create(
         networkType,
         linkedPublicKey,
-        transaction.getStartPoint(),
-        transaction.getEndPoint(),
+        transaction.getStartEpoch(),
+        transaction.getEndEpoch(),
         linkAction);
   }
 
@@ -51,7 +51,7 @@ public class VotingKeyLinkTransactionMapper
   protected void copyToDto(VotingKeyLinkTransaction transaction, VotingKeyLinkTransactionDTO dto) {
     dto.setLinkAction(LinkActionEnum.fromValue((int) transaction.getLinkAction().getValue()));
     dto.setLinkedPublicKey(transaction.getLinkedPublicKey().toHex());
-    dto.setStartPoint(transaction.getStartPoint());
-    dto.setEndPoint(transaction.getEndPoint());
+    dto.setStartEpoch(transaction.getStartEpoch());
+    dto.setEndEpoch(transaction.getEndEpoch());
   }
 }

@@ -30,7 +30,7 @@ import io.nem.symbol.catapult.builders.BlockDurationDto;
 import io.nem.symbol.catapult.builders.CosignatureBuilder;
 import io.nem.symbol.catapult.builders.EmbeddedTransactionBuilder;
 import io.nem.symbol.catapult.builders.EntityTypeDto;
-import io.nem.symbol.catapult.builders.FinalizationPointDto;
+import io.nem.symbol.catapult.builders.FinalizationEpochDto;
 import io.nem.symbol.catapult.builders.Hash256Dto;
 import io.nem.symbol.catapult.builders.HashLockTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.KeyDto;
@@ -1675,26 +1675,26 @@ public class BinarySerializationImpl implements BinarySerialization {
       VotingKeyLinkTransactionBodyBuilder builder =
           (VotingKeyLinkTransactionBodyBuilder) transactionBuilder;
       VotingKey linkedPublicKey = SerializationUtils.toVotingKey(builder.getLinkedPublicKey());
-      BigInteger startPoint =
-          SerializationUtils.toUnsignedBigInteger(builder.getStartPoint().getFinalizationPoint());
-      BigInteger endPoint =
-          SerializationUtils.toUnsignedBigInteger(builder.getEndPoint().getFinalizationPoint());
+      long startEpoch =
+          SerializationUtils.intToUnsignedLong(builder.getStartEpoch().getFinalizationEpoch());
+      long endEpoch =
+          SerializationUtils.intToUnsignedLong(builder.getEndEpoch().getFinalizationEpoch());
       LinkAction linkAction = LinkAction.rawValueOf(builder.getLinkAction().getValue());
       return VotingKeyLinkTransactionFactory.create(
-          networkType, linkedPublicKey, startPoint, endPoint, linkAction);
+          networkType, linkedPublicKey, startEpoch, endEpoch, linkAction);
     }
 
     @Override
     public Serializer toBodyBuilder(VotingKeyLinkTransaction transaction) {
       VotingKeyDto linkedPublicKey =
           SerializationUtils.toVotingKeyDto(transaction.getLinkedPublicKey());
-      FinalizationPointDto startPoint =
-          SerializationUtils.toFinalizationPointDto(transaction.getStartPoint());
-      FinalizationPointDto endPoint =
-          SerializationUtils.toFinalizationPointDto(transaction.getEndPoint());
+      FinalizationEpochDto startEpoch =
+          SerializationUtils.toFinalizationEpochDto(transaction.getStartEpoch());
+      FinalizationEpochDto endEpoch =
+          SerializationUtils.toFinalizationEpochDto(transaction.getEndEpoch());
       LinkActionDto linkAction = LinkActionDto.rawValueOf(transaction.getLinkAction().getValue());
       return VotingKeyLinkTransactionBodyBuilder.create(
-          linkedPublicKey, startPoint, endPoint, linkAction);
+          linkedPublicKey, startEpoch, endEpoch, linkAction);
     }
   }
 }
