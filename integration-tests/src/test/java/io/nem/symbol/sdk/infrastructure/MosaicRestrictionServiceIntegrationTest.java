@@ -233,7 +233,8 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
 
     // 1) Create mosaic and alias
     String mosaicAliasName =
-        "createUpdateMosaicAddressRestrictionTransactionFactoryUsingAlias".toLowerCase();
+        "createUpdateMosaicAddressRestrictionAlias".toLowerCase()
+            + RandomUtils.generateRandomInt(100000);
     NamespaceId mosaicAlias = NamespaceId.createFromName(mosaicAliasName);
     MosaicId mosaicId = createMosaic(testAccount, type, null, mosaicAliasName);
 

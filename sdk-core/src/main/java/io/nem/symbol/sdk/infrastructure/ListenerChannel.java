@@ -20,6 +20,7 @@ import java.util.Arrays;
 public enum ListenerChannel {
   BLOCK("block"),
   CONFIRMED_ADDED("confirmedAdded"),
+  FINALIZED_BLOCK("finalizedBlock"),
   UNCONFIRMED_ADDED("unconfirmedAdded"),
   UNCONFIRMED_REMOVED("unconfirmedRemoved"),
   AGGREGATE_BONDED_ADDED("partialAdded"),

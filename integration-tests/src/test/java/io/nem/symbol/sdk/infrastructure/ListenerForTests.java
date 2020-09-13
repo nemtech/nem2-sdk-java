@@ -22,8 +22,8 @@ import java.util.concurrent.ExecutionException;
 /** Main class that listen to symbol in order to troubleshooting integration tests. */
 public class ListenerForTests extends BaseIntegrationTest {
 
-  public static void main(String[] args) throws ExecutionException, InterruptedException {
-
+  public static void main(String[] args) throws Exception {
+    BaseIntegrationTest.beforeAll();
     new ListenerForTests().run();
   }
 
@@ -37,14 +37,22 @@ public class ListenerForTests extends BaseIntegrationTest {
             b -> {
               System.out.println("New BLOCK!!");
             });
-    listenToAccount("Test Account 1", config().getTestAccount(), listener);
-    listenToAccount("Test Account 2", config().getTestAccount2(), listener);
-    listenToAccount("Cosignatory Account", config().getCosignatoryAccount(), listener);
-    listenToAccount("Cosignatory Account 2", config().getCosignatory2Account(), listener);
-    listenToAccount("Multisign Account 2", config().getMultisigAccount(), listener);
 
-    config().getNemesisAccounts().stream()
-        .forEach(account -> listenToAccount("Nemesis Account", account, listener));
+    listener
+        .finalizedBlock()
+        .subscribe(
+            b -> {
+              System.out.println("New Finalized Block!!");
+              System.out.println(toJson(b));
+            });
+    //    listenToAccount("Test Account 1", config().getTestAccount(), listener);
+    //    listenToAccount("Test Account 2", config().getTestAccount2(), listener);
+    //    listenToAccount("Cosignatory Account", config().getCosignatoryAccount(), listener);
+    //    listenToAccount("Cosignatory Account 2", config().getCosignatory2Account(), listener);
+    //    listenToAccount("Multisign Account 2", config().getMultisigAccount(), listener);
+    //
+    //    config().getNemesisAccounts().stream()
+    //        .forEach(account -> listenToAccount("Nemesis Account", account, listener));
   }
 
   private void listenToAccount(String accountDescription, Account account, Listener listener) {

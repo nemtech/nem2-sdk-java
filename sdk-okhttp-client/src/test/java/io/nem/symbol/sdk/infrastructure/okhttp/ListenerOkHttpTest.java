@@ -24,6 +24,7 @@ import io.nem.symbol.sdk.infrastructure.ListenerChannel;
 import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.blockchain.FinalizedBlock;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
@@ -58,19 +59,13 @@ import org.mockito.Mockito;
 /** Tests for the {@link ListenerOkHttp} implementation of the {@link Listener} */
 public class ListenerOkHttpTest {
 
-  private ListenerOkHttp listener;
-
-  private OkHttpClient httpClientMock;
-
-  private NamespaceRepository namespaceRepository;
-
-  private WebSocket webSocketMock;
-
-  private JsonHelper jsonHelper;
-
   private final String wsId = "TheWSid";
-
-  private NetworkType networkType = NetworkType.MIJIN_TEST;
+  private ListenerOkHttp listener;
+  private OkHttpClient httpClientMock;
+  private NamespaceRepository namespaceRepository;
+  private WebSocket webSocketMock;
+  private JsonHelper jsonHelper;
+  private final NetworkType networkType = NetworkType.MIJIN_TEST;
 
   @BeforeEach
   public void setUp() {
@@ -128,6 +123,31 @@ public class ListenerOkHttpTest {
             .getMessage());
 
     Mockito.verify(webSocketMock).close(1000, null);
+  }
+
+  @Test
+  public void subscribeFinalizedBlock()
+      throws ExecutionException, InterruptedException, TimeoutException {
+
+    simulateWebSocketStartup();
+
+    FinalizedBlock finalizedBlock =
+        new FinalizedBlock(1L, BigInteger.valueOf(2), BigInteger.valueOf(3), "abc");
+
+    JsonObject transactionInfoDtoJsonObject = jsonHelper.convert(finalizedBlock, JsonObject.class);
+
+    String channelName = ListenerChannel.FINALIZED_BLOCK.toString();
+
+    List<FinalizedBlock> finalizedBlocks = new ArrayList<>();
+    listener.finalizedBlock().forEach(finalizedBlocks::add);
+
+    handle(transactionInfoDtoJsonObject, channelName);
+
+    Assertions.assertEquals(1, finalizedBlocks.size());
+
+    Assertions.assertEquals(finalizedBlock, finalizedBlocks.get(0));
+    Mockito.verify(webSocketMock)
+        .send(jsonHelper.print(new ListenerSubscribeMessage(this.wsId, channelName)));
   }
 
   @Test

@@ -27,9 +27,11 @@ import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountNames;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
+import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.reactivex.Observable;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,12 +52,12 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void getAccountInfo(RepositoryType type) {
+    Account testAccount = this.config().getDefaultAccount();
     Observable<AccountInfo> accountInfo1 =
-        this.getAccountRepository(type)
-            .getAccountInfo(this.getTestAccount().getPublicAccount().getAddress());
+        this.getAccountRepository(type).getAccountInfo(testAccount.getPublicAccount().getAddress());
     AccountInfo accountInfo = get(accountInfo1);
 
-    assertEquals(this.getTestAccount().getPublicKey(), accountInfo.getPublicKey());
+    assertEquals(testAccount.getPublicKey(), accountInfo.getPublicKey());
     assertEquals(AccountType.UNLINKED, accountInfo.getAccountType());
   }
 
@@ -142,14 +144,13 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
             .getData();
     Assertions.assertTrue(transactions.size() > 0);
 
-    String lastOne = transactions.get(0).getTransactionInfo().get().getId().get();
     String id = transactions.get(1).getTransactionInfo().get().getId().get();
     List<Transaction> transactions2 =
         get(transactionRepository.getTransactions(TransactionGroup.CONFIRMED, Arrays.asList(id)));
 
     Assertions.assertEquals(1, transactions2.size());
     transactions2.forEach(
-        t -> Assertions.assertEquals(lastOne, t.getTransactionInfo().get().getId().get()));
+        t -> Assertions.assertEquals(id, t.getTransactionInfo().get().getId().get()));
   }
 
   @ParameterizedTest
@@ -168,14 +169,13 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
 
     Assertions.assertTrue(transactions.size() > 1);
 
-    String lastOne = transactions.get(0).getTransactionInfo().get().getId().get();
     String id = transactions.get(1).getTransactionInfo().get().getId().get();
     List<Transaction> transactions2 =
         get(transactionRepository.getTransactions(TransactionGroup.CONFIRMED, Arrays.asList(id)));
 
     Assertions.assertEquals(1, transactions2.size());
     transactions2.forEach(
-        t -> Assertions.assertEquals(lastOne, t.getTransactionInfo().get().getId().get()));
+        t -> Assertions.assertEquals(id, t.getTransactionInfo().get().getId().get()));
   }
 
   @ParameterizedTest
@@ -199,14 +199,13 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
     transactions.forEach(t -> Assertions.assertEquals(transactionType, t.getType()));
   }
 
-  private void assertTransaction(Transaction transaction, boolean outgoingTransactions) {
+  private void assertTransaction(Transaction transaction, Address signer) {
 
     Assertions.assertNotNull(transaction.getType());
     Assertions.assertTrue(transaction.getTransactionInfo().isPresent());
     Assertions.assertEquals(getNetworkType(), transaction.getNetworkType());
-    if (outgoingTransactions) {
-      Assertions.assertEquals(
-          getTestAccount().getAddress(), transaction.getSigner().get().getAddress());
+    if (signer != null) {
+      Assertions.assertEquals(signer, transaction.getSigner().get().getAddress());
     }
 
     Assertions.assertTrue(transaction.getSignature().isPresent());
@@ -220,18 +219,27 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
   void outgoingTransactions(RepositoryType type) {
     TransactionRepository transactionRepository =
         getRepositoryFactory(type).createTransactionRepository();
+    PublicAccount recipient = this.getTestPublicAccount();
     List<Transaction> transactions =
         get(transactionRepository.search(
                 new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
-                    .recipientAddress((this.getTestPublicAccount()).getAddress())))
+                    .transactionTypes(Collections.singletonList(TransactionType.TRANSFER))
+                    .recipientAddress(recipient.getAddress())))
             .getData();
     System.out.println(transactions.size());
-    transactions.forEach(transaction -> assertTransaction(transaction, true));
+    transactions.forEach(
+        transaction -> {
+          assertTransaction(transaction, null);
+
+          TransferTransaction transferTransaction = (TransferTransaction) transaction;
+          Assertions.assertEquals(recipient.getAddress(), transferTransaction.getRecipient());
+        });
   }
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void unconfirmedTransactions(RepositoryType type) {
+    Account testAccount = this.config().getDefaultAccount();
     TransactionRepository transactionRepository =
         getRepositoryFactory(type).createTransactionRepository();
     List<Transaction> transactions =
@@ -240,40 +248,21 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
                     .signerPublicKey((this.getTestPublicAccount()).getPublicKey())))
             .getData();
     System.out.println(transactions.size());
-    transactions.forEach(transaction -> assertTransaction(transaction, true));
+    transactions.forEach(transaction -> assertTransaction(transaction, testAccount.getAddress()));
   }
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
-  void throwExceptionWhenBlockDoesNotExists(RepositoryType type) {
+  void throwExceptionWhenAddressDoesNotExist(RepositoryType type) {
+    Address address = Address.generateRandom(getNetworkType());
     RepositoryCallException exception =
         Assertions.assertThrows(
             RepositoryCallException.class,
-            () ->
-                get(
-                    this.getAccountRepository(type)
-                        .getAccountInfo(
-                            Address.createFromRawAddress(
-                                "SCJFR55L7KWHERD2VW6C3NR2MBZLVDQWDHCH1111"))));
+            () -> get(this.getAccountRepository(type).getAccountInfo(address)));
     Assertions.assertEquals(
-        "ApiException: Conflict - 409 - InvalidArgument - accountId has an invalid format",
-        exception.getMessage());
-  }
-
-  @ParameterizedTest
-  @EnumSource(RepositoryType.class)
-  void throwExceptionWhenInvalidFormat(RepositoryType type) {
-    RepositoryCallException exception =
-        Assertions.assertThrows(
-            RepositoryCallException.class,
-            () ->
-                get(
-                    this.getAccountRepository(type)
-                        .getAccountInfo(
-                            Address.createFromRawAddress(
-                                "SARDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZY"))));
-    Assertions.assertEquals(
-        "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id 'SARDGFTDLLCB67D4HPGIMIHPNSRYRJRT7DOBGWZY'",
+        "ApiException: Not Found - 404 - ResourceNotFound - no resource exists with id '"
+            + address.plain()
+            + "'",
         exception.getMessage());
   }
 }

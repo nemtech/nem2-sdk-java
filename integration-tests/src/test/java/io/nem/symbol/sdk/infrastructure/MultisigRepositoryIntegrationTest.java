@@ -29,7 +29,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.internal.util.collections.Sets;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-// TODO BROKEN!
 public class MultisigRepositoryIntegrationTest extends BaseIntegrationTest {
 
   @ParameterizedTest

@@ -20,17 +20,21 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.symbol.sdk.api.Listener;
+import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.TransactionRepository;
 import io.nem.symbol.sdk.api.TransactionSearchCriteria;
 import io.nem.symbol.sdk.api.TransactionService;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
+import io.nem.symbol.sdk.model.blockchain.FinalizedBlock;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.CosignatureTransaction;
+import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
+import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionGroup;
@@ -44,16 +48,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-@SuppressWarnings("squid:S1607")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Disabled
-// TODO BROKEN!
 class ListenerIntegrationTest extends BaseIntegrationTest {
 
   private Account account;
@@ -84,12 +86,21 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void shouldReturnNewBlockViaListener(RepositoryType type) {
     Listener listener = getListener(type);
-
-    this.announceStandaloneTransferTransaction(type);
-
     BlockInfo blockInfo = get(listener.newBlock().take(1));
-
     assertTrue(blockInfo.getHeight().intValue() > 0);
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  @Disabled
+  void shouldReturnFinalizedBlock(RepositoryType type) {
+    Listener listener = getListener(type);
+    FinalizedBlock finalizedBlock1 = get(listener.finalizedBlock().take(1));
+    FinalizedBlock finalizedBlock2 =
+        get(getRepositoryFactory(type).createChainRepository().getChainInfo())
+            .getLatestFinalizedBlock();
+    assertTrue(finalizedBlock1.getHeight().intValue() > 0);
+    assertEquals(finalizedBlock1, finalizedBlock2);
   }
 
   @ParameterizedTest
@@ -97,15 +108,13 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
   void shouldReturnConfirmedTransactionAddressSignerViaListener(RepositoryType type) {
     Listener listener = getListener(type);
 
-    //        listener.unconfirmedAdded(getRecipient()).forEach(t -> System.out.println(toJson(t)));
-    //        listener.unconfirmedAdded(this.account.getAddress())
-    //            .forEach(t -> System.out.println(toJson(t)));
+    SignedTransaction signedTransaction =
+        this.announceStandaloneTransferTransaction(type, this.getRecipient());
 
-    Observable<Transaction> confirmed = listener.confirmed(this.account.getAddress());
+    Observable<Transaction> confirmed =
+        listener.confirmed(this.account.getAddress(), signedTransaction.getHash());
 
-    SignedTransaction signedTransaction = this.announceStandaloneTransferTransaction(type);
-
-    Transaction transaction = get(confirmed);
+    Transaction transaction = get(confirmed.take(1));
 
     assertEquals(
         signedTransaction.getHash(), transaction.getTransactionInfo().get().getHash().get());
@@ -115,10 +124,13 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void shouldReturnConfirmedTransactionAddressRecipientViaListener(RepositoryType type) {
     Listener listener = getListener(type);
-    SignedTransaction signedTransaction = this.announceStandaloneTransferTransaction(type);
 
-    Transaction transaction =
-        get(listener.confirmed(this.getRecipient(), signedTransaction.getHash()));
+    SignedTransaction signedTransaction =
+        this.announceStandaloneTransferTransaction(type, this.getRecipient());
+
+    Observable<Transaction> confirmed =
+        listener.confirmed(this.getRecipient(), signedTransaction.getHash());
+    Transaction transaction = get(confirmed.take(1));
 
     assertEquals(
         signedTransaction.getHash(), transaction.getTransactionInfo().get().getHash().get());
@@ -129,70 +141,98 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
   void shouldReturnUnconfirmedAddedTransactionViaListener(RepositoryType type) {
     Listener listener = getListener(type);
 
-    SignedTransaction signedTransaction = this.announceStandaloneTransferTransaction(type);
-
-    Transaction transaction = get(listener.unconfirmedAdded(this.account.getAddress()));
+    SignedTransaction signedTransaction =
+        this.announceStandaloneTransferTransaction(type, this.getRecipient());
+    Transaction transaction =
+        get(
+            listener
+                .unconfirmedAdded(this.account.getAddress(), signedTransaction.getHash())
+                .take(1));
     assertEquals(
         signedTransaction.getHash(), transaction.getTransactionInfo().get().getHash().get());
   }
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
-  @Disabled
-  void shouldReturnUnconfirmedRemovedTransactionViaListener(RepositoryType type)
-      throws ExecutionException, InterruptedException {
-    Listener listener = getRepositoryFactory(type).createListener();
-    listener.open().get();
+  void shouldReturnUnconfirmedRemovedTransactionViaListener(RepositoryType type) {
+    Listener listener = getListener(type);
 
-    SignedTransaction signedTransaction = this.announceStandaloneTransferTransaction(type);
+    SignedTransaction signedTransaction =
+        this.announceStandaloneTransferTransaction(type, this.getRecipient());
 
-    String transactionHash = get(listener.unconfirmedRemoved(this.account.getAddress()));
+    String transactionHash = get(listener.unconfirmedRemoved(this.account.getAddress()).take(1));
     assertEquals(signedTransaction.getHash(), transactionHash);
   }
 
-  @Disabled
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void shouldReturnAggregateBondedAddedTransactionViaListener(RepositoryType type) {
+    Listener listener = getListener(type);
+    RepositoryFactory repositoryFactory = getRepositoryFactory(type);
+    TransactionService transactionService = new TransactionServiceImpl(repositoryFactory);
 
-    TransactionService transactionService = new TransactionServiceImpl(getRepositoryFactory(type));
+    Pair<SignedTransaction, SignedTransaction> pair = this.createAggregateBondedTransaction(type);
 
-    SignedTransaction signedTransaction = this.createAggregateBondedTransaction();
+    System.out.println("Announcing HashLock transaction " + pair.getRight().getHash());
+    get(transactionService.announce(listener, pair.getRight()));
 
+    SignedTransaction signedTransaction = pair.getLeft();
+
+    System.out.println("Announcing Aggregate transaction " + signedTransaction.getHash());
     AggregateTransaction aggregateTransaction =
-        get(transactionService.announceAggregateBonded(getListener(type), signedTransaction));
+        get(transactionService.announceAggregateBonded(listener, signedTransaction).take(1));
 
     assertEquals(
-        signedTransaction.getHash(), aggregateTransaction.getTransactionInfo().get().getHash());
+        signedTransaction.getHash(),
+        aggregateTransaction.getTransactionInfo().get().getHash().get());
   }
 
-  @Disabled
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
+  @Disabled
   void shouldReturnAggregateBondedRemovedTransactionViaListener(RepositoryType type) {
     Listener listener = getListener(type);
 
-    SignedTransaction signedTransaction = this.createAggregateBondedTransaction();
+    RepositoryFactory repositoryFactory = getRepositoryFactory(type);
+    TransactionService transactionService = new TransactionServiceImpl(repositoryFactory);
 
-    String transactionHash = get(listener.aggregateBondedRemoved(this.account.getAddress()));
+    Pair<SignedTransaction, SignedTransaction> pair = this.createAggregateBondedTransaction(type);
+
+    System.out.println("Announcing HashLock transaction " + pair.getRight().getHash());
+    get(transactionService.announce(listener, pair.getRight()));
+
+    SignedTransaction signedTransaction = pair.getLeft();
+
+    System.out.println("Announcing Aggregate transaction " + signedTransaction.getHash());
+    get(transactionService.announceAggregateBonded(listener, signedTransaction).take(1));
+
+    String transactionHash =
+        get(listener.aggregateBondedRemoved(this.account.getAddress()).take(1));
     assertEquals(signedTransaction.getHash(), transactionHash);
   }
 
-  @Disabled
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
+  @Disabled
   void shouldReturnCosignatureAddedViaListener(RepositoryType type) {
     Listener listener = getListener(type);
 
-    SignedTransaction signedTransaction = this.createAggregateBondedTransaction();
+    RepositoryFactory repositoryFactory = getRepositoryFactory(type);
+    TransactionService transactionService = new TransactionServiceImpl(repositoryFactory);
 
-    TransactionService transactionService = new TransactionServiceImpl(getRepositoryFactory(type));
+    Pair<SignedTransaction, SignedTransaction> pair = this.createAggregateBondedTransaction(type);
+
+    System.out.println("Announcing HashLock transaction " + pair.getRight().getHash());
+    get(transactionService.announce(listener, pair.getRight()));
+
+    SignedTransaction signedTransaction = pair.getLeft();
 
     AggregateTransaction announcedTransaction =
         get(transactionService.announceAggregateBonded(listener, signedTransaction));
 
     assertEquals(
-        signedTransaction.getHash(), announcedTransaction.getTransactionInfo().get().getHash());
+        signedTransaction.getHash(),
+        announcedTransaction.getTransactionInfo().get().getHash().get());
 
     TransactionRepository transactionRepository =
         getRepositoryFactory(type).createTransactionRepository();
@@ -209,7 +249,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     this.announceCosignatureTransaction(transactionToCosign, type);
 
     CosignatureSignedTransaction cosignatureSignedTransaction =
-        get(listener.cosignatureAdded(this.cosignatoryAccount.getAddress()));
+        get(listener.cosignatureAdded(this.cosignatoryAccount.getAddress()).take(1));
 
     assertEquals(
         cosignatureSignedTransaction.getSigner(), this.cosignatoryAccount2.getPublicAccount());
@@ -223,24 +263,28 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     SignedTransaction signedTransaction =
         this.announceStandaloneTransferTransactionWithInsufficientBalance(type);
 
-    TransactionStatusError transactionHash = get(listener.status(this.account.getAddress()));
+    TransactionStatusError transactionHash =
+        get(listener.status(this.account.getAddress(), signedTransaction.getHash()).take(1));
     assertEquals(signedTransaction.getHash(), transactionHash.getHash());
   }
 
-  private SignedTransaction announceStandaloneTransferTransaction(RepositoryType type) {
+  private SignedTransaction announceStandaloneTransferTransaction(
+      RepositoryType type, Address recipient) {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 getNetworkType(),
-                this.getRecipient(),
+                recipient,
                 Collections.singletonList(
                     getNetworkCurrency().createAbsolute(BigInteger.valueOf(10000L))),
                 PlainMessage.create("test-message"))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     SignedTransaction signedTransaction =
         this.account.sign(transferTransaction, getGenerationHash());
+    System.out.println("Announcing transaction " + signedTransaction.getHash());
     get(getTransactionRepository(type).announce(signedTransaction));
+    System.out.println("Transaction " + signedTransaction.getHash() + " Announced");
     return signedTransaction;
   }
 
@@ -253,11 +297,11 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 getNetworkType(),
-                new Address("SBILTA367K2LX2FEXG5TFWAS7GEFYAGY7QLFBYKC", getNetworkType()),
+                Address.generateRandom(getNetworkType()),
                 Collections.singletonList(
                     getNetworkCurrency().createRelative(new BigInteger("100000000000"))),
                 PlainMessage.create("test-message"))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     SignedTransaction signedTransaction =
@@ -266,14 +310,23 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     return signedTransaction;
   }
 
-  private SignedTransaction createAggregateBondedTransaction() {
+  private Pair<SignedTransaction, SignedTransaction> createAggregateBondedTransaction(
+      RepositoryType type) {
+
+    helper().sendMosaicFromNemesis(type, this.cosignatoryAccount, false);
+    helper().sendMosaicFromNemesis(type, this.cosignatoryAccount2, false);
+    helper().sendMosaicFromNemesis(type, this.multisigAccount, false);
+    helper()
+        .createMultisigAccountBonded(
+            type, this.multisigAccount, this.cosignatoryAccount, this.cosignatoryAccount2);
+
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 getNetworkType(),
                 Account.generateNewAccount(getNetworkType()).getAddress(),
                 Collections.emptyList(),
                 PlainMessage.create("test-message"))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -281,10 +334,25 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 Collections.singletonList(
                     transferTransaction.toAggregate(this.multisigAccount.getPublicAccount())))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
-    return this.cosignatoryAccount.sign(aggregateTransaction, getGenerationHash());
+    SignedTransaction aggregateSignedTransaction =
+        this.cosignatoryAccount.sign(aggregateTransaction, getGenerationHash());
+
+    HashLockTransaction hashLockTransaction =
+        HashLockTransactionFactory.create(
+                getNetworkType(),
+                getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
+                BigInteger.valueOf(100),
+                aggregateSignedTransaction)
+            .maxFee(maxFee)
+            .build();
+
+    SignedTransaction signedHashLockTransaction =
+        hashLockTransaction.signWith(this.cosignatoryAccount, getGenerationHash());
+
+    return Pair.of(aggregateSignedTransaction, signedHashLockTransaction);
   }
 
   private CosignatureSignedTransaction announceCosignatureTransaction(

@@ -37,14 +37,14 @@ public class NodeKeyLinkTransactionIntegrationTest extends BaseIntegrationTest {
 
     NodeKeyLinkTransaction linkTransaction =
         NodeKeyLinkTransactionFactory.create(getNetworkType(), linkedPublicKey, LinkAction.LINK)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, account, linkTransaction);
 
     NodeKeyLinkTransaction unlinkTransaction =
         NodeKeyLinkTransactionFactory.create(getNetworkType(), linkedPublicKey, LinkAction.UNLINK)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, account, unlinkTransaction);

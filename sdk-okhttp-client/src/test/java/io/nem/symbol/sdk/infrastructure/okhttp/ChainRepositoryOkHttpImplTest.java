@@ -15,9 +15,9 @@
  */
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
-import io.nem.symbol.sdk.model.blockchain.BlockchainScore;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.ChainScoreDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.HeightInfoDTO;
+import io.nem.symbol.sdk.model.blockchain.ChainInfo;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.ChainInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.FinalizedBlockDTO;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,23 +39,33 @@ public class ChainRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
   }
 
   @Test
-  public void shouldGetBlockchainHeight() throws Exception {
-    HeightInfoDTO dto = new HeightInfoDTO();
-    dto.setHeight(BigInteger.valueOf(8L));
-    mockRemoteCall(dto);
-    BigInteger blockchainHeight = repository.getBlockchainHeight().toFuture().get();
-    Assertions.assertEquals((dto.getHeight()), blockchainHeight);
-  }
-
-  @Test
   public void shouldGetBlockchainScore() throws Exception {
-    ChainScoreDTO dto = new ChainScoreDTO();
-    dto.setScoreLow(BigInteger.valueOf(3L));
-    dto.setScoreHigh(BigInteger.valueOf(5L));
+    ChainInfoDTO dto = new ChainInfoDTO();
+    dto.setScoreLow(BigInteger.valueOf(1));
+    dto.setScoreHigh(BigInteger.valueOf(2));
+    dto.setHeight(BigInteger.valueOf(3));
+    dto.latestFinalizedBlock(
+        new FinalizedBlockDTO()
+            .hash("abc")
+            .height(BigInteger.valueOf(6))
+            .finalizationEpoch(7L)
+            .finalizationPoint(BigInteger.valueOf(8)));
     mockRemoteCall(dto);
-    BlockchainScore blockchainScore = repository.getChainScore().toFuture().get();
-    Assertions.assertEquals((dto.getScoreLow()), blockchainScore.getScoreLow());
-    Assertions.assertEquals((dto.getScoreHigh()), blockchainScore.getScoreHigh());
+    ChainInfo chainInfo = repository.getChainInfo().toFuture().get();
+    Assertions.assertEquals((dto.getScoreLow()), chainInfo.getScoreLow());
+    Assertions.assertEquals((dto.getScoreHigh()), chainInfo.getScoreHigh());
+    Assertions.assertEquals((dto.getHeight()), chainInfo.getHeight());
+    Assertions.assertEquals(
+        (dto.getLatestFinalizedBlock().getFinalizationPoint()),
+        chainInfo.getLatestFinalizedBlock().getFinalizationPoint());
+    Assertions.assertEquals(
+        (dto.getLatestFinalizedBlock().getHeight()),
+        chainInfo.getLatestFinalizedBlock().getHeight());
+    Assertions.assertEquals(
+        (dto.getLatestFinalizedBlock().getFinalizationEpoch()),
+        chainInfo.getLatestFinalizedBlock().getFinalizationEpoch());
+    Assertions.assertEquals(
+        (dto.getLatestFinalizedBlock().getHash()), chainInfo.getLatestFinalizedBlock().getHash());
   }
 
   @Override

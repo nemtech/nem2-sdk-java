@@ -24,12 +24,14 @@ import io.nem.symbol.sdk.infrastructure.TransactionMapper;
 import io.nem.symbol.sdk.infrastructure.vertx.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
+import io.nem.symbol.sdk.model.blockchain.FinalizedBlock;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.openapi.vertx.model.BlockInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.Cosignature;
+import io.nem.symbol.sdk.openapi.vertx.model.FinalizedBlockDTO;
 import io.reactivex.Observable;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.RequestOptions;
@@ -111,6 +113,12 @@ public class ListenerVertx extends ListenerBase implements Listener {
   protected BlockInfo toBlockInfo(Object blockInfoDTO) {
     return BlockRepositoryVertxImpl.toBlockInfo(
         getJsonHelper().convert(blockInfoDTO, BlockInfoDTO.class));
+  }
+
+  @Override
+  protected FinalizedBlock toFinalizedBlock(Object blockInfoDTO) {
+    return ChainRepositoryVertxImpl.toFinalizedBlock(
+        getJsonHelper().convert(blockInfoDTO, FinalizedBlockDTO.class));
   }
 
   @Override

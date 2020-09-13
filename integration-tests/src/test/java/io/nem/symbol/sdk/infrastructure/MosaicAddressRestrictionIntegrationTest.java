@@ -83,7 +83,8 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
     BigInteger originalRestrictionValue = BigInteger.valueOf(30);
 
     Address targetAddress = testAccount2.getAddress();
-    NamespaceId targetAddressAlias = NamespaceId.createFromName("testaccount2");
+    NamespaceId targetAddressAlias =
+        setAddressAlias(type, testAccount2.getAddress(), "testaccount2");
     MosaicAddressRestrictionTransaction createTransaction =
         MosaicAddressRestrictionTransactionFactory.create(
                 getNetworkType(),
@@ -109,16 +110,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
         getRepositoryFactory(type).createRestrictionMosaicRepository();
 
     assertMosaicAddressRestriction(
-        targetAddress,
-        createTransaction,
-        (MosaicAddressRestriction)
-            get(restrictionRepository.search(
-                    new MosaicRestrictionSearchCriteria()
-                        .entryType(MosaicRestrictionEntryType.ADDRESS)
-                        .targetAddress(targetAddress)
-                        .mosaicId(mosaicId)))
-                .getData()
-                .get(0));
+        restrictionRepository, targetAddress, createTransaction, targetAddress, mosaicId);
 
     // 6) Update the restriction
     MosaicAddressRestrictionTransaction updateTransaction =
@@ -135,18 +127,8 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
     sleep(1000);
     assertTransaction(updateTransaction, announced);
 
-    // 8) Validates that the endpoints have the new values
     assertMosaicAddressRestriction(
-        targetAddress,
-        updateTransaction,
-        (MosaicAddressRestriction)
-            get(restrictionRepository.search(
-                    new MosaicRestrictionSearchCriteria()
-                        .entryType(MosaicRestrictionEntryType.ADDRESS)
-                        .targetAddress(targetAddress)
-                        .mosaicId(mosaicId)))
-                .getData()
-                .get(0));
+        restrictionRepository, targetAddress, updateTransaction, targetAddress, mosaicId);
   }
 
   private void assertTransaction(
@@ -170,9 +152,31 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
   }
 
   private void assertMosaicAddressRestriction(
+      RestrictionMosaicRepository restrictionRepository,
       Address address,
       MosaicAddressRestrictionTransaction transaction,
-      MosaicAddressRestriction restriction) {
+      Address targetAddress,
+      MosaicId mosaicId) {
+
+    Page<MosaicRestriction<?>> page =
+        get(
+            restrictionRepository.search(
+                new MosaicRestrictionSearchCriteria()
+                    .entryType(MosaicRestrictionEntryType.ADDRESS)
+                    .targetAddress(targetAddress)
+                    .mosaicId(mosaicId)));
+
+    Assertions.assertEquals(
+        1,
+        page.getData().size(),
+        "Cannot find restriction target address "
+            + targetAddress.plain()
+            + " encoded: "
+            + targetAddress.encoded()
+            + " mosaicId "
+            + mosaicId.getIdAsHex());
+
+    MosaicAddressRestriction restriction = (MosaicAddressRestriction) page.getData().get(0);
 
     BigInteger restrictionKey = transaction.getRestrictionKey();
     BigInteger newRestrictionValue = transaction.getNewRestrictionValue();

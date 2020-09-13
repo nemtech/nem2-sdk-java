@@ -22,6 +22,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 /** Static class that contains utility functions for converting hex strings to and from bytes. */
 public class ConvertUtils {
@@ -93,6 +94,20 @@ public class ConvertUtils {
       throw new IllegalArgumentException(
           hexString + " could not be decoded. " + ExceptionUtils.getMessage(e), e);
     }
+  }
+
+  /**
+   * A method that XORs to values.
+   *
+   * @param originalValue the original value
+   * @param newValue the new value
+   * @return the xor plus the delta.
+   */
+  public static Pair<String, Integer> xorValues(String originalValue, String newValue) {
+    byte[] currentValueBytes = StringEncoder.getBytes(originalValue);
+    byte[] newValueBytes = StringEncoder.getBytes(newValue);
+    String xorValue = StringEncoder.getString(ConvertUtils.xor(currentValueBytes, newValueBytes));
+    return Pair.of(xorValue, newValueBytes.length - currentValueBytes.length);
   }
 
   /**

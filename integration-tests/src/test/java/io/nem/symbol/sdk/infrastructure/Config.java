@@ -37,8 +37,8 @@ public class Config {
 
   private static final String CONFIG_JSON = "config.json";
   private final JsonObject config;
-  private List<Account> nemesisAccounts;
   private final Map<String, Account> accountCache = new HashMap<>();
+  private List<Account> nemesisAccounts;
   private NetworkType networkType;
 
   public Config() {
@@ -54,18 +54,17 @@ public class Config {
     }
   }
 
-  public void init(NetworkType networkType) {
-    this.networkType = networkType;
-    this.nemesisAccounts = loadNemesisAccountsFromBootstrap(getNetworkType());
-  }
-
   private static List<Account> loadNemesisAccountsFromBootstrap(NetworkType networkType) {
 
     File generatedAddressesOption =
         new File("../target/bootstrap/config/generated-addresses/addresses.yml");
     if (!generatedAddressesOption.exists()) {
-      throw new IllegalArgumentException(
-          "File " + generatedAddressesOption.getAbsolutePath() + " doesn't exist");
+      generatedAddressesOption =
+          new File("./target/bootstrap/config/generated-addresses/addresses.yml");
+      if (!generatedAddressesOption.exists()) {
+        throw new IllegalArgumentException(
+            "File " + generatedAddressesOption.getAbsolutePath() + " doesn't exist");
+      }
     }
     if (generatedAddressesOption.isDirectory()) {
       throw new IllegalArgumentException(
@@ -115,6 +114,11 @@ public class Config {
               + " not found. Using shared config.json");
       return BaseIntegrationTest.class.getClassLoader().getResourceAsStream(CONFIG_JSON);
     }
+  }
+
+  public void init(NetworkType networkType) {
+    this.networkType = networkType;
+    this.nemesisAccounts = loadNemesisAccountsFromBootstrap(getNetworkType());
   }
 
   public String getApiUrl() {

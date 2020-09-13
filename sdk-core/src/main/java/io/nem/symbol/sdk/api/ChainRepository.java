@@ -15,23 +15,15 @@
  */
 package io.nem.symbol.sdk.api;
 
-import io.nem.symbol.sdk.model.blockchain.BlockchainScore;
+import io.nem.symbol.sdk.model.blockchain.ChainInfo;
 import io.reactivex.Observable;
-import java.math.BigInteger;
 
 public interface ChainRepository {
-
-  /**
-   * Gets current blockchain height.
-   *
-   * @return Observable of BigInteger
-   */
-  Observable<BigInteger> getBlockchainHeight();
 
   /**
    * Gets current blockchain score.
    *
    * @return Observable of BigInteger
    */
-  Observable<BlockchainScore> getChainScore();
+  Observable<ChainInfo> getChainInfo();
 }

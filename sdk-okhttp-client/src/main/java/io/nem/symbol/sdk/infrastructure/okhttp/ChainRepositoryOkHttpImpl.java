@@ -16,14 +16,14 @@
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.sdk.api.ChainRepository;
-import io.nem.symbol.sdk.model.blockchain.BlockchainScore;
+import io.nem.symbol.sdk.model.blockchain.ChainInfo;
+import io.nem.symbol.sdk.model.blockchain.FinalizedBlock;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.ChainRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.ChainScoreDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.HeightInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.ChainInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.FinalizedBlockDTO;
 import io.reactivex.Observable;
 import java.math.BigInteger;
-import java.util.concurrent.Callable;
 
 /** Chain http repository. */
 public class ChainRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
@@ -41,28 +41,24 @@ public class ChainRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
   }
 
   /**
-   * Get Block chain height
-   *
-   * @return io.reactivex.Observable of {@link BigInteger}
-   */
-  public Observable<BigInteger> getBlockchainHeight() {
-
-    Callable<HeightInfoDTO> callback = getClient()::getChainHeight;
-    return exceptionHandling(call(callback).map(HeightInfoDTO::getHeight));
-  }
-
-  /**
    * Get Block chain score
    *
    * @return io.reactivex.Observable of {@link BigInteger}
    */
-  public Observable<BlockchainScore> getChainScore() {
-    Callable<ChainScoreDTO> callback = getClient()::getChainScore;
-    return exceptionHandling(
-        call(callback)
-            .map(
-                blockchainScoreDTO ->
-                    new BlockchainScore(
-                        (blockchainScoreDTO.getScoreLow()), (blockchainScoreDTO.getScoreHigh()))));
+  public Observable<ChainInfo> getChainInfo() {
+    return call(getClient()::getChainInfo, this::toChainInfo);
+  }
+
+  private ChainInfo toChainInfo(ChainInfoDTO dto) {
+    return new ChainInfo(
+        dto.getHeight(),
+        dto.getScoreLow(),
+        dto.getScoreHigh(),
+        toFinalizedBlock(dto.getLatestFinalizedBlock()));
+  }
+
+  public static FinalizedBlock toFinalizedBlock(FinalizedBlockDTO dto) {
+    return new FinalizedBlock(
+        dto.getFinalizationEpoch(), dto.getFinalizationPoint(), dto.getHeight(), dto.getHash());
   }
 }

@@ -19,6 +19,7 @@ import io.nem.symbol.sdk.api.Listener;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
+import io.nem.symbol.sdk.model.blockchain.FinalizedBlock;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.namespace.NamespaceName;
 import io.nem.symbol.sdk.model.network.NetworkType;
@@ -101,6 +102,9 @@ public abstract class ListenerBase implements Listener {
       case BLOCK:
         onNext(channel, channelParams, toBlockInfo(message));
         break;
+      case FINALIZED_BLOCK:
+        onNext(channel, channelParams, toFinalizedBlock(message));
+        break;
       case STATUS:
         onNext(channel, channelParams, toStatus(message, channelParams));
         break;
@@ -118,6 +122,14 @@ public abstract class ListenerBase implements Listener {
         throw new IllegalArgumentException("Channel " + channel + "is not supported.");
     }
   }
+
+  /**
+   * Subclasses are in charge of creating the finalized blocked model object
+   *
+   * @param message the payload
+   * @return the finalized object
+   */
+  protected abstract FinalizedBlock toFinalizedBlock(Object message);
 
   private TransactionStatusError toStatus(Object message, String channelParams) {
     Address address = Address.createFromRawAddress(channelParams);
@@ -147,6 +159,15 @@ public abstract class ListenerBase implements Listener {
     return getMessageSubject()
         .filter(rawMessage -> rawMessage.getChannel().equals(ListenerChannel.BLOCK))
         .map(rawMessage -> (BlockInfo) rawMessage.getMessage());
+  }
+
+  @Override
+  public Observable<FinalizedBlock> finalizedBlock() {
+    validateOpen();
+    this.subscribeTo(ListenerChannel.FINALIZED_BLOCK.toString());
+    return getMessageSubject()
+        .filter(rawMessage -> rawMessage.getChannel().equals(ListenerChannel.FINALIZED_BLOCK))
+        .map(rawMessage -> (FinalizedBlock) rawMessage.getMessage());
   }
 
   @Override

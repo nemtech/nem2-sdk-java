@@ -25,7 +25,6 @@ import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.transaction.NamespaceMetadataTransaction;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -34,23 +33,16 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NamespaceMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
-  private Account signerAccount;
-
-  private Account targetAccount;
-
-  @BeforeEach
-  void setup() {
-    signerAccount = config().getDefaultAccount();
-    targetAccount = config().getDefaultAccount();
-  }
-
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void setAndUpdateNamespaceMetadata(RepositoryType type) {
 
+    // TODO try target != signer
+    Account signerAccount = config().getDefaultAccount();
+    Account targetAccount = config().getDefaultAccount();
     String namespaceName =
         "namespace-id-metadata-service-integration-test-"
-            + new Double(Math.floor(Math.random() * 10000)).intValue();
+            + Double.valueOf(Math.floor(Math.random() * 10000)).intValue();
 
     NamespaceId targetNamespaceId = super.createRootNamespace(type, signerAccount, namespaceName);
 
@@ -71,12 +63,12 @@ class NamespaceMetadataServiceIntegrationTest extends BaseIntegrationTest {
                 originalMessage,
                 signerAccount.getAddress(),
                 targetNamespaceId))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAggregateAndValidate(type, originalTransaction, signerAccount);
 
-    assertMetadata(targetNamespaceId, key, originalMessage, metadataRepository);
+    assertMetadata(targetNamespaceId, key, originalMessage, metadataRepository, signerAccount);
 
     NamespaceMetadataTransaction updateTransaction =
         get(service.createNamespaceMetadataTransactionFactory(
@@ -85,19 +77,20 @@ class NamespaceMetadataServiceIntegrationTest extends BaseIntegrationTest {
                 newMessage,
                 signerAccount.getAddress(),
                 targetNamespaceId))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAggregateAndValidate(type, updateTransaction, signerAccount);
 
-    assertMetadata(targetNamespaceId, key, newMessage, metadataRepository);
+    assertMetadata(targetNamespaceId, key, newMessage, metadataRepository, signerAccount);
   }
 
   private void assertMetadata(
       NamespaceId targetNamespaceId,
       BigInteger key,
       String value,
-      MetadataRepository metadataRepository) {
+      MetadataRepository metadataRepository,
+      Account signerAccount) {
     MetadataSearchCriteria criteria =
         new MetadataSearchCriteria()
             .targetId(targetNamespaceId)

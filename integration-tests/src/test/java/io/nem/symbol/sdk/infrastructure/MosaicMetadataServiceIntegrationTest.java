@@ -15,6 +15,7 @@
  */
 package io.nem.symbol.sdk.infrastructure;
 
+import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.api.MetadataRepository;
 import io.nem.symbol.sdk.api.MetadataSearchCriteria;
 import io.nem.symbol.sdk.api.MetadataTransactionService;
@@ -24,6 +25,7 @@ import io.nem.symbol.sdk.model.metadata.Metadata;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.transaction.MosaicMetadataTransaction;
 import java.math.BigInteger;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,13 +33,18 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 /** Integration tests around mosaic metadata service. */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
+class MosaicMetadataServiceIntegrationTest extends BaseIntegrationTest {
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void setAndUpdateMosaicMetadata(RepositoryType type) {
+    // TODO FIX THIS ONE when target != signerAccount
     Account signerAccount = config().getDefaultAccount();
-    Account targetAccount = config().getTestAccount();
+    Account targetAccount = config().getDefaultAccount();
+
+    Assertions.assertFalse(helper().isMultisig(type, signerAccount));
+    Assertions.assertFalse(helper().isMultisig(type, targetAccount));
+
     MosaicId targetMosaicId = super.createMosaic(signerAccount, type, BigInteger.ZERO, null);
 
     BigInteger key = BigInteger.valueOf(RandomUtils.generateRandomInt(100000));
@@ -60,9 +67,15 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
             .maxFee(maxFee)
             .build();
 
-    announceAggregateAndValidate(type, originalTransaction, signerAccount);
+    Assertions.assertEquals(targetAccount.getAddress(), originalTransaction.getTargetAddress());
+    Assertions.assertEquals(targetMosaicId, originalTransaction.getTargetMosaicId());
+    Assertions.assertEquals(key, originalTransaction.getScopedMetadataKey());
+    Assertions.assertEquals(originalMessage, originalTransaction.getValue());
 
-    assertMetadata(targetMosaicId, key, originalMessage, metadataRepository, signerAccount);
+    helper().announceAggregateAndValidate(type, originalTransaction, signerAccount);
+
+    assertMetadata(
+        targetMosaicId, key, originalMessage, metadataRepository, signerAccount, targetAccount);
 
     MosaicMetadataTransaction updateTransaction =
         get(service.createMosaicMetadataTransactionFactory(
@@ -74,9 +87,18 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
             .maxFee(maxFee)
             .build();
 
-    announceAggregateAndValidate(type, updateTransaction, signerAccount);
+    Assertions.assertEquals(targetAccount.getAddress(), updateTransaction.getTargetAddress());
+    Assertions.assertEquals(targetMosaicId, updateTransaction.getTargetMosaicId());
+    Assertions.assertEquals(key, updateTransaction.getScopedMetadataKey());
 
-    assertMetadata(targetMosaicId, key, newMessage, metadataRepository, signerAccount);
+    Pair<String, Integer> xorAndDelta = ConvertUtils.xorValues(originalMessage, newMessage);
+    Assertions.assertEquals(xorAndDelta.getLeft(), updateTransaction.getValue());
+    Assertions.assertEquals(xorAndDelta.getRight(), updateTransaction.getValueSizeDelta());
+
+    helper().announceAggregateAndValidate(type, updateTransaction, signerAccount);
+
+    assertMetadata(
+        targetMosaicId, key, newMessage, metadataRepository, signerAccount, targetAccount);
   }
 
   private void assertMetadata(
@@ -84,10 +106,12 @@ class MosaicIdMetadataServiceIntegrationTest extends BaseIntegrationTest {
       BigInteger key,
       String value,
       MetadataRepository metadataRepository,
-      Account signerAccount) {
+      Account signerAccount,
+      Account targetAccount) {
     MetadataSearchCriteria criteria =
         new MetadataSearchCriteria()
             .targetId(targetMosaicId)
+            .targetAddress(targetAccount.getAddress())
             .scopedMetadataKey(key)
             .sourceAddress(signerAccount.getAddress());
     Metadata originalMetadata = get(metadataRepository.search(criteria)).getData().get(0);

@@ -25,12 +25,14 @@ import io.nem.symbol.sdk.infrastructure.TransactionMapper;
 import io.nem.symbol.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
+import io.nem.symbol.sdk.model.blockchain.FinalizedBlock;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.BlockInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Cosignature;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.FinalizedBlockDTO;
 import io.reactivex.Observable;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -103,6 +105,12 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
 
   private String checkTrailingSlash(String url) {
     return url.endsWith("/") ? url : url + "/";
+  }
+
+  @Override
+  protected FinalizedBlock toFinalizedBlock(Object blockInfoDTO) {
+    return ChainRepositoryOkHttpImpl.toFinalizedBlock(
+        getJsonHelper().convert(blockInfoDTO, FinalizedBlockDTO.class));
   }
 
   @Override

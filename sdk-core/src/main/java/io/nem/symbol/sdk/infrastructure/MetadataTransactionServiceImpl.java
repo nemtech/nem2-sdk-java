@@ -16,7 +16,6 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.core.utils.ConvertUtils;
-import io.nem.symbol.core.utils.StringEncoder;
 import io.nem.symbol.sdk.api.AliasService;
 import io.nem.symbol.sdk.api.MetadataRepository;
 import io.nem.symbol.sdk.api.MetadataSearchCriteria;
@@ -34,6 +33,7 @@ import io.nem.symbol.sdk.model.transaction.NamespaceMetadataTransactionFactory;
 import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.function.BiFunction;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Implementation of {@link MetadataTransactionService}
@@ -144,14 +144,11 @@ public class MetadataTransactionServiceImpl implements MetadataTransactionServic
                       if (page.getData().isEmpty()) {
                         return transactionFactory.apply(newValue, networkType);
                       } else {
-                        byte[] currentValueBytes =
-                            StringEncoder.getBytes(page.getData().get(0).getValue());
-                        byte[] newValueBytes = StringEncoder.getBytes(newValue);
-                        String xorValue =
-                            StringEncoder.getString(
-                                ConvertUtils.xor(currentValueBytes, newValueBytes));
-                        T factory = transactionFactory.apply(xorValue, networkType);
-                        factory.valueSizeDelta(newValueBytes.length - currentValueBytes.length);
+                        String originalValue = page.getData().get(0).getValue();
+                        Pair<String, Integer> xorAndDelta =
+                            ConvertUtils.xorValues(originalValue, newValue);
+                        T factory = transactionFactory.apply(xorAndDelta.getLeft(), networkType);
+                        factory.valueSizeDelta(xorAndDelta.getRight());
                         return factory;
                       }
                     }));

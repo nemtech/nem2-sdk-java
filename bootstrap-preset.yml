@@ -1,6 +1,6 @@
 symbolRestImage: fboucquez/catapult-rest:finalization
 throttlingBurst: 35
-throttlingRate: 100
+throttlingRate: 1000
 nemesis:
   mosaics:
     - accounts: 20

@@ -16,21 +16,28 @@
 package io.nem.symbol.sdk.model.blockchain;
 
 import java.math.BigInteger;
+import org.apache.commons.lang3.Validate;
 
-public class BlockchainScore {
+public class ChainInfo {
 
+  private final BigInteger height;
   private final BigInteger scoreLow;
   private final BigInteger scoreHigh;
+  private final FinalizedBlock latestFinalizedBlock;
 
-  /**
-   * Constructor
-   *
-   * @param scoreLow the score low.
-   * @param scoreHigh the score high.
-   */
-  public BlockchainScore(BigInteger scoreLow, BigInteger scoreHigh) {
-    this.scoreHigh = scoreHigh;
+  public ChainInfo(
+      BigInteger height,
+      BigInteger scoreLow,
+      BigInteger scoreHigh,
+      FinalizedBlock latestFinalizedBlock) {
+    Validate.notNull(height, "height must not be null");
+    Validate.notNull(scoreLow, "scoreLow must not be null");
+    Validate.notNull(scoreHigh, "scoreHigh must not be null");
+    Validate.notNull(latestFinalizedBlock, "latestFinalizedBlock must not be null");
+    this.height = height;
     this.scoreLow = scoreLow;
+    this.scoreHigh = scoreHigh;
+    this.latestFinalizedBlock = latestFinalizedBlock;
   }
 
   /**
@@ -49,5 +56,23 @@ public class BlockchainScore {
    */
   public BigInteger getScoreHigh() {
     return this.scoreHigh;
+  }
+
+  /**
+   * Get the chain height
+   *
+   * @return BigInteger
+   */
+  public BigInteger getHeight() {
+    return height;
+  }
+
+  /**
+   * Get the finalized block information
+   *
+   * @return the Finalized Block information.
+   */
+  public FinalizedBlock getLatestFinalizedBlock() {
+    return latestFinalizedBlock;
   }
 }

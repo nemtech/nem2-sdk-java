@@ -15,11 +15,12 @@
  */
 package io.nem.symbol.sdk.infrastructure;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nem.symbol.sdk.api.ChainRepository;
-import io.nem.symbol.sdk.model.blockchain.BlockchainScore;
-import java.math.BigInteger;
+import io.nem.symbol.sdk.model.blockchain.ChainInfo;
+import io.nem.symbol.sdk.model.blockchain.FinalizedBlock;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -29,17 +30,17 @@ class ChainRepositoryIntegrationTest extends BaseIntegrationTest {
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
-  void getBlockchainHeight(RepositoryType type) {
-    BigInteger blockchainHeight = get(getChainRepository(type).getBlockchainHeight());
-    assertTrue(blockchainHeight.intValue() > 0);
-  }
+  void getChainInfo(RepositoryType type) {
+    ChainInfo chainInfo = get(getChainRepository(type).getChainInfo());
+    assertTrue(chainInfo.getScoreLow().longValue() >= 0);
+    assertTrue(chainInfo.getScoreHigh().longValue() >= 0);
+    assertTrue(chainInfo.getHeight().longValue() > 0);
+    FinalizedBlock finalizedBlock = chainInfo.getLatestFinalizedBlock();
 
-  @ParameterizedTest
-  @EnumSource(RepositoryType.class)
-  void getBlockchainScore(RepositoryType type) {
-    BlockchainScore blockchainScore = get(getChainRepository(type).getChainScore());
-    assertTrue(blockchainScore.getScoreLow().longValue() >= 0);
-    assertTrue(blockchainScore.getScoreHigh().longValue() >= 0);
+    assertTrue(finalizedBlock.getFinalizationEpoch() >= 0);
+    assertTrue(finalizedBlock.getFinalizationPoint().longValue() >= 0);
+    assertTrue(finalizedBlock.getHeight().longValue() > 0);
+    assertNotNull(finalizedBlock.getHash());
   }
 
   private ChainRepository getChainRepository(RepositoryType type) {

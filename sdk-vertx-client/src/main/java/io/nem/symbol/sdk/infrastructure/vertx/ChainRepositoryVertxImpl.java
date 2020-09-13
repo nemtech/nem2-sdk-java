@@ -16,17 +16,15 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.sdk.api.ChainRepository;
-import io.nem.symbol.sdk.model.blockchain.BlockchainScore;
+import io.nem.symbol.sdk.model.blockchain.ChainInfo;
+import io.nem.symbol.sdk.model.blockchain.FinalizedBlock;
 import io.nem.symbol.sdk.openapi.vertx.api.ChainRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.ChainRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
-import io.nem.symbol.sdk.openapi.vertx.model.ChainScoreDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.HeightInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.ChainInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.FinalizedBlockDTO;
 import io.reactivex.Observable;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import java.math.BigInteger;
-import java.util.function.Consumer;
 
 /** Chain http repository. */
 public class ChainRepositoryVertxImpl extends AbstractRepositoryVertxImpl
@@ -44,27 +42,24 @@ public class ChainRepositoryVertxImpl extends AbstractRepositoryVertxImpl
   }
 
   /**
-   * Get Block chain height
-   *
-   * @return {@link Observable} of {@link BigInteger}
-   */
-  public Observable<BigInteger> getBlockchainHeight() {
-    Consumer<Handler<AsyncResult<HeightInfoDTO>>> callback = client::getChainHeight;
-    return exceptionHandling(call(callback).map(HeightInfoDTO::getHeight));
-  }
-
-  /**
    * Get Block chain score
    *
    * @return {@link Observable} of {@link BigInteger}
    */
-  public Observable<BlockchainScore> getChainScore() {
-    Consumer<Handler<AsyncResult<ChainScoreDTO>>> callback = client::getChainScore;
-    return exceptionHandling(
-        call(callback)
-            .map(
-                blockchainScoreDTO ->
-                    new BlockchainScore(
-                        blockchainScoreDTO.getScoreLow(), blockchainScoreDTO.getScoreHigh())));
+  public Observable<ChainInfo> getChainInfo() {
+    return call(getClient()::getChainInfo, this::toChainInfo);
+  }
+
+  private ChainInfo toChainInfo(ChainInfoDTO dto) {
+    return new ChainInfo(
+        dto.getHeight(),
+        dto.getScoreLow(),
+        dto.getScoreHigh(),
+        toFinalizedBlock(dto.getLatestFinalizedBlock()));
+  }
+
+  public static FinalizedBlock toFinalizedBlock(FinalizedBlockDTO dto) {
+    return new FinalizedBlock(
+        dto.getFinalizationEpoch(), dto.getFinalizationPoint(), dto.getHeight(), dto.getHash());
   }
 }

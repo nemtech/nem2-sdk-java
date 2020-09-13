@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
+import io.nem.symbol.sdk.model.blockchain.FinalizedBlock;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
@@ -49,6 +50,14 @@ public interface Listener extends Closeable {
    * @return an observable stream of BlockInfo
    */
   Observable<BlockInfo> newBlock();
+
+  /**
+   * Returns an observable stream of FinalizedBlock. Each time a new block is finalized in the
+   * blockchain, it emits a new FinalizedBlock in the event stream.
+   *
+   * @return an observable stream of FinalizedBlock
+   */
+  Observable<FinalizedBlock> finalizedBlock();
 
   /**
    * Returns an observable stream of Transaction for a specific address. Each time a transaction is

@@ -191,7 +191,8 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
     criteria.setOrderBy(BlockOrderBy.HEIGHT);
     int offsetIndex = 2;
     List<BlockInfo> blocksWithoutOffset = get(streamer.search(criteria).toList().toObservable());
-    criteria.setOffset(blocksWithoutOffset.get(offsetIndex).getRecordId().get());
+    String offset = blocksWithoutOffset.get(offsetIndex).getHeight().toString();
+    criteria.setOffset(offset);
     List<BlockInfo> blockFromOffsets = get(streamer.search(criteria).toList().toObservable());
     PaginationTester.sameEntities(
         blocksWithoutOffset.stream().skip(offsetIndex + 1).collect(Collectors.toList()),
