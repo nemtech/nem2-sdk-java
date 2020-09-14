@@ -26,6 +26,15 @@ public class MosaicAddressRestriction extends MosaicRestriction<BigInteger> {
   /** Target address */
   private final Address targetAddress;
 
+  /**
+   * constructor
+   *
+   * @param compositeHash the restriction composite hash
+   * @param entryType the entry type
+   * @param mosaicId the mosaic id
+   * @param targetAddress the target address.
+   * @param restrictions the restrictions of the mosaic.
+   */
   public MosaicAddressRestriction(
       String compositeHash,
       MosaicRestrictionEntryType entryType,

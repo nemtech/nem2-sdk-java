@@ -22,7 +22,14 @@ import java.util.Map;
 /** Mosaic global restriction structure describes restriction information for an mosaic. */
 public class MosaicGlobalRestriction extends MosaicRestriction<MosaicGlobalRestrictionItem> {
 
-  /** constructor */
+  /**
+   * constructor
+   *
+   * @param compositeHash the restriction composite hash
+   * @param entryType the entry type
+   * @param mosaicId the mosaic id
+   * @param restrictions the restrictions of the mosaic.
+   */
   public MosaicGlobalRestriction(
       String compositeHash,
       MosaicRestrictionEntryType entryType,

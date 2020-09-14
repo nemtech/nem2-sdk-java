@@ -15,9 +15,6 @@
  */
 package io.nem.symbol.sdk.model.transaction;
 
-import io.nem.symbol.core.crypto.CryptoEngines;
-import io.nem.symbol.core.crypto.DsaSigner;
-import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.account.Account;
 
 /**
@@ -73,13 +70,6 @@ public class CosignatureTransaction {
    * @return {@link CosignatureSignedTransaction}
    */
   public CosignatureSignedTransaction signWith(Account account) {
-    DsaSigner signer = CryptoEngines.defaultEngine().createDsaSigner(account.getKeyPair());
-    byte[] bytes = ConvertUtils.fromHexToBytes(transactionHash);
-    byte[] signatureBytes = signer.sign(bytes).getBytes();
-    return new CosignatureSignedTransaction(
-        AggregateTransactionCosignature.DEFAULT_VERSION,
-        transactionHash,
-        ConvertUtils.toHex(signatureBytes),
-        account.getPublicAccount());
+    return account.signCosignatureTransaction(this.transactionHash);
   }
 }

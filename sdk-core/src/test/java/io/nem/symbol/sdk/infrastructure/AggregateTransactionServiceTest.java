@@ -52,20 +52,16 @@ import org.mockito.Mockito;
 public class AggregateTransactionServiceTest {
 
   private final NetworkType networkType = NetworkType.MIJIN_TEST;
-  private AggregateTransactionServiceImpl service;
-
   private final Account account1 = Account.generateNewAccount(networkType);
   private final Account account2 = Account.generateNewAccount(networkType);
   private final Account account3 = Account.generateNewAccount(networkType);
   private final Account account4 = Account.generateNewAccount(networkType);
-
   private final Account multisig1 = Account.generateNewAccount(networkType);
   private final Account multisig2 = Account.generateNewAccount(networkType);
   private final Account multisig3 = Account.generateNewAccount(networkType);
-
   private final String generationHash =
       "57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6";
-
+  private AggregateTransactionServiceImpl service;
   private RepositoryFactory factory;
   private MultisigRepository multisigRepository;
   private NetworkRepository networkRepository;
@@ -292,8 +288,8 @@ public class AggregateTransactionServiceTest {
             .build();
 
     SignedTransaction signedTransaction =
-        aggregateTransaction.signTransactionWithCosigners(
-            account1, Collections.singletonList(account2), generationHash);
+        account1.signTransactionWithCosignatories(
+            aggregateTransaction, Collections.singletonList(account2), generationHash);
 
     Assertions.assertTrue(service.isComplete(signedTransaction).toFuture().get());
   }
@@ -323,8 +319,8 @@ public class AggregateTransactionServiceTest {
             .build();
 
     SignedTransaction signedTransaction =
-        aggregateTransaction.signTransactionWithCosigners(
-            account1, Collections.emptyList(), generationHash);
+        account1.signTransactionWithCosignatories(
+            aggregateTransaction, Collections.emptyList(), generationHash);
     Assertions.assertFalse(service.isComplete(signedTransaction).toFuture().get());
 
     AggregateTransaction deserialize =
@@ -367,12 +363,12 @@ public class AggregateTransactionServiceTest {
             .build();
 
     SignedTransaction signedTransaction1 =
-        aggregateTransaction.signTransactionWithCosigners(
-            account1, Collections.singletonList(account4), generationHash);
+        account1.signTransactionWithCosignatories(
+            aggregateTransaction, Collections.singletonList(account4), generationHash);
 
     SignedTransaction signedTransaction2 =
-        aggregateTransaction.signTransactionWithCosigners(
-            account1, Collections.singletonList(account4), generationHash);
+        account1.signTransactionWithCosignatories(
+            aggregateTransaction, Collections.singletonList(account4), generationHash);
 
     Assertions.assertEquals(signedTransaction1.getHash(), signedTransaction2.getHash());
     Assertions.assertEquals(signedTransaction1.getPayload(), signedTransaction2.getPayload());
@@ -430,8 +426,8 @@ public class AggregateTransactionServiceTest {
             .build();
 
     SignedTransaction signedTransaction =
-        aggregateTransaction.signTransactionWithCosigners(
-            account1, Collections.singletonList(account4), generationHash);
+        account1.signTransactionWithCosignatories(
+            aggregateTransaction, Collections.singletonList(account4), generationHash);
     Assertions.assertFalse(service.isComplete(signedTransaction).toFuture().get());
   }
 
@@ -470,8 +466,8 @@ public class AggregateTransactionServiceTest {
             .build();
 
     SignedTransaction signedTransaction =
-        aggregateTransaction.signTransactionWithCosigners(
-            account1, Arrays.asList(account4, account2), generationHash);
+        account1.signTransactionWithCosignatories(
+            aggregateTransaction, Arrays.asList(account4, account2), generationHash);
     Assertions.assertTrue(service.isComplete(signedTransaction).toFuture().get());
   }
 
@@ -597,8 +593,8 @@ public class AggregateTransactionServiceTest {
     Assertions.assertFalse(service.isComplete(signedTransaction1).toFuture().get());
 
     SignedTransaction signedTransaction2 =
-        aggregateTransaction.signTransactionWithCosigners(
-            account1, Collections.singletonList(account4), generationHash);
+        account1.signTransactionWithCosignatories(
+            aggregateTransaction, Collections.singletonList(account4), generationHash);
 
     Assertions.assertTrue(service.isComplete(signedTransaction2).toFuture().get());
   }
@@ -639,8 +635,8 @@ public class AggregateTransactionServiceTest {
             .build();
 
     SignedTransaction signedTransaction =
-        aggregateTransaction.signTransactionWithCosigners(
-            account1, Collections.emptyList(), generationHash);
+        account1.signTransactionWithCosignatories(
+            aggregateTransaction, Collections.emptyList(), generationHash);
 
     Assertions.assertFalse(service.isComplete(signedTransaction).toFuture().get());
   }
@@ -667,11 +663,27 @@ public class AggregateTransactionServiceTest {
                     transferTransaction.toAggregate(multisig3.getPublicAccount())))
             .build();
 
-    SignedTransaction signedTransaction =
-        aggregateTransaction.signTransactionWithCosigners(
-            account2, Collections.singletonList(account3), generationHash);
+    SignedTransaction signedTransactionNoCosignatures =
+        account2.sign(aggregateTransaction, generationHash);
 
-    Assertions.assertTrue(service.isComplete(signedTransaction).toFuture().get());
+    SignedTransaction signedTransaction1 =
+        account2.signTransactionGivenSignatures(
+            aggregateTransaction,
+            Collections.singletonList(
+                account3.signCosignatureTransaction(signedTransactionNoCosignatures.getHash())),
+            generationHash);
+
+    SignedTransaction signedTransaction2 =
+        account2.signTransactionWithCosignatories(
+            aggregateTransaction, Collections.singletonList(account3), generationHash);
+
+    Assertions.assertEquals(signedTransaction1.getPayload(), signedTransaction2.getPayload());
+    Assertions.assertEquals(signedTransaction1.getHash(), signedTransaction2.getHash());
+    Assertions.assertEquals(signedTransaction1.getSigner(), signedTransaction2.getSigner());
+    Assertions.assertEquals(signedTransaction1.getType(), signedTransaction2.getType());
+
+    Assertions.assertTrue(service.isComplete(signedTransaction1).toFuture().get());
+    Assertions.assertTrue(service.isComplete(signedTransaction2).toFuture().get());
   }
 
   /*
@@ -697,8 +709,8 @@ public class AggregateTransactionServiceTest {
             .build();
 
     SignedTransaction signedTransaction =
-        aggregateTransaction.signTransactionWithCosigners(
-            account2, Collections.emptyList(), generationHash);
+        account2.signTransactionWithCosignatories(
+            aggregateTransaction, Collections.emptyList(), generationHash);
 
     Assertions.assertFalse(service.isComplete(signedTransaction).toFuture().get());
   }

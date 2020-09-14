@@ -15,10 +15,14 @@
  */
 package io.nem.symbol.sdk.model.account;
 
+import io.nem.symbol.core.crypto.CryptoEngines;
+import io.nem.symbol.core.crypto.DsaSigner;
 import io.nem.symbol.core.crypto.KeyPair;
 import io.nem.symbol.core.crypto.PrivateKey;
+import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
+import io.nem.symbol.sdk.model.transaction.AggregateTransactionCosignature;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.CosignatureTransaction;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
@@ -146,6 +150,23 @@ public class Account {
   }
 
   /**
+   * Creates a CosignatureSignedTransaction from a hash.
+   *
+   * @param transactionHash The transaction hash
+   * @return {@link CosignatureSignedTransaction}
+   */
+  public CosignatureSignedTransaction signCosignatureTransaction(String transactionHash) {
+    DsaSigner signer = CryptoEngines.defaultEngine().createDsaSigner(this.getKeyPair());
+    byte[] bytes = ConvertUtils.fromHexToBytes(transactionHash);
+    byte[] signatureBytes = signer.sign(bytes).getBytes();
+    return new CosignatureSignedTransaction(
+        AggregateTransactionCosignature.DEFAULT_VERSION,
+        transactionHash,
+        ConvertUtils.toHex(signatureBytes),
+        this.getPublicAccount());
+  }
+
+  /**
    * Sign transaction with cosignatories creating a new SignedTransaction.
    *
    * @param transaction The aggregate transaction to be signed.
@@ -158,6 +179,21 @@ public class Account {
       final List<Account> cosignatories,
       final String generationHash) {
     return transaction.signTransactionWithCosigners(this, cosignatories, generationHash);
+  }
+
+  /**
+   * Sign transaction with cosignatures creating a new SignedTransaction.
+   *
+   * @param transaction The aggregate transaction to be signed.
+   * @param cosignatures The list of precreated cosignatures
+   * @param generationHash the generation hash.
+   * @return {@link SignedTransaction}
+   */
+  public SignedTransaction signTransactionGivenSignatures(
+      final AggregateTransaction transaction,
+      final List<AggregateTransactionCosignature> cosignatures,
+      final String generationHash) {
+    return transaction.signTransactionGivenSignatures(this, cosignatures, generationHash);
   }
 
   public NetworkType getNetworkType() {
