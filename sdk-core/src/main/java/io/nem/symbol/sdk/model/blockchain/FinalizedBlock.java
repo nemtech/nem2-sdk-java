@@ -24,14 +24,14 @@ public class FinalizedBlock {
 
   private final Long finalizationEpoch;
 
-  private final BigInteger finalizationPoint;
+  private final Long finalizationPoint;
 
   private final BigInteger height;
 
   private final String hash;
 
   public FinalizedBlock(
-      Long finalizationEpoch, BigInteger finalizationPoint, BigInteger height, String hash) {
+      Long finalizationEpoch, Long finalizationPoint, BigInteger height, String hash) {
     Validate.notNull(finalizationEpoch, "finalizationEpoch is required");
     Validate.notNull(finalizationPoint, "finalizationPoint is required");
     Validate.notNull(height, "height is required");
@@ -46,7 +46,7 @@ public class FinalizedBlock {
     return finalizationEpoch;
   }
 
-  public BigInteger getFinalizationPoint() {
+  public Long getFinalizationPoint() {
     return finalizationPoint;
   }
 

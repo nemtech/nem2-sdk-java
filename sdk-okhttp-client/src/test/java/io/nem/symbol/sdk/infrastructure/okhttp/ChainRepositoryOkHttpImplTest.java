@@ -49,7 +49,7 @@ public class ChainRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
             .hash("abc")
             .height(BigInteger.valueOf(6))
             .finalizationEpoch(7L)
-            .finalizationPoint(BigInteger.valueOf(8)));
+            .finalizationPoint(8L));
     mockRemoteCall(dto);
     ChainInfo chainInfo = repository.getChainInfo().toFuture().get();
     Assertions.assertEquals((dto.getScoreLow()), chainInfo.getScoreLow());

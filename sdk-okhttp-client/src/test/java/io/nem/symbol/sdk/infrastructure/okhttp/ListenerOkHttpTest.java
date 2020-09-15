@@ -131,8 +131,7 @@ public class ListenerOkHttpTest {
 
     simulateWebSocketStartup();
 
-    FinalizedBlock finalizedBlock =
-        new FinalizedBlock(1L, BigInteger.valueOf(2), BigInteger.valueOf(3), "abc");
+    FinalizedBlock finalizedBlock = new FinalizedBlock(1L, 2L, BigInteger.valueOf(3), "abc");
 
     JsonObject transactionInfoDtoJsonObject = jsonHelper.convert(finalizedBlock, JsonObject.class);
 

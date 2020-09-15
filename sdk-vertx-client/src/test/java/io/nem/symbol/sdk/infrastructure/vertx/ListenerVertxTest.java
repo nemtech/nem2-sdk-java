@@ -206,8 +206,7 @@ public class ListenerVertxTest {
 
     String channelName = ListenerChannel.FINALIZED_BLOCK.toString();
 
-    FinalizedBlock finalizedBlock =
-        new FinalizedBlock(1L, BigInteger.valueOf(2), BigInteger.valueOf(3), "abc");
+    FinalizedBlock finalizedBlock = new FinalizedBlock(1L, 2L, BigInteger.valueOf(3), "abc");
 
     ObjectNode transactionInfoDtoJsonObject = jsonHelper.convert(finalizedBlock, ObjectNode.class);
 

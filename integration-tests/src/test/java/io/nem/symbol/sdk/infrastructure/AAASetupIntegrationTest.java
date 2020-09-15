@@ -16,6 +16,7 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
   void createTestAccount() {
     helper().sendMosaicFromNemesis(type, config().getTestAccount(), false);
     setAddressAlias(type, config().getTestAccount().getAddress(), "testaccount");
-    helper().basicSendMosaicToNemesis(type, NamespaceId.createFromName("testaccount"));
+    helper().basicSendMosaicFromNemesis(type, NamespaceId.createFromName("testaccount"));
   }
 
   @Test
@@ -64,14 +65,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
   @Test
   @Order(5)
   void createMultisigAccountBonded() {
-    helper().sendMosaicFromNemesis(type, config().getMultisigAccount(), false);
-    setAddressAlias(type, config().getMultisigAccount().getAddress(), "multisig-account");
-    helper()
-        .createMultisigAccountBonded(
-            type,
-            config().getMultisigAccount(),
-            config().getCosignatoryAccount(),
-            config().getCosignatory2Account());
+    Assertions.assertNotNull(helper().getMultisigAccount(type));
   }
 
   @Test

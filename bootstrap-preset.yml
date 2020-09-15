@@ -1,4 +1,4 @@
-symbolRestImage: fboucquez/catapult-rest:finalization
+symbolRestImage: symbolplatform/symbol-rest:1.3.1-alpha
 throttlingBurst: 35
 throttlingRate: 1000
 nemesis:

@@ -38,7 +38,7 @@ class ChainRepositoryIntegrationTest extends BaseIntegrationTest {
     FinalizedBlock finalizedBlock = chainInfo.getLatestFinalizedBlock();
 
     assertTrue(finalizedBlock.getFinalizationEpoch() >= 0);
-    assertTrue(finalizedBlock.getFinalizationPoint().longValue() >= 0);
+    assertTrue(finalizedBlock.getFinalizationPoint() >= 0);
     assertTrue(finalizedBlock.getHeight().longValue() > 0);
     assertNotNull(finalizedBlock.getHash());
   }

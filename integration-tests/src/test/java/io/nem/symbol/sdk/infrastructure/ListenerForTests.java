@@ -35,24 +35,23 @@ public class ListenerForTests extends BaseIntegrationTest {
         .newBlock()
         .subscribe(
             b -> {
-              System.out.println("New BLOCK!!");
+              System.out.println("New BLOCK!! " + b.getHeight());
             });
 
     listener
         .finalizedBlock()
         .subscribe(
             b -> {
-              System.out.println("New Finalized Block!!");
-              System.out.println(toJson(b));
+              System.out.println("New Finalized Block!! " + b.getHeight());
             });
-    //    listenToAccount("Test Account 1", config().getTestAccount(), listener);
-    //    listenToAccount("Test Account 2", config().getTestAccount2(), listener);
-    //    listenToAccount("Cosignatory Account", config().getCosignatoryAccount(), listener);
-    //    listenToAccount("Cosignatory Account 2", config().getCosignatory2Account(), listener);
-    //    listenToAccount("Multisign Account 2", config().getMultisigAccount(), listener);
-    //
-    //    config().getNemesisAccounts().stream()
-    //        .forEach(account -> listenToAccount("Nemesis Account", account, listener));
+    listenToAccount("Test Account 1", config().getTestAccount(), listener);
+    listenToAccount("Test Account 2", config().getTestAccount2(), listener);
+    listenToAccount("Cosignatory Account", config().getCosignatoryAccount(), listener);
+    listenToAccount("Cosignatory Account 2", config().getCosignatory2Account(), listener);
+    listenToAccount("Multisign Account 2", config().getMultisigAccount(), listener);
+
+    config().getNemesisAccounts().stream()
+        .forEach(account -> listenToAccount("Nemesis Account", account, listener));
   }
 
   private void listenToAccount(String accountDescription, Account account, Listener listener) {

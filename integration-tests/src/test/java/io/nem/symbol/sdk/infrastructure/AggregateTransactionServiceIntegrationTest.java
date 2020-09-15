@@ -17,7 +17,6 @@ package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.AggregateTransactionService;
 import io.nem.symbol.sdk.model.account.Account;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
@@ -45,7 +44,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(getNetworkType(), Collections.emptyList())
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAggregateAndValidate(type, aggregateTransaction, config().getDefaultAccount());
@@ -55,16 +54,17 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void isMultisigAccountModificationTransactionAdditionComplete(RepositoryType type) {
 
-    Account multisigAccount = config().getMultisigAccount();
-    List<Account> accounts =
-        Arrays.asList(config().getCosignatoryAccount(), config().getCosignatory2Account());
+    Account multisigAccount = helper().getMultisigAccount(type);
+    Account cosignatoryAccount = config().getCosignatoryAccount();
+    Account cosignatory2Account = config().getCosignatory2Account();
 
+    List<Account> accounts = Arrays.asList(cosignatoryAccount, cosignatory2Account);
     List<UnresolvedAddress> additions =
         accounts.stream().map(Account::getAddress).collect(Collectors.toList());
     MultisigAccountModificationTransaction multisigAccountModificationTransaction =
         MultisigAccountModificationTransactionFactory.create(
                 getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList())
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -73,7 +73,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
                 Collections.singletonList(
                     multisigAccountModificationTransaction.toAggregate(
                         multisigAccount.getPublicAccount())))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     SignedTransaction signedAggregateTransaction =
@@ -90,12 +90,13 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void isTransferFromMultisigComplete(RepositoryType type) {
 
-    Account multisigAccount = config().getMultisigAccount();
+    Account multisigAccount = helper().getMultisigAccount(type);
+    Account cosignatoryAccount = config().getCosignatoryAccount();
 
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 getNetworkType(), getRecipient(), Collections.emptyList(), PlainMessage.Empty)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -103,13 +104,13 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 Collections.singletonList(
                     transferTransaction.toAggregate(multisigAccount.getPublicAccount())))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     SignedTransaction signedAggregateTransaction =
         aggregateTransaction.signTransactionWithCosigners(
             multisigAccount,
-            Arrays.asList(config().getCosignatoryAccount(), config().getTestAccount()),
+            Arrays.asList(cosignatoryAccount, config().getTestAccount()),
             getGenerationHash());
 
     AggregateTransactionService aggregateTransactionService =
@@ -122,12 +123,12 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void isTransferFromMultisigNotComplete(RepositoryType type) {
 
-    Account multisigAccount = config().getMultisigAccount();
+    Account multisigAccount = helper().getMultisigAccount(type);
 
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 getNetworkType(), getRecipient(), Collections.emptyList(), PlainMessage.Empty)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -135,7 +136,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 Collections.singletonList(
                     transferTransaction.toAggregate(multisigAccount.getPublicAccount())))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     SignedTransaction signedAggregateTransaction =
@@ -154,16 +155,20 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void isMultisigAccountModificationTransactionAdditionNotComplete(RepositoryType type) {
 
-    Account multisigAccount = config().getMultisigAccount();
-    List<Account> accounts =
-        Arrays.asList(config().getCosignatoryAccount(), config().getCosignatory2Account());
+    Account testAccount = getTestAccount();
+
+    Account multisigAccount = helper().getMultisigAccount(type);
+    Account cosignatoryAccount = config().getCosignatoryAccount();
+    Account cosignatory2Account = config().getCosignatory2Account();
+
+    List<Account> accounts = Arrays.asList(cosignatoryAccount, cosignatory2Account);
 
     List<UnresolvedAddress> additions =
         accounts.stream().map(Account::getAddress).collect(Collectors.toList());
     MultisigAccountModificationTransaction multisigAccountModificationTransaction =
         MultisigAccountModificationTransactionFactory.create(
                 getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList())
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -172,12 +177,12 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
                 Collections.singletonList(
                     multisigAccountModificationTransaction.toAggregate(
                         multisigAccount.getPublicAccount())))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     SignedTransaction signedAggregateTransaction =
         aggregateTransaction.signTransactionWithCosigners(
-            multisigAccount, Collections.singletonList(getTestAccount()), getGenerationHash());
+            multisigAccount, Collections.singletonList(testAccount), getGenerationHash());
 
     AggregateTransactionService aggregateTransactionService =
         new AggregateTransactionServiceImpl(getRepositoryFactory(type));
@@ -189,9 +194,10 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void isMultisigAccountModificationTransactionDeletionComplete(RepositoryType type) {
 
-    Account multisigAccount = config().getMultisigAccount();
-    List<Account> accounts =
-        Arrays.asList(config().getCosignatoryAccount(), config().getCosignatory2Account());
+    Account multisigAccount = helper().getMultisigAccount(type);
+    Account cosignatoryAccount = config().getCosignatoryAccount();
+    Account cosignatory2Account = config().getCosignatory2Account();
+    List<Account> accounts = Arrays.asList(cosignatoryAccount, cosignatory2Account);
 
     MultisigAccountModificationTransaction multisigAccountModificationTransaction =
         MultisigAccountModificationTransactionFactory.create(
@@ -200,7 +206,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
                 (byte) 1,
                 Collections.emptyList(),
                 Collections.singletonList(accounts.get(0).getAddress()))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -209,7 +215,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
                 Collections.singletonList(
                     multisigAccountModificationTransaction.toAggregate(
                         multisigAccount.getPublicAccount())))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     SignedTransaction signedAggregateTransaction =
@@ -226,12 +232,12 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void isMultisigAccountModificationTransactionDeletionNotComplete(RepositoryType type) {
 
-    Account multisigAccount = config().getMultisigAccount();
-    List<Account> accounts =
-        Arrays.asList(config().getCosignatoryAccount(), config().getCosignatory2Account());
+    Account multisigAccount = helper().getMultisigAccount(type);
+    Account cosignatoryAccount = config().getCosignatoryAccount();
+    Account cosignatory2Account = config().getCosignatory2Account();
 
-    List<PublicAccount> additions =
-        accounts.stream().map(Account::getPublicAccount).collect(Collectors.toList());
+    List<Account> accounts = Arrays.asList(cosignatoryAccount, cosignatory2Account);
+
     MultisigAccountModificationTransaction multisigAccountModificationTransaction =
         MultisigAccountModificationTransactionFactory.create(
                 getNetworkType(),
@@ -239,7 +245,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
                 (byte) 1,
                 Collections.emptyList(),
                 Collections.singletonList(accounts.get(0).getAddress()))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -248,7 +254,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
                 Collections.singletonList(
                     multisigAccountModificationTransaction.toAggregate(
                         multisigAccount.getPublicAccount())))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     SignedTransaction signedAggregateTransaction =

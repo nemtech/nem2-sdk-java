@@ -50,7 +50,7 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
 
   @BeforeAll
   void setup() {
-    testAccount = config().getDefaultAccount();
+    testAccount = helper().createTestAccount(TestHelper.DEFAULT_REPOSITORY_TYPE);
     mosaicId = createMosaic(DEFAULT_REPOSITORY_TYPE, testAccount);
     mosaicIds.add(mosaicId);
   }

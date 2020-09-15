@@ -157,7 +157,6 @@ public abstract class BaseIntegrationTest {
     return helper().getTransactionOrFail(observable, originalTransaction);
   }
 
-  @Deprecated
   protected String toJson(Transaction originalTransaction) {
     return helper().toJson(originalTransaction);
   }

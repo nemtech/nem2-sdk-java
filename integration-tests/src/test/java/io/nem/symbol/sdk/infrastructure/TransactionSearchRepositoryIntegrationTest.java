@@ -16,6 +16,7 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.core.crypto.PublicKey;
+import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.api.TransactionPaginationStreamer;
 import io.nem.symbol.sdk.api.TransactionRepository;
 import io.nem.symbol.sdk.api.TransactionSearchCriteria;
@@ -28,9 +29,13 @@ import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
+import io.reactivex.Observable;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
@@ -204,11 +209,71 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
     TransactionRepository transactionRepository = getTransactionRepository(type);
     TransactionPaginationStreamer streamer =
         new TransactionPaginationStreamer(transactionRepository);
-    TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.CONFIRMED);
-    List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
-    transactions.forEach(b -> Assertions.assertNotNull(b.getTransactionInfo().get().getHeight()));
+    TransactionGroup group = TransactionGroup.CONFIRMED;
+    TransactionSearchCriteria criteria = new TransactionSearchCriteria(group);
+    List<Transaction> transactions =
+        get(
+            streamer
+                .search(criteria)
+                .flatMap(
+                    t ->
+                        t.isTransactionFullyLoaded()
+                            ? Observable.just(t)
+                            : transactionRepository.getTransaction(
+                                group, t.getTransactionInfo().get().getHash().get()))
+                .toList()
+                .toObservable());
+    String generationHash = getGenerationHash();
+
+    List<String> headers =
+        Arrays.asList(
+            "Valid", "Type", "Height", "Stored Hash", "Calculated Hash", "Binary", "Json");
+    System.out.println("| " + String.join(" | ", headers) + " | ");
+    System.out.println(
+        "| " + headers.stream().map(r -> "---------").collect(Collectors.joining(" | ")) + " | ");
+
+    Set<String> reported = new HashSet<>();
+
+    transactions.forEach(
+        b -> {
+          String originalHash = b.getTransactionInfo().get().getHash().get();
+          BigInteger height = b.getTransactionInfo().get().getHeight();
+          String calculatedHash =
+              b.createTransactionHash(
+                  ConvertUtils.toHex(b.serialize()), ConvertUtils.fromHexToBytes(generationHash));
+
+          String valid = originalHash.equals(calculatedHash) ? ":heavy_check_mark:" : ":x:";
+          List<String> values =
+              Arrays.asList(
+                  valid,
+                  b.getType().name(),
+                  height.toString(),
+                  originalHash,
+                  calculatedHash,
+                  ConvertUtils.toHex(b.serialize()),
+                  toJson(b));
+          if (reported.add(b.getType().name() + height.compareTo(BigInteger.ONE) + valid)) {
+            System.out.println("| " + String.join(" | ", values) + " |");
+          }
+
+          //
+          //          System.out.println("Type | stored hash | calculated hash | binary | json");
+          //
+          //            System.out.println(
+          //                "Invalid hash! stored hash "
+          //                    + originalHash
+          //                    + " calculated hash:"
+          //                    + calculatedHash
+          //                    + ""
+          //                    + b.getType()
+          //                    + " "
+          //                    + height + " payload: \n" + jsonHelper().prettyPrint(toJson(b)) );
+
+          //          Assertions.assertEquals(originalHash, calculatedHash);
+          Assertions.assertNotNull(b.getTransactionInfo().get().getHeight());
+        });
     Assertions.assertFalse(transactions.isEmpty());
-    helper.assertById(transactionRepository, TransactionGroup.CONFIRMED, transactions);
+    helper.assertById(transactionRepository, group, transactions);
   }
 
   @ParameterizedTest

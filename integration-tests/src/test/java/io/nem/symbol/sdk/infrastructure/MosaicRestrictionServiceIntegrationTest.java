@@ -32,7 +32,7 @@ import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
 import java.math.BigInteger;
 import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -43,7 +43,7 @@ public class MosaicRestrictionServiceIntegrationTest extends BaseIntegrationTest
   private final BigInteger restrictionKey = BigInteger.valueOf(11111);
   private Account testAccount;
 
-  @BeforeEach
+  @BeforeAll
   void setup() {
     testAccount = config().getDefaultAccount();
   }

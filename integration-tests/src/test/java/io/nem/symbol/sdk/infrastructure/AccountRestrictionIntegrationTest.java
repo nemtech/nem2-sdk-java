@@ -38,12 +38,20 @@ import io.nem.symbol.sdk.model.transaction.TransactionType;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
+
+  private Account testAccount;
+
+  @BeforeAll
+  void setup() {
+    testAccount = helper().createTestAccount(TestHelper.DEFAULT_REPOSITORY_TYPE);
+  }
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
@@ -52,8 +60,6 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
     AccountOperationRestrictionFlags restrictionFlags =
         AccountOperationRestrictionFlags.BLOCK_OUTGOING_TRANSACTION_TYPE;
     TransactionType transactionType = TransactionType.SECRET_PROOF;
-
-    Account testAccount = getTestAccount();
 
     Assertions.assertNotNull(
         get(
@@ -84,8 +90,6 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
 
     AccountMosaicRestrictionFlags restrictionFlags =
         AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC;
-
-    Account testAccount = getTestAccount();
 
     MosaicNonce nonce = MosaicNonce.createRandom();
     MosaicId mosaicId = MosaicId.createFromNonce(nonce, testAccount.getPublicAccount());
@@ -120,8 +124,6 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
     AccountAddressRestrictionFlags restrictionFlags =
         AccountAddressRestrictionFlags.ALLOW_OUTGOING_ADDRESS;
     Address address = getRecipient();
-
-    Account testAccount = getTestAccount();
 
     Assertions.assertNotNull(
         get(
@@ -182,7 +184,6 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
       boolean add,
       AccountOperationRestrictionFlags accountRestrictionFlags) {
 
-    Account testAccount = getTestAccount();
     List<TransactionType> additions =
         add ? Collections.singletonList(transactionType) : Collections.emptyList();
     List<TransactionType> deletions =
@@ -191,7 +192,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
     AccountOperationRestrictionTransaction transaction =
         AccountOperationRestrictionTransactionFactory.create(
                 getNetworkType(), accountRestrictionFlags, additions, deletions)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     AccountOperationRestrictionTransaction processedTransaction =
@@ -213,11 +214,10 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
     List<UnresolvedMosaicId> deletions =
         !add ? Collections.singletonList(unresolvedMosaicId) : Collections.emptyList();
 
-    Account testAccount = getTestAccount();
     AccountMosaicRestrictionTransaction transaction =
         AccountMosaicRestrictionTransactionFactory.create(
                 getNetworkType(), accountRestrictionFlags, additions, deletions)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     AccountMosaicRestrictionTransaction processedTransaction =
@@ -239,11 +239,10 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
     List<UnresolvedAddress> deletions =
         !add ? Collections.singletonList(unresolvedAddress) : Collections.emptyList();
 
-    Account testAccount = getTestAccount();
     AccountAddressRestrictionTransaction transaction =
         AccountAddressRestrictionTransactionFactory.create(
                 getNetworkType(), accountRestrictionFlags, additions, deletions)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     AccountAddressRestrictionTransaction processedTransaction =

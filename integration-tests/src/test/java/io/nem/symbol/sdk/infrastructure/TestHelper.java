@@ -94,6 +94,7 @@ import org.junit.jupiter.api.Assertions;
 public class TestHelper {
 
   public static final long AMOUNT_PER_TRANSFER = 100000000;
+  public static final long MIN_AMOUNT_PER_TRANSFER = 1000000;
   protected static final RepositoryType DEFAULT_REPOSITORY_TYPE = RepositoryType.VERTX;
   private final Map<RepositoryType, RepositoryFactory> repositoryFactoryMap = new HashMap<>();
   private final Map<RepositoryType, Listener> listenerMap = new HashMap<>();
@@ -258,7 +259,10 @@ public class TestHelper {
                   .createAccountRepository()
                   .getAccountInfo(recipient.getAddress()));
       return accountInfo.getMosaics().stream()
-          .anyMatch(m -> m.getAmount().longValue() >= AMOUNT_PER_TRANSFER);
+          .anyMatch(
+              m ->
+                  networkCurrency.getMosaicId().get().equals(m.getId())
+                      && m.getAmount().longValue() >= MIN_AMOUNT_PER_TRANSFER);
     } catch (RepositoryCallException e) {
       return false;
     }
@@ -381,38 +385,37 @@ public class TestHelper {
     return jsonHelper.prettyPrint(anyObject);
   }
 
-  protected NamespaceId setAddressAlias(
-      RepositoryType type, Address address, String namespaceName) {
-
-    NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
-
-    Account nemesisAccount = config().getNemesisAccount1();
-
+  protected boolean isAlias(RepositoryType type, Address address, NamespaceId namespaceId) {
     List<AccountNames> accountNames =
         get(
             getRepositoryFactory(type)
                 .createNamespaceRepository()
                 .getAccountsNames(Collections.singletonList(address)));
 
-    if (accountNames.stream()
+    return (accountNames.stream()
         .anyMatch(
             an ->
                 an.getNames().stream()
                     .anyMatch(
                         ns ->
-                            ns.getName().equals(namespaceName)
-                                && ns.getNamespaceId().equals(namespaceId)))) {
+                            namespaceId.getFullName().map(f -> ns.getName().equals(f)).orElse(false)
+                                && ns.getNamespaceId().equals(namespaceId))));
+  }
+
+  protected NamespaceId setAddressAlias(
+      RepositoryType type, Address address, String namespaceName) {
+
+    NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
+
+    if (isAlias(type, address, namespaceId)) {
       System.out.println(
           namespaceName + " ADDRESS Alias for address " + address.plain() + " found, reusing it.");
       return namespaceId;
-
-    } else {
-      System.out.println(
-          namespaceName
-              + " ADDRESS Alias not found, CREATING ADDRESS "
-              + address.plain()
-              + " ALIAS");
     }
+    System.out.println(
+        namespaceName + " ADDRESS Alias not found, CREATING ADDRESS " + address.plain() + " ALIAS");
+
+    Account nemesisAccount = config().getNemesisAccount1();
 
     System.out.println("Setting up namespace " + namespaceName);
     NamespaceRegistrationTransaction namespaceRegistrationTransaction =
@@ -434,27 +437,41 @@ public class TestHelper {
             .build();
 
     announceAggregateAndValidate(type, aliasTransaction, nemesisAccount);
+
+    int retry = 10;
+    while (!isAlias(type, address, namespaceId)) {
+      sleep(300);
+      retry--;
+      if (retry == 0) {
+        Assertions.fail("Could not create " + address.plain() + " alias: " + namespaceName);
+      }
+    }
+
     return rootNamespaceId;
   }
 
-  protected NamespaceId setMosaicAlias(
-      RepositoryType type, MosaicId mosaicId, String namespaceName) {
-    Account nemesisAccount = config().getNemesisAccount1();
-    NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
+  protected boolean isAlias(RepositoryType type, MosaicId mosaicId, NamespaceId namespaceId) {
     List<MosaicNames> mosaicNames =
         get(
             getRepositoryFactory(type)
                 .createNamespaceRepository()
                 .getMosaicsNames(Collections.singletonList(mosaicId)));
 
-    if (mosaicNames.stream()
+    return (mosaicNames.stream()
         .anyMatch(
             an ->
                 an.getNames().stream()
                     .anyMatch(
                         ns ->
-                            ns.getName().equals(namespaceName)
-                                && ns.getNamespaceId().equals(namespaceId)))) {
+                            namespaceId.getFullName().map(f -> ns.getName().equals(f)).orElse(false)
+                                && ns.getNamespaceId().equals(namespaceId))));
+  }
+
+  protected NamespaceId setMosaicAlias(
+      RepositoryType type, MosaicId mosaicId, String namespaceName) {
+    Account nemesisAccount = config().getNemesisAccount1();
+    NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
+    if (isAlias(type, mosaicId, namespaceId)) {
       System.out.println(namespaceName + " MOSAIC Alias found, reusing it.");
       return namespaceId;
     } else {
@@ -483,6 +500,15 @@ public class TestHelper {
             .build();
 
     announceAggregateAndValidate(type, aliasTransaction, nemesisAccount);
+
+    int retry = 10;
+    while (!isAlias(type, mosaicId, namespaceId)) {
+      sleep(300);
+      retry--;
+      if (retry == 0) {
+        Assertions.fail("Could not create " + mosaicId.getIdAsHex() + " alias: " + namespaceName);
+      }
+    }
     return rootNamespaceId;
   }
 
@@ -569,6 +595,15 @@ public class TestHelper {
       Assertions.assertEquals(404, e.getStatusCode());
       return false;
     }
+  }
+
+  public Account getMultisigAccount(RepositoryType type) {
+    Account multisigAccount = config().getMultisigAccount();
+    setAddressAlias(type, multisigAccount.getAddress(), "multisig-account");
+    sendMosaicFromNemesis(type, multisigAccount, false);
+    this.createMultisigAccountBonded(
+        type, multisigAccount, config().getCosignatoryAccount(), config().getCosignatory2Account());
+    return multisigAccount;
   }
 
   public void createMultisigAccountBonded(
@@ -713,10 +748,10 @@ public class TestHelper {
     }
     System.out.println("Sending " + AMOUNT_PER_TRANSFER + " currency tokens to: ");
     printAccount(recipient);
-    basicSendMosaicToNemesis(type, recipient.getAddress());
+    basicSendMosaicFromNemesis(type, recipient.getAddress());
   }
 
-  public void basicSendMosaicToNemesis(RepositoryType type, UnresolvedAddress recipient) {
+  public void basicSendMosaicFromNemesis(RepositoryType type, UnresolvedAddress recipient) {
 
     Account nemesisAccount = config().getNemesisAccount();
     BigInteger amount = BigInteger.valueOf(AMOUNT_PER_TRANSFER);
@@ -752,5 +787,17 @@ public class TestHelper {
     } catch (InterruptedException e) {
       throw new IllegalStateException(e.getMessage(), e);
     }
+  }
+
+  public Account createTestAccount(RepositoryType type) {
+    Account testAccount = Account.generateNewAccount(this.networkType);
+    sendMosaicFromNemesis(type, testAccount, false);
+    return testAccount;
+  }
+
+  public Account getTestAccount(RepositoryType type) {
+    Account testAccount = config().getTestAccount();
+    sendMosaicFromNemesis(type, testAccount, false);
+    return testAccount;
   }
 }

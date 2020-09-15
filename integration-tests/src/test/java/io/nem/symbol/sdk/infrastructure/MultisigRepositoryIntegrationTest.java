@@ -17,11 +17,12 @@ package io.nem.symbol.sdk.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.MultisigAccountGraphInfo;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,26 +35,26 @@ public class MultisigRepositoryIntegrationTest extends BaseIntegrationTest {
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void getMultisigAccountInfo(RepositoryType type) {
-    System.out.println(config().getMultisigAccount().getAddress().plain());
+    Account multisigAccount = helper().getMultisigAccount(type);
+    Account cosignatoryAccount = config().getCosignatoryAccount();
+    Account cosignatory2Account = config().getCosignatory2Account();
+    System.out.println(multisigAccount.getAddress().plain());
     MultisigAccountInfo multisigAccountInfo =
         get(
             getRepositoryFactory(type)
                 .createMultisigRepository()
-                .getMultisigAccountInfo(config().getMultisigAccount().getAddress()));
+                .getMultisigAccountInfo(multisigAccount.getAddress()));
 
     Set<UnresolvedAddress> cosignatoriesSet =
-        multisigAccountInfo.getCosignatoryAddresses().stream().collect(Collectors.toSet());
+        new HashSet<>(multisigAccountInfo.getCosignatoryAddresses());
 
     Assertions.assertEquals(
-        Sets.newSet(
-            config().getCosignatoryAccount().getAddress(),
-            config().getCosignatory2Account().getAddress()),
+        Sets.newSet(cosignatoryAccount.getAddress(), cosignatory2Account.getAddress()),
         cosignatoriesSet);
 
     Assertions.assertTrue(multisigAccountInfo.isMultisig());
 
-    assertEquals(
-        config().getMultisigAccount().getAddress(), multisigAccountInfo.getAccountAddress());
+    assertEquals(multisigAccount.getAddress(), multisigAccountInfo.getAccountAddress());
 
     Assertions.assertEquals(1, multisigAccountInfo.getMinApproval());
     Assertions.assertEquals(1, multisigAccountInfo.getMinRemoval());
@@ -62,11 +63,12 @@ public class MultisigRepositoryIntegrationTest extends BaseIntegrationTest {
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void getMultisigAccountGraphInfo(RepositoryType type) {
+    Account multisigAccount = helper().getMultisigAccount(type);
     MultisigAccountGraphInfo multisigAccountGraphInfos =
         get(
             this.getRepositoryFactory(type)
                 .createMultisigRepository()
-                .getMultisigAccountGraphInfo(config().getMultisigAccount().getAddress()));
+                .getMultisigAccountGraphInfo(multisigAccount.getAddress()));
 
     assertEquals(2, multisigAccountGraphInfos.getLevelsNumber().size());
 
@@ -79,7 +81,7 @@ public class MultisigRepositoryIntegrationTest extends BaseIntegrationTest {
     assertEquals(2, multisigAccountGraphInfos.getMultisigEntries().get(1).size());
 
     assertEquals(
-        config().getMultisigAccount().getAddress(),
+        multisigAccount.getAddress(),
         multisigAccountGraphInfos.getMultisigEntries().get(0).get(0).getAccountAddress());
   }
 }
