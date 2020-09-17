@@ -205,6 +205,50 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
+  void searchByTransactionToHeight(RepositoryType type) {
+    TransactionRepository transactionRepository = getTransactionRepository(type);
+    TransactionPaginationStreamer streamer =
+        new TransactionPaginationStreamer(transactionRepository);
+    TransactionSearchCriteria toBlockOneTransactions =
+        new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
+            .toHeight(BigInteger.ONE)
+            .embedded(true);
+    List<Transaction> transactions =
+        get(streamer.search(toBlockOneTransactions).toList().toObservable());
+    transactions.forEach(
+        b -> Assertions.assertEquals(BigInteger.ONE, b.getTransactionInfo().get().getHeight()));
+    Assertions.assertFalse(transactions.isEmpty());
+
+    TransactionSearchCriteria blockOneTransactions =
+        new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
+            .height(BigInteger.ONE)
+            .embedded(true);
+    helper.assertSameRecordList(
+        get(streamer.search(toBlockOneTransactions).toList().toObservable()),
+        get(streamer.search(blockOneTransactions).toList().toObservable()));
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchByTransactionFromHeight(RepositoryType type) {
+    TransactionRepository transactionRepository = getTransactionRepository(type);
+    TransactionPaginationStreamer streamer =
+        new TransactionPaginationStreamer(transactionRepository);
+    TransactionSearchCriteria toBlockOneTransactions =
+        new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
+            .fromHeight(BigInteger.valueOf(2))
+            .embedded(true);
+    List<Transaction> transactions =
+        get(streamer.search(toBlockOneTransactions).toList().toObservable());
+    transactions.forEach(
+        b ->
+            Assertions.assertTrue(
+                b.getTransactionInfo().get().getHeight().compareTo(BigInteger.ONE) > 0));
+    Assertions.assertFalse(transactions.isEmpty());
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
   void searchByGroup(RepositoryType type) {
     TransactionRepository transactionRepository = getTransactionRepository(type);
     TransactionPaginationStreamer streamer =
@@ -328,9 +372,11 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
           }
           if (t.getType() == TransactionType.AGGREGATE_BONDED
               || t.getType() == TransactionType.AGGREGATE_COMPLETE) {
-            Assertions.assertThrows(IllegalArgumentException.class, t::getSize);
+            Assertions.assertTrue(t.getSize() > 0);
+            Assertions.assertThrows(IllegalArgumentException.class, t::serialize);
           } else {
             Assertions.assertTrue(t.getSize() > 0);
+            Assertions.assertNotNull(t.serialize());
           }
         });
   }

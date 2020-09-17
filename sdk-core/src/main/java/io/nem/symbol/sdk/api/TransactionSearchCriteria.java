@@ -29,9 +29,10 @@ import java.util.Objects;
  */
 public class TransactionSearchCriteria extends SearchCriteria<TransactionSearchCriteria> {
 
+  /** The group of transaction (optional, default is confirmed) */
+  private final TransactionGroup group;
   /** Transaction identifier up to which transactions are returned. (optional) */
   private String id;
-
   /**
    * Filter by address involved in the transaction.
    *
@@ -42,19 +43,22 @@ public class TransactionSearchCriteria extends SearchCriteria<TransactionSearchC
    * params. (optional)
    */
   private Address address;
-
   /** Address of an account receiving the transaction. (optional) */
   private Address recipientAddress;
-
   /** Public key of the account signing the entity. (optional) */
   private PublicKey signerPublicKey;
-
   /** Filter by block height. (optional, default to null) */
   private BigInteger height;
-
-  /** The group of transaction (optional, default is confirmed) */
-  private final TransactionGroup group;
-
+  /**
+   * Only blocks with height greater or equal than this one are returned. (optional, default to
+   * null).
+   */
+  private BigInteger fromHeight;
+  /**
+   * Only blocks with height smaller or equal than this one are returned. (optional, default to
+   * null).
+   */
+  private BigInteger toHeight;
   /**
    * Filter by transaction type. To filter by multiple transaction type. (optional, default to new
    * empty array)
@@ -77,20 +81,40 @@ public class TransactionSearchCriteria extends SearchCriteria<TransactionSearchC
     return id;
   }
 
+  public void setId(String id) {
+    this.id = id;
+  }
+
   public Address getAddress() {
     return address;
+  }
+
+  public void setAddress(Address address) {
+    this.address = address;
   }
 
   public Address getRecipientAddress() {
     return recipientAddress;
   }
 
+  public void setRecipientAddress(Address recipientAddress) {
+    this.recipientAddress = recipientAddress;
+  }
+
   public PublicKey getSignerPublicKey() {
     return signerPublicKey;
   }
 
+  public void setSignerPublicKey(PublicKey signerPublicKey) {
+    this.signerPublicKey = signerPublicKey;
+  }
+
   public BigInteger getHeight() {
     return height;
+  }
+
+  public void setHeight(BigInteger height) {
+    this.height = height;
   }
 
   public TransactionGroup getGroup() {
@@ -101,32 +125,12 @@ public class TransactionSearchCriteria extends SearchCriteria<TransactionSearchC
     return transactionTypes;
   }
 
-  public Boolean getEmbedded() {
-    return embedded;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public void setAddress(Address address) {
-    this.address = address;
-  }
-
-  public void setRecipientAddress(Address recipientAddress) {
-    this.recipientAddress = recipientAddress;
-  }
-
-  public void setSignerPublicKey(PublicKey signerPublicKey) {
-    this.signerPublicKey = signerPublicKey;
-  }
-
-  public void setHeight(BigInteger height) {
-    this.height = height;
-  }
-
   public void setTransactionTypes(List<TransactionType> transactionTypes) {
     this.transactionTypes = transactionTypes;
+  }
+
+  public Boolean getEmbedded() {
+    return embedded;
   }
 
   public void setEmbedded(Boolean embedded) {
@@ -168,6 +172,32 @@ public class TransactionSearchCriteria extends SearchCriteria<TransactionSearchC
     return this;
   }
 
+  public BigInteger getFromHeight() {
+    return fromHeight;
+  }
+
+  public void setFromHeight(BigInteger fromHeight) {
+    this.fromHeight = fromHeight;
+  }
+
+  public TransactionSearchCriteria fromHeight(BigInteger fromHeight) {
+    this.fromHeight = fromHeight;
+    return this;
+  }
+
+  public BigInteger getToHeight() {
+    return toHeight;
+  }
+
+  public void setToHeight(BigInteger toHeight) {
+    this.toHeight = toHeight;
+  }
+
+  public TransactionSearchCriteria toHeight(BigInteger toHeight) {
+    this.toHeight = toHeight;
+    return this;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -185,6 +215,8 @@ public class TransactionSearchCriteria extends SearchCriteria<TransactionSearchC
         && Objects.equals(recipientAddress, that.recipientAddress)
         && Objects.equals(signerPublicKey, that.signerPublicKey)
         && Objects.equals(height, that.height)
+        && Objects.equals(fromHeight, that.fromHeight)
+        && Objects.equals(toHeight, that.toHeight)
         && group == that.group
         && Objects.equals(transactionTypes, that.transactionTypes)
         && Objects.equals(embedded, that.embedded);
@@ -199,6 +231,8 @@ public class TransactionSearchCriteria extends SearchCriteria<TransactionSearchC
         recipientAddress,
         signerPublicKey,
         height,
+        fromHeight,
+        toHeight,
         group,
         transactionTypes,
         embedded);

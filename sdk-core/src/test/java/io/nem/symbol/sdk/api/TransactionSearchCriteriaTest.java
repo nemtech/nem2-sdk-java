@@ -40,6 +40,8 @@ class TransactionSearchCriteriaTest {
     Assertions.assertNull(criteria.getEmbedded());
     Assertions.assertEquals(TransactionGroup.CONFIRMED, criteria.getGroup());
     Assertions.assertNull(criteria.getHeight());
+    Assertions.assertNull(criteria.getFromHeight());
+    Assertions.assertNull(criteria.getToHeight());
     Assertions.assertNull(criteria.getOffset());
     Assertions.assertNull(criteria.getRecipientAddress());
     Assertions.assertNull(criteria.getSignerPublicKey());
@@ -65,6 +67,8 @@ class TransactionSearchCriteriaTest {
     criteria.setRecipientAddress(address2);
     criteria.setEmbedded(true);
     criteria.setHeight(BigInteger.ONE);
+    criteria.setFromHeight(BigInteger.valueOf(2));
+    criteria.setToHeight(BigInteger.valueOf(3));
     criteria.setOffset("offset1");
     criteria.setSignerPublicKey(signerPublicKey);
 
@@ -81,6 +85,8 @@ class TransactionSearchCriteriaTest {
     Assertions.assertEquals(true, criteria.getEmbedded());
     Assertions.assertEquals("offset1", criteria.getOffset());
     Assertions.assertEquals(BigInteger.ONE, criteria.getHeight());
+    Assertions.assertEquals(BigInteger.valueOf(2), criteria.getFromHeight());
+    Assertions.assertEquals(BigInteger.valueOf(3), criteria.getToHeight());
     Assertions.assertEquals(signerPublicKey, criteria.getSignerPublicKey());
   }
 
@@ -141,6 +147,8 @@ class TransactionSearchCriteriaTest {
     criteria1.height(BigInteger.ONE);
     criteria1.offset("offset1");
     criteria1.setSignerPublicKey(signerPublicKey);
+    criteria1.setFromHeight(BigInteger.valueOf(2));
+    criteria1.setToHeight(BigInteger.valueOf(3));
 
     TransactionSearchCriteria criteria2 =
         new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED)
@@ -155,6 +163,8 @@ class TransactionSearchCriteriaTest {
     criteria2.height(BigInteger.ONE);
     criteria2.offset("offset1");
     criteria2.setSignerPublicKey(signerPublicKey);
+    criteria2.setFromHeight(BigInteger.valueOf(2));
+    criteria2.setToHeight(BigInteger.valueOf(3));
 
     Assertions.assertEquals(
         new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED),
