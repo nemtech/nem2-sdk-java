@@ -67,8 +67,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
 
     Address address = Address.generateRandom(networkType);
     TransferTransactionFactory factory =
-        TransferTransactionFactory.create(
-            networkType, address, Collections.emptyList(), PlainMessage.Empty);
+        TransferTransactionFactory.create(networkType, address, Collections.emptyList())
+            .message(PlainMessage.Empty);
     TransferTransaction transaction = factory.build();
 
     assertEquals(networkType, transaction.getNetworkType());
@@ -91,8 +91,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
         TransferTransactionFactory.create(
                 networkType,
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
-                Collections.emptyList(),
-                PlainMessage.Empty)
+                Collections.emptyList())
+            .message(PlainMessage.Empty)
             .calculateMaxFeeFromMultiplier(feeMultiplier);
     TransferTransaction transaction = factory.build();
 
@@ -114,7 +114,6 @@ class TransferTransactionTest extends AbstractTransactionTester {
   }
 
   @Test
-  @DisplayName("Serialization")
   void shouldGenerateBytes() {
     String expected =
         "B10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019054410000000000000000010000000000000090F36CA680C35D630662A0C38DC89D4978D10B511B3D241A0100010000000000672B0000CE560000640000000000000000";
@@ -124,8 +123,24 @@ class TransferTransactionTest extends AbstractTransactionTester {
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.singletonList(
                     new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
-                PlainMessage.Empty)
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
+            .message(PlainMessage.Empty)
+            .deadline(new FakeDeadline())
+            .build();
+    assertSerialization(expected, transaction);
+  }
+
+  @Test
+  void shouldGenerateBytesNoMessage() {
+    String expected =
+        "B00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019054410000000000000000010000000000000090F36CA680C35D630662A0C38DC89D4978D10B511B3D241A0000010000000000672B0000CE5600006400000000000000";
+    TransferTransaction transaction =
+        TransferTransactionFactory.create(
+                networkType,
+                new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
+                Collections.singletonList(
+                    new Mosaic(
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
             .deadline(new FakeDeadline())
             .build();
     assertSerialization(expected, transaction);
@@ -144,8 +159,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
         TransferTransactionFactory.create(
                 networkType,
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
-                Arrays.asList(mosaicId1, mosaicId2),
-                new PlainMessage("Some Message 漢字"))
+                Arrays.asList(mosaicId1, mosaicId2))
+            .message(new PlainMessage("Some Message 漢字"))
             .signer(account.getPublicAccount())
             .deadline(new FakeDeadline())
             .build();
@@ -176,8 +191,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
                 recipient,
                 Collections.singletonList(
                     new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
-                new PlainMessage("Some Message 漢字"))
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
+            .message(new PlainMessage("Some Message 漢字"))
             .deadline(new FakeDeadline())
             .build();
 
@@ -229,8 +244,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.singletonList(
                     new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
-                PlainMessage.Empty)
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
+            .message(PlainMessage.Empty)
             .deadline(new FakeDeadline())
             .build();
 
@@ -250,8 +265,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.singletonList(
                     new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
-                PlainMessage.Empty)
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
+            .message(PlainMessage.Empty)
             .deadline(new FakeDeadline())
             .build();
 
@@ -274,8 +289,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
                 networkType,
                 namespaceId,
                 Collections.singletonList(
-                    NetworkCurrency.CAT_CURRENCY.createAbsolute(BigInteger.ONE)),
-                PlainMessage.create("test-message"))
+                    NetworkCurrency.CAT_CURRENCY.createAbsolute(BigInteger.ONE)))
+            .message(new PlainMessage("test-message"))
             .deadline(new Deadline(BigInteger.ONE))
             .build();
 
@@ -331,11 +346,11 @@ class TransferTransactionTest extends AbstractTransactionTester {
     assertNotNull(transferTransaction.getMessage());
     assertEquals(
         MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,
-        transferTransaction.getMessage().getType());
-    assertNotNull(transferTransaction.getMessage().getPayload());
+        transferTransaction.getMessage().get().getType());
+    assertNotNull(transferTransaction.getMessage().get().getPayload());
 
     PersistentHarvestingDelegationMessage message =
-        (PersistentHarvestingDelegationMessage) transferTransaction.getMessage();
+        (PersistentHarvestingDelegationMessage) transferTransaction.getMessage().get();
     HarvestingKeys decodedKeys = message.decryptPayload(recipient.getPrivateKey());
     Assertions.assertEquals(signingPrivateKey.getPrivateKey(), decodedKeys.getSigningPrivateKey());
     Assertions.assertEquals(vrfPrivateKey.getPrivateKey(), decodedKeys.getVrfPrivateKey());
@@ -347,9 +362,10 @@ class TransferTransactionTest extends AbstractTransactionTester {
     TransferTransaction deserialized = (TransferTransaction) serialization.deserialize(actual);
 
     assertEquals(
-        MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE, deserialized.getMessage().getType());
+        MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,
+        deserialized.getMessage().get().getType());
     PersistentHarvestingDelegationMessage deserializedMessage =
-        (PersistentHarvestingDelegationMessage) deserialized.getMessage();
+        (PersistentHarvestingDelegationMessage) deserialized.getMessage().get();
     HarvestingKeys decodedKeys2 = deserializedMessage.decryptPayload(recipient.getPrivateKey());
     Assertions.assertEquals(signingPrivateKey.getPrivateKey(), decodedKeys2.getSigningPrivateKey());
     Assertions.assertEquals(vrfPrivateKey.getPrivateKey(), decodedKeys2.getVrfPrivateKey());
@@ -365,8 +381,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
         TransferTransactionFactory.create(
                 networkType,
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
-                mosaics,
-                PlainMessage.Empty)
+                mosaics)
+            .message(PlainMessage.Empty)
             .deadline(new FakeDeadline())
             .build();
 
@@ -390,8 +406,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
         TransferTransactionFactory.create(
                 networkType,
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
-                mosaics,
-                PlainMessage.Empty)
+                mosaics)
+            .message(PlainMessage.Empty)
             .deadline(new FakeDeadline())
             .build();
 

@@ -778,8 +778,8 @@ public class ListenerVertxTest {
   private TransferTransaction transferTransaction(
       PublicAccount signer, UnresolvedAddress recipient) {
     TransferTransactionFactory factory =
-        TransferTransactionFactory.create(
-            NETWORK_TYPE, recipient, Collections.emptyList(), PlainMessage.Empty);
+        TransferTransactionFactory.create(NETWORK_TYPE, recipient, Collections.emptyList())
+            .message(PlainMessage.Empty);
     if (signer != null) {
       factory.signer(signer);
     }

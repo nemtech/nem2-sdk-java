@@ -62,7 +62,8 @@ public class VertxAggregateTransactionTest {
     Address recipient = Address.generateRandom(networkType);
     TransferTransaction transferTx =
         TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST, recipient, Collections.emptyList(), PlainMessage.Empty)
+                NetworkType.MIJIN_TEST, recipient, Collections.emptyList())
+            .message(PlainMessage.Empty)
             .build();
 
     AggregateTransaction aggregateTx =
@@ -90,8 +91,8 @@ public class VertxAggregateTransactionTest {
         TransferTransactionFactory.create(
                 networkType,
                 address,
-                Collections.singletonList(createAbsolute(BigInteger.valueOf(10000000))),
-                PlainMessage.Empty)
+                Collections.singletonList(createAbsolute(BigInteger.valueOf(10000000))))
+            .message(PlainMessage.Empty)
             .deadline(new VertxFakeDeadline())
             .build();
 
@@ -119,8 +120,8 @@ public class VertxAggregateTransactionTest {
 
     Address address = Address.generateRandom(networkType);
     TransferTransaction transferTx =
-        TransferTransactionFactory.create(
-                networkType, address, Collections.emptyList(), new PlainMessage("test-message"))
+        TransferTransactionFactory.create(networkType, address, Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTx =

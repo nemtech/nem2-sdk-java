@@ -94,8 +94,8 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
     Account cosignatoryAccount = config().getCosignatoryAccount();
 
     TransferTransaction transferTransaction =
-        TransferTransactionFactory.create(
-                getNetworkType(), getRecipient(), Collections.emptyList(), PlainMessage.Empty)
+        TransferTransactionFactory.create(getNetworkType(), getRecipient(), Collections.emptyList())
+            .message(PlainMessage.Empty)
             .maxFee(maxFee)
             .build();
 
@@ -126,8 +126,8 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
     Account multisigAccount = helper().getMultisigAccount(type);
 
     TransferTransaction transferTransaction =
-        TransferTransactionFactory.create(
-                getNetworkType(), getRecipient(), Collections.emptyList(), PlainMessage.Empty)
+        TransferTransactionFactory.create(getNetworkType(), getRecipient(), Collections.emptyList())
+            .message(PlainMessage.Empty)
             .maxFee(maxFee)
             .build();
 

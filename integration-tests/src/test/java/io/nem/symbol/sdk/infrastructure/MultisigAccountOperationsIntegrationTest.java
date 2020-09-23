@@ -49,8 +49,8 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
                 getNetworkType(),
                 recipient,
                 Collections.singletonList(
-                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-                PlainMessage.create("test-message"))
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
+            .message(new PlainMessage("test-message"))
             .maxFee(maxFee)
             .build();
 

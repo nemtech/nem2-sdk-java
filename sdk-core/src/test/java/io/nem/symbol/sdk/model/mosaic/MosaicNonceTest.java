@@ -15,14 +15,10 @@
  */
 package io.nem.symbol.sdk.model.mosaic;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,46 +27,31 @@ public class MosaicNonceTest {
   @Test
   void createRandomNonce() {
     MosaicNonce nonce = MosaicNonce.createRandom();
-    assertNotNull(nonce.getNonce());
+    assertEquals(Integer.toUnsignedLong(nonce.getNonceAsInt()), nonce.getNonceAsLong());
   }
 
   @Test
   void createRandomNonceTwiceNotTheSame() {
     MosaicNonce nonce1 = MosaicNonce.createRandom();
     MosaicNonce nonce2 = MosaicNonce.createRandom();
-    assertNotNull(nonce1.getNonce());
-    assertNotNull(nonce2.getNonce());
-    assertFalse(Arrays.equals(nonce1.getNonce(), nonce2.getNonce()));
     assertNotEquals(nonce1, nonce2);
     assertEquals(nonce2, nonce2);
   }
 
   @Test
-  void createNonceFromHexadecimalString() {
-    MosaicNonce nonce = MosaicNonce.createFromHex("00000000");
-    assertNotNull(nonce.getNonce());
-    assertArrayEquals(new byte[] {0x0, 0x0, 0x0, 0x0}, nonce.getNonce());
-  }
-
-  @Test
-  void shouldFailWhenCreatingFromAndInvalidHex() {
-    IllegalArgumentException exception =
-        Assertions.assertThrows(
-            IllegalArgumentException.class, () -> MosaicNonce.createFromHex("Z0000000"));
-    Assertions.assertEquals(
-        "Z0000000 could not be decoded. DecoderException: Illegal hexadecimal character Z at index 0",
-        exception.getMessage());
-  }
-
-  @Test
   void createNonceFromHexadecimalStringTwiceNotTheSame() {
-    MosaicNonce nonce1 = MosaicNonce.createFromHex("00000000");
-    MosaicNonce nonce2 = MosaicNonce.createFromHex("FFFFFFFF");
-    assertNotNull(nonce1.getNonce());
-    assertNotNull(nonce2.getNonce());
-    assertArrayEquals(new byte[] {0x0, 0x0, 0x0, 0x0}, nonce1.getNonce());
-    assertArrayEquals(new byte[] {-0x1, -0x1, -0x1, -0x1}, nonce2.getNonce());
-    assertFalse(Arrays.equals(nonce1.getNonce(), nonce2.getNonce()));
+    MosaicNonce nonce1 = MosaicNonce.createFromInteger(0);
+    assertEquals(0L, nonce1.getNonceAsLong());
+
+    MosaicNonce nonce2 = MosaicNonce.createFromInteger((int) 4294967295L);
+    assertEquals(4294967295L, nonce2.getNonceAsLong());
+    assertEquals(-1, nonce2.getNonceAsInt());
+    assertNotEquals(nonce1, nonce2);
+
+    MosaicNonce nonce3 = MosaicNonce.createFromInteger(1234);
+    assertEquals(1234, nonce3.getNonceAsLong());
+    assertEquals(1234, nonce3.getNonceAsInt());
+    assertNotEquals(nonce1, nonce3);
   }
 
   @Test
@@ -78,13 +59,39 @@ public class MosaicNonceTest {
     MosaicNonce nonce1 = MosaicNonce.createFromBigInteger(new BigInteger("0"));
     MosaicNonce nonce2 = MosaicNonce.createFromBigInteger(new BigInteger("4294967295"));
     MosaicNonce nonce3 = MosaicNonce.createFromBigInteger(new BigInteger("4294967295"));
-    assertNotNull(nonce1.getNonce());
-    assertNotNull(nonce2.getNonce());
-    assertEquals(0, nonce1.getNonceAsInt());
-    assertEquals(nonce2.getNonceAsInt(), new BigInteger("4294967295").intValue());
-    assertArrayEquals(nonce1.getNonce(), MosaicNonce.createFromHex("00000000").getNonce());
-    assertArrayEquals(nonce2.getNonce(), MosaicNonce.createFromHex("FFFFFFFF").getNonce());
+    assertEquals(0, nonce1.getNonceAsLong());
+    long actual = 4294967295L;
+    assertEquals(nonce2.getNonceAsLong(), actual);
     assertNotEquals(nonce1, nonce2);
     assertEquals(nonce3, nonce2);
+  }
+
+  @Test
+  void createMosaicNonceFromInteger() {
+    assertFromInt((int) 4294967295L);
+    assertFromInt(1);
+    assertFromInt(2);
+    assertFromInt(3);
+    assertFromInt(4);
+    assertFromInt(67305985);
+    assertFromInt((int) 3310277026L);
+  }
+
+  private void assertFromInt(int nonceNumber) {
+
+    Assertions.assertEquals(
+        nonceNumber, MosaicNonce.createFromInteger(nonceNumber).getNonceAsInt());
+
+    Assertions.assertEquals(
+        Integer.toUnsignedLong(nonceNumber),
+        MosaicNonce.createFromBigInteger(BigInteger.valueOf(nonceNumber)).getNonceAsLong());
+
+    Assertions.assertEquals(
+        Integer.toUnsignedLong(nonceNumber),
+        MosaicNonce.createFromInteger(nonceNumber).getNonceAsLong());
+
+    Assertions.assertEquals(
+        nonceNumber,
+        MosaicNonce.createFromBigInteger(BigInteger.valueOf(nonceNumber)).getNonceAsInt());
   }
 }

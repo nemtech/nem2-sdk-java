@@ -189,10 +189,10 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
-            getNetworkType(),
-            recipientNamespace,
-            Collections.singletonList(new Mosaic(mosaicNamespace, amount)),
-            new PlainMessage("E2ETest:TransactionServiceIntegrationTest"));
+                getNetworkType(),
+                recipientNamespace,
+                Collections.singletonList(new Mosaic(mosaicNamespace, amount)))
+            .message(new PlainMessage("E2ETest:TransactionServiceIntegrationTest"));
 
     factory.maxFee(this.maxFee);
     TransferTransaction transferTransaction = factory.build();
@@ -229,10 +229,10 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
-            getNetworkType(),
-            recipientNamespace,
-            Collections.singletonList(new Mosaic(mosaicNamespace, amount)),
-            new PlainMessage("E2ETest:TransactionServiceIntegrationTest"));
+                getNetworkType(),
+                recipientNamespace,
+                Collections.singletonList(new Mosaic(mosaicNamespace, amount)))
+            .message(new PlainMessage("E2ETest:TransactionServiceIntegrationTest"));
 
     factory.maxFee(this.maxFee);
     TransferTransaction transferTransaction = factory.build();

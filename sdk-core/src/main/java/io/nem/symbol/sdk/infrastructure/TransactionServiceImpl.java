@@ -355,8 +355,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     BiFunction<Address, List<Mosaic>, TransferTransactionFactory> mergeFunction =
         (address, mosaics) ->
-            TransferTransactionFactory.create(
-                transaction.getNetworkType(), address, mosaics, transaction.getMessage());
+            TransferTransactionFactory.create(transaction.getNetworkType(), address, mosaics)
+                .message(transaction.getMessage().orElse(null));
     return Observable.combineLatest(resolvedRecipient, resolvedMosaics, mergeFunction);
   }
 

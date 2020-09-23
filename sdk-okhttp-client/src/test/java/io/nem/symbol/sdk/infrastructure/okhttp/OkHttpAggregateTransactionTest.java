@@ -59,8 +59,8 @@ public class OkHttpAggregateTransactionTest {
 
     Address recipient = Address.generateRandom(NetworkType.MIJIN_TEST);
     TransferTransaction transferTx =
-        TransferTransactionFactory.create(
-                networkType, recipient, Collections.emptyList(), PlainMessage.Empty)
+        TransferTransactionFactory.create(networkType, recipient, Collections.emptyList())
+            .message(PlainMessage.Empty)
             .build();
 
     AggregateTransaction aggregateTx =
@@ -88,8 +88,8 @@ public class OkHttpAggregateTransactionTest {
         TransferTransactionFactory.create(
                 networkType,
                 address,
-                Collections.singletonList(createAbsolute(BigInteger.valueOf(10000000))),
-                PlainMessage.Empty)
+                Collections.singletonList(createAbsolute(BigInteger.valueOf(10000000))))
+            .message(PlainMessage.Empty)
             .deadline(new OkHttpFakeDeadline())
             .build();
 
@@ -117,8 +117,8 @@ public class OkHttpAggregateTransactionTest {
 
     Address address = Address.generateRandom(networkType);
     TransferTransaction transferTx =
-        TransferTransactionFactory.create(
-                networkType, address, Collections.emptyList(), new PlainMessage("test-message"))
+        TransferTransactionFactory.create(networkType, address, Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTx =

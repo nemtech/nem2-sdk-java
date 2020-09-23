@@ -30,22 +30,24 @@ import org.apache.commons.lang3.Validate;
 /** Factory of {@link TransferTransaction} */
 public class TransferTransactionFactory extends TransactionFactory<TransferTransaction> {
 
+  /** The required recipient. */
   private final UnresolvedAddress recipient;
+
+  /** The mosaic to be transfered. */
   private final List<Mosaic> mosaics;
-  private final Message message;
+
+  /** An optional message. */
+  private Message message;
 
   private TransferTransactionFactory(
       final NetworkType networkType,
       final UnresolvedAddress recipient,
-      final List<Mosaic> mosaics,
-      final Message message) {
+      final List<Mosaic> mosaics) {
     super(TransactionType.TRANSFER, networkType);
     Validate.notNull(recipient, "Recipient must not be null");
     Validate.notNull(mosaics, "Mosaics must not be null");
-    Validate.notNull(message, "Message must not be null");
     this.recipient = recipient;
     this.mosaics = mosaics;
-    this.message = message;
   }
 
   /**
@@ -54,15 +56,13 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
    * @param networkType Network type.
    * @param recipient Recipient address.
    * @param mosaics List of mosaics.
-   * @param message Message.
    * @return Transfer transaction.
    */
   public static TransferTransactionFactory create(
       final NetworkType networkType,
       final UnresolvedAddress recipient,
-      final List<Mosaic> mosaics,
-      final Message message) {
-    return new TransferTransactionFactory(networkType, recipient, mosaics, message);
+      final List<Mosaic> mosaics) {
+    return new TransferTransactionFactory(networkType, recipient, mosaics);
   }
 
   /**
@@ -84,10 +84,10 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
         PersistentHarvestingDelegationMessage.create(
             signingPrivateKey, vrfPrivateKey, nodePublicKey);
     return new TransferTransactionFactory(
-        networkType,
-        Address.createFromPublicKey(nodePublicKey.toHex(), networkType),
-        Collections.emptyList(),
-        message);
+            networkType,
+            Address.createFromPublicKey(nodePublicKey.toHex(), networkType),
+            Collections.emptyList())
+        .message(message);
   }
 
   /**
@@ -115,6 +115,17 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
    */
   public Message getMessage() {
     return message;
+  }
+
+  /**
+   * It sets the message if required.
+   *
+   * @param message the message to be set.
+   * @return this factory
+   */
+  public TransferTransactionFactory message(Message message) {
+    this.message = message;
+    return this;
   }
 
   @Override

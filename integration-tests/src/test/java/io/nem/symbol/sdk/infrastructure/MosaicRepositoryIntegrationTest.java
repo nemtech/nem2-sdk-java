@@ -119,7 +119,7 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
   }
 
   private MosaicId createMosaic(RepositoryType type, Account testAccount) {
-    MosaicNonce nonce = new MosaicNonce(new byte[4]);
+    MosaicNonce nonce = MosaicNonce.createFromInteger(0);
     System.out.println("Nonce: " + nonce.getNonceAsInt());
     System.out.println("Address: " + testAccount.getAddress().plain());
     MosaicId mosaicId = MosaicId.createFromNonce(nonce, testAccount.getPublicAccount());

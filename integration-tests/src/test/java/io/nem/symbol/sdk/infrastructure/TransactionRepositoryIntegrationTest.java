@@ -67,15 +67,15 @@ public class TransactionRepositoryIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 recipient,
                 Collections.singletonList(
-                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-                PlainMessage.create(message))
-            .maxFee(this.maxFee)
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
+            .message(new PlainMessage(message))
+            .maxFee(maxFee)
             .build();
 
     TransferTransaction processed =
         announceAndValidate(type, config().getDefaultAccount(), transferTransaction);
 
-    Assertions.assertEquals(message, processed.getMessage().getPayload());
+    Assertions.assertEquals(message, processed.getMessage().get().getPayload());
 
     PublicAccount account = config().getDefaultAccount().getPublicAccount();
     List<Transaction> allTransactions =

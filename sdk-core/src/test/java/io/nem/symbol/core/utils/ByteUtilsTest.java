@@ -33,23 +33,6 @@ public class ByteUtilsTest {
     MatcherAssert.assertThat(result, IsEqual.equalTo(expected));
   }
 
-  private static void assertBigIntToBytesOfSizeConversion(
-      final BigInteger input, final int size, final byte[] expected) {
-    // Act:
-    final byte[] result = ByteUtils.bigIntToBytesOfSize(input, size);
-
-    // Assert:
-    MatcherAssert.assertThat(result, IsEqual.equalTo(expected));
-  }
-
-  private static void assertBytesToLongConversion(final byte[] input, final long expected) {
-    // Act:
-    final long result = ByteUtils.bytesToLong(input);
-
-    // Assert:
-    MatcherAssert.assertThat(result, IsEqual.equalTo(expected));
-  }
-
   private static void assertLongToBytesConversion(final long input, final byte[] expected) {
     // Act:
     final byte[] result = ByteUtils.longToBytes(input);
@@ -66,28 +49,6 @@ public class ByteUtilsTest {
     MatcherAssert.assertThat(result, IsEqual.equalTo(expected));
   }
 
-  // endregion
-
-  // region bytesToLong / longToBytes
-
-  // region bytesToLong
-
-  private static void assertIntToBytesConversion(final int input, final byte[] expected) {
-    // Act:
-    final byte[] result = ByteUtils.intToBytes(input);
-
-    // Assert:
-    MatcherAssert.assertThat(result, IsEqual.equalTo(expected));
-  }
-
-  private static void assertIntArrayToBytesConversion(final int[] input, final byte[] expected) {
-    // Act:
-    final byte[] result = ByteUtils.intArrayToByteArray(input);
-
-    // Assert:
-    MatcherAssert.assertThat(result, IsEqual.equalTo(expected));
-  }
-
   @Test
   public void canConvertBigIntToBytes() {
     // Assert:
@@ -99,60 +60,7 @@ public class ByteUtilsTest {
         new byte[] {0x6F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F});
   }
 
-  @Test
-  public void canConvertBigIntToBytesOfGivenSize() {
-    // Assert:
-    assertBigIntToBytesOfSizeConversion(new BigInteger("0"), 4, new byte[] {0, 0, 0, 0});
-    assertBigIntToBytesOfSizeConversion(
-        new BigInteger("2139062143"), 4, new byte[] {0x7F, 0x7F, 0x7F, 0x7F});
-  }
-
-  @Test
-  public void canConvertBigIntToBytesIgnoresExcessiveData() {
-    // Assert:
-    // Should truncates higher than 8 bytes
-    assertBigIntToBytesConversion(
-        new BigInteger("1760474967448236294015"),
-        new byte[] {0x6F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F});
-    // Should truncates higher than 4 bytes
-    assertBigIntToBytesOfSizeConversion(
-        new BigInteger("8034280445828890495"), 4, new byte[] {0x7F, 0x7F, 0x7F, 0x7F});
-  }
-
   // endregion
-
-  // region longToBytes
-
-  @Test
-  public void canConvertBytesToLong() {
-    // Assert:
-    assertBytesToLongConversion(new byte[] {1, 2, 3, 4, 5, 6, 7, 8}, 0x0102030405060708L);
-  }
-
-  @Test
-  public void canConvertBytesToLongNegative() {
-    // Assert:
-    assertBytesToLongConversion(new byte[] {(byte) 0x80, 2, 3, 4, 5, 6, 7, 8}, 0x8002030405060708L);
-  }
-
-  @Test
-  public void conversionToLongIgnoresExcessiveData() {
-    // Assert:
-    assertBytesToLongConversion(new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9}, 0x0102030405060708L);
-  }
-
-  // endregion
-
-  // region roundtrip
-
-  @Test
-  public void conversionToLongFailsOnDataUnderflow() {
-    // Arrange:
-    final byte[] data = {1, 2, 3, 4, 5, 6};
-
-    // Act:
-    Assertions.assertThrows(IndexOutOfBoundsException.class, () -> ByteUtils.bytesToLong(data));
-  }
 
   @Test
   public void canConvertLongToBytes() {
@@ -173,36 +81,17 @@ public class ByteUtilsTest {
     // Arrange:
     assertLongToBytesConversion(
         0x8070605040302010L, new byte[] {(byte) 0x80, 0x70, 0x60, 0x50, 0x40, 0x30, 0x20, 0x10});
-  }
 
-  @Test
-  public void canRoundtripLongViaBytes() {
-    // Arrange:
-    final long input = 0x8070605040302010L;
+    assertLongToBytesConversion(1L, new byte[] {0, 0, 0, 0, 0, 0, 0, 1});
 
-    // Act:
-    final long result = ByteUtils.bytesToLong(ByteUtils.longToBytes(input));
-
-    // Assert:
-    MatcherAssert.assertThat(result, IsEqual.equalTo(input));
-  }
-
-  @Test
-  public void canRoundtripBytesViaLong() {
-    // Arrange:
-    final byte[] input = {(byte) 0x80, 2, 3, 4, 5, 6, 7, 8};
-
-    // Act:
-    final byte[] result = ByteUtils.longToBytes(ByteUtils.bytesToLong(input));
-
-    // Assert:
-    MatcherAssert.assertThat(result, IsEqual.equalTo(input));
+    assertLongToBytesConversion(600L, new byte[] {0, 0, 0, 0, 0, 0, 2, 88});
   }
 
   @Test
   public void canConvertBytesToInt() {
     // Assert:
     assertBytesToIntConversion(new byte[] {1, 2, 3, 4}, 0x01020304);
+    assertBytesToIntConversion(new byte[] {1, 0, 0, 0}, 0x01000000);
   }
 
   @Test
@@ -231,22 +120,6 @@ public class ByteUtilsTest {
   }
 
   @Test
-  public void canConvertIntToBytes() {
-    // Assert:
-    assertIntToBytesConversion(0x08070605, new byte[] {8, 7, 6, 5});
-  }
-
-  // endregion
-
-  // region roundtrip
-
-  @Test
-  public void canConvertIntNegativeToBytes() {
-    // Arrange:
-    assertIntToBytesConversion(0x80706050, new byte[] {(byte) 0x80, 0x70, 0x60, 0x50});
-  }
-
-  @Test
   public void canRoundtripIntViaBytes() {
     // Arrange:
     final int input = 0x80706050;
@@ -272,16 +145,6 @@ public class ByteUtilsTest {
 
     // Assert:
     MatcherAssert.assertThat(result, IsEqual.equalTo(input));
-  }
-
-  @Test
-  public void canConvertIntArrayToBytes() {
-    // Assert:
-    assertIntArrayToBytesConversion(new int[] {1, 2, 3, 4}, new byte[] {1, 2, 3, 4});
-    assertIntArrayToBytesConversion(
-        new int[] {1, 2, 3, 4, 5, 6, 7, 8}, new byte[] {1, 2, 3, 4, 5, 6, 7, 8});
-    assertIntArrayToBytesConversion(new int[] {0x7F, 0x7F}, new byte[] {0x7F, 0x7F});
-    assertIntArrayToBytesConversion(new int[] {0xFF, 0xFF}, new byte[] {-0x1, -0x1});
   }
 
   // endregion

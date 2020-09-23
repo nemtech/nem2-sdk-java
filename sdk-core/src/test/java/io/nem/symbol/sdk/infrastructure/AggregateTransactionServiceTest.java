@@ -274,10 +274,8 @@ public class AggregateTransactionServiceTest {
 
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType,
-                Address.generateRandom(networkType),
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+                networkType, Address.generateRandom(networkType), Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -305,10 +303,8 @@ public class AggregateTransactionServiceTest {
       throws ExecutionException, InterruptedException {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType,
-                Address.generateRandom(networkType),
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+                networkType, Address.generateRandom(networkType), Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -349,10 +345,8 @@ public class AggregateTransactionServiceTest {
 
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType,
-                Address.generateRandom(networkType),
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+                networkType, Address.generateRandom(networkType), Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -403,18 +397,14 @@ public class AggregateTransactionServiceTest {
           throws ExecutionException, InterruptedException {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType,
-                Address.generateRandom(networkType),
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+                networkType, Address.generateRandom(networkType), Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     TransferTransaction transferTransaction2 =
         TransferTransactionFactory.create(
-                networkType,
-                account2.getAddress(),
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+                networkType, account2.getAddress(), Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -443,18 +433,14 @@ public class AggregateTransactionServiceTest {
           throws ExecutionException, InterruptedException {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType,
-                account2.getAddress(),
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+                networkType, account2.getAddress(), Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     TransferTransaction transferTransaction2 =
         TransferTransactionFactory.create(
-                networkType,
-                account2.getAddress(),
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+                networkType, account2.getAddress(), Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -509,10 +495,8 @@ public class AggregateTransactionServiceTest {
       throws ExecutionException, InterruptedException {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType,
-                account2.getAddress(),
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+                networkType, account2.getAddress(), Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -535,10 +519,8 @@ public class AggregateTransactionServiceTest {
       throws ExecutionException, InterruptedException {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType,
-                account2.getAddress(),
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+                networkType, account2.getAddress(), Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -566,18 +548,14 @@ public class AggregateTransactionServiceTest {
 
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType,
-                account1.getAddress(),
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+                networkType, account1.getAddress(), Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     TransferTransaction transferTransaction2 =
         TransferTransactionFactory.create(
-                networkType,
-                account4.getAddress(),
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+                networkType, account4.getAddress(), Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -612,18 +590,14 @@ public class AggregateTransactionServiceTest {
 
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType,
-                account1.getAddress(),
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+                networkType, account1.getAddress(), Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     TransferTransaction transferTransaction2 =
         TransferTransactionFactory.create(
-                networkType,
-                account4.getAddress(),
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+                networkType, account4.getAddress(), Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -650,10 +624,8 @@ public class AggregateTransactionServiceTest {
       throws ExecutionException, InterruptedException {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType,
-                account4.getAddress(),
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+                networkType, account4.getAddress(), Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
@@ -695,10 +667,8 @@ public class AggregateTransactionServiceTest {
       throws ExecutionException, InterruptedException {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType,
-                account4.getAddress(),
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+                networkType, account4.getAddress(), Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =

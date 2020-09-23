@@ -515,17 +515,31 @@ public class BinarySerializationImpl implements BinarySerialization {
       TransferTransactionBodyBuilder builder =
           ((TransferTransactionBodyBuilder) transactionBuilder);
       byte[] messageArray = builder.getMessage().array();
-      MessageType messageType =
-          MessageType.rawValueOf(SerializationUtils.byteToUnsignedInt(messageArray[0]));
-      String messageHex = ConvertUtils.toHex(messageArray).substring(2);
+
+      Message message = getMessage(messageArray);
+
       UnresolvedAddress recipient =
           SerializationUtils.toUnresolvedAddress(builder.getRecipientAddress());
       List<Mosaic> mosaics =
           builder.getMosaics().stream()
               .map(SerializationUtils::toMosaic)
               .collect(Collectors.toList());
-      Message message = Message.createFromPayload(messageType, messageHex);
-      return TransferTransactionFactory.create(networkType, recipient, mosaics, message);
+      TransferTransactionFactory factory =
+          TransferTransactionFactory.create(networkType, recipient, mosaics);
+      if (message != null) {
+        factory.message(message);
+      }
+      return factory;
+    }
+
+    private Message getMessage(byte[] messageArray) {
+      if (messageArray.length == 0) {
+        return null;
+      }
+      MessageType messageType =
+          MessageType.rawValueOf(SerializationUtils.byteToUnsignedInt(messageArray[0]));
+      String messageHex = ConvertUtils.toHex(messageArray).substring(2);
+      return Message.createFromPayload(messageType, messageHex);
     }
 
     @Override
@@ -569,14 +583,20 @@ public class BinarySerializationImpl implements BinarySerialization {
      * @return Message buffer.
      */
     private ByteBuffer getMessageBuffer(TransferTransaction transaction) {
-      final byte byteMessageType = (byte) transaction.getMessage().getType().getValue();
-      final byte[] bytePayload =
-          transaction.getMessage().getPayload().getBytes(StandardCharsets.UTF_8);
-      final ByteBuffer messageBuffer =
-          ByteBuffer.allocate(bytePayload.length + 1 /* for the message type */);
-      messageBuffer.put(byteMessageType);
-      messageBuffer.put(bytePayload);
-      return messageBuffer;
+      return transaction
+          .getMessage()
+          .map(
+              message -> {
+                MessageType type = message.getType();
+                final byte byteMessageType = (byte) type.getValue();
+                final byte[] bytePayload = message.getPayload().getBytes(StandardCharsets.UTF_8);
+                final ByteBuffer messageBuffer =
+                    ByteBuffer.allocate(bytePayload.length + 1 /* for the message type */);
+                messageBuffer.put(byteMessageType);
+                messageBuffer.put(bytePayload);
+                return messageBuffer;
+              })
+          .orElseGet(() -> ByteBuffer.allocate(0));
     }
   }
 
@@ -651,7 +671,7 @@ public class BinarySerializationImpl implements BinarySerialization {
       return MosaicDefinitionTransactionBodyBuilder.create(
           new MosaicIdDto(SerializationUtils.toUnsignedLong(transaction.getMosaicId().getId())),
           new BlockDurationDto(transaction.getBlockDuration().getDuration()),
-          new MosaicNonceDto(transaction.getMosaicNonce().getNonceAsInt()),
+          new MosaicNonceDto((int) transaction.getMosaicNonce().getNonceAsLong()),
           getMosaicFlagsEnumSet(transaction),
           (byte) transaction.getDivisibility());
     }

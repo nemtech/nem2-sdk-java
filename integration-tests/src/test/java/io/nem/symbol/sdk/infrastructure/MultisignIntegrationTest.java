@@ -185,11 +185,8 @@ class MultisignIntegrationTest extends BaseIntegrationTest {
   private SignedTransaction createSignedAggregatedBondTransaction(
       Account multisigAccount, Account cosignAccount, Address recipient) {
     TransferTransaction transferTransaction =
-        TransferTransactionFactory.create(
-                getNetworkType(),
-                recipient,
-                Collections.emptyList(),
-                PlainMessage.create("test-message"))
+        TransferTransactionFactory.create(getNetworkType(), recipient, Collections.emptyList())
+            .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =

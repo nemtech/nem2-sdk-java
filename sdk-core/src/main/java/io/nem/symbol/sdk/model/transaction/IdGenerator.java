@@ -16,7 +16,6 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.core.crypto.Hashes;
-import io.nem.symbol.core.utils.ByteUtils;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.mosaic.IllegalIdentifierException;
 import java.math.BigInteger;
@@ -39,13 +38,14 @@ public class IdGenerator {
   /**
    * Generate mosaic id.
    *
-   * @param nonce Nonce bytes.
+   * @param nonce Nonce int.
    * @param publicKey Public key.
    * @return Mosaic id.
    */
-  public static BigInteger generateMosaicId(final byte[] nonce, final byte[] publicKey) {
-    final byte[] reverseNonce = ByteUtils.reverseCopy(nonce);
-    final byte[] hash = IdGenerator.getHashInLittleEndian(reverseNonce, publicKey);
+  public static BigInteger generateMosaicId(final int nonce, final byte[] publicKey) {
+    final ByteBuffer parentIdBuffer =
+        ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(nonce);
+    final byte[] hash = IdGenerator.getHashInLittleEndian(parentIdBuffer.array(), publicKey);
     // Unset the high bit for mosaic id
     return BigInteger.valueOf(ByteBuffer.wrap(hash).getLong() & ~ID_GENERATOR_FLAG);
   }

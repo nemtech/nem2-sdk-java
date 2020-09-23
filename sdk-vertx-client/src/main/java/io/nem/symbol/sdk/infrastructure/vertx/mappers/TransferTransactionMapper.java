@@ -15,14 +15,12 @@
  */
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
-import static io.nem.symbol.core.utils.MapperUtils.toUnresolvedAddress;
 import static io.nem.symbol.core.utils.MapperUtils.toUnresolvedMosaicId;
 
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.message.Message;
 import io.nem.symbol.sdk.model.message.MessageType;
-import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
@@ -65,10 +63,15 @@ class TransferTransactionMapper
                 m ->
                     Message.createFromPayload(
                         MessageType.rawValueOf(m.getType().getValue()), m.getPayload()))
-            .orElse(PlainMessage.Empty);
+            .orElse(null);
 
-    return TransferTransactionFactory.create(
-        networkType, toUnresolvedAddress(transaction.getRecipientAddress()), mosaics, message);
+    TransferTransactionFactory transferTransactionFactory =
+        TransferTransactionFactory.create(
+            networkType,
+            MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()),
+            mosaics);
+    if (message != null) transferTransactionFactory.message(message);
+    return transferTransactionFactory;
   }
 
   @Override
@@ -79,8 +82,7 @@ class TransferTransactionMapper
           transaction.getMosaics().stream()
               .map(
                   mosaic -> {
-                    io.nem.symbol.sdk.openapi.vertx.model.UnresolvedMosaic mosaicDto =
-                        new io.nem.symbol.sdk.openapi.vertx.model.UnresolvedMosaic();
+                    UnresolvedMosaic mosaicDto = new UnresolvedMosaic();
                     mosaicDto.setAmount(mosaic.getAmount());
                     mosaicDto.setId(MapperUtils.getIdAsHex(mosaic.getId()));
                     return mosaicDto;
@@ -88,14 +90,19 @@ class TransferTransactionMapper
               .collect(Collectors.toList());
     }
 
-    MessageDTO message = null;
-    if (transaction.getMessage() != null) {
-      message = new MessageDTO();
-      message.setType(MessageTypeEnum.NUMBER_0);
-      message.setPayload(
-          ConvertUtils.toHex(
-              transaction.getMessage().getPayload().getBytes(StandardCharsets.UTF_8)));
-    }
+    MessageDTO message =
+        transaction
+            .getMessage()
+            .map(
+                fromMessage -> {
+                  MessageDTO toMessage = new MessageDTO();
+                  toMessage.setType(MessageTypeEnum.fromValue(fromMessage.getType().getValue()));
+                  toMessage.setPayload(
+                      ConvertUtils.toHex(
+                          fromMessage.getPayload().getBytes(StandardCharsets.UTF_8)));
+                  return toMessage;
+                })
+            .orElse(null);
     dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));
     dto.setMosaics(mosaics);
     dto.setMessage(message);

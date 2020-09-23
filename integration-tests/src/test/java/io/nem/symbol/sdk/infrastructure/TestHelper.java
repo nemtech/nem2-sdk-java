@@ -38,7 +38,6 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.blockchain.BlockDuration;
-import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -760,8 +759,7 @@ public class TestHelper {
         TransferTransactionFactory.create(
             getNetworkType(),
             recipient,
-            Collections.singletonList(getNetworkCurrency().createAbsolute(amount)),
-            new PlainMessage("E2ETest:SetUpAccountsTool"));
+            Collections.singletonList(getNetworkCurrency().createAbsolute(amount)));
 
     factory.maxFee(maxFee);
     TransferTransaction transferTransaction = factory.build();

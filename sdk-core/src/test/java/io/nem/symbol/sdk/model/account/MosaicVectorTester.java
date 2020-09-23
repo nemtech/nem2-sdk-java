@@ -60,9 +60,12 @@ class MosaicVectorTester extends AbstractVectorTester {
   void testMosaics(NetworkType networkType, long mosaicNonce, String plain, String mosaicHex) {
     Address address = Address.createFromRawAddress(plain);
     Assertions.assertEquals(networkType, address.getNetworkType());
-    MosaicId mosaicId =
-        MosaicId.createFromNonce(
-            MosaicNonce.createFromBigInteger(BigInteger.valueOf(mosaicNonce)), address);
+    MosaicNonce nonce = MosaicNonce.createFromBigInteger(BigInteger.valueOf(mosaicNonce));
+    MosaicNonce nonce2 = MosaicNonce.createFromInteger((int) mosaicNonce);
+    Assertions.assertEquals(mosaicNonce, nonce.getNonceAsLong());
+    Assertions.assertEquals(mosaicNonce, nonce2.getNonceAsLong());
+    Assertions.assertEquals(nonce2, nonce);
+    MosaicId mosaicId = MosaicId.createFromNonce(nonce, address);
     Assertions.assertEquals(mosaicHex, mosaicId.getIdAsHex());
   }
 }

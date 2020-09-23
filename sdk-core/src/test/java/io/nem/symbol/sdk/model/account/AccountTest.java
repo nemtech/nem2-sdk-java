@@ -114,8 +114,8 @@ class AccountTest {
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", NetworkType.MIJIN_TEST),
                 Collections.singletonList(
                     new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
-                PlainMessage.Empty)
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
+            .message(PlainMessage.Empty)
             .deadline(new FakeDeadline())
             .build();
 

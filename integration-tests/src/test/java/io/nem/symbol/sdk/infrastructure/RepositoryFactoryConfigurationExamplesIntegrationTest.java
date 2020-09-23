@@ -106,8 +106,8 @@ public class RepositoryFactoryConfigurationExamplesIntegrationTest {
         TransferTransactionFactory.create(
                 networkType,
                 recipient.getAddress(),
-                Collections.singletonList(currency.createRelative(BigInteger.TEN)),
-                PlainMessage.Empty)
+                Collections.singletonList(currency.createRelative(BigInteger.TEN)))
+            .message(PlainMessage.Empty)
             .build();
 
     SignedTransaction signedTransaction = transferTransaction.signWith(sender, generationHash);

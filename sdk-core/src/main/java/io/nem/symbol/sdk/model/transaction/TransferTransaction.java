@@ -19,6 +19,7 @@ import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.message.Message;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The transfer transactions object contain data about transfers of mosaics and message to another
@@ -66,7 +67,7 @@ public class TransferTransaction extends Transaction implements RecipientTransac
    *
    * @return Message.
    */
-  public Message getMessage() {
-    return message;
+  public Optional<Message> getMessage() {
+    return Optional.ofNullable(message);
   }
 }

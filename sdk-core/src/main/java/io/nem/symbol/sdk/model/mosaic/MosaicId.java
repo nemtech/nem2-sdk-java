@@ -61,7 +61,8 @@ public class MosaicId implements UnresolvedMosaicId {
    */
   public MosaicId(MosaicNonce mosaicNonce, Address owner) {
     this.id =
-        IdGenerator.generateMosaicId(mosaicNonce.getNonce(), Base32Encoder.getBytes(owner.plain()));
+        IdGenerator.generateMosaicId(
+            mosaicNonce.getNonceAsInt(), Base32Encoder.getBytes(owner.plain()));
   }
 
   /**

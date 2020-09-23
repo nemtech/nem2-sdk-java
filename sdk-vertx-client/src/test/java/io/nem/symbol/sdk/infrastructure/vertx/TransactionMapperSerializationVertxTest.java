@@ -52,6 +52,9 @@ public class TransactionMapperSerializationVertxTest {
   }
 
   private static File[] getResourceFolderFiles(String folder) {
+    String resName = "../sdk-core/src/test/resources/" + folder;
+    File file = new File(resName);
+    if (file.exists()) return file.listFiles();
     ClassLoader loader = Thread.currentThread().getContextClassLoader();
     URL url = loader.getResource(folder);
     String path = url.getPath();

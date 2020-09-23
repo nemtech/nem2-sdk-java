@@ -65,14 +65,14 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 recipient,
                 Collections.singletonList(
-                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-                new PlainMessage(message))
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
+            .message(new PlainMessage(message))
             .maxFee(maxFee)
             .build();
 
     TransferTransaction processed =
         announceAggregateAndValidate(type, transferTransaction, account).getKey();
-    Assertions.assertEquals(message, processed.getMessage().getPayload());
+    Assertions.assertEquals(message, processed.getMessage().get().getPayload());
   }
 
   @ParameterizedTest
@@ -97,8 +97,8 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 recipient,
                 Collections.singletonList(
-                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-                encryptedMessage)
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
+            .message(encryptedMessage)
             .maxFee(maxFee)
             .build();
 
@@ -137,8 +137,8 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 recipient,
                 Collections.singletonList(
-                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1000000000))),
-                PlainMessage.Empty)
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1000000000))))
+            .message(PlainMessage.Empty)
             .maxFee(maxFee)
             .build();
 
@@ -156,9 +156,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         expected.getRecipient().encoded(getNetworkType()),
         processed.getRecipient().encoded(getNetworkType()));
     Assertions.assertEquals(expected.getRecipient(), processed.getRecipient());
-    Assertions.assertEquals(expected.getMessage().getType(), processed.getMessage().getType());
-    Assertions.assertEquals(
-        expected.getMessage().getPayload(), processed.getMessage().getPayload());
+    Assertions.assertEquals(expected.getMessage(), processed.getMessage());
   }
 
   private void assertEncryptedMessageTransaction(
@@ -166,10 +164,10 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
       KeyPair senderKeyPair,
       KeyPair recipientKeyPair,
       TransferTransaction transaction) {
-    Assertions.assertTrue(transaction.getMessage() instanceof EncryptedMessage);
-    Assertions.assertNotEquals(message, transaction.getMessage().getPayload());
+    Assertions.assertTrue(transaction.getMessage().get() instanceof EncryptedMessage);
+    Assertions.assertNotEquals(message, transaction.getMessage().get().getPayload());
     String decryptedMessage =
-        ((EncryptedMessage) transaction.getMessage())
+        ((EncryptedMessage) transaction.getMessage().get())
             .decryptPayload(senderKeyPair.getPublicKey(), recipientKeyPair.getPrivateKey());
     Assertions.assertNotNull(message, decryptedMessage);
   }
@@ -211,12 +209,13 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
       KeyPair recipientKeyPair, KeyPair vrfPrivateKey, TransferTransaction transaction) {
     String message = recipientKeyPair.getPublicKey().toHex();
     Assertions.assertTrue(
-        transaction.getMessage() instanceof PersistentHarvestingDelegationMessage);
-    Assertions.assertNotEquals(message, transaction.getMessage().getPayload());
+        transaction.getMessage().get() instanceof PersistentHarvestingDelegationMessage);
+    Assertions.assertNotEquals(message, transaction.getMessage().get().getPayload());
     Assertions.assertEquals(
-        MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE, transaction.getMessage().getType());
+        MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,
+        transaction.getMessage().get().getType());
     HarvestingKeys decryptedMessage =
-        ((PersistentHarvestingDelegationMessage) transaction.getMessage())
+        ((PersistentHarvestingDelegationMessage) transaction.getMessage().get())
             .decryptPayload(recipientKeyPair.getPrivateKey());
     Assertions.assertEquals(
         recipientKeyPair.getPrivateKey(), decryptedMessage.getSigningPrivateKey());

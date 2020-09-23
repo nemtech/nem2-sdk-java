@@ -5,18 +5,20 @@ The changelog format is based on [Keep a Changelog](https://keepachangelog.com/e
 
 ## [0.21.0] - 21-Sep-2020
 
-**Milestone**: Gorilla.1(0.9.7.0)
+**Milestone**: Gorilla.1(0.10.0.1.0)
  Package  | Version  | Link
 ---|---|---
 SDK OkHttp| v0.21.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-okhttp-client
 SDK Vertx| v0.21.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-vertx-client
 Catbuffer Library| v0.0.23 | https://repo.maven.apache.org/maven2/io/nem/catbuffer-java
-Client OkHttp | v0.9.7  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-okhttp-gson-client
-Client Vertx | v0.9.7  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-vertx-client/
+Client OkHttp | v0.10.0.1  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-okhttp-gson-client
+Client Vertx | v0.10.0.1  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-vertx-client/
 
 - **[BREAKING CHANGE]** Updated `ChainRepository` merging Height and Score into Info object. Added finalized block information.
 - **[BREAKING CHANGE]** Updated `RestrictionMosaicRepository` adding pagination.
 - **[BREAKING CHANGE]** Updated `RestrictionAccountRepository` getter.
+- **[BREAKING CHANGE]** Simplified `MosaicNonce`. It works with an `int` instead of a `byte[]`.
+- **[BREAKING CHANGE]** Messages in Transfer Transactions are optional. `TransferTransactionFactory` creates a transaction with no message by default.
 - Added support for topic/data payload wrapper in WS Listener allowing users to reuse the connection for different channels.
 - Added `finalizedBlock` WS Listener subscription
 - Added `SecretLockRepository` and `HashLockRepository`

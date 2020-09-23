@@ -47,10 +47,11 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
 
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
-            getNetworkType(),
-            account.getAddress(),
-            Collections.singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-            new PlainMessage("E2ETest:standaloneLockFundsTransaction"));
+                getNetworkType(),
+                account.getAddress(),
+                Collections.singletonList(
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
+            .message(new PlainMessage("E2ETest:standaloneLockFundsTransaction"));
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createBonded(
@@ -81,10 +82,11 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
 
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
-            getNetworkType(),
-            this.account.getAddress(),
-            Collections.singletonList(getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-            new PlainMessage("E2ETest:standaloneLockFundsTransaction"));
+                getNetworkType(),
+                this.account.getAddress(),
+                Collections.singletonList(
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
+            .message(new PlainMessage("E2ETest:standaloneLockFundsTransaction"));
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createBonded(

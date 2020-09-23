@@ -17,26 +17,11 @@ package io.nem.symbol.core.utils;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 public class ByteUtils {
 
   /** Private constructor for this utility class. */
   private ByteUtils() {}
-
-  /**
-   * Converts a BigInteger value into an array of size bytes.
-   *
-   * @param x The BigInteger.
-   * @param size The number of bytes in the returned byte array.
-   * @return The bytes.
-   */
-  public static byte[] bigIntToBytesOfSize(final BigInteger x, final int size) {
-    byte[] bytes = x.toByteArray();
-    int maxSize = bytes.length;
-    return Arrays.copyOfRange(
-        bytes, (maxSize <= size) ? 0 : maxSize - size, Math.max(maxSize, size));
-  }
 
   /**
    * Converts a BigInteger to a byte array of the given size leading with zeros.
@@ -82,19 +67,6 @@ public class ByteUtils {
    */
   public static byte[] bigIntToBytes(final BigInteger x) {
     return ByteUtils.longToBytes(x.longValue());
-  }
-
-  /**
-   * Converts an array of 8 bytes into a long.
-   *
-   * @param bytes The bytes.
-   * @return The long.
-   */
-  public static long bytesToLong(final byte[] bytes) {
-    final ByteBuffer buffer = ByteBuffer.allocate(8);
-    buffer.put(bytes, 0, 8);
-    buffer.flip();
-    return buffer.getLong();
   }
 
   /**
@@ -147,21 +119,6 @@ public class ByteUtils {
   }
 
   /**
-   * Converts an int array into a byte array. Assumes each integer value fits in a byte. If integer
-   * value uses more than 1 byte then only the lowest byte
-   *
-   * @param intArray The int array.
-   * @return The bytes.
-   */
-  public static byte[] intArrayToByteArray(final int[] intArray) {
-    byte[] bytes = new byte[intArray.length];
-    for (int i = 0; i < intArray.length; i++) {
-      bytes[i] = (byte) intArray[i];
-    }
-    return bytes;
-  }
-
-  /**
    * Constant-time byte comparison. The constant time behavior eliminates side channel attacks.
    *
    * @param b One byte.
@@ -204,20 +161,5 @@ public class ByteUtils {
 
     builder.append("}");
     return builder.toString();
-  }
-
-  /**
-   * Reverse and copy to a new array.
-   *
-   * @param array Array to copy.
-   * @return Reverse array.
-   */
-  public static byte[] reverseCopy(final byte[] array) {
-    final byte[] reverseArray = new byte[array.length];
-
-    for (int i = 0, j = array.length - 1; i < array.length; i++, j--) {
-      reverseArray[j] = array[i];
-    }
-    return reverseArray;
   }
 }

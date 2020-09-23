@@ -183,7 +183,6 @@ public class NamespaceId implements UnresolvedMosaicId, UnresolvedAddress {
    */
   @Override
   public String getIdAsHex() {
-    byte[] bytes = ByteUtils.bigIntToBytes(getId());
-    return ConvertUtils.toHex(bytes);
+    return ConvertUtils.toHex(ByteUtils.bigIntToBytes(getId()));
   }
 }

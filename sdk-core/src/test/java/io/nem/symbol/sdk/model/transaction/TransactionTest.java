@@ -41,10 +41,10 @@ public class TransactionTest {
   void generateHashFromTransferTransactionPayload() {
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
-            networkType,
-            new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
-            Collections.emptyList(),
-            PlainMessage.Empty);
+                networkType,
+                new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
+                Collections.emptyList())
+            .message(PlainMessage.Empty);
     TransferTransaction transaction = factory.build();
 
     String hash =
@@ -58,10 +58,10 @@ public class TransactionTest {
   void generateHashFromAggregateTransactionPayload() {
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
-            networkType,
-            new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
-            Collections.emptyList(),
-            PlainMessage.Empty);
+                networkType,
+                new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
+                Collections.emptyList())
+            .message(PlainMessage.Empty);
     TransferTransaction transaction = factory.build();
 
     String hash =

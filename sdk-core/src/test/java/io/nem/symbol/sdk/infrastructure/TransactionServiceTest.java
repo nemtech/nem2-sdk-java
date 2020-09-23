@@ -147,10 +147,8 @@ class TransactionServiceTest {
 
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType,
-                Address.generateRandom(networkType),
-                Collections.emptyList(),
-                PlainMessage.Empty)
+                networkType, Address.generateRandom(networkType), Collections.emptyList())
+            .message(PlainMessage.Empty)
             .build();
 
     SignedTransaction signedTransaction = transferTransaction.signWith(account, "abc");
@@ -179,8 +177,8 @@ class TransactionServiceTest {
                 Address.generateRandom(networkType),
                 Arrays.asList(
                     new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
-                new PlainMessage("Some Message"))
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
+            .message(new PlainMessage("Some Message"))
             .signer(account.getPublicAccount())
             .build();
 
@@ -225,8 +223,8 @@ class TransactionServiceTest {
                 Address.generateRandom(networkType),
                 Collections.singletonList(
                     new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
-                new PlainMessage("Some Message"))
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
+            .message(new PlainMessage("Some Message"))
             .signer(account.getPublicAccount())
             .build();
 
@@ -298,8 +296,8 @@ class TransactionServiceTest {
     String transactionHash = "aaaa";
 
     TransactionFactory<TransferTransaction> factory =
-        TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST, recipient, mosaics, PlainMessage.Empty)
+        TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
+            .message(PlainMessage.Empty)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
     simulateStatement(height, 1, 0);
@@ -352,8 +350,8 @@ class TransactionServiceTest {
     String transactionHash = "aaaa";
 
     TransactionFactory<TransferTransaction> factory =
-        TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST, recipient, mosaics, PlainMessage.Empty)
+        TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
+            .message(PlainMessage.Empty)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
     simulateStatement(height, 0, 0);
@@ -390,8 +388,8 @@ class TransactionServiceTest {
     String transactionHash = "aaaa";
 
     TransactionFactory<TransferTransaction> factory =
-        TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST, recipient, mosaics, PlainMessage.Empty)
+        TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
+            .message(PlainMessage.Empty)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
     simulateStatement(height, 1, 0);
@@ -764,8 +762,8 @@ class TransactionServiceTest {
     String transactionHash = "aaaa";
 
     TransactionFactory<TransferTransaction> factory =
-        TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST, recipient, mosaics, PlainMessage.Empty)
+        TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
+            .message(PlainMessage.Empty)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", "BBBB", ""));
 
     // Extra transfer not aliases
@@ -773,8 +771,8 @@ class TransactionServiceTest {
         TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 address2,
-                Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))),
-                PlainMessage.Empty)
+                Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))))
+            .message(PlainMessage.Empty)
             .transactionInfo(TransactionInfo.create(height, 1, "ABC", "CCCC", ""));
 
     TransferTransaction transferTransaction = factory.build();
@@ -846,17 +844,17 @@ class TransactionServiceTest {
     String transactionHash = "aaaa";
 
     TransactionFactory<TransferTransaction> factory =
-        TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST, recipient, mosaics, PlainMessage.Empty)
+        TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
+            .message(PlainMessage.Empty)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", "BBBB", ""));
 
     // Extra transfer not aliases
     TransactionFactory<TransferTransaction> extraTransaction =
         TransferTransactionFactory.create(
-            NetworkType.MIJIN_TEST,
-            address2,
-            Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))),
-            PlainMessage.Empty);
+                NetworkType.MIJIN_TEST,
+                address2,
+                Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))))
+            .message(PlainMessage.Empty);
 
     TransferTransaction transferTransaction = factory.build();
 
@@ -907,17 +905,17 @@ class TransactionServiceTest {
     String transactionHash = "aaaa";
 
     TransactionFactory<TransferTransaction> factory =
-        TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST, recipient, mosaics, PlainMessage.Empty)
+        TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
+            .message(PlainMessage.Empty)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", "BBBB", ""));
 
     // Extra transfer not aliases
     TransactionFactory<TransferTransaction> extraTransaction =
         TransferTransactionFactory.create(
-            NetworkType.MIJIN_TEST,
-            address2,
-            Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))),
-            PlainMessage.Empty);
+                NetworkType.MIJIN_TEST,
+                address2,
+                Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))))
+            .message(PlainMessage.Empty);
 
     TransferTransaction transferTransaction = factory.build();
 

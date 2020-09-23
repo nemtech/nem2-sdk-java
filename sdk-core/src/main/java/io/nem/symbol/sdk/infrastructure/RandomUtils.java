@@ -61,4 +61,14 @@ public class RandomUtils {
   public static int generateRandomInt(int bound) {
     return new SecureRandom().nextInt(bound);
   }
+
+  /**
+   * Returns a pseudorandom, uniformly distributed {@code int} value between 0 (inclusive) and the
+   * specified value (exclusive)/
+   *
+   * @return a random int between 0 (inclusive) and bound (exclusive)
+   */
+  public static int generateRandomInt() {
+    return new SecureRandom().nextInt();
+  }
 }

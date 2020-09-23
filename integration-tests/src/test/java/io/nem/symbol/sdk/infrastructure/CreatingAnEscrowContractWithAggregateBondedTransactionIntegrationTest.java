@@ -55,8 +55,8 @@ public class CreatingAnEscrowContractWithAggregateBondedTransactionIntegrationTe
                 getNetworkType(),
                 ticketDistributorAccount.getAddress(),
                 Collections.singletonList(
-                    getNetworkCurrency().createRelative(BigInteger.valueOf(100))),
-                PlainMessage.create("send 100 cat.currency to distributor"))
+                    getNetworkCurrency().createRelative(BigInteger.valueOf(100))))
+            .message(new PlainMessage("send 100 cat.currency to distributor"))
             .maxFee(this.maxFee)
             .build();
 
@@ -64,8 +64,8 @@ public class CreatingAnEscrowContractWithAggregateBondedTransactionIntegrationTe
         TransferTransactionFactory.create(
                 getNetworkType(),
                 aliceAccount.getAddress(),
-                Collections.singletonList(new Mosaic(mosaicId, BigInteger.ONE)),
-                PlainMessage.create("send 1 museum ticket to alice"))
+                Collections.singletonList(new Mosaic(mosaicId, BigInteger.ONE)))
+            .message(new PlainMessage("send 1 museum ticket to alice"))
             .maxFee(this.maxFee)
             .build();
 

@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "height": "1",
+    "hash": "A30E094114442D93AD6B556929294D97FD98EF1A66DC8DAB8B2E9F8AA3839CCC",
+    "merkleComponentHash": "A30E094114442D93AD6B556929294D97FD98EF1A66DC8DAB8B2E9F8AA3839CCC",
+    "index": 6
+  },
+  "transaction": {
+    "size": 150,
+    "signature": "8777077E4953F31DD8172C2192ABA9E2613B725D72237733AF6FF4AFEDD42DDEE990E888BAC27A0EDDCF33B2DB1D2F2902C4CB3935F380BD34CEB4D2900EE405",
+    "signerPublicKey": "458C385FB4D911A2FC249169131C8932A97857DA251ABD2CB807C19EC9A410EB",
+    "version": 1,
+    "network": 152,
+    "type": 16717,
+    "maxFee": "0",
+    "deadline": "1",
+    "nonce": 1,
+    "id": "154E071380F100A7",
+    "flags": 3,
+    "divisibility": 3,
+    "duration": "0"
+  },
+  "id": "5F6A7B0CE512F803F1221627"
+}

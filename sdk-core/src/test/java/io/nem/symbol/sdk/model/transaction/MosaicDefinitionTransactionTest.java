@@ -18,6 +18,9 @@ package io.nem.symbol.sdk.model.transaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.symbol.core.utils.ConvertUtils;
+import io.nem.symbol.sdk.infrastructure.BinarySerializationImpl;
+import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.blockchain.BlockDuration;
 import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
@@ -33,27 +36,33 @@ class MosaicDefinitionTransactionTest extends AbstractTransactionTester {
 
   @Test
   void createAMosaicCreationTransactionViaStaticConstructor() {
+    Account owner = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+    int nonceNumber = 12345;
+    MosaicNonce nonce = MosaicNonce.createFromInteger(nonceNumber);
     MosaicDefinitionTransaction mosaicCreationTx =
         MosaicDefinitionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
-                MosaicNonce.createFromBigInteger(new BigInteger("0")),
-                new MosaicId(new BigInteger("0")),
+                nonce,
+                MosaicId.createFromNonce(nonce, owner.getPublicAccount()),
                 MosaicFlags.create(true, true, true),
                 4,
-                new BlockDuration(10000))
+                new BlockDuration(222222))
             .deadline(new FakeDeadline())
             .build();
 
+    System.out.println(
+        ConvertUtils.toHex(BinarySerializationImpl.INSTANCE.serialize(mosaicCreationTx)));
     assertEquals(NetworkType.MIJIN_TEST, mosaicCreationTx.getNetworkType());
     assertEquals(1, (int) mosaicCreationTx.getVersion());
     assertTrue(LocalDateTime.now().isBefore(mosaicCreationTx.getDeadline().getLocalDateTime()));
     assertEquals(BigInteger.valueOf(0), mosaicCreationTx.getMaxFee());
-    assertEquals(new BigInteger("0"), mosaicCreationTx.getMosaicId().getId());
+    //    assertEquals(new BigInteger("0"), mosaicCreationTx.getMosaicId().getId());
     assertTrue(mosaicCreationTx.getMosaicFlags().isSupplyMutable());
     assertTrue(mosaicCreationTx.getMosaicFlags().isTransferable());
     assertTrue(mosaicCreationTx.getMosaicFlags().isRestrictable());
+    assertEquals(nonceNumber, mosaicCreationTx.getMosaicNonce().getNonceAsInt());
     assertEquals(4, mosaicCreationTx.getDivisibility());
-    assertEquals(new BlockDuration(10000), mosaicCreationTx.getBlockDuration());
+    assertEquals(new BlockDuration(222222), mosaicCreationTx.getBlockDuration());
   }
 
   @Test

@@ -16,6 +16,7 @@
 package io.nem.symbol.sdk.model.message;
 
 import io.nem.symbol.core.utils.ConvertUtils;
+import java.util.Objects;
 
 /** An abstract message class that serves as the base class of all message types. */
 public abstract class Message {
@@ -67,5 +68,22 @@ public abstract class Message {
    */
   public String getPayload() {
     return payload;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Message message = (Message) o;
+    return type == message.type && Objects.equals(payload, message.payload);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(type, payload);
   }
 }

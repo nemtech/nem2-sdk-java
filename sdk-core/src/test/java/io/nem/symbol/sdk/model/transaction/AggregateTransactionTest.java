@@ -86,8 +86,8 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.singletonList(
                     new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
-                new PlainMessage("Some Message"))
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
+            .message(new PlainMessage("Some Message"))
             .signer(account.getPublicAccount())
             .build();
 
@@ -187,8 +187,8 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.singletonList(
                     new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
-                new PlainMessage("Some Message"))
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
+            .message(new PlainMessage("Some Message"))
             .signer(account.getPublicAccount())
             .build();
 
@@ -320,8 +320,8 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.singletonList(
                     new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
-                new PlainMessage("Some Message"))
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
+            .message(new PlainMessage("Some Message"))
             .signer(account.getPublicAccount())
             .build();
 
@@ -403,8 +403,8 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.singletonList(
                     new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
-                new PlainMessage("Some Message"))
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
+            .message(new PlainMessage("Some Message"))
             .signer(account.getPublicAccount())
             .build();
 

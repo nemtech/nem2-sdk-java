@@ -19,9 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class MosaicIdTest {
@@ -32,6 +34,38 @@ class MosaicIdTest {
   void createAMosaicIdFromIdViaConstructor() {
     MosaicId mosaicId = new MosaicId(new BigInteger("-8810190493148073404"));
     assertEquals(mosaicId.getId(), new BigInteger("-8810190493148073404"));
+  }
+
+  @Test
+  void testCurrencyTestnet() {
+    String nemesisSignerPublicKey =
+        "871B2F2F9D825252FFF43543066EE8D9141A3373F2F013BB449C6425A03362D8";
+    Address nemesisAddress =
+        Address.createFromPublicKey(nemesisSignerPublicKey, NetworkType.TEST_NET);
+    MosaicId mosaicId = MosaicId.createFromNonce(MosaicNonce.createFromInteger(0), nemesisAddress);
+    assertEquals("5E62990DCAC5BE8A", mosaicId.getIdAsHex());
+  }
+
+  @Test
+  void testCurrency() {
+    String nemesisSignerPublicKey =
+        "E0AC0720AA389B8DBF9DB9D2672991CDA7DEC284737984702CE7FD7C6E07A5E2";
+    Address nemesisAddress =
+        Address.createFromPublicKey(nemesisSignerPublicKey, NetworkType.TEST_NET);
+    MosaicId mosaicId = MosaicId.createFromNonce(MosaicNonce.createFromInteger(0), nemesisAddress);
+    assertEquals("61B0856247BD3A71", mosaicId.getIdAsHex());
+  }
+
+  @Test
+  void testHarvestCurrency() {
+    String nemesisSignerPublicKey =
+        "AA4174DBA4C6CABFF16DEDA628ACE549701FD1618BC6CE89E10BEFE33459CD12";
+    Address nemesisAddress =
+        Address.createFromPublicKey(nemesisSignerPublicKey, NetworkType.TEST_NET);
+    MosaicNonce nonce = MosaicNonce.createFromInteger(1);
+    Assertions.assertEquals(1, nonce.getNonceAsLong());
+    MosaicId mosaicId = MosaicId.createFromNonce(nonce, nemesisAddress);
+    assertEquals("1646351CC29EBDCB", mosaicId.getIdAsHex());
   }
 
   @Test
@@ -75,8 +109,7 @@ class MosaicIdTest {
   @Test
   void createAMosaicIdFromNonceAndOwner() {
     PublicAccount owner = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST);
-    byte[] bytes = new byte[] {0x0, 0x0, 0x0, 0x0};
-    MosaicNonce nonce = new MosaicNonce(bytes);
+    MosaicNonce nonce = MosaicNonce.createFromInteger(0);
     MosaicId mosaicId = MosaicId.createFromNonce(nonce, owner);
     MosaicId mosaicId2 = new MosaicId(new BigInteger("5331590414131997017"));
     MosaicId mosaicId3 = MosaicId.createFromNonce(nonce, owner.getAddress());
@@ -89,8 +122,7 @@ class MosaicIdTest {
   @Test
   void hashCodeAndEquals() {
     PublicAccount owner = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST);
-    byte[] bytes = new byte[] {0x0, 0x0, 0x0, 0x0};
-    MosaicNonce nonce = new MosaicNonce(bytes);
+    MosaicNonce nonce = MosaicNonce.createFromInteger(0);
     MosaicId mosaicId = MosaicId.createFromNonce(nonce, owner);
     MosaicId mosaicId2 = new MosaicId(new BigInteger("5331590414131997017"));
     MosaicId mosaicId3 = MosaicId.createFromNonce(nonce, owner.getAddress());
@@ -105,8 +137,7 @@ class MosaicIdTest {
   @Test
   void createAMosaicIdFromNonceAndOwnerTwiceTheSame() {
     PublicAccount owner = PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST);
-    byte[] bytes = new byte[] {0x0, 0x0, 0x0, 0x0};
-    MosaicNonce nonce = new MosaicNonce(bytes);
+    MosaicNonce nonce = MosaicNonce.createFromInteger(0);
     MosaicId mosaicId1 = MosaicId.createFromNonce(nonce, owner);
     MosaicId mosaicId2 = MosaicId.createFromNonce(nonce, owner);
     assertEquals(mosaicId1, mosaicId2);

@@ -297,8 +297,8 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
         TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 recipientAddress,
-                Collections.singletonList(createAbsolute(BigInteger.valueOf(1))),
-                new PlainMessage("E2ETest:standaloneTransferTransaction:message"))
+                Collections.singletonList(createAbsolute(BigInteger.valueOf(1))))
+            .message(new PlainMessage("E2ETest:standaloneTransferTransaction:message"))
             .build();
 
     SignedTransaction signedTransaction = account.sign(transferTransaction, generationHash);

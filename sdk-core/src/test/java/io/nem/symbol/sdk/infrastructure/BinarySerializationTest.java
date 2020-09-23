@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.infrastructure;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.message.MessageType;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -79,8 +80,8 @@ class BinarySerializationTest {
                 Address.generateRandom(NetworkType.MIJIN_TEST),
                 Arrays.asList(
                     new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
-                new PlainMessage("Some Message"))
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
+            .message(new PlainMessage("Some Message"))
             .deadline(new FakeDeadline())
             .build();
 
@@ -91,7 +92,10 @@ class BinarySerializationTest {
         (TransferTransaction) binarySerialization.deserialize(serialize);
     Assertions.assertNotNull(deserializedTransaction);
 
-    Assertions.assertEquals("Some Message", deserializedTransaction.getMessage().getPayload());
+    Assertions.assertEquals(
+        "Some Message", deserializedTransaction.getMessage().get().getPayload());
+    Assertions.assertEquals(
+        MessageType.PLAIN_MESSAGE, deserializedTransaction.getMessage().get().getType());
   }
 
   @Test
@@ -103,8 +107,8 @@ class BinarySerializationTest {
                 Address.generateRandom(NetworkType.MIJIN_TEST),
                 Arrays.asList(
                     new Mosaic(
-                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))),
-                new PlainMessage("Some Message"))
+                        new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
+            .message(new PlainMessage("Some Message"))
             .deadline(new FakeDeadline())
             .build();
 

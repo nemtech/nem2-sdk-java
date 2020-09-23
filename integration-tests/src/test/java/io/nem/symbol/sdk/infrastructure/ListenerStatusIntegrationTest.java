@@ -86,8 +86,8 @@ class ListenerStatusIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 account2.getAddress(),
                 Collections.singletonList(
-                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-                PlainMessage.create("test-message"))
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
+            .message(new PlainMessage("test-message"))
             .maxFee(this.maxFee)
             .build();
     announceAndValidate(type, account1, transferTransaction);
@@ -140,8 +140,8 @@ class ListenerStatusIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 account2.getAddress(),
                 Collections.singletonList(
-                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-                PlainMessage.create("test-message"))
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
+            .message(new PlainMessage("test-message"))
             .maxFee(this.maxFee)
             .build();
     announceAndValidate(type, account1, transferTransaction);
@@ -187,8 +187,8 @@ class ListenerStatusIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 account2.getAddress(),
                 Collections.singletonList(
-                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))),
-                PlainMessage.create("test-message"))
+                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
+            .message(new PlainMessage("test-message"))
             .maxFee(this.maxFee)
             .build();
     announceAndValidate(type, account1, transferTransaction);

@@ -80,10 +80,26 @@ class NamespaceIdTest {
 
   @Test
   void createANamespaceIdFromSubNamespacePathViaConstructor() {
-    NamespaceId test = NamespaceId.createFromName("subnem");
     NamespaceId namespaceId = NamespaceId.createFromName("nem.subnem");
     assertEquals(new BigInteger("16440672666685223858"), namespaceId.getId());
     assertEquals("nem.subnem", namespaceId.getFullName().get());
+  }
+
+  @Test
+  void constructorFromHex() {
+    assertNamespace(0, "0000000000000000");
+    assertNamespace(1, "0000000000000001");
+    assertNamespace(268435456, "0000000010000000");
+    assertNamespace(68719476736L, "0000001000000000");
+    assertNamespace(16, "0000000000000010");
+  }
+
+  private void assertNamespace(long number, String hex) {
+    Assertions.assertEquals(BigInteger.valueOf(number), new NamespaceId(hex).getId());
+    Assertions.assertEquals(hex, new NamespaceId(hex).getIdAsHex());
+    Assertions.assertEquals(
+        BigInteger.valueOf(number), NamespaceId.createFromId(BigInteger.valueOf(number)).getId());
+    Assertions.assertEquals(hex, NamespaceId.createFromId(BigInteger.valueOf(number)).getIdAsHex());
   }
 
   @Test

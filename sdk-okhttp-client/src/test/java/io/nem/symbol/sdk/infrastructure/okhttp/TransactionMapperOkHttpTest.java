@@ -606,7 +606,7 @@ public class TransactionMapperOkHttpTest {
     TransferTransaction transferTransaction = (TransferTransaction) map(transferTransactionDTO);
 
     validateStandaloneTransaction(transferTransaction, transferTransactionDTO);
-    Assertions.assertEquals("", transferTransaction.getMessage().getPayload());
+    Assertions.assertEquals("", transferTransaction.getMessage().get().getPayload());
   }
 
   void validateAggregateTransaction(
@@ -679,19 +679,19 @@ public class TransactionMapperOkHttpTest {
       assertEquals(mosaicsDTO.get(0).getAmount(), transaction.getMosaics().get(0).getAmount());
     }
 
-    if (transaction.getMessage().getPayload().isEmpty()) {
-      assertEquals("", transaction.getMessage().getPayload());
+    if (transaction.getMessage().get().getPayload().isEmpty()) {
+      assertEquals("", transaction.getMessage().get().getPayload());
     } else {
       assertEquals(
           new String(
               ConvertUtils.fromHexToBytes(transferTransaction.getMessage().getPayload()),
               StandardCharsets.UTF_8),
-          transaction.getMessage().getPayload());
+          transaction.getMessage().get().getPayload());
     }
 
     assertEquals(
         (int) transferTransaction.getMessage().getType().getValue(),
-        transaction.getMessage().getType().getValue());
+        transaction.getMessage().get().getType().getValue());
   }
 
   void validateNamespaceCreationTx(
