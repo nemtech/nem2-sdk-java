@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.model.message;
 
 import io.nem.symbol.core.crypto.KeyPair;
 import io.nem.symbol.sdk.model.message.PersistentHarvestingDelegationMessage.HarvestingKeys;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +35,7 @@ public class PersistentHarvestingDelegationMessageTest {
             signing.getPrivateKey(), vrf.getPrivateKey(), harvester.getPublicKey());
 
     Assertions.assertTrue(
-        encryptedMessage.getPayload().startsWith(MessageMarker.PERSISTENT_DELEGATION_UNLOCK));
+        encryptedMessage.getText().startsWith(MessageMarker.PERSISTENT_DELEGATION_UNLOCK));
 
     Assertions.assertEquals(
         MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE, encryptedMessage.getType());
@@ -43,5 +44,13 @@ public class PersistentHarvestingDelegationMessageTest {
 
     Assertions.assertEquals(signing.getPrivateKey(), plainMessage.getSigningPrivateKey());
     Assertions.assertEquals(vrf.getPrivateKey(), plainMessage.getVrfPrivateKey());
+
+    Optional<Message> encryptedMessage2 =
+        Message.createFromHexPayload(encryptedMessage.getPayloadHex());
+    Assertions.assertEquals(encryptedMessage, encryptedMessage2.get());
+
+    Optional<Message> encryptedMessage3 =
+        Message.createFromPayload(encryptedMessage.getPayloadByteBuffer().array());
+    Assertions.assertEquals(encryptedMessage, encryptedMessage3.get());
   }
 }

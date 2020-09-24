@@ -16,6 +16,7 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -68,6 +69,7 @@ import io.vertx.core.json.Json;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -104,7 +106,7 @@ public class TransactionMapperVertxTest {
     TransferTransaction transferTransaction = (TransferTransaction) map(transferTransactionDTO);
 
     validateStandaloneTransaction(transferTransaction, transferTransactionDTO);
-    Assertions.assertEquals("", transferTransaction.getMessage().get().getPayload());
+    Assertions.assertEquals("", transferTransaction.getMessage().get().getText());
   }
 
   @Test
@@ -708,19 +710,17 @@ public class TransactionMapperVertxTest {
       assertEquals(mosaicsDTO.get(0).getAmount(), transaction.getMosaics().get(0).getAmount());
     }
 
-    if (transaction.getMessage().get().getPayload().isEmpty()) {
-      assertEquals("", transaction.getMessage().get().getPayload());
+    if (StringUtils.isEmpty(transferTransaction.getMessage())) {
+      assertFalse(transaction.getMessage().isPresent());
+    } else if (transaction.getMessage().get().getText().isEmpty()) {
+      assertEquals("", transaction.getMessage().get().getText());
     } else {
       assertEquals(
           new String(
-              ConvertUtils.fromHexToBytes(transferTransaction.getMessage().getPayload()),
+              ConvertUtils.fromHexToBytes(transferTransaction.getMessage().substring(2)),
               StandardCharsets.UTF_8),
-          transaction.getMessage().get().getPayload());
+          transaction.getMessage().get().getText());
     }
-
-    assertEquals(
-        (int) transferTransaction.getMessage().getType().getValue(),
-        transaction.getMessage().get().getType().getValue());
   }
 
   void validateNamespaceCreationTx(

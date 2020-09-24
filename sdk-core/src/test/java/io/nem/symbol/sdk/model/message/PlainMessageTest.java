@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.model.message;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+import io.nem.symbol.core.utils.ConvertUtils;
 import org.junit.jupiter.api.Test;
 
 class PlainMessageTest {
@@ -25,14 +26,33 @@ class PlainMessageTest {
   @Test
   void shouldCreatePlainMessageViaConstructor() {
     PlainMessage plainMessage = new PlainMessage("test-message");
-    assertEquals("test-message", plainMessage.getPayload());
+    assertEquals("test-message", plainMessage.getText());
     assertSame(MessageType.PLAIN_MESSAGE, plainMessage.getType());
+
+    PlainMessage anotherPlain =
+        (PlainMessage) Message.createFromHexPayload(plainMessage.getPayloadHex()).get();
+    assertEquals(anotherPlain, plainMessage);
   }
 
   @Test
   void shouldCreatePlainMessageViaStaticConstructor() {
     PlainMessage plainMessage = PlainMessage.create("test-message");
-    assertEquals("test-message", plainMessage.getPayload());
+    assertEquals("test-message", plainMessage.getText());
     assertSame(MessageType.PLAIN_MESSAGE, plainMessage.getType());
+    byte[] payload = plainMessage.getPayloadByteBuffer().array();
+    assertEquals("00746573742D6D657373616765", ConvertUtils.toHex(payload));
+    PlainMessage anotherPlain = (PlainMessage) Message.createFromPayload(payload).get();
+    assertEquals(anotherPlain, plainMessage);
+  }
+
+  @Test
+  void shouldCreateWhenEmptyMessage() {
+    PlainMessage plainMessage = PlainMessage.create("");
+    assertEquals("", plainMessage.getText());
+    assertSame(MessageType.PLAIN_MESSAGE, plainMessage.getType());
+    byte[] payload = plainMessage.getPayloadByteBuffer().array();
+    assertEquals("00", ConvertUtils.toHex(payload));
+    PlainMessage anotherPlain = (PlainMessage) Message.createFromPayload(payload).get();
+    assertEquals(anotherPlain, plainMessage);
   }
 }

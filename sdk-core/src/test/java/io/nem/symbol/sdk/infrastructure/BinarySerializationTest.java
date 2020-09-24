@@ -92,8 +92,7 @@ class BinarySerializationTest {
         (TransferTransaction) binarySerialization.deserialize(serialize);
     Assertions.assertNotNull(deserializedTransaction);
 
-    Assertions.assertEquals(
-        "Some Message", deserializedTransaction.getMessage().get().getPayload());
+    Assertions.assertEquals("Some Message", deserializedTransaction.getMessage().get().getText());
     Assertions.assertEquals(
         MessageType.PLAIN_MESSAGE, deserializedTransaction.getMessage().get().getType());
   }

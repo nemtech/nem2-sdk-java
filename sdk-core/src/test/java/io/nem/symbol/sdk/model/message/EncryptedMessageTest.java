@@ -18,7 +18,7 @@ package io.nem.symbol.sdk.model.message;
 import io.nem.symbol.core.crypto.CryptoException;
 import io.nem.symbol.core.crypto.KeyPair;
 import io.nem.symbol.core.crypto.PrivateKey;
-import io.nem.symbol.core.utils.ConvertUtils;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -115,14 +115,18 @@ public class EncryptedMessageTest {
     String typescriptEncryptedKey =
         "079A490A7F68CC42F7156D12F082AF1ADC193FD8E3DA93CF67FA1D3F880D5DCEF2A9734EFE39646501023D1A9B63A44E57AEDE";
 
-    EncryptedMessage encryptedMessage =
-        (EncryptedMessage)
-            Message.createFromPayload(
-                MessageType.ENCRYPTED_MESSAGE,
-                ConvertUtils.fromStringToHex(typescriptEncryptedKey));
+    EncryptedMessage encryptedMessage = new EncryptedMessage(typescriptEncryptedKey);
     String plainMessage =
         encryptedMessage.decryptPayload(sender.getPublicKey(), recipient.getPrivateKey());
 
     Assertions.assertEquals("test transaction 漢字", plainMessage);
+
+    Optional<Message> encryptedMessage2 =
+        Message.createFromHexPayload(encryptedMessage.getPayloadHex());
+    Assertions.assertEquals(encryptedMessage, encryptedMessage2.get());
+
+    Optional<Message> encryptedMessage3 =
+        Message.createFromPayload(encryptedMessage.getPayloadByteBuffer().array());
+    Assertions.assertEquals(encryptedMessage, encryptedMessage3.get());
   }
 }

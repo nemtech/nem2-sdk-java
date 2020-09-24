@@ -17,10 +17,8 @@ package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
 import static io.nem.symbol.core.utils.MapperUtils.toUnresolvedMosaicId;
 
-import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.message.Message;
-import io.nem.symbol.sdk.model.message.MessageType;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
@@ -28,14 +26,10 @@ import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.MessageDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.MessageTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransferTransactionDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.UnresolvedMosaic;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /** Transfer transaction mapper. */
@@ -57,20 +51,14 @@ class TransferTransactionMapper
               .collect(Collectors.toList());
     }
 
-    Message message =
-        Optional.ofNullable(transaction.getMessage())
-            .map(
-                m ->
-                    Message.createFromPayload(
-                        MessageType.rawValueOf(m.getType().getValue()), m.getPayload()))
-            .orElse(null);
-
     TransferTransactionFactory transferTransactionFactory =
         TransferTransactionFactory.create(
             networkType,
             MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()),
             mosaics);
-    if (message != null) transferTransactionFactory.message(message);
+    Message.createFromHexPayload(transaction.getMessage())
+        .ifPresent(transferTransactionFactory::message);
+
     return transferTransactionFactory;
   }
 
@@ -90,19 +78,7 @@ class TransferTransactionMapper
               .collect(Collectors.toList());
     }
 
-    MessageDTO message =
-        transaction
-            .getMessage()
-            .map(
-                fromMessage -> {
-                  MessageDTO toMessage = new MessageDTO();
-                  toMessage.setType(MessageTypeEnum.fromValue(fromMessage.getType().getValue()));
-                  toMessage.setPayload(
-                      ConvertUtils.toHex(
-                          fromMessage.getPayload().getBytes(StandardCharsets.UTF_8)));
-                  return toMessage;
-                })
-            .orElse(null);
+    String message = transaction.getMessage().map(Message::getPayloadHex).orElse(null);
     dto.setRecipientAddress(transaction.getRecipient().encoded(transaction.getNetworkType()));
     dto.setMosaics(mosaics);
     dto.setMessage(message);

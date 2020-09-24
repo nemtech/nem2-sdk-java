@@ -16,37 +16,59 @@
 package io.nem.symbol.sdk.model.message;
 
 import io.nem.symbol.core.utils.ConvertUtils;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.Optional;
 
 /** An abstract message class that serves as the base class of all message types. */
 public abstract class Message {
 
   private final MessageType type;
-  private final String payload;
+  private final String text;
 
-  public Message(MessageType type, String payload) {
+  public Message(MessageType type, String text) {
     this.type = type;
-    this.payload = payload;
+    this.text = text;
   }
 
   /**
    * This factory method knows how to create the right Message instance from the provided message
-   * type and payload.
+   * payload.
    *
-   * @param messageType the message type you want to create.
-   * @param payload the raw payload as it comes from REST data.
+   * @param payloadHex the raw payload as it comes from REST data.
    * @return the Message.
    */
-  public static Message createFromPayload(MessageType messageType, String payload) {
-    String decoded =
-        payload == null || payload.isEmpty() ? "" : ConvertUtils.fromHexToString(payload);
+  public static Optional<Message> createFromHexPayload(String payloadHex) {
+    if (payloadHex == null || payloadHex.isEmpty()) {
+      return Optional.empty();
+    }
+    return createFromPayload(ConvertUtils.fromHexToBytes(payloadHex));
+  }
+
+  /**
+   * This factory method knows how to create the right Message instance from the provided message
+   * payload.
+   *
+   * @param payload the raw payload as it comes from binary data.
+   * @return the Message.
+   */
+  public static Optional<Message> createFromPayload(byte[] payload) {
+    if (payload == null || payload.length == 0) {
+      return Optional.empty();
+    }
+    MessageType messageType =
+        MessageType.rawValueOf(SerializationUtils.byteToUnsignedInt(payload[0]));
+    String messageHex = ConvertUtils.toHex(payload).substring(2);
+    String text = ConvertUtils.fromHexToString(messageHex);
     switch (messageType) {
       case PLAIN_MESSAGE:
-        return new PlainMessage(decoded);
+        return Optional.of(new PlainMessage(text));
       case ENCRYPTED_MESSAGE:
-        return new EncryptedMessage(decoded);
+        return Optional.of(new EncryptedMessage(text));
       case PERSISTENT_HARVESTING_DELEGATION_MESSAGE:
-        return new PersistentHarvestingDelegationMessage(decoded);
+        return Optional.of(new PersistentHarvestingDelegationMessage(text));
       default:
         throw new IllegalStateException("Unknown Message Type " + messageType);
     }
@@ -66,8 +88,25 @@ public abstract class Message {
    *
    * @return String
    */
-  public String getPayload() {
-    return payload;
+  public String getText() {
+    return text;
+  }
+
+  /** @return the full payload including the message type as byte buffer */
+  public ByteBuffer getPayloadByteBuffer() {
+    MessageType type = this.getType();
+    final byte byteMessageType = (byte) type.getValue();
+    final byte[] bytePayload = this.getText().getBytes(StandardCharsets.UTF_8);
+    final ByteBuffer messageBuffer =
+        ByteBuffer.allocate(bytePayload.length + 1 /* for the message type */);
+    messageBuffer.put(byteMessageType);
+    messageBuffer.put(bytePayload);
+    return messageBuffer;
+  }
+
+  /** @return the full payload including the message type as string. */
+  public String getPayloadHex() {
+    return ConvertUtils.toHex(getPayloadByteBuffer().array());
   }
 
   @Override
@@ -79,11 +118,11 @@ public abstract class Message {
       return false;
     }
     Message message = (Message) o;
-    return type == message.type && Objects.equals(payload, message.payload);
+    return type == message.type && Objects.equals(text, message.text);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(type, payload);
+    return Objects.hash(type, text);
   }
 }

@@ -76,6 +76,6 @@ public class EncryptedMessage extends Message {
     KeyPair sender = KeyPair.onlyPublic(senderPublicKey, engine);
     KeyPair recipient = KeyPair.fromPrivate(recipientPrivateKey);
     BlockCipher blockCipher = engine.createBlockCipher(sender, recipient);
-    return StringEncoder.getString(blockCipher.decrypt(ConvertUtils.fromHexToBytes(getPayload())));
+    return StringEncoder.getString(blockCipher.decrypt(ConvertUtils.fromHexToBytes(getText())));
   }
 }

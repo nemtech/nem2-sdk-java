@@ -72,7 +72,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
 
     TransferTransaction processed =
         announceAggregateAndValidate(type, transferTransaction, account).getKey();
-    Assertions.assertEquals(message, processed.getMessage().get().getPayload());
+    Assertions.assertEquals(message, processed.getMessage().get().getText());
   }
 
   @ParameterizedTest
@@ -165,7 +165,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
       KeyPair recipientKeyPair,
       TransferTransaction transaction) {
     Assertions.assertTrue(transaction.getMessage().get() instanceof EncryptedMessage);
-    Assertions.assertNotEquals(message, transaction.getMessage().get().getPayload());
+    Assertions.assertNotEquals(message, transaction.getMessage().get().getText());
     String decryptedMessage =
         ((EncryptedMessage) transaction.getMessage().get())
             .decryptPayload(senderKeyPair.getPublicKey(), recipientKeyPair.getPrivateKey());
@@ -210,7 +210,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
     String message = recipientKeyPair.getPublicKey().toHex();
     Assertions.assertTrue(
         transaction.getMessage().get() instanceof PersistentHarvestingDelegationMessage);
-    Assertions.assertNotEquals(message, transaction.getMessage().get().getPayload());
+    Assertions.assertNotEquals(message, transaction.getMessage().get().getText());
     Assertions.assertEquals(
         MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,
         transaction.getMessage().get().getType());

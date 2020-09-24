@@ -347,7 +347,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
     assertEquals(
         MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,
         transferTransaction.getMessage().get().getType());
-    assertNotNull(transferTransaction.getMessage().get().getPayload());
+    assertNotNull(transferTransaction.getMessage().get().getText());
 
     PersistentHarvestingDelegationMessage message =
         (PersistentHarvestingDelegationMessage) transferTransaction.getMessage().get();

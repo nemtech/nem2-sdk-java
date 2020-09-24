@@ -27,7 +27,6 @@ import io.nem.symbol.sdk.api.BlockOrderBy;
 import io.nem.symbol.sdk.model.account.AccountKeyType;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.blockchain.Position;
-import io.nem.symbol.sdk.model.message.MessageType;
 import io.nem.symbol.sdk.model.mosaic.MosaicSupplyChangeActionType;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.AliasType;
@@ -50,7 +49,6 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.AliasTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.BlockOrderByEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.LinkActionEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.LockHashAlgorithmEnum;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.MessageTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicRestrictionEntryTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicRestrictionTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicSupplyChangeActionEnum;
@@ -446,30 +444,6 @@ public class EnumMapperTest {
             v -> {
               Assertions.assertNotNull(
                   MosaicRestrictionEntryTypeEnum.fromValue(v.getValue()), v.name());
-              Assertions.assertTrue(
-                  existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
-            });
-  }
-
-  @Test
-  void testMessageTypeEnumToMessageType() {
-    Set<Integer> existingValues = new HashSet<>();
-    Arrays.stream(MessageTypeEnum.values())
-        .forEach(
-            v -> {
-              Assertions.assertNotNull(MessageType.rawValueOf(v.getValue()), v.name());
-              Assertions.assertTrue(
-                  existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
-            });
-  }
-
-  @Test
-  void testMessageTypeToMessageTypeEnum() {
-    Set<Integer> existingValues = new HashSet<>();
-    Arrays.stream(MessageType.values())
-        .forEach(
-            v -> {
-              Assertions.assertNotNull(MessageTypeEnum.fromValue(v.getValue()), v.name());
               Assertions.assertTrue(
                   existingValues.add(v.getValue()), v.getValue() + " is duplicated!!");
             });

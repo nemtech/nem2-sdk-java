@@ -78,7 +78,6 @@ import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.blockchain.BlockDuration;
 import io.nem.symbol.sdk.model.message.Message;
-import io.nem.symbol.sdk.model.message.MessageType;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -150,7 +149,6 @@ import io.nem.symbol.sdk.model.transaction.VrfKeyLinkTransactionFactory;
 import java.io.DataInputStream;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -516,8 +514,6 @@ public class BinarySerializationImpl implements BinarySerialization {
           ((TransferTransactionBodyBuilder) transactionBuilder);
       byte[] messageArray = builder.getMessage().array();
 
-      Message message = getMessage(messageArray);
-
       UnresolvedAddress recipient =
           SerializationUtils.toUnresolvedAddress(builder.getRecipientAddress());
       List<Mosaic> mosaics =
@@ -526,20 +522,8 @@ public class BinarySerializationImpl implements BinarySerialization {
               .collect(Collectors.toList());
       TransferTransactionFactory factory =
           TransferTransactionFactory.create(networkType, recipient, mosaics);
-      if (message != null) {
-        factory.message(message);
-      }
+      Message.createFromPayload(messageArray).ifPresent(factory::message);
       return factory;
-    }
-
-    private Message getMessage(byte[] messageArray) {
-      if (messageArray.length == 0) {
-        return null;
-      }
-      MessageType messageType =
-          MessageType.rawValueOf(SerializationUtils.byteToUnsignedInt(messageArray[0]));
-      String messageHex = ConvertUtils.toHex(messageArray).substring(2);
-      return Message.createFromPayload(messageType, messageHex);
     }
 
     @Override
@@ -585,17 +569,7 @@ public class BinarySerializationImpl implements BinarySerialization {
     private ByteBuffer getMessageBuffer(TransferTransaction transaction) {
       return transaction
           .getMessage()
-          .map(
-              message -> {
-                MessageType type = message.getType();
-                final byte byteMessageType = (byte) type.getValue();
-                final byte[] bytePayload = message.getPayload().getBytes(StandardCharsets.UTF_8);
-                final ByteBuffer messageBuffer =
-                    ByteBuffer.allocate(bytePayload.length + 1 /* for the message type */);
-                messageBuffer.put(byteMessageType);
-                messageBuffer.put(bytePayload);
-                return messageBuffer;
-              })
+          .map(Message::getPayloadByteBuffer)
           .orElseGet(() -> ByteBuffer.allocate(0));
     }
   }

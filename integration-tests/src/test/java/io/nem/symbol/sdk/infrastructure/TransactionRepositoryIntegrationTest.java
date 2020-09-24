@@ -75,7 +75,7 @@ public class TransactionRepositoryIntegrationTest extends BaseIntegrationTest {
     TransferTransaction processed =
         announceAndValidate(type, config().getDefaultAccount(), transferTransaction);
 
-    Assertions.assertEquals(message, processed.getMessage().get().getPayload());
+    Assertions.assertEquals(message, processed.getMessage().get().getText());
 
     PublicAccount account = config().getDefaultAccount().getPublicAccount();
     List<Transaction> allTransactions =

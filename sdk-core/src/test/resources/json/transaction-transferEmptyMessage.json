@@ -15,10 +15,7 @@
     "maxFee": "10000000",
     "deadline": "4604134480",
     "recipientAddress": "903CC58E8C242DCFC33DE4E2F8B434C77F93A48BA13BC3E3",
-    "message": {
-      "type": 0,
-      "payload": ""
-    },
+    "message": "00",
     "mosaics": [
       {
         "id": "85BBEA6CC462B244",
