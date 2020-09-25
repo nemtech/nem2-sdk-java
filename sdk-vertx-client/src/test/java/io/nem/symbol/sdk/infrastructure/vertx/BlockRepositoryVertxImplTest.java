@@ -75,9 +75,11 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
     BlockInfoDTO dto = new BlockInfoDTO();
     BlockMetaDTO metaDTO = new BlockMetaDTO();
     metaDTO.setHash("someHash");
-    metaDTO.setNumTransactions(10);
+    metaDTO.setTransactionsCount(10);
+    metaDTO.setTotalTransactionsCount(5);
+    metaDTO.setTransactionsCount(15);
     metaDTO.setGenerationHash("generationHash");
-    metaDTO.setNumStatements(20);
+    metaDTO.setStatementsCount(20);
     metaDTO.setStateHashSubCacheMerkleRoots(Arrays.asList("string1", "string2"));
     metaDTO.setTotalFee(BigInteger.valueOf(8));
 
@@ -113,8 +115,10 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
     Assertions.assertEquals(NetworkType.MIJIN_TEST, info.getNetworkType());
     Assertions.assertEquals(BigInteger.valueOf(9L), info.getHeight());
     Assertions.assertEquals(metaDTO.getHash(), info.getHash());
-    Assertions.assertEquals(metaDTO.getNumTransactions(), info.getNumTransactions());
-    Assertions.assertEquals(metaDTO.getNumStatements(), info.getNumStatements().get());
+    Assertions.assertEquals(metaDTO.getTotalTransactionsCount(), info.getTotalTransactionsCount());
+    Assertions.assertEquals(metaDTO.getTransactionsCount(), info.getTransactionsCount());
+    Assertions.assertEquals(metaDTO.getTotalTransactionsCount(), info.getTotalTransactionsCount());
+    Assertions.assertEquals(metaDTO.getStatementsCount(), info.getStatementsCount());
     Assertions.assertEquals(metaDTO.getGenerationHash(), info.getGenerationHash());
     Assertions.assertEquals(
         metaDTO.getStateHashSubCacheMerkleRoots(), info.getSubCacheMerkleRoots());
@@ -131,9 +135,9 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
     BlockInfoDTO dto = new BlockInfoDTO();
     BlockMetaDTO metaDTO = new BlockMetaDTO();
     metaDTO.setHash("someHash");
-    metaDTO.setNumTransactions(10);
+    metaDTO.setTransactionsCount(10);
     metaDTO.setGenerationHash("generationHash");
-    metaDTO.setNumStatements(20);
+    metaDTO.setStatementsCount(20);
     metaDTO.setStateHashSubCacheMerkleRoots(Arrays.asList("string1", "string2"));
     metaDTO.setTotalFee(BigInteger.valueOf(8));
 
@@ -176,7 +180,7 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
     Assertions.assertEquals(BigInteger.valueOf(9L), info.getHeight());
     Assertions.assertEquals(metaDTO.getHash(), info.getHash());
     Assertions.assertEquals(metaDTO.getGenerationHash(), info.getGenerationHash());
-    Assertions.assertEquals(metaDTO.getNumTransactions(), info.getNumTransactions());
+    Assertions.assertEquals(metaDTO.getTransactionsCount(), info.getTransactionsCount());
     Assertions.assertEquals(
         metaDTO.getStateHashSubCacheMerkleRoots(), info.getSubCacheMerkleRoots());
     Assertions.assertEquals(metaDTO.getTotalFee(), info.getTotalFee());

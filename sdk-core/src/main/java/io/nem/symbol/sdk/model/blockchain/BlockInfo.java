@@ -32,8 +32,9 @@ public class BlockInfo implements Stored {
   private final String generationHash;
   private final BigInteger totalFee;
   private final List<String> stateHashSubCacheMerkleRoots;
-  private final Integer numTransactions;
-  private final Optional<Integer> numStatements;
+  private final Integer transactionsCount;
+  private final Integer totalTransactionsCount;
+  private final Integer statementsCount;
   private final List<String> subCacheMerkleRoots;
   private final String signature;
   private final PublicAccount signerPublicAccount;
@@ -61,8 +62,9 @@ public class BlockInfo implements Stored {
       String generationHash,
       BigInteger totalFee,
       List<String> stateHashSubCacheMerkleRoots,
-      Integer numTransactions,
-      Optional<Integer> numStatements,
+      Integer transactionsCount,
+      Integer totalTransactionsCount,
+      Integer statementsCount,
       List<String> subCacheMerkleRoots,
       String signature,
       PublicAccount signerPublicAccount,
@@ -87,8 +89,9 @@ public class BlockInfo implements Stored {
     this.generationHash = generationHash;
     this.totalFee = totalFee;
     this.stateHashSubCacheMerkleRoots = stateHashSubCacheMerkleRoots;
-    this.numTransactions = numTransactions;
-    this.numStatements = numStatements;
+    this.transactionsCount = transactionsCount;
+    this.totalTransactionsCount = totalTransactionsCount;
+    this.statementsCount = statementsCount;
     this.subCacheMerkleRoots = subCacheMerkleRoots;
     this.signature = signature;
     this.signerPublicAccount = signerPublicAccount;
@@ -146,21 +149,21 @@ public class BlockInfo implements Stored {
   }
 
   /**
-   * Returns number of transactions included the block.
+   * Number of transactions confirmed in this block. This does not count *embedded* transactions
    *
    * @return Integer
    */
-  public Integer getNumTransactions() {
-    return numTransactions;
+  public Integer getTransactionsCount() {
+    return transactionsCount;
   }
 
   /**
    * Returns number of statements included the block.
    *
-   * @return optional of Integer
+   * @return Integer
    */
-  public Optional<Integer> getNumStatements() {
-    return numStatements;
+  public Integer getStatementsCount() {
+    return statementsCount;
   }
 
   /** @return list of SubCache Merkle Root. */
@@ -249,6 +252,16 @@ public class BlockInfo implements Stored {
    */
   public Long getFeeMultiplier() {
     return feeMultiplier;
+  }
+
+  /**
+   * Total number of transactions confirmed in this block, including *embedded* transactions (i.e.
+   * transactions contained within aggregate transactions).
+   *
+   * @return Integer
+   */
+  public Integer getTotalTransactionsCount() {
+    return totalTransactionsCount;
   }
 
   /**

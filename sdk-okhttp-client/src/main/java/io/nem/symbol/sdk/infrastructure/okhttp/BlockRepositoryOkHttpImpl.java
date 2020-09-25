@@ -35,7 +35,6 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.MerkleProofInfoDTO;
 import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -64,8 +63,9 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
         blockInfoDTO.getMeta().getGenerationHash(),
         blockInfoDTO.getMeta().getTotalFee(),
         blockInfoDTO.getMeta().getStateHashSubCacheMerkleRoots(),
-        blockInfoDTO.getMeta().getNumTransactions(),
-        Optional.ofNullable(blockInfoDTO.getMeta().getNumStatements()),
+        blockInfoDTO.getMeta().getTransactionsCount(),
+        blockInfoDTO.getMeta().getTotalTransactionsCount(),
+        blockInfoDTO.getMeta().getStatementsCount(),
         blockInfoDTO.getMeta().getStateHashSubCacheMerkleRoots(),
         blockInfoDTO.getBlock().getSignature(),
         PublicAccount.createFromPublicKey(

@@ -25,7 +25,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -64,7 +63,8 @@ class BlockInfoTest {
             BigInteger.ZERO,
             stateHashSubCacheMerkleRoots,
             25,
-            Optional.of(35),
+            20,
+            35,
             subCacheMerkleRoots,
             signature,
             signer,
@@ -88,8 +88,9 @@ class BlockInfoTest {
     assertEquals(generationHash, blockInfo.getGenerationHash());
     assertEquals(BigInteger.valueOf(0), blockInfo.getTotalFee());
     assertEquals(10L, blockInfo.getSize());
-    assertEquals(25, blockInfo.getNumTransactions());
-    assertEquals(35, blockInfo.getNumStatements().get());
+    assertEquals(25, blockInfo.getTransactionsCount());
+    assertEquals(20, blockInfo.getTotalTransactionsCount());
+    assertEquals(35, blockInfo.getStatementsCount());
     assertEquals(signature, blockInfo.getSignature());
     Assertions.assertEquals(signer, blockInfo.getSignerPublicAccount());
     assertEquals(NetworkType.MIJIN_TEST, blockInfo.getNetworkType());

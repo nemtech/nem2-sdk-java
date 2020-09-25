@@ -194,9 +194,10 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
     String offset = blocksWithoutOffset.get(offsetIndex).getHeight().toString();
     criteria.setOffset(offset);
     List<BlockInfo> blockFromOffsets = get(streamer.search(criteria).toList().toObservable());
-    PaginationTester.sameEntities(
-        blocksWithoutOffset.stream().skip(offsetIndex + 1).collect(Collectors.toList()),
-        blockFromOffsets);
+    List<BlockInfo> expectedList =
+        blocksWithoutOffset.stream().skip(offsetIndex + 1).collect(Collectors.toList());
+    // If the block grows when running the last search
+    PaginationTester.sameEntities(expectedList, blockFromOffsets.subList(0, expectedList.size()));
   }
 
   @ParameterizedTest

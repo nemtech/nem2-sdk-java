@@ -15,11 +15,11 @@
  */
 package io.nem.symbol.sdk.infrastructure.vertx;
 
+import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.BlockOrderBy;
 import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.BlockSearchCriteria;
 import io.nem.symbol.sdk.api.Page;
-import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerklePathItem;
@@ -38,7 +38,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -131,8 +130,9 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
         blockInfoDTO.getMeta().getGenerationHash(),
         blockInfoDTO.getMeta().getTotalFee(),
         blockInfoDTO.getMeta().getStateHashSubCacheMerkleRoots(),
-        blockInfoDTO.getMeta().getNumTransactions(),
-        Optional.ofNullable(blockInfoDTO.getMeta().getNumStatements()),
+        blockInfoDTO.getMeta().getTransactionsCount(),
+        blockInfoDTO.getMeta().getTotalTransactionsCount(),
+        blockInfoDTO.getMeta().getStatementsCount(),
         blockInfoDTO.getMeta().getStateHashSubCacheMerkleRoots(),
         blockInfoDTO.getBlock().getSignature(),
         PublicAccount.createFromPublicKey(
@@ -151,7 +151,7 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
         blockInfoDTO.getBlock().getProofGamma(),
         blockInfoDTO.getBlock().getProofScalar(),
         blockInfoDTO.getBlock().getProofVerificationHash(),
-        Address.createFromEncoded(blockInfoDTO.getBlock().getBeneficiaryAddress()));
+        MapperUtils.toAddress(blockInfoDTO.getBlock().getBeneficiaryAddress()));
   }
 
   public BlockRoutesApi getClient() {
