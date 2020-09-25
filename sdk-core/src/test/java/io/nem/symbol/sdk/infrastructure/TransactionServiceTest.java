@@ -148,7 +148,6 @@ class TransactionServiceTest {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 networkType, Address.generateRandom(networkType), Collections.emptyList())
-            .message(PlainMessage.Empty)
             .build();
 
     SignedTransaction signedTransaction = transferTransaction.signWith(account, "abc");
@@ -297,7 +296,6 @@ class TransactionServiceTest {
 
     TransactionFactory<TransferTransaction> factory =
         TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
-            .message(PlainMessage.Empty)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
     simulateStatement(height, 1, 0);
@@ -351,7 +349,6 @@ class TransactionServiceTest {
 
     TransactionFactory<TransferTransaction> factory =
         TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
-            .message(PlainMessage.Empty)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
     simulateStatement(height, 0, 0);
@@ -389,7 +386,6 @@ class TransactionServiceTest {
 
     TransactionFactory<TransferTransaction> factory =
         TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
-            .message(PlainMessage.Empty)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
     simulateStatement(height, 1, 0);
@@ -763,7 +759,7 @@ class TransactionServiceTest {
 
     TransactionFactory<TransferTransaction> factory =
         TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", "BBBB", ""));
 
     // Extra transfer not aliases
@@ -772,7 +768,6 @@ class TransactionServiceTest {
                 NetworkType.MIJIN_TEST,
                 address2,
                 Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))))
-            .message(PlainMessage.Empty)
             .transactionInfo(TransactionInfo.create(height, 1, "ABC", "CCCC", ""));
 
     TransferTransaction transferTransaction = factory.build();
@@ -845,7 +840,7 @@ class TransactionServiceTest {
 
     TransactionFactory<TransferTransaction> factory =
         TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", "BBBB", ""));
 
     // Extra transfer not aliases
@@ -854,7 +849,7 @@ class TransactionServiceTest {
                 NetworkType.MIJIN_TEST,
                 address2,
                 Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))))
-            .message(PlainMessage.Empty);
+            .message(new PlainMessage(""));
 
     TransferTransaction transferTransaction = factory.build();
 
@@ -906,7 +901,7 @@ class TransactionServiceTest {
 
     TransactionFactory<TransferTransaction> factory =
         TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", "BBBB", ""));
 
     // Extra transfer not aliases
@@ -915,7 +910,7 @@ class TransactionServiceTest {
                 NetworkType.MIJIN_TEST,
                 address2,
                 Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))))
-            .message(PlainMessage.Empty);
+            .message(new PlainMessage(""));
 
     TransferTransaction transferTransaction = factory.build();
 

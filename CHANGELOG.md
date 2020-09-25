@@ -18,7 +18,7 @@ Client Vertx | v0.10.0.1  | https://repo.maven.apache.org/maven2/io/nem/symbol-
 - **[BREAKING CHANGE]** Updated `RestrictionMosaicRepository` adding pagination.
 - **[BREAKING CHANGE]** Updated `RestrictionAccountRepository` getter.
 - **[BREAKING CHANGE]** Simplified `MosaicNonce`. It works with an `int` instead of a `byte[]`.
-- **[BREAKING CHANGE]** Messages in Transfer Transactions are optional. `TransferTransactionFactory` creates a transaction with no message by default.
+- **[BREAKING CHANGE]** Messages in Transfer Transactions are optional. `TransferTransactionFactory` creates a transaction with no message by default. `PlainMessage.Empty` has been removed.
 - Added support for topic/data payload wrapper in WS Listener allowing users to reuse the connection for different channels.
 - Added `finalizedBlock` WS Listener subscription
 - Added `SecretLockRepository` and `HashLockRepository`

@@ -68,7 +68,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
     Address address = Address.generateRandom(networkType);
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(networkType, address, Collections.emptyList())
-            .message(PlainMessage.Empty);
+            .message(new PlainMessage(""));
     TransferTransaction transaction = factory.build();
 
     assertEquals(networkType, transaction.getNetworkType());
@@ -92,7 +92,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
                 networkType,
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.emptyList())
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .calculateMaxFeeFromMultiplier(feeMultiplier);
     TransferTransaction transaction = factory.build();
 
@@ -124,7 +124,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .deadline(new FakeDeadline())
             .build();
     assertSerialization(expected, transaction);
@@ -245,7 +245,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .deadline(new FakeDeadline())
             .build();
 
@@ -266,7 +266,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .deadline(new FakeDeadline())
             .build();
 
@@ -382,7 +382,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
                 networkType,
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 mosaics)
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .deadline(new FakeDeadline())
             .build();
 
@@ -407,7 +407,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
                 networkType,
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 mosaics)
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .deadline(new FakeDeadline())
             .build();
 

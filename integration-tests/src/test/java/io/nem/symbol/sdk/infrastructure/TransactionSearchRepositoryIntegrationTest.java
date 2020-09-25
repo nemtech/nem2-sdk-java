@@ -148,7 +148,7 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
                 recipient,
                 Collections.singletonList(
                     getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .maxFee(maxFee)
             .build();
 

@@ -95,7 +95,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
 
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(getNetworkType(), getRecipient(), Collections.emptyList())
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .maxFee(maxFee)
             .build();
 
@@ -127,7 +127,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
 
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(getNetworkType(), getRecipient(), Collections.emptyList())
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .maxFee(maxFee)
             .build();
 

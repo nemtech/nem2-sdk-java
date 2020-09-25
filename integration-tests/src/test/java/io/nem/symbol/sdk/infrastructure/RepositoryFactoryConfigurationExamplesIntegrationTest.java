@@ -107,7 +107,7 @@ public class RepositoryFactoryConfigurationExamplesIntegrationTest {
                 networkType,
                 recipient.getAddress(),
                 Collections.singletonList(currency.createRelative(BigInteger.TEN)))
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .build();
 
     SignedTransaction signedTransaction = transferTransaction.signWith(sender, generationHash);

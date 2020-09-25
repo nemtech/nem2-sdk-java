@@ -138,7 +138,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
                 recipient,
                 Collections.singletonList(
                     getNetworkCurrency().createAbsolute(BigInteger.valueOf(1000000000))))
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .maxFee(maxFee)
             .build();
 

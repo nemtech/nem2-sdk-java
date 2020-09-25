@@ -21,10 +21,6 @@ package io.nem.symbol.sdk.model.message;
  * @since 1.0
  */
 public class PlainMessage extends Message {
-
-  /** Plain message containing an empty string. */
-  public static final PlainMessage Empty = new PlainMessage("");
-
   /**
    * Constructor
    *

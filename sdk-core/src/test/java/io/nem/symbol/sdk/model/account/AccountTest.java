@@ -115,7 +115,7 @@ class AccountTest {
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .deadline(new FakeDeadline())
             .build();
 

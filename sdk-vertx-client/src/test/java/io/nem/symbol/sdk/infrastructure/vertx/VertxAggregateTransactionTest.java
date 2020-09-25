@@ -63,7 +63,7 @@ public class VertxAggregateTransactionTest {
     TransferTransaction transferTx =
         TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST, recipient, Collections.emptyList())
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .build();
 
     AggregateTransaction aggregateTx =
@@ -92,7 +92,7 @@ public class VertxAggregateTransactionTest {
                 networkType,
                 address,
                 Collections.singletonList(createAbsolute(BigInteger.valueOf(10000000))))
-            .message(PlainMessage.Empty)
+            .message(new PlainMessage(""))
             .deadline(new VertxFakeDeadline())
             .build();
 

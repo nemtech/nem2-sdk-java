@@ -44,7 +44,7 @@ public class TransactionTest {
                 networkType,
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.emptyList())
-            .message(PlainMessage.Empty);
+            .message(new PlainMessage(""));
     TransferTransaction transaction = factory.build();
 
     String hash =
@@ -61,7 +61,7 @@ public class TransactionTest {
                 networkType,
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.emptyList())
-            .message(PlainMessage.Empty);
+            .message(new PlainMessage(""));
     TransferTransaction transaction = factory.build();
 
     String hash =
