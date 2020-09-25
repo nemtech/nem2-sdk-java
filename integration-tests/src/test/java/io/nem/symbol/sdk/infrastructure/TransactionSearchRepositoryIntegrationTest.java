@@ -22,6 +22,7 @@ import io.nem.symbol.sdk.api.TransactionRepository;
 import io.nem.symbol.sdk.api.TransactionSearchCriteria;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.message.Message;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
@@ -243,6 +244,29 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
         b ->
             Assertions.assertTrue(
                 b.getTransactionInfo().get().getHeight().compareTo(BigInteger.ONE) > 0));
+    Assertions.assertFalse(transactions.isEmpty());
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void searchTransactionType(RepositoryType type) {
+    TransactionRepository transactionRepository = getTransactionRepository(type);
+    TransactionPaginationStreamer streamer =
+        new TransactionPaginationStreamer(transactionRepository);
+    TransactionGroup group = TransactionGroup.CONFIRMED;
+    TransactionSearchCriteria criteria =
+        new TransactionSearchCriteria(group)
+            .transactionTypes(Arrays.asList(TransactionType.TRANSFER));
+    List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
+
+    transactions.forEach(
+        b -> {
+          TransferTransaction transferTransaction = (TransferTransaction) b;
+          Message message =
+              transferTransaction.getMessage().orElse(PlainMessage.create("No Message!!"));
+          Assertions.assertNotNull(message.getText());
+        });
+
     Assertions.assertFalse(transactions.isEmpty());
   }
 

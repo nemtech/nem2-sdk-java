@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.model.message;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import org.apache.commons.lang3.Validate;
 
 /** An SDK defined message where the type is prepended to the payload. */
 public abstract class TypedMessage extends Message {
@@ -31,6 +32,7 @@ public abstract class TypedMessage extends Message {
    */
   public TypedMessage(MessageType type, String text) {
     super(getPayloadByteBuffer(type, text).array(), type);
+    Validate.notNull(text, "text is required");
     this.text = text;
   }
 

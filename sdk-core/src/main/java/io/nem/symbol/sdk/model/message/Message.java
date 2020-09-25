@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import org.apache.commons.lang3.Validate;
 
 /** An abstract message class that serves as the base class of all message types. */
 public abstract class Message {
@@ -32,6 +33,8 @@ public abstract class Message {
   private final MessageType type;
 
   public Message(byte[] payload, MessageType type) {
+    Validate.notNull(payload, "payload is required");
+    Validate.notNull(type, "type is required");
     this.payload = payload;
     this.type = type;
   }

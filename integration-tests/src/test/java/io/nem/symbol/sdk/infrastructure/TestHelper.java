@@ -38,7 +38,6 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.blockchain.BlockDuration;
-import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -251,13 +250,13 @@ public class TestHelper {
     }
   }
 
-  protected boolean hasMosaic(Account recipient) {
+  protected boolean hasMosaic(Address recipient) {
     try {
       AccountInfo accountInfo =
           get(
               getRepositoryFactory(DEFAULT_REPOSITORY_TYPE)
                   .createAccountRepository()
-                  .getAccountInfo(recipient.getAddress()));
+                  .getAccountInfo(recipient));
       return accountInfo.getMosaics().stream()
           .anyMatch(
               m ->
@@ -600,7 +599,7 @@ public class TestHelper {
   public Account getMultisigAccount(RepositoryType type) {
     Account multisigAccount = config().getMultisigAccount();
     setAddressAlias(type, multisigAccount.getAddress(), "multisig-account");
-    sendMosaicFromNemesis(type, multisigAccount, false);
+    sendMosaicFromNemesis(type, multisigAccount.getAddress(), false);
     this.createMultisigAccountBonded(
         type, multisigAccount, config().getCosignatoryAccount(), config().getCosignatory2Account());
     return multisigAccount;
@@ -740,7 +739,7 @@ public class TestHelper {
     return new TransactionServiceImpl(getRepositoryFactory(type));
   }
 
-  protected void sendMosaicFromNemesis(RepositoryType type, Account recipient, boolean force) {
+  protected void sendMosaicFromNemesis(RepositoryType type, Address recipient, boolean force) {
     if (hasMosaic(recipient) && !force) {
       System.out.println("Ignoring recipient. It has the currency token already: ");
       printAccount(recipient);
@@ -748,7 +747,7 @@ public class TestHelper {
     }
     System.out.println("Sending " + AMOUNT_PER_TRANSFER + " currency tokens to: ");
     printAccount(recipient);
-    basicSendMosaicFromNemesis(type, recipient.getAddress());
+    basicSendMosaicFromNemesis(type, recipient);
   }
 
   public void basicSendMosaicFromNemesis(RepositoryType type, UnresolvedAddress recipient) {
@@ -758,10 +757,9 @@ public class TestHelper {
 
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
-                getNetworkType(),
-                recipient,
-                Collections.singletonList(getNetworkCurrency().createAbsolute(amount)))
-            .message(new PlainMessage(""));
+            getNetworkType(),
+            recipient,
+            Collections.singletonList(getNetworkCurrency().createAbsolute(amount)));
 
     factory.maxFee(maxFee);
     TransferTransaction transferTransaction = factory.build();
@@ -779,6 +777,12 @@ public class TestHelper {
     System.out.println(getJsonHelper().print(map));
   }
 
+  void printAccount(Address account) {
+    Map<String, String> map = new LinkedHashMap<>();
+    map.put("address", account.plain());
+    System.out.println(getJsonHelper().print(map));
+  }
+
   @SuppressWarnings("squid:S2925")
   protected void sleep(long time) {
     try {
@@ -791,13 +795,13 @@ public class TestHelper {
 
   public Account createTestAccount(RepositoryType type) {
     Account testAccount = Account.generateNewAccount(this.networkType);
-    sendMosaicFromNemesis(type, testAccount, false);
+    sendMosaicFromNemesis(type, testAccount.getAddress(), false);
     return testAccount;
   }
 
   public Account getTestAccount(RepositoryType type) {
     Account testAccount = config().getTestAccount();
-    sendMosaicFromNemesis(type, testAccount, false);
+    sendMosaicFromNemesis(type, testAccount.getAddress(), false);
     return testAccount;
   }
 }

@@ -1,6 +1,7 @@
-symbolRestImage: symbolplatform/symbol-rest:1.3.1-alpha
+symbolRestImage: symbolplatform/symbol-rest:2.0.0-alpha
 throttlingBurst: 35
 throttlingRate: 1000
+blockGenerationTargetTime: 5s
 nemesis:
   mosaics:
     - accounts: 20

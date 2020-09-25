@@ -36,7 +36,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
   @Test
   @Order(1)
   void createTestAccount() {
-    helper().sendMosaicFromNemesis(type, config().getTestAccount(), false);
+    helper().sendMosaicFromNemesis(type, config().getTestAccount().getAddress(), false);
     setAddressAlias(type, config().getTestAccount().getAddress(), "testaccount");
     helper().basicSendMosaicFromNemesis(type, NamespaceId.createFromName("testaccount"));
   }
@@ -44,21 +44,21 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
   @Test
   @Order(2)
   void createTestAccount2() {
-    helper().sendMosaicFromNemesis(type, config().getTestAccount2(), false);
+    helper().sendMosaicFromNemesis(type, config().getTestAccount2().getAddress(), false);
     setAddressAlias(type, config().getTestAccount2().getAddress(), "testaccount2");
   }
 
   @Test
   @Order(3)
   void createCosignatoryAccount() {
-    helper().sendMosaicFromNemesis(type, config().getCosignatoryAccount(), false);
+    helper().sendMosaicFromNemesis(type, config().getCosignatoryAccount().getAddress(), false);
     setAddressAlias(type, config().getCosignatoryAccount().getAddress(), "cosignatory-account");
   }
 
   @Test
   @Order(4)
   void createCosignatoryAccount2() {
-    helper().sendMosaicFromNemesis(type, config().getCosignatory2Account(), false);
+    helper().sendMosaicFromNemesis(type, config().getCosignatory2Account().getAddress(), false);
     setAddressAlias(type, config().getCosignatory2Account().getAddress(), "cosignatory-account2");
   }
 

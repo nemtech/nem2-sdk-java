@@ -78,11 +78,12 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   public void standaloneTransferTransactionEncryptedMessage(RepositoryType type) {
-    String namespaceName = "testaccount2";
+    this.helper().sendMosaicFromNemesis(type, getRecipient(), false);
+    String namespaceName = "standaloneTransferTransactionEncryptedMessagealias".toLowerCase();
 
     NamespaceId recipient = setAddressAlias(type, getRecipient(), namespaceName);
     Assertions.assertEquals(
-        "9988DD7D72227ECAE7000000000000000000000000000000", recipient.encoded(getNetworkType()));
+        "9960629109A48AFBC0000000000000000000000000000000", recipient.encoded(getNetworkType()));
     String message = "E2ETest:standaloneTransferTransaction:message 漢字";
 
     KeyPair senderKeyPair = KeyPair.random();

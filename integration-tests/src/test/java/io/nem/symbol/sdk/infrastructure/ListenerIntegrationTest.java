@@ -313,9 +313,9 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
   private Pair<SignedTransaction, SignedTransaction> createAggregateBondedTransaction(
       RepositoryType type) {
 
-    helper().sendMosaicFromNemesis(type, this.cosignatoryAccount, false);
-    helper().sendMosaicFromNemesis(type, this.cosignatoryAccount2, false);
-    helper().sendMosaicFromNemesis(type, this.multisigAccount, false);
+    helper().sendMosaicFromNemesis(type, this.cosignatoryAccount.getAddress(), false);
+    helper().sendMosaicFromNemesis(type, this.cosignatoryAccount2.getAddress(), false);
+    helper().sendMosaicFromNemesis(type, this.multisigAccount.getAddress(), false);
     helper()
         .createMultisigAccountBonded(
             type, this.multisigAccount, this.cosignatoryAccount, this.cosignatoryAccount2);
