@@ -3,16 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [0.21.0] - 21-Sep-2020
+## [0.21.0] - 25-Sep-2020
 
-**Milestone**: Gorilla.1(0.10.0.1.0)
+**Milestone**: Catapult-server finality(0.10.0.3)
  Package  | Version  | Link
 ---|---|---
 SDK OkHttp| v0.21.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-okhttp-client
 SDK Vertx| v0.21.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-vertx-client
 Catbuffer Library| v0.0.23 | https://repo.maven.apache.org/maven2/io/nem/catbuffer-java
-Client OkHttp | v0.10.0.1  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-okhttp-gson-client
-Client Vertx | v0.10.0.1  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-vertx-client/
+Client OkHttp | v0.10.0  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-okhttp-gson-client
+Client Vertx | v0.10.0  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-vertx-client/
 
 - **[BREAKING CHANGE]** Updated `ChainRepository` merging Height and Score into Info object. Added finalized block information.
 - **[BREAKING CHANGE]** Updated `RestrictionMosaicRepository` adding pagination.
