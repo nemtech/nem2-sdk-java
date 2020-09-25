@@ -25,7 +25,7 @@ import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.StringEncoder;
 
 /** A message that has been encrypted using the NEM's SDK libraries. */
-public class EncryptedMessage extends Message {
+public class EncryptedMessage extends TypedMessage {
 
   /**
    * It creates a Encrypted Message from the encryptedPayload.

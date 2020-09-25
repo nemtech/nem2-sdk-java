@@ -22,15 +22,17 @@ import java.util.Arrays;
  * Persistent harvesting delegation.
  */
 public enum MessageType {
+  RAW_MESSAGE(null),
+
   PLAIN_MESSAGE(0),
 
   ENCRYPTED_MESSAGE(1),
 
   PERSISTENT_HARVESTING_DELEGATION_MESSAGE(254);
 
-  private final int value;
+  private final Integer value;
 
-  MessageType(int value) {
+  MessageType(Integer value) {
     this.value = value;
   }
 
@@ -42,9 +44,9 @@ public enum MessageType {
    */
   public static MessageType rawValueOf(final int value) {
     return Arrays.stream(values())
-        .filter(e -> e.value == value)
+        .filter(e -> e.value != null && e.value == value)
         .findFirst()
-        .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+        .orElse(MessageType.RAW_MESSAGE);
   }
 
   /**

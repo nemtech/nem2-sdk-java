@@ -14,29 +14,19 @@
  * limitations under the License.
  */
 package io.nem.symbol.sdk.model.message;
-/**
- * The plain message model defines a plain string. When sending it to the network we transform the
- * payload to hex-string.
- *
- * @since 1.0
- */
-public class PlainMessage extends TypedMessage {
-  /**
-   * Constructor
-   *
-   * @param payload plain message payload
-   */
-  public PlainMessage(String payload) {
-    super(MessageType.PLAIN_MESSAGE, payload);
+
+import java.nio.charset.StandardCharsets;
+
+/** The raw message, a message that's not typed. */
+public class RawMessage extends Message {
+
+  public RawMessage(byte[] payload) {
+    super(payload, MessageType.RAW_MESSAGE);
   }
 
-  /**
-   * Create a plain message object.
-   *
-   * @param text plain message text
-   * @return instance of PlainMessage
-   */
-  public static PlainMessage create(String text) {
-    return new PlainMessage(text);
+  /** @return the raw payload as utf-8 text. */
+  @Override
+  public String getText() {
+    return new String(getPayload(), StandardCharsets.UTF_8);
   }
 }

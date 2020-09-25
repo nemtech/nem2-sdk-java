@@ -25,7 +25,7 @@ import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.StringEncoder;
 import org.apache.commons.lang3.Validate;
 
-public class PersistentHarvestingDelegationMessage extends Message {
+public class PersistentHarvestingDelegationMessage extends TypedMessage {
 
   /** When decrypting, the message is converted back to the 2 original private keys. */
   public static class HarvestingKeys {

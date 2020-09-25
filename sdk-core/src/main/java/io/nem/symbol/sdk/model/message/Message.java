@@ -18,19 +18,22 @@ package io.nem.symbol.sdk.model.message;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
 /** An abstract message class that serves as the base class of all message types. */
 public abstract class Message {
 
-  private final MessageType type;
-  private final String text;
+  /** The low level message. */
+  private final byte[] payload;
 
-  public Message(MessageType type, String text) {
+  /** The message type */
+  private final MessageType type;
+
+  public Message(byte[] payload, MessageType type) {
+    this.payload = payload;
     this.type = type;
-    this.text = text;
   }
 
   /**
@@ -60,53 +63,50 @@ public abstract class Message {
     }
     MessageType messageType =
         MessageType.rawValueOf(SerializationUtils.byteToUnsignedInt(payload[0]));
+
+    return Optional.of(createMessage(payload, messageType));
+  }
+
+  private static Message createMessage(byte[] payload, MessageType messageType) {
     String messageHex = ConvertUtils.toHex(payload).substring(2);
     String text = ConvertUtils.fromHexToString(messageHex);
     switch (messageType) {
       case PLAIN_MESSAGE:
-        return Optional.of(new PlainMessage(text));
+        return new PlainMessage(text);
       case ENCRYPTED_MESSAGE:
-        return Optional.of(new EncryptedMessage(text));
+        return new EncryptedMessage(text);
       case PERSISTENT_HARVESTING_DELEGATION_MESSAGE:
-        return Optional.of(new PersistentHarvestingDelegationMessage(text));
+        return new PersistentHarvestingDelegationMessage(text);
       default:
-        throw new IllegalStateException("Unknown Message Type " + messageType);
+        return new RawMessage(payload);
     }
   }
 
-  /**
-   * Returns message type.
-   *
-   * @return int
-   */
+  /** @return the raw byte payload. */
+  public byte[] getPayload() {
+    return payload;
+  }
+
+  /** @return the type of this message. */
   public MessageType getType() {
     return type;
   }
 
   /**
-   * Returns message payload.
+   * Returns payload as text. Sub
    *
    * @return String
    */
-  public String getText() {
-    return text;
-  }
+  public abstract String getText();
 
   /** @return the full payload including the message type as byte buffer */
   public ByteBuffer getPayloadByteBuffer() {
-    MessageType type = this.getType();
-    final byte byteMessageType = (byte) type.getValue();
-    final byte[] bytePayload = this.getText().getBytes(StandardCharsets.UTF_8);
-    final ByteBuffer messageBuffer =
-        ByteBuffer.allocate(bytePayload.length + 1 /* for the message type */);
-    messageBuffer.put(byteMessageType);
-    messageBuffer.put(bytePayload);
-    return messageBuffer;
+    return ByteBuffer.wrap(getPayload());
   }
 
   /** @return the full payload including the message type as string. */
   public String getPayloadHex() {
-    return ConvertUtils.toHex(getPayloadByteBuffer().array());
+    return ConvertUtils.toHex(getPayload());
   }
 
   @Override
@@ -118,11 +118,13 @@ public abstract class Message {
       return false;
     }
     Message message = (Message) o;
-    return type == message.type && Objects.equals(text, message.text);
+    return Arrays.equals(payload, message.payload) && type == message.type;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(type, text);
+    int result = Objects.hash(type);
+    result = 31 * result + Arrays.hashCode(payload);
+    return result;
   }
 }
