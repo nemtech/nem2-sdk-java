@@ -15,6 +15,7 @@
  */
 package io.nem.symbol.sdk.infrastructure;
 
+import io.nem.symbol.core.utils.FormatUtils;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.RepositoryFactoryConfiguration;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -28,6 +29,7 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.node.NodeInfo;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -57,6 +59,9 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
   /** The resolved harvest currency. This observable is lazy (cold) and cached. */
   private final Observable<NetworkCurrency> harvestCurrency;
 
+  /** The resolved epochAdjustment. This observable is lazy (cold) and cached. */
+  private final Observable<Duration> epochAdjustment;
+
   /** @param configuration the user provided configuration. */
   public RepositoryFactoryBase(RepositoryFactoryConfiguration configuration) {
     this.baseUrl = configuration.getBaseUrl();
@@ -78,14 +83,24 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
 
     this.harvestCurrency =
         createLazyObservable(configuration.getHarvestCurrency(), this::loadHarvestCurrency);
+
+    this.epochAdjustment =
+        createLazyObservable(configuration.getEpochAdjustment(), this::loadEpochAdjustment);
+  }
+
+  private static <T> Observable<T> createLazyObservable(
+      T providedValue, Callable<Observable<T>> remoteObservable) {
+    if (providedValue != null) {
+      return Observable.just(providedValue);
+    } else {
+      return Observable.defer(remoteObservable).cache();
+    }
   }
 
   protected Observable<NetworkCurrency> loadHarvestCurrency() {
     return this.remoteNetworkConfiguration.flatMap(
         cs -> {
-          if (cs == null
-              || cs.getChain() == null
-              || cs.getChain().getHarvestingMosaicId() == null) {
+          if (cs.getChain() == null || cs.getChain().getHarvestingMosaicId() == null) {
             return this.networkCurrency;
           }
           if (cs.getChain().getHarvestingMosaicId().equals(cs.getChain().getCurrencyMosaicId())) {
@@ -95,10 +110,22 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
         });
   }
 
+  protected Observable<Duration> loadEpochAdjustment() {
+    return this.remoteNetworkConfiguration.map(
+        cs -> {
+          if (cs.getNetwork() == null || cs.getNetwork().getEpochAdjustment() == null) {
+            throw new IllegalStateException(
+                "EpochAdjustment could not be loaded from Rest's network Properties.");
+          } else {
+            return FormatUtils.parserServerDuration(cs.getNetwork().getEpochAdjustment());
+          }
+        });
+  }
+
   protected Observable<NetworkCurrency> loadNetworkCurrency() {
     return this.remoteNetworkConfiguration.flatMap(
         cs -> {
-          if (cs == null || cs.getChain() == null || cs.getChain().getCurrencyMosaicId() == null) {
+          if (cs.getChain() == null || cs.getChain().getCurrencyMosaicId() == null) {
             return Observable.error(
                 new IllegalStateException(
                     "No currency could be found in the network configuration."));
@@ -136,15 +163,6 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
     return NamespaceId.createFromIdAndFullName(namespaceId.getId(), namespaceName.getName());
   }
 
-  private static <T> Observable<T> createLazyObservable(
-      T providedValue, Callable<Observable<T>> remoteObservable) {
-    if (providedValue != null) {
-      return Observable.just(providedValue);
-    } else {
-      return Observable.defer(remoteObservable).cache();
-    }
-  }
-
   @Override
   public Observable<NetworkType> getNetworkType() {
     return networkType;
@@ -167,5 +185,10 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
   @Override
   public Observable<NetworkCurrency> getHarvestCurrency() {
     return harvestCurrency;
+  }
+
+  @Override
+  public Observable<Duration> getEpochAdjustment() {
+    return epochAdjustment;
   }
 }

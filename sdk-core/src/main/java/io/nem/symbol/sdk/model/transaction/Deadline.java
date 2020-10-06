@@ -16,6 +16,7 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -30,20 +31,8 @@ import java.time.temporal.ChronoUnit;
  */
 public class Deadline {
 
-  /** Nemesis block timestamp. */
-  private static final Instant TIMESTAMP_NEMESIS_BLOCK = Instant.ofEpochSecond(1573430400);
-
-  private final Instant instant;
-
-  /**
-   * Constructor
-   *
-   * @param units int
-   * @param chronoUnit Chrono unit
-   */
-  public Deadline(int units, ChronoUnit chronoUnit) {
-    instant = Instant.now().plus(units, chronoUnit);
-  }
+  /** number of millis elapsed since the creation of the nemesis block */
+  private final BigInteger value;
 
   /**
    * Constructor
@@ -51,60 +40,78 @@ public class Deadline {
    * @param input Deadline in BigInteger format
    */
   public Deadline(BigInteger input) {
-    instant =
-        Instant.ofEpochMilli(input.longValue() + Deadline.TIMESTAMP_NEMESIS_BLOCK.toEpochMilli());
-  }
-
-  /** @return the BigInteger representation of the duration. */
-  public BigInteger toBigInteger() {
-    return BigInteger.valueOf(getInstant());
+    this.value = input;
   }
 
   /**
    * Create deadline model.
    *
+   * @param epochAdjustment the network's epoch adjustment. Defined in the network/properties.
    * @param units int
    * @param chronoUnit Chrono unit
    * @return {@link Deadline}
    */
-  public static Deadline create(int units, ChronoUnit chronoUnit) {
-    return new Deadline(units, chronoUnit);
+  public static Deadline create(Duration epochAdjustment, int units, ChronoUnit chronoUnit) {
+    long millis =
+        Instant.now()
+            .plus(units, chronoUnit)
+            .minusMillis(epochAdjustment.toMillis())
+            .toEpochMilli();
+    return new Deadline(BigInteger.valueOf(millis));
   }
 
   /**
    * Create the default deadline of 2 hours.
    *
+   * @param epochAdjustment the network's epoch adjustment. Defined in the network/properties.
    * @return {@link Deadline}
    */
-  public static Deadline create() {
-    return new Deadline(2, ChronoUnit.HOURS);
+  public static Deadline create(Duration epochAdjustment) {
+    return create(epochAdjustment, 2, ChronoUnit.HOURS);
+  }
+
+  /** @return the BigInteger representation of the duration. */
+  public BigInteger toBigInteger() {
+    return value;
   }
 
   /**
-   * Returns number of seconds elapsed since the creation of the nemesis block.
+   * Returns number of seconds elapsed since the creation of the nemesis block in milliseconds.
    *
    * @return long
    */
-  public long getInstant() {
-    return instant.toEpochMilli() - Deadline.TIMESTAMP_NEMESIS_BLOCK.toEpochMilli();
+  public long getValue() {
+    return value.longValue();
+  }
+
+  /**
+   * Returns the value as instant
+   *
+   * @param epochAdjustment the network's epoch adjustment. Defined in the network/properties.
+   * @return the instant time from the creation of the nemesis block.
+   */
+  public Instant getInstant(Duration epochAdjustment) {
+    return Instant.ofEpochMilli(value.longValue()).plusMillis(epochAdjustment.toMillis());
   }
 
   /**
    * Returns deadline as local date time in a given timezone.
    *
+   * @param epochAdjustment the network's epoch adjustment. Defined in the network/properties.
    * @param zoneId Timezone
    * @return LocalDateTime
    */
-  public LocalDateTime getLocalDateTime(ZoneId zoneId) {
-    return LocalDateTime.ofInstant(instant, zoneId);
+  public LocalDateTime getLocalDateTime(Duration epochAdjustment, ZoneId zoneId) {
+    return LocalDateTime.ofInstant(getInstant(epochAdjustment), zoneId);
   }
 
   /**
    * Returns deadline as local date time.
    *
+   * @param epochAdjustment the network's epoch adjustment. Defined in the network/properties.
    * @return LocalDateTime
    */
-  public LocalDateTime getLocalDateTime() {
-    return getLocalDateTime(ZoneId.systemDefault());
+  public LocalDateTime getLocalDateTime(Duration epochAdjustment) {
+    return getLocalDateTime(epochAdjustment, ZoneId.systemDefault());
   }
 }

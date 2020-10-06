@@ -273,6 +273,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 recipient,
                 Collections.singletonList(
                     getNetworkCurrency().createAbsolute(BigInteger.valueOf(10000L))))
@@ -297,6 +298,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 Address.generateRandom(getNetworkType()),
                 Collections.singletonList(
                     getNetworkCurrency().createRelative(new BigInteger("100000000000"))))
@@ -323,6 +325,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 Account.generateNewAccount(getNetworkType()).getAddress(),
                 Collections.emptyList())
             .message(new PlainMessage("test-message"))
@@ -332,6 +335,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createBonded(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(
                     transferTransaction.toAggregate(this.multisigAccount.getPublicAccount())))
             .maxFee(maxFee)
@@ -343,6 +347,7 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     HashLockTransaction hashLockTransaction =
         HashLockTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 aggregateSignedTransaction)

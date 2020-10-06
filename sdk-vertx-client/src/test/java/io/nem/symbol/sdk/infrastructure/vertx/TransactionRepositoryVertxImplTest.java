@@ -31,6 +31,7 @@ import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionCosignature;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionAnnounceResponse;
@@ -296,6 +297,7 @@ public class TransactionRepositoryVertxImplTest extends AbstractVertxRespository
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 recipientAddress,
                 Collections.singletonList(createAbsolute(BigInteger.valueOf(1))))
             .message(new PlainMessage("E2ETest:standaloneTransferTransaction:message"))

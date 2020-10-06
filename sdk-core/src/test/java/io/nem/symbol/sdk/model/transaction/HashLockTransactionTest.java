@@ -42,11 +42,11 @@ class HashLockTransactionTest extends AbstractTransactionTester {
     HashLockTransaction transaction =
         HashLockTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 "8498B38D89C1DC8A448EA5824938FF828926CD9F7747B1844B59B4B6807E878B")
             .signer(account.getPublicAccount())
-            .deadline(new FakeDeadline())
             .build();
 
     assertSerialization(expected, transaction);
@@ -61,10 +61,10 @@ class HashLockTransactionTest extends AbstractTransactionTester {
     HashLockTransaction transaction =
         HashLockTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 "8498B38D89C1DC8A448EA5824938FF828926CD9F7747B1844B59B4B6807E878B")
-            .deadline(new FakeDeadline())
             .build();
 
     transaction.toAggregate(
@@ -85,10 +85,10 @@ class HashLockTransactionTest extends AbstractTransactionTester {
     HashLockTransaction transaction =
         HashLockTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 signedTransaction)
-            .deadline(new FakeDeadline())
             .build();
     SignedTransaction lockFundsTransactionSigned = transaction.signWith(account, generationHash);
 
@@ -115,10 +115,10 @@ class HashLockTransactionTest extends AbstractTransactionTester {
         () -> {
           HashLockTransactionFactory.create(
                   networkType,
+                  new Deadline(BigInteger.ONE),
                   NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                   BigInteger.valueOf(100),
                   signedTransaction)
-              .deadline(new FakeDeadline())
               .build();
         },
         "Signed transaction must be Aggregate Bonded Transaction");

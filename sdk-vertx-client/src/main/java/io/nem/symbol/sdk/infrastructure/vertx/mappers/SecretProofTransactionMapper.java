@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretProofTransaction;
@@ -36,9 +37,10 @@ class SecretProofTransactionMapper
 
   @Override
   protected TransactionFactory<SecretProofTransaction> createFactory(
-      NetworkType networkType, SecretProofTransactionDTO transaction) {
+      NetworkType networkType, Deadline deadline, SecretProofTransactionDTO transaction) {
     return SecretProofTransactionFactory.create(
         networkType,
+        deadline,
         LockHashAlgorithm.rawValueOf(transaction.getHashAlgorithm().getValue()),
         MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()),
         transaction.getSecret(),

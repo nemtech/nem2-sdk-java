@@ -254,7 +254,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     return Observable.just(
-        new TransactionFactory<Transaction>(transaction.getType(), transaction.getNetworkType()) {
+        new TransactionFactory<Transaction>(
+            transaction.getType(), transaction.getNetworkType(), transaction.getDeadline()) {
           @Override
           public Transaction build() {
             return transaction;
@@ -278,6 +279,7 @@ public class TransactionServiceImpl implements TransactionService {
         mosaic ->
             HashLockTransactionFactory.create(
                 transaction.getNetworkType(),
+                transaction.getDeadline(),
                 mosaic,
                 transaction.getDuration(),
                 transaction.getHash()));
@@ -305,9 +307,13 @@ public class TransactionServiceImpl implements TransactionService {
         resolvedMosaic,
         (address, mosaic) ->
             SecretLockTransactionFactory.create(
-                transaction.getNetworkType(), mosaic,
-                transaction.getDuration(), transaction.getHashAlgorithm(),
-                transaction.getSecret(), address));
+                transaction.getNetworkType(),
+                transaction.getDeadline(),
+                mosaic,
+                transaction.getDuration(),
+                transaction.getHashAlgorithm(),
+                transaction.getSecret(),
+                address));
   }
 
   private Observable<TransactionFactory<? extends Transaction>> resolveTransactionFactory(
@@ -325,6 +331,7 @@ public class TransactionServiceImpl implements TransactionService {
         address ->
             SecretProofTransactionFactory.create(
                 transaction.getNetworkType(),
+                transaction.getDeadline(),
                 transaction.getHashType(),
                 address,
                 transaction.getSecret(),
@@ -355,7 +362,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     BiFunction<Address, List<Mosaic>, TransferTransactionFactory> mergeFunction =
         (address, mosaics) ->
-            TransferTransactionFactory.create(transaction.getNetworkType(), address, mosaics)
+            TransferTransactionFactory.create(
+                    transaction.getNetworkType(), transaction.getDeadline(), address, mosaics)
                 .message(transaction.getMessage().orElse(null));
     return Observable.combineLatest(resolvedRecipient, resolvedMosaics, mergeFunction);
   }
@@ -385,6 +393,7 @@ public class TransactionServiceImpl implements TransactionService {
           MosaicGlobalRestrictionTransactionFactory factory =
               MosaicGlobalRestrictionTransactionFactory.create(
                   transaction.getNetworkType(),
+                  transaction.getDeadline(),
                   mosaicId,
                   transaction.getRestrictionKey(),
                   transaction.getNewRestrictionValue(),
@@ -422,6 +431,7 @@ public class TransactionServiceImpl implements TransactionService {
             (mosaicId, targetAddress) ->
                 MosaicAddressRestrictionTransactionFactory.create(
                         transaction.getNetworkType(),
+                        transaction.getDeadline(),
                         mosaicId,
                         transaction.getRestrictionKey(),
                         targetAddress,
@@ -456,6 +466,7 @@ public class TransactionServiceImpl implements TransactionService {
             (additions, deletions) ->
                 AccountMosaicRestrictionTransactionFactory.create(
                     transaction.getNetworkType(),
+                    transaction.getDeadline(),
                     transaction.getRestrictionFlags(),
                     additions,
                     deletions);
@@ -488,6 +499,7 @@ public class TransactionServiceImpl implements TransactionService {
             (additions, deletions) ->
                 AccountAddressRestrictionTransactionFactory.create(
                     transaction.getNetworkType(),
+                    transaction.getDeadline(),
                     transaction.getRestrictionFlags(),
                     additions,
                     deletions);
@@ -510,6 +522,7 @@ public class TransactionServiceImpl implements TransactionService {
         mosaicId ->
             MosaicMetadataTransactionFactory.create(
                     transaction.getNetworkType(),
+                    transaction.getDeadline(),
                     transaction.getTargetAddress(),
                     mosaicId,
                     transaction.getScopedMetadataKey(),
@@ -534,6 +547,7 @@ public class TransactionServiceImpl implements TransactionService {
         mosaicId ->
             MosaicSupplyChangeTransactionFactory.create(
                 transaction.getNetworkType(),
+                transaction.getDeadline(),
                 mosaicId,
                 transaction.getAction(),
                 transaction.getDelta()));
@@ -566,6 +580,7 @@ public class TransactionServiceImpl implements TransactionService {
             AggregateTransactionFactory.create(
                 transaction.getType(),
                 transaction.getNetworkType(),
+                transaction.getDeadline(),
                 txs,
                 transaction.getCosignatures()));
   }
@@ -573,7 +588,6 @@ public class TransactionServiceImpl implements TransactionService {
   private Transaction completeAndBuild(
       TransactionFactory<? extends Transaction> transactionFactory, Transaction transaction) {
     transactionFactory.maxFee(transaction.getMaxFee());
-    transactionFactory.deadline(transaction.getDeadline());
     transactionFactory.version(transaction.getVersion());
     transaction.getSignature().ifPresent(transactionFactory::signature);
     transaction.getSigner().ifPresent(transactionFactory::signer);

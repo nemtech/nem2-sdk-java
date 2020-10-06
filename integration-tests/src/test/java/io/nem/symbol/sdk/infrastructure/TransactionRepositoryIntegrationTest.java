@@ -65,6 +65,7 @@ public class TransactionRepositoryIntegrationTest extends BaseIntegrationTest {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 recipient,
                 Collections.singletonList(
                     getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))

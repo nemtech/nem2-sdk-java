@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 
@@ -30,11 +31,14 @@ class MosaicGlobalRestrictionTransactionTest extends AbstractTransactionTester {
       new Account("26b64cb10f005e5988a36744ca19e20d835ccc7c105aaa5f3b212da593180930", networkType);
   static String generationHash = "57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6";
 
+  static Duration epochAdjustment = Duration.ofSeconds(1573430400);
+
   @Test
   void createAMosaicGlobalRestrictionTransactionViaStaticConstructor() {
     MosaicGlobalRestrictionTransaction transaction =
         MosaicGlobalRestrictionTransactionFactory.create(
                 networkType,
+                Deadline.create(epochAdjustment),
                 new MosaicId(new BigInteger("1")), // restrictedMosaicId
                 BigInteger.valueOf(1), // restrictionKey
                 BigInteger.valueOf(8), // newRestrictionValue
@@ -47,7 +51,8 @@ class MosaicGlobalRestrictionTransactionTest extends AbstractTransactionTester {
 
     assertEquals(networkType, transaction.getNetworkType());
     assertTrue(1 == transaction.getVersion());
-    assertTrue(LocalDateTime.now().isBefore(transaction.getDeadline().getLocalDateTime()));
+    assertTrue(
+        LocalDateTime.now().isBefore(transaction.getDeadline().getLocalDateTime(epochAdjustment)));
     assertEquals(BigInteger.valueOf(0), transaction.getMaxFee());
     assertEquals(new BigInteger("1"), transaction.getMosaicId().getId());
     assertEquals(new BigInteger("2"), transaction.getReferenceMosaicId().getId());
@@ -63,6 +68,7 @@ class MosaicGlobalRestrictionTransactionTest extends AbstractTransactionTester {
     MosaicGlobalRestrictionTransaction transaction =
         MosaicGlobalRestrictionTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new MosaicId(new BigInteger("1")), // restricted
                 // MosaicId
                 BigInteger.valueOf(1), // restrictionKey
@@ -72,7 +78,6 @@ class MosaicGlobalRestrictionTransactionTest extends AbstractTransactionTester {
             .referenceMosaicId(new MosaicId(new BigInteger("2")))
             .previousRestrictionValue(BigInteger.valueOf(9))
             .previousRestrictionType(MosaicRestrictionType.EQ)
-            .deadline(new FakeDeadline())
             .build();
 
     SignedTransaction signedTransaction = transaction.signWith(account, generationHash);
@@ -87,6 +92,7 @@ class MosaicGlobalRestrictionTransactionTest extends AbstractTransactionTester {
     MosaicGlobalRestrictionTransaction transaction =
         MosaicGlobalRestrictionTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new MosaicId(new BigInteger("3456")), // restricted
                 // MosaicId
                 BigInteger.valueOf(1), // restrictionKey
@@ -96,7 +102,6 @@ class MosaicGlobalRestrictionTransactionTest extends AbstractTransactionTester {
             .referenceMosaicId(new MosaicId(new BigInteger("2")))
             .previousRestrictionValue(BigInteger.valueOf(9))
             .previousRestrictionType(MosaicRestrictionType.EQ)
-            .deadline(new FakeDeadline())
             .signer(account.getPublicAccount())
             .build();
 

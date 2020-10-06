@@ -48,6 +48,7 @@ import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionCosignature;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
@@ -778,7 +779,8 @@ public class ListenerVertxTest {
   private TransferTransaction transferTransaction(
       PublicAccount signer, UnresolvedAddress recipient) {
     TransferTransactionFactory factory =
-        TransferTransactionFactory.create(NETWORK_TYPE, recipient, Collections.emptyList())
+        TransferTransactionFactory.create(
+                NETWORK_TYPE, new Deadline(BigInteger.ONE), recipient, Collections.emptyList())
             .message(new PlainMessage(""));
     if (signer != null) {
       factory.signer(signer);
@@ -808,7 +810,8 @@ public class ListenerVertxTest {
   private VrfKeyLinkTransaction vrfKeyLinkTransaction(
       PublicAccount signer, PublicKey linkedAccount) {
     VrfKeyLinkTransactionFactory factory =
-        VrfKeyLinkTransactionFactory.create(NETWORK_TYPE, linkedAccount, LinkAction.LINK);
+        VrfKeyLinkTransactionFactory.create(
+            NETWORK_TYPE, new Deadline(BigInteger.ONE), linkedAccount, LinkAction.LINK);
     if (signer != null) {
       factory.signer(signer);
     }
@@ -836,7 +839,7 @@ public class ListenerVertxTest {
       PublicAccount signer, Address targetAccount) {
     AccountMetadataTransactionFactory factory =
         AccountMetadataTransactionFactory.create(
-            NETWORK_TYPE, targetAccount, BigInteger.ONE, "someValue");
+            NETWORK_TYPE, new Deadline(BigInteger.ONE), targetAccount, BigInteger.ONE, "someValue");
     if (signer != null) {
       factory.signer(signer);
     }
@@ -850,7 +853,7 @@ public class ListenerVertxTest {
 
     MultisigAccountModificationTransactionFactory factory =
         MultisigAccountModificationTransactionFactory.create(
-            NETWORK_TYPE, (byte) 0, (byte) 0, additions, deletions);
+            NETWORK_TYPE, new Deadline(BigInteger.ONE), (byte) 0, (byte) 0, additions, deletions);
     if (signer != null) {
       factory.signer(signer);
     }
@@ -1096,6 +1099,7 @@ public class ListenerVertxTest {
         AggregateTransactionFactory.create(
             TransactionType.AGGREGATE_COMPLETE,
             NETWORK_TYPE,
+            new Deadline(BigInteger.ONE),
             Arrays.asList(anotherTransactions),
             cosignatures);
     if (signer != null) {
@@ -1115,7 +1119,11 @@ public class ListenerVertxTest {
     Mosaic mosaic = new Mosaic(mosaicId, BigInteger.TEN);
     HashLockTransactionFactory factory =
         HashLockTransactionFactory.create(
-            NETWORK_TYPE, mosaic, BigInteger.TEN, signedTransaction.getHash());
+            NETWORK_TYPE,
+            new Deadline(BigInteger.ONE),
+            mosaic,
+            BigInteger.TEN,
+            signedTransaction.getHash());
     if (signer != null) {
       factory.signer(signer);
     }
@@ -1169,6 +1177,7 @@ public class ListenerVertxTest {
     AccountAddressRestrictionTransactionFactory factory =
         AccountAddressRestrictionTransactionFactory.create(
             NETWORK_TYPE,
+            new Deadline(BigInteger.ONE),
             AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
             additions,
             deletions);
@@ -1184,6 +1193,7 @@ public class ListenerVertxTest {
     MosaicAddressRestrictionTransactionFactory factory =
         MosaicAddressRestrictionTransactionFactory.create(
             NETWORK_TYPE,
+            new Deadline(BigInteger.ONE),
             NamespaceId.createFromName("abc"),
             BigInteger.ONE,
             targetAddress,

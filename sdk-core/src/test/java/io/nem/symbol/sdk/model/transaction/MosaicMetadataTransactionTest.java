@@ -42,9 +42,13 @@ public class MosaicMetadataTransactionTest extends AbstractTransactionTester {
     MosaicId mosaicId = new MosaicId(BigInteger.valueOf(1000));
     MosaicMetadataTransaction transaction =
         MosaicMetadataTransactionFactory.create(
-                NetworkType.MIJIN_TEST, account.getAddress(), mosaicId, BigInteger.TEN, "123ABC")
+                NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
+                account.getAddress(),
+                mosaicId,
+                BigInteger.TEN,
+                "123ABC")
             .valueSizeDelta(10)
-            .deadline(new FakeDeadline())
             .build();
     assertEquals("123ABC", transaction.getValue());
     assertEquals(mosaicId, transaction.getTargetMosaicId());
@@ -60,10 +64,14 @@ public class MosaicMetadataTransactionTest extends AbstractTransactionTester {
     MosaicId mosaicId = new MosaicId(BigInteger.valueOf(1000));
     MosaicMetadataTransaction transaction =
         MosaicMetadataTransactionFactory.create(
-                NetworkType.MIJIN_TEST, account.getAddress(), mosaicId, BigInteger.TEN, "123ABC")
+                NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
+                account.getAddress(),
+                mosaicId,
+                BigInteger.TEN,
+                "123ABC")
             .valueSizeDelta(10)
             .signer(account.getPublicAccount())
-            .deadline(new FakeDeadline())
             .build();
 
     String expectedHash =

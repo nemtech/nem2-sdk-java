@@ -40,6 +40,7 @@ import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,16 +65,18 @@ class TransferTransactionTest extends AbstractTransactionTester {
 
   @Test
   void createATransferTransactionViaStaticConstructor() {
-
+    Duration epochAdjustment = Duration.ofSeconds(100);
     Address address = Address.generateRandom(networkType);
     TransferTransactionFactory factory =
-        TransferTransactionFactory.create(networkType, address, Collections.emptyList())
+        TransferTransactionFactory.create(
+                networkType, Deadline.create(epochAdjustment), address, Collections.emptyList())
             .message(new PlainMessage(""));
     TransferTransaction transaction = factory.build();
 
     assertEquals(networkType, transaction.getNetworkType());
     assertEquals(1, (int) transaction.getVersion());
-    assertTrue(LocalDateTime.now().isBefore(transaction.getDeadline().getLocalDateTime()));
+    assertTrue(
+        LocalDateTime.now().isBefore(transaction.getDeadline().getLocalDateTime(epochAdjustment)));
     assertEquals(BigInteger.valueOf(0), transaction.getMaxFee());
     assertEquals(address, transaction.getRecipient());
     assertEquals(0, transaction.getMosaics().size());
@@ -85,11 +88,12 @@ class TransferTransactionTest extends AbstractTransactionTester {
 
   @Test
   void createATransferTransactionViaStaticConstructorSetMaxFee() {
-
+    Duration epochAdjustment = Duration.ofSeconds(100);
     long feeMultiplier = 10;
     TransactionFactory<TransferTransaction> factory =
         TransferTransactionFactory.create(
                 networkType,
+                Deadline.create(epochAdjustment),
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.emptyList())
             .message(new PlainMessage(""))
@@ -98,7 +102,8 @@ class TransferTransactionTest extends AbstractTransactionTester {
 
     assertEquals(networkType, transaction.getNetworkType());
     assertEquals(1, (int) transaction.getVersion());
-    assertTrue(LocalDateTime.now().isBefore(transaction.getDeadline().getLocalDateTime()));
+    assertTrue(
+        LocalDateTime.now().isBefore(transaction.getDeadline().getLocalDateTime(epochAdjustment)));
     assertEquals(BigInteger.valueOf(1610), transaction.getMaxFee());
     assertEquals(
         new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
@@ -120,12 +125,12 @@ class TransferTransactionTest extends AbstractTransactionTester {
     TransferTransaction transaction =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
             .message(new PlainMessage(""))
-            .deadline(new FakeDeadline())
             .build();
     assertSerialization(expected, transaction);
   }
@@ -137,11 +142,11 @@ class TransferTransactionTest extends AbstractTransactionTester {
     TransferTransaction transaction =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
-            .deadline(new FakeDeadline())
             .build();
     assertSerialization(expected, transaction);
   }
@@ -158,11 +163,11 @@ class TransferTransactionTest extends AbstractTransactionTester {
     TransferTransaction transaction =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Arrays.asList(mosaicId1, mosaicId2))
             .message(new PlainMessage("Some Message 漢字"))
             .signer(account.getPublicAccount())
-            .deadline(new FakeDeadline())
             .build();
 
     assertSerialization(expected, transaction);
@@ -188,12 +193,12 @@ class TransferTransactionTest extends AbstractTransactionTester {
     TransferTransaction transaction =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 recipient,
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
             .message(new PlainMessage("Some Message 漢字"))
-            .deadline(new FakeDeadline())
             .build();
 
     Assertions.assertEquals(
@@ -241,12 +246,12 @@ class TransferTransactionTest extends AbstractTransactionTester {
     TransferTransaction transaction =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
             .message(new PlainMessage(""))
-            .deadline(new FakeDeadline())
             .build();
 
     Transaction aggregateTransaction =
@@ -262,12 +267,12 @@ class TransferTransactionTest extends AbstractTransactionTester {
     TransferTransaction transaction =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.singletonList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
             .message(new PlainMessage(""))
-            .deadline(new FakeDeadline())
             .build();
 
     SignedTransaction signedTransaction = transaction.signWith(account, generationHash);
@@ -287,11 +292,11 @@ class TransferTransactionTest extends AbstractTransactionTester {
     TransferTransaction transaction =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 namespaceId,
                 Collections.singletonList(
                     NetworkCurrency.CAT_CURRENCY.createAbsolute(BigInteger.ONE)))
             .message(new PlainMessage("test-message"))
-            .deadline(new Deadline(BigInteger.ONE))
             .build();
 
     byte[] payload = transaction.serialize();
@@ -310,7 +315,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
 
   @Test
   void createPersistentDelegationRequestTransaction() {
-
+    Duration epochAdjustment = Duration.ofSeconds(100);
     KeyPair signingPrivateKey =
         KeyPair.fromPrivate(
             PrivateKey.fromHexString(
@@ -329,15 +334,17 @@ class TransferTransactionTest extends AbstractTransactionTester {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.createPersistentDelegationRequestTransaction(
                 networkType,
+                Deadline.create(epochAdjustment),
                 signingPrivateKey.getPrivateKey(),
                 vrfPrivateKey.getPrivateKey(),
                 recipient.getPublicKey())
-            .deadline(new FakeDeadline())
             .build();
 
     assertEquals(networkType, transferTransaction.getNetworkType());
     assertEquals(1, (int) transferTransaction.getVersion());
-    assertTrue(LocalDateTime.now().isBefore(transferTransaction.getDeadline().getLocalDateTime()));
+    assertTrue(
+        LocalDateTime.now()
+            .isBefore(transferTransaction.getDeadline().getLocalDateTime(epochAdjustment)));
     assertEquals(BigInteger.valueOf(0), transferTransaction.getMaxFee());
     assertEquals(
         Address.createFromPublicKey(recipient.getPublicKey().toHex(), networkType),
@@ -380,10 +387,10 @@ class TransferTransactionTest extends AbstractTransactionTester {
     TransferTransaction transaction =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 mosaics)
             .message(new PlainMessage(""))
-            .deadline(new FakeDeadline())
             .build();
 
     assertEquals(mosaics.get(0).getId().getIdAsLong(), new BigInteger("200").longValue());
@@ -405,10 +412,10 @@ class TransferTransactionTest extends AbstractTransactionTester {
     TransferTransaction transaction =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 mosaics)
             .message(new PlainMessage(""))
-            .deadline(new FakeDeadline())
             .build();
 
     assertEquals("D525AD41D95FCF29", mosaics.get(0).getId().getIdAsHex().toUpperCase());

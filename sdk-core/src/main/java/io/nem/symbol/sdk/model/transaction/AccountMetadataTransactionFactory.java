@@ -25,16 +25,24 @@ public class AccountMetadataTransactionFactory
 
   private AccountMetadataTransactionFactory(
       NetworkType networkType,
+      Deadline deadline,
       UnresolvedAddress targetAddress,
       BigInteger scopedMetadataKey,
       String value) {
-    super(TransactionType.ACCOUNT_METADATA, networkType, targetAddress, scopedMetadataKey, value);
+    super(
+        TransactionType.ACCOUNT_METADATA,
+        networkType,
+        deadline,
+        targetAddress,
+        scopedMetadataKey,
+        value);
   }
 
   /**
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline the deadline
    * @param targetAddress Target address.
    * @param scopedMetadataKey Scoped metadata key.
    * @param value Value.
@@ -42,11 +50,12 @@ public class AccountMetadataTransactionFactory
    */
   public static AccountMetadataTransactionFactory create(
       NetworkType networkType,
+      Deadline deadline,
       UnresolvedAddress targetAddress,
       BigInteger scopedMetadataKey,
       String value) {
     return new AccountMetadataTransactionFactory(
-        networkType, targetAddress, scopedMetadataKey, value);
+        networkType, deadline, targetAddress, scopedMetadataKey, value);
   }
 
   @Override

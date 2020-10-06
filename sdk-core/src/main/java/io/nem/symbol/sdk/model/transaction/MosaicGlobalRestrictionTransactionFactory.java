@@ -38,6 +38,7 @@ public class MosaicGlobalRestrictionTransactionFactory
    * Create a mosaic global restriction transaction object with factory build and modifier methods.
    *
    * @param networkType {@link NetworkType}
+   * @param deadline the transaction deadline.
    * @param mosaicId {@link UnresolvedMosaicId}
    * @param restrictionKey BigInteger
    * @param newRestrictionValue BigInteger
@@ -45,11 +46,12 @@ public class MosaicGlobalRestrictionTransactionFactory
    */
   private MosaicGlobalRestrictionTransactionFactory(
       NetworkType networkType,
+      Deadline deadline,
       UnresolvedMosaicId mosaicId,
       BigInteger restrictionKey,
       BigInteger newRestrictionValue,
       MosaicRestrictionType newRestrictionType) {
-    super(TransactionType.MOSAIC_GLOBAL_RESTRICTION, networkType);
+    super(TransactionType.MOSAIC_GLOBAL_RESTRICTION, networkType, deadline);
     Validate.notNull(mosaicId, "RestrictedMosaicId must not be null");
     Validate.notNull(restrictionKey, "RestrictionKey must not be null");
     Validate.notNull(newRestrictionValue, "NewRestrictionValue must not be null");
@@ -66,6 +68,7 @@ public class MosaicGlobalRestrictionTransactionFactory
    * Static create method for factory.
    *
    * @param networkType {@link NetworkType}
+   * @param deadline the deadline
    * @param mosaicId {@link UnresolvedMosaicId}
    * @param restrictionKey Restriction key.
    * @param newRestrictionValue New restriction value.
@@ -74,12 +77,13 @@ public class MosaicGlobalRestrictionTransactionFactory
    */
   public static MosaicGlobalRestrictionTransactionFactory create(
       NetworkType networkType,
+      Deadline deadline,
       UnresolvedMosaicId mosaicId,
       BigInteger restrictionKey,
       BigInteger newRestrictionValue,
       MosaicRestrictionType newRestrictionType) {
     return new MosaicGlobalRestrictionTransactionFactory(
-        networkType, mosaicId, restrictionKey, newRestrictionValue, newRestrictionType);
+        networkType, deadline, mosaicId, restrictionKey, newRestrictionValue, newRestrictionType);
   }
 
   @Override

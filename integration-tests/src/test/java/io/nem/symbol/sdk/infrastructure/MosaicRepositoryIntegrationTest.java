@@ -130,12 +130,13 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
     MosaicDefinitionTransaction mosaicDefinitionTransaction =
         MosaicDefinitionTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 nonce,
                 mosaicId,
                 MosaicFlags.create(true, true, true),
                 4,
                 new BlockDuration(100))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     MosaicDefinitionTransaction validateTransaction =

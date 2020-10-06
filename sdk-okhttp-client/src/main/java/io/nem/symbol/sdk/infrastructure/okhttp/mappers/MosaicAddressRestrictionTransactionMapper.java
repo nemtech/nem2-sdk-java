@@ -20,6 +20,7 @@ import static io.nem.symbol.core.utils.MapperUtils.toUnresolvedMosaicId;
 
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransactionFactory;
@@ -41,9 +42,12 @@ class MosaicAddressRestrictionTransactionMapper
 
   @Override
   protected TransactionFactory<MosaicAddressRestrictionTransaction> createFactory(
-      NetworkType networkType, MosaicAddressRestrictionTransactionDTO transaction) {
+      NetworkType networkType,
+      Deadline deadline,
+      MosaicAddressRestrictionTransactionDTO transaction) {
     return MosaicAddressRestrictionTransactionFactory.create(
             networkType,
+            deadline,
             toUnresolvedMosaicId(transaction.getMosaicId()),
             MapperUtils.fromHexToBigInteger(transaction.getRestrictionKey()),
             MapperUtils.toUnresolvedAddress(transaction.getTargetAddress()),

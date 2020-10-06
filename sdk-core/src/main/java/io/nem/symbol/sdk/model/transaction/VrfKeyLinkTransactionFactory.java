@@ -32,12 +32,16 @@ public class VrfKeyLinkTransactionFactory extends TransactionFactory<VrfKeyLinkT
    * The factory constructor for {@link VrfKeyLinkTransaction}
    *
    * @param networkType the network type of this transaction.
+   * @param deadline the transaction deadline.
    * @param linkedPublicKey the linked public key.
    * @param linkAction the link action.
    */
   public VrfKeyLinkTransactionFactory(
-      final NetworkType networkType, final PublicKey linkedPublicKey, LinkAction linkAction) {
-    super(TransactionType.VRF_KEY_LINK, networkType);
+      final NetworkType networkType,
+      final Deadline deadline,
+      final PublicKey linkedPublicKey,
+      LinkAction linkAction) {
+    super(TransactionType.VRF_KEY_LINK, networkType, deadline);
     Validate.notNull(linkedPublicKey, "linkedPublicKey must not be null");
     Validate.notNull(linkAction, "linkAction must not be null");
     this.linkedPublicKey = linkedPublicKey;
@@ -48,13 +52,17 @@ public class VrfKeyLinkTransactionFactory extends TransactionFactory<VrfKeyLinkT
    * The factory constructor for {@link VrfKeyLinkTransaction}
    *
    * @param networkType the network type of this transaction.
+   * @param deadline the deadline
    * @param linkedPublicKey the linked public key.
    * @param linkAction the link action.
    * @return an instance of the factory.
    */
   public static VrfKeyLinkTransactionFactory create(
-      final NetworkType networkType, final PublicKey linkedPublicKey, final LinkAction linkAction) {
-    return new VrfKeyLinkTransactionFactory(networkType, linkedPublicKey, linkAction);
+      final NetworkType networkType,
+      Deadline deadline,
+      final PublicKey linkedPublicKey,
+      final LinkAction linkAction) {
+    return new VrfKeyLinkTransactionFactory(networkType, deadline, linkedPublicKey, linkAction);
   }
 
   @Override

@@ -50,9 +50,9 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
         AggregateTransactionFactory.create(
                 TransactionType.AGGREGATE_BONDED,
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Collections.emptyList(),
                 Collections.emptyList())
-            .deadline(new FakeDeadline())
             .build();
     String expected =
         "a80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019041420000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
@@ -83,6 +83,7 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
     TransferTransaction transaction1 =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.singletonList(
                     new Mosaic(
@@ -94,6 +95,7 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
     MosaicSupplyChangeTransaction transaction2 =
         MosaicSupplyChangeTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new MosaicId(new BigInteger("6300565133566699912")),
                 MosaicSupplyChangeActionType.INCREASE,
                 BigInteger.valueOf(10))
@@ -104,9 +106,9 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
         AggregateTransactionFactory.create(
                 TransactionType.AGGREGATE_BONDED,
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Arrays.asList(transaction1, transaction2),
                 Collections.emptyList())
-            .deadline(new FakeDeadline())
             .build();
 
     BinarySerializationImpl binarySerialization = new BinarySerializationImpl();
@@ -184,6 +186,7 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
     TransferTransaction transaction1 =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.singletonList(
                     new Mosaic(
@@ -196,6 +199,7 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
         AggregateTransactionFactory.create(
             TransactionType.AGGREGATE_COMPLETE,
             networkType,
+            new Deadline(BigInteger.ONE),
             Collections.singletonList(transaction1),
             Arrays.asList(cosignature1, cosignature2, cosignature3));
 
@@ -264,9 +268,9 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
         AggregateTransactionFactory.create(
                 TransactionType.AGGREGATE_COMPLETE,
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Collections.emptyList(),
                 Arrays.asList(cosignature1, cosignature2, cosignature3))
-            .deadline(new FakeDeadline())
             .build();
 
     Assertions.assertEquals(3, aggregateTransaction.getCosignatures().size());
@@ -317,6 +321,7 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
     TransferTransaction transaction1 =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.singletonList(
                     new Mosaic(
@@ -328,6 +333,7 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
     MosaicSupplyChangeTransaction transaction2 =
         MosaicSupplyChangeTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new MosaicId(new BigInteger("6300565133566699912")),
                 MosaicSupplyChangeActionType.INCREASE,
                 BigInteger.valueOf(10))
@@ -338,9 +344,9 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
         AggregateTransactionFactory.create(
                 TransactionType.AGGREGATE_BONDED,
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Arrays.asList(transaction1, transaction2),
                 Arrays.asList(cosignature1, cosignature2))
-            .deadline(new FakeDeadline())
             .build();
 
     String expected =
@@ -400,6 +406,7 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
     TransferTransaction transaction1 =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.singletonList(
                     new Mosaic(
@@ -411,6 +418,7 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
     MosaicSupplyChangeTransaction transaction2 =
         MosaicSupplyChangeTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new MosaicId(new BigInteger("6300565133566699912")),
                 MosaicSupplyChangeActionType.INCREASE,
                 BigInteger.valueOf(10))
@@ -421,10 +429,10 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
         AggregateTransactionFactory.create(
                 TransactionType.AGGREGATE_BONDED,
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Arrays.asList(transaction1, transaction2),
                 Collections.singletonList(cosignature1))
             .addCosignatures(cosignature2)
-            .deadline(new FakeDeadline())
             .build();
 
     String expected =

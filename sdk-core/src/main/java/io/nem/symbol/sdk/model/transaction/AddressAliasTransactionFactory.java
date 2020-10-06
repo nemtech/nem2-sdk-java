@@ -30,10 +30,11 @@ public class AddressAliasTransactionFactory extends TransactionFactory<AddressAl
 
   private AddressAliasTransactionFactory(
       final NetworkType networkType,
+      final Deadline deadline,
       final AliasAction aliasAction,
       final NamespaceId namespaceId,
       final Address address) {
-    super(TransactionType.ADDRESS_ALIAS, networkType);
+    super(TransactionType.ADDRESS_ALIAS, networkType, deadline);
     Validate.notNull(aliasAction, "aliasAction must not be null");
     Validate.notNull(namespaceId, "namespaceId must not be null");
     Validate.notNull(address, "address must not be null");
@@ -46,14 +47,20 @@ public class AddressAliasTransactionFactory extends TransactionFactory<AddressAl
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline the deadline.
    * @param aliasAction Alias action.
    * @param namespaceId Namespace id.
    * @param address Address.
    * @return Address alias transaction.
    */
   public static AddressAliasTransactionFactory create(
-      NetworkType networkType, AliasAction aliasAction, NamespaceId namespaceId, Address address) {
-    return new AddressAliasTransactionFactory(networkType, aliasAction, namespaceId, address);
+      NetworkType networkType,
+      Deadline deadline,
+      AliasAction aliasAction,
+      NamespaceId namespaceId,
+      Address address) {
+    return new AddressAliasTransactionFactory(
+        networkType, deadline, aliasAction, namespaceId, address);
   }
 
   /**

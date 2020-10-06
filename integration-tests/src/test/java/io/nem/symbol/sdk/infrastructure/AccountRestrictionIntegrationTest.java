@@ -191,7 +191,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
 
     AccountOperationRestrictionTransaction transaction =
         AccountOperationRestrictionTransactionFactory.create(
-                getNetworkType(), accountRestrictionFlags, additions, deletions)
+                getNetworkType(), getDeadline(), accountRestrictionFlags, additions, deletions)
             .maxFee(maxFee)
             .build();
 
@@ -216,7 +216,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
 
     AccountMosaicRestrictionTransaction transaction =
         AccountMosaicRestrictionTransactionFactory.create(
-                getNetworkType(), accountRestrictionFlags, additions, deletions)
+                getNetworkType(), getDeadline(), accountRestrictionFlags, additions, deletions)
             .maxFee(maxFee)
             .build();
 
@@ -241,7 +241,7 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
 
     AccountAddressRestrictionTransaction transaction =
         AccountAddressRestrictionTransactionFactory.create(
-                getNetworkType(), accountRestrictionFlags, additions, deletions)
+                getNetworkType(), getDeadline(), accountRestrictionFlags, additions, deletions)
             .maxFee(maxFee)
             .build();
 

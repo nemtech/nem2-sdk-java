@@ -21,6 +21,7 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionCosignature;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
@@ -46,7 +47,7 @@ class AggregateTransactionMapper
 
   @Override
   protected AggregateTransactionFactory createFactory(
-      NetworkType networkType, AggregateTransactionExtendedDTO transaction) {
+      NetworkType networkType, Deadline deadline, AggregateTransactionExtendedDTO transaction) {
 
     List<Transaction> transactions =
         transaction.getTransactions().stream()
@@ -73,6 +74,7 @@ class AggregateTransactionMapper
     return AggregateTransactionFactory.create(
         getTransactionType(),
         networkType,
+        deadline,
         transaction.getTransactionsHash(),
         transactions,
         cosignatures);

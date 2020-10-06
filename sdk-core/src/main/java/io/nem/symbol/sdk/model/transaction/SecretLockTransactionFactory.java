@@ -33,12 +33,13 @@ public class SecretLockTransactionFactory extends TransactionFactory<SecretLockT
 
   private SecretLockTransactionFactory(
       NetworkType networkType,
+      Deadline deadline,
       Mosaic mosaic,
       BigInteger duration,
       LockHashAlgorithm hashAlgorithm,
       String secret,
       UnresolvedAddress recipient) {
-    super(TransactionType.SECRET_LOCK, networkType);
+    super(TransactionType.SECRET_LOCK, networkType, deadline);
     Validate.notNull(mosaic, "Mosaic must not be null");
     Validate.notNull(duration, "Duration must not be null");
     Validate.notNull(secret, "Secret must not be null");
@@ -59,6 +60,7 @@ public class SecretLockTransactionFactory extends TransactionFactory<SecretLockT
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline the deadline
    * @param mosaic Mosaic.
    * @param duration Duration.
    * @param hashAlgorithm Hash algorithm.
@@ -68,13 +70,14 @@ public class SecretLockTransactionFactory extends TransactionFactory<SecretLockT
    */
   public static SecretLockTransactionFactory create(
       NetworkType networkType,
+      Deadline deadline,
       Mosaic mosaic,
       BigInteger duration,
       LockHashAlgorithm hashAlgorithm,
       String secret,
       UnresolvedAddress recipient) {
     return new SecretLockTransactionFactory(
-        networkType, mosaic, duration, hashAlgorithm, secret, recipient);
+        networkType, deadline, mosaic, duration, hashAlgorithm, secret, recipient);
   }
 
   /**

@@ -146,6 +146,7 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 recipient,
                 Collections.singletonList(
                     getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
@@ -180,9 +181,6 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
                         .equals(signedTransaction.getHash()))
             .findAny()
             .isPresent());
-
-    System.out.println(
-        "http://localhost:3000/transactions/unconfirmed/" + signedTransaction.getHash());
 
     helper.assertById(transactionRepository, group, transactions);
   }
@@ -272,6 +270,27 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
+  void searchEmbedded(RepositoryType type) {
+    TransactionRepository transactionRepository = getTransactionRepository(type);
+    TransactionPaginationStreamer streamer =
+        new TransactionPaginationStreamer(transactionRepository);
+    TransactionGroup group = TransactionGroup.CONFIRMED;
+    TransactionSearchCriteria criteria = new TransactionSearchCriteria(group).embedded(true);
+    List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
+
+    transactions.forEach(
+        b -> {
+          TransferTransaction transferTransaction = (TransferTransaction) b;
+          Message message =
+              transferTransaction.getMessage().orElse(PlainMessage.create("No Message!!"));
+          Assertions.assertNotNull(message.getText());
+        });
+
+    Assertions.assertFalse(transactions.isEmpty());
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
   void searchByGroup(RepositoryType type) {
     TransactionRepository transactionRepository = getTransactionRepository(type);
     TransactionPaginationStreamer streamer =
@@ -344,71 +363,37 @@ public class TransactionSearchRepositoryIntegrationTest extends BaseIntegrationT
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
-  void searchEmbedded(RepositoryType type) {
-    TransactionRepository transactionRepository = getTransactionRepository(type);
-    TransactionPaginationStreamer streamer =
-        new TransactionPaginationStreamer(transactionRepository);
-    TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.CONFIRMED);
-    criteria.setEmbedded(true);
-    List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
-    Assertions.assertFalse(transactions.isEmpty());
-
-    transactions.forEach(
-        t -> {
-          Assertions.assertTrue(t.getTransactionInfo().isPresent());
-          Assertions.assertTrue(
-              t.getTransactionInfo().get().getHash().isPresent()
-                  || t.getTransactionInfo().get().getAggregateId().isPresent());
-          Assertions.assertTrue(t.getTransactionInfo().get().getId().isPresent());
-          Assertions.assertNotNull(t.getTransactionInfo().get().getHeight());
-          Assertions.assertTrue(t.getTransactionInfo().get().getIndex().isPresent());
-          if (t.getTransactionInfo().get().getHash().isPresent()) {
-            Assertions.assertTrue(t.getTransactionInfo().get().getHash().isPresent());
-            Assertions.assertTrue(
-                t.getTransactionInfo().get().getMerkleComponentHash().isPresent());
-            Assertions.assertFalse(t.getTransactionInfo().get().getAggregateHash().isPresent());
-            Assertions.assertFalse(t.getTransactionInfo().get().getAggregateId().isPresent());
-          }
-
-          if (t.getTransactionInfo().get().getAggregateHash().isPresent()) {
-            Assertions.assertFalse(t.getTransactionInfo().get().getHash().isPresent());
-            Assertions.assertFalse(
-                t.getTransactionInfo().get().getMerkleComponentHash().isPresent());
-            Assertions.assertTrue(t.getTransactionInfo().get().getAggregateHash().isPresent());
-            Assertions.assertTrue(t.getTransactionInfo().get().getAggregateId().isPresent());
-          }
-          if (t.getType() == TransactionType.AGGREGATE_BONDED
-              || t.getType() == TransactionType.AGGREGATE_COMPLETE) {
-            Assertions.assertTrue(t.getSize() > 0);
-            Assertions.assertThrows(IllegalArgumentException.class, t::serialize);
-          } else {
-            Assertions.assertTrue(t.getSize() > 0);
-            Assertions.assertNotNull(t.serialize());
-          }
-        });
-  }
-
-  @ParameterizedTest
-  @EnumSource(RepositoryType.class)
   void searchEmbeddedTransactionType(RepositoryType type) {
     TransactionRepository transactionRepository = getTransactionRepository(type);
     TransactionPaginationStreamer streamer =
         new TransactionPaginationStreamer(transactionRepository);
     TransactionSearchCriteria criteria = new TransactionSearchCriteria(TransactionGroup.CONFIRMED);
     criteria.setEmbedded(true);
-    criteria.setTransactionTypes(Collections.singletonList(TransactionType.TRANSFER));
     List<Transaction> transactions = get(streamer.search(criteria).toList().toObservable());
     Assertions.assertFalse(transactions.isEmpty());
 
     transactions.stream()
         .forEach(
             t -> {
-              get(
-                  transactionRepository.getTransaction(
-                      TransactionGroup.CONFIRMED, t.getRecordId().get()));
-              get(
-                  transactionRepository.getTransaction(
-                      TransactionGroup.CONFIRMED, t.getTransactionInfo().get().getHash().get()));
+              Transaction storedById =
+                  get(
+                      transactionRepository.getTransaction(
+                          TransactionGroup.CONFIRMED, t.getRecordId().get()));
+
+              Assertions.assertEquals(storedById.getRecordId().get(), t.getRecordId().get());
+              if (t.getTransactionInfo().get().getHash().isPresent()) {
+                Transaction transaction =
+                    get(
+                        transactionRepository.getTransaction(
+                            TransactionGroup.CONFIRMED,
+                            t.getTransactionInfo().get().getHash().get()));
+                Assertions.assertEquals(storedById.getRecordId().get(), t.getRecordId().get());
+                Assertions.assertEquals(
+                    t.getTransactionInfo().get().getHash().get(),
+                    t.getTransactionInfo().get().getHash().get());
+              } else {
+                Assertions.assertEquals(0, t.getMaxFee().intValue());
+              }
             });
   }
 

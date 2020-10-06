@@ -21,6 +21,7 @@ import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.MosaicAliasTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicAliasTransactionFactory;
@@ -39,12 +40,16 @@ class MosaicAliasTransactionMapper
 
   @Override
   protected TransactionFactory<MosaicAliasTransaction> createFactory(
-      NetworkType networkType, MosaicAliasTransactionDTO transaction) {
+      NetworkType networkType, Deadline deadline, MosaicAliasTransactionDTO transaction) {
     NamespaceId namespaceId = MapperUtils.toNamespaceId(transaction.getNamespaceId());
     AliasAction aliasAction =
         AliasAction.rawValueOf(transaction.getAliasAction().getValue().byteValue());
     return MosaicAliasTransactionFactory.create(
-        networkType, aliasAction, namespaceId, MapperUtils.toMosaicId(transaction.getMosaicId()));
+        networkType,
+        deadline,
+        aliasAction,
+        namespaceId,
+        MapperUtils.toMosaicId(transaction.getMosaicId()));
   }
 
   @Override

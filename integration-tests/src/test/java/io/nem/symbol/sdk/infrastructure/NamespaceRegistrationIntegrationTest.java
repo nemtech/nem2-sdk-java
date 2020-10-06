@@ -20,7 +20,6 @@ import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.namespace.NamespaceInfo;
 import io.nem.symbol.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.symbol.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
-import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
@@ -48,7 +47,7 @@ public class NamespaceRegistrationIntegrationTest extends BaseIntegrationTest {
 
     NamespaceRegistrationTransaction namespaceRegistrationTransaction =
         NamespaceRegistrationTransactionFactory.createRootNamespace(
-                getNetworkType(), namespaceName, BigInteger.valueOf(100))
+                getNetworkType(), getDeadline(), namespaceName, helper().getDuration())
             .maxFee(maxFee)
             .build();
 
@@ -74,7 +73,7 @@ public class NamespaceRegistrationIntegrationTest extends BaseIntegrationTest {
 
     NamespaceRegistrationTransaction namespaceRegistrationTransaction =
         NamespaceRegistrationTransactionFactory.createRootNamespace(
-                getNetworkType(), namespaceName, BigInteger.valueOf(100))
+                getNetworkType(), getDeadline(), namespaceName, helper().getDuration())
             .maxFee(maxFee)
             .build();
 
@@ -103,7 +102,7 @@ public class NamespaceRegistrationIntegrationTest extends BaseIntegrationTest {
 
     NamespaceRegistrationTransaction namespaceRegistrationTransaction =
         NamespaceRegistrationTransactionFactory.createSubNamespace(
-                getNetworkType(), namespaceName, this.rootNamespaceId)
+                getNetworkType(), getDeadline(), namespaceName, this.rootNamespaceId)
             .maxFee(maxFee)
             .build();
 
@@ -131,7 +130,7 @@ public class NamespaceRegistrationIntegrationTest extends BaseIntegrationTest {
 
     NamespaceRegistrationTransaction namespaceRegistrationTransaction =
         NamespaceRegistrationTransactionFactory.createSubNamespace(
-                getNetworkType(), namespaceName, this.rootNamespaceId)
+                getNetworkType(), getDeadline(), namespaceName, this.rootNamespaceId)
             .maxFee(maxFee)
             .build();
 

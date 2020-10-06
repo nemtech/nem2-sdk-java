@@ -41,11 +41,12 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
 
   private AggregateTransactionFactory(
       TransactionType type,
+      Deadline deadline,
       NetworkType networkType,
       String transactionsHash,
       List<Transaction> innerTransactions,
       List<AggregateTransactionCosignature> cosignatures) {
-    super(type, networkType);
+    super(type, networkType, deadline);
     // Remove this once rest provides the transactionsHash
     String theTransactionsHash =
         transactionsHash == null ? calculateTransactionsHash(innerTransactions) : transactionsHash;
@@ -63,6 +64,7 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
    *
    * @param type Transaction type.
    * @param networkType Network type.
+   * @param deadline the deadline
    * @param transactionsHash Aggregate hash of an aggregate's transactions
    * @param innerTransactions List of inner transactions.
    * @param cosignatures List of transaction cosigners signatures.
@@ -71,11 +73,12 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
   public static AggregateTransactionFactory create(
       TransactionType type,
       NetworkType networkType,
+      Deadline deadline,
       String transactionsHash,
       List<Transaction> innerTransactions,
       List<AggregateTransactionCosignature> cosignatures) {
     return new AggregateTransactionFactory(
-        type, networkType, transactionsHash, innerTransactions, cosignatures);
+        type, deadline, networkType, transactionsHash, innerTransactions, cosignatures);
   }
 
   /**
@@ -83,6 +86,7 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
    *
    * @param type Transaction type.
    * @param networkType Network type.
+   * @param deadline The deadeline.
    * @param innerTransactions List of inner transactions.
    * @param cosignatures List of transaction cosigners signatures.
    * @return The aggregate transaction factory
@@ -90,11 +94,13 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
   public static AggregateTransactionFactory create(
       TransactionType type,
       NetworkType networkType,
+      Deadline deadline,
       List<Transaction> innerTransactions,
       List<AggregateTransactionCosignature> cosignatures) {
     return create(
         type,
         networkType,
+        deadline,
         calculateTransactionsHash(innerTransactions),
         innerTransactions,
         cosignatures);
@@ -104,13 +110,59 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
    * Create an aggregate complete transaction factory that can be customized.
    *
    * @param networkType The network type.
+   * @param deadline The deadline
    * @param innerTransactions The list of inner innerTransactions.
    * @return The aggregate transaction factory
    */
   public static AggregateTransactionFactory createComplete(
-      NetworkType networkType, List<Transaction> innerTransactions) {
+      NetworkType networkType, Deadline deadline, List<Transaction> innerTransactions) {
     return create(
-        TransactionType.AGGREGATE_COMPLETE, networkType, innerTransactions, new ArrayList<>());
+        TransactionType.AGGREGATE_COMPLETE,
+        networkType,
+        deadline,
+        innerTransactions,
+        new ArrayList<>());
+  }
+
+  /**
+   * Create an aggregate bonded transaction factory that can be customized.
+   *
+   * @param networkType The network type.
+   * @param deadline deadline.
+   * @param innerTransactions The list of inner innerTransactions.
+   * @return The aggregate transaction factory
+   */
+  public static AggregateTransactionFactory createBonded(
+      NetworkType networkType, Deadline deadline, List<Transaction> innerTransactions) {
+    return create(
+        TransactionType.AGGREGATE_BONDED,
+        networkType,
+        deadline,
+        innerTransactions,
+        new ArrayList<>());
+  }
+
+  /**
+   * It generates the hash of the transactions that are going to be included in the {@link
+   * AggregateTransaction}
+   *
+   * @param transactions the inner transaction
+   * @return the added transaction hash.
+   */
+  private static String calculateTransactionsHash(final List<Transaction> transactions) {
+
+    final MerkleHashBuilder transactionsHashBuilder = new MerkleHashBuilder();
+    final BinarySerializationImpl transactionSerialization = new BinarySerializationImpl();
+
+    Hasher hasher = Hashes::sha3_256;
+    for (final Transaction transaction : transactions) {
+      final byte[] bytes = transactionSerialization.serializeEmbedded(transaction);
+      byte[] transactionHash = hasher.hash(bytes);
+      transactionsHashBuilder.update(transactionHash);
+    }
+
+    final byte[] hash = transactionsHashBuilder.getRootHash();
+    return ConvertUtils.toHex(hash);
   }
 
   /**
@@ -146,19 +198,6 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
         this.getSize() + (calculatedCosignatures - this.cosignatures.size()) * COSIGNATURE_SIZE;
     return (AggregateTransactionFactory)
         maxFee(BigInteger.valueOf(calculatedSize).multiply(BigInteger.valueOf(feeMultiplier)));
-  }
-
-  /**
-   * Create an aggregate bonded transaction factory that can be customized.
-   *
-   * @param networkType The network type.
-   * @param innerTransactions The list of inner innerTransactions.
-   * @return The aggregate transaction factory
-   */
-  public static AggregateTransactionFactory createBonded(
-      NetworkType networkType, List<Transaction> innerTransactions) {
-    return create(
-        TransactionType.AGGREGATE_BONDED, networkType, innerTransactions, new ArrayList<>());
   }
 
   /**
@@ -200,28 +239,5 @@ public class AggregateTransactionFactory extends TransactionFactory<AggregateTra
   @Override
   public AggregateTransaction build() {
     return new AggregateTransaction(this);
-  }
-
-  /**
-   * It generates the hash of the transactions that are going to be included in the {@link
-   * AggregateTransaction}
-   *
-   * @param transactions the inner transaction
-   * @return the added transaction hash.
-   */
-  private static String calculateTransactionsHash(final List<Transaction> transactions) {
-
-    final MerkleHashBuilder transactionsHashBuilder = new MerkleHashBuilder();
-    final BinarySerializationImpl transactionSerialization = new BinarySerializationImpl();
-
-    Hasher hasher = Hashes::sha3_256;
-    for (final Transaction transaction : transactions) {
-      final byte[] bytes = transactionSerialization.serializeEmbedded(transaction);
-      byte[] transactionHash = hasher.hash(bytes);
-      transactionsHashBuilder.update(transactionHash);
-    }
-
-    final byte[] hash = transactionsHashBuilder.getRootHash();
-    return ConvertUtils.toHex(hash);
   }
 }

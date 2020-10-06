@@ -23,6 +23,7 @@ import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicSupplyChangeActionType;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,17 +33,21 @@ class MosaicSupplyChangeTransactionTest extends AbstractTransactionTester {
   @Test
   void createAMosaicSupplyChangeTransactionViaConstructor() {
 
+    Duration epochAdjustment = Duration.ofSeconds(100);
     MosaicSupplyChangeTransaction mosaicSupplyChangeTx =
         MosaicSupplyChangeTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                Deadline.create(epochAdjustment),
                 new MosaicId(new BigInteger("6300565133566699912")),
                 MosaicSupplyChangeActionType.INCREASE,
                 BigInteger.valueOf(10))
             .build();
 
     assertEquals(NetworkType.MIJIN_TEST, mosaicSupplyChangeTx.getNetworkType());
-    assertTrue(1 == mosaicSupplyChangeTx.getVersion());
-    assertTrue(LocalDateTime.now().isBefore(mosaicSupplyChangeTx.getDeadline().getLocalDateTime()));
+    assertEquals(1, mosaicSupplyChangeTx.getVersion());
+    assertTrue(
+        LocalDateTime.now()
+            .isBefore(mosaicSupplyChangeTx.getDeadline().getLocalDateTime(epochAdjustment)));
     assertEquals(BigInteger.valueOf(0), mosaicSupplyChangeTx.getMaxFee());
     assertEquals(new BigInteger("6300565133566699912"), mosaicSupplyChangeTx.getMosaicId().getId());
     assertEquals(MosaicSupplyChangeActionType.INCREASE, mosaicSupplyChangeTx.getAction());
@@ -58,10 +63,10 @@ class MosaicSupplyChangeTransactionTest extends AbstractTransactionTester {
     MosaicSupplyChangeTransaction transaction =
         MosaicSupplyChangeTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 new MosaicId(new BigInteger("6300565133566699912")),
                 MosaicSupplyChangeActionType.INCREASE,
                 BigInteger.valueOf(10))
-            .deadline(new FakeDeadline())
             .build();
 
     byte[] actual = transaction.serialize();

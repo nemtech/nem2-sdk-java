@@ -36,16 +36,17 @@ public class AccountKeyLinkTransactionIntegrationTest extends BaseIntegrationTes
         PublicKey.fromHexString("F5D0AAD909CFBC810A3F888C33C57A9051AE1A59D1CDA872A8B90BCA7EF2D34A");
 
     AccountKeyLinkTransaction linkTransaction =
-        AccountKeyLinkTransactionFactory.create(getNetworkType(), linkedPublicKey, LinkAction.LINK)
-            .maxFee(this.maxFee)
+        AccountKeyLinkTransactionFactory.create(
+                getNetworkType(), getDeadline(), linkedPublicKey, LinkAction.LINK)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, account, linkTransaction);
 
     AccountKeyLinkTransaction unlinkTransaction =
         AccountKeyLinkTransactionFactory.create(
-                getNetworkType(), linkedPublicKey, LinkAction.UNLINK)
-            .maxFee(this.maxFee)
+                getNetworkType(), getDeadline(), linkedPublicKey, LinkAction.UNLINK)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, account, unlinkTransaction);

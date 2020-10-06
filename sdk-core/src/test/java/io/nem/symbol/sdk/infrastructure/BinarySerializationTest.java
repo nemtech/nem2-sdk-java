@@ -23,7 +23,7 @@ import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.network.NetworkType;
-import io.nem.symbol.sdk.model.transaction.FakeDeadline;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
@@ -77,12 +77,12 @@ class BinarySerializationTest {
     TransferTransaction transaction =
         TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 Address.generateRandom(NetworkType.MIJIN_TEST),
                 Arrays.asList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
             .message(new PlainMessage("Some Message"))
-            .deadline(new FakeDeadline())
             .build();
 
     byte[] serialize = binarySerialization.serialize(transaction);
@@ -103,12 +103,12 @@ class BinarySerializationTest {
     TransferTransaction transaction =
         TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 Address.generateRandom(NetworkType.MIJIN_TEST),
                 Arrays.asList(
                     new Mosaic(
                         new MosaicId(new BigInteger("95442763262823")), BigInteger.valueOf(100))))
             .message(new PlainMessage("Some Message"))
-            .deadline(new FakeDeadline())
             .build();
 
     SignedTransaction signedTransaction = transaction.signWith(account, generationHash);

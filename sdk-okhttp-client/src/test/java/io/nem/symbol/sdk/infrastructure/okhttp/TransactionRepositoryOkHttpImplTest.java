@@ -29,6 +29,7 @@ import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionCosignature;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionAnnounceResponse;
@@ -57,6 +58,8 @@ import org.mockito.ArgumentCaptor;
 public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest {
 
   private TransactionRepositoryOkHttpImpl repository;
+
+  private final Deadline deadline = new Deadline(BigInteger.ONE);
 
   @BeforeEach
   public void setUp() {
@@ -161,6 +164,7 @@ public class TransactionRepositoryOkHttpImplTest extends AbstractOkHttpResposito
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                deadline,
                 address,
                 Collections.singletonList(createAbsolute(BigInteger.valueOf(1))))
             .message(new PlainMessage("E2ETest:standaloneTransferTransaction:message"))

@@ -298,7 +298,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         NetworkTypeDto.rawValueOf((byte) transaction.getNetworkType().getValue()),
         EntityTypeDto.rawValueOf((short) transaction.getType().getValue()),
         new AmountDto(SerializationUtils.toUnsignedLong(transaction.getMaxFee())),
-        new TimestampDto(transaction.getDeadline().getInstant()));
+        new TimestampDto(transaction.getDeadline().getValue()));
   }
 
   /**
@@ -394,11 +394,11 @@ public class BinarySerializationImpl implements BinarySerialization {
         new Deadline(SerializationUtils.toUnsignedBigInteger(builder.getDeadline().getTimestamp()));
 
     TransactionFactory<?> factory =
-        resolveSerializer(transactionType).fromBodyBuilder(networkType, builder.getBody());
+        resolveSerializer(transactionType)
+            .fromBodyBuilder(networkType, deadline, builder.getBody());
 
     factory.version(SerializationUtils.byteToUnsignedInt(builder.getVersion()));
     factory.maxFee(SerializationUtils.toUnsignedBigInteger(builder.getFee()));
-    factory.deadline(deadline);
     if (!areAllZeros(builder.getSignature().getSignature().array())) {
       factory.signature(SerializationUtils.toHexString(builder.getSignature().getSignature()));
     }
@@ -452,7 +452,8 @@ public class BinarySerializationImpl implements BinarySerialization {
         NetworkType.rawValueOf(
             SerializationUtils.byteToUnsignedInt(builder.getNetwork().getValue()));
     TransactionFactory<?> factory =
-        resolveSerializer(transactionType).fromBodyBuilder(networkType, builder.getBody());
+        resolveSerializer(transactionType)
+            .fromBodyBuilder(networkType, new Deadline(BigInteger.ZERO), builder.getBody());
     factory.signer(SerializationUtils.toPublicAccount(builder.getSignerPublicKey(), networkType));
     factory.version(SerializationUtils.byteToUnsignedInt(builder.getVersion()));
     return factory.build();
@@ -477,11 +478,13 @@ public class BinarySerializationImpl implements BinarySerialization {
      * efforts.
      *
      * @param networkType the network type
+     * @param deadline the deadline.
      * @param transactionBuilder the stream containing just the specific transaction values in the
      *     right order.
      * @return the TransactionFactory of the transaction type this object handles.
      */
-    TransactionFactory fromBodyBuilder(NetworkType networkType, Serializer transactionBuilder);
+    TransactionFactory fromBodyBuilder(
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder);
 
     /**
      * Subclasses would need to know how to serialize the internal components of a transaction, the
@@ -509,7 +512,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory<?> fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
       TransferTransactionBodyBuilder builder =
           ((TransferTransactionBodyBuilder) transactionBuilder);
       byte[] messageArray = builder.getMessage().array();
@@ -521,7 +524,7 @@ public class BinarySerializationImpl implements BinarySerialization {
               .map(SerializationUtils::toMosaic)
               .collect(Collectors.toList());
       TransferTransactionFactory factory =
-          TransferTransactionFactory.create(networkType, recipient, mosaics);
+          TransferTransactionFactory.create(networkType, deadline, recipient, mosaics);
       Message.createFromPayload(messageArray).ifPresent(factory::message);
       return factory;
     }
@@ -589,14 +592,15 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory<?> fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
       MosaicSupplyChangeTransactionBodyBuilder builder =
           ((MosaicSupplyChangeTransactionBodyBuilder) transactionBuilder);
       UnresolvedMosaicId mosaicId = SerializationUtils.toUnresolvedMosaicId(builder.getMosaicId());
       MosaicSupplyChangeActionType action =
           MosaicSupplyChangeActionType.rawValueOf(builder.getAction().getValue());
       BigInteger delta = SerializationUtils.toUnsignedBigInteger(builder.getDelta());
-      return MosaicSupplyChangeTransactionFactory.create(networkType, mosaicId, action, delta);
+      return MosaicSupplyChangeTransactionFactory.create(
+          networkType, deadline, mosaicId, action, delta);
     }
 
     @Override
@@ -624,7 +628,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory<?> fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
       MosaicDefinitionTransactionBodyBuilder builder =
           (MosaicDefinitionTransactionBodyBuilder) transactionBuilder;
       MosaicNonce mosaicNonce = MosaicNonce.createFromInteger(builder.getNonce().getMosaicNonce());
@@ -637,7 +641,7 @@ public class BinarySerializationImpl implements BinarySerialization {
       int divisibility = SerializationUtils.byteToUnsignedInt(builder.getDivisibility());
       BlockDuration blockDuration = new BlockDuration(builder.getDuration().getBlockDuration());
       return MosaicDefinitionTransactionFactory.create(
-          networkType, mosaicNonce, mosaicId, mosaicFlags, divisibility, blockDuration);
+          networkType, deadline, mosaicNonce, mosaicId, mosaicFlags, divisibility, blockDuration);
     }
 
     @Override
@@ -685,12 +689,13 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
       AccountKeyLinkTransactionBodyBuilder builder =
           (AccountKeyLinkTransactionBodyBuilder) transactionBuilder;
       PublicKey linkedPublicKey = SerializationUtils.toPublicKey(builder.getLinkedPublicKey());
       LinkAction linkAction = LinkAction.rawValueOf(builder.getLinkAction().getValue());
-      return AccountKeyLinkTransactionFactory.create(networkType, linkedPublicKey, linkAction);
+      return AccountKeyLinkTransactionFactory.create(
+          networkType, deadline, linkedPublicKey, linkAction);
     }
 
     @Override
@@ -716,7 +721,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
       AccountMetadataTransactionBodyBuilder builder =
           (AccountMetadataTransactionBodyBuilder) transactionBuilder;
       UnresolvedAddress targetAccount =
@@ -725,7 +730,7 @@ public class BinarySerializationImpl implements BinarySerialization {
           SerializationUtils.toUnsignedBigInteger(builder.getScopedMetadataKey());
       String value = SerializationUtils.toString(builder.getValue());
       return AccountMetadataTransactionFactory.create(
-              networkType, targetAccount, scopedMetadataKey, value)
+              networkType, deadline, targetAccount, scopedMetadataKey, value)
           .valueSizeDelta(builder.getValueSizeDelta());
     }
 
@@ -755,7 +760,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
       MosaicMetadataTransactionBodyBuilder builder =
           (MosaicMetadataTransactionBodyBuilder) transactionBuilder;
       UnresolvedAddress targetAccount =
@@ -766,7 +771,7 @@ public class BinarySerializationImpl implements BinarySerialization {
       UnresolvedMosaicId targetMosaicId =
           SerializationUtils.toUnresolvedMosaicId(builder.getTargetMosaicId());
       return MosaicMetadataTransactionFactory.create(
-              networkType, targetAccount, targetMosaicId, scopedMetadataKey, value)
+              networkType, deadline, targetAccount, targetMosaicId, scopedMetadataKey, value)
           .valueSizeDelta(builder.getValueSizeDelta());
     }
 
@@ -797,7 +802,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
       NamespaceMetadataTransactionBodyBuilder builder =
           (NamespaceMetadataTransactionBodyBuilder) transactionBuilder;
       UnresolvedAddress targetAddress =
@@ -808,7 +813,7 @@ public class BinarySerializationImpl implements BinarySerialization {
       NamespaceId targetNamespaceId =
           SerializationUtils.toNamespaceId(builder.getTargetNamespaceId());
       return NamespaceMetadataTransactionFactory.create(
-              networkType, targetAddress, targetNamespaceId, scopedMetadataKey, value)
+              networkType, deadline, targetAddress, targetNamespaceId, scopedMetadataKey, value)
           .valueSizeDelta(builder.getValueSizeDelta());
     }
 
@@ -840,7 +845,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
 
       NamespaceRegistrationTransactionBodyBuilder builder =
           (NamespaceRegistrationTransactionBodyBuilder) transactionBuilder;
@@ -863,7 +868,13 @@ public class BinarySerializationImpl implements BinarySerialization {
               : Optional.empty();
 
       return NamespaceRegistrationTransactionFactory.create(
-          networkType, namespaceName, namespaceId, namespaceRegistrationType, duration, parentId);
+          networkType,
+          deadline,
+          namespaceName,
+          namespaceId,
+          namespaceRegistrationType,
+          duration,
+          parentId);
     }
 
     @Override
@@ -917,7 +928,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
 
       SecretLockTransactionBodyBuilder builder =
           (SecretLockTransactionBodyBuilder) transactionBuilder;
@@ -932,7 +943,7 @@ public class BinarySerializationImpl implements BinarySerialization {
       UnresolvedAddress recipient =
           SerializationUtils.toUnresolvedAddress(builder.getRecipientAddress());
       return SecretLockTransactionFactory.create(
-          networkType, mosaic, duration, hashAlgorithm, secret, recipient);
+          networkType, deadline, mosaic, duration, hashAlgorithm, secret, recipient);
     }
 
     @Override
@@ -980,7 +991,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
 
       SecretProofTransactionBodyBuilder builder =
           (SecretProofTransactionBodyBuilder) transactionBuilder;
@@ -992,7 +1003,8 @@ public class BinarySerializationImpl implements BinarySerialization {
           SerializationUtils.toUnresolvedAddress(builder.getRecipientAddress());
       String secret = SerializationUtils.toHexString(builder.getSecret());
       String proof = SerializationUtils.toHexString(builder.getProof());
-      return SecretProofTransactionFactory.create(networkType, hashType, recipient, secret, proof);
+      return SecretProofTransactionFactory.create(
+          networkType, deadline, hashType, recipient, secret, proof);
     }
 
     @Override
@@ -1044,7 +1056,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
 
       AddressAliasTransactionBodyBuilder builder =
           (AddressAliasTransactionBodyBuilder) transactionBuilder;
@@ -1053,7 +1065,8 @@ public class BinarySerializationImpl implements BinarySerialization {
       NamespaceId namespaceId = SerializationUtils.toNamespaceId(builder.getNamespaceId());
       Address address = SerializationUtils.toAddress(builder.getAddress());
 
-      return AddressAliasTransactionFactory.create(networkType, aliasAction, namespaceId, address);
+      return AddressAliasTransactionFactory.create(
+          networkType, deadline, aliasAction, namespaceId, address);
     }
 
     @Override
@@ -1083,7 +1096,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
 
       MosaicAliasTransactionBodyBuilder builder =
           (MosaicAliasTransactionBodyBuilder) transactionBuilder;
@@ -1092,7 +1105,8 @@ public class BinarySerializationImpl implements BinarySerialization {
       NamespaceId namespaceId = SerializationUtils.toNamespaceId(builder.getNamespaceId());
       MosaicId mosaicId = SerializationUtils.toMosaicId(builder.getMosaicId());
 
-      return MosaicAliasTransactionFactory.create(networkType, aliasAction, namespaceId, mosaicId);
+      return MosaicAliasTransactionFactory.create(
+          networkType, deadline, aliasAction, namespaceId, mosaicId);
     }
 
     @Override
@@ -1119,7 +1133,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
 
       HashLockTransactionBodyBuilder builder = (HashLockTransactionBodyBuilder) transactionBuilder;
 
@@ -1127,7 +1141,11 @@ public class BinarySerializationImpl implements BinarySerialization {
       BigInteger duration =
           SerializationUtils.toUnsignedBigInteger(builder.getDuration().getBlockDuration());
       return HashLockTransactionFactory.create(
-          networkType, mosaic, duration, SerializationUtils.toHexString(builder.getHash()));
+          networkType,
+          deadline,
+          mosaic,
+          duration,
+          SerializationUtils.toHexString(builder.getHash()));
     }
 
     @Override
@@ -1167,7 +1185,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
 
       AccountAddressRestrictionTransactionBodyBuilder builder =
           (AccountAddressRestrictionTransactionBodyBuilder) transactionBuilder;
@@ -1191,7 +1209,7 @@ public class BinarySerializationImpl implements BinarySerialization {
               .collect(Collectors.toList());
 
       return AccountAddressRestrictionTransactionFactory.create(
-          networkType, restrictionFlags, restrictionAdditions, restrictionDeletions);
+          networkType, deadline, restrictionFlags, restrictionAdditions, restrictionDeletions);
     }
 
     @Override
@@ -1233,7 +1251,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
 
       AccountMosaicRestrictionTransactionBodyBuilder builder =
           (AccountMosaicRestrictionTransactionBodyBuilder) transactionBuilder;
@@ -1256,7 +1274,7 @@ public class BinarySerializationImpl implements BinarySerialization {
               .collect(Collectors.toList());
 
       return AccountMosaicRestrictionTransactionFactory.create(
-          networkType, restrictionFlags, restrictionAdditions, restrictionDeletions);
+          networkType, deadline, restrictionFlags, restrictionAdditions, restrictionDeletions);
     }
 
     @Override
@@ -1298,7 +1316,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
 
       AccountOperationRestrictionTransactionBodyBuilder builder =
           (AccountOperationRestrictionTransactionBodyBuilder) transactionBuilder;
@@ -1322,7 +1340,7 @@ public class BinarySerializationImpl implements BinarySerialization {
               .collect(Collectors.toList());
 
       return AccountOperationRestrictionTransactionFactory.create(
-          networkType, restrictionFlags, restrictionAdditions, restrictionDeletions);
+          networkType, deadline, restrictionFlags, restrictionAdditions, restrictionDeletions);
     }
 
     @Override
@@ -1364,7 +1382,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
 
       MosaicAddressRestrictionTransactionBodyBuilder builder =
           (MosaicAddressRestrictionTransactionBodyBuilder) transactionBuilder;
@@ -1379,7 +1397,7 @@ public class BinarySerializationImpl implements BinarySerialization {
       BigInteger previousRestrictionValue =
           SerializationUtils.toUnsignedBigInteger(builder.getPreviousRestrictionValue());
       return MosaicAddressRestrictionTransactionFactory.create(
-              networkType, mosaicId, restrictionKey, targetAddress, newRestrictionValue)
+              networkType, deadline, mosaicId, restrictionKey, targetAddress, newRestrictionValue)
           .previousRestrictionValue(previousRestrictionValue);
     }
 
@@ -1412,7 +1430,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
       MosaicGlobalRestrictionTransactionBodyBuilder builder =
           (MosaicGlobalRestrictionTransactionBodyBuilder) transactionBuilder;
       UnresolvedMosaicId mosaicId = SerializationUtils.toUnresolvedMosaicId(builder.getMosaicId());
@@ -1427,7 +1445,12 @@ public class BinarySerializationImpl implements BinarySerialization {
       MosaicRestrictionType previousRestrictionType =
           MosaicRestrictionType.rawValueOf(builder.getPreviousRestrictionType().getValue());
       return MosaicGlobalRestrictionTransactionFactory.create(
-              networkType, mosaicId, restrictionKey, newRestrictionValue, newRestrictionType)
+              networkType,
+              deadline,
+              mosaicId,
+              restrictionKey,
+              newRestrictionValue,
+              newRestrictionType)
           .referenceMosaicId(
               SerializationUtils.toUnresolvedMosaicId(builder.getReferenceMosaicId()))
           .previousRestrictionValue(previousRestrictionValue)
@@ -1462,7 +1485,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
 
       MultisigAccountModificationTransactionBodyBuilder builder =
           (MultisigAccountModificationTransactionBodyBuilder) transactionBuilder;
@@ -1480,7 +1503,12 @@ public class BinarySerializationImpl implements BinarySerialization {
               .collect(Collectors.toList());
 
       return MultisigAccountModificationTransactionFactory.create(
-          networkType, minApprovalDelta, minRemovalDelta, addressAdditions, addressDeletions);
+          networkType,
+          deadline,
+          minApprovalDelta,
+          minRemovalDelta,
+          addressAdditions,
+          addressDeletions);
     }
 
     @Override
@@ -1529,7 +1557,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory<?> fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
       AggregateTransactionBodyBuilder builder =
           (AggregateTransactionBodyBuilder) transactionBuilder;
       List<Transaction> transactions =
@@ -1546,6 +1574,7 @@ public class BinarySerializationImpl implements BinarySerialization {
       return AggregateTransactionFactory.create(
           getTransactionType(),
           networkType,
+          deadline,
           SerializationUtils.toHexString(builder.getTransactionsHash()),
           transactions,
           cosignatures);
@@ -1603,12 +1632,13 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
       NodeKeyLinkTransactionBodyBuilder builder =
           (NodeKeyLinkTransactionBodyBuilder) transactionBuilder;
       PublicKey linkedPublicKey = SerializationUtils.toPublicKey(builder.getLinkedPublicKey());
       LinkAction linkAction = LinkAction.rawValueOf(builder.getLinkAction().getValue());
-      return NodeKeyLinkTransactionFactory.create(networkType, linkedPublicKey, linkAction);
+      return NodeKeyLinkTransactionFactory.create(
+          networkType, deadline, linkedPublicKey, linkAction);
     }
 
     @Override
@@ -1634,12 +1664,13 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
       VrfKeyLinkTransactionBodyBuilder builder =
           (VrfKeyLinkTransactionBodyBuilder) transactionBuilder;
       PublicKey linkedPublicKey = SerializationUtils.toPublicKey(builder.getLinkedPublicKey());
       LinkAction linkAction = LinkAction.rawValueOf(builder.getLinkAction().getValue());
-      return VrfKeyLinkTransactionFactory.create(networkType, linkedPublicKey, linkAction);
+      return VrfKeyLinkTransactionFactory.create(
+          networkType, deadline, linkedPublicKey, linkAction);
     }
 
     @Override
@@ -1665,7 +1696,7 @@ public class BinarySerializationImpl implements BinarySerialization {
 
     @Override
     public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Serializer transactionBuilder) {
+        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
       VotingKeyLinkTransactionBodyBuilder builder =
           (VotingKeyLinkTransactionBodyBuilder) transactionBuilder;
       VotingKey linkedPublicKey = SerializationUtils.toVotingKey(builder.getLinkedPublicKey());
@@ -1675,7 +1706,7 @@ public class BinarySerializationImpl implements BinarySerialization {
           SerializationUtils.intToUnsignedLong(builder.getEndEpoch().getFinalizationEpoch());
       LinkAction linkAction = LinkAction.rawValueOf(builder.getLinkAction().getValue());
       return VotingKeyLinkTransactionFactory.create(
-          networkType, linkedPublicKey, startEpoch, endEpoch, linkAction);
+          networkType, deadline, linkedPublicKey, startEpoch, endEpoch, linkAction);
     }
 
     @Override

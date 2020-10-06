@@ -23,6 +23,7 @@ import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMetadataTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountMetadataTransactionDTO;
@@ -38,7 +39,7 @@ class AccountMetadataTransactionMapper
 
   @Override
   protected AccountMetadataTransactionFactory createFactory(
-      NetworkType networkType, AccountMetadataTransactionDTO transaction) {
+      NetworkType networkType, Deadline deadline, AccountMetadataTransactionDTO transaction) {
     UnresolvedAddress targetAddress = toUnresolvedAddress(transaction.getTargetAddress());
     Integer valueSizeDelta = transaction.getValueSizeDelta();
     BigInteger scopedMetaDataKey =
@@ -46,7 +47,7 @@ class AccountMetadataTransactionMapper
     String value = ConvertUtils.fromHexToString(transaction.getValue());
     AccountMetadataTransactionFactory factory =
         AccountMetadataTransactionFactory.create(
-            networkType, targetAddress, scopedMetaDataKey, value);
+            networkType, deadline, targetAddress, scopedMetaDataKey, value);
     factory.valueSizeDelta(valueSizeDelta);
     Long valueSize = transaction.getValueSize();
     if (valueSize != null) {

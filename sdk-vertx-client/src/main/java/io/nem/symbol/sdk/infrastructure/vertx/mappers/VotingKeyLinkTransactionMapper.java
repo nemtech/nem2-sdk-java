@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
 import io.nem.symbol.core.crypto.VotingKey;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.LinkAction;
 import io.nem.symbol.sdk.model.transaction.TransactionFactory;
@@ -36,11 +37,12 @@ public class VotingKeyLinkTransactionMapper
 
   @Override
   protected TransactionFactory<VotingKeyLinkTransaction> createFactory(
-      NetworkType networkType, VotingKeyLinkTransactionDTO transaction) {
+      NetworkType networkType, Deadline deadline, VotingKeyLinkTransactionDTO transaction) {
     VotingKey linkedPublicKey = VotingKey.fromHexString(transaction.getLinkedPublicKey());
     LinkAction linkAction = LinkAction.rawValueOf(transaction.getLinkAction().getValue());
     return VotingKeyLinkTransactionFactory.create(
         networkType,
+        deadline,
         linkedPublicKey,
         transaction.getStartEpoch(),
         transaction.getEndEpoch(),

@@ -46,11 +46,14 @@ public class AddressAliasTransactionTest extends AbstractTransactionTester {
 
     AddressAliasTransaction transaction =
         AddressAliasTransactionFactory.create(
-                networkType, AliasAction.LINK, namespaceId, signature.getAddress())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                AliasAction.LINK,
+                namespaceId,
+                signature.getAddress())
             .signer(signature)
             .transactionInfo(transactionInfo)
             .signature(signatureHex)
-            .deadline(new FakeDeadline())
             .maxFee(fee)
             .build();
 

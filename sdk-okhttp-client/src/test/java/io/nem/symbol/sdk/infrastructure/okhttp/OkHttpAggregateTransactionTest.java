@@ -32,12 +32,14 @@ import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,18 +56,21 @@ public class OkHttpAggregateTransactionTest {
 
   private final JsonHelper jsonHelper = new JsonHelperGson();
 
+  private final Deadline deadline = new Deadline(BigInteger.ONE);
+
   @Test
   void createAAggregateTransactionViaStaticConstructor() {
-
+    Duration epochAdjustment = Duration.ofSeconds(100);
     Address recipient = Address.generateRandom(NetworkType.MIJIN_TEST);
     TransferTransaction transferTx =
-        TransferTransactionFactory.create(networkType, recipient, Collections.emptyList())
+        TransferTransactionFactory.create(networkType, deadline, recipient, Collections.emptyList())
             .message(new PlainMessage(""))
             .build();
 
     AggregateTransaction aggregateTx =
         AggregateTransactionFactory.createComplete(
                 networkType,
+                Deadline.create(epochAdjustment),
                 Collections.singletonList(
                     transferTx.toAggregate(
                         new PublicAccount(
@@ -75,7 +80,8 @@ public class OkHttpAggregateTransactionTest {
 
     assertEquals(networkType, aggregateTx.getNetworkType());
     assertEquals(1, (int) aggregateTx.getVersion());
-    assertTrue(LocalDateTime.now().isBefore(aggregateTx.getDeadline().getLocalDateTime()));
+    assertTrue(
+        LocalDateTime.now().isBefore(aggregateTx.getDeadline().getLocalDateTime(epochAdjustment)));
     assertEquals(BigInteger.valueOf(0), aggregateTx.getMaxFee());
     assertEquals(1, aggregateTx.getInnerTransactions().size());
   }
@@ -87,17 +93,16 @@ public class OkHttpAggregateTransactionTest {
     TransferTransaction transferTx =
         TransferTransactionFactory.create(
                 networkType,
+                deadline,
                 address,
                 Collections.singletonList(createAbsolute(BigInteger.valueOf(10000000))))
             .message(new PlainMessage(""))
-            .deadline(new OkHttpFakeDeadline())
             .build();
 
     PublicAccount signer = Account.generateNewAccount(networkType).getPublicAccount();
     AggregateTransaction aggregateTx =
         AggregateTransactionFactory.createComplete(
-                networkType, Collections.singletonList(transferTx.toAggregate(signer)))
-            .deadline(new OkHttpFakeDeadline())
+                networkType, deadline, Collections.singletonList(transferTx.toAggregate(signer)))
             .build();
 
     byte[] actual = aggregateTx.serialize();
@@ -117,19 +122,19 @@ public class OkHttpAggregateTransactionTest {
 
     Address address = Address.generateRandom(networkType);
     TransferTransaction transferTx =
-        TransferTransactionFactory.create(networkType, address, Collections.emptyList())
+        TransferTransactionFactory.create(networkType, deadline, address, Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTx =
         AggregateTransactionFactory.createComplete(
                 networkType,
+                deadline,
                 Collections.singletonList(
                     transferTx.toAggregate(
                         new PublicAccount(
                             "B694186EE4AB0558CA4AFCFDD43B42114AE71094F5A1FC4A913FE9971CACD21D",
                             networkType))))
-            .deadline(new OkHttpFakeDeadline())
             .build();
 
     Account cosignatoryAccount = Account.generateNewAccount(this.networkType);

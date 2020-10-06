@@ -28,11 +28,13 @@ import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.restriction.MosaicGlobalRestrictionItem;
 import io.nem.symbol.sdk.model.restriction.MosaicRestrictionEntryType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MosaicGlobalRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
 import io.reactivex.Observable;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.Optional;
 
 /** Implementation of {@link MosaicRestrictionTransactionService}. */
@@ -41,6 +43,9 @@ public class MosaicRestrictionTransactionServiceImpl
 
   /** The network type so user is not required to provide it each time. */
   private final Observable<NetworkType> networkTypeObservable;
+
+  /** The network epoch timestamp. */
+  private final Observable<Duration> epochAdjustmentObservable;
 
   /** The repository used to retrieve the old mosaic restriction values. */
   private final RestrictionMosaicRepository repository;
@@ -55,6 +60,7 @@ public class MosaicRestrictionTransactionServiceImpl
   public MosaicRestrictionTransactionServiceImpl(RepositoryFactory repositoryFactory) {
     this.repository = repositoryFactory.createRestrictionMosaicRepository();
     this.networkTypeObservable = repositoryFactory.getNetworkType();
+    this.epochAdjustmentObservable = repositoryFactory.getEpochAdjustment();
     this.aliasService = new AliasServiceImpl(repositoryFactory);
   }
 
@@ -65,32 +71,34 @@ public class MosaicRestrictionTransactionServiceImpl
           BigInteger restrictionKey,
           BigInteger restrictionValue,
           MosaicRestrictionType restrictionType) {
-    return aliasService
-        .resolveMosaicId(unresolvedMosaicId)
-        .flatMap(
-            mosaicId ->
-                networkTypeObservable.flatMap(
-                    networkType ->
-                        this.getGlobalRestrictionEntry(mosaicId, restrictionKey)
-                            .map(
-                                optional -> {
-                                  MosaicGlobalRestrictionTransactionFactory factory =
-                                      MosaicGlobalRestrictionTransactionFactory.create(
-                                          networkType,
-                                          unresolvedMosaicId,
-                                          restrictionKey,
-                                          restrictionValue,
-                                          restrictionType);
 
-                                  optional.ifPresent(
-                                      mosaicGlobalRestrictionItem -> {
-                                        factory.previousRestrictionValue(
-                                            mosaicGlobalRestrictionItem.getRestrictionValue());
-                                        factory.previousRestrictionType(
-                                            mosaicGlobalRestrictionItem.getRestrictionType());
-                                      });
-                                  return factory;
-                                })));
+    return Observable.combineLatest(
+            networkTypeObservable,
+            epochAdjustmentObservable,
+            aliasService.resolveMosaicId(unresolvedMosaicId),
+            ((networkType, epochAdjustment, mosaicId) ->
+                this.getGlobalRestrictionEntry(mosaicId, restrictionKey)
+                    .map(
+                        optional -> {
+                          MosaicGlobalRestrictionTransactionFactory factory =
+                              MosaicGlobalRestrictionTransactionFactory.create(
+                                  networkType,
+                                  Deadline.create(epochAdjustment),
+                                  unresolvedMosaicId,
+                                  restrictionKey,
+                                  restrictionValue,
+                                  restrictionType);
+
+                          optional.ifPresent(
+                              mosaicGlobalRestrictionItem -> {
+                                factory.previousRestrictionValue(
+                                    mosaicGlobalRestrictionItem.getRestrictionValue());
+                                factory.previousRestrictionType(
+                                    mosaicGlobalRestrictionItem.getRestrictionType());
+                              });
+                          return factory;
+                        })))
+        .flatMap(f -> f);
   }
 
   @Override
@@ -103,9 +111,10 @@ public class MosaicRestrictionTransactionServiceImpl
 
     return Observable.combineLatest(
             networkTypeObservable,
+            epochAdjustmentObservable,
             aliasService.resolveMosaicId(unresolvedMosaicId),
             aliasService.resolveAddress(unresolvedTargetAddress),
-            (networkType, mosaicId, targetAddress) ->
+            (networkType, epochAdjustment, mosaicId, targetAddress) ->
                 getGlobalRestrictionEntry(mosaicId, restrictionKey)
                     .flatMap(
                         optional -> {
@@ -123,6 +132,7 @@ public class MosaicRestrictionTransactionServiceImpl
                                     MosaicAddressRestrictionTransactionFactory factory =
                                         MosaicAddressRestrictionTransactionFactory.create(
                                             networkType,
+                                            Deadline.create(epochAdjustment),
                                             unresolvedMosaicId,
                                             restrictionKey,
                                             unresolvedTargetAddress,

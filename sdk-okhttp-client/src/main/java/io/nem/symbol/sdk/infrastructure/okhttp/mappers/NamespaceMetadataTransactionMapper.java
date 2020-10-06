@@ -20,6 +20,7 @@ import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.NamespaceMetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.NamespaceMetadataTransactionFactory;
@@ -38,7 +39,7 @@ class NamespaceMetadataTransactionMapper
 
   @Override
   protected NamespaceMetadataTransactionFactory createFactory(
-      NetworkType networkType, NamespaceMetadataTransactionDTO transaction) {
+      NetworkType networkType, Deadline deadline, NamespaceMetadataTransactionDTO transaction) {
     UnresolvedAddress targetAddress =
         MapperUtils.toUnresolvedAddress(transaction.getTargetAddress());
     Integer valueSizeDelta = transaction.getValueSizeDelta();
@@ -48,7 +49,7 @@ class NamespaceMetadataTransactionMapper
     NamespaceId targetNamespace = MapperUtils.toNamespaceId(transaction.getTargetNamespaceId());
     NamespaceMetadataTransactionFactory factory =
         NamespaceMetadataTransactionFactory.create(
-            networkType, targetAddress, targetNamespace, scopedMetaDataKey, value);
+            networkType, deadline, targetAddress, targetNamespace, scopedMetaDataKey, value);
     factory.valueSizeDelta(valueSizeDelta);
     Long valueSize = transaction.getValueSize();
     if (valueSize != null) {

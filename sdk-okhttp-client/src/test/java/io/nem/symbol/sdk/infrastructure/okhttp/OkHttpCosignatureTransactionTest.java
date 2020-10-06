@@ -26,8 +26,10 @@ import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.CosignatureTransaction;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
+import java.math.BigInteger;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -37,6 +39,8 @@ public class OkHttpCosignatureTransactionTest {
   static Account account;
 
   private final JsonHelper jsonHelper = new JsonHelperGson();
+
+  private final Deadline deadline = new Deadline(BigInteger.ONE);
 
   @BeforeAll
   public static void setup() {
@@ -76,7 +80,8 @@ public class OkHttpCosignatureTransactionTest {
   void shouldThrowExceptionWhenTransactionToCosignHasNotBeenAnnunced() {
 
     AggregateTransaction aggregateTransaction =
-        AggregateTransactionFactory.createComplete(NetworkType.MIJIN_TEST, Collections.emptyList())
+        AggregateTransactionFactory.createComplete(
+                NetworkType.MIJIN_TEST, deadline, Collections.emptyList())
             .build();
 
     assertThrows(

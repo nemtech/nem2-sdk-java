@@ -47,6 +47,7 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 recipient,
                 Collections.singletonList(
                     getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
@@ -57,6 +58,7 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createBonded(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(
                     transferTransaction.toAggregate(multisigAccount.getPublicAccount())))
             .maxFee(maxFee)
@@ -68,6 +70,7 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
     TransactionFactory<HashLockTransaction> hashLockTransaction =
         HashLockTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 signedTransaction)

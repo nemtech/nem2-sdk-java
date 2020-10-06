@@ -62,13 +62,14 @@ public class MosaicMetadataIntegrationTest extends BaseIntegrationTest {
     BigInteger key = BigInteger.TEN;
     MosaicMetadataTransaction transaction =
         MosaicMetadataTransactionFactory.create(
-                getNetworkType(), testAccount.getAddress(), alias, key, message)
+                getNetworkType(), getDeadline(), testAccount.getAddress(), alias, key, message)
             .maxFee(maxFee)
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(transaction.toAggregate(testAccount.getPublicAccount())))
             .maxFee(maxFee)
             .build();

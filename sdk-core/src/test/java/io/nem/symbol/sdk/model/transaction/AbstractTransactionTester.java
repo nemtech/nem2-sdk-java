@@ -81,6 +81,7 @@ abstract class AbstractTransactionTester {
         AggregateTransactionFactory.create(
                 TransactionType.AGGREGATE_BONDED,
                 deserialized.getNetworkType(),
+                deserialized.getDeadline(),
                 Collections.singletonList(deserialized.toAggregate(account.getPublicAccount())),
                 Collections.emptyList())
             .maxFee(BigInteger.TEN)

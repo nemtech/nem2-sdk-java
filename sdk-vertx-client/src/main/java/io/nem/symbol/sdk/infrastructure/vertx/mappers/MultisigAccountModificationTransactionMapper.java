@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
@@ -40,7 +41,9 @@ class MultisigAccountModificationTransactionMapper
 
   @Override
   protected MultisigAccountModificationTransactionFactory createFactory(
-      NetworkType networkType, MultisigAccountModificationTransactionDTO transaction) {
+      NetworkType networkType,
+      Deadline deadline,
+      MultisigAccountModificationTransactionDTO transaction) {
     List<UnresolvedAddress> additions =
         transaction.getAddressAdditions().stream()
             .map(MapperUtils::toUnresolvedAddress)
@@ -51,6 +54,7 @@ class MultisigAccountModificationTransactionMapper
             .collect(Collectors.toList());
     return MultisigAccountModificationTransactionFactory.create(
         networkType,
+        deadline,
         transaction.getMinApprovalDelta().byteValue(),
         transaction.getMinRemovalDelta().byteValue(),
         additions,

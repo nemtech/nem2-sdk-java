@@ -31,12 +31,14 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.network.PluginsProperties;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransaction;
 import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import io.reactivex.Observable;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -274,13 +276,17 @@ public class AggregateTransactionServiceTest {
 
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType, Address.generateRandom(networkType), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                Address.generateRandom(networkType),
+                Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Collections.singletonList(
                     transferTransaction.toAggregate(multisig2.getPublicAccount())))
             .build();
@@ -303,13 +309,17 @@ public class AggregateTransactionServiceTest {
       throws ExecutionException, InterruptedException {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType, Address.generateRandom(networkType), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                Address.generateRandom(networkType),
+                Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Collections.singletonList(
                     transferTransaction.toAggregate(multisig2.getPublicAccount())))
             .build();
@@ -345,13 +355,17 @@ public class AggregateTransactionServiceTest {
 
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType, Address.generateRandom(networkType), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                Address.generateRandom(networkType),
+                Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Collections.singletonList(
                     transferTransaction.toAggregate(multisig2.getPublicAccount())))
             .build();
@@ -397,19 +411,26 @@ public class AggregateTransactionServiceTest {
           throws ExecutionException, InterruptedException {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType, Address.generateRandom(networkType), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                Address.generateRandom(networkType),
+                Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     TransferTransaction transferTransaction2 =
         TransferTransactionFactory.create(
-                networkType, account2.getAddress(), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                account2.getAddress(),
+                Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Arrays.asList(
                     transferTransaction.toAggregate(multisig2.getPublicAccount()),
                     transferTransaction2.toAggregate(account4.getPublicAccount())))
@@ -433,19 +454,26 @@ public class AggregateTransactionServiceTest {
           throws ExecutionException, InterruptedException {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType, account2.getAddress(), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                account2.getAddress(),
+                Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     TransferTransaction transferTransaction2 =
         TransferTransactionFactory.create(
-                networkType, account2.getAddress(), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                account2.getAddress(),
+                Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Arrays.asList(
                     transferTransaction.toAggregate(multisig2.getPublicAccount()),
                     transferTransaction2.toAggregate(account4.getPublicAccount())))
@@ -468,6 +496,7 @@ public class AggregateTransactionServiceTest {
     MultisigAccountModificationTransaction modifyMultisigTransaction =
         MultisigAccountModificationTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 (byte) 1,
                 (byte) 1,
                 Collections.emptyList(),
@@ -477,6 +506,7 @@ public class AggregateTransactionServiceTest {
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Collections.singletonList(
                     modifyMultisigTransaction.toAggregate(multisig2.getPublicAccount())))
             .build();
@@ -495,13 +525,17 @@ public class AggregateTransactionServiceTest {
       throws ExecutionException, InterruptedException {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType, account2.getAddress(), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                account2.getAddress(),
+                Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Collections.singletonList(
                     transferTransaction.toAggregate(account4.getPublicAccount())))
             .build();
@@ -519,13 +553,17 @@ public class AggregateTransactionServiceTest {
       throws ExecutionException, InterruptedException {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType, account2.getAddress(), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                account2.getAddress(),
+                Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Collections.singletonList(
                     transferTransaction.toAggregate(account4.getPublicAccount())))
             .build();
@@ -548,19 +586,26 @@ public class AggregateTransactionServiceTest {
 
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType, account1.getAddress(), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                account1.getAddress(),
+                Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     TransferTransaction transferTransaction2 =
         TransferTransactionFactory.create(
-                networkType, account4.getAddress(), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                account4.getAddress(),
+                Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Arrays.asList(
                     transferTransaction.toAggregate(account4.getPublicAccount()),
                     transferTransaction2.toAggregate(account1.getPublicAccount())))
@@ -590,19 +635,26 @@ public class AggregateTransactionServiceTest {
 
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType, account1.getAddress(), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                account1.getAddress(),
+                Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     TransferTransaction transferTransaction2 =
         TransferTransactionFactory.create(
-                networkType, account4.getAddress(), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                account4.getAddress(),
+                Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Arrays.asList(
                     transferTransaction.toAggregate(account4.getPublicAccount()),
                     transferTransaction2.toAggregate(account1.getPublicAccount())))
@@ -624,13 +676,17 @@ public class AggregateTransactionServiceTest {
       throws ExecutionException, InterruptedException {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType, account4.getAddress(), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                account4.getAddress(),
+                Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Collections.singletonList(
                     transferTransaction.toAggregate(multisig3.getPublicAccount())))
             .build();
@@ -667,13 +723,17 @@ public class AggregateTransactionServiceTest {
       throws ExecutionException, InterruptedException {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType, account4.getAddress(), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                account4.getAddress(),
+                Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Collections.singletonList(
                     transferTransaction.toAggregate(multisig3.getPublicAccount())))
             .build();

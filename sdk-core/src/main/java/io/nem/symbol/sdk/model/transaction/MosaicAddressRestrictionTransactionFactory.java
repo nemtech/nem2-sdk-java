@@ -37,6 +37,7 @@ public class MosaicAddressRestrictionTransactionFactory
    * Create a mosaic address restriction transaction object with factory build and modifier methods.
    *
    * @param networkType {@link NetworkType}
+   * @param deadline the deadline
    * @param mosaicId {@link UnresolvedMosaicId}
    * @param restrictionKey BigInteger
    * @param targetAddress {@link UnresolvedAddress}
@@ -44,11 +45,12 @@ public class MosaicAddressRestrictionTransactionFactory
    */
   private MosaicAddressRestrictionTransactionFactory(
       NetworkType networkType,
+      Deadline deadline,
       UnresolvedMosaicId mosaicId,
       BigInteger restrictionKey,
       UnresolvedAddress targetAddress,
       BigInteger newRestrictionValue) {
-    super(TransactionType.MOSAIC_ADDRESS_RESTRICTION, networkType);
+    super(TransactionType.MOSAIC_ADDRESS_RESTRICTION, networkType, deadline);
     Validate.notNull(mosaicId, "UnresolvedMosaicId must not be null");
     Validate.notNull(restrictionKey, "RestrictionKey must not be null");
     Validate.notNull(targetAddress, "TargetAddress must not be null");
@@ -65,6 +67,7 @@ public class MosaicAddressRestrictionTransactionFactory
    * Static create method for factory.
    *
    * @param networkType {@link NetworkType}
+   * @param deadline the deadline.
    * @param mosaicId {@link UnresolvedMosaicId}
    * @param restrictionKey Restriction key.
    * @param targetAddress {@link UnresolvedAddress}
@@ -73,12 +76,13 @@ public class MosaicAddressRestrictionTransactionFactory
    */
   public static MosaicAddressRestrictionTransactionFactory create(
       NetworkType networkType,
+      Deadline deadline,
       UnresolvedMosaicId mosaicId,
       BigInteger restrictionKey,
       UnresolvedAddress targetAddress,
       BigInteger newRestrictionValue) {
     return new MosaicAddressRestrictionTransactionFactory(
-        networkType, mosaicId, restrictionKey, targetAddress, newRestrictionValue);
+        networkType, deadline, mosaicId, restrictionKey, targetAddress, newRestrictionValue);
   }
 
   @Override

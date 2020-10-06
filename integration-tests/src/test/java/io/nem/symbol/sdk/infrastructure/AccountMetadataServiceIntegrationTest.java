@@ -59,7 +59,7 @@ class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
     AccountMetadataTransaction originalTransaction =
         get(service.createAccountMetadataTransactionFactory(
                 targetAccount.getAddress(), key, originalMessage, signerAccount.getAddress()))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAggregateAndValidate(type, originalTransaction, signerAccount);
@@ -70,7 +70,7 @@ class AccountMetadataServiceIntegrationTest extends BaseIntegrationTest {
     AccountMetadataTransaction updateTransaction =
         get(service.createAccountMetadataTransactionFactory(
                 targetAccount.getAddress(), key, newMessage, signerAccount.getAddress()))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAggregateAndValidate(type, updateTransaction, signerAccount);

@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Test;
@@ -27,12 +28,13 @@ public class TransactionStatusTest {
 
   @Test
   void createATransactionStatusViaConstructor() {
+    Duration epochAdjustment = Duration.ofSeconds(1573430400);
     TransactionStatus transactionStatus =
         new TransactionStatus(
             TransactionState.CONFIRMED,
             "Success",
             "B6C7648A3DDF71415650805E9E7801424FE03BBEE7D21F9C57B60220D3E95B2F",
-            new Deadline(2, ChronoUnit.HOURS),
+            Deadline.create(epochAdjustment, 2, ChronoUnit.HOURS),
             new BigInteger("121855"));
 
     assertEquals(TransactionState.CONFIRMED, transactionStatus.getGroup());
@@ -40,7 +42,9 @@ public class TransactionStatusTest {
     assertEquals(
         "B6C7648A3DDF71415650805E9E7801424FE03BBEE7D21F9C57B60220D3E95B2F",
         transactionStatus.getHash());
-    assertTrue(LocalDateTime.now().isBefore(transactionStatus.getDeadline().getLocalDateTime()));
+    assertTrue(
+        LocalDateTime.now()
+            .isBefore(transactionStatus.getDeadline().getLocalDateTime(epochAdjustment)));
     assertEquals(new BigInteger("121855"), transactionStatus.getHeight());
   }
 }

@@ -19,6 +19,7 @@ import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.reactivex.Observable;
 import java.io.Closeable;
+import java.time.Duration;
 
 /**
  * A repository factory allows clients to create repositories to access NEM Server without knowing
@@ -107,8 +108,8 @@ public interface RepositoryFactory extends Closeable {
   /**
    * @return the configured network currency configuration like "cat.harvest", "nem.xem " and
    *     "symbol.xym". This method uses the user configured properties if provided. If it's not
-   *     provided, it resolves the configuration by querying block 1 transactions. This method is
-   *     cached, the server is only called the first time.
+   *     provided, it resolves the configuration from the /network/properties endpoint. This method
+   *     is cached, the server is only called the first time.
    * @see NetworkCurrencyService
    * @see RepositoryFactoryConfiguration
    */
@@ -117,10 +118,19 @@ public interface RepositoryFactory extends Closeable {
   /**
    * @return the configured harvest currency configuration like "cat.harvest". This method uses the
    *     user configured properties if provided. If it's not provided, it resolves the configuration
-   *     by querying block 1 transactions. This method is cached, the server is only called the
+   *     from the /network/properties endpoint. This method is cached, the server is only called the
    *     first time. The network currency configuration
    * @see NetworkCurrencyService
    * @see RepositoryFactoryConfiguration
    */
   Observable<NetworkCurrency> getHarvestCurrency();
+
+  /**
+   * @return the configured server epochAdjustment. This method uses the user configured properties
+   *     if provided. If it's not provided, it resolves the configuration from the
+   *     /network/properties endpoint. This method is cached, the server is only called the first
+   *     time. The network currency configuration
+   * @see RepositoryFactoryConfiguration
+   */
+  Observable<Duration> getEpochAdjustment();
 }

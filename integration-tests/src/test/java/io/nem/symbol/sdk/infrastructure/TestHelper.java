@@ -53,6 +53,7 @@ import io.nem.symbol.sdk.model.transaction.AddressAliasTransaction;
 import io.nem.symbol.sdk.model.transaction.AddressAliasTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.HashLockInfo;
 import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
@@ -76,6 +77,7 @@ import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import io.reactivex.Observable;
 import java.io.File;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -103,6 +105,7 @@ public class TestHelper {
   private final JsonHelper jsonHelper =
       new JsonHelperJackson2(JsonHelperJackson2.configureMapper(new ObjectMapper()));
   private final Config config;
+  private final Duration epochAdjustment;
   protected BigInteger maxFee = BigInteger.valueOf(1000000);
 
   public TestHelper() {
@@ -111,6 +114,7 @@ public class TestHelper {
     this.generationHash = resolveGenerationHash();
     this.networkCurrency = resolveNetworkCurrency();
     this.networkType = resolveNetworkType();
+    this.epochAdjustment = resolveEpochAdjustment();
     this.config.init(this.networkType);
 
     System.out.println("Network Type: " + networkType);
@@ -165,6 +169,7 @@ public class TestHelper {
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(transaction.toAggregate(signer.getPublicAccount())))
             .maxFee(maxFee)
             .build();
@@ -338,6 +343,10 @@ public class TestHelper {
     return get(getRepositoryFactory(DEFAULT_REPOSITORY_TYPE).getNetworkType());
   }
 
+  private Duration resolveEpochAdjustment() {
+    return get(getRepositoryFactory(DEFAULT_REPOSITORY_TYPE).getEpochAdjustment());
+  }
+
   public RepositoryFactory getRepositoryFactory(RepositoryType type) {
     return repositoryFactoryMap.computeIfAbsent(type, this::createRepositoryFactory);
   }
@@ -401,7 +410,7 @@ public class TestHelper {
                                 && ns.getNamespaceId().equals(namespaceId))));
   }
 
-  protected NamespaceId setAddressAlias(
+  public NamespaceId setAddressAlias(
       RepositoryType type, Address address, String namespaceName) {
 
     NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
@@ -419,7 +428,7 @@ public class TestHelper {
     System.out.println("Setting up namespace " + namespaceName);
     NamespaceRegistrationTransaction namespaceRegistrationTransaction =
         NamespaceRegistrationTransactionFactory.createRootNamespace(
-                getNetworkType(), namespaceName, BigInteger.valueOf(100))
+                getNetworkType(), getDeadline(), namespaceName, getDuration())
             .maxFee(maxFee)
             .build();
 
@@ -431,7 +440,7 @@ public class TestHelper {
     System.out.println("Setting account alias " + address.plain() + " alias: " + namespaceName);
     AddressAliasTransaction aliasTransaction =
         AddressAliasTransactionFactory.create(
-                getNetworkType(), AliasAction.LINK, rootNamespaceId, address)
+                getNetworkType(), getDeadline(), AliasAction.LINK, rootNamespaceId, address)
             .maxFee(maxFee)
             .build();
 
@@ -480,7 +489,7 @@ public class TestHelper {
     System.out.println("Setting up namespace " + namespaceName);
     NamespaceRegistrationTransaction namespaceRegistrationTransaction =
         NamespaceRegistrationTransactionFactory.createRootNamespace(
-                getNetworkType(), namespaceName, BigInteger.valueOf(100))
+                getNetworkType(), getDeadline(), namespaceName, getDuration())
             .maxFee(maxFee)
             .build();
 
@@ -494,7 +503,7 @@ public class TestHelper {
 
     MosaicAliasTransaction aliasTransaction =
         MosaicAliasTransactionFactory.create(
-                getNetworkType(), AliasAction.LINK, rootNamespaceId, mosaicId)
+                getNetworkType(), getDeadline(), AliasAction.LINK, rootNamespaceId, mosaicId)
             .maxFee(maxFee)
             .build();
 
@@ -519,6 +528,7 @@ public class TestHelper {
     MosaicDefinitionTransaction mosaicDefinitionTransaction =
         MosaicDefinitionTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 nonce,
                 mosaicId,
                 MosaicFlags.create(true, true, true),
@@ -539,7 +549,7 @@ public class TestHelper {
 
       MosaicAliasTransaction addressAliasTransaction =
           MosaicAliasTransactionFactory.create(
-                  getNetworkType(), AliasAction.LINK, rootNamespaceId, mosaicId)
+                  getNetworkType(), getDeadline(), AliasAction.LINK, rootNamespaceId, mosaicId)
               .maxFee(maxFee)
               .build();
 
@@ -550,6 +560,7 @@ public class TestHelper {
       MosaicSupplyChangeTransaction mosaicSupplyChangeTransaction =
           MosaicSupplyChangeTransactionFactory.create(
                   getNetworkType(),
+                  getDeadline(),
                   unresolvedMosaicId,
                   MosaicSupplyChangeActionType.INCREASE,
                   initialSupply)
@@ -567,7 +578,7 @@ public class TestHelper {
     System.out.println("Creating namespace " + namespaceName);
     NamespaceRegistrationTransaction namespaceRegistrationTransaction =
         NamespaceRegistrationTransactionFactory.createRootNamespace(
-                getNetworkType(), namespaceName, BigInteger.valueOf(10))
+                getNetworkType(), getDeadline(), namespaceName, getDuration())
             .maxFee(maxFee)
             .build();
 
@@ -582,6 +593,10 @@ public class TestHelper {
         namespaceRegistrationTransaction.getNamespaceName(),
         processedTransaction.getNamespaceName());
     return namespaceRegistrationTransaction.getNamespaceId();
+  }
+
+  public BigInteger getDuration() {
+    return BigInteger.valueOf(100);
   }
 
   public boolean isMultisig(RepositoryType type, Account multisigAccount) {
@@ -630,13 +645,19 @@ public class TestHelper {
         Arrays.stream(accounts).map(Account::getAddress).collect(Collectors.toList());
     MultisigAccountModificationTransaction convertIntoMultisigTransaction =
         MultisigAccountModificationTransactionFactory.create(
-                getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList())
+                getNetworkType(),
+                getDeadline(),
+                (byte) 1,
+                (byte) 1,
+                additions,
+                Collections.emptyList())
             .maxFee(maxFee)
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createBonded(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(
                     convertIntoMultisigTransaction.toAggregate(multisigAccount.getPublicAccount())))
             .maxFee(maxFee)
@@ -649,7 +670,11 @@ public class TestHelper {
     Mosaic hashAmount = getNetworkCurrency().createRelative(BigInteger.valueOf(10));
     HashLockTransaction hashLockTransaction =
         HashLockTransactionFactory.create(
-                getNetworkType(), hashAmount, BigInteger.valueOf(100), signedAggregateTransaction)
+                getNetworkType(),
+                getDeadline(),
+                hashAmount,
+                BigInteger.valueOf(100),
+                signedAggregateTransaction)
             .maxFee(maxFee)
             .build();
     SignedTransaction signedHashLockTransaction =
@@ -709,13 +734,19 @@ public class TestHelper {
         Arrays.stream(accounts).map(Account::getAddress).collect(Collectors.toList());
     MultisigAccountModificationTransaction convertIntoMultisigTransaction =
         MultisigAccountModificationTransactionFactory.create(
-                getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList())
+                getNetworkType(),
+                getDeadline(),
+                (byte) 1,
+                (byte) 1,
+                additions,
+                Collections.emptyList())
             .maxFee(maxFee)
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(
                     convertIntoMultisigTransaction.toAggregate(multisigAccount.getPublicAccount())))
             .maxFee(maxFee)
@@ -758,6 +789,7 @@ public class TestHelper {
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
             getNetworkType(),
+            getDeadline(),
             recipient,
             Collections.singletonList(getNetworkCurrency().createAbsolute(amount)));
 
@@ -803,5 +835,9 @@ public class TestHelper {
     Account testAccount = config().getTestAccount();
     sendMosaicFromNemesis(type, testAccount.getAddress(), false);
     return testAccount;
+  }
+
+  public Deadline getDeadline() {
+    return Deadline.create(this.epochAdjustment);
   }
 }

@@ -53,20 +53,22 @@ public class CreatingAnEscrowContractWithAggregateBondedTransactionIntegrationTe
     TransferTransaction aliceToTicketDistributorTx =
         TransferTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 ticketDistributorAccount.getAddress(),
                 Collections.singletonList(
                     getNetworkCurrency().createRelative(BigInteger.valueOf(100))))
             .message(new PlainMessage("send 100 cat.currency to distributor"))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     TransferTransaction ticketDistributorToAliceTx =
         TransferTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 aliceAccount.getAddress(),
                 Collections.singletonList(new Mosaic(mosaicId, BigInteger.ONE)))
             .message(new PlainMessage("send 1 museum ticket to alice"))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     /* end block 01 */
@@ -75,11 +77,12 @@ public class CreatingAnEscrowContractWithAggregateBondedTransactionIntegrationTe
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createBonded(
                 getNetworkType(),
+                getDeadline(),
                 Arrays.asList(
                     aliceToTicketDistributorTx.toAggregate(aliceAccount.getPublicAccount()),
                     ticketDistributorToAliceTx.toAggregate(
                         ticketDistributorAccount.getPublicAccount())))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     String networkGenerationHash = getGenerationHash();
@@ -93,10 +96,11 @@ public class CreatingAnEscrowContractWithAggregateBondedTransactionIntegrationTe
     HashLockTransaction hashLockTransaction =
         HashLockTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 getNetworkCurrency().createRelative(BigInteger.TEN),
                 BigInteger.valueOf(480),
                 signedTransaction)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     SignedTransaction signedHashLockTransaction =

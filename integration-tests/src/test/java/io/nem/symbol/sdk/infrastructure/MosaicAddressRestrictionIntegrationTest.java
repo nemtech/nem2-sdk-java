@@ -68,6 +68,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
     MosaicGlobalRestrictionTransaction mosaicGlobalRestrictionTransaction =
         MosaicGlobalRestrictionTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 mosaicId,
                 restrictionKey,
                 BigInteger.valueOf(20),
@@ -88,6 +89,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
     MosaicAddressRestrictionTransaction createTransaction =
         MosaicAddressRestrictionTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 mosaicId,
                 restrictionKey,
                 targetAddressAlias,
@@ -115,7 +117,12 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
     // 6) Update the restriction
     MosaicAddressRestrictionTransaction updateTransaction =
         MosaicAddressRestrictionTransactionFactory.create(
-                getNetworkType(), mosaicId, restrictionKey, targetAddress, BigInteger.valueOf(40))
+                getNetworkType(),
+                getDeadline(),
+                mosaicId,
+                restrictionKey,
+                targetAddress,
+                BigInteger.valueOf(40))
             .previousRestrictionValue(originalRestrictionValue)
             .maxFee(maxFee)
             .build();
@@ -201,6 +208,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
     MosaicDefinitionTransaction mosaicDefinitionTransaction =
         MosaicDefinitionTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 nonce,
                 mosaicId,
                 MosaicFlags.create(true, true, true),

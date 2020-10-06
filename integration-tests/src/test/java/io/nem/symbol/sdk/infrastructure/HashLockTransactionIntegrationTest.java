@@ -48,6 +48,7 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 account.getAddress(),
                 Collections.singletonList(
                     getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
@@ -56,8 +57,9 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createBonded(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(factory.build().toAggregate(account.getPublicAccount())))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
     SignedTransaction signedTransaction =
         this.account.sign(aggregateTransaction, getGenerationHash());
@@ -65,10 +67,11 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
     HashLockTransaction hashLockTransaction =
         HashLockTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 signedTransaction)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, this.account, hashLockTransaction);
@@ -83,6 +86,7 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 this.account.getAddress(),
                 Collections.singletonList(
                     getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
@@ -91,8 +95,9 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createBonded(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(factory.build().toAggregate(account.getPublicAccount())))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     SignedTransaction signedTransaction =
@@ -100,10 +105,11 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
     HashLockTransaction hashLockTransaction =
         HashLockTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 signedTransaction)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAggregateAndValidate(type, hashLockTransaction, this.account);

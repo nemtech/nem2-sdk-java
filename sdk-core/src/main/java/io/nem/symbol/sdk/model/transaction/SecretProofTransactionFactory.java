@@ -29,11 +29,12 @@ public class SecretProofTransactionFactory extends TransactionFactory<SecretProo
 
   private SecretProofTransactionFactory(
       final NetworkType networkType,
+      final Deadline deadline,
       final LockHashAlgorithm hashType,
       final UnresolvedAddress recipient,
       final String secret,
       final String proof) {
-    super(TransactionType.SECRET_PROOF, networkType);
+    super(TransactionType.SECRET_PROOF, networkType, deadline);
     Validate.notNull(secret, "Secret must not be null.");
     Validate.notNull(proof, "Proof must not be null.");
     Validate.notNull(recipient, "Recipient must not be null.");
@@ -53,6 +54,7 @@ public class SecretProofTransactionFactory extends TransactionFactory<SecretProo
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline deadline
    * @param hashType Hash algorithm secret is generated with.
    * @param recipient Recipient address.
    * @param secret Seed proof hashed.
@@ -61,11 +63,13 @@ public class SecretProofTransactionFactory extends TransactionFactory<SecretProo
    */
   public static SecretProofTransactionFactory create(
       NetworkType networkType,
+      Deadline deadline,
       LockHashAlgorithm hashType,
       UnresolvedAddress recipient,
       String secret,
       String proof) {
-    return new SecretProofTransactionFactory(networkType, hashType, recipient, secret, proof);
+    return new SecretProofTransactionFactory(
+        networkType, deadline, hashType, recipient, secret, proof);
   }
 
   /**

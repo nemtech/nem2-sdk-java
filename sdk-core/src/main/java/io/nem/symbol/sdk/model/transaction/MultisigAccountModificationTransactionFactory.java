@@ -31,11 +31,12 @@ public class MultisigAccountModificationTransactionFactory
 
   private MultisigAccountModificationTransactionFactory(
       NetworkType networkType,
+      Deadline deadline,
       byte minApprovalDelta,
       byte minRemovalDelta,
       List<UnresolvedAddress> addressAdditions,
       List<UnresolvedAddress> addressDeletions) {
-    super(TransactionType.MULTISIG_ACCOUNT_MODIFICATION, networkType);
+    super(TransactionType.MULTISIG_ACCOUNT_MODIFICATION, networkType, deadline);
     Validate.notNull(addressAdditions, "AddressAdditions must not be null");
     Validate.notNull(addressDeletions, "AddressDeletions must not be null");
     this.minApprovalDelta = minApprovalDelta;
@@ -48,6 +49,7 @@ public class MultisigAccountModificationTransactionFactory
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline the deadline
    * @param minApprovalDelta Minimum approval delta.
    * @param minRemovalDelta Minimum removal delta.
    * @param addressAdditions List of public accounts that are going to be added to the multisig
@@ -58,12 +60,18 @@ public class MultisigAccountModificationTransactionFactory
    */
   public static MultisigAccountModificationTransactionFactory create(
       NetworkType networkType,
+      Deadline deadline,
       byte minApprovalDelta,
       byte minRemovalDelta,
       List<UnresolvedAddress> addressAdditions,
       List<UnresolvedAddress> addressDeletions) {
     return new MultisigAccountModificationTransactionFactory(
-        networkType, minApprovalDelta, minRemovalDelta, addressAdditions, addressDeletions);
+        networkType,
+        deadline,
+        minApprovalDelta,
+        minRemovalDelta,
+        addressAdditions,
+        addressDeletions);
   }
 
   /**

@@ -27,8 +27,11 @@ public class AccountKeyLinkTransactionFactory
   private final LinkAction linkAction;
 
   private AccountKeyLinkTransactionFactory(
-      final NetworkType networkType, final PublicKey linkedPublicKey, final LinkAction linkAction) {
-    super(TransactionType.ACCOUNT_KEY_LINK, networkType);
+      final NetworkType networkType,
+      final Deadline deadline,
+      final PublicKey linkedPublicKey,
+      final LinkAction linkAction) {
+    super(TransactionType.ACCOUNT_KEY_LINK, networkType, deadline);
     Validate.notNull(linkedPublicKey, "LinkedPublicKey must not be null");
     Validate.notNull(linkAction, "LinkAction must not be null");
     this.linkedPublicKey = linkedPublicKey;
@@ -39,13 +42,17 @@ public class AccountKeyLinkTransactionFactory
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline the deadline
    * @param linkedPublicKey linked public key.
    * @param linkAction Link action.
    * @return Account link transaction.
    */
   public static AccountKeyLinkTransactionFactory create(
-      NetworkType networkType, PublicKey linkedPublicKey, LinkAction linkAction) {
-    return new AccountKeyLinkTransactionFactory(networkType, linkedPublicKey, linkAction);
+      NetworkType networkType,
+      Deadline deadline,
+      PublicKey linkedPublicKey,
+      LinkAction linkAction) {
+    return new AccountKeyLinkTransactionFactory(networkType, deadline, linkedPublicKey, linkAction);
   }
 
   /**

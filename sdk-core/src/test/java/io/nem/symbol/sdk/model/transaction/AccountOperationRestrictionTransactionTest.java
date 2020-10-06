@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -37,10 +38,10 @@ public class AccountOperationRestrictionTransactionTest extends AbstractTransact
     AccountOperationRestrictionTransaction transaction =
         AccountOperationRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 AccountOperationRestrictionFlags.ALLOW_OUTGOING_TRANSACTION_TYPE,
                 additions,
                 deletions)
-            .deadline(new FakeDeadline())
             .build();
     Assertions.assertEquals(
         AccountOperationRestrictionFlags.ALLOW_OUTGOING_TRANSACTION_TYPE,
@@ -57,11 +58,11 @@ public class AccountOperationRestrictionTransactionTest extends AbstractTransact
     AccountOperationRestrictionTransaction transaction =
         AccountOperationRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 AccountOperationRestrictionFlags.ALLOW_OUTGOING_TRANSACTION_TYPE,
                 additions,
                 deletions)
             .signer(account.getPublicAccount())
-            .deadline(new FakeDeadline())
             .build();
 
     String expected =

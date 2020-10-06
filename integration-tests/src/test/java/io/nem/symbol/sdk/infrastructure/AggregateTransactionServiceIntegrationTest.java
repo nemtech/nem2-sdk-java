@@ -43,7 +43,8 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
   void aggregateWhenEmptyInnerTransactions(RepositoryType type) {
 
     AggregateTransaction aggregateTransaction =
-        AggregateTransactionFactory.createComplete(getNetworkType(), Collections.emptyList())
+        AggregateTransactionFactory.createComplete(
+                getNetworkType(), getDeadline(), Collections.emptyList())
             .maxFee(maxFee)
             .build();
 
@@ -63,13 +64,19 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
         accounts.stream().map(Account::getAddress).collect(Collectors.toList());
     MultisigAccountModificationTransaction multisigAccountModificationTransaction =
         MultisigAccountModificationTransactionFactory.create(
-                getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList())
+                getNetworkType(),
+                getDeadline(),
+                (byte) 1,
+                (byte) 1,
+                additions,
+                Collections.emptyList())
             .maxFee(maxFee)
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(
                     multisigAccountModificationTransaction.toAggregate(
                         multisigAccount.getPublicAccount())))
@@ -94,7 +101,8 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
     Account cosignatoryAccount = config().getCosignatoryAccount();
 
     TransferTransaction transferTransaction =
-        TransferTransactionFactory.create(getNetworkType(), getRecipient(), Collections.emptyList())
+        TransferTransactionFactory.create(
+                getNetworkType(), getDeadline(), getRecipient(), Collections.emptyList())
             .message(new PlainMessage(""))
             .maxFee(maxFee)
             .build();
@@ -102,6 +110,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(
                     transferTransaction.toAggregate(multisigAccount.getPublicAccount())))
             .maxFee(maxFee)
@@ -126,7 +135,8 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
     Account multisigAccount = helper().getMultisigAccount(type);
 
     TransferTransaction transferTransaction =
-        TransferTransactionFactory.create(getNetworkType(), getRecipient(), Collections.emptyList())
+        TransferTransactionFactory.create(
+                getNetworkType(), getDeadline(), getRecipient(), Collections.emptyList())
             .message(new PlainMessage(""))
             .maxFee(maxFee)
             .build();
@@ -134,6 +144,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(
                     transferTransaction.toAggregate(multisigAccount.getPublicAccount())))
             .maxFee(maxFee)
@@ -155,7 +166,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void isMultisigAccountModificationTransactionAdditionNotComplete(RepositoryType type) {
 
-    Account testAccount = getTestAccount();
+    Account testAccount = helper().getTestAccount(type);
 
     Account multisigAccount = helper().getMultisigAccount(type);
     Account cosignatoryAccount = config().getCosignatoryAccount();
@@ -167,13 +178,19 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
         accounts.stream().map(Account::getAddress).collect(Collectors.toList());
     MultisigAccountModificationTransaction multisigAccountModificationTransaction =
         MultisigAccountModificationTransactionFactory.create(
-                getNetworkType(), (byte) 1, (byte) 1, additions, Collections.emptyList())
+                getNetworkType(),
+                getDeadline(),
+                (byte) 1,
+                (byte) 1,
+                additions,
+                Collections.emptyList())
             .maxFee(maxFee)
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(
                     multisigAccountModificationTransaction.toAggregate(
                         multisigAccount.getPublicAccount())))
@@ -202,6 +219,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
     MultisigAccountModificationTransaction multisigAccountModificationTransaction =
         MultisigAccountModificationTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 (byte) 1,
                 (byte) 1,
                 Collections.emptyList(),
@@ -212,6 +230,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(
                     multisigAccountModificationTransaction.toAggregate(
                         multisigAccount.getPublicAccount())))
@@ -241,6 +260,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
     MultisigAccountModificationTransaction multisigAccountModificationTransaction =
         MultisigAccountModificationTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 (byte) 1,
                 (byte) 1,
                 Collections.emptyList(),
@@ -251,6 +271,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(
                     multisigAccountModificationTransaction.toAggregate(
                         multisigAccount.getPublicAccount())))

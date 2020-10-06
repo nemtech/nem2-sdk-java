@@ -20,6 +20,7 @@ import static io.nem.symbol.core.utils.MapperUtils.toNamespaceId;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.symbol.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
@@ -43,13 +44,14 @@ class NamespaceRegistrationTransactionMapper
 
   @Override
   protected TransactionFactory<NamespaceRegistrationTransaction> createFactory(
-      NetworkType networkType, NamespaceRegistrationTransactionDTO transaction) {
+      NetworkType networkType, Deadline deadline, NamespaceRegistrationTransactionDTO transaction) {
 
     NamespaceRegistrationType namespaceRegistrationType =
         NamespaceRegistrationType.rawValueOf(transaction.getRegistrationType().getValue());
 
     return NamespaceRegistrationTransactionFactory.create(
         networkType,
+        deadline,
         transaction.getName(),
         toNamespaceId(transaction.getId()),
         namespaceRegistrationType,

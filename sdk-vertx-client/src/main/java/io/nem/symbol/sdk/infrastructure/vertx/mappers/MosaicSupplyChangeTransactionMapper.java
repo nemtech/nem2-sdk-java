@@ -20,6 +20,7 @@ import static io.nem.symbol.core.utils.MapperUtils.toUnresolvedMosaicId;
 
 import io.nem.symbol.sdk.model.mosaic.MosaicSupplyChangeActionType;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.MosaicSupplyChangeTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicSupplyChangeTransactionFactory;
@@ -39,9 +40,10 @@ class MosaicSupplyChangeTransactionMapper
 
   @Override
   protected TransactionFactory<MosaicSupplyChangeTransaction> createFactory(
-      NetworkType networkType, MosaicSupplyChangeTransactionDTO transaction) {
+      NetworkType networkType, Deadline deadline, MosaicSupplyChangeTransactionDTO transaction) {
     return MosaicSupplyChangeTransactionFactory.create(
         networkType,
+        deadline,
         toUnresolvedMosaicId(transaction.getMosaicId()),
         MosaicSupplyChangeActionType.rawValueOf(transaction.getAction().getValue()),
         transaction.getDelta());

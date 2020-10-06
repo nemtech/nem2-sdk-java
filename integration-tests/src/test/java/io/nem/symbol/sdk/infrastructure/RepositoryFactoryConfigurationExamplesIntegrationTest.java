@@ -24,10 +24,12 @@ import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrencyBuilder;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Disabled;
@@ -102,9 +104,11 @@ public class RepositoryFactoryConfigurationExamplesIntegrationTest {
     Account sender = Account.generateNewAccount(networkType);
     Account recipient = Account.generateNewAccount(networkType);
 
+    Duration epochAdjustment = repositoryFactory.getEpochAdjustment().toFuture().get();
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 networkType,
+                Deadline.create(epochAdjustment),
                 recipient.getAddress(),
                 Collections.singletonList(currency.createRelative(BigInteger.TEN)))
             .message(new PlainMessage(""))

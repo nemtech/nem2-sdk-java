@@ -31,10 +31,11 @@ public class AccountOperationRestrictionTransactionFactory
 
   private AccountOperationRestrictionTransactionFactory(
       final NetworkType networkType,
+      final Deadline deadline,
       final AccountOperationRestrictionFlags restrictionFlags,
       List<TransactionType> restrictionAdditions,
       List<TransactionType> restrictionDeletions) {
-    super(TransactionType.ACCOUNT_OPERATION_RESTRICTION, networkType);
+    super(TransactionType.ACCOUNT_OPERATION_RESTRICTION, networkType, deadline);
     Validate.notNull(restrictionFlags, "RestrictionType must not be null");
     Validate.notNull(restrictionAdditions, "RestrictionAdditions must not be null");
     Validate.notNull(restrictionDeletions, "RestrictionDeletions must not be null");
@@ -47,6 +48,7 @@ public class AccountOperationRestrictionTransactionFactory
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline the deadline
    * @param restrictionFlags Restriction flags.
    * @param restrictionAdditions List of transaction types that are going to be added to the
    *     restriction.
@@ -56,11 +58,12 @@ public class AccountOperationRestrictionTransactionFactory
    */
   public static AccountOperationRestrictionTransactionFactory create(
       NetworkType networkType,
+      Deadline deadline,
       AccountOperationRestrictionFlags restrictionFlags,
       List<TransactionType> restrictionAdditions,
       List<TransactionType> restrictionDeletions) {
     return new AccountOperationRestrictionTransactionFactory(
-        networkType, restrictionFlags, restrictionAdditions, restrictionDeletions);
+        networkType, deadline, restrictionFlags, restrictionAdditions, restrictionDeletions);
   }
 
   /**

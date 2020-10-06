@@ -19,6 +19,7 @@ import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AccountKeyLinkTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountKeyLinkTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.LinkAction;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
@@ -35,10 +36,13 @@ class AccountKeyLinkTransactionMapper
 
   @Override
   protected AccountKeyLinkTransactionFactory createFactory(
-      NetworkType networkType, AccountKeyLinkTransactionDTO dto) {
+      NetworkType networkType, Deadline deadline, AccountKeyLinkTransactionDTO dto) {
     PublicKey linkedPublicKey = PublicKey.fromHexString(dto.getLinkedPublicKey());
     return AccountKeyLinkTransactionFactory.create(
-        networkType, linkedPublicKey, LinkAction.rawValueOf(dto.getLinkAction().getValue()));
+        networkType,
+        deadline,
+        linkedPublicKey,
+        LinkAction.rawValueOf(dto.getLinkAction().getValue()));
   }
 
   @Override

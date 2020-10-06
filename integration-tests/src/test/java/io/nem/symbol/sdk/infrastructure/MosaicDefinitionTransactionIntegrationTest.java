@@ -66,12 +66,13 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
     MosaicDefinitionTransaction mosaicDefinitionTransaction =
         MosaicDefinitionTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 nonce,
                 mosaicId,
                 MosaicFlags.create(true, true, true),
                 4,
                 new BlockDuration(100))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     MosaicDefinitionTransaction processed =
@@ -91,12 +92,13 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
     MosaicDefinitionTransaction mosaicDefinitionTransaction =
         MosaicDefinitionTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 nonce,
                 mosaicId,
                 MosaicFlags.create(true, false, true),
                 4,
                 new BlockDuration(100))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     MosaicDefinitionTransaction processed =
@@ -114,10 +116,11 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
     MosaicSupplyChangeTransaction mosaicSupplyChangeTransaction =
         MosaicSupplyChangeTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 mosaicId,
                 MosaicSupplyChangeActionType.INCREASE,
                 BigInteger.valueOf(11))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, account, mosaicSupplyChangeTransaction);
@@ -132,10 +135,11 @@ public class MosaicDefinitionTransactionIntegrationTest extends BaseIntegrationT
     MosaicSupplyChangeTransaction mosaicSupplyChangeTransaction =
         MosaicSupplyChangeTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 mosaicId,
                 MosaicSupplyChangeActionType.INCREASE,
                 BigInteger.valueOf(12))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAggregateAndValidate(type, mosaicSupplyChangeTransaction, account);

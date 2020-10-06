@@ -87,6 +87,7 @@ class MultisignIntegrationTest extends BaseIntegrationTest {
     MultisigAccountModificationTransaction modifyMultisigAccountTransaction =
         MultisigAccountModificationTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 (byte) 2,
                 (byte) 1,
                 Arrays.asList(
@@ -100,6 +101,7 @@ class MultisignIntegrationTest extends BaseIntegrationTest {
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(
                     modifyMultisigAccountTransaction.toAggregate(
                         multisigAccount.getPublicAccount())))
@@ -185,13 +187,15 @@ class MultisignIntegrationTest extends BaseIntegrationTest {
   private SignedTransaction createSignedAggregatedBondTransaction(
       Account multisigAccount, Account cosignAccount, Address recipient) {
     TransferTransaction transferTransaction =
-        TransferTransactionFactory.create(getNetworkType(), recipient, Collections.emptyList())
+        TransferTransactionFactory.create(
+                getNetworkType(), getDeadline(), recipient, Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createBonded(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(
                     transferTransaction.toAggregate(multisigAccount.getPublicAccount())))
             .maxFee(maxFee)
@@ -205,6 +209,7 @@ class MultisignIntegrationTest extends BaseIntegrationTest {
     HashLockTransaction hasLockTransaction =
         HashLockTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(10000),
                 signedAggregatedTransaction)

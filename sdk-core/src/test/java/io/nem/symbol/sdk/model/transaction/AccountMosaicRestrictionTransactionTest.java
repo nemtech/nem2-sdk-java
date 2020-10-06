@@ -44,10 +44,10 @@ public class AccountMosaicRestrictionTransactionTest extends AbstractTransaction
     AccountMosaicRestrictionTransaction transaction =
         AccountMosaicRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC,
                 additions,
                 deletions)
-            .deadline(new FakeDeadline())
             .build();
     Assertions.assertEquals(
         AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC, transaction.getRestrictionFlags());
@@ -63,10 +63,10 @@ public class AccountMosaicRestrictionTransactionTest extends AbstractTransaction
     AccountMosaicRestrictionTransaction transaction =
         AccountMosaicRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC,
                 additions,
                 deletions)
-            .deadline(new FakeDeadline())
             .signer(account.getPublicAccount())
             .build();
 

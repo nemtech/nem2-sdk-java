@@ -20,6 +20,7 @@ import static io.nem.symbol.core.utils.MapperUtils.toUnresolvedMosaicId;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransaction;
@@ -39,11 +40,12 @@ class SecretLockTransactionMapper
 
   @Override
   protected TransactionFactory<SecretLockTransaction> createFactory(
-      NetworkType networkType, SecretLockTransactionDTO transaction) {
+      NetworkType networkType, Deadline deadline, SecretLockTransactionDTO transaction) {
     Mosaic mosaic =
         new Mosaic(toUnresolvedMosaicId(transaction.getMosaicId()), transaction.getAmount());
     return SecretLockTransactionFactory.create(
         networkType,
+        deadline,
         mosaic,
         transaction.getDuration(),
         LockHashAlgorithm.rawValueOf(transaction.getHashAlgorithm().getValue()),

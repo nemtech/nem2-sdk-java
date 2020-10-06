@@ -44,6 +44,7 @@ import io.nem.symbol.sdk.model.transaction.MosaicGlobalRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
 import io.reactivex.Observable;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -86,6 +87,7 @@ public class MosaicRestrictionTransactionServiceTest {
     when(factory.createNamespaceRepository()).thenReturn(namespaceRepository);
 
     when(factory.getNetworkType()).thenReturn(Observable.just(networkType));
+    when(factory.getEpochAdjustment()).thenReturn(Observable.just(Duration.ofSeconds(10)));
     service = new MosaicRestrictionTransactionServiceImpl(factory);
 
     when(restrictionMosaicRepository.search(

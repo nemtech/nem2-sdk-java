@@ -85,4 +85,21 @@ public class FormatUtilsTest {
     // Assert:
     assertFiveDecimalPlaceFormatting(d -> FormatUtils.format(d, 5));
   }
+
+  @Test
+  public void parserServerDuration() {
+    Assertions.assertEquals("PT15S", FormatUtils.parserServerDuration("15s").toString());
+    Assertions.assertEquals("PT10M15S", FormatUtils.parserServerDuration("10m:15s").toString());
+    Assertions.assertEquals("PT10M", FormatUtils.parserServerDuration("10m").toString());
+    Assertions.assertEquals("PT5H3M1S", FormatUtils.parserServerDuration("5h3m1s").toString());
+    Assertions.assertEquals("PT240H5M1S", FormatUtils.parserServerDuration("10d:5m1s").toString());
+    Assertions.assertEquals("PT240H5M1S", FormatUtils.parserServerDuration("10d 5m1s").toString());
+    Assertions.assertEquals(
+        "PT240H5M0.1S", FormatUtils.parserServerDuration("10d:5m100ms").toString());
+    Assertions.assertEquals(
+        "PT240H5M0.001S", FormatUtils.parserServerDuration("10d:5m1ms").toString());
+    Assertions.assertEquals("PT1.2S", FormatUtils.parserServerDuration("1'200ms").toString());
+    Assertions.assertEquals("PT5S", FormatUtils.parserServerDuration("5s10x").toString());
+    Assertions.assertEquals("PT0S", FormatUtils.parserServerDuration("5sss").toString());
+  }
 }

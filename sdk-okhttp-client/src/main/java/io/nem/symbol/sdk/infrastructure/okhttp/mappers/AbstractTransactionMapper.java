@@ -31,6 +31,7 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.NetworkTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.TransactionMetaDTO;
+import java.math.BigInteger;
 
 /**
  * Abstract transaction mapper for the transaction mappers that support a specific type of
@@ -121,11 +122,13 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction>
     D transaction = getJsonHelper().convert(transactionDto, transactionDtoClass);
     TransactionDTO transactionDTO = getJsonHelper().convert(transactionDto, TransactionDTO.class);
     NetworkType networkType = NetworkType.rawValueOf(transactionDTO.getNetwork().getValue());
-    TransactionFactory<T> factory = createFactory(networkType, transaction);
+    Deadline deadline =
+        transactionDTO.getDeadline() != null
+            ? new Deadline(transactionDTO.getDeadline())
+            : new Deadline(BigInteger.ZERO);
+    TransactionFactory<T> factory = createFactory(networkType, deadline, transaction);
     factory.version(transactionDTO.getVersion());
-    if (transactionDTO.getDeadline() != null) {
-      factory.deadline(new Deadline(transactionDTO.getDeadline()));
-    }
+
     if (transactionDTO.getSignerPublicKey() != null) {
       factory.signer(
           PublicAccount.createFromPublicKey(transactionDTO.getSignerPublicKey(), networkType));
@@ -149,7 +152,8 @@ public abstract class AbstractTransactionMapper<D, T extends Transaction>
     return factory;
   }
 
-  protected abstract TransactionFactory<T> createFactory(NetworkType networkType, D transaction);
+  protected abstract TransactionFactory<T> createFactory(
+      NetworkType networkType, Deadline deadline, D transaction);
 
   private EmbeddedTransactionMetaDTO createTransactionInfoEmbedded(Transaction transaction) {
     return transaction

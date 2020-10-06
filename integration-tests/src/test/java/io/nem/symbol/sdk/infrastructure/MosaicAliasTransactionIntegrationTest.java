@@ -44,7 +44,7 @@ public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
   void sendMosaicAliasTransaction(RepositoryType type) {
     String namespaceName =
         "test-root-namespace-for-mosaic-alias-"
-            + new Double(Math.floor(Math.random() * 10000)).intValue();
+            + Double.valueOf(Math.floor(Math.random() * 10000)).intValue();
 
     Account account = this.config().getDefaultAccount();
     AccountInfo accountInfo =
@@ -59,8 +59,8 @@ public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
 
     NamespaceRegistrationTransaction namespaceRegistrationTransaction =
         NamespaceRegistrationTransactionFactory.createRootNamespace(
-                getNetworkType(), namespaceName, BigInteger.valueOf(100))
-            .maxFee(this.maxFee)
+                getNetworkType(), getDeadline(), namespaceName, helper().getDuration())
+            .maxFee(maxFee)
             .build();
 
     NamespaceId rootNamespaceId =
@@ -70,8 +70,8 @@ public class MosaicAliasTransactionIntegrationTest extends BaseIntegrationTest {
 
     MosaicAliasTransaction addressAliasTransaction =
         MosaicAliasTransactionFactory.create(
-                getNetworkType(), AliasAction.LINK, rootNamespaceId, mosaicId)
-            .maxFee(this.maxFee)
+                getNetworkType(), getDeadline(), AliasAction.LINK, rootNamespaceId, mosaicId)
+            .maxFee(maxFee)
             .build();
 
     announceAggregateAndValidate(type, addressAliasTransaction, account);

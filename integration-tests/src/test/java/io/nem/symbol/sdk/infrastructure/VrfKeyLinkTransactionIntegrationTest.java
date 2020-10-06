@@ -36,15 +36,17 @@ public class VrfKeyLinkTransactionIntegrationTest extends BaseIntegrationTest {
         PublicKey.fromHexString("F5D0AAD909CFBC810A3F888C33C57A9051AE1A59D1CDA872A8B90BCA7EF2D34A");
 
     VrfKeyLinkTransaction linkTransaction =
-        VrfKeyLinkTransactionFactory.create(getNetworkType(), linkedPublicKey, LinkAction.LINK)
-            .maxFee(this.maxFee)
+        VrfKeyLinkTransactionFactory.create(
+                getNetworkType(), getDeadline(), linkedPublicKey, LinkAction.LINK)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, account, linkTransaction);
 
     VrfKeyLinkTransaction unlinkTransaction =
-        VrfKeyLinkTransactionFactory.create(getNetworkType(), linkedPublicKey, LinkAction.UNLINK)
-            .maxFee(this.maxFee)
+        VrfKeyLinkTransactionFactory.create(
+                getNetworkType(), getDeadline(), linkedPublicKey, LinkAction.UNLINK)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, account, unlinkTransaction);

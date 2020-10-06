@@ -27,6 +27,7 @@ import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.reactivex.Observable;
@@ -108,13 +109,12 @@ public abstract class BaseIntegrationTest {
     return helper().getNetworkType();
   }
 
-  public Account getTestAccount() {
-    return config().getTestAccount();
+
+
+  public Deadline getDeadline() {
+    return helper().getDeadline();
   }
 
-  public PublicAccount getTestPublicAccount() {
-    return config().getTestAccount().getPublicAccount();
-  }
 
   public Address getRecipient() {
     return config().getTestAccount2().getAddress();

@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.model.transaction;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -44,10 +45,10 @@ public class AccountAddressRestrictionTransactionTest extends AbstractTransactio
     AccountAddressRestrictionTransaction transaction =
         AccountAddressRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
                 additions,
                 deletions)
-            .deadline(new FakeDeadline())
             .build();
     Assertions.assertEquals(
         AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS, transaction.getRestrictionFlags());
@@ -64,10 +65,10 @@ public class AccountAddressRestrictionTransactionTest extends AbstractTransactio
     AccountAddressRestrictionTransaction transaction =
         AccountAddressRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
                 additions,
                 deletions)
-            .deadline(new FakeDeadline())
             .signer(account.getPublicAccount())
             .build();
     Assertions.assertEquals(

@@ -46,12 +46,12 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
     SecretLockTransaction transaction =
         SecretLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithm.SHA3_256,
                 secret,
                 Address.createFromRawAddress("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ"))
-            .deadline(new FakeDeadline())
             .build();
     assertSerialization(expected, transaction);
   }
@@ -69,12 +69,12 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
     SecretLockTransaction transaction =
         SecretLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithm.SHA3_256,
                 secret,
                 Address.createFromRawAddress("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ"))
-            .deadline(new FakeDeadline())
             .signer(publicAccount)
             .build();
 
@@ -95,12 +95,12 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
     SecretLockTransaction transaction =
         SecretLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithm.SHA3_256,
                 secret,
                 Address.createFromRawAddress("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ"))
-            .deadline(new FakeDeadline())
             .build();
     SignedTransaction signedTransaction = transaction.signWith(account, generationHash);
     String payload = signedTransaction.getPayload();
@@ -120,12 +120,12 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
             () ->
                 SecretLockTransactionFactory.create(
                         NetworkType.MIJIN_TEST,
+                        new Deadline(BigInteger.ONE),
                         NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                         BigInteger.valueOf(100),
                         LockHashAlgorithm.SHA3_256,
                         "non valid hash",
                         Address.generateRandom(NetworkType.MIJIN_TEST))
-                    .deadline(new FakeDeadline())
                     .build(),
             "not a valid secret");
     Assertions.assertEquals(

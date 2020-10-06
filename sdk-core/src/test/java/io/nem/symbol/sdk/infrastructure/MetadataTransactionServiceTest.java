@@ -43,6 +43,7 @@ import io.nem.symbol.sdk.model.transaction.MosaicMetadataTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.NamespaceMetadataTransactionFactory;
 import io.reactivex.Observable;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -74,6 +75,8 @@ class MetadataTransactionServiceTest {
     NamespaceRepository namespaceRepository = mock(NamespaceRepository.class);
     Mockito.when(factory.createMetadataRepository()).thenReturn(metadataRepositoryMock);
     Mockito.when(factory.getNetworkType()).thenReturn(Observable.just(networkType));
+    Mockito.when(factory.getEpochAdjustment())
+        .thenReturn(Observable.just(Duration.ofSeconds(100L)));
     when(factory.createNamespaceRepository()).thenReturn(namespaceRepository);
     service = new MetadataTransactionServiceImpl(factory);
 

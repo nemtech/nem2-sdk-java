@@ -21,6 +21,7 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountMosaicRestrictionTransactionDTO;
@@ -42,7 +43,9 @@ public class AccountMosaicRestrictionTransactionMapper
 
   @Override
   protected AccountMosaicRestrictionTransactionFactory createFactory(
-      NetworkType networkType, AccountMosaicRestrictionTransactionDTO transaction) {
+      NetworkType networkType,
+      Deadline deadline,
+      AccountMosaicRestrictionTransactionDTO transaction) {
     AccountMosaicRestrictionFlags restrictionFlags =
         AccountMosaicRestrictionFlags.rawValueOf(transaction.getRestrictionFlags().getValue());
 
@@ -56,7 +59,7 @@ public class AccountMosaicRestrictionTransactionMapper
             .map(MapperUtils::toUnresolvedMosaicId)
             .collect(Collectors.toList());
     return AccountMosaicRestrictionTransactionFactory.create(
-        networkType, restrictionFlags, additions, deletions);
+        networkType, deadline, restrictionFlags, additions, deletions);
   }
 
   @Override

@@ -48,7 +48,7 @@ import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.FakeDeadline;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
@@ -96,11 +96,6 @@ import org.mockito.Mockito;
 class TransactionServiceTest {
 
   private final NetworkType networkType = NetworkType.MIJIN_TEST;
-  private TransactionServiceImpl service;
-  private TransactionRepository transactionRepositoryMock;
-  private ReceiptRepository receiptRepositoryMock;
-  private Account account;
-  private Listener listener;
   private final BigInteger height = BigInteger.TEN;
   private final MosaicId mosaicId1 = new MosaicId("AAAAAAAAAAAAAAA1");
   private final MosaicId mosaicId2 = new MosaicId("AAAAAAAAAAAAAAA2");
@@ -114,6 +109,11 @@ class TransactionServiceTest {
   private final NamespaceId addressNamespace1 = NamespaceId.createFromName("addressnamespace1");
   private final NamespaceId addressNamespace2 = NamespaceId.createFromName("addressnamespace2");
   private final NamespaceId addressNamespace3 = NamespaceId.createFromName("addressnamespace3");
+  private TransactionServiceImpl service;
+  private TransactionRepository transactionRepositoryMock;
+  private ReceiptRepository receiptRepositoryMock;
+  private Account account;
+  private Listener listener;
 
   @BeforeEach
   void setup() {
@@ -147,7 +147,10 @@ class TransactionServiceTest {
 
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                networkType, Address.generateRandom(networkType), Collections.emptyList())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                Address.generateRandom(networkType),
+                Collections.emptyList())
             .build();
 
     SignedTransaction signedTransaction = transferTransaction.signWith(account, "abc");
@@ -173,6 +176,7 @@ class TransactionServiceTest {
     TransferTransaction transaction1 =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Address.generateRandom(networkType),
                 Arrays.asList(
                     new Mosaic(
@@ -185,9 +189,9 @@ class TransactionServiceTest {
         AggregateTransactionFactory.create(
                 TransactionType.AGGREGATE_BONDED,
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Collections.singletonList(transaction1),
                 Collections.emptyList())
-            .deadline(new FakeDeadline())
             .build();
 
     String generationHash = "abc";
@@ -219,6 +223,7 @@ class TransactionServiceTest {
     TransferTransaction transaction1 =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Address.generateRandom(networkType),
                 Collections.singletonList(
                     new Mosaic(
@@ -231,9 +236,9 @@ class TransactionServiceTest {
         AggregateTransactionFactory.create(
                 TransactionType.AGGREGATE_BONDED,
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Collections.singletonList(transaction1),
                 Collections.emptyList())
-            .deadline(new FakeDeadline())
             .build();
 
     String generationHash = "abc";
@@ -243,6 +248,7 @@ class TransactionServiceTest {
     HashLockTransaction hashLockTransaction =
         HashLockTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 aggregateSignedTransaction.getHash())
@@ -295,7 +301,8 @@ class TransactionServiceTest {
     String transactionHash = "aaaa";
 
     TransactionFactory<TransferTransaction> factory =
-        TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
+        TransferTransactionFactory.create(
+                NetworkType.MIJIN_TEST, new Deadline(BigInteger.ONE), recipient, mosaics)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
     simulateStatement(height, 1, 0);
@@ -348,7 +355,8 @@ class TransactionServiceTest {
     String transactionHash = "aaaa";
 
     TransactionFactory<TransferTransaction> factory =
-        TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
+        TransferTransactionFactory.create(
+                NetworkType.MIJIN_TEST, new Deadline(BigInteger.ONE), recipient, mosaics)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
     simulateStatement(height, 0, 0);
@@ -385,7 +393,8 @@ class TransactionServiceTest {
     String transactionHash = "aaaa";
 
     TransactionFactory<TransferTransaction> factory =
-        TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
+        TransferTransactionFactory.create(
+                NetworkType.MIJIN_TEST, new Deadline(BigInteger.ONE), recipient, mosaics)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
     simulateStatement(height, 1, 0);
@@ -420,6 +429,7 @@ class TransactionServiceTest {
     TransactionFactory<SecretLockTransaction> factory =
         SecretLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 unresolvedMosaicId,
                 BigInteger.TEN,
                 LockHashAlgorithm.SHA3_256,
@@ -457,7 +467,12 @@ class TransactionServiceTest {
 
     TransactionFactory<SecretProofTransaction> factory =
         SecretProofTransactionFactory.create(
-                NetworkType.MIJIN_TEST, LockHashAlgorithm.SHA3_256, recipient, secret, proof)
+                NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
+                LockHashAlgorithm.SHA3_256,
+                recipient,
+                secret,
+                proof)
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
     simulateStatement(height, 1, 0);
@@ -486,6 +501,7 @@ class TransactionServiceTest {
     MosaicGlobalRestrictionTransactionFactory mosaicGlobalRestrictionTransactionFactory =
         MosaicGlobalRestrictionTransactionFactory.create(
             NetworkType.MIJIN_TEST,
+            new Deadline(BigInteger.ONE),
             mosaicNamespace2,
             BigInteger.TEN,
             BigInteger.ONE,
@@ -524,6 +540,7 @@ class TransactionServiceTest {
     TransactionFactory<MosaicAddressRestrictionTransaction> factory =
         MosaicAddressRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 mosaicNamespace2,
                 BigInteger.TEN,
                 addressNamespace3,
@@ -560,6 +577,7 @@ class TransactionServiceTest {
     TransactionFactory<AccountMosaicRestrictionTransaction> factory =
         AccountMosaicRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 AccountMosaicRestrictionFlags.ALLOW_INCOMING_MOSAIC,
                 Arrays.asList(mosaicNamespace1, mosaicId2, mosaicNamespace2),
                 Arrays.asList(mosaicNamespace2, mosaicNamespace3, mosaicId3))
@@ -596,6 +614,7 @@ class TransactionServiceTest {
     TransactionFactory<MosaicMetadataTransaction> factory =
         MosaicMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 Account.generateNewAccount(networkType).getAddress(),
                 mosaicNamespace2,
                 BigInteger.TEN,
@@ -627,6 +646,7 @@ class TransactionServiceTest {
     TransactionFactory<MosaicSupplyChangeTransaction> factory =
         MosaicSupplyChangeTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 mosaicNamespace2,
                 MosaicSupplyChangeActionType.INCREASE,
                 BigInteger.ONE)
@@ -657,6 +677,7 @@ class TransactionServiceTest {
     TransactionFactory<MosaicDefinitionTransaction> factory =
         MosaicDefinitionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 MosaicNonce.createFromBigInteger(new BigInteger("0")),
                 mosaicId2,
                 MosaicFlags.create(true, true, true),
@@ -690,6 +711,7 @@ class TransactionServiceTest {
     TransactionFactory<AccountAddressRestrictionTransaction> factory =
         AccountAddressRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
                 Arrays.asList(addressNamespace1, address2, addressNamespace2),
                 Arrays.asList(addressNamespace2, addressNamespace3, address3))
@@ -725,7 +747,11 @@ class TransactionServiceTest {
 
     TransactionFactory<HashLockTransaction> factory =
         HashLockTransactionFactory.create(
-                NetworkType.MIJIN_TEST, unresolvedMosaicId, BigInteger.TEN, "SomeHash")
+                NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
+                unresolvedMosaicId,
+                BigInteger.TEN,
+                "SomeHash")
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", transactionHash, ""));
 
     simulateStatement(height, 1, 0);
@@ -758,7 +784,8 @@ class TransactionServiceTest {
     String transactionHash = "aaaa";
 
     TransactionFactory<TransferTransaction> factory =
-        TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
+        TransferTransactionFactory.create(
+                NetworkType.MIJIN_TEST, new Deadline(BigInteger.ONE), recipient, mosaics)
             .message(new PlainMessage(""))
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", "BBBB", ""));
 
@@ -766,6 +793,7 @@ class TransactionServiceTest {
     TransactionFactory<TransferTransaction> extraTransaction =
         TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 address2,
                 Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))))
             .transactionInfo(TransactionInfo.create(height, 1, "ABC", "CCCC", ""));
@@ -777,6 +805,7 @@ class TransactionServiceTest {
     TransactionFactory<AggregateTransaction> aggregateTransactionFactory =
         AggregateTransactionFactory.createComplete(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 Arrays.asList(
                     transferTransaction,
                     extraTransaction
@@ -839,7 +868,8 @@ class TransactionServiceTest {
     String transactionHash = "aaaa";
 
     TransactionFactory<TransferTransaction> factory =
-        TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
+        TransferTransactionFactory.create(
+                NetworkType.MIJIN_TEST, new Deadline(BigInteger.ONE), recipient, mosaics)
             .message(new PlainMessage(""))
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", "BBBB", ""));
 
@@ -847,6 +877,7 @@ class TransactionServiceTest {
     TransactionFactory<TransferTransaction> extraTransaction =
         TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 address2,
                 Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))))
             .message(new PlainMessage(""));
@@ -858,6 +889,7 @@ class TransactionServiceTest {
     TransactionFactory<AggregateTransaction> aggregateTransactionFactory =
         AggregateTransactionFactory.createComplete(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 Arrays.asList(
                     transferTransaction,
                     extraTransaction
@@ -900,7 +932,8 @@ class TransactionServiceTest {
     String transactionHash = "aaaa";
 
     TransactionFactory<TransferTransaction> factory =
-        TransferTransactionFactory.create(NetworkType.MIJIN_TEST, recipient, mosaics)
+        TransferTransactionFactory.create(
+                NetworkType.MIJIN_TEST, new Deadline(BigInteger.ONE), recipient, mosaics)
             .message(new PlainMessage(""))
             .transactionInfo(TransactionInfo.create(height, 0, "ABC", "BBBB", ""));
 
@@ -908,6 +941,7 @@ class TransactionServiceTest {
     TransactionFactory<TransferTransaction> extraTransaction =
         TransferTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 address2,
                 Collections.singletonList(new Mosaic(mosaicId1, BigInteger.valueOf(1))))
             .message(new PlainMessage(""));
@@ -919,6 +953,7 @@ class TransactionServiceTest {
     TransactionFactory<AggregateTransaction> aggregateTransactionFactory =
         AggregateTransactionFactory.createComplete(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 Arrays.asList(
                     transferTransaction,
                     extraTransaction

@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.vertx.core.json.JsonObject;
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +36,11 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 public class Config {
 
-  private static final String CONFIG_JSON = "config.json";
+  private static final String CONFIG_JSON = "./integration-tests/src/test/resources/config.json";
+  private static final String ADDRESSES_YML = "./target/bootstrap/addresses.yml";
+  //  private static final String ADDRESSES_YML =
+  // "./target/bootstrap/config/generated-addresses/addresses.yml";
+
   private final JsonObject config;
   private final Map<String, Account> accountCache = new HashMap<>();
   private List<Account> nemesisAccounts;
@@ -44,33 +49,11 @@ public class Config {
   public Config() {
 
     try (InputStream inputStream = getConfigInputStream()) {
-      if (inputStream == null) {
-        throw new IOException(CONFIG_JSON + " not found");
-      }
       this.config = new JsonObject(IOUtils.toString(inputStream));
     } catch (IOException e) {
       throw new IllegalStateException(
           "Config file could not be loaded. " + ExceptionUtils.getMessage(e), e);
     }
-  }
-
-  private static List<Account> loadNemesisAccountsFromBootstrap(NetworkType networkType) {
-
-    File generatedAddressesOption =
-        new File("../target/bootstrap/config/generated-addresses/addresses.yml");
-    if (!generatedAddressesOption.exists()) {
-      generatedAddressesOption =
-          new File("./target/bootstrap/config/generated-addresses/addresses.yml");
-      if (!generatedAddressesOption.exists()) {
-        throw new IllegalArgumentException(
-            "File " + generatedAddressesOption.getAbsolutePath() + " doesn't exist");
-      }
-    }
-    if (generatedAddressesOption.isDirectory()) {
-      throw new IllegalArgumentException(
-          "File " + generatedAddressesOption.getAbsolutePath() + " is a directory!");
-    }
-    return loadNemesisAccountsFromBootstrap(networkType, generatedAddressesOption);
   }
 
   private static List<Account> loadNemesisAccountsFromBootstrap(
@@ -101,19 +84,27 @@ public class Config {
     }
   }
 
+  private static List<Account> loadNemesisAccountsFromBootstrap(NetworkType networkType) {
+    return loadNemesisAccountsFromBootstrap(networkType, loadConfigFile(ADDRESSES_YML));
+  }
+
   private static InputStream getConfigInputStream() throws IOException {
-    String cwd = System.getProperty("user.home");
-    File localConfiguration = new File(new File(cwd), "nem-sdk-java-integration-test-config.json");
-    if (localConfiguration.exists()) {
-      System.out.println("Using local configuration " + localConfiguration);
-      return new FileInputStream(localConfiguration);
-    } else {
-      System.out.println(
-          "Local configuration "
-              + localConfiguration.getPath()
-              + " not found. Using shared config.json");
-      return BaseIntegrationTest.class.getClassLoader().getResourceAsStream(CONFIG_JSON);
+    return new FileInputStream(loadConfigFile(CONFIG_JSON));
+  }
+
+  private static File loadConfigFile(String configFile) {
+
+    File file = new File(configFile);
+    if (!file.exists()) {
+      file = new File("." + configFile);
+      if (!file.exists()) {
+        throw new IllegalArgumentException("File " + file.getAbsolutePath() + " doesn't exist");
+      }
     }
+    if (file.isDirectory()) {
+      throw new IllegalArgumentException("File " + file.getAbsolutePath() + " is a directory!");
+    }
+    return file;
   }
 
   public void init(NetworkType networkType) {
@@ -215,22 +206,6 @@ public class Config {
     return getNemesisAccount(9);
   }
 
-  public Account getNemesisAccount11() {
-    return getNemesisAccount(10);
-  }
-
-  public Account getNemesisAccount12() {
-    return getNemesisAccount(11);
-  }
-
-  public Account getNemesisAccount13() {
-    return getNemesisAccount(12);
-  }
-
-  public Account getNemesisAccount14() {
-    return getNemesisAccount(13);
-  }
-
   public Account getTestAccount() {
     return getAccount("testAccount");
   }
@@ -261,5 +236,9 @@ public class Config {
     } else {
       return Optional.empty();
     }
+  }
+
+  public Deadline getDeadline() {
+    return null;
   }
 }

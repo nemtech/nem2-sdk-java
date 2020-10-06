@@ -74,8 +74,9 @@ public class NamespaceMetadataIntegrationTest extends BaseIntegrationTest {
     AggregateTransaction aggregateTransaction =
         AggregateTransactionFactory.createComplete(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(transaction.toAggregate(testAccount.getPublicAccount())))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     AggregateTransaction announceCorrectly =

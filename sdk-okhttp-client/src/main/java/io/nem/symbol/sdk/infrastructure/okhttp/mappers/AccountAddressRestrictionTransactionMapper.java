@@ -21,6 +21,7 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountAddressRestrictionTransactionDTO;
@@ -42,7 +43,9 @@ public class AccountAddressRestrictionTransactionMapper
 
   @Override
   protected AccountAddressRestrictionTransactionFactory createFactory(
-      NetworkType networkType, AccountAddressRestrictionTransactionDTO transaction) {
+      NetworkType networkType,
+      Deadline deadline,
+      AccountAddressRestrictionTransactionDTO transaction) {
     AccountAddressRestrictionFlags restrictionFlags =
         AccountAddressRestrictionFlags.rawValueOf(transaction.getRestrictionFlags().getValue());
     List<UnresolvedAddress> restrictionAdditions =
@@ -56,7 +59,7 @@ public class AccountAddressRestrictionTransactionMapper
             .collect(Collectors.toList());
 
     return AccountAddressRestrictionTransactionFactory.create(
-        networkType, restrictionFlags, restrictionAdditions, restrictionDeletions);
+        networkType, deadline, restrictionFlags, restrictionAdditions, restrictionDeletions);
   }
 
   @Override

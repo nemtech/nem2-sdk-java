@@ -37,12 +37,12 @@ public class NamespaceMetadataTransactionTest extends AbstractTransactionTester 
     NamespaceMetadataTransaction transaction =
         NamespaceMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 account.getPublicAccount().getAddress(),
                 namespaceId,
                 BigInteger.TEN,
                 "ABC123")
             .valueSizeDelta(10)
-            .deadline(new FakeDeadline())
             .build();
     assertEquals("ABC123", transaction.getValue());
     assertEquals(namespaceId, transaction.getTargetNamespaceId());
@@ -58,10 +58,14 @@ public class NamespaceMetadataTransactionTest extends AbstractTransactionTester 
     NamespaceId namespaceId = NamespaceId.createFromId(BigInteger.valueOf(1000));
     NamespaceMetadataTransaction transaction =
         NamespaceMetadataTransactionFactory.create(
-                NetworkType.MIJIN_TEST, account.getAddress(), namespaceId, BigInteger.TEN, "ABC123")
+                NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
+                account.getAddress(),
+                namespaceId,
+                BigInteger.TEN,
+                "ABC123")
             .valueSizeDelta(10)
             .signer(account.getPublicAccount())
-            .deadline(new FakeDeadline())
             .build();
 
     String expectedHash =

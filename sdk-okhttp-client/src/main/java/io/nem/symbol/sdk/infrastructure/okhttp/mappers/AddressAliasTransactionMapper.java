@@ -23,6 +23,7 @@ import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AddressAliasTransaction;
 import io.nem.symbol.sdk.model.transaction.AddressAliasTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AddressAliasTransactionDTO;
@@ -38,12 +39,16 @@ class AddressAliasTransactionMapper
 
   @Override
   protected AddressAliasTransactionFactory createFactory(
-      NetworkType networkType, AddressAliasTransactionDTO transaction) {
+      NetworkType networkType, Deadline deadline, AddressAliasTransactionDTO transaction) {
     NamespaceId namespaceId = MapperUtils.toNamespaceId(transaction.getNamespaceId());
     AliasAction aliasAction =
         AliasAction.rawValueOf(transaction.getAliasAction().getValue().byteValue());
     return AddressAliasTransactionFactory.create(
-        networkType, aliasAction, namespaceId, MapperUtils.toAddress(transaction.getAddress()));
+        networkType,
+        deadline,
+        aliasAction,
+        namespaceId,
+        MapperUtils.toAddress(transaction.getAddress()));
   }
 
   @Override

@@ -46,11 +46,12 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
    */
   private VotingKeyLinkTransactionFactory(
       final NetworkType networkType,
+      final Deadline deadline,
       final VotingKey linkedPublicKey,
       long startEpoch,
       long endEpoch,
       final LinkAction linkAction) {
-    super(TransactionType.VOTING_KEY_LINK, networkType);
+    super(TransactionType.VOTING_KEY_LINK, networkType, deadline);
     Validate.notNull(linkedPublicKey, "linkedPublicKey must not be null");
     Validate.notNull(linkAction, "linkAction must not be null");
     ConvertUtils.validateNotNegative(startEpoch);
@@ -73,12 +74,13 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
    */
   public static VotingKeyLinkTransactionFactory create(
       final NetworkType networkType,
+      final Deadline deadline,
       final VotingKey linkedPublicKey,
       long startEpoch,
       long endEpoch,
       final LinkAction linkAction) {
     return new VotingKeyLinkTransactionFactory(
-        networkType, linkedPublicKey, startEpoch, endEpoch, linkAction);
+        networkType, deadline, linkedPublicKey, startEpoch, endEpoch, linkAction);
   }
 
   @Override

@@ -41,9 +41,10 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
 
   private TransferTransactionFactory(
       final NetworkType networkType,
+      final Deadline deadline,
       final UnresolvedAddress recipient,
       final List<Mosaic> mosaics) {
-    super(TransactionType.TRANSFER, networkType);
+    super(TransactionType.TRANSFER, networkType, deadline);
     Validate.notNull(recipient, "Recipient must not be null");
     Validate.notNull(mosaics, "Mosaics must not be null");
     this.recipient = recipient;
@@ -54,15 +55,17 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline the deadline
    * @param recipient Recipient address.
    * @param mosaics List of mosaics.
    * @return Transfer transaction.
    */
   public static TransferTransactionFactory create(
       final NetworkType networkType,
+      final Deadline deadline,
       final UnresolvedAddress recipient,
       final List<Mosaic> mosaics) {
-    return new TransferTransactionFactory(networkType, recipient, mosaics);
+    return new TransferTransactionFactory(networkType, deadline, recipient, mosaics);
   }
 
   /**
@@ -70,6 +73,7 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
    * delegation unlocking
    *
    * @param networkType The network type.
+   * @param deadline the deadline
    * @param signingPrivateKey Remote harvester signing private key linked to the main account
    * @param vrfPrivateKey VRF private key linked to the main account
    * @param nodePublicKey Recipient public key
@@ -77,6 +81,7 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
    */
   public static TransferTransactionFactory createPersistentDelegationRequestTransaction(
       NetworkType networkType,
+      Deadline deadline,
       PrivateKey signingPrivateKey,
       PrivateKey vrfPrivateKey,
       PublicKey nodePublicKey) {
@@ -85,6 +90,7 @@ public class TransferTransactionFactory extends TransactionFactory<TransferTrans
             signingPrivateKey, vrfPrivateKey, nodePublicKey);
     return new TransferTransactionFactory(
             networkType,
+            deadline,
             Address.createFromPublicKey(nodePublicKey.toHex(), networkType),
             Collections.emptyList())
         .message(message);

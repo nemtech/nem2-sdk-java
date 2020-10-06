@@ -34,12 +34,13 @@ public class NamespaceRegistrationTransactionFactory
 
   private NamespaceRegistrationTransactionFactory(
       final NetworkType networkType,
+      final Deadline deadline,
       final String namespaceName,
       final NamespaceId namespaceId,
       final NamespaceRegistrationType namespaceRegistrationType,
       final Optional<BigInteger> duration,
       final Optional<NamespaceId> parentId) {
-    super(TransactionType.NAMESPACE_REGISTRATION, networkType);
+    super(TransactionType.NAMESPACE_REGISTRATION, networkType, deadline);
     Validate.notNull(namespaceName, "NamespaceName must not be null");
     Validate.notNull(namespaceRegistrationType, "NamespaceType must not be null");
     Validate.notNull(namespaceId, "NamespaceId must not be null");
@@ -59,6 +60,7 @@ public class NamespaceRegistrationTransactionFactory
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline the deadline
    * @param namespaceName Namespace name.
    * @param namespaceId Namespace id.
    * @param namespaceRegistrationType Namespace registration type.
@@ -68,28 +70,40 @@ public class NamespaceRegistrationTransactionFactory
    */
   public static NamespaceRegistrationTransactionFactory create(
       final NetworkType networkType,
+      Deadline deadline,
       final String namespaceName,
       final NamespaceId namespaceId,
       final NamespaceRegistrationType namespaceRegistrationType,
       final Optional<BigInteger> duration,
       final Optional<NamespaceId> parentId) {
     return new NamespaceRegistrationTransactionFactory(
-        networkType, namespaceName, namespaceId, namespaceRegistrationType, duration, parentId);
+        networkType,
+        deadline,
+        namespaceName,
+        namespaceId,
+        namespaceRegistrationType,
+        duration,
+        parentId);
   }
 
   /**
    * Creates a root namespace factory.
    *
    * @param networkType Network type.
+   * @param deadline the deadline
    * @param namespaceName Namespace name.
    * @param duration Duration of the namespace.
    * @return Register namespace transaction.
    */
   public static NamespaceRegistrationTransactionFactory createRootNamespace(
-      final NetworkType networkType, final String namespaceName, final BigInteger duration) {
+      final NetworkType networkType,
+      Deadline deadline,
+      final String namespaceName,
+      final BigInteger duration) {
     NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
     return create(
         networkType,
+        deadline,
         namespaceName,
         namespaceId,
         NamespaceRegistrationType.ROOT_NAMESPACE,
@@ -101,16 +115,21 @@ public class NamespaceRegistrationTransactionFactory
    * Create a sub namespace object.
    *
    * @param networkType Network type.
+   * @param deadline the deadline
    * @param namespaceName Namespace name.
    * @param parentId Namespace parent id.
    * @return Register namespace transaction.
    */
   public static NamespaceRegistrationTransactionFactory createSubNamespace(
-      final NetworkType networkType, final String namespaceName, final NamespaceId parentId) {
+      final NetworkType networkType,
+      final Deadline deadline,
+      final String namespaceName,
+      final NamespaceId parentId) {
     NamespaceId namespaceId =
         NamespaceId.createFromNameAndParentId(namespaceName, parentId.getId());
     return create(
         networkType,
+        deadline,
         namespaceName,
         namespaceId,
         NamespaceRegistrationType.SUB_NAMESPACE,

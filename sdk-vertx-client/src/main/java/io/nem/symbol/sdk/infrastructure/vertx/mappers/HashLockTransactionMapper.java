@@ -20,6 +20,7 @@ import static io.nem.symbol.core.utils.MapperUtils.toMosaicId;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
@@ -41,9 +42,13 @@ class HashLockTransactionMapper
 
   @Override
   protected TransactionFactory<HashLockTransaction> createFactory(
-      NetworkType networkType, HashLockTransactionDTO transaction) {
+      NetworkType networkType, Deadline deadline, HashLockTransactionDTO transaction) {
     return HashLockTransactionFactory.create(
-        networkType, getMosaic(transaction), transaction.getDuration(), transaction.getHash());
+        networkType,
+        deadline,
+        getMosaic(transaction),
+        transaction.getDuration(),
+        transaction.getHash());
   }
 
   @Override

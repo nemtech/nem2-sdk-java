@@ -64,6 +64,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
     MosaicGlobalRestrictionTransaction createTransaction =
         MosaicGlobalRestrictionTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 mosaicAlias,
                 restrictionKey,
                 originalValue,
@@ -90,6 +91,7 @@ public class MosaicGlobalRestrictionIntegrationTest extends BaseIntegrationTest 
     MosaicGlobalRestrictionTransaction updateTransaction =
         MosaicGlobalRestrictionTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 mosaicId,
                 restrictionKey,
                 BigInteger.valueOf(40),

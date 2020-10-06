@@ -77,6 +77,7 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
     SecretLockTransaction secretLockTransaction =
         SecretLockTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 mosaic,
                 BigInteger.valueOf(100),
                 lockHashAlgorithm,
@@ -89,13 +90,19 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
 
     SecretProofTransaction secretProofTransaction =
         SecretProofTransactionFactory.create(
-                getNetworkType(), lockHashAlgorithm, account2.getAddress(), secret, proof)
+                getNetworkType(),
+                getDeadline(),
+                lockHashAlgorithm,
+                account2.getAddress(),
+                secret,
+                proof)
             .maxFee(maxFee)
             .build();
 
     SecretProofTransaction secretProofTransactionAnnounced =
         announceAndValidate(type, account, secretProofTransaction);
 
+    sleep(500);
     Assertions.assertEquals(lockHashAlgorithm, secretProofTransactionAnnounced.getHashType());
     Assertions.assertEquals(account2.getAddress(), secretProofTransactionAnnounced.getRecipient());
     Assertions.assertEquals(storedSecret, secretProofTransactionAnnounced.getSecret());

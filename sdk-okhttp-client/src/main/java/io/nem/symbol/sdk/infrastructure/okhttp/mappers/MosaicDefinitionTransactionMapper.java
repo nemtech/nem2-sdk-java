@@ -22,6 +22,7 @@ import io.nem.symbol.sdk.model.blockchain.BlockDuration;
 import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicNonce;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransactionFactory;
@@ -40,10 +41,11 @@ class MosaicDefinitionTransactionMapper
 
   @Override
   protected TransactionFactory<MosaicDefinitionTransaction> createFactory(
-      NetworkType networkType, MosaicDefinitionTransactionDTO transaction) {
+      NetworkType networkType, Deadline deadline, MosaicDefinitionTransactionDTO transaction) {
     MosaicFlags mosaicFlags = MosaicFlags.create(transaction.getFlags());
     return MosaicDefinitionTransactionFactory.create(
         networkType,
+        deadline,
         MosaicNonce.createFromInteger(transaction.getNonce().intValue()),
         MapperUtils.toMosaicId(transaction.getId()),
         mosaicFlags,

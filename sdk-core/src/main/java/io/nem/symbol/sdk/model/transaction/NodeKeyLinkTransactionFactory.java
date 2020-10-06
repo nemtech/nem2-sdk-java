@@ -32,12 +32,16 @@ public class NodeKeyLinkTransactionFactory extends TransactionFactory<NodeKeyLin
    * The factory constructor for {@link NodeKeyLinkTransaction}
    *
    * @param networkType the network type of this transaction.
+   * @param deadline the transaction deadline.
    * @param linkedPublicKey the linked public key.
    * @param linkAction the link action.
    */
   private NodeKeyLinkTransactionFactory(
-      final NetworkType networkType, final PublicKey linkedPublicKey, LinkAction linkAction) {
-    super(TransactionType.NODE_KEY_LINK, networkType);
+      final NetworkType networkType,
+      Deadline deadline,
+      final PublicKey linkedPublicKey,
+      LinkAction linkAction) {
+    super(TransactionType.NODE_KEY_LINK, networkType, deadline);
     Validate.notNull(linkedPublicKey, "linkedPublicKey must not be null");
     Validate.notNull(linkAction, "linkAction must not be null");
     this.linkedPublicKey = linkedPublicKey;
@@ -48,13 +52,17 @@ public class NodeKeyLinkTransactionFactory extends TransactionFactory<NodeKeyLin
    * The factory constructor for {@link NodeKeyLinkTransaction}
    *
    * @param networkType the network type of this transaction.
+   * @param deadline the deadline
    * @param linkedPublicKey the linked public key.
    * @param linkAction the link action.
    * @return an instance of the factory.
    */
   public static NodeKeyLinkTransactionFactory create(
-      final NetworkType networkType, final PublicKey linkedPublicKey, final LinkAction linkAction) {
-    return new NodeKeyLinkTransactionFactory(networkType, linkedPublicKey, linkAction);
+      final NetworkType networkType,
+      Deadline deadline,
+      final PublicKey linkedPublicKey,
+      final LinkAction linkAction) {
+    return new NodeKeyLinkTransactionFactory(networkType, deadline, linkedPublicKey, linkAction);
   }
 
   @Override

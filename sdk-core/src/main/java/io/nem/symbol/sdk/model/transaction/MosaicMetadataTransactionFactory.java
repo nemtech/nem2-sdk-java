@@ -30,11 +30,18 @@ public class MosaicMetadataTransactionFactory
 
   private MosaicMetadataTransactionFactory(
       NetworkType networkType,
+      Deadline deadline,
       UnresolvedAddress targetAddress,
       UnresolvedMosaicId targetMosaicId,
       BigInteger scopedMetadataKey,
       String value) {
-    super(TransactionType.MOSAIC_METADATA, networkType, targetAddress, scopedMetadataKey, value);
+    super(
+        TransactionType.MOSAIC_METADATA,
+        networkType,
+        deadline,
+        targetAddress,
+        scopedMetadataKey,
+        value);
     Validate.notNull(targetMosaicId, "TargetMosaicId must not be null");
     this.targetMosaicId = targetMosaicId;
   }
@@ -43,6 +50,7 @@ public class MosaicMetadataTransactionFactory
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline the deadline
    * @param targetAddress Target address.
    * @param targetMosaicId Target mosaic id.
    * @param scopedMetadataKey Scoped metadata key.
@@ -51,12 +59,13 @@ public class MosaicMetadataTransactionFactory
    */
   public static MosaicMetadataTransactionFactory create(
       NetworkType networkType,
+      Deadline deadline,
       UnresolvedAddress targetAddress,
       UnresolvedMosaicId targetMosaicId,
       BigInteger scopedMetadataKey,
       String value) {
     return new MosaicMetadataTransactionFactory(
-        networkType, targetAddress, targetMosaicId, scopedMetadataKey, value);
+        networkType, deadline, targetAddress, targetMosaicId, scopedMetadataKey, value);
   }
 
   public UnresolvedMosaicId getTargetMosaicId() {

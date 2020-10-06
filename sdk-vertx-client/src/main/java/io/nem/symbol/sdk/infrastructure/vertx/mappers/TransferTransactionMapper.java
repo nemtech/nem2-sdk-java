@@ -21,6 +21,7 @@ import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.message.Message;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
@@ -42,7 +43,7 @@ class TransferTransactionMapper
 
   @Override
   protected TransactionFactory<TransferTransaction> createFactory(
-      NetworkType networkType, TransferTransactionDTO transaction) {
+      NetworkType networkType, Deadline deadline, TransferTransactionDTO transaction) {
     List<Mosaic> mosaics = new ArrayList<>();
     if (transaction.getMosaics() != null) {
       mosaics =
@@ -54,6 +55,7 @@ class TransferTransactionMapper
     TransferTransactionFactory transferTransactionFactory =
         TransferTransactionFactory.create(
             networkType,
+            deadline,
             MapperUtils.toUnresolvedAddress(transaction.getRecipientAddress()),
             mosaics);
     Message.createFromHexPayload(transaction.getMessage())

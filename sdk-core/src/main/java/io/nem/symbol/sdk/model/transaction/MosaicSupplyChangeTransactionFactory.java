@@ -32,10 +32,11 @@ public class MosaicSupplyChangeTransactionFactory
 
   private MosaicSupplyChangeTransactionFactory(
       NetworkType networkType,
+      Deadline deadline,
       UnresolvedMosaicId mosaicId,
       MosaicSupplyChangeActionType action,
       BigInteger delta) {
-    super(TransactionType.MOSAIC_SUPPLY_CHANGE, networkType);
+    super(TransactionType.MOSAIC_SUPPLY_CHANGE, networkType, deadline);
     Validate.notNull(mosaicId, "UnresolvedMosaicId must not be null");
     Validate.notNull(action, "Action must not be null");
     Validate.notNull(delta, "Delta must not be null");
@@ -49,6 +50,7 @@ public class MosaicSupplyChangeTransactionFactory
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline the deadline
    * @param mosaicId Mosaic id.
    * @param action Action.
    * @param delta Delta.
@@ -56,10 +58,11 @@ public class MosaicSupplyChangeTransactionFactory
    */
   public static MosaicSupplyChangeTransactionFactory create(
       NetworkType networkType,
+      Deadline deadline,
       UnresolvedMosaicId mosaicId,
       MosaicSupplyChangeActionType action,
       BigInteger delta) {
-    return new MosaicSupplyChangeTransactionFactory(networkType, mosaicId, action, delta);
+    return new MosaicSupplyChangeTransactionFactory(networkType, deadline, mosaicId, action, delta);
   }
 
   /**

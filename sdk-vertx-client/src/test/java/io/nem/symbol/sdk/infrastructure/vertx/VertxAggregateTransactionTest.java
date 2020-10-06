@@ -32,6 +32,7 @@ import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
@@ -39,6 +40,7 @@ import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.vertx.core.json.Json;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -59,26 +61,29 @@ public class VertxAggregateTransactionTest {
   @Test
   void createAAggregateTransactionViaStaticConstructor() {
 
+    Duration epochAdjustment = Duration.ofSeconds(100);
     Address recipient = Address.generateRandom(networkType);
+    Deadline deadline = Deadline.create(epochAdjustment);
     TransferTransaction transferTx =
-        TransferTransactionFactory.create(
-                NetworkType.MIJIN_TEST, recipient, Collections.emptyList())
+        TransferTransactionFactory.create(networkType, deadline, recipient, Collections.emptyList())
             .message(new PlainMessage(""))
             .build();
 
     AggregateTransaction aggregateTx =
         AggregateTransactionFactory.createComplete(
-                NetworkType.MIJIN_TEST,
+                networkType,
+                deadline,
                 Collections.singletonList(
                     transferTx.toAggregate(
                         new PublicAccount(
                             "9A49366406ACA952B88BADF5F1E9BE6CE4968141035A60BE503273EA65456B24",
-                            NetworkType.MIJIN_TEST))))
+                            networkType))))
             .build();
 
-    assertEquals(NetworkType.MIJIN_TEST, aggregateTx.getNetworkType());
+    assertEquals(networkType, aggregateTx.getNetworkType());
     assertEquals(1, (int) aggregateTx.getVersion());
-    assertTrue(LocalDateTime.now().isBefore(aggregateTx.getDeadline().getLocalDateTime()));
+    assertTrue(
+        LocalDateTime.now().isBefore(aggregateTx.getDeadline().getLocalDateTime(epochAdjustment)));
     assertEquals(BigInteger.valueOf(0), aggregateTx.getMaxFee());
     assertEquals(1, aggregateTx.getInnerTransactions().size());
   }
@@ -90,17 +95,18 @@ public class VertxAggregateTransactionTest {
     TransferTransaction transferTx =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 address,
                 Collections.singletonList(createAbsolute(BigInteger.valueOf(10000000))))
             .message(new PlainMessage(""))
-            .deadline(new VertxFakeDeadline())
             .build();
 
     PublicAccount signer = Account.generateNewAccount(networkType).getPublicAccount();
     AggregateTransaction aggregateTx =
         AggregateTransactionFactory.createComplete(
-                networkType, Collections.singletonList(transferTx.toAggregate(signer)))
-            .deadline(new VertxFakeDeadline())
+                networkType,
+                new Deadline(BigInteger.ONE),
+                Collections.singletonList(transferTx.toAggregate(signer)))
             .build();
 
     byte[] actual = aggregateTx.serialize();
@@ -120,19 +126,20 @@ public class VertxAggregateTransactionTest {
 
     Address address = Address.generateRandom(networkType);
     TransferTransaction transferTx =
-        TransferTransactionFactory.create(networkType, address, Collections.emptyList())
+        TransferTransactionFactory.create(
+                networkType, new Deadline(BigInteger.ONE), address, Collections.emptyList())
             .message(new PlainMessage("test-message"))
             .build();
 
     AggregateTransaction aggregateTx =
         AggregateTransactionFactory.createComplete(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 Collections.singletonList(
                     transferTx.toAggregate(
                         new PublicAccount(
                             "B694186EE4AB0558CA4AFCFDD43B42114AE71094F5A1FC4A913FE9971CACD21D",
                             networkType))))
-            .deadline(new VertxFakeDeadline())
             .build();
 
     Account cosignatoryAccount = Account.generateNewAccount(this.networkType);
@@ -168,17 +175,14 @@ public class VertxAggregateTransactionTest {
     assertTrue(
         aggregateTransferTransaction.signedByAccount(
             PublicAccount.createFromPublicKey(
-                "A5F82EC8EBB341427B6785C8111906CD0DF18838FB11B51CE0E18B5E79DFF630",
-                NetworkType.MIJIN_TEST)));
+                "A5F82EC8EBB341427B6785C8111906CD0DF18838FB11B51CE0E18B5E79DFF630", networkType)));
     assertTrue(
         aggregateTransferTransaction.signedByAccount(
             PublicAccount.createFromPublicKey(
-                "7681ED5023141D9CDCF184E5A7B60B7D466739918ED5DA30F7E71EA7B86EFF2D",
-                NetworkType.MIJIN_TEST)));
+                "7681ED5023141D9CDCF184E5A7B60B7D466739918ED5DA30F7E71EA7B86EFF2D", networkType)));
     assertFalse(
         aggregateTransferTransaction.signedByAccount(
             PublicAccount.createFromPublicKey(
-                "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
-                NetworkType.MIJIN_TEST)));
+                "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF", networkType)));
   }
 }

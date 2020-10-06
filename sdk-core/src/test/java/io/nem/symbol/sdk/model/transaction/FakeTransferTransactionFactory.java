@@ -19,8 +19,8 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 
 public class FakeTransferTransactionFactory extends TransactionFactory<FakeTransferTransaction> {
 
-  public FakeTransferTransactionFactory(NetworkType networkType) {
-    super(TransactionType.TRANSFER, networkType);
+  public FakeTransferTransactionFactory(NetworkType networkType, Deadline deadline) {
+    super(TransactionType.TRANSFER, networkType, deadline);
   }
 
   @Override

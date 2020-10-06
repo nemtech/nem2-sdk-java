@@ -32,10 +32,11 @@ public class AccountMosaicRestrictionTransactionFactory
 
   private AccountMosaicRestrictionTransactionFactory(
       final NetworkType networkType,
+      final Deadline deadline,
       final AccountMosaicRestrictionFlags restrictionFlags,
       final List<UnresolvedMosaicId> restrictionAdditions,
       final List<UnresolvedMosaicId> restrictionDeletions) {
-    super(TransactionType.ACCOUNT_MOSAIC_RESTRICTION, networkType);
+    super(TransactionType.ACCOUNT_MOSAIC_RESTRICTION, networkType, deadline);
     Validate.notNull(restrictionFlags, "RestrictionType must not be null");
     Validate.notNull(restrictionAdditions, "RestrictionAdditions must not be null");
     Validate.notNull(restrictionDeletions, "RestrictionDeletions must not be null");
@@ -48,6 +49,7 @@ public class AccountMosaicRestrictionTransactionFactory
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline the deadline
    * @param restrictionFlags Restriction falgs.
    * @param restrictionAdditions List of mosaic ids that are going to be added to the restriction.
    * @param restrictionDeletions List of mosaic ids that are going to be removed from the
@@ -56,11 +58,12 @@ public class AccountMosaicRestrictionTransactionFactory
    */
   public static AccountMosaicRestrictionTransactionFactory create(
       NetworkType networkType,
+      Deadline deadline,
       AccountMosaicRestrictionFlags restrictionFlags,
       final List<UnresolvedMosaicId> restrictionAdditions,
       final List<UnresolvedMosaicId> restrictionDeletions) {
     return new AccountMosaicRestrictionTransactionFactory(
-        networkType, restrictionFlags, restrictionAdditions, restrictionDeletions);
+        networkType, deadline, restrictionFlags, restrictionAdditions, restrictionDeletions);
   }
 
   /**

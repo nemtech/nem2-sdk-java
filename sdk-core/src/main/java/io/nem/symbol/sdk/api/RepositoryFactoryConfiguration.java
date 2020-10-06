@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.api;
 import io.nem.symbol.sdk.infrastructure.RepositoryFactoryBase;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import java.time.Duration;
 
 /**
  * This bean helps the user to create {@link RepositoryFactory}.
@@ -39,6 +40,9 @@ public class RepositoryFactoryConfiguration {
 
   /** The known generation hash. If not provided, the value will be retrieved from rest. */
   private String generationHash;
+
+  /** The server epochAdjustment. If not provided, the value will be retrieved from rest. /* */
+  private Duration epochAdjustment;
 
   /** The known network currency. If not provided, the value will be retrieved from rest. */
   private NetworkCurrency networkCurrency;
@@ -100,6 +104,17 @@ public class RepositoryFactoryConfiguration {
     return this;
   }
 
+  /**
+   * Helper method to setup the epochAdjustment when don't want to load it using rest.
+   *
+   * @param epochAdjustment the configured epochAdjustment
+   * @return this configuration.
+   */
+  public RepositoryFactoryConfiguration withEpochAdjustment(Duration epochAdjustment) {
+    this.epochAdjustment = epochAdjustment;
+    return this;
+  }
+
   public String getBaseUrl() {
     return baseUrl;
   }
@@ -134,5 +149,13 @@ public class RepositoryFactoryConfiguration {
 
   public void setHarvestCurrency(NetworkCurrency harvestCurrency) {
     this.harvestCurrency = harvestCurrency;
+  }
+
+  public Duration getEpochAdjustment() {
+    return epochAdjustment;
+  }
+
+  public void setEpochAdjustment(Duration epochAdjustment) {
+    this.epochAdjustment = epochAdjustment;
   }
 }

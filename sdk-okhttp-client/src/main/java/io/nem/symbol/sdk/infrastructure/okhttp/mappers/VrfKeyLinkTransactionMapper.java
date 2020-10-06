@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.infrastructure.okhttp.mappers;
 
 import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.LinkAction;
 import io.nem.symbol.sdk.model.transaction.TransactionFactory;
@@ -36,10 +37,10 @@ public class VrfKeyLinkTransactionMapper
 
   @Override
   protected TransactionFactory<VrfKeyLinkTransaction> createFactory(
-      NetworkType networkType, VrfKeyLinkTransactionDTO transaction) {
+      NetworkType networkType, Deadline deadline, VrfKeyLinkTransactionDTO transaction) {
     PublicKey linkedPublicKey = PublicKey.fromHexString(transaction.getLinkedPublicKey());
     LinkAction linkAction = LinkAction.rawValueOf(transaction.getLinkAction().getValue());
-    return VrfKeyLinkTransactionFactory.create(networkType, linkedPublicKey, linkAction);
+    return VrfKeyLinkTransactionFactory.create(networkType, deadline, linkedPublicKey, linkAction);
   }
 
   @Override

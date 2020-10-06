@@ -29,8 +29,8 @@ public class HashLockTransactionFactory extends TransactionFactory<HashLockTrans
   private final String hash;
 
   private HashLockTransactionFactory(
-      NetworkType networkType, Mosaic mosaic, BigInteger duration, String hash) {
-    super(TransactionType.HASH_LOCK, networkType);
+      NetworkType networkType, Deadline deadline, Mosaic mosaic, BigInteger duration, String hash) {
+    super(TransactionType.HASH_LOCK, networkType, deadline);
     Validate.notNull(mosaic, "Mosaic must not be null");
     Validate.notNull(duration, "Duration must not be null");
     Validate.notNull(hash, "Hash must not be null");
@@ -44,20 +44,22 @@ public class HashLockTransactionFactory extends TransactionFactory<HashLockTrans
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline the deadline.
    * @param mosaic Mosaic.
    * @param duration Duration.
    * @param hash the transaction hash.
    * @return Hash lock transaction.
    */
   public static HashLockTransactionFactory create(
-      NetworkType networkType, Mosaic mosaic, BigInteger duration, String hash) {
-    return new HashLockTransactionFactory(networkType, mosaic, duration, hash);
+      NetworkType networkType, Deadline deadline, Mosaic mosaic, BigInteger duration, String hash) {
+    return new HashLockTransactionFactory(networkType, deadline, mosaic, duration, hash);
   }
 
   /**
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline Deadline
    * @param mosaic Mosaic.
    * @param duration Duration.
    * @param signedTransaction Signed transaction.
@@ -65,6 +67,7 @@ public class HashLockTransactionFactory extends TransactionFactory<HashLockTrans
    */
   public static HashLockTransactionFactory create(
       NetworkType networkType,
+      Deadline deadline,
       Mosaic mosaic,
       BigInteger duration,
       SignedTransaction signedTransaction) {
@@ -72,7 +75,7 @@ public class HashLockTransactionFactory extends TransactionFactory<HashLockTrans
       throw new IllegalArgumentException("Signed transaction must be Aggregate Bonded Transaction");
     }
     return new HashLockTransactionFactory(
-        networkType, mosaic, duration, signedTransaction.getHash());
+        networkType, deadline, mosaic, duration, signedTransaction.getHash());
   }
 
   /**

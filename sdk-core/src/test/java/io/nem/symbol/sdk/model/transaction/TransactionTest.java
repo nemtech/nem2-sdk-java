@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 public class TransactionTest {
 
   private final NetworkType networkType = NetworkType.MIJIN_TEST;
-
+  private final Deadline deadline = new Deadline(BigInteger.ONE);
   private final PublicAccount signer =
       PublicAccount.createFromPublicKey(
           "b4f12e7c9f6946091e2cb8b6d3a12b50d17ccbbf646386ea27ce2946a7423dcf", networkType);
@@ -42,6 +42,7 @@ public class TransactionTest {
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.emptyList())
             .message(new PlainMessage(""));
@@ -59,6 +60,7 @@ public class TransactionTest {
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
                 networkType,
+                new Deadline(BigInteger.ONE),
                 new Address("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQ", networkType),
                 Collections.emptyList())
             .message(new PlainMessage(""));
@@ -74,7 +76,9 @@ public class TransactionTest {
   @Test
   void shouldReturnStateCONFIRMED() {
     FakeTransferTransaction fakeTransaction =
-        new FakeTransferTransactionFactory(networkType).group(TransactionGroup.CONFIRMED).build();
+        new FakeTransferTransactionFactory(networkType, deadline)
+            .group(TransactionGroup.CONFIRMED)
+            .build();
     assertFalse(fakeTransaction.isUnconfirmed());
     assertTrue(fakeTransaction.isConfirmed());
     assertFalse(fakeTransaction.isUnannounced());
@@ -85,7 +89,9 @@ public class TransactionTest {
   @Test
   void shouldReturnStatePARTIAL() {
     FakeTransferTransaction fakeTransaction =
-        new FakeTransferTransactionFactory(networkType).group(TransactionGroup.PARTIAL).build();
+        new FakeTransferTransactionFactory(networkType, deadline)
+            .group(TransactionGroup.PARTIAL)
+            .build();
     assertFalse(fakeTransaction.isUnconfirmed());
     assertFalse(fakeTransaction.isConfirmed());
     assertFalse(fakeTransaction.isUnannounced());
@@ -96,7 +102,9 @@ public class TransactionTest {
   @Test
   void shouldReturnStateUNCONFIRMED() {
     FakeTransferTransaction fakeTransaction =
-        new FakeTransferTransactionFactory(networkType).group(TransactionGroup.UNCONFIRMED).build();
+        new FakeTransferTransactionFactory(networkType, deadline)
+            .group(TransactionGroup.UNCONFIRMED)
+            .build();
     assertTrue(fakeTransaction.isUnconfirmed());
     assertFalse(fakeTransaction.isConfirmed());
     assertFalse(fakeTransaction.isUnannounced());
@@ -107,7 +115,7 @@ public class TransactionTest {
   @Test
   void shouldReturnStateNone() {
     FakeTransferTransaction fakeTransaction =
-        new FakeTransferTransactionFactory(networkType).build();
+        new FakeTransferTransactionFactory(networkType, deadline).build();
     assertFalse(fakeTransaction.isUnconfirmed());
     assertFalse(fakeTransaction.isConfirmed());
     assertTrue(fakeTransaction.isUnannounced());
@@ -120,8 +128,7 @@ public class TransactionTest {
     TransactionInfo transactionInfo =
         TransactionInfo.create(BigInteger.valueOf(0), 1, "ABC", "hash", "hash_2");
     FakeTransferTransaction fakeTransaction =
-        new FakeTransferTransactionFactory(networkType)
-            .deadline(new FakeDeadline())
+        new FakeTransferTransactionFactory(networkType, deadline)
             .signature("signature")
             .signer(signer)
             .transactionInfo(transactionInfo)

@@ -57,7 +57,7 @@ public class TransactionStatusRepositoryVertxImplTest extends AbstractVertxRespo
     Assertions.assertNotNull(transaction);
 
     Assertions.assertEquals(transactionStatusDTO.getHash(), transaction.getHash());
-    Assertions.assertEquals(5L, transaction.getDeadline().getInstant());
+    Assertions.assertEquals(5L, transaction.getDeadline().getValue());
     Assertions.assertEquals(BigInteger.valueOf(6L), transaction.getHeight());
     Assertions.assertEquals("Failure_AccountLink_Link_Already_Exists", transaction.getCode());
     Assertions.assertEquals(
@@ -86,7 +86,7 @@ public class TransactionStatusRepositoryVertxImplTest extends AbstractVertxRespo
     Assertions.assertNotNull(transaction);
 
     Assertions.assertEquals(transactionStatusDTO.getHash(), transaction.getHash());
-    Assertions.assertEquals(5L, transaction.getDeadline().getInstant());
+    Assertions.assertEquals(5L, transaction.getDeadline().getValue());
     Assertions.assertEquals(BigInteger.valueOf(6L), transaction.getHeight());
     Assertions.assertEquals("Failure_AccountLink_Link_Already_Exists", transaction.getCode());
     Assertions.assertEquals(

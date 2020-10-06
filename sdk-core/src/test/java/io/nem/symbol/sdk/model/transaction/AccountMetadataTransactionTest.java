@@ -41,11 +41,11 @@ public class AccountMetadataTransactionTest extends AbstractTransactionTester {
     AccountMetadataTransaction transaction =
         AccountMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 account.getPublicAccount().getAddress(),
                 BigInteger.TEN,
                 "123BAC")
             .valueSizeDelta(10)
-            .deadline(new FakeDeadline())
             .build();
 
     assertEquals("123BAC", transaction.getValue());
@@ -61,12 +61,12 @@ public class AccountMetadataTransactionTest extends AbstractTransactionTester {
     AccountMetadataTransaction transaction =
         AccountMetadataTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 account.getPublicAccount().getAddress(),
                 BigInteger.TEN,
                 "123BAC")
             .valueSizeDelta(10)
             .signer(account.getPublicAccount())
-            .deadline(new FakeDeadline())
             .build();
 
     String expected =

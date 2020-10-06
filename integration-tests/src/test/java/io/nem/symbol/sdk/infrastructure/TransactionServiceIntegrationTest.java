@@ -15,16 +15,12 @@
  */
 package io.nem.symbol.sdk.infrastructure;
 
-import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.model.account.Account;
-import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
-import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
-import io.nem.symbol.sdk.model.namespace.NamespaceInfo;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
@@ -33,6 +29,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
@@ -42,15 +39,18 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
-  String mosaicAlias = "transaction-service-mosaic-test-5";
-
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   public void testTransferCatCurrencyFromNemesis(RepositoryType type) {
     String mosaicAlias = getNetworkCurrency().getNamespaceId().get().getFullName().get();
+
+    Account testAccount = helper().getTestAccount(type);
+    String recipientAlias = "testaccount" + RandomUtils.nextInt(0, 10000);
+    helper().setAddressAlias(type, testAccount.getAddress(), recipientAlias);
+
     String hash =
         transferUsingAliases(
-                config().getNemesisAccount(), type, mosaicAlias, "testaccount2", BigInteger.TEN)
+                config().getNemesisAccount(), type, mosaicAlias, recipientAlias, BigInteger.TEN)
             .getTransactionInfo()
             .get()
             .getHash()
@@ -64,8 +64,7 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
     TransferTransaction resolvedTransaction = (TransferTransaction) transactions.get(0);
     System.out.println(toJson(resolvedTransaction));
 
-    Assertions.assertEquals(
-        config().getTestAccount2().getAddress(), resolvedTransaction.getRecipient());
+    Assertions.assertEquals(testAccount.getAddress(), resolvedTransaction.getRecipient());
 
     System.out.println(resolvedTransaction.getMosaics().get(0).getId());
 
@@ -77,11 +76,15 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   public void testTransferCustomCurrencyFromAccount1(RepositoryType type) {
 
-    MosaicId mosaicId = createMosaicUsingAlias(type, mosaicAlias);
-
+    String mosaicAlias =
+        ("testTransferCustomCurrencyFromAccount1" + RandomUtils.nextInt(0, 10000)).toLowerCase();
+    String recipientAlias = "testaccount" + RandomUtils.nextInt(0, 10000);
+    Account testAccount = helper.getTestAccount(type);
+    MosaicId mosaicId =
+        helper().createMosaic(testAccount, type, BigInteger.valueOf(10000), mosaicAlias);
+    helper().setAddressAlias(type, testAccount.getAddress(), recipientAlias);
     String transferTransactionHash =
-        transferUsingAliases(
-                config().getNemesisAccount(), type, mosaicAlias, "testaccount2", BigInteger.ONE)
+        transferUsingAliases(testAccount, type, mosaicAlias, recipientAlias, BigInteger.ONE)
             .getTransactionInfo()
             .get()
             .getHash()
@@ -92,18 +95,25 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
     Assertions.assertEquals(1, transactions.size());
     TransferTransaction resolvedTransaction = (TransferTransaction) transactions.get(0);
-    assertTransaction(mosaicId, resolvedTransaction);
+    assertTransaction(mosaicId, resolvedTransaction, testAccount);
   }
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   public void testTransferCustomCurrencyFromAccount1UsingAggregate(RepositoryType type) {
 
-    MosaicId mosaicId = createMosaicUsingAlias(type, mosaicAlias);
+    String mosaicAlias =
+        ("testTransferCustomCurrencyFromAccount1UsingAggregate" + RandomUtils.nextInt(0, 10000))
+            .toLowerCase();
+    Account testAccount = helper().getTestAccount(type);
+    String recipientAlias = "testaccount" + RandomUtils.nextInt(0, 10000);
+
+    MosaicId mosaicId =
+        helper().createMosaic(testAccount, type, BigInteger.valueOf(10000), mosaicAlias);
 
     String aggregateTransactionHash =
         transferUsingAliasesAggregate(
-                config().getNemesisAccount(), type, mosaicAlias, "testaccount2", BigInteger.ONE)
+            testAccount, type, mosaicAlias, recipientAlias, BigInteger.ONE)
             .getTransactionInfo()
             .get()
             .getHash()
@@ -118,60 +128,19 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
     TransferTransaction resolvedTransaction =
         (TransferTransaction)
             ((AggregateTransaction) transactions.get(0)).getInnerTransactions().get(0);
-    assertTransaction(mosaicId, resolvedTransaction);
+    assertTransaction(mosaicId, resolvedTransaction, testAccount);
   }
 
-  private MosaicId createMosaicUsingAlias(RepositoryType type, String mosaicAlias) {
-    NamespaceId mosaicNamespace = NamespaceId.createFromName(mosaicAlias);
-    NamespaceInfo namespaceInfo = null;
-    MosaicId mosaicId = null;
-    RepositoryFactory repositoryFactory = getRepositoryFactory(type);
-    try {
-      namespaceInfo =
-          get(repositoryFactory.createNamespaceRepository().getNamespace(mosaicNamespace));
-      System.out.println("Mosaic found!");
-      mosaicId =
-          get(repositoryFactory.createNamespaceRepository().getLinkedMosaicId(mosaicNamespace));
-      System.out.println("Mosaic id: " + mosaicId.getIdAsHex());
-
-      MosaicInfo mosaicInfo = get(repositoryFactory.createMosaicRepository().getMosaic(mosaicId));
-
-      System.out.println("Supply: " + mosaicInfo.getSupply());
-
-    } catch (Exception e) {
-
-    }
-
-    System.out.println("Mosaic Alias: " + mosaicAlias);
-    if (namespaceInfo == null) {
-
-      System.out.println("Creating mosaic!");
-
-      Account account = this.config().getDefaultAccount();
-      AccountInfo accountInfo =
-          get(
-              repositoryFactory
-                  .createAccountRepository()
-                  .getAccountInfo(account.getPublicAccount().getAddress()));
-
-      Assertions.assertFalse(accountInfo.getMosaics().isEmpty());
-
-      mosaicId = createMosaic(account, type, BigInteger.valueOf(100000), mosaicAlias);
-    }
-    return mosaicId;
-  }
-
-  private void assertTransaction(MosaicId mosaicId, TransferTransaction resolvedTransaction) {
+  private void assertTransaction(
+      MosaicId mosaicId, TransferTransaction resolvedTransaction, Account testAccount) {
 
     System.out.println(toJson(resolvedTransaction));
-    Assertions.assertEquals(
-        config().getTestAccount2().getAddress(), resolvedTransaction.getRecipient());
+    Assertions.assertEquals(testAccount.getAddress(), resolvedTransaction.getRecipient());
     System.out.println(resolvedTransaction.getMosaics().get(0).getId());
     Assertions.assertTrue(resolvedTransaction.getMosaics().get(0).getId() instanceof MosaicId);
     Assertions.assertTrue(resolvedTransaction.getRecipient() instanceof Address);
     Assertions.assertEquals(mosaicId, resolvedTransaction.getMosaics().get(0).getId());
-    Assertions.assertEquals(
-        config().getTestAccount2().getAddress(), resolvedTransaction.getRecipient());
+    Assertions.assertEquals(testAccount.getAddress(), resolvedTransaction.getRecipient());
   }
 
   private TransferTransaction transferUsingAliases(
@@ -190,11 +159,12 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 recipientNamespace,
                 Collections.singletonList(new Mosaic(mosaicNamespace, amount)))
             .message(new PlainMessage("E2ETest:TransactionServiceIntegrationTest"));
 
-    factory.maxFee(this.maxFee);
+    factory.maxFee(maxFee);
     TransferTransaction transferTransaction = factory.build();
 
     Assertions.assertTrue(transferTransaction.getMosaics().get(0).getId() instanceof NamespaceId);
@@ -230,11 +200,12 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 recipientNamespace,
                 Collections.singletonList(new Mosaic(mosaicNamespace, amount)))
             .message(new PlainMessage("E2ETest:TransactionServiceIntegrationTest"));
 
-    factory.maxFee(this.maxFee);
+    factory.maxFee(maxFee);
     TransferTransaction transferTransaction = factory.build();
 
     Assertions.assertTrue(transferTransaction.getMosaics().get(0).getId() instanceof NamespaceId);

@@ -17,7 +17,10 @@ package io.nem.symbol.core.utils;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.time.Duration;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** Static class containing helper functions for formatting. */
 public class FormatUtils {
@@ -76,5 +79,43 @@ public class FormatUtils {
   public static String format(final double value, final int decimalPlaces) {
     final DecimalFormat formatter = getDecimalFormat(decimalPlaces);
     return formatter.format(value);
+  }
+
+  /**
+   * It parse a server time/duration configuration like: - 1000ms 1000 milliseconds - 15s 15 seconds
+   * - 5m 5 minutes - 2h 2 hours - 10d 10 days
+   *
+   * <p>into a @{@link Duration} object
+   *
+   * @param serverValue time.
+   * @return an instant from that value.
+   */
+  public static Duration parserServerDuration(String serverValue) {
+    String preprocessedValue = serverValue.replace("'", "").trim();
+    Pattern periodPattern = Pattern.compile("([0-9]+)([hdms]+)[:\\s]?");
+    Matcher matcher = periodPattern.matcher(preprocessedValue);
+    Duration duration = Duration.ofMillis(0);
+    while (matcher.find()) {
+      int num = Integer.parseInt(matcher.group(1));
+      String type = matcher.group(2);
+      switch (type) {
+        case "ms":
+          duration = duration.plus(Duration.ofMillis(num));
+          break;
+        case "s":
+          duration = duration.plus(Duration.ofSeconds(num));
+          break;
+        case "m":
+          duration = duration.plus(Duration.ofMinutes(num));
+          break;
+        case "h":
+          duration = duration.plus(Duration.ofHours(num));
+          break;
+        case "d":
+          duration = duration.plus(Duration.ofDays(num));
+          break;
+      }
+    }
+    return duration;
   }
 }

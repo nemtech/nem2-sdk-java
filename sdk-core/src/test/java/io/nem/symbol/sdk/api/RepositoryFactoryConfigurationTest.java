@@ -19,6 +19,7 @@ import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrencyBuilder;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import java.time.Duration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,6 +32,8 @@ class RepositoryFactoryConfigurationTest {
         new RepositoryFactoryConfiguration("http://localhost:3000");
     configuration.withNetworkType(NetworkType.MAIN_NET);
     configuration.withGenerationHash("abc");
+    Duration epochAdjustment = Duration.ofMillis(100L);
+    configuration.withEpochAdjustment(epochAdjustment);
     NetworkCurrency networkCurrency =
         new NetworkCurrencyBuilder(NamespaceId.createFromName("my.custom.currency"), 6).build();
     configuration.withNetworkCurrency(networkCurrency);
@@ -38,7 +41,7 @@ class RepositoryFactoryConfigurationTest {
     NetworkCurrency networkHarvestCurrency =
         new NetworkCurrencyBuilder(NamespaceId.createFromName("my.custom.harvest"), 3).build();
     configuration.withHarvestCurrency(networkHarvestCurrency);
-
+    Assertions.assertEquals(epochAdjustment, configuration.getEpochAdjustment());
     Assertions.assertEquals("http://localhost:3000", configuration.getBaseUrl());
     Assertions.assertEquals("abc", configuration.getGenerationHash());
     Assertions.assertEquals(NetworkType.MAIN_NET, configuration.getNetworkType());
@@ -56,10 +59,13 @@ class RepositoryFactoryConfigurationTest {
         new NetworkCurrencyBuilder(NamespaceId.createFromName("my.custom.currency"), 6).build();
     configuration.setNetworkCurrency(networkCurrency);
 
+    Duration epochAdjustment = Duration.ofMillis(100L);
+    configuration.setEpochAdjustment(epochAdjustment);
     NetworkCurrency networkHarvestCurrency =
         new NetworkCurrencyBuilder(NamespaceId.createFromName("my.custom.harvest"), 3).build();
     configuration.setHarvestCurrency(networkHarvestCurrency);
 
+    Assertions.assertEquals(Duration.ofMillis(100L), configuration.getEpochAdjustment());
     Assertions.assertEquals("http://localhost:3000", configuration.getBaseUrl());
     Assertions.assertEquals("abc", configuration.getGenerationHash());
     Assertions.assertEquals(NetworkType.MAIN_NET, configuration.getNetworkType());

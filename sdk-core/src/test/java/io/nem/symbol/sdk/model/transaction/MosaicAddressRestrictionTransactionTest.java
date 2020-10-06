@@ -22,6 +22,7 @@ import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 
@@ -35,9 +36,12 @@ class MosaicAddressRestrictionTransactionTest extends AbstractTransactionTester 
 
   @Test
   void createAMosaicAddressRestrictionTransactionViaStaticConstructor() {
+
+    Duration epochAdjustment = Duration.ofSeconds(100);
     MosaicAddressRestrictionTransaction transaction =
         MosaicAddressRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                Deadline.create(epochAdjustment),
                 new MosaicId(new BigInteger("0")), // restricted
                 // MosaicId
                 BigInteger.valueOf(1), // restrictionKey
@@ -50,7 +54,8 @@ class MosaicAddressRestrictionTransactionTest extends AbstractTransactionTester 
 
     assertEquals(NetworkType.MIJIN_TEST, transaction.getNetworkType());
     assertEquals(1, (int) transaction.getVersion());
-    assertTrue(LocalDateTime.now().isBefore(transaction.getDeadline().getLocalDateTime()));
+    assertTrue(
+        LocalDateTime.now().isBefore(transaction.getDeadline().getLocalDateTime(epochAdjustment)));
     assertEquals(BigInteger.valueOf(0), transaction.getMaxFee());
     assertEquals(new BigInteger("0"), transaction.getMosaicId().getId());
     assertEquals(BigInteger.valueOf(1), transaction.getRestrictionKey());
@@ -64,6 +69,7 @@ class MosaicAddressRestrictionTransactionTest extends AbstractTransactionTester 
     MosaicAddressRestrictionTransaction transaction =
         MosaicAddressRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 new MosaicId(new BigInteger("1")), // restricted
                 // MosaicId
                 BigInteger.valueOf(1), // restrictionKey
@@ -71,7 +77,6 @@ class MosaicAddressRestrictionTransactionTest extends AbstractTransactionTester 
                 BigInteger.valueOf(8) // newRestrictionValue
                 )
             .previousRestrictionValue(BigInteger.valueOf(9))
-            .deadline(new FakeDeadline())
             .build();
 
     SignedTransaction signedTransaction = transaction.signWith(account, generationHash);
@@ -86,6 +91,7 @@ class MosaicAddressRestrictionTransactionTest extends AbstractTransactionTester 
     MosaicAddressRestrictionTransaction transaction =
         MosaicAddressRestrictionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 new MosaicId(new BigInteger("1")), // restricted
                 // MosaicId
                 BigInteger.valueOf(1), // restrictionKey
@@ -93,7 +99,6 @@ class MosaicAddressRestrictionTransactionTest extends AbstractTransactionTester 
                 BigInteger.valueOf(8) // newRestrictionValue
                 )
             .previousRestrictionValue(BigInteger.valueOf(9))
-            .deadline(new FakeDeadline())
             .signer(account.getPublicAccount())
             .build();
 

@@ -63,6 +63,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 recipient,
                 Collections.singletonList(
                     getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
@@ -96,6 +97,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 recipient,
                 Collections.singletonList(
                     getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
@@ -136,6 +138,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 recipient,
                 Collections.singletonList(
                     getNetworkCurrency().createAbsolute(BigInteger.valueOf(1000000000))))
@@ -184,6 +187,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
     TransferTransaction transferTransaction =
         TransferTransactionFactory.createPersistentDelegationRequestTransaction(
                 getNetworkType(),
+                getDeadline(),
                 senderKeyPair.getPrivateKey(),
                 vrfPrivateKey.getPrivateKey(),
                 recipientKeyPair.getPublicKey())

@@ -30,11 +30,18 @@ public class NamespaceMetadataTransactionFactory
 
   private NamespaceMetadataTransactionFactory(
       NetworkType networkType,
+      Deadline deadline,
       UnresolvedAddress targetAddress,
       NamespaceId targetNamespaceId,
       BigInteger scopedMetadataKey,
       String value) {
-    super(TransactionType.NAMESPACE_METADATA, networkType, targetAddress, scopedMetadataKey, value);
+    super(
+        TransactionType.NAMESPACE_METADATA,
+        networkType,
+        deadline,
+        targetAddress,
+        scopedMetadataKey,
+        value);
     Validate.notNull(targetNamespaceId, "TargetNamespaceId must not be null");
     this.targetNamespaceId = targetNamespaceId;
   }
@@ -43,6 +50,7 @@ public class NamespaceMetadataTransactionFactory
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline the deadline
    * @param targetAddress Target address.
    * @param targetNamespaceId Target namespace id.
    * @param scopedMetadataKey Scoped metadata key.
@@ -51,12 +59,13 @@ public class NamespaceMetadataTransactionFactory
    */
   public static NamespaceMetadataTransactionFactory create(
       NetworkType networkType,
+      Deadline deadline,
       UnresolvedAddress targetAddress,
       NamespaceId targetNamespaceId,
       BigInteger scopedMetadataKey,
       String value) {
     return new NamespaceMetadataTransactionFactory(
-        networkType, targetAddress, targetNamespaceId, scopedMetadataKey, value);
+        networkType, deadline, targetAddress, targetNamespaceId, scopedMetadataKey, value);
   }
 
   public NamespaceId getTargetNamespaceId() {

@@ -19,6 +19,7 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountOperationRestrictionTransactionDTO;
@@ -41,7 +42,9 @@ public class AccountOperationRestrictionTransactionMapper
 
   @Override
   protected AccountOperationRestrictionTransactionFactory createFactory(
-      NetworkType networkType, AccountOperationRestrictionTransactionDTO transaction) {
+      NetworkType networkType,
+      Deadline deadline,
+      AccountOperationRestrictionTransactionDTO transaction) {
     AccountOperationRestrictionFlags restrictionFlags =
         AccountOperationRestrictionFlags.rawValueOf(transaction.getRestrictionFlags().getValue());
 
@@ -55,7 +58,7 @@ public class AccountOperationRestrictionTransactionMapper
             .map(transactionTypeEnum -> TransactionType.rawValueOf(transactionTypeEnum.getValue()))
             .collect(Collectors.toList());
     return AccountOperationRestrictionTransactionFactory.create(
-        networkType, restrictionFlags, additions, deletions);
+        networkType, deadline, restrictionFlags, additions, deletions);
   }
 
   @Override

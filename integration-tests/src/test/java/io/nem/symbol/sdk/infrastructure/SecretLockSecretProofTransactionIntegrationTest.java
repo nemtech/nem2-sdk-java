@@ -51,12 +51,13 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
     SecretLockTransaction secretLockTransaction =
         SecretLockTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithm.SHA3_256,
                 secret,
                 recipient)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, account, secretLockTransaction);
@@ -72,12 +73,13 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
     SecretLockTransaction transaction =
         SecretLockTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithm.SHA3_256,
                 secret,
                 recipient)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAggregateAndValidate(type, transaction, account);
@@ -94,20 +96,26 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
     SecretLockTransaction secretLockTransaction =
         SecretLockTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithm.SHA3_256,
                 secret,
                 recipient)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, account, secretLockTransaction);
 
     SecretProofTransaction secretProofTransaction =
         SecretProofTransactionFactory.create(
-                getNetworkType(), LockHashAlgorithm.SHA3_256, recipient, secret, proof)
-            .maxFee(this.maxFee)
+                getNetworkType(),
+                getDeadline(),
+                LockHashAlgorithm.SHA3_256,
+                recipient,
+                secret,
+                proof)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, account, secretProofTransaction);
@@ -124,20 +132,26 @@ public class SecretLockSecretProofTransactionIntegrationTest extends BaseIntegra
     SecretLockTransaction secretLockTransaction =
         SecretLockTransactionFactory.create(
                 getNetworkType(),
+                getDeadline(),
                 getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithm.SHA3_256,
                 secret,
                 recipient)
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, account, secretLockTransaction);
 
     SecretProofTransaction secretProofTransaction =
         SecretProofTransactionFactory.create(
-                getNetworkType(), LockHashAlgorithm.SHA3_256, recipient, secret, proof)
-            .maxFee(this.maxFee)
+                getNetworkType(),
+                getDeadline(),
+                LockHashAlgorithm.SHA3_256,
+                recipient,
+                secret,
+                proof)
+            .maxFee(maxFee)
             .build();
 
     announceAggregateAndValidate(type, secretProofTransaction, account);

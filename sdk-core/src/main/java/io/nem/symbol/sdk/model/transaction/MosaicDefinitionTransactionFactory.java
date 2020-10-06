@@ -34,12 +34,13 @@ public class MosaicDefinitionTransactionFactory
 
   private MosaicDefinitionTransactionFactory(
       NetworkType networkType,
+      Deadline deadline,
       MosaicNonce mosaicNonce,
       MosaicId mosaicId,
       MosaicFlags mosaicFlags,
       int divisibility,
       BlockDuration blockDuration) {
-    super(TransactionType.MOSAIC_DEFINITION, networkType);
+    super(TransactionType.MOSAIC_DEFINITION, networkType, deadline);
     Validate.notNull(mosaicNonce, "MosaicNonce must not be null");
     Validate.notNull(mosaicId, "MosaicId must not be null");
     Validate.notNull(mosaicFlags, "MosaicFlags must not be null");
@@ -55,6 +56,7 @@ public class MosaicDefinitionTransactionFactory
    * Static create method for factory.
    *
    * @param networkType {@link NetworkType}
+   * @param deadline the deadline
    * @param mosaicNonce {@link MosaicNonce}
    * @param mosaicId {@link MosaicId}
    * @param mosaicFlags {@link MosaicFlags}
@@ -64,13 +66,14 @@ public class MosaicDefinitionTransactionFactory
    */
   public static MosaicDefinitionTransactionFactory create(
       NetworkType networkType,
+      Deadline deadline,
       MosaicNonce mosaicNonce,
       MosaicId mosaicId,
       MosaicFlags mosaicFlags,
       int divisibility,
       BlockDuration blockDuration) {
     return new MosaicDefinitionTransactionFactory(
-        networkType, mosaicNonce, mosaicId, mosaicFlags, divisibility, blockDuration);
+        networkType, deadline, mosaicNonce, mosaicId, mosaicFlags, divisibility, blockDuration);
   }
 
   /**

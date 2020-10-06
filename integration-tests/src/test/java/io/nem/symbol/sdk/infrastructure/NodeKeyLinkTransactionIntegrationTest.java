@@ -36,14 +36,16 @@ public class NodeKeyLinkTransactionIntegrationTest extends BaseIntegrationTest {
         PublicKey.fromHexString("F5D0AAD909CFBC810A3F888C33C57A9051AE1A59D1CDA872A8B90BCA7EF2D34A");
 
     NodeKeyLinkTransaction linkTransaction =
-        NodeKeyLinkTransactionFactory.create(getNetworkType(), linkedPublicKey, LinkAction.LINK)
+        NodeKeyLinkTransactionFactory.create(
+                getNetworkType(), getDeadline(), linkedPublicKey, LinkAction.LINK)
             .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, account, linkTransaction);
 
     NodeKeyLinkTransaction unlinkTransaction =
-        NodeKeyLinkTransactionFactory.create(getNetworkType(), linkedPublicKey, LinkAction.UNLINK)
+        NodeKeyLinkTransactionFactory.create(
+                getNetworkType(), getDeadline(), linkedPublicKey, LinkAction.UNLINK)
             .maxFee(maxFee)
             .build();
 

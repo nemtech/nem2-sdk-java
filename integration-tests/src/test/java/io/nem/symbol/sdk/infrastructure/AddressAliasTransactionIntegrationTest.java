@@ -29,7 +29,6 @@ import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.symbol.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,8 +50,8 @@ public class AddressAliasTransactionIntegrationTest extends BaseIntegrationTest 
 
     NamespaceRegistrationTransaction namespaceRegistrationTransaction =
         NamespaceRegistrationTransactionFactory.createRootNamespace(
-                getNetworkType(), namespaceName, BigInteger.valueOf(100))
-            .maxFee(this.maxFee)
+                getNetworkType(), getDeadline(), namespaceName, helper().getDuration())
+            .maxFee(maxFee)
             .build();
 
     NamespaceId rootNamespaceId =
@@ -62,16 +61,21 @@ public class AddressAliasTransactionIntegrationTest extends BaseIntegrationTest 
 
     AddressAliasTransaction addressAliasTransaction =
         AddressAliasTransactionFactory.create(
-                getNetworkType(), AliasAction.LINK, rootNamespaceId, account.getAddress())
-            .maxFee(this.maxFee)
+                getNetworkType(),
+                getDeadline(),
+                AliasAction.LINK,
+                rootNamespaceId,
+                account.getAddress())
+            .maxFee(maxFee)
             .build();
 
     AggregateTransaction aggregateTransaction2 =
         AggregateTransactionFactory.createComplete(
                 getNetworkType(),
+                getDeadline(),
                 Collections.singletonList(
                     addressAliasTransaction.toAggregate(account.getPublicAccount())))
-            .maxFee(this.maxFee)
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, account, aggregateTransaction2);
@@ -103,8 +107,8 @@ public class AddressAliasTransactionIntegrationTest extends BaseIntegrationTest 
 
     NamespaceRegistrationTransaction namespaceRegistrationTransaction =
         NamespaceRegistrationTransactionFactory.createRootNamespace(
-                getNetworkType(), namespaceName, BigInteger.valueOf(100))
-            .maxFee(this.maxFee)
+                getNetworkType(), getDeadline(), namespaceName, helper().getDuration())
+            .maxFee(maxFee)
             .build();
 
     NamespaceId rootNamespaceId =
@@ -112,8 +116,12 @@ public class AddressAliasTransactionIntegrationTest extends BaseIntegrationTest 
 
     AddressAliasTransaction addressAliasTransaction =
         AddressAliasTransactionFactory.create(
-                getNetworkType(), AliasAction.LINK, rootNamespaceId, account.getAddress())
-            .maxFee(this.maxFee)
+                getNetworkType(),
+                getDeadline(),
+                AliasAction.LINK,
+                rootNamespaceId,
+                account.getAddress())
+            .maxFee(maxFee)
             .build();
 
     announceAndValidate(type, account, addressAliasTransaction);

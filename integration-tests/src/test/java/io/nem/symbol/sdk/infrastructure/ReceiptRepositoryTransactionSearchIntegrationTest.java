@@ -70,21 +70,19 @@ class ReceiptRepositoryTransactionSearchIntegrationTest extends BaseIntegrationT
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
-  void searchUsingRecipientTypes(RepositoryType type) {
+  void  searchUsingRecipientTypes(RepositoryType type) {
 
-    assertRecipientType(type, Collections.singletonList(ReceiptType.HARVEST_FEE), false);
-    assertRecipientType(type, Collections.singletonList(ReceiptType.NAMESPACE_RENTAL_FEE), false);
+    assertRecipientType(type, Collections.singletonList(ReceiptType.HARVEST_FEE));
+    assertRecipientType(type, Collections.singletonList(ReceiptType.NAMESPACE_RENTAL_FEE));
     assertRecipientType(
-        type, Arrays.asList(ReceiptType.HARVEST_FEE, ReceiptType.NAMESPACE_RENTAL_FEE), false);
+        type, Arrays.asList(ReceiptType.HARVEST_FEE, ReceiptType.NAMESPACE_RENTAL_FEE));
     assertRecipientType(
-        type,
-        Arrays.asList(ReceiptType.TRANSACTION_GROUP, ReceiptType.NAMESPACE_RENTAL_FEE),
-        false);
-    assertRecipientType(type, Collections.singletonList(ReceiptType.TRANSACTION_GROUP), true);
+        type, Arrays.asList(ReceiptType.TRANSACTION_GROUP, ReceiptType.NAMESPACE_RENTAL_FEE));
+    assertRecipientType(type, Collections.singletonList(ReceiptType.TRANSACTION_GROUP));
   }
 
   List<TransactionStatement> assertRecipientType(
-      RepositoryType type, List<ReceiptType> receiptTypes, boolean empty) {
+      RepositoryType type, List<ReceiptType> receiptTypes) {
 
     ReceiptRepository receiptRepository = getReceiptRepository(type);
     PaginationStreamer<TransactionStatement, TransactionStatementSearchCriteria> streamer =
@@ -97,14 +95,9 @@ class ReceiptRepositoryTransactionSearchIntegrationTest extends BaseIntegrationT
                 .toObservable());
 
     transactionStatements.forEach(
-        s -> {
-          s.getReceipts()
-              .forEach(
-                  r -> {
-                    Assertions.assertTrue(receiptTypes.contains(r.getType()));
-                  });
-        });
-    Assertions.assertEquals(empty, transactionStatements.isEmpty());
+        s ->
+            Assertions.assertTrue(
+                s.getReceipts().stream().anyMatch(r -> (receiptTypes.contains(r.getType())))));
     return transactionStatements;
   }
 

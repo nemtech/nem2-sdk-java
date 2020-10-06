@@ -22,6 +22,7 @@ import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.MosaicMetadataTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicMetadataTransactionFactory;
@@ -39,7 +40,7 @@ class MosaicMetadataTransactionMapper
 
   @Override
   protected MosaicMetadataTransactionFactory createFactory(
-      NetworkType networkType, MosaicMetadataTransactionDTO transaction) {
+      NetworkType networkType, Deadline deadline, MosaicMetadataTransactionDTO transaction) {
     UnresolvedAddress targetAddress = toUnresolvedAddress(transaction.getTargetAddress());
     Integer valueSizeDelta = transaction.getValueSizeDelta();
     BigInteger scopedMetaDataKey =
@@ -49,7 +50,7 @@ class MosaicMetadataTransactionMapper
         MapperUtils.toUnresolvedMosaicId(transaction.getTargetMosaicId());
     MosaicMetadataTransactionFactory factory =
         MosaicMetadataTransactionFactory.create(
-            networkType, targetAddress, targetMosaic, scopedMetaDataKey, value);
+            networkType, deadline, targetAddress, targetMosaic, scopedMetaDataKey, value);
     factory.valueSizeDelta(valueSizeDelta);
     Long valueSize = transaction.getValueSize();
     if (valueSize != null) {

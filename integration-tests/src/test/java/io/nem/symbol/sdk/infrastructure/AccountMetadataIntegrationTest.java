@@ -59,8 +59,8 @@ public class AccountMetadataIntegrationTest extends BaseIntegrationTest {
 
     AccountMetadataTransaction transaction =
         AccountMetadataTransactionFactory.create(
-                getNetworkType(), testAccount.getAddress(), key, message)
-            .maxFee(this.maxFee)
+                getNetworkType(), getDeadline(), testAccount.getAddress(), key, message)
+            .maxFee(maxFee)
             .build();
 
     AccountMetadataTransaction processedTransaction =

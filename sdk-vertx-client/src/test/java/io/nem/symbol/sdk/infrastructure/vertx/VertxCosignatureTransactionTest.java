@@ -26,9 +26,11 @@ import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.CosignatureTransaction;
+import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.vertx.core.json.Json;
+import java.math.BigInteger;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -78,7 +80,8 @@ public class VertxCosignatureTransactionTest {
   void shouldThrowExceptionWhenTransactionToCosignHasNotBeenAnnunced() throws Exception {
 
     AggregateTransaction aggregateTransaction =
-        AggregateTransactionFactory.createComplete(NetworkType.MIJIN_TEST, Collections.emptyList())
+        AggregateTransactionFactory.createComplete(
+                NetworkType.MIJIN_TEST, new Deadline(BigInteger.ONE), Collections.emptyList())
             .build();
 
     assertThrows(

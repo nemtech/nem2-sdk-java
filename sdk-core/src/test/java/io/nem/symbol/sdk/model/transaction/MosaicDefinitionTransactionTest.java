@@ -28,6 +28,7 @@ import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNonce;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,24 +38,27 @@ class MosaicDefinitionTransactionTest extends AbstractTransactionTester {
   @Test
   void createAMosaicCreationTransactionViaStaticConstructor() {
     Account owner = Account.generateNewAccount(NetworkType.MIJIN_TEST);
+    Duration epochAdjustment = Duration.ofSeconds(100);
     int nonceNumber = 12345;
     MosaicNonce nonce = MosaicNonce.createFromInteger(nonceNumber);
     MosaicDefinitionTransaction mosaicCreationTx =
         MosaicDefinitionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                Deadline.create(epochAdjustment),
                 nonce,
                 MosaicId.createFromNonce(nonce, owner.getPublicAccount()),
                 MosaicFlags.create(true, true, true),
                 4,
                 new BlockDuration(222222))
-            .deadline(new FakeDeadline())
             .build();
 
     System.out.println(
         ConvertUtils.toHex(BinarySerializationImpl.INSTANCE.serialize(mosaicCreationTx)));
     assertEquals(NetworkType.MIJIN_TEST, mosaicCreationTx.getNetworkType());
     assertEquals(1, (int) mosaicCreationTx.getVersion());
-    assertTrue(LocalDateTime.now().isBefore(mosaicCreationTx.getDeadline().getLocalDateTime()));
+    assertTrue(
+        LocalDateTime.now()
+            .isBefore(mosaicCreationTx.getDeadline().getLocalDateTime(epochAdjustment)));
     assertEquals(BigInteger.valueOf(0), mosaicCreationTx.getMaxFee());
     //    assertEquals(new BigInteger("0"), mosaicCreationTx.getMosaicId().getId());
     assertTrue(mosaicCreationTx.getMosaicFlags().isSupplyMutable());
@@ -73,12 +77,12 @@ class MosaicDefinitionTransactionTest extends AbstractTransactionTester {
     MosaicDefinitionTransaction transaction =
         MosaicDefinitionTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
                 MosaicNonce.createFromBigInteger(new BigInteger("0")),
                 new MosaicId(new BigInteger("0")),
                 MosaicFlags.create(true, false, true),
                 4,
                 new BlockDuration(10000))
-            .deadline(new FakeDeadline())
             .build();
     assertSerialization(expected, transaction);
   }
@@ -109,7 +113,13 @@ class MosaicDefinitionTransactionTest extends AbstractTransactionTester {
 
     MosaicDefinitionTransaction transaction =
         MosaicDefinitionTransactionFactory.create(
-                networkType, mosaicNonce, mosaicId, mosaicFlags, 3, new BlockDuration(10))
+                networkType,
+                new Deadline(BigInteger.ONE),
+                mosaicNonce,
+                mosaicId,
+                mosaicFlags,
+                3,
+                new BlockDuration(10))
             .maxFee(fee)
             .signature("theSigner")
             .signer(signature)

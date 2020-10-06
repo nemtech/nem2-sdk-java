@@ -30,10 +30,11 @@ public class MosaicAliasTransactionFactory extends TransactionFactory<MosaicAlia
 
   private MosaicAliasTransactionFactory(
       final NetworkType networkType,
+      final Deadline deadline,
       final AliasAction aliasAction,
       final NamespaceId namespaceId,
       final MosaicId mosaicId) {
-    super(TransactionType.MOSAIC_ALIAS, networkType);
+    super(TransactionType.MOSAIC_ALIAS, networkType, deadline);
     Validate.notNull(namespaceId, "namespaceId must not be null");
     Validate.notNull(mosaicId, "mosaicId must not be null");
 
@@ -46,6 +47,7 @@ public class MosaicAliasTransactionFactory extends TransactionFactory<MosaicAlia
    * Static create method for factory.
    *
    * @param networkType Network type.
+   * @param deadline the deadline
    * @param aliasAction Alias action.
    * @param namespaceId Namespace id.
    * @param mosaicId Mosaic id.
@@ -53,10 +55,12 @@ public class MosaicAliasTransactionFactory extends TransactionFactory<MosaicAlia
    */
   public static MosaicAliasTransactionFactory create(
       NetworkType networkType,
+      Deadline deadline,
       AliasAction aliasAction,
       NamespaceId namespaceId,
       MosaicId mosaicId) {
-    return new MosaicAliasTransactionFactory(networkType, aliasAction, namespaceId, mosaicId);
+    return new MosaicAliasTransactionFactory(
+        networkType, deadline, aliasAction, namespaceId, mosaicId);
   }
 
   /**

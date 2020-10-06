@@ -23,6 +23,7 @@ import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -31,13 +32,14 @@ import org.junit.jupiter.api.Test;
 
 class MultisigAccountModificationTransactionTest extends AbstractTransactionTester {
 
-  private static Account account =
+  private static final Account account =
       new Account(
           "041e2ce90c31cd65620ed16ab7a5a485e5b335d7e61c75cd9b3a2fed3e091728",
           NetworkType.MIJIN_TEST);
 
   @Test
   void createAMultisigModificationTransactionViaConstructor() {
+    Duration epochAdjustment = Duration.ofSeconds(100);
     List<UnresolvedAddress> additions =
         Collections.singletonList(
             PublicAccount.createFromPublicKey(
@@ -52,14 +54,22 @@ class MultisigAccountModificationTransactionTest extends AbstractTransactionTest
                 .getAddress());
     MultisigAccountModificationTransaction multisigAccountModificationTransaction =
         MultisigAccountModificationTransactionFactory.create(
-                NetworkType.MIJIN_TEST, (byte) 2, (byte) 1, additions, deletions)
+                NetworkType.MIJIN_TEST,
+                Deadline.create(epochAdjustment),
+                (byte) 2,
+                (byte) 1,
+                additions,
+                deletions)
             .build();
 
     assertEquals(NetworkType.MIJIN_TEST, multisigAccountModificationTransaction.getNetworkType());
     assertTrue(1 == multisigAccountModificationTransaction.getVersion());
     assertTrue(
         LocalDateTime.now()
-            .isBefore(multisigAccountModificationTransaction.getDeadline().getLocalDateTime()));
+            .isBefore(
+                multisigAccountModificationTransaction
+                    .getDeadline()
+                    .getLocalDateTime(epochAdjustment)));
     assertEquals(BigInteger.valueOf(0), multisigAccountModificationTransaction.getMaxFee());
     assertEquals(2, multisigAccountModificationTransaction.getMinApprovalDelta());
     assertEquals(1, multisigAccountModificationTransaction.getMinRemovalDelta());
@@ -86,9 +96,13 @@ class MultisigAccountModificationTransactionTest extends AbstractTransactionTest
                 .getAddress());
     MultisigAccountModificationTransaction transaction =
         MultisigAccountModificationTransactionFactory.create(
-                NetworkType.MIJIN_TEST, (byte) 2, (byte) 1, additions, deletions)
+                NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
+                (byte) 2,
+                (byte) 1,
+                additions,
+                deletions)
             .signer(account.getPublicAccount())
-            .deadline(new FakeDeadline())
             .build();
 
     String expected =

@@ -39,7 +39,11 @@ public class MosaicAliasTransactionTest extends AbstractTransactionTester {
     NamespaceId namespaceId = NamespaceId.createFromName("anamespaced");
     MosaicAliasTransaction transaction =
         MosaicAliasTransactionFactory.create(
-                NetworkType.MIJIN_TEST, AliasAction.LINK, namespaceId, mosaicId)
+                NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
+                AliasAction.LINK,
+                namespaceId,
+                mosaicId)
             .build();
 
     assertEquals(NetworkType.MIJIN_TEST, transaction.getNetworkType());
@@ -54,9 +58,12 @@ public class MosaicAliasTransactionTest extends AbstractTransactionTester {
     NamespaceId namespaceId = NamespaceId.createFromName("anamespaced");
     MosaicAliasTransaction transaction =
         MosaicAliasTransactionFactory.create(
-                NetworkType.MIJIN_TEST, AliasAction.LINK, namespaceId, mosaicId)
+                NetworkType.MIJIN_TEST,
+                new Deadline(BigInteger.ONE),
+                AliasAction.LINK,
+                namespaceId,
+                mosaicId)
             .signer(account.getPublicAccount())
-            .deadline(new FakeDeadline())
             .build();
 
     String expectedHash =

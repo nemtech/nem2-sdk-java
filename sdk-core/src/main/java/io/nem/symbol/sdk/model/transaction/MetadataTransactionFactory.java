@@ -30,25 +30,24 @@ public abstract class MetadataTransactionFactory<T extends MetadataTransaction>
 
   /** Metadata key scoped to source, target and type. */
   private final BigInteger scopedMetadataKey;
-  /** Change in value size in bytes. Defaulted to the size of the encoded value. */
-  private int valueSizeDelta;
-
   /**
    * When there is an existing value, the new value is calculated as xor(previous-value, value). It
    * can be a plain text.
    */
   private final String value;
-
+  /** Change in value size in bytes. Defaulted to the size of the encoded value. */
+  private int valueSizeDelta;
   /** The value size. Defaulted to the size of the encoded value. */
   private long valueSize;
 
   MetadataTransactionFactory(
       TransactionType transactionType,
       NetworkType networkType,
+      Deadline deadline,
       UnresolvedAddress targetAddress,
       BigInteger scopedMetadataKey,
       String value) {
-    super(transactionType, networkType);
+    super(transactionType, networkType, deadline);
 
     Validate.notNull(targetAddress, "TargetAddress must not be null");
     Validate.notNull(scopedMetadataKey, "ScopedMetadataKey must not be null");

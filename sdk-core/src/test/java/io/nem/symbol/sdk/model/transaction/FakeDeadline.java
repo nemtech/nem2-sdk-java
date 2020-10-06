@@ -15,16 +15,11 @@
  */
 package io.nem.symbol.sdk.model.transaction;
 
-import java.time.temporal.ChronoUnit;
+import java.math.BigInteger;
 
 public class FakeDeadline extends Deadline {
 
   public FakeDeadline() {
-    super(1, ChronoUnit.HOURS);
-  }
-
-  @Override
-  public long getInstant() {
-    return 1;
+    super(BigInteger.ONE);
   }
 }
