@@ -70,7 +70,7 @@ class ReceiptRepositoryTransactionSearchIntegrationTest extends BaseIntegrationT
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
-  void  searchUsingRecipientTypes(RepositoryType type) {
+  void searchUsingRecipientTypes(RepositoryType type) {
 
     assertRecipientType(type, Collections.singletonList(ReceiptType.HARVEST_FEE));
     assertRecipientType(type, Collections.singletonList(ReceiptType.NAMESPACE_RENTAL_FEE));

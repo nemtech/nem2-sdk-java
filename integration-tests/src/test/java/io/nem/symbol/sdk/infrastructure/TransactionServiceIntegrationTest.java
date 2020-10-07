@@ -113,7 +113,7 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
     String aggregateTransactionHash =
         transferUsingAliasesAggregate(
-            testAccount, type, mosaicAlias, recipientAlias, BigInteger.ONE)
+                testAccount, type, mosaicAlias, recipientAlias, BigInteger.ONE)
             .getTransactionInfo()
             .get()
             .getHash()

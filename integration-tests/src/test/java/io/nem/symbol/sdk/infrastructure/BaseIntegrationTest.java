@@ -21,7 +21,6 @@ import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.TransactionService;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
@@ -109,12 +108,9 @@ public abstract class BaseIntegrationTest {
     return helper().getNetworkType();
   }
 
-
-
   public Deadline getDeadline() {
     return helper().getDeadline();
   }
-
 
   public Address getRecipient() {
     return config().getTestAccount2().getAddress();

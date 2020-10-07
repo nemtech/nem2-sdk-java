@@ -49,7 +49,7 @@ public abstract class TransactionFactory<T extends Transaction> {
   private final NetworkType networkType;
 
   /** The deadline of the new transaction. */
-  private final Deadline deadline;
+  private Deadline deadline;
 
   /** The version of the new transaction, by default the {@link TransactionType} default version. */
   private Integer version;
@@ -99,6 +99,18 @@ public abstract class TransactionFactory<T extends Transaction> {
     this.networkType = networkType;
     this.version = type.getCurrentVersion();
     this.deadline = deadline;
+  }
+
+  /**
+   * Builder method used to change the default deadline.
+   *
+   * @param deadline a new deadline
+   * @return this factory to continue building the transaction.
+   */
+  public TransactionFactory<T> deadline(Deadline deadline) {
+    Validate.notNull(deadline, "Deadline must not be null");
+    this.deadline = deadline;
+    return this;
   }
 
   /**

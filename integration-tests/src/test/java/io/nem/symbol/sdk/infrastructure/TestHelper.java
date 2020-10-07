@@ -410,8 +410,7 @@ public class TestHelper {
                                 && ns.getNamespaceId().equals(namespaceId))));
   }
 
-  public NamespaceId setAddressAlias(
-      RepositoryType type, Address address, String namespaceName) {
+  public NamespaceId setAddressAlias(RepositoryType type, Address address, String namespaceName) {
 
     NamespaceId namespaceId = NamespaceId.createFromName(namespaceName);
 

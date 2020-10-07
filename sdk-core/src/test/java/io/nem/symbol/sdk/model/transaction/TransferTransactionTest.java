@@ -67,10 +67,17 @@ class TransferTransactionTest extends AbstractTransactionTester {
   void createATransferTransactionViaStaticConstructor() {
     Duration epochAdjustment = Duration.ofSeconds(100);
     Address address = Address.generateRandom(networkType);
+    Deadline originalDeadline = new Deadline(BigInteger.ONE);
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
-                networkType, Deadline.create(epochAdjustment), address, Collections.emptyList())
+                networkType, originalDeadline, address, Collections.emptyList())
             .message(new PlainMessage(""));
+
+    Assertions.assertEquals(originalDeadline, factory.getDeadline());
+
+    Deadline updatedDeadline = Deadline.create(epochAdjustment);
+    factory.deadline(updatedDeadline);
+    Assertions.assertEquals(updatedDeadline, factory.getDeadline());
     TransferTransaction transaction = factory.build();
 
     assertEquals(networkType, transaction.getNetworkType());
