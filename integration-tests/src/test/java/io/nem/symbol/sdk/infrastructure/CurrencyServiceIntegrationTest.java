@@ -15,71 +15,60 @@
  */
 package io.nem.symbol.sdk.infrastructure;
 
-import io.nem.symbol.sdk.api.NetworkCurrencyService;
+import io.nem.symbol.sdk.api.CurrencyService;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
+import io.nem.symbol.sdk.model.mosaic.NetworkCurrencies;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import java.math.BigInteger;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class NetworkCurrencyServiceIntegrationTest extends BaseIntegrationTest {
+class CurrencyServiceIntegrationTest extends BaseIntegrationTest {
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void getNetworkCurrencies(RepositoryType type) {
 
     RepositoryFactory repositoryFactory = getRepositoryFactory(type);
-    NetworkCurrencyService service = new NetworkCurrencyServiceImpl(repositoryFactory);
+    CurrencyService service = new CurrencyServiceImpl(repositoryFactory);
 
-    List<NetworkCurrency> networkCurrencies = get(service.getNetworkCurrenciesFromNemesis());
+    NetworkCurrencies networkCurrencies = get(service.getNetworkCurrencies());
 
-    System.out.println(toJson(networkCurrencies));
+    Assertions.assertNotNull(networkCurrencies.getCurrency());
+    Assertions.assertEquals(
+        networkCurrencies.getCurrency().getUnresolvedMosaicId(),
+        networkCurrencies.getCurrency().getMosaicId().get());
+    Assertions.assertNotNull(networkCurrencies.getCurrency().getMosaicId().get());
 
-    Assertions.assertTrue(networkCurrencies.size() > 0);
-    Assertions.assertTrue(networkCurrencies.size() < 3);
+    Assertions.assertEquals(
+        networkCurrencies.getCurrency(), (get(repositoryFactory.getNetworkCurrency())));
 
-    Assertions.assertTrue(networkCurrencies.contains(get(repositoryFactory.getNetworkCurrency())));
-    Assertions.assertTrue(networkCurrencies.contains(get(repositoryFactory.getHarvestCurrency())));
-
-    networkCurrencies.forEach(
-        networkCurrency -> {
-          Assertions.assertTrue(networkCurrency.getMosaicId().isPresent());
-          Assertions.assertTrue(networkCurrency.getNamespaceId().isPresent());
-          NetworkCurrency loadedFromMosaicId =
-              get(service.getNetworkCurrencyFromMosaicId(networkCurrency.getMosaicId().get()));
-
-          Assertions.assertEquals(toJson(loadedFromMosaicId), toJson(networkCurrency));
-          Assertions.assertEquals(loadedFromMosaicId, networkCurrency);
-
-          NetworkCurrency loadedFromNamespaceId =
-              get(
-                  service.getNetworkCurrencyFromNamespaceId(
-                      networkCurrency.getNamespaceId().get()));
-
-          Assertions.assertEquals(toJson(loadedFromNamespaceId), toJson(networkCurrency));
-          Assertions.assertEquals(loadedFromNamespaceId, networkCurrency);
-        });
+    Assertions.assertNotNull(networkCurrencies.getHarvest());
+    Assertions.assertEquals(
+        networkCurrencies.getHarvest().getUnresolvedMosaicId(),
+        networkCurrencies.getHarvest().getMosaicId().get());
+    Assertions.assertNotNull(networkCurrencies.getHarvest().getMosaicId().get());
+    Assertions.assertEquals(
+        networkCurrencies.getHarvest(), (get(repositoryFactory.getHarvestCurrency())));
   }
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void testNetworkCurrencyInvalidNamespaceId(RepositoryType type) {
     RepositoryFactory repositoryFactory = getRepositoryFactory(type);
-    NetworkCurrencyService service = new NetworkCurrencyServiceImpl(repositoryFactory);
+    CurrencyService service = new CurrencyServiceImpl(repositoryFactory);
 
     RepositoryCallException exception =
         Assertions.assertThrows(
             RepositoryCallException.class,
             () -> {
               get(
-                  service.getNetworkCurrencyFromNamespaceId(
+                  service.getCurrencyFromNamespaceId(
                       NamespaceId.createFromName("invalid.currency")));
             });
 
@@ -92,13 +81,13 @@ class NetworkCurrencyServiceIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void testNetworkCurrencyInvaliMosaicId(RepositoryType type) {
     RepositoryFactory repositoryFactory = getRepositoryFactory(type);
-    NetworkCurrencyService service = new NetworkCurrencyServiceImpl(repositoryFactory);
+    CurrencyService service = new CurrencyServiceImpl(repositoryFactory);
 
     RepositoryCallException exception =
         Assertions.assertThrows(
             RepositoryCallException.class,
             () -> {
-              get(service.getNetworkCurrencyFromMosaicId(new MosaicId(BigInteger.TEN)));
+              get(service.getCurrency(new MosaicId(BigInteger.TEN)));
             });
 
     Assertions.assertEquals(

@@ -19,7 +19,8 @@ import io.nem.symbol.catapult.builders.GeneratorUtils;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.RepositoryFactoryConfiguration;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
+import io.nem.symbol.sdk.model.mosaic.Currency;
+import io.nem.symbol.sdk.model.mosaic.NetworkCurrencies;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.reactivex.Observable;
 import org.junit.jupiter.api.Assertions;
@@ -80,8 +81,7 @@ public class RepositoryFactoryVertxImplTest {
     RepositoryFactoryConfiguration configuration = new RepositoryFactoryConfiguration(baseUrl);
     configuration.withGenerationHash("abc");
     configuration.withNetworkType(NetworkType.MAIN_NET);
-    configuration.withNetworkCurrency(NetworkCurrency.CAT_CURRENCY);
-    configuration.withHarvestCurrency(NetworkCurrency.CAT_HARVEST);
+    configuration.withNetworkCurrencies(NetworkCurrencies.PUBLIC);
 
     RepositoryFactory factory = new RepositoryFactoryVertxImpl(configuration);
 
@@ -92,10 +92,12 @@ public class RepositoryFactoryVertxImplTest {
         configuration.getGenerationHash(), factory.getGenerationHash().toFuture().get());
 
     Assertions.assertEquals(
-        configuration.getHarvestCurrency(), factory.getHarvestCurrency().toFuture().get());
+        configuration.getNetworkCurrencies().getHarvest(),
+        factory.getHarvestCurrency().toFuture().get());
 
     Assertions.assertEquals(
-        configuration.getNetworkCurrency(), factory.getNetworkCurrency().toFuture().get());
+        configuration.getNetworkCurrencies().getCurrency(),
+        factory.getNetworkCurrency().toFuture().get());
   }
 
   @Test
@@ -109,13 +111,9 @@ public class RepositoryFactoryVertxImplTest {
         new RepositoryFactoryVertxImpl(configuration) {
 
           @Override
-          protected Observable<NetworkCurrency> loadNetworkCurrency() {
-            return Observable.just(NetworkCurrency.CAT_CURRENCY);
-          }
-
-          @Override
-          protected Observable<NetworkCurrency> loadHarvestCurrency() {
-            return Observable.just(NetworkCurrency.CAT_HARVEST);
+          protected Observable<NetworkCurrencies> loadNetworkCurrencies() {
+            return Observable.just(
+                new NetworkCurrencies(Currency.CAT_CURRENCY, Currency.CAT_HARVEST));
           }
         };
 
@@ -125,11 +123,9 @@ public class RepositoryFactoryVertxImplTest {
     Assertions.assertEquals(
         configuration.getGenerationHash(), factory.getGenerationHash().toFuture().get());
 
-    Assertions.assertEquals(
-        NetworkCurrency.CAT_HARVEST, factory.getHarvestCurrency().toFuture().get());
+    Assertions.assertEquals(Currency.CAT_HARVEST, factory.getHarvestCurrency().toFuture().get());
 
-    Assertions.assertEquals(
-        NetworkCurrency.CAT_CURRENCY, factory.getNetworkCurrency().toFuture().get());
+    Assertions.assertEquals(Currency.CAT_CURRENCY, factory.getNetworkCurrency().toFuture().get());
   }
 
   @Test

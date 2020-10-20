@@ -102,4 +102,11 @@ public class FormatUtilsTest {
     Assertions.assertEquals("PT5S", FormatUtils.parserServerDuration("5s10x").toString());
     Assertions.assertEquals("PT0S", FormatUtils.parserServerDuration("5sss").toString());
   }
+
+  @Test
+  public void toSimpleHex() {
+    Assertions.assertEquals("017D16940477B3F5", FormatUtils.toSimpleHex("0x017D'1694'0477'B3F5"));
+    Assertions.assertEquals("017D16940477B3F5", FormatUtils.toSimpleHex("0x017D'1694'0477'B3F5"));
+    Assertions.assertEquals("017D16940477B3F5", FormatUtils.toSimpleHex("0x017D'1694'0477'B3F5"));
+  }
 }

@@ -15,40 +15,46 @@
  */
 package io.nem.symbol.sdk.api;
 
+import io.nem.symbol.sdk.model.mosaic.Currency;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
+import io.nem.symbol.sdk.model.mosaic.NetworkCurrencies;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.reactivex.Observable;
 import java.util.List;
 
-/** Service related to network currencies. */
-public interface NetworkCurrencyService {
+/** A service that allows you loading Network currencies for mosaic creation. */
+public interface CurrencyService {
 
   /**
-   * This method returns the list of {@link NetworkCurrency} found in block 1.
+   * This method load network currencies (main currency and harvest).
    *
-   * <p>The intent of this method is to resolve the configured main (like cat.currency or
-   * symbol.xym) and harvest currencies (cat.harvest). More currencies may be defined in the block
-   * one.
-   *
-   * @return the list of {@link NetworkCurrency} found in block 1.
+   * @return the network currencies.
    */
-  Observable<List<NetworkCurrency>> getNetworkCurrenciesFromNemesis();
+  Observable<NetworkCurrencies> getNetworkCurrencies();
 
   /**
-   * This method resolves a {@link NetworkCurrency} from a known {@link MosaicId} using rest. The
+   * This method resolves a {@link Currency} from a known {@link MosaicId} using rest. The
    * NetworkCurrency will contain the first resolved alias / namespace id if exist.
    *
    * @param mosaicId the mosaic id
    * @return the NetworkCurrency of the given mosaic id.
    */
-  Observable<NetworkCurrency> getNetworkCurrencyFromMosaicId(MosaicId mosaicId);
+  Observable<Currency> getCurrency(MosaicId mosaicId);
 
   /**
-   * This method resolves a {@link NetworkCurrency} from a known {@link NamespaceId} using rest.
+   * This method resolves a {@link Currency} objects from a known {@link MosaicId} ids using rest.
+   * The * NetworkCurrency will contain the first resolved alias / namespace id if exist.
+   *
+   * @param mosaicIds the mosaic ids
+   * @return the resolved currencies.
+   */
+  Observable<List<Currency>> getCurrencies(List<MosaicId> mosaicIds);
+
+  /**
+   * This method resolves a {@link Currency} from a known {@link NamespaceId} using rest.
    *
    * @param namespaceId the namespace id
    * @return the NetworkCurrency of the given namespace id.
    */
-  Observable<NetworkCurrency> getNetworkCurrencyFromNamespaceId(NamespaceId namespaceId);
+  Observable<Currency> getCurrencyFromNamespaceId(NamespaceId namespaceId);
 }

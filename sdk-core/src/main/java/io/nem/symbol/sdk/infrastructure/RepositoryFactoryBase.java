@@ -18,22 +18,14 @@ package io.nem.symbol.sdk.infrastructure;
 import io.nem.symbol.core.utils.FormatUtils;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.RepositoryFactoryConfiguration;
-import io.nem.symbol.sdk.model.mosaic.MosaicId;
-import io.nem.symbol.sdk.model.mosaic.MosaicNames;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrencyBuilder;
-import io.nem.symbol.sdk.model.namespace.NamespaceId;
-import io.nem.symbol.sdk.model.namespace.NamespaceName;
+import io.nem.symbol.sdk.model.mosaic.Currency;
+import io.nem.symbol.sdk.model.mosaic.NetworkCurrencies;
 import io.nem.symbol.sdk.model.network.NetworkConfiguration;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.node.NodeInfo;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import java.time.Duration;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.Callable;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Base class of all the {@link RepositoryFactory}. It handles common functions like resolving
@@ -54,10 +46,7 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
   private final Observable<NetworkConfiguration> remoteNetworkConfiguration;
 
   /** The resolved network currency . This observable is lazy (cold) and cached. */
-  private final Observable<NetworkCurrency> networkCurrency;
-
-  /** The resolved harvest currency. This observable is lazy (cold) and cached. */
-  private final Observable<NetworkCurrency> harvestCurrency;
+  private final Observable<NetworkCurrencies> networkCurrencies;
 
   /** The resolved epochAdjustment. This observable is lazy (cold) and cached. */
   private final Observable<Duration> epochAdjustment;
@@ -78,11 +67,8 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
     this.remoteNetworkConfiguration =
         Observable.defer(() -> createNetworkRepository().getNetworkProperties()).cache();
 
-    this.networkCurrency =
-        createLazyObservable(configuration.getNetworkCurrency(), this::loadNetworkCurrency);
-
-    this.harvestCurrency =
-        createLazyObservable(configuration.getHarvestCurrency(), this::loadHarvestCurrency);
+    this.networkCurrencies =
+        createLazyObservable(configuration.getNetworkCurrencies(), this::loadNetworkCurrencies);
 
     this.epochAdjustment =
         createLazyObservable(configuration.getEpochAdjustment(), this::loadEpochAdjustment);
@@ -97,17 +83,8 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
     }
   }
 
-  protected Observable<NetworkCurrency> loadHarvestCurrency() {
-    return this.remoteNetworkConfiguration.flatMap(
-        cs -> {
-          if (cs.getChain() == null || cs.getChain().getHarvestingMosaicId() == null) {
-            return this.networkCurrency;
-          }
-          if (cs.getChain().getHarvestingMosaicId().equals(cs.getChain().getCurrencyMosaicId())) {
-            return this.networkCurrency;
-          }
-          return getNetworkCurrency(cs.getChain().getHarvestingMosaicId());
-        });
+  protected Observable<NetworkCurrencies> loadNetworkCurrencies() {
+    return new CurrencyServiceImpl(this).getNetworkCurrencies();
   }
 
   protected Observable<Duration> loadEpochAdjustment() {
@@ -120,47 +97,6 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
             return FormatUtils.parserServerDuration(cs.getNetwork().getEpochAdjustment());
           }
         });
-  }
-
-  protected Observable<NetworkCurrency> loadNetworkCurrency() {
-    return this.remoteNetworkConfiguration.flatMap(
-        cs -> {
-          if (cs.getChain() == null || cs.getChain().getCurrencyMosaicId() == null) {
-            return Observable.error(
-                new IllegalStateException(
-                    "No currency could be found in the network configuration."));
-          }
-          return getNetworkCurrency(cs.getChain().getCurrencyMosaicId());
-        });
-  }
-
-  protected ObservableSource<NetworkCurrency> getNetworkCurrency(String mosaicIdHex) {
-    MosaicId mosaicId =
-        new MosaicId(StringUtils.removeStart(mosaicIdHex.replace("'", "").substring(2), "0x"));
-    return createMosaicRepository()
-        .getMosaic(mosaicId)
-        .map(
-            mosaicInfo ->
-                new NetworkCurrencyBuilder(mosaicInfo.getMosaicId(), mosaicInfo.getDivisibility())
-                    .withTransferable(mosaicInfo.isTransferable())
-                    .withSupplyMutable(mosaicInfo.isSupplyMutable()))
-        .flatMap(
-            builder ->
-                createNamespaceRepository()
-                    .getMosaicsNames(Collections.singletonList(mosaicId))
-                    .map(
-                        names ->
-                            names.stream()
-                                .filter(n -> n.getMosaicId().equals(mosaicId))
-                                .findFirst()
-                                .map(name -> builder.withNamespaceId(getNamespaceId(names)).build())
-                                .orElse(builder.build())));
-  }
-
-  private NamespaceId getNamespaceId(List<MosaicNames> names) {
-    NamespaceName namespaceName = names.get(0).getNames().get(0);
-    NamespaceId namespaceId = namespaceName.getNamespaceId();
-    return NamespaceId.createFromIdAndFullName(namespaceId.getId(), namespaceName.getName());
   }
 
   @Override
@@ -178,13 +114,18 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
   }
 
   @Override
-  public Observable<NetworkCurrency> getNetworkCurrency() {
-    return networkCurrency;
+  public Observable<Currency> getNetworkCurrency() {
+    return this.getNetworkCurrencies().map(NetworkCurrencies::getCurrency);
   }
 
   @Override
-  public Observable<NetworkCurrency> getHarvestCurrency() {
-    return harvestCurrency;
+  public Observable<Currency> getHarvestCurrency() {
+    return this.getNetworkCurrencies().map(NetworkCurrencies::getHarvest);
+  }
+
+  @Override
+  public Observable<NetworkCurrencies> getNetworkCurrencies() {
+    return this.networkCurrencies;
   }
 
   @Override

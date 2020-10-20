@@ -16,7 +16,7 @@
 package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.infrastructure.RepositoryFactoryBase;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
+import io.nem.symbol.sdk.model.mosaic.NetworkCurrencies;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.time.Duration;
 
@@ -44,11 +44,8 @@ public class RepositoryFactoryConfiguration {
   /** The server epochAdjustment. If not provided, the value will be retrieved from rest. /* */
   private Duration epochAdjustment;
 
-  /** The known network currency. If not provided, the value will be retrieved from rest. */
-  private NetworkCurrency networkCurrency;
-
-  /** The known harvest currency. If not provided, the value will be retrieved from rest. */
-  private NetworkCurrency harvestCurrency;
+  /** The known network currencies. If not provided, the value will be retrieved from rest. */
+  private NetworkCurrencies networkCurrencies;
 
   /**
    * It creates a basic configuration with the required base url.
@@ -71,13 +68,13 @@ public class RepositoryFactoryConfiguration {
   }
 
   /**
-   * Helper method to setup the main {@link NetworkCurrency} when don't want to load it using rest.
+   * Helper method to setup the {@link NetworkCurrencies} when don't want to load it using rest.
    *
-   * @param networkCurrency the main {@link NetworkCurrency}
+   * @param networkCurrencies the {@link NetworkCurrencies}
    * @return this configuration.
    */
-  public RepositoryFactoryConfiguration withNetworkCurrency(NetworkCurrency networkCurrency) {
-    this.networkCurrency = networkCurrency;
+  public RepositoryFactoryConfiguration withNetworkCurrencies(NetworkCurrencies networkCurrencies) {
+    this.networkCurrencies = networkCurrencies;
     return this;
   }
 
@@ -89,18 +86,6 @@ public class RepositoryFactoryConfiguration {
    */
   public RepositoryFactoryConfiguration withGenerationHash(String generationHash) {
     this.generationHash = generationHash;
-    return this;
-  }
-
-  /**
-   * Helper method to setup the harvest {@link NetworkCurrency} when don't want to load it using
-   * rest.
-   *
-   * @param harvestCurrency the harvest {@link NetworkCurrency}
-   * @return this configuration.
-   */
-  public RepositoryFactoryConfiguration withHarvestCurrency(NetworkCurrency harvestCurrency) {
-    this.harvestCurrency = harvestCurrency;
     return this;
   }
 
@@ -123,32 +108,16 @@ public class RepositoryFactoryConfiguration {
     return networkType;
   }
 
-  public String getGenerationHash() {
-    return generationHash;
-  }
-
-  public NetworkCurrency getNetworkCurrency() {
-    return networkCurrency;
-  }
-
-  public NetworkCurrency getHarvestCurrency() {
-    return harvestCurrency;
-  }
-
   public void setNetworkType(NetworkType networkType) {
     this.networkType = networkType;
   }
 
-  public void setNetworkCurrency(NetworkCurrency networkCurrency) {
-    this.networkCurrency = networkCurrency;
+  public String getGenerationHash() {
+    return generationHash;
   }
 
   public void setGenerationHash(String generationHash) {
     this.generationHash = generationHash;
-  }
-
-  public void setHarvestCurrency(NetworkCurrency harvestCurrency) {
-    this.harvestCurrency = harvestCurrency;
   }
 
   public Duration getEpochAdjustment() {
@@ -157,5 +126,13 @@ public class RepositoryFactoryConfiguration {
 
   public void setEpochAdjustment(Duration epochAdjustment) {
     this.epochAdjustment = epochAdjustment;
+  }
+
+  public NetworkCurrencies getNetworkCurrencies() {
+    return networkCurrencies;
+  }
+
+  public void setNetworkCurrencies(NetworkCurrencies networkCurrencies) {
+    this.networkCurrencies = networkCurrencies;
   }
 }

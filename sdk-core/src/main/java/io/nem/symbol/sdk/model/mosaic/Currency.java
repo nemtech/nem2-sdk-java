@@ -15,7 +15,7 @@
  */
 package io.nem.symbol.sdk.model.mosaic;
 
-import io.nem.symbol.sdk.api.NetworkCurrencyService;
+import io.nem.symbol.sdk.api.CurrencyService;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.infrastructure.RepositoryFactoryBase;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
@@ -33,34 +33,48 @@ import org.apache.commons.lang3.Validate;
  * <p>Some commonly used and known instances are also provided statically if the user wants to work
  * offline.
  *
- * <p>Objects of this class are created using the {@link NetworkCurrencyBuilder} and they are thread
- * safe and immutable.
+ * <p>Objects of this class are created using the {@link CurrencyBuilder} and they are thread safe
+ * and immutable.
  *
- * @see NetworkCurrencyService
+ * @see CurrencyService
  * @see RepositoryFactory
  * @see RepositoryFactoryBase
- * @see NetworkCurrencyBuilder
+ * @see CurrencyBuilder
  */
-public class NetworkCurrency {
+public class Currency {
 
-  /** The original public bootstrap network currency. */
-  public static final NetworkCurrency CAT_CURRENCY =
-      new NetworkCurrencyBuilder(NamespaceId.createFromName("cat.currency"), 6)
+  /**
+   * Currency for public / Public_test network.
+   *
+   * <p>This represents the per-network currency mosaic. This mosaicId is aliased with namespace
+   * name `symbol.xym`.
+   *
+   * <p>This simplifies offline operations but general applications should load the currency from
+   * the repository factory and network currency service.
+   *
+   * <p>If you are creating a private network and you need offline access, you can create a Currency
+   * in memory.
+   */
+  public static final Currency SYMBOL_XYM =
+      new CurrencyBuilder(NamespaceId.createFromName("symbol.xym"), 6)
           .withSupplyMutable(false)
           .withTransferable(true)
+          .withRestrictable(false)
           .build();
-  /** The original public bootstrap havest currency. */
-  public static final NetworkCurrency CAT_HARVEST =
-      new NetworkCurrencyBuilder(NamespaceId.createFromName("cat.harvest"), 3)
+
+  /** The original public bootstrap network currency. This is for test only! */
+  public static final Currency CAT_CURRENCY =
+      new CurrencyBuilder(NamespaceId.createFromName("cat.currency"), 6)
+          .withSupplyMutable(false)
+          .withTransferable(true)
+          .withRestrictable(false)
+          .build();
+  /** The original public bootstrap havest currency. This is for test only! */
+  public static final Currency CAT_HARVEST =
+      new CurrencyBuilder(NamespaceId.createFromName("cat.harvest"), 3)
           .withSupplyMutable(true)
           .withTransferable(true)
-          .build();
-
-  /** The new public network currency. */
-  public static final NetworkCurrency SYMBOL_XYM =
-      new NetworkCurrencyBuilder(NamespaceId.createFromName("symbol.xym"), 6)
-          .withSupplyMutable(false)
-          .withTransferable(true)
+          .withRestrictable(false)
           .build();
 
   /**
@@ -87,13 +101,16 @@ public class NetworkCurrency {
   /** Is this currency supply mutable. */
   private final boolean supplyMutable;
 
+  /** Is this currency restrictable. */
+  private final boolean restrictable;
+
   /**
    * User would create these objects using the builder.
    *
    * @param builder the builder.
    * @see NetworkType
    */
-  NetworkCurrency(NetworkCurrencyBuilder builder) {
+  Currency(CurrencyBuilder builder) {
     Validate.notNull(builder, "builder must not be null");
     this.unresolvedMosaicId = builder.getUnresolvedMosaicId();
     this.mosaicId = builder.getMosaicId();
@@ -101,6 +118,7 @@ public class NetworkCurrency {
     this.divisibility = builder.getDivisibility();
     this.transferable = builder.isTransferable();
     this.supplyMutable = builder.isSupplyMutable();
+    this.restrictable = builder.isRestrictable();
   }
 
   public UnresolvedMosaicId getUnresolvedMosaicId() {
@@ -201,36 +219,25 @@ public class NetworkCurrency {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    NetworkCurrency that = (NetworkCurrency) o;
-    return divisibility == that.divisibility
-        && transferable == that.transferable
-        && supplyMutable == that.supplyMutable
-        && Objects.equals(unresolvedMosaicId, that.unresolvedMosaicId)
-        && Objects.equals(mosaicId, that.mosaicId)
-        && Objects.equals(namespaceId, that.namespaceId);
+    Currency currency = (Currency) o;
+    return divisibility == currency.divisibility
+        && transferable == currency.transferable
+        && supplyMutable == currency.supplyMutable
+        && restrictable == currency.restrictable
+        && Objects.equals(unresolvedMosaicId, currency.unresolvedMosaicId)
+        && Objects.equals(mosaicId, currency.mosaicId)
+        && Objects.equals(namespaceId, currency.namespaceId);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(
-        unresolvedMosaicId, mosaicId, namespaceId, divisibility, transferable, supplyMutable);
-  }
-
-  @Override
-  public String toString() {
-    return "NetworkCurrency{"
-        + "unresolvedMosaicId="
-        + unresolvedMosaicId
-        + ", mosaicId="
-        + mosaicId
-        + ", namespaceId="
-        + namespaceId
-        + ", divisibility="
-        + divisibility
-        + ", transferable="
-        + transferable
-        + ", supplyMutable="
-        + supplyMutable
-        + '}';
+        unresolvedMosaicId,
+        mosaicId,
+        namespaceId,
+        divisibility,
+        transferable,
+        supplyMutable,
+        restrictable);
   }
 }

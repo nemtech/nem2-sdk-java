@@ -24,21 +24,21 @@ import org.junit.jupiter.api.Test;
 
 class NetworkHarvestCatHarvestTest {
 
-  private NetworkCurrency networkCurrency = NetworkCurrency.CAT_HARVEST;
+  private Currency currency = Currency.CAT_HARVEST;
 
   @Test
   void shouldCreateRelativeNetworkHarvestMosaic() {
-    Mosaic currency = networkCurrency.createRelative(BigInteger.valueOf(1000));
+    Mosaic currency = this.currency.createRelative(BigInteger.valueOf(1000));
     assertEquals(BigInteger.valueOf(1000 * 1000), currency.getAmount());
-    assertEquals(networkCurrency.getNamespaceId().get(), currency.getId());
+    assertEquals(this.currency.getNamespaceId().get(), currency.getId());
     assertEquals("941299B2B7E1291C", currency.getIdAsHex());
   }
 
   @Test
   void shouldCreateAbsoluteNetworkHarvestMosaic() {
-    Mosaic currency = networkCurrency.createAbsolute(BigInteger.valueOf(1));
+    Mosaic currency = this.currency.createAbsolute(BigInteger.valueOf(1));
     assertEquals(BigInteger.valueOf(1), currency.getAmount());
-    assertEquals(networkCurrency.getNamespaceId().get(), currency.getId());
+    assertEquals(this.currency.getNamespaceId().get(), currency.getId());
     assertEquals("941299B2B7E1291C", currency.getIdAsHex());
   }
 
@@ -46,17 +46,17 @@ class NetworkHarvestCatHarvestTest {
   void shouldCompareNamespaceIdsForEquality() {
     NamespaceId namespaceId = NamespaceId.createFromId(BigInteger.valueOf(-7776984613647210212L));
     assertEquals(-7776984613647210212L, namespaceId.getIdAsLong());
-    assertEquals(networkCurrency.getNamespaceId().get().getIdAsLong(), namespaceId.getIdAsLong());
-    assertEquals(networkCurrency.getNamespaceId().get().getIdAsHex(), namespaceId.getIdAsHex());
+    assertEquals(currency.getNamespaceId().get().getIdAsLong(), namespaceId.getIdAsLong());
+    assertEquals(currency.getNamespaceId().get().getIdAsHex(), namespaceId.getIdAsHex());
   }
 
   @Test
   @SuppressWarnings("squid:S3415")
   void shouldHaveValidStatics() {
-    assertEquals(networkCurrency.getUnresolvedMosaicId(), networkCurrency.getNamespaceId().get());
-    assertEquals("cat.harvest", networkCurrency.getNamespaceId().get().getFullName().get());
-    assertEquals(3, networkCurrency.getDivisibility());
-    assertTrue(networkCurrency.isTransferable());
-    assertTrue(networkCurrency.isSupplyMutable());
+    assertEquals(currency.getUnresolvedMosaicId(), currency.getNamespaceId().get());
+    assertEquals("cat.harvest", currency.getNamespaceId().get().getFullName().get());
+    assertEquals(3, currency.getDivisibility());
+    assertTrue(currency.isTransferable());
+    assertTrue(currency.isSupplyMutable());
   }
 }

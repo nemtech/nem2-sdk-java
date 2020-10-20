@@ -28,12 +28,12 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.blockchain.BlockDuration;
 import io.nem.symbol.sdk.model.message.PlainMessage;
+import io.nem.symbol.sdk.model.mosaic.Currency;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNonce;
 import io.nem.symbol.sdk.model.mosaic.MosaicSupplyChangeActionType;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.receipt.AddressResolutionStatement;
@@ -249,7 +249,7 @@ class TransactionServiceTest {
         HashLockTransactionFactory.create(
                 networkType,
                 new Deadline(BigInteger.ONE),
-                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
+                Currency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 aggregateSignedTransaction.getHash())
             .build();

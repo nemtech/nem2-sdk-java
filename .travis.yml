@@ -20,7 +20,7 @@ jobs:
   include:
     - stage: e2e
       script: source e2e.sh
-      if: branch = e2e
+      if: branch = main and type = cron
 install:
   - true  #If install is not set, travis will run gradle assemble
 script: /bin/sh travis/build.sh

@@ -20,8 +20,9 @@ import io.nem.symbol.sdk.api.RepositoryFactoryConfiguration;
 import io.nem.symbol.sdk.infrastructure.vertx.RepositoryFactoryVertxImpl;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.message.PlainMessage;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrencyBuilder;
+import io.nem.symbol.sdk.model.mosaic.Currency;
+import io.nem.symbol.sdk.model.mosaic.CurrencyBuilder;
+import io.nem.symbol.sdk.model.mosaic.NetworkCurrencies;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.Deadline;
@@ -50,11 +51,12 @@ public class RepositoryFactoryConfigurationExamplesIntegrationTest {
         new RepositoryFactoryConfiguration("http://localhost:3000");
     configuration.withNetworkType(NetworkType.MAIN_NET);
     configuration.withGenerationHash("abc");
-    configuration.withNetworkCurrency(
-        new NetworkCurrencyBuilder(NamespaceId.createFromName("my.custom.currency"), 6).build());
+    Currency currency =
+        new CurrencyBuilder(NamespaceId.createFromName("my.custom.currency"), 6).build();
 
-    configuration.withHarvestCurrency(
-        new NetworkCurrencyBuilder(NamespaceId.createFromName("my.custom.harvest"), 3).build());
+    Currency harvest =
+        new CurrencyBuilder(NamespaceId.createFromName("my.custom.harvest"), 3).build();
+    configuration.withNetworkCurrencies(new NetworkCurrencies(currency, harvest));
 
     try (RepositoryFactory repositoryFactory = new RepositoryFactoryVertxImpl(configuration)) {
       appDoSomeStuff(repositoryFactory);
@@ -82,8 +84,8 @@ public class RepositoryFactoryConfigurationExamplesIntegrationTest {
     RepositoryFactoryConfiguration configuration =
         new RepositoryFactoryConfiguration("http://localhost:3000");
 
-    configuration.withNetworkCurrency(NetworkCurrency.CAT_CURRENCY);
-    configuration.withHarvestCurrency(NetworkCurrency.CAT_HARVEST);
+    configuration.withNetworkCurrencies(
+        new NetworkCurrencies(Currency.CAT_CURRENCY, Currency.CAT_HARVEST));
 
     try (RepositoryFactory repositoryFactory = new RepositoryFactoryVertxImpl(configuration)) {
       appDoSomeStuff(repositoryFactory);
@@ -97,7 +99,7 @@ public class RepositoryFactoryConfigurationExamplesIntegrationTest {
     // set
 
     // Note: if rest is used, these values are cached form rest
-    NetworkCurrency currency = repositoryFactory.getNetworkCurrency().toFuture().get();
+    Currency currency = repositoryFactory.getNetworkCurrency().toFuture().get();
     String generationHash = repositoryFactory.getGenerationHash().toFuture().get();
     NetworkType networkType = repositoryFactory.getNetworkType().toFuture().get();
 

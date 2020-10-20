@@ -21,8 +21,8 @@ import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.TransactionService;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.mosaic.Currency;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
@@ -165,8 +165,8 @@ public abstract class BaseIntegrationTest {
     helper().sleep(time);
   }
 
-  public NetworkCurrency getNetworkCurrency() {
-    return helper().getNetworkCurrency();
+  public Currency getNetworkCurrency() {
+    return helper().getCurrency();
   }
 
   protected NamespaceId setAddressAlias(

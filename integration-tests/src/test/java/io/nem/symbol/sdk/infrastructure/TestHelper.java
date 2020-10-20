@@ -38,13 +38,13 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.blockchain.BlockDuration;
+import io.nem.symbol.sdk.model.mosaic.Currency;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNames;
 import io.nem.symbol.sdk.model.mosaic.MosaicNonce;
 import io.nem.symbol.sdk.model.mosaic.MosaicSupplyChangeActionType;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
@@ -101,7 +101,7 @@ public class TestHelper {
   private final Map<RepositoryType, Listener> listenerMap = new HashMap<>();
   private final String generationHash;
   private final NetworkType networkType;
-  private final NetworkCurrency networkCurrency;
+  private final Currency currency;
   private final JsonHelper jsonHelper =
       new JsonHelperJackson2(JsonHelperJackson2.configureMapper(new ObjectMapper()));
   private final Config config;
@@ -112,7 +112,7 @@ public class TestHelper {
     this.config = new Config();
     System.out.println("Running tests against server: " + config().getApiUrl());
     this.generationHash = resolveGenerationHash();
-    this.networkCurrency = resolveNetworkCurrency();
+    this.currency = resolveNetworkCurrency();
     this.networkType = resolveNetworkType();
     this.epochAdjustment = resolveEpochAdjustment();
     this.config.init(this.networkType);
@@ -265,7 +265,7 @@ public class TestHelper {
       return accountInfo.getMosaics().stream()
           .anyMatch(
               m ->
-                  networkCurrency.getMosaicId().get().equals(m.getId())
+                  currency.getMosaicId().get().equals(m.getId())
                       && m.getAmount().longValue() >= MIN_AMOUNT_PER_TRANSFER);
     } catch (RepositoryCallException e) {
       return false;
@@ -331,7 +331,7 @@ public class TestHelper {
     Assertions.assertEquals(records1, records2);
   }
 
-  private NetworkCurrency resolveNetworkCurrency() {
+  private Currency resolveNetworkCurrency() {
     return get(getRepositoryFactory(DEFAULT_REPOSITORY_TYPE).getNetworkCurrency());
   }
 
@@ -375,8 +375,8 @@ public class TestHelper {
     return networkType;
   }
 
-  public NetworkCurrency getNetworkCurrency() {
-    return networkCurrency;
+  public Currency getCurrency() {
+    return currency;
   }
 
   public JsonHelper getJsonHelper() {
@@ -666,7 +666,7 @@ public class TestHelper {
         aggregateTransaction.signTransactionWithCosigners(
             multisigAccount, Arrays.asList(accounts), getGenerationHash());
 
-    Mosaic hashAmount = getNetworkCurrency().createRelative(BigInteger.valueOf(10));
+    Mosaic hashAmount = getCurrency().createRelative(BigInteger.valueOf(10));
     HashLockTransaction hashLockTransaction =
         HashLockTransactionFactory.create(
                 getNetworkType(),
@@ -790,7 +790,7 @@ public class TestHelper {
             getNetworkType(),
             getDeadline(),
             recipient,
-            Collections.singletonList(getNetworkCurrency().createAbsolute(amount)));
+            Collections.singletonList(getCurrency().createAbsolute(amount)));
 
     factory.maxFee(maxFee);
     TransferTransaction transferTransaction = factory.build();

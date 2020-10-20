@@ -118,4 +118,14 @@ public class FormatUtils {
     }
     return duration;
   }
+
+  /**
+   * It converts a server Hex like 0x017D'1694'0477'B3F5 to 017D16940477B3F5
+   *
+   * @param serverHex the server hex
+   * @return a regular hex string.
+   */
+  public static String toSimpleHex(String serverHex) {
+    return serverHex.replace("'", "").replaceAll("^(0x)", "");
+  }
 }

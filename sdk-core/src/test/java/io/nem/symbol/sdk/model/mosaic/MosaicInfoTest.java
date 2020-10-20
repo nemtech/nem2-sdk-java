@@ -76,12 +76,12 @@ class MosaicInfoTest {
             3,
             BigInteger.valueOf(10));
 
-    NetworkCurrency networkCurrency = mosaicInfo.toNetworkCurrency();
-    assertEquals(mosaicId, networkCurrency.getMosaicId().get());
-    assertFalse(networkCurrency.getNamespaceId().isPresent());
-    assertTrue(networkCurrency.isSupplyMutable());
-    assertTrue(networkCurrency.isTransferable());
-    assertEquals(3, networkCurrency.getDivisibility());
+    Currency currency = mosaicInfo.toCurrency();
+    assertEquals(mosaicId, currency.getMosaicId().get());
+    assertFalse(currency.getNamespaceId().isPresent());
+    assertTrue(currency.isSupplyMutable());
+    assertTrue(currency.isTransferable());
+    assertEquals(3, currency.getDivisibility());
   }
 
   @Test

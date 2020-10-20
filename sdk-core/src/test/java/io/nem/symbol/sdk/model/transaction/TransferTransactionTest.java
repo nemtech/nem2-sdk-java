@@ -35,9 +35,9 @@ import io.nem.symbol.sdk.model.message.MessageType;
 import io.nem.symbol.sdk.model.message.PersistentHarvestingDelegationMessage;
 import io.nem.symbol.sdk.model.message.PersistentHarvestingDelegationMessage.HarvestingKeys;
 import io.nem.symbol.sdk.model.message.PlainMessage;
+import io.nem.symbol.sdk.model.mosaic.Currency;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import java.math.BigInteger;
 import java.time.Duration;
@@ -301,8 +301,7 @@ class TransferTransactionTest extends AbstractTransactionTester {
                 networkType,
                 new Deadline(BigInteger.ONE),
                 namespaceId,
-                Collections.singletonList(
-                    NetworkCurrency.CAT_CURRENCY.createAbsolute(BigInteger.ONE)))
+                Collections.singletonList(Currency.CAT_CURRENCY.createAbsolute(BigInteger.ONE)))
             .message(new PlainMessage("test-message"))
             .build();
 

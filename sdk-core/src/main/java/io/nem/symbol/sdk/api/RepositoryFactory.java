@@ -15,7 +15,8 @@
  */
 package io.nem.symbol.sdk.api;
 
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
+import io.nem.symbol.sdk.model.mosaic.Currency;
+import io.nem.symbol.sdk.model.mosaic.NetworkCurrencies;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.reactivex.Observable;
 import java.io.Closeable;
@@ -106,24 +107,33 @@ public interface RepositoryFactory extends Closeable {
   Observable<String> getGenerationHash();
 
   /**
-   * @return the configured network currency configuration like "cat.harvest", "nem.xem " and
+   * @return the configured network currency configuration like "cat.currency", "nem.xem " and
    *     "symbol.xym". This method uses the user configured properties if provided. If it's not
    *     provided, it resolves the configuration from the /network/properties endpoint. This method
    *     is cached, the server is only called the first time.
-   * @see NetworkCurrencyService
+   * @see CurrencyService
    * @see RepositoryFactoryConfiguration
    */
-  Observable<NetworkCurrency> getNetworkCurrency();
+  Observable<Currency> getNetworkCurrency();
 
   /**
    * @return the configured harvest currency configuration like "cat.harvest". This method uses the
    *     user configured properties if provided. If it's not provided, it resolves the configuration
    *     from the /network/properties endpoint. This method is cached, the server is only called the
    *     first time. The network currency configuration
-   * @see NetworkCurrencyService
+   * @see CurrencyService
    * @see RepositoryFactoryConfiguration
    */
-  Observable<NetworkCurrency> getHarvestCurrency();
+  Observable<Currency> getHarvestCurrency();
+  /**
+   * @return the configured harvest currencies configuration like "cat.currency" or "cat.harvest".
+   *     This method uses the user configured properties if provided. If it's not provided, it
+   *     resolves the configuration * from the /network/properties endpoint. This method is cached,
+   *     the server is only called the * first time. The network currency configuration
+   * @see CurrencyService
+   * @see RepositoryFactoryConfiguration
+   */
+  Observable<NetworkCurrencies> getNetworkCurrencies();
 
   /**
    * @return the configured server epochAdjustment. This method uses the user configured properties

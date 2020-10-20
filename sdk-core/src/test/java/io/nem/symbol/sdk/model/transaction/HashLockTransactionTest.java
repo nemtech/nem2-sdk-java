@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.PublicAccount;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
+import io.nem.symbol.sdk.model.mosaic.Currency;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +43,7 @@ class HashLockTransactionTest extends AbstractTransactionTester {
         HashLockTransactionFactory.create(
                 networkType,
                 new Deadline(BigInteger.ONE),
-                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
+                Currency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 "8498B38D89C1DC8A448EA5824938FF828926CD9F7747B1844B59B4B6807E878B")
             .signer(account.getPublicAccount())
@@ -62,7 +62,7 @@ class HashLockTransactionTest extends AbstractTransactionTester {
         HashLockTransactionFactory.create(
                 networkType,
                 new Deadline(BigInteger.ONE),
-                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
+                Currency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 "8498B38D89C1DC8A448EA5824938FF828926CD9F7747B1844B59B4B6807E878B")
             .build();
@@ -86,7 +86,7 @@ class HashLockTransactionTest extends AbstractTransactionTester {
         HashLockTransactionFactory.create(
                 networkType,
                 new Deadline(BigInteger.ONE),
-                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
+                Currency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 signedTransaction)
             .build();
@@ -116,7 +116,7 @@ class HashLockTransactionTest extends AbstractTransactionTester {
           HashLockTransactionFactory.create(
                   networkType,
                   new Deadline(BigInteger.ONE),
-                  NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
+                  Currency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                   BigInteger.valueOf(100),
                   signedTransaction)
               .build();

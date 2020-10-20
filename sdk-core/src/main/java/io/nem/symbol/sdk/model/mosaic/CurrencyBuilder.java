@@ -21,14 +21,14 @@ import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 
 /**
- * Builder of {@link NetworkCurrency}. This builders helps the user creating the {@link
- * NetworkCurrency} objects when setting up the {@link RepositoryFactoryConfiguration}.
+ * Builder of {@link Currency}. This builders helps the user creating the {@link Currency} objects
+ * when setting up the {@link RepositoryFactoryConfiguration}.
  */
-public final class NetworkCurrencyBuilder {
+public final class CurrencyBuilder {
 
   /**
-   * The selected unresolved mosaic id the {@link NetworkCurrency} uses when creating {@link
-   * Mosaic}. This could either be the Namespace or the Mosaic id.
+   * The selected unresolved mosaic id the {@link Currency} uses when creating {@link Mosaic}. This
+   * could either be the Namespace or the Mosaic id.
    */
   private final UnresolvedMosaicId unresolvedMosaicId;
 
@@ -52,7 +52,10 @@ public final class NetworkCurrencyBuilder {
   /** Is this currency supply mutable. */
   private boolean supplyMutable = false;
 
-  public NetworkCurrencyBuilder(UnresolvedMosaicId unresolvedMosaicId, int divisibility) {
+  /** Is this currency restrictable. */
+  private boolean restrictable = false;
+
+  public CurrencyBuilder(UnresolvedMosaicId unresolvedMosaicId, int divisibility) {
     Validate.notNull(unresolvedMosaicId, "unresolvedMosaicId must not be null");
     Validate.isTrue(divisibility > 0, "divisibility must be greater than 0");
     this.unresolvedMosaicId = unresolvedMosaicId;
@@ -70,7 +73,7 @@ public final class NetworkCurrencyBuilder {
    * @param mosaicId the mosaic id
    * @return this builder.
    */
-  public NetworkCurrencyBuilder withMosaicId(MosaicId mosaicId) {
+  public CurrencyBuilder withMosaicId(MosaicId mosaicId) {
     Validate.notNull(mosaicId, "mosaicId must not be null");
     this.mosaicId = Optional.of(mosaicId);
     return this;
@@ -82,7 +85,7 @@ public final class NetworkCurrencyBuilder {
    * @param namespaceId the namespace id
    * @return this builder.
    */
-  public NetworkCurrencyBuilder withNamespaceId(NamespaceId namespaceId) {
+  public CurrencyBuilder withNamespaceId(NamespaceId namespaceId) {
     Validate.notNull(namespaceId, "namespaceId must not be null");
     this.namespaceId = Optional.of(namespaceId);
     return this;
@@ -94,7 +97,7 @@ public final class NetworkCurrencyBuilder {
    * @param transferable the transferable
    * @return this builder.
    */
-  public NetworkCurrencyBuilder withTransferable(boolean transferable) {
+  public CurrencyBuilder withTransferable(boolean transferable) {
     this.transferable = transferable;
     return this;
   }
@@ -105,18 +108,29 @@ public final class NetworkCurrencyBuilder {
    * @param supplyMutable the supplyMutable
    * @return this builder.
    */
-  public NetworkCurrencyBuilder withSupplyMutable(boolean supplyMutable) {
+  public CurrencyBuilder withSupplyMutable(boolean supplyMutable) {
     this.supplyMutable = supplyMutable;
     return this;
   }
 
   /**
-   * Once the builder is configured, call this method to create the {@link NetworkCurrency}
+   * Helper method to setup the restrictable flag.
+   *
+   * @param restrictable the restrictable
+   * @return this builder.
+   */
+  public CurrencyBuilder withRestrictable(boolean restrictable) {
+    this.restrictable = restrictable;
+    return this;
+  }
+
+  /**
+   * Once the builder is configured, call this method to create the {@link Currency}
    *
    * @return the network currency.
    */
-  public NetworkCurrency build() {
-    return new NetworkCurrency(this);
+  public Currency build() {
+    return new Currency(this);
   }
 
   public UnresolvedMosaicId getUnresolvedMosaicId() {
@@ -141,5 +155,9 @@ public final class NetworkCurrencyBuilder {
 
   public boolean isSupplyMutable() {
     return supplyMutable;
+  }
+
+  public boolean isRestrictable() {
+    return restrictable;
   }
 }

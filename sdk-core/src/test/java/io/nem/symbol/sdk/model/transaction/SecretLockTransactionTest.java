@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
+import io.nem.symbol.sdk.model.mosaic.Currency;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
@@ -47,7 +47,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
         SecretLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new Deadline(BigInteger.ONE),
-                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
+                Currency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithm.SHA3_256,
                 secret,
@@ -70,7 +70,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
         SecretLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new Deadline(BigInteger.ONE),
-                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
+                Currency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithm.SHA3_256,
                 secret,
@@ -96,7 +96,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
         SecretLockTransactionFactory.create(
                 NetworkType.MIJIN_TEST,
                 new Deadline(BigInteger.ONE),
-                NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
+                Currency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                 BigInteger.valueOf(100),
                 LockHashAlgorithm.SHA3_256,
                 secret,
@@ -121,7 +121,7 @@ public class SecretLockTransactionTest extends AbstractTransactionTester {
                 SecretLockTransactionFactory.create(
                         NetworkType.MIJIN_TEST,
                         new Deadline(BigInteger.ONE),
-                        NetworkCurrency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
+                        Currency.CAT_CURRENCY.createRelative(BigInteger.valueOf(10)),
                         BigInteger.valueOf(100),
                         LockHashAlgorithm.SHA3_256,
                         "non valid hash",

@@ -67,20 +67,29 @@ public class Config {
                 + " Nemesis address must bue added manually");
         return Collections.emptyList();
       }
-      Map<String, List<Map<String, String>>> mosaics =
-          (Map<String, List<Map<String, String>>>)
-              mapper.readValue(generatedAddresses, Map.class).get("mosaics");
-      List<Map<String, String>> bootstrapAddresses = mosaics.get("currency");
+
+      List<Map<String, String>> bootstrapAddresses;
+      try {
+        // OLD FORMAT
+        Map<String, List<Map<String, String>>> mosaics =
+            (Map<String, List<Map<String, String>>>)
+                mapper.readValue(generatedAddresses, Map.class).get("mosaics");
+        bootstrapAddresses = mosaics.get("currency");
+      } catch (ClassCastException e) {
+        // NEW FORMAT
+        List<Map<String, List<Map<String, String>>>> mosaics =
+            (List<Map<String, List<Map<String, String>>>>)
+                mapper.readValue(generatedAddresses, Map.class).get("mosaics");
+        bootstrapAddresses = mosaics.get(0).get("accounts");
+      }
 
       return bootstrapAddresses.stream()
           .map(m -> Account.createFromPrivateKey(m.get("privateKey"), networkType))
           .collect(Collectors.toList());
 
     } catch (Exception e) {
-      System.err.println(
-          "Nemesis account could not be loaded from Bootstrap: " + ExceptionUtils.getMessage(e));
-      e.printStackTrace();
-      return Collections.emptyList();
+      throw new IllegalStateException(
+          "Nemesis account could not be loaded from Bootstrap: " + ExceptionUtils.getMessage(e), e);
     }
   }
 

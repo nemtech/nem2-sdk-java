@@ -20,11 +20,11 @@ import io.nem.symbol.sdk.api.AccountPaginationStreamer;
 import io.nem.symbol.sdk.api.AccountRepository;
 import io.nem.symbol.sdk.api.AccountSearchCriteria;
 import io.nem.symbol.sdk.api.RepositoryCallException;
+import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
+import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import java.util.List;
-import java.util.function.Function;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -55,17 +55,17 @@ class AccountSearchRepositoryIntegrationTest extends BaseIntegrationTest {
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
-  void searchMosaicIdProvided(
-      RepositoryType type, Function<MosaicId, AccountSearchCriteria> function) {
+  void searchMosaicIdProvided(RepositoryType type) {
     AccountPaginationStreamer streamer =
         new AccountPaginationStreamer(this.getAccountRepository(type));
+    RepositoryFactory repositoryFactory = getRepositoryFactory(type);
+    NamespaceId networkCurrencyId =
+        get(repositoryFactory.getNetworkCurrency()).getNamespaceId().get();
+    Assertions.assertTrue(networkCurrencyId.getFullName().isPresent());
     MosaicId mosaicId =
-        get(
-            getRepositoryFactory(type)
-                .createNamespaceRepository()
-                .getLinkedMosaicId(NetworkCurrency.CAT_CURRENCY.getNamespaceId().get()));
+        get(repositoryFactory.createNamespaceRepository().getLinkedMosaicId(networkCurrencyId));
 
-    AccountSearchCriteria criteria = function.apply(mosaicId);
+    AccountSearchCriteria criteria = new AccountSearchCriteria().mosaicId(mosaicId);
     List<AccountInfo> accounts = get(streamer.search(criteria).toList().toObservable());
 
     Assertions.assertFalse(accounts.isEmpty());

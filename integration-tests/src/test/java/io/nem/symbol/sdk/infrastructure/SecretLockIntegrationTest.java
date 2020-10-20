@@ -22,8 +22,8 @@ import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.SecretLockRepository;
 import io.nem.symbol.sdk.api.SecretLockSearchCriteria;
 import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.mosaic.Currency;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
-import io.nem.symbol.sdk.model.mosaic.NetworkCurrency;
 import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransaction;
@@ -71,8 +71,8 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
 
     Account account = config().getNemesisAccount1();
     Account account2 = config().getNemesisAccount2();
-    NetworkCurrency networkCurrency = get(repositoryFactory.getNetworkCurrency());
-    Mosaic mosaic = networkCurrency.createAbsolute(BigInteger.valueOf(1));
+    Currency currency = get(repositoryFactory.getNetworkCurrency());
+    Mosaic mosaic = currency.createAbsolute(BigInteger.valueOf(1));
     BigInteger amount = mosaic.getAmount();
     SecretLockTransaction secretLockTransaction =
         SecretLockTransactionFactory.create(

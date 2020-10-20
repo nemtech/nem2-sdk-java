@@ -24,40 +24,40 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 
-class NetworkCurrencyCatCurrencyTest {
+class CurrencySymbolXymTest {
 
-  private NetworkCurrency networkCurrency = NetworkCurrency.CAT_CURRENCY;
+  private Currency currency = Currency.SYMBOL_XYM;
 
   @Test
   void shouldCreateRelativeMosaic() {
-    Mosaic currency = networkCurrency.createRelative(BigInteger.valueOf(1000));
+    Mosaic currency = this.currency.createRelative(BigInteger.valueOf(1000));
     assertEquals(BigInteger.valueOf(1000 * 1000000), currency.getAmount());
-    assertEquals(networkCurrency.getNamespaceId().get(), currency.getId());
-    assertEquals("85BBEA6CC462B244", currency.getIdAsHex());
+    assertEquals(this.currency.getNamespaceId().get(), currency.getId());
+    assertEquals("E74B99BA41F4AFEE", currency.getIdAsHex());
   }
 
   @Test
   void shouldCreateRelativeMosaicUsingBigDecimal() {
-    Mosaic currency = networkCurrency.createRelative(BigDecimal.valueOf(0.000001));
+    Mosaic currency = this.currency.createRelative(BigDecimal.valueOf(0.000001));
     assertEquals(BigInteger.valueOf((long) (0.000001 * 1000000)), currency.getAmount());
-    assertEquals(networkCurrency.getNamespaceId().get(), currency.getId());
-    assertEquals("85BBEA6CC462B244", currency.getIdAsHex());
+    assertEquals(this.currency.getNamespaceId().get(), currency.getId());
+    assertEquals("E74B99BA41F4AFEE", currency.getIdAsHex());
   }
 
   @Test
   void shouldCreateAbsoluteMosaic() {
-    Mosaic currency = networkCurrency.createAbsolute(BigInteger.valueOf(1));
+    Mosaic currency = this.currency.createAbsolute(BigInteger.valueOf(1));
     assertEquals(BigInteger.valueOf(1), currency.getAmount());
-    assertEquals(networkCurrency.getNamespaceId().get(), currency.getId());
-    assertEquals("85BBEA6CC462B244", currency.getIdAsHex());
+    assertEquals(this.currency.getNamespaceId().get(), currency.getId());
+    assertEquals("E74B99BA41F4AFEE", currency.getIdAsHex());
   }
 
   @Test
   void shouldCompareNamespaceIdsForEquality() {
-    NamespaceId namespaceId = NamespaceId.createFromId(BigInteger.valueOf(-8810190493148073404L));
-    assertEquals(-8810190493148073404L, namespaceId.getIdAsLong());
-    assertEquals(networkCurrency.getNamespaceId().get().getIdAsLong(), namespaceId.getIdAsLong());
-    assertEquals(networkCurrency.getNamespaceId().get().getIdAsHex(), namespaceId.getIdAsHex());
+    NamespaceId namespaceId = NamespaceId.createFromId(BigInteger.valueOf(-1780160202445377554L));
+    assertEquals(-1780160202445377554L, namespaceId.getIdAsLong());
+    assertEquals(currency.getNamespaceId().get().getIdAsLong(), namespaceId.getIdAsLong());
+    assertEquals(currency.getNamespaceId().get().getIdAsHex(), namespaceId.getIdAsHex());
 
     // Note:
     // BigInteger decimal generated from namespace path vs generated using Lower and
@@ -72,10 +72,10 @@ class NetworkCurrencyCatCurrencyTest {
   @Test
   @SuppressWarnings("squid:S3415")
   void shouldHaveValidStatics() {
-    assertEquals(networkCurrency.getUnresolvedMosaicId(), networkCurrency.getNamespaceId().get());
-    assertEquals("cat.currency", networkCurrency.getNamespaceId().get().getFullName().get());
-    assertEquals(6, networkCurrency.getDivisibility());
-    assertTrue(networkCurrency.isTransferable());
-    assertFalse(networkCurrency.isSupplyMutable());
+    assertEquals(currency.getUnresolvedMosaicId(), currency.getNamespaceId().get());
+    assertEquals("symbol.xym", currency.getNamespaceId().get().getFullName().get());
+    assertEquals(6, currency.getDivisibility());
+    assertTrue(currency.isTransferable());
+    assertFalse(currency.isSupplyMutable());
   }
 }
