@@ -38,8 +38,7 @@ plugins {
 
 apply plugin: 'nebula-aggregate-javadocs'
 
-def artifactVersion = rootProject.file('version.txt').text.trim()
-def isReleaseVersion = !artifactVersion.contains("SNAPSHOT")
+
 
 ext {
     vertxVersion = "3.5.0"
@@ -77,6 +76,11 @@ def signingPassword = getPropertyValue('signingPassword')
 
 def githubToken = getPropertyValue('GITHUB_TOKEN')
 def repoPath = getPropertyValue('TRAVIS_REPO_SLUG', "nemtech/symbol-sdk-java")
+
+def artifactVersion =  getPropertyValue('VERSION', rootProject.file('version.txt').text.trim() + '-SNAPSHOT')
+def isReleaseVersion = !artifactVersion.contains("SNAPSHOT")
+
+System.out.println("Current Version: " + artifactVersion)
 
 allprojects {
     ext."signing.keyId" = signingKeyId

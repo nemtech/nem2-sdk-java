@@ -7,6 +7,12 @@ jdk:
   - openjdk8
 services:
   - docker
+env:
+  global:
+    - DEV_BRANCH=dev
+    - RELEASE_BRANCH=main
+    - POST_RELEASE_BRANCH=main
+    - RELEASE_MESSAGE=release
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -16,38 +22,51 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
     - gradle/wrapper/
+before_script:
+  - . ./travis/travis-functions.sh
+  - VERSION="$(load_version_from_file)-SNAPSHOT"
+  - log_env_variables
+install:
+  - true
+script: ./gradlew install spotlessCheck jacocoTestReport coveralls -x javadoc -x integrationTest
 jobs:
   include:
-    - stage: e2e
+    - stage: test
+      name: javadoc
+      script: ./gradlew javadoc
+    - stage: test
+      name: spotlessCheck
+      script: ./gradlew spotlessCheck
+#    - stage: test
+#      name: sonarqube
+#      script: ./gradlew sonarqube -x test
+    - name: e2e tests
       script: source e2e.sh
-      if: branch = e2e
-install:
-  - true  #If install is not set, travis will run gradle assemble
-script: /bin/sh travis/build.sh
-deploy:
-  - provider: script
-    skip_cleanup: true
-    script: /bin/sh travis/uploadArchives.sh
-    on:
-      branch: main
-      jdk: oraclejdk8
-  - provider: script
-    skip_cleanup: true
-    script: /bin/sh travis/release.sh
-    on:
-      branch: $RELEASE_BRANCH
-      jdk: oraclejdk8
-#  - provider: script
-#    skip_cleanup: true
-#    script: /bin/sh travis/sonarqube.sh
-#    on:
-#      branch: main
-#      jdk: oraclejdk9
+      if: (branch = env(DEV_BRANCH) AND type = cron) OR (commit_message = e2e)
+    - stage: publish
+      name: github alpha pages
+      script: ./gradlew javadoc gitPublishPush
+      if: branch = env(DEV_BRANCH) AND type = push
+    - name: alpha maven
+      script: ./gradlew publish
+      if: branch = env(DEV_BRANCH) AND type = push
+    - stage: release
+      name: release maven
+      script: VERSION="$(load_version_from_file)" && ./gradlew publish closeAndReleaseRepository
+      if: branch = env(RELEASE_BRANCH) AND type = api AND commit_message = env(RELEASE_MESSAGE)
+    - name: github release pages
+      script: VERSION="$(load_version_from_file)" && ./gradlew javadoc gitPublishPush
+      if: branch = env(RELEASE_BRANCH) AND type = api AND commit_message = env(RELEASE_MESSAGE)
+    - stage: post release
+      name: tag and version upgrade
+      script: /bin/bash travis/travis-functions.sh post_release_version_file
+      if: branch = env(RELEASE_BRANCH) AND type = api AND commit_message = env(RELEASE_MESSAGE)
+
 before_install:
   - |
     if [ -z "${signingKeyId}" ]; then
       echo "No signing the artifacts"
     else
       echo "Signing artifacts"
-      openssl aes-256-cbc -K $encrypted_98cf1ffdea51_key -iv $encrypted_98cf1ffdea51_iv -in travis/symbol-sdk-java.gpg.enc -out symbol-sdk-java.gpg -d
+      openssl aes-256-cbc -K $encrypted_98cf1ffdea51_key -iv $encrypted_98cf1ffdea51_iv -in symbol-sdk-java.gpg.enc -out symbol-sdk-java.gpg -d
     fi
