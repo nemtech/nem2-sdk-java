@@ -78,6 +78,9 @@ public interface RepositoryFactory extends Closeable {
   /** @return a newly created {@link SecretLockRepository} */
   SecretLockRepository createSecretLockRepository();
 
+  /** @return a newly created {@link FinalizationRepository} */
+  FinalizationRepository createFinalizationRepository();
+
   /** @return a newly created {@link Listener} */
   Listener createListener();
 

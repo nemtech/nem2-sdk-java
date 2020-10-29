@@ -24,12 +24,28 @@ public class SecretLockSearchCriteria extends SearchCriteria<SecretLockSearchCri
   /** Account address. */
   private final Address address;
 
+  /** filter by secret */
+  private String secret;
+
   public SecretLockSearchCriteria(Address address) {
     this.address = address;
   }
 
   public Address getAddress() {
     return address;
+  }
+
+  public String getSecret() {
+    return secret;
+  }
+
+  public void setSecret(String secret) {
+    this.secret = secret;
+  }
+
+  public SecretLockSearchCriteria secret(String secret) {
+    this.secret = secret;
+    return this;
   }
 
   @Override
@@ -44,11 +60,11 @@ public class SecretLockSearchCriteria extends SearchCriteria<SecretLockSearchCri
       return false;
     }
     SecretLockSearchCriteria that = (SecretLockSearchCriteria) o;
-    return Objects.equals(address, that.address);
+    return Objects.equals(address, that.address) && Objects.equals(secret, that.secret);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), address);
+    return Objects.hash(super.hashCode(), address, secret);
   }
 }

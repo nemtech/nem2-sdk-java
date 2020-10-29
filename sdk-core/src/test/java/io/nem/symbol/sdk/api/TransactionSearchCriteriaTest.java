@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
@@ -45,6 +46,9 @@ class TransactionSearchCriteriaTest {
     Assertions.assertNull(criteria.getOffset());
     Assertions.assertNull(criteria.getRecipientAddress());
     Assertions.assertNull(criteria.getSignerPublicKey());
+    Assertions.assertNull(criteria.getTransferMosaicId());
+    Assertions.assertNull(criteria.getFromTransferAmount());
+    Assertions.assertNull(criteria.getToTransferAmount());
   }
 
   @Test
@@ -53,6 +57,7 @@ class TransactionSearchCriteriaTest {
     Address address1 = Address.generateRandom(NetworkType.MIJIN_TEST);
     Address address2 = Address.generateRandom(NetworkType.MIJIN_TEST);
     PublicKey signerPublicKey = PublicKey.fromHexString("227F");
+    MosaicId mosaicId = new MosaicId(BigInteger.TEN);
 
     TransactionSearchCriteria criteria =
         new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED);
@@ -72,6 +77,11 @@ class TransactionSearchCriteriaTest {
     criteria.setOffset("offset1");
     criteria.setSignerPublicKey(signerPublicKey);
 
+    criteria.setFromTransferAmount(BigInteger.valueOf(10));
+    criteria.setToTransferAmount(BigInteger.valueOf(20));
+    criteria.setTransferMosaicId(mosaicId);
+    criteria.setSignerPublicKey(signerPublicKey);
+
     Assertions.assertEquals("theId", criteria.getId());
     Assertions.assertEquals(OrderBy.DESC, criteria.getOrder());
     Assertions.assertEquals(10, criteria.getPageSize());
@@ -88,6 +98,10 @@ class TransactionSearchCriteriaTest {
     Assertions.assertEquals(BigInteger.valueOf(2), criteria.getFromHeight());
     Assertions.assertEquals(BigInteger.valueOf(3), criteria.getToHeight());
     Assertions.assertEquals(signerPublicKey, criteria.getSignerPublicKey());
+
+    Assertions.assertEquals(BigInteger.valueOf(10), criteria.getFromTransferAmount());
+    Assertions.assertEquals(BigInteger.valueOf(20), criteria.getToTransferAmount());
+    Assertions.assertEquals(mosaicId, criteria.getTransferMosaicId());
   }
 
   @Test
@@ -96,6 +110,7 @@ class TransactionSearchCriteriaTest {
     Address address1 = Address.generateRandom(NetworkType.MIJIN_TEST);
     Address address2 = Address.generateRandom(NetworkType.MIJIN_TEST);
     PublicKey signerPublicKey = PublicKey.fromHexString("227F");
+    MosaicId mosaicId = new MosaicId(BigInteger.TEN);
 
     TransactionSearchCriteria criteria =
         new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED)
@@ -109,7 +124,10 @@ class TransactionSearchCriteriaTest {
     criteria.embedded(true);
     criteria.height(BigInteger.ONE);
     criteria.offset("offset1");
-    criteria.setSignerPublicKey(signerPublicKey);
+    criteria.signerPublicKey(signerPublicKey);
+    criteria.fromTransferAmount(BigInteger.valueOf(10));
+    criteria.toTransferAmount(BigInteger.valueOf(20));
+    criteria.transferMosaicId(mosaicId);
 
     Assertions.assertEquals("theId", criteria.getId());
     Assertions.assertEquals(OrderBy.ASC, criteria.getOrder());
@@ -125,6 +143,10 @@ class TransactionSearchCriteriaTest {
     Assertions.assertEquals("offset1", criteria.getOffset());
     Assertions.assertEquals(BigInteger.ONE, criteria.getHeight());
     Assertions.assertEquals(signerPublicKey, criteria.getSignerPublicKey());
+
+    Assertions.assertEquals(BigInteger.valueOf(10), criteria.getFromTransferAmount());
+    Assertions.assertEquals(BigInteger.valueOf(20), criteria.getToTransferAmount());
+    Assertions.assertEquals(mosaicId, criteria.getTransferMosaicId());
   }
 
   @Test

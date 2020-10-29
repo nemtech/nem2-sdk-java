@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 import io.nem.symbol.sdk.api.AccountRepository;
 import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.ChainRepository;
+import io.nem.symbol.sdk.api.FinalizationRepository;
 import io.nem.symbol.sdk.api.HashLockRepository;
 import io.nem.symbol.sdk.api.JsonSerialization;
 import io.nem.symbol.sdk.api.Listener;
@@ -141,6 +142,11 @@ public class RepositoryFactoryOkHttpImpl extends RepositoryFactoryBase {
   @Override
   public SecretLockRepository createSecretLockRepository() {
     return new SecretLockRepositoryOkHttpImpl(apiClient);
+  }
+
+  @Override
+  public FinalizationRepository createFinalizationRepository() {
+    return new FinalizationRepositoryOkHttpImpl(apiClient);
   }
 
   @Override

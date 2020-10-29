@@ -15,7 +15,6 @@
  */
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
-import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.SecretLockRepository;
@@ -49,16 +48,6 @@ public class SecretLockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
     this.client = new SecretLockRoutesApi(apiClient);
   }
 
-  @Override
-  public Observable<SecretLockInfo> getSecretLock(String secret) {
-    Callable<SecretLockInfoDTO> callback =
-        () ->
-            getClient()
-                .getSecretLock(
-                    ConvertUtils.padHex(secret, LockHashAlgorithm.DEFAULT_SECRET_HEX_SIZE));
-    return this.call(callback, this::toSecretLockInfo);
-  }
-
   private SecretLockInfo toSecretLockInfo(SecretLockInfoDTO dto) {
     SecretLockEntryDTO lock = dto.getLock();
     MosaicId mosaicId = MapperUtils.toMosaicId(lock.getMosaicId());
@@ -78,12 +67,13 @@ public class SecretLockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
   @Override
   public Observable<Page<SecretLockInfo>> search(SecretLockSearchCriteria criteria) {
     String address = toDto(criteria.getAddress());
+    String secret = criteria.getSecret();
     Integer pageSize = criteria.getPageSize();
     Integer pageNumber = criteria.getPageNumber();
     String offset = criteria.getOffset();
     Order order = toDto(criteria.getOrder());
     Callable<SecretLockPage> callback =
-        () -> getClient().searchSecretLock(address, pageSize, pageNumber, offset, order);
+        () -> getClient().searchSecretLock(address, secret, pageSize, pageNumber, offset, order);
     return this.call(callback, this::toPage);
   }
 

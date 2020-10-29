@@ -52,6 +52,7 @@ public class RepositoryFactoryOkHttpImplTest {
     Assertions.assertNotNull(factory.createHashLockRepository());
     Assertions.assertNotNull(factory.createSecretLockRepository());
     Assertions.assertNotNull(factory.createMultisigRepository());
+    Assertions.assertNotNull(factory.createFinalizationRepository());
     Assertions.assertNotNull(factory.createJsonSerialization());
     factory.close();
     factory.close();

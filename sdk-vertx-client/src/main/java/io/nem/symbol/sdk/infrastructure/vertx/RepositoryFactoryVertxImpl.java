@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.infrastructure.vertx;
 import io.nem.symbol.sdk.api.AccountRepository;
 import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.ChainRepository;
+import io.nem.symbol.sdk.api.FinalizationRepository;
 import io.nem.symbol.sdk.api.HashLockRepository;
 import io.nem.symbol.sdk.api.JsonSerialization;
 import io.nem.symbol.sdk.api.Listener;
@@ -153,6 +154,11 @@ public class RepositoryFactoryVertxImpl extends RepositoryFactoryBase {
   @Override
   public SecretLockRepository createSecretLockRepository() {
     return new SecretLockRepositoryVertxImpl(apiClient);
+  }
+
+  @Override
+  public FinalizationRepository createFinalizationRepository() {
+    return new FinalizationRepositoryVertxImpl(apiClient);
   }
 
   @Override

@@ -22,6 +22,7 @@ import io.nem.symbol.sdk.api.OrderBy;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiException;
@@ -132,6 +133,10 @@ public abstract class AbstractRepositoryVertxImpl {
 
   protected String toDto(Address address) {
     return address == null ? null : address.plain();
+  }
+
+  protected String toDto(MosaicId mosaicId) {
+    return mosaicId == null ? null : mosaicId.getIdAsHex();
   }
 
   protected String toDto(BigInteger number) {

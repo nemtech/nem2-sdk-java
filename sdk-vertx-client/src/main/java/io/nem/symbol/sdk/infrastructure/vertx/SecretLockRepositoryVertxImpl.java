@@ -15,7 +15,6 @@
  */
 package io.nem.symbol.sdk.infrastructure.vertx;
 
-import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.SecretLockRepository;
@@ -47,16 +46,6 @@ public class SecretLockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     this.client = new SecretLockRoutesApiImpl(apiClient);
   }
 
-  @Override
-  public Observable<SecretLockInfo> getSecretLock(String secret) {
-    return this.call(
-        (h) ->
-            getClient()
-                .getSecretLock(
-                    ConvertUtils.padHex(secret, LockHashAlgorithm.DEFAULT_SECRET_HEX_SIZE), h),
-        this::toSecretLockInfo);
-  }
-
   private SecretLockInfo toSecretLockInfo(SecretLockInfoDTO dto) {
     SecretLockEntryDTO lock = dto.getLock();
     MosaicId mosaicId = MapperUtils.toMosaicId(lock.getMosaicId());
@@ -79,9 +68,11 @@ public class SecretLockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     Integer pageSize = criteria.getPageSize();
     Integer pageNumber = criteria.getPageNumber();
     String offset = criteria.getOffset();
+    String secret = criteria.getSecret();
     Order order = toDto(criteria.getOrder());
     Consumer<Handler<AsyncResult<SecretLockPage>>> handlerConsumer =
-        (h) -> getClient().searchSecretLock(address, pageSize, pageNumber, offset, order, h);
+        (h) ->
+            getClient().searchSecretLock(address, secret, pageSize, pageNumber, offset, order, h);
     return this.call(handlerConsumer, this::toPage);
   }
 

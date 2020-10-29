@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import java.math.BigInteger;
@@ -64,6 +65,23 @@ public class TransactionSearchCriteria extends SearchCriteria<TransactionSearchC
    * empty array)
    */
   private List<TransactionType> transactionTypes;
+
+  /** Filters transactions involving a specific mosaic id. (optional) */
+  private MosaicId transferMosaicId;
+
+  /**
+   * Requires providing the transferMosaicId filter. Only transfer transactions with a transfer
+   * amount of the provided mosaic id, greater or equal than this amount are returned. (optional,
+   * default to null)
+   */
+  private BigInteger fromTransferAmount;
+
+  /**
+   * Requires providing the transferMosaicId filter. Only transfer transactions with a transfer
+   * amount of the provided mosaic id, lesser or equal than this amount are returned. (optional,
+   * default to null)
+   */
+  private BigInteger toTransferAmount;
 
   /**
    * When true, the endpoint also returns all the embedded aggregate transactions. When false, only
@@ -198,6 +216,45 @@ public class TransactionSearchCriteria extends SearchCriteria<TransactionSearchC
     return this;
   }
 
+  public MosaicId getTransferMosaicId() {
+    return transferMosaicId;
+  }
+
+  public void setTransferMosaicId(MosaicId transferMosaicId) {
+    this.transferMosaicId = transferMosaicId;
+  }
+
+  public TransactionSearchCriteria transferMosaicId(MosaicId transferMosaicId) {
+    this.transferMosaicId = transferMosaicId;
+    return this;
+  }
+
+  public BigInteger getFromTransferAmount() {
+    return fromTransferAmount;
+  }
+
+  public void setFromTransferAmount(BigInteger fromTransferAmount) {
+    this.fromTransferAmount = fromTransferAmount;
+  }
+
+  public TransactionSearchCriteria fromTransferAmount(BigInteger fromTransferAmount) {
+    this.fromTransferAmount = fromTransferAmount;
+    return this;
+  }
+
+  public BigInteger getToTransferAmount() {
+    return toTransferAmount;
+  }
+
+  public void setToTransferAmount(BigInteger toTransferAmount) {
+    this.toTransferAmount = toTransferAmount;
+  }
+
+  public TransactionSearchCriteria toTransferAmount(BigInteger toTransferAmount) {
+    this.toTransferAmount = toTransferAmount;
+    return this;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -210,15 +267,18 @@ public class TransactionSearchCriteria extends SearchCriteria<TransactionSearchC
       return false;
     }
     TransactionSearchCriteria that = (TransactionSearchCriteria) o;
-    return Objects.equals(id, that.id)
+    return group == that.group
+        && Objects.equals(id, that.id)
         && Objects.equals(address, that.address)
         && Objects.equals(recipientAddress, that.recipientAddress)
         && Objects.equals(signerPublicKey, that.signerPublicKey)
         && Objects.equals(height, that.height)
         && Objects.equals(fromHeight, that.fromHeight)
         && Objects.equals(toHeight, that.toHeight)
-        && group == that.group
         && Objects.equals(transactionTypes, that.transactionTypes)
+        && Objects.equals(transferMosaicId, that.transferMosaicId)
+        && Objects.equals(fromTransferAmount, that.fromTransferAmount)
+        && Objects.equals(toTransferAmount, that.toTransferAmount)
         && Objects.equals(embedded, that.embedded);
   }
 
@@ -226,6 +286,7 @@ public class TransactionSearchCriteria extends SearchCriteria<TransactionSearchC
   public int hashCode() {
     return Objects.hash(
         super.hashCode(),
+        group,
         id,
         address,
         recipientAddress,
@@ -233,8 +294,10 @@ public class TransactionSearchCriteria extends SearchCriteria<TransactionSearchC
         height,
         fromHeight,
         toHeight,
-        group,
         transactionTypes,
+        transferMosaicId,
+        fromTransferAmount,
+        toTransferAmount,
         embedded);
   }
 }

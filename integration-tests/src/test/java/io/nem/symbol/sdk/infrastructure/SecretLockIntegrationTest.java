@@ -111,14 +111,18 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
     SecretLockRepository hashLockRepository =
         getRepositoryFactory(type).createSecretLockRepository();
 
-    SecretLockInfo info = get(hashLockRepository.getSecretLock(secret));
+    SecretLockInfo info =
+        get(hashLockRepository.search(
+                new SecretLockSearchCriteria(account.getAddress()).secret(storedSecret)))
+            .getData()
+            .get(0);
     Assertions.assertNotNull(info);
     Assertions.assertEquals(account.getAddress(), info.getOwnerAddress());
     Assertions.assertEquals(account2.getAddress(), info.getRecipientAddress());
     Assertions.assertEquals(amount, info.getAmount());
+    Assertions.assertEquals(storedSecret, info.getSecret());
     Assertions.assertEquals(lockHashAlgorithm, info.getHashAlgorithm());
     Assertions.assertEquals(1, info.getStatus());
-    Assertions.assertEquals(storedSecret, info.getSecret());
 
     Page<SecretLockInfo> page =
         get(

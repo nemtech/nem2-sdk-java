@@ -22,6 +22,7 @@ import io.nem.symbol.sdk.api.OrderBy;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiException;
@@ -123,6 +124,10 @@ public abstract class AbstractRepositoryOkHttpImpl {
 
   protected String toDto(PublicKey publicKey) {
     return publicKey == null ? null : publicKey.toHex();
+  }
+
+  protected String toDto(MosaicId mosaicId) {
+    return mosaicId == null ? null : mosaicId.getIdAsHex();
   }
 
   protected String toDto(Address address) {

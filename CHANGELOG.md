@@ -3,6 +3,22 @@ All notable changes to this project will be documented in this file.
 
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.21.1] - NEXT
+
+**Milestone**: Catapult-server finality(0.10.0.3)
+ Package  | Version  | Link
+---|---|---
+SDK OkHttp| v0.21.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-okhttp-client
+SDK Vertx| v0.21.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-vertx-client
+Catbuffer Library| v0.0.23 | https://repo.maven.apache.org/maven2/io/nem/catbuffer-java
+Client OkHttp | v0.10.1  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-okhttp-gson-client
+Client Vertx | v0.10.1  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-vertx-client/
+
+- **[BREAKING CHANGE]** `SecreatLockRepository.getSecretLock` has been removed. You can now search by secret by using the search criteria.
+- Added `FinalizationRepository`.
+- Added `transferMosaicId`, `fromTransferAmount`, `toTransferAmount` to transaction searches.
+- Added `CurrencyService` to allow loading Network and custom `Currency` objects from the rest service.
+
 ## [0.21.0] - 25-Sep-2020
 
 **Milestone**: Catapult-server finality(0.10.0.3)

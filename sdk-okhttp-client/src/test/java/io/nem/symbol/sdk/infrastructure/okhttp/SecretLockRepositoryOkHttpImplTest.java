@@ -54,42 +54,6 @@ public class SecretLockRepositoryOkHttpImplTest extends AbstractOkHttpRespositor
   }
 
   @Test
-  public void shouldGetSecretLockInfo() throws Exception {
-    Address address = Address.generateRandom(this.networkType);
-    MosaicId mosaicId = MosaicId.createFromNonce(MosaicNonce.createRandom(), address);
-    Address recipientAddress = Address.generateRandom(this.networkType);
-
-    SecretLockEntryDTO lockHashDto = new SecretLockEntryDTO();
-    lockHashDto.setOwnerAddress(encodeAddress(address));
-    lockHashDto.setAmount(BigInteger.ONE);
-    lockHashDto.setEndHeight(BigInteger.TEN);
-    lockHashDto.setCompositeHash("ABC");
-    lockHashDto.setMosaicId(mosaicId.getIdAsHex());
-    lockHashDto.setRecipientAddress(encodeAddress(recipientAddress));
-    lockHashDto.setHashAlgorithm(LockHashAlgorithmEnum.NUMBER_2);
-    lockHashDto.setStatus(2);
-
-    SecretLockInfoDTO hashLockInfoDTO = new SecretLockInfoDTO();
-    hashLockInfoDTO.setLock(lockHashDto);
-    hashLockInfoDTO.setId("123");
-
-    mockRemoteCall(hashLockInfoDTO);
-
-    SecretLockInfo resolvedSecretLockInfo = repository.getSecretLock("abc").toFuture().get();
-    Assertions.assertEquals(address, resolvedSecretLockInfo.getOwnerAddress());
-    Assertions.assertEquals(recipientAddress, resolvedSecretLockInfo.getRecipientAddress());
-    Assertions.assertEquals(hashLockInfoDTO.getId(), resolvedSecretLockInfo.getRecordId().get());
-    Assertions.assertEquals(address, resolvedSecretLockInfo.getOwnerAddress());
-    Assertions.assertEquals(
-        lockHashDto.getCompositeHash(), resolvedSecretLockInfo.getCompositeHash());
-    Assertions.assertEquals(lockHashDto.getStatus(), resolvedSecretLockInfo.getStatus());
-    Assertions.assertEquals(mosaicId, resolvedSecretLockInfo.getMosaicId());
-    Assertions.assertEquals(LockHashAlgorithm.HASH_256, resolvedSecretLockInfo.getHashAlgorithm());
-    Assertions.assertEquals(lockHashDto.getAmount(), resolvedSecretLockInfo.getAmount());
-    Assertions.assertEquals(lockHashDto.getEndHeight(), resolvedSecretLockInfo.getEndHeight());
-  }
-
-  @Test
   public void shouldSearch() throws Exception {
     Address address = Address.generateRandom(this.networkType);
     MosaicId mosaicId = MosaicId.createFromNonce(MosaicNonce.createRandom(), address);

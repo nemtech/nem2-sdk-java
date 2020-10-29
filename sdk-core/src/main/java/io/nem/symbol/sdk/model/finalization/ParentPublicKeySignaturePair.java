@@ -13,9 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.nem.symbol.sdk.api;
+package io.nem.symbol.sdk.model.finalization;
 
-import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
+/** Parent publickey signature pair */
+public class ParentPublicKeySignaturePair {
 
-/** Repository used to retrieves secrets lock. */
-public interface SecretLockRepository extends Searcher<SecretLockInfo, SecretLockSearchCriteria> {}
+  /** Parent public key. */
+  private final String parentPublicKey;
+  /** Signature. */
+  private final String signature;
+
+  public ParentPublicKeySignaturePair(String parentPublicKey, String signature) {
+    this.parentPublicKey = parentPublicKey;
+    this.signature = signature;
+  }
+
+  public String getParentPublicKey() {
+    return parentPublicKey;
+  }
+
+  public String getSignature() {
+    return signature;
+  }
+}
