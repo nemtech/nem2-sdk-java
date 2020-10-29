@@ -1,4 +1,4 @@
-dist: trusty
+dist: focal
 language: java
 node_js: 12
 jdk:
@@ -26,6 +26,7 @@ before_script:
   - . ./travis/travis-functions.sh
   - VERSION="$(load_version_from_file)-SNAPSHOT"
   - log_env_variables
+  - docker-compose -version
 install:
   - true
 script: ./gradlew install spotlessCheck jacocoTestReport coveralls -x javadoc -x integrationTest
