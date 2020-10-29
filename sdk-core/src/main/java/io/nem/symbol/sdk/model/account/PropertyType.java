@@ -31,7 +31,7 @@ public enum PropertyType {
   BLOCK_MOSAIC(0x80 + 0x02),
   BLOCK_TRANSACTION(0x80 + 0x04);
 
-  private Integer value;
+  private final int value;
 
   PropertyType(int value) {
     this.value = value;
@@ -54,7 +54,7 @@ public enum PropertyType {
    *
    * @return enum value
    */
-  public Integer getValue() {
+  public int getValue() {
     return this.value;
   }
 }

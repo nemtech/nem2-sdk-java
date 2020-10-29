@@ -18,6 +18,8 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 import static io.nem.symbol.core.utils.MapperUtils.toAddress;
 import static io.nem.symbol.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.symbol.core.crypto.PublicKey;
+import io.nem.symbol.core.crypto.VotingKey;
 import io.nem.symbol.sdk.api.AccountRepository;
 import io.nem.symbol.sdk.api.AccountSearchCriteria;
 import io.nem.symbol.sdk.api.Page;
@@ -34,6 +36,7 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountIds;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountLinkPublicKeyDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountOrderByEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountPage;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Order;
@@ -41,7 +44,6 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.SupplementalPublicKeysDTO;
 import io.reactivex.Observable;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -84,62 +86,6 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
             .toObservable());
   }
 
-  private AccountInfo toAccountInfo(AccountInfoDTO accountInfoDTO) {
-    AccountDTO accountDTO = accountInfoDTO.getAccount();
-    return new AccountInfo(
-        accountInfoDTO.getId(),
-        toAddress(accountDTO.getAddress()),
-        accountDTO.getAddressHeight(),
-        accountDTO.getPublicKey(),
-        accountDTO.getPublicKeyHeight(),
-        accountDTO.getImportance(),
-        accountDTO.getImportanceHeight(),
-        accountDTO.getMosaics().stream()
-            .map(
-                mosaicDTO ->
-                    new ResolvedMosaic(toMosaicId(mosaicDTO.getId()), mosaicDTO.getAmount()))
-            .collect(Collectors.toList()),
-        AccountType.rawValueOf(accountDTO.getAccountType().getValue()),
-        toDto(accountDTO.getSupplementalPublicKeys()),
-        accountDTO.getActivityBuckets().stream()
-            .map(
-                dto ->
-                    new ActivityBucket(
-                        dto.getStartHeight(),
-                        dto.getTotalFeesPaid(),
-                        dto.getBeneficiaryCount(),
-                        dto.getRawScore()))
-            .collect(Collectors.toList()));
-  }
-
-  private SupplementalAccountKeys toDto(SupplementalPublicKeysDTO dto) {
-    if (dto == null) {
-      return new SupplementalAccountKeys(
-          Optional.empty(), Optional.empty(), Optional.empty(), Collections.emptyList());
-    }
-    Optional<String> linked =
-        Optional.ofNullable(dto.getLinked() == null ? null : dto.getLinked().getPublicKey());
-    Optional<String> node =
-        Optional.ofNullable(dto.getNode() == null ? null : dto.getNode().getPublicKey());
-    Optional<String> vrf =
-        Optional.ofNullable(dto.getVrf() == null ? null : dto.getVrf().getPublicKey());
-
-    List<AccountLinkVotingKey> voting =
-        dto.getVoting() == null || dto.getVoting().getPublicKeys() == null
-            ? Collections.emptyList()
-            : dto.getVoting().getPublicKeys().stream()
-                .map(
-                    p ->
-                        new AccountLinkVotingKey(
-                            p.getPublicKey(), p.getStartEpoch(), p.getEndEpoch()))
-                .collect(Collectors.toList());
-    return new SupplementalAccountKeys(linked, node, vrf, voting);
-  }
-
-  private AccountRoutesApi getClient() {
-    return client;
-  }
-
   @Override
   public Observable<Page<AccountInfo>> search(AccountSearchCriteria criteria) {
 
@@ -165,5 +111,66 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
                         page.getData().stream()
                             .map(this::toAccountInfo)
                             .collect(Collectors.toList()))));
+  }
+
+  private AccountInfo toAccountInfo(AccountInfoDTO accountInfoDTO) {
+    AccountDTO accountDTO = accountInfoDTO.getAccount();
+    return new AccountInfo(
+        accountInfoDTO.getId(),
+        toAddress(accountDTO.getAddress()),
+        accountDTO.getAddressHeight(),
+        PublicKey.fromHexString(accountDTO.getPublicKey()),
+        accountDTO.getPublicKeyHeight(),
+        accountDTO.getImportance(),
+        accountDTO.getImportanceHeight(),
+        accountDTO.getMosaics().stream()
+            .map(
+                mosaicDTO ->
+                    new ResolvedMosaic(toMosaicId(mosaicDTO.getId()), mosaicDTO.getAmount()))
+            .collect(Collectors.toList()),
+        AccountType.rawValueOf(accountDTO.getAccountType().getValue()),
+        toDto(accountDTO.getSupplementalPublicKeys()),
+        accountDTO.getActivityBuckets().stream()
+            .map(
+                dto ->
+                    new ActivityBucket(
+                        dto.getStartHeight(),
+                        dto.getTotalFeesPaid(),
+                        dto.getBeneficiaryCount(),
+                        dto.getRawScore()))
+            .collect(Collectors.toList()));
+  }
+
+  private SupplementalAccountKeys toDto(SupplementalPublicKeysDTO dto) {
+    if (dto == null) {
+      return new SupplementalAccountKeys(null, null, null, Collections.emptyList());
+    }
+    PublicKey linked = toPublicKey(dto.getLinked());
+    PublicKey node = toPublicKey(dto.getNode());
+    PublicKey vrf = toPublicKey(dto.getVrf());
+
+    List<AccountLinkVotingKey> voting =
+        dto.getVoting() == null || dto.getVoting().getPublicKeys() == null
+            ? Collections.emptyList()
+            : dto.getVoting().getPublicKeys().stream()
+                .map(
+                    p ->
+                        new AccountLinkVotingKey(
+                            VotingKey.fromHexString(p.getPublicKey()),
+                            (p.getStartEpoch()),
+                            (p.getEndEpoch())))
+                .collect(Collectors.toList());
+    return new SupplementalAccountKeys(linked, node, vrf, voting);
+  }
+
+  private PublicKey toPublicKey(AccountLinkPublicKeyDTO dto) {
+    if (dto == null || dto.getPublicKey() == null) {
+      return null;
+    }
+    return PublicKey.fromHexString(dto.getPublicKey());
+  }
+
+  private AccountRoutesApi getClient() {
+    return client;
   }
 }

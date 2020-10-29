@@ -98,7 +98,7 @@ public class AliasServiceTest {
         1,
         Collections.emptyList(),
         null,
-        null,
+        Address.generateRandom(networkType),
         BigInteger.ONE,
         BigInteger.TEN,
         new AddressAlias(address));
@@ -114,7 +114,7 @@ public class AliasServiceTest {
         1,
         Collections.emptyList(),
         null,
-        null,
+        Address.generateRandom(networkType),
         BigInteger.ONE,
         BigInteger.TEN,
         new MosaicAlias(mosaicId));

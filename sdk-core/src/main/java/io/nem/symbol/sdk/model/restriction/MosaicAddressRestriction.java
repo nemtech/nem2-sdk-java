@@ -15,10 +15,19 @@
  */
 package io.nem.symbol.sdk.model.restriction;
 
+import io.nem.symbol.catapult.builders.AddressDto;
+import io.nem.symbol.catapult.builders.AddressKeyValueBuilder;
+import io.nem.symbol.catapult.builders.AddressKeyValueSetBuilder;
+import io.nem.symbol.catapult.builders.MosaicAddressRestrictionEntryBuilder;
+import io.nem.symbol.catapult.builders.MosaicIdDto;
+import io.nem.symbol.catapult.builders.MosaicRestrictionKeyDto;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /** Mosaic address restriction structure describes restriction information for an mosaic. */
 public class MosaicAddressRestriction extends MosaicRestriction<BigInteger> {
@@ -47,5 +56,23 @@ public class MosaicAddressRestriction extends MosaicRestriction<BigInteger> {
 
   public Address getTargetAddress() {
     return targetAddress;
+  }
+
+  /** @return serializes the state of this object. */
+  public byte[] serialize() {
+    MosaicIdDto mosaicId = SerializationUtils.toMosaicIdDto(getMosaicId());
+    AddressDto targetAddress = SerializationUtils.toAddressDto(getTargetAddress());
+    AddressKeyValueSetBuilder restrictions =
+        AddressKeyValueSetBuilder.create(
+            getRestrictions().entrySet().stream()
+                .map(this::toAddressKeyValueBuilder)
+                .collect(Collectors.toList()));
+    return MosaicAddressRestrictionEntryBuilder.create(mosaicId, targetAddress, restrictions)
+        .serialize();
+  }
+
+  private AddressKeyValueBuilder toAddressKeyValueBuilder(Entry<BigInteger, BigInteger> entry) {
+    MosaicRestrictionKeyDto key = new MosaicRestrictionKeyDto(entry.getKey().longValue());
+    return AddressKeyValueBuilder.create(key, entry.getValue().longValue());
   }
 }

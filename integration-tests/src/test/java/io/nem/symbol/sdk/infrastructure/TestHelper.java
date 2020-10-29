@@ -610,13 +610,14 @@ public class TestHelper {
     }
   }
 
-  public Account getMultisigAccount(RepositoryType type) {
+  public Pair<Account, NamespaceId> getMultisigAccount(RepositoryType type) {
     Account multisigAccount = config().getMultisigAccount();
-    setAddressAlias(type, multisigAccount.getAddress(), "multisig-account");
+    NamespaceId namespaceId =
+        setAddressAlias(type, multisigAccount.getAddress(), "multisig-account");
     sendMosaicFromNemesis(type, multisigAccount.getAddress(), false);
     this.createMultisigAccountBonded(
         type, multisigAccount, config().getCosignatoryAccount(), config().getCosignatory2Account());
-    return multisigAccount;
+    return Pair.of(multisigAccount, namespaceId);
   }
 
   public void createMultisigAccountBonded(
@@ -802,14 +803,6 @@ public class TestHelper {
     Assertions.assertEquals(amount, processedTransaction.getMosaics().get(0).getAmount());
   }
 
-  void printAccount(Account account) {
-    Map<String, String> map = new LinkedHashMap<>();
-    map.put("privateKey", account.getPrivateKey());
-    map.put("publicKey", account.getPublicKey());
-    map.put("address", account.getAddress().plain());
-    System.out.println(getJsonHelper().print(map));
-  }
-
   void printAccount(Address account) {
     Map<String, String> map = new LinkedHashMap<>();
     map.put("address", account.plain());
@@ -832,10 +825,11 @@ public class TestHelper {
     return testAccount;
   }
 
-  public Account getTestAccount(RepositoryType type) {
+  public Pair<Account, NamespaceId> getTestAccount(RepositoryType type) {
     Account testAccount = config().getTestAccount();
+    NamespaceId namespaceId = setAddressAlias(type, testAccount.getAddress(), "testaccount");
     sendMosaicFromNemesis(type, testAccount.getAddress(), false);
-    return testAccount;
+    return Pair.of(testAccount, namespaceId);
   }
 
   public Deadline getDeadline() {

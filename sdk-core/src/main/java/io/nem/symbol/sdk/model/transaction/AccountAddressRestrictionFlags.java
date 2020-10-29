@@ -33,6 +33,7 @@ import java.util.List;
  * <p>0xC001 (49153 decimal) - Block outgoing transactions to a given address.
  */
 public enum AccountAddressRestrictionFlags implements AccountRestrictionFlags {
+
   /** Allow only incoming transactions from a given address. */
   ALLOW_INCOMING_ADDRESS(AccountRestrictionFlag.ADDRESS_VALUE),
 

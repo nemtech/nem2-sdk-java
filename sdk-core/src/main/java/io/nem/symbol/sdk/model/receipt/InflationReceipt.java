@@ -15,11 +15,11 @@
  */
 package io.nem.symbol.sdk.model.receipt;
 
-import io.nem.symbol.catapult.builders.AmountDto;
 import io.nem.symbol.catapult.builders.InflationReceiptBuilder;
 import io.nem.symbol.catapult.builders.MosaicBuilder;
 import io.nem.symbol.catapult.builders.MosaicIdDto;
 import io.nem.symbol.catapult.builders.ReceiptTypeDto;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
 import java.util.Optional;
@@ -95,7 +95,7 @@ public class InflationReceipt extends Receipt {
     ReceiptTypeDto type = ReceiptTypeDto.rawValueOf((short) getType().getValue());
     MosaicBuilder mosaic =
         MosaicBuilder.create(
-            new MosaicIdDto(getMosaicId().getIdAsLong()), new AmountDto(getAmount().longValue()));
+            new MosaicIdDto(getMosaicId().getIdAsLong()), SerializationUtils.toAmount(getAmount()));
     return InflationReceiptBuilder.create(version, type, mosaic).serialize();
   }
 

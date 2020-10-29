@@ -219,7 +219,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
   void outgoingTransactions(RepositoryType type) {
     TransactionRepository transactionRepository =
         getRepositoryFactory(type).createTransactionRepository();
-    PublicAccount recipient = this.helper().getTestAccount(type).getPublicAccount();
+    PublicAccount recipient = this.helper().getTestAccount(type).getLeft().getPublicAccount();
     List<Transaction> transactions =
         get(transactionRepository.search(
                 new TransactionSearchCriteria(TransactionGroup.CONFIRMED)
@@ -242,7 +242,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
     Account testAccount = this.config().getDefaultAccount();
     TransactionRepository transactionRepository =
         getRepositoryFactory(type).createTransactionRepository();
-    PublicAccount publicAccount = this.helper().getTestAccount(type).getPublicAccount();
+    PublicAccount publicAccount = this.helper().getTestAccount(type).getLeft().getPublicAccount();
     List<Transaction> transactions =
         get(transactionRepository.search(
                 new TransactionSearchCriteria(TransactionGroup.UNCONFIRMED)

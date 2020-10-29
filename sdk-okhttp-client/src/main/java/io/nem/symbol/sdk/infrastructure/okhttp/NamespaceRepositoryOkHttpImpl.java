@@ -277,9 +277,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
   }
 
   /** Extract the alias from a NamespaceDTO */
-  private Alias extractAlias(NamespaceDTO namespaceDTO) {
-
-    Alias alias = new EmptyAlias();
+  private Alias<?> extractAlias(NamespaceDTO namespaceDTO) {
     if (namespaceDTO.getAlias() != null) {
       if (namespaceDTO.getAlias().getType().getValue().equals(AliasType.MOSAIC.getValue())) {
         return new MosaicAlias(toMosaicId(namespaceDTO));
@@ -291,13 +289,13 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
         return new AddressAlias(toAddress(namespaceDTO));
       }
     }
-    return alias;
+    return new EmptyAlias();
   }
 
   /** Create a MosaicId from a NamespaceDTO */
   private MosaicId toMosaicId(NamespaceDTO namespaceDTO) {
     if (namespaceDTO.getAlias() != null
-        && AliasType.MOSAIC.getValue().equals(namespaceDTO.getAlias().getType().getValue())) {
+        && AliasType.MOSAIC.getValue() == (namespaceDTO.getAlias().getType().getValue())) {
       return MapperUtils.toMosaicId(namespaceDTO.getAlias().getMosaicId());
     } else {
       return null;
@@ -307,7 +305,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
   /** Create a Address from a NamespaceDTO */
   private Address toAddress(NamespaceDTO namespaceDTO) {
     if (namespaceDTO.getAlias() != null
-        && AliasType.ADDRESS.getValue().equals(namespaceDTO.getAlias().getType().getValue())) {
+        && AliasType.ADDRESS.getValue() == (namespaceDTO.getAlias().getType().getValue())) {
       return MapperUtils.toAddress(namespaceDTO.getAlias().getAddress());
     } else {
       return null;

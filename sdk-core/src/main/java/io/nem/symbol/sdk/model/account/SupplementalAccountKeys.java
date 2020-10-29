@@ -15,6 +15,7 @@
  */
 package io.nem.symbol.sdk.model.account;
 
+import io.nem.symbol.core.crypto.PublicKey;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,38 +23,35 @@ import java.util.Optional;
 public class SupplementalAccountKeys {
 
   /** Linked public key if any */
-  private final Optional<String> linked;
+  private final PublicKey linked;
 
   /** Node public key if any */
-  private final Optional<String> node;
+  private final PublicKey node;
 
   /** VRF public key if any */
-  private final Optional<String> vrf;
+  private final PublicKey vrf;
 
   /** Veys public keys if any */
   private final List<AccountLinkVotingKey> voting;
 
   public SupplementalAccountKeys(
-      Optional<String> linked,
-      Optional<String> node,
-      Optional<String> vrf,
-      List<AccountLinkVotingKey> voting) {
+      PublicKey linked, PublicKey node, PublicKey vrf, List<AccountLinkVotingKey> voting) {
     this.linked = linked;
     this.node = node;
     this.vrf = vrf;
     this.voting = voting;
   }
 
-  public Optional<String> getLinked() {
-    return linked;
+  public Optional<PublicKey> getLinked() {
+    return Optional.ofNullable(linked);
   }
 
-  public Optional<String> getNode() {
-    return node;
+  public Optional<PublicKey> getNode() {
+    return Optional.ofNullable(node);
   }
 
-  public Optional<String> getVrf() {
-    return vrf;
+  public Optional<PublicKey> getVrf() {
+    return Optional.ofNullable(vrf);
   }
 
   public List<AccountLinkVotingKey> getVoting() {

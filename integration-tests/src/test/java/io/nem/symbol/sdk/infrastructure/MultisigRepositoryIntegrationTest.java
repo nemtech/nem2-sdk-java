@@ -35,7 +35,7 @@ public class MultisigRepositoryIntegrationTest extends BaseIntegrationTest {
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void getMultisigAccountInfo(RepositoryType type) {
-    Account multisigAccount = helper().getMultisigAccount(type);
+    Account multisigAccount = helper().getMultisigAccount(type).getLeft();
     Account cosignatoryAccount = config().getCosignatoryAccount();
     Account cosignatory2Account = config().getCosignatory2Account();
     System.out.println(multisigAccount.getAddress().plain());
@@ -63,7 +63,7 @@ public class MultisigRepositoryIntegrationTest extends BaseIntegrationTest {
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void getMultisigAccountGraphInfo(RepositoryType type) {
-    Account multisigAccount = helper().getMultisigAccount(type);
+    Account multisigAccount = helper().getMultisigAccount(type).getLeft();
     MultisigAccountGraphInfo multisigAccountGraphInfos =
         get(
             this.getRepositoryFactory(type)

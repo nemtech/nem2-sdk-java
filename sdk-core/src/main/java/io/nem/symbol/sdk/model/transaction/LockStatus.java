@@ -17,20 +17,25 @@ package io.nem.symbol.sdk.model.transaction;
 
 import java.util.Arrays;
 
-/** Possible status of lock states: * 0 - UNUSED. * 1 - USED. */
+/** It defines the state of the lock entry. */
 public enum LockStatus {
-  UNUSED(0),
 
-  USED(1);
+  /** lock is unused. */
+  UNUSED((byte) 0),
 
-  private final Integer value;
+  /** lock was already used. */
+  USED((byte) 1);
 
-  LockStatus(Integer value) {
+  /** Enum value. */
+  private final byte value;
+
+  /**
+   * Constructor.
+   *
+   * @param value Enum value.
+   */
+  LockStatus(final byte value) {
     this.value = value;
-  }
-
-  public Integer getValue() {
-    return value;
   }
 
   /**
@@ -39,10 +44,19 @@ public enum LockStatus {
    * @param value Raw value of the enum.
    * @return Enum value.
    */
-  public static LockStatus rawValueOf(final int value) {
+  public static LockStatus rawValueOf(final byte value) {
     return Arrays.stream(values())
         .filter(e -> e.value == value)
         .findFirst()
         .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid value"));
+  }
+
+  /**
+   * Gets the value of the enum.
+   *
+   * @return Value of the enum.
+   */
+  public byte getValue() {
+    return this.value;
   }
 }

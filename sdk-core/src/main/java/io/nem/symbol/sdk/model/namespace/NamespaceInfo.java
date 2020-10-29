@@ -16,10 +16,11 @@
 package io.nem.symbol.sdk.model.namespace;
 
 import io.nem.symbol.sdk.model.Stored;
-import io.nem.symbol.sdk.model.account.UnresolvedAddress;
+import io.nem.symbol.sdk.model.account.Address;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+import org.apache.commons.lang3.Validate;
 
 /**
  * NamespaceInfo contains the state information of a namespace.
@@ -28,17 +29,17 @@ import java.util.Optional;
  */
 public class NamespaceInfo implements Stored {
 
-  private final Optional<String> recordId;
+  private final String recordId;
   private final boolean active;
   private final Integer index;
   private final NamespaceRegistrationType registrationType;
   private final Integer depth;
   private final List<NamespaceId> levels;
   private final NamespaceId parentId;
-  private final UnresolvedAddress ownerAddress;
+  private final Address ownerAddress;
   private final BigInteger startHeight;
   private final BigInteger endHeight;
-  private final Alias alias;
+  private final Alias<?> alias;
 
   @SuppressWarnings("squid:S00107")
   public NamespaceInfo(
@@ -49,11 +50,21 @@ public class NamespaceInfo implements Stored {
       Integer depth,
       List<NamespaceId> levels,
       NamespaceId parentId,
-      UnresolvedAddress ownerAddress,
+      Address ownerAddress,
       BigInteger startHeight,
       BigInteger endHeight,
-      Alias alias) {
-    this.recordId = Optional.ofNullable(recordId);
+      Alias<?> alias) {
+
+    Validate.notNull(index, "index is required");
+    Validate.notNull(metaId, "metaId is required");
+    Validate.notNull(registrationType, "registrationType is required");
+    Validate.notNull(depth, "depth is required");
+    Validate.notNull(ownerAddress, "ownerAddress is required");
+    Validate.notNull(startHeight, "startHeight is required");
+    Validate.notNull(endHeight, "endHeight is required");
+    Validate.notNull(alias, "alias is required");
+
+    this.recordId = recordId;
     this.active = active;
     this.index = index;
     this.registrationType = registrationType;
@@ -72,7 +83,7 @@ public class NamespaceInfo implements Stored {
    * @return the parent id.
    */
   public Optional<String> getRecordId() {
-    return recordId;
+    return Optional.ofNullable(recordId);
   }
 
   /**
@@ -134,7 +145,7 @@ public class NamespaceInfo implements Stored {
    *
    * @return mosaic namespace owner
    */
-  public UnresolvedAddress getOwnerAddress() {
+  public Address getOwnerAddress() {
     return ownerAddress;
   }
 
@@ -179,7 +190,7 @@ public class NamespaceInfo implements Stored {
    *
    * @return alias
    */
-  public Alias getAlias() {
+  public Alias<?> getAlias() {
     return alias;
   }
 
@@ -212,4 +223,26 @@ public class NamespaceInfo implements Stored {
     }
     return this.parentId;
   }
+
+  //  /** @return serializes the state of this object. */
+  //  public byte[] serialize() {
+  //
+  //    NamespaceIdDto id = new NamespaceIdDto(getId().getIdAsLong());
+  //    AddressDto ownerAddress = SerializationUtils.toAddressDto(getOwnerAddress());
+  //    NamespaceLifetimeBuilder lifetime =
+  //        NamespaceLifetimeBuilder.create(
+  //            new HeightDto(getStartHeight().longValue()), new
+  // HeightDto(getEndHeight().longValue()));
+  //    NamespaceAliasTypeDto rootAlias =
+  //        NamespaceAliasTypeDto.rawValueOf((byte) getAlias().getType().getValue());
+  //    List<NamespacePathBuilder> paths =
+  //        getLevels().stream().map(this::toNamespaceAliasTypeDto).collect(Collectors.toList());
+  //
+  //    return RootNamespaceHistoryBuilder.create(id, ownerAddress, lifetime, rootAlias, paths)
+  //        .serialize();
+  //  }
+  //
+  //  private NamespacePathBuilder toNamespaceAliasTypeDto(NamespaceId namespaceId) {
+  //
+  //  }
 }

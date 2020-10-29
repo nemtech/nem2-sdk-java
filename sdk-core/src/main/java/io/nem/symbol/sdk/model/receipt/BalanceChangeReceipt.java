@@ -16,7 +16,6 @@
 package io.nem.symbol.sdk.model.receipt;
 
 import io.nem.symbol.catapult.builders.AddressDto;
-import io.nem.symbol.catapult.builders.AmountDto;
 import io.nem.symbol.catapult.builders.BalanceChangeReceiptBuilder;
 import io.nem.symbol.catapult.builders.MosaicBuilder;
 import io.nem.symbol.catapult.builders.MosaicIdDto;
@@ -114,7 +113,7 @@ public class BalanceChangeReceipt extends Receipt {
     ReceiptTypeDto type = ReceiptTypeDto.rawValueOf((short) getType().getValue());
     MosaicBuilder mosaic =
         MosaicBuilder.create(
-            new MosaicIdDto(getMosaicId().getIdAsLong()), new AmountDto(getAmount().longValue()));
+            new MosaicIdDto(getMosaicId().getIdAsLong()), SerializationUtils.toAmount(getAmount()));
     AddressDto targetAddress = SerializationUtils.toAddressDto(getTargetAddress());
     return BalanceChangeReceiptBuilder.create(version, type, mosaic, targetAddress).serialize();
   }

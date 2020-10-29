@@ -40,7 +40,7 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
   @EnumSource(RepositoryType.class)
   void cosignatureTransactionOnSign(RepositoryType type) {
 
-    Account multisigAccount = helper().getMultisigAccount(type);
+    Account multisigAccount = helper().getMultisigAccount(type).getLeft();
     Account cosignatoryAccount = config().getCosignatoryAccount();
 
     Address recipient = getRecipient();

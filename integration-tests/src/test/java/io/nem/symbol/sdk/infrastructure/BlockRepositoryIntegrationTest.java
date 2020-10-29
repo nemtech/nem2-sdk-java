@@ -24,18 +24,30 @@ import io.nem.symbol.sdk.api.BlockPaginationStreamer;
 import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.BlockSearchCriteria;
 import io.nem.symbol.sdk.api.OrderBy;
-import io.nem.symbol.sdk.api.Page;
+import io.nem.symbol.sdk.api.PaginationStreamer;
+import io.nem.symbol.sdk.api.ReceiptPaginationStreamer;
+import io.nem.symbol.sdk.api.ReceiptRepository;
 import io.nem.symbol.sdk.api.RepositoryCallException;
+import io.nem.symbol.sdk.api.ResolutionStatementSearchCriteria;
+import io.nem.symbol.sdk.api.TransactionPaginationStreamer;
+import io.nem.symbol.sdk.api.TransactionRepository;
+import io.nem.symbol.sdk.api.TransactionSearchCriteria;
 import io.nem.symbol.sdk.api.TransactionStatementSearchCriteria;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
+import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.receipt.AddressResolutionStatement;
+import io.nem.symbol.sdk.model.receipt.MosaicResolutionStatement;
 import io.nem.symbol.sdk.model.receipt.TransactionStatement;
+import io.nem.symbol.sdk.model.transaction.Transaction;
+import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -226,23 +238,125 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
-  void getMerkleReceipts(RepositoryType type) {
-    BigInteger height = BigInteger.ONE;
+  void getMerkleReceiptsFromTransactions(RepositoryType type) {
     BlockRepository blockRepository = getBlockRepository(type);
 
-    Page<TransactionStatement> transactionStatementPage =
-        get(
-            getRepositoryFactory(type)
-                .createReceiptRepository()
-                .searchReceipts(new TransactionStatementSearchCriteria().height(height)));
+    ReceiptRepository receiptRepository = getRepositoryFactory(type).createReceiptRepository();
 
-    transactionStatementPage
-        .getData()
-        .forEach(
-            s -> {
-              MerkleProofInfo merkleProofInfo =
-                  get(blockRepository.getMerkleReceipts(s.getHeight(), s.generateHash()));
-              toJson(merkleProofInfo);
-            });
+    PaginationStreamer<TransactionStatement, TransactionStatementSearchCriteria> streamer =
+        ReceiptPaginationStreamer.transactions(receiptRepository);
+
+    List<TransactionStatement> list =
+        get(
+            streamer
+                .search(new TransactionStatementSearchCriteria())
+                .take(5)
+                .toList()
+                .toObservable());
+
+    System.out.println(list.size());
+
+    list.forEach(
+        s -> {
+          String hash = s.generateHash();
+          System.out.println(hash);
+          System.out.println(s.getHeight());
+          MerkleProofInfo merkleProofInfo =
+              get(blockRepository.getMerkleReceipts(s.getHeight(), hash));
+          System.out.println(toJson(merkleProofInfo));
+        });
+  }
+
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getMerkleReceiptsFromMosaics(RepositoryType type) {
+    BlockRepository blockRepository = getBlockRepository(type);
+
+    ReceiptRepository receiptRepository = getRepositoryFactory(type).createReceiptRepository();
+
+    PaginationStreamer<MosaicResolutionStatement, ResolutionStatementSearchCriteria> streamer =
+        ReceiptPaginationStreamer.mosaics(receiptRepository);
+
+    List<MosaicResolutionStatement> list =
+        get(
+            streamer
+                .search(new ResolutionStatementSearchCriteria())
+                .take(5)
+                .toList()
+                .toObservable());
+
+    Assertions.assertFalse(list.isEmpty());
+
+    list.forEach(
+        s -> {
+          String hash = s.generateHash(getNetworkType());
+          MerkleProofInfo merkleProofInfo =
+              get(blockRepository.getMerkleReceipts(s.getHeight(), hash));
+          Assertions.assertFalse(merkleProofInfo.getMerklePath().isEmpty());
+        });
+  }
+
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getMerkleReceiptsFromAddresses(RepositoryType type) {
+
+    Pair<Account, NamespaceId> testAccount = helper().getTestAccount(type);
+    helper().basicSendMosaicFromNemesis(type, testAccount.getRight());
+
+    BlockRepository blockRepository = getBlockRepository(type);
+
+    ReceiptRepository receiptRepository = getRepositoryFactory(type).createReceiptRepository();
+
+    PaginationStreamer<AddressResolutionStatement, ResolutionStatementSearchCriteria> streamer =
+        ReceiptPaginationStreamer.addresses(receiptRepository);
+
+    List<AddressResolutionStatement> list =
+        get(
+            streamer
+                .search(new ResolutionStatementSearchCriteria())
+                .take(5)
+                .toList()
+                .toObservable());
+
+    Assertions.assertFalse(list.isEmpty());
+
+    list.forEach(
+        s -> {
+          String hash = s.generateHash(getNetworkType());
+          MerkleProofInfo merkleProofInfo =
+              get(blockRepository.getMerkleReceipts(s.getHeight(), hash));
+          Assertions.assertFalse(merkleProofInfo.getMerklePath().isEmpty());
+        });
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getMerkleTransaction(RepositoryType type) {
+    BlockRepository blockRepository = getBlockRepository(type);
+
+    TransactionRepository transactionRepository = getRepositoryFactory(type).createTransactionRepository();
+
+    TransactionPaginationStreamer streamer = new TransactionPaginationStreamer(transactionRepository);
+
+    List<Transaction> list =
+        get(
+            streamer
+                .search(new TransactionSearchCriteria(TransactionGroup.CONFIRMED))
+                .take(5)
+                .toList()
+                .toObservable());
+
+    Assertions.assertFalse(list.isEmpty());
+
+    list.forEach(
+        s -> {
+          String hash = s.getTransactionInfo().get().getHash().get();
+          BigInteger height = s.getTransactionInfo().get().getHeight();
+          MerkleProofInfo merkleProofInfo =
+              get(blockRepository.getMerkleTransaction(height, hash));
+          Assertions.assertFalse(merkleProofInfo.getMerklePath().isEmpty());
+        });
   }
 }

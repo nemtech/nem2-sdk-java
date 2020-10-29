@@ -45,7 +45,6 @@ import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.time.Duration;
 import java.util.Collections;
-import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -94,7 +93,7 @@ class MetadataTransactionServiceTest {
         1,
         Collections.emptyList(),
         null,
-        null,
+        Address.generateRandom(networkType),
         BigInteger.ONE,
         BigInteger.TEN,
         new MosaicAlias(mosaicId));
@@ -121,7 +120,7 @@ class MetadataTransactionServiceTest {
             metadataKey,
             MetadataType.ACCOUNT,
             oldValue,
-            Optional.of(targetAccount.getAddress().encoded()));
+            null);
 
     MetadataSearchCriteria criteria =
         new MetadataSearchCriteria()
@@ -270,7 +269,7 @@ class MetadataTransactionServiceTest {
             metadataKey,
             MetadataType.MOSAIC,
             oldValue,
-            Optional.of(targetAccount.getAddress().encoded()));
+            mosaicId.getIdAsHex());
 
     MetadataSearchCriteria criteria =
         new MetadataSearchCriteria()
@@ -317,7 +316,7 @@ class MetadataTransactionServiceTest {
             metadataKey,
             MetadataType.MOSAIC,
             oldValue,
-            Optional.of(targetAccount.getAddress().encoded()));
+            mosaicId.getIdAsHex());
 
     MetadataSearchCriteria criteria =
         new MetadataSearchCriteria()
@@ -475,7 +474,7 @@ class MetadataTransactionServiceTest {
             metadataKey,
             MetadataType.NAMESPACE,
             oldValue,
-            Optional.of(targetAccount.getAddress().encoded()));
+            namespaceId.getIdAsHex());
 
     MetadataSearchCriteria criteria =
         new MetadataSearchCriteria()

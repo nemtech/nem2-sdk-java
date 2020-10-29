@@ -16,7 +16,6 @@
 package io.nem.symbol.sdk.model.receipt;
 
 import io.nem.symbol.catapult.builders.AddressDto;
-import io.nem.symbol.catapult.builders.AmountDto;
 import io.nem.symbol.catapult.builders.BalanceTransferReceiptBuilder;
 import io.nem.symbol.catapult.builders.MosaicBuilder;
 import io.nem.symbol.catapult.builders.MosaicIdDto;
@@ -135,7 +134,7 @@ public class BalanceTransferReceipt extends Receipt {
     final ReceiptTypeDto type = ReceiptTypeDto.rawValueOf((short) getType().getValue());
     final MosaicBuilder mosaic =
         MosaicBuilder.create(
-            new MosaicIdDto(getMosaicId().getIdAsLong()), new AmountDto(getAmount().longValue()));
+            new MosaicIdDto(getMosaicId().getIdAsLong()), SerializationUtils.toAmount(getAmount()));
     final AddressDto senderAddress = SerializationUtils.toAddressDto(getSenderAddress());
     final AddressDto recipientAddress = SerializationUtils.toAddressDto(getRecipientAddress());
     return BalanceTransferReceiptBuilder.create(

@@ -231,7 +231,7 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl
         namespaceInfoDTO.getNamespace().getDepth(),
         this.extractLevels(namespaceInfoDTO),
         toNamespaceId(namespaceInfoDTO.getNamespace().getParentId()),
-        MapperUtils.toUnresolvedAddress(namespaceInfoDTO.getNamespace().getOwnerAddress()),
+        MapperUtils.toAddress(namespaceInfoDTO.getNamespace().getOwnerAddress()),
         namespaceInfoDTO.getNamespace().getStartHeight(),
         namespaceInfoDTO.getNamespace().getEndHeight(),
         this.extractAlias(namespaceInfoDTO.getNamespace()));
@@ -241,7 +241,7 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl
   private MosaicId toMosaicId(NamespaceDTO namespaceDTO) {
     MosaicId mosaicId = null;
     if (namespaceDTO.getAlias() != null
-        && AliasType.MOSAIC.getValue().equals(namespaceDTO.getAlias().getType().getValue())) {
+        && AliasType.MOSAIC.getValue() == (namespaceDTO.getAlias().getType().getValue())) {
       mosaicId = MapperUtils.toMosaicId(namespaceDTO.getAlias().getMosaicId());
     }
     return mosaicId;
@@ -251,7 +251,7 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl
   private Address toAddress(NamespaceDTO namespaceDTO) {
     Address address = null;
     if (namespaceDTO.getAlias() != null
-        && AliasType.ADDRESS.getValue().equals(namespaceDTO.getAlias().getType().getValue())) {
+        && AliasType.ADDRESS.getValue() == (namespaceDTO.getAlias().getType().getValue())) {
       String encodedAddress = namespaceDTO.getAlias().getAddress();
       if (encodedAddress != null) {
         address = MapperUtils.toAddress(encodedAddress);
@@ -316,9 +316,8 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl
    * @param namespaceDTO the dto
    * @return the address, mosaic or empty alias.
    */
-  private Alias extractAlias(NamespaceDTO namespaceDTO) {
+  private Alias<?> extractAlias(NamespaceDTO namespaceDTO) {
 
-    Alias alias = new EmptyAlias();
     if (namespaceDTO.getAlias() != null) {
       if (namespaceDTO.getAlias().getType().getValue().equals(AliasType.MOSAIC.getValue())) {
         return new MosaicAlias(toMosaicId(namespaceDTO));
@@ -330,6 +329,6 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl
         return new AddressAlias(toAddress(namespaceDTO));
       }
     }
-    return alias;
+    return new EmptyAlias();
   }
 }

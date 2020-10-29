@@ -18,6 +18,8 @@ package io.nem.symbol.sdk.infrastructure.vertx;
 import static io.nem.symbol.core.utils.MapperUtils.toAddress;
 import static io.nem.symbol.core.utils.MapperUtils.toMosaicId;
 
+import io.nem.symbol.core.crypto.PublicKey;
+import io.nem.symbol.core.crypto.VotingKey;
 import io.nem.symbol.sdk.api.AccountRepository;
 import io.nem.symbol.sdk.api.AccountSearchCriteria;
 import io.nem.symbol.sdk.api.Page;
@@ -35,6 +37,7 @@ import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountIds;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.AccountLinkPublicKeyDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountOrderByEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountPage;
 import io.nem.symbol.sdk.openapi.vertx.model.Order;
@@ -44,7 +47,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -92,34 +94,6 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl
             .toObservable());
   }
 
-  private AccountInfo toAccountInfo(AccountInfoDTO accountInfoDTO) {
-    AccountDTO accountDTO = accountInfoDTO.getAccount();
-    return new AccountInfo(
-        accountInfoDTO.getId(),
-        toAddress(accountDTO.getAddress()),
-        accountDTO.getAddressHeight(),
-        accountDTO.getPublicKey(),
-        accountDTO.getPublicKeyHeight(),
-        accountDTO.getImportance(),
-        accountDTO.getImportanceHeight(),
-        accountDTO.getMosaics().stream()
-            .map(
-                mosaicDTO ->
-                    new ResolvedMosaic(toMosaicId(mosaicDTO.getId()), mosaicDTO.getAmount()))
-            .collect(Collectors.toList()),
-        AccountType.rawValueOf(accountDTO.getAccountType().getValue()),
-        toDto(accountDTO.getSupplementalPublicKeys()),
-        accountDTO.getActivityBuckets().stream()
-            .map(
-                dto ->
-                    new ActivityBucket(
-                        dto.getStartHeight(),
-                        dto.getTotalFeesPaid(),
-                        dto.getBeneficiaryCount(),
-                        dto.getRawScore()))
-            .collect(Collectors.toList()));
-  }
-
   @Override
   public Observable<Page<AccountInfo>> search(AccountSearchCriteria criteria) {
 
@@ -149,17 +123,41 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl
                             .collect(Collectors.toList()))));
   }
 
+  private AccountInfo toAccountInfo(AccountInfoDTO accountInfoDTO) {
+    AccountDTO accountDTO = accountInfoDTO.getAccount();
+    return new AccountInfo(
+        accountInfoDTO.getId(),
+        toAddress(accountDTO.getAddress()),
+        accountDTO.getAddressHeight(),
+        PublicKey.fromHexString(accountDTO.getPublicKey()),
+        accountDTO.getPublicKeyHeight(),
+        accountDTO.getImportance(),
+        accountDTO.getImportanceHeight(),
+        accountDTO.getMosaics().stream()
+            .map(
+                mosaicDTO ->
+                    new ResolvedMosaic(toMosaicId(mosaicDTO.getId()), mosaicDTO.getAmount()))
+            .collect(Collectors.toList()),
+        AccountType.rawValueOf(accountDTO.getAccountType().getValue()),
+        toDto(accountDTO.getSupplementalPublicKeys()),
+        accountDTO.getActivityBuckets().stream()
+            .map(
+                dto ->
+                    new ActivityBucket(
+                        dto.getStartHeight(),
+                        dto.getTotalFeesPaid(),
+                        dto.getBeneficiaryCount(),
+                        dto.getRawScore()))
+            .collect(Collectors.toList()));
+  }
+
   private SupplementalAccountKeys toDto(SupplementalPublicKeysDTO dto) {
     if (dto == null) {
-      return new SupplementalAccountKeys(
-          Optional.empty(), Optional.empty(), Optional.empty(), Collections.emptyList());
+      return new SupplementalAccountKeys(null, null, null, Collections.emptyList());
     }
-    Optional<String> linked =
-        Optional.ofNullable(dto.getLinked() == null ? null : dto.getLinked().getPublicKey());
-    Optional<String> node =
-        Optional.ofNullable(dto.getNode() == null ? null : dto.getNode().getPublicKey());
-    Optional<String> vrf =
-        Optional.ofNullable(dto.getVrf() == null ? null : dto.getVrf().getPublicKey());
+    PublicKey linked = toPublicKey(dto.getLinked());
+    PublicKey node = toPublicKey(dto.getNode());
+    PublicKey vrf = toPublicKey(dto.getVrf());
 
     List<AccountLinkVotingKey> voting =
         dto.getVoting() == null || dto.getVoting().getPublicKeys() == null
@@ -168,9 +166,18 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl
                 .map(
                     p ->
                         new AccountLinkVotingKey(
-                            p.getPublicKey(), (p.getStartEpoch()), (p.getEndEpoch())))
+                            VotingKey.fromHexString(p.getPublicKey()),
+                            (p.getStartEpoch()),
+                            (p.getEndEpoch())))
                 .collect(Collectors.toList());
     return new SupplementalAccountKeys(linked, node, vrf, voting);
+  }
+
+  private PublicKey toPublicKey(AccountLinkPublicKeyDTO dto) {
+    if (dto == null || dto.getPublicKey() == null) {
+      return null;
+    }
+    return PublicKey.fromHexString(dto.getPublicKey());
   }
 
   private AccountRoutesApi getClient() {

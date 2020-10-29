@@ -101,6 +101,7 @@ import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionTransactionFa
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlag;
 import io.nem.symbol.sdk.model.transaction.AddressAliasTransaction;
 import io.nem.symbol.sdk.model.transaction.AddressAliasTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
@@ -297,7 +298,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         transaction.getVersion().byteValue(),
         NetworkTypeDto.rawValueOf((byte) transaction.getNetworkType().getValue()),
         EntityTypeDto.rawValueOf((short) transaction.getType().getValue()),
-        new AmountDto(SerializationUtils.toUnsignedLong(transaction.getMaxFee())),
+        SerializationUtils.toAmount(transaction.getMaxFee()),
         new TimestampDto(transaction.getDeadline().getValue()));
   }
 
@@ -558,7 +559,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         final UnresolvedMosaicBuilder mosaicBuilder =
             UnresolvedMosaicBuilder.create(
                 new UnresolvedMosaicIdDto(mosaic.getId().getIdAsLong()),
-                new AmountDto(SerializationUtils.toUnsignedLong(mosaic.getAmount())));
+                SerializationUtils.toAmount(mosaic.getAmount()));
         unresolvedMosaicList.add(mosaicBuilder);
       }
       return unresolvedMosaicList;
@@ -608,7 +609,7 @@ public class BinarySerializationImpl implements BinarySerialization {
       return MosaicSupplyChangeTransactionBodyBuilder.create(
           new UnresolvedMosaicIdDto(
               SerializationUtils.toUnsignedLong(transaction.getMosaicId().getId())),
-          new AmountDto(SerializationUtils.toUnsignedLong(transaction.getDelta())),
+          SerializationUtils.toAmount(transaction.getDelta()),
           MosaicSupplyChangeActionDto.rawValueOf((byte) transaction.getAction().getValue()));
     }
   }
@@ -650,27 +651,8 @@ public class BinarySerializationImpl implements BinarySerialization {
           new MosaicIdDto(SerializationUtils.toUnsignedLong(transaction.getMosaicId().getId())),
           new BlockDurationDto(transaction.getBlockDuration().getDuration()),
           new MosaicNonceDto((int) transaction.getMosaicNonce().getNonceAsLong()),
-          getMosaicFlagsEnumSet(transaction),
+          SerializationUtils.getMosaicFlagsEnumSet(transaction.getMosaicFlags()),
           (byte) transaction.getDivisibility());
-    }
-
-    /**
-     * Get the mosaic flags.
-     *
-     * @return Mosaic flags
-     */
-    private EnumSet<MosaicFlagsDto> getMosaicFlagsEnumSet(MosaicDefinitionTransaction transaction) {
-      EnumSet<MosaicFlagsDto> mosaicFlagsBuilder = EnumSet.of(MosaicFlagsDto.NONE);
-      if (transaction.getMosaicFlags().isSupplyMutable()) {
-        mosaicFlagsBuilder.add(MosaicFlagsDto.SUPPLY_MUTABLE);
-      }
-      if (transaction.getMosaicFlags().isTransferable()) {
-        mosaicFlagsBuilder.add(MosaicFlagsDto.TRANSFERABLE);
-      }
-      if (transaction.getMosaicFlags().isRestrictable()) {
-        mosaicFlagsBuilder.add(MosaicFlagsDto.RESTRICTABLE);
-      }
-      return mosaicFlagsBuilder;
     }
   }
 
@@ -950,8 +932,7 @@ public class BinarySerializationImpl implements BinarySerialization {
     public Serializer toBodyBuilder(SecretLockTransaction transaction) {
       UnresolvedMosaicIdDto mosaicId =
           new UnresolvedMosaicIdDto(transaction.getMosaic().getId().getIdAsLong());
-      AmountDto amount =
-          new AmountDto(SerializationUtils.toUnsignedLong(transaction.getMosaic().getAmount()));
+      AmountDto amount = SerializationUtils.toAmount(transaction.getMosaic().getAmount());
       UnresolvedMosaicBuilder unresolvedMosaicBuilder =
           UnresolvedMosaicBuilder.create(mosaicId, amount);
       return SecretLockTransactionBodyBuilder.create(
@@ -1216,10 +1197,7 @@ public class BinarySerializationImpl implements BinarySerialization {
     public Serializer toBodyBuilder(AccountAddressRestrictionTransaction transaction) {
 
       EnumSet<AccountRestrictionFlagsDto> flags =
-          transaction.getRestrictionFlags().getFlags().stream()
-              .map(f -> AccountRestrictionFlagsDto.rawValueOf((short) f.getValue()))
-              .collect(
-                  Collectors.toCollection(() -> EnumSet.noneOf(AccountRestrictionFlagsDto.class)));
+          toAccountRestrictionsFlagsDto(transaction.getRestrictionFlags().getFlags());
 
       List<UnresolvedAddressDto> restrictionAdditions =
           transaction.getRestrictionAdditions().stream()
@@ -1281,10 +1259,7 @@ public class BinarySerializationImpl implements BinarySerialization {
     public Serializer toBodyBuilder(AccountMosaicRestrictionTransaction transaction) {
 
       EnumSet<AccountRestrictionFlagsDto> flags =
-          transaction.getRestrictionFlags().getFlags().stream()
-              .map(f -> AccountRestrictionFlagsDto.rawValueOf((short) f.getValue()))
-              .collect(
-                  Collectors.toCollection(() -> EnumSet.noneOf(AccountRestrictionFlagsDto.class)));
+          toAccountRestrictionsFlagsDto(transaction.getRestrictionFlags().getFlags());
 
       List<UnresolvedMosaicIdDto> restrictionAdditions =
           transaction.getRestrictionAdditions().stream()
@@ -1346,11 +1321,10 @@ public class BinarySerializationImpl implements BinarySerialization {
     @Override
     public Serializer toBodyBuilder(AccountOperationRestrictionTransaction transaction) {
 
+      List<AccountRestrictionFlag> accountRestrictionFlags =
+          transaction.getRestrictionFlags().getFlags();
       EnumSet<AccountRestrictionFlagsDto> flags =
-          transaction.getRestrictionFlags().getFlags().stream()
-              .map(f -> AccountRestrictionFlagsDto.rawValueOf((short) f.getValue()))
-              .collect(
-                  Collectors.toCollection(() -> EnumSet.noneOf(AccountRestrictionFlagsDto.class)));
+          toAccountRestrictionsFlagsDto(accountRestrictionFlags);
 
       List<EntityTypeDto> restrictionAdditions =
           transaction.getRestrictionAdditions().stream()
@@ -1365,6 +1339,13 @@ public class BinarySerializationImpl implements BinarySerialization {
       return AccountOperationRestrictionTransactionBodyBuilder.create(
           flags, restrictionAdditions, restrictionDeletions);
     }
+  }
+
+  public static EnumSet<AccountRestrictionFlagsDto> toAccountRestrictionsFlagsDto(
+      List<AccountRestrictionFlag> accountRestrictionFlags) {
+    return accountRestrictionFlags.stream()
+        .map(f -> AccountRestrictionFlagsDto.rawValueOf((short) f.getValue()))
+        .collect(Collectors.toCollection(() -> EnumSet.noneOf(AccountRestrictionFlagsDto.class)));
   }
 
   private static class MosaicAddressRestrictionTransactionSerializer

@@ -15,7 +15,22 @@
  */
 package io.nem.symbol.sdk.model.account;
 
+import io.nem.symbol.catapult.builders.AccountRestrictionAddressValueBuilder;
+import io.nem.symbol.catapult.builders.AccountRestrictionFlagsDto;
+import io.nem.symbol.catapult.builders.AccountRestrictionMosaicValueBuilder;
+import io.nem.symbol.catapult.builders.AccountRestrictionTransactionTypeValueBuilder;
+import io.nem.symbol.catapult.builders.AccountRestrictionsBuilder;
+import io.nem.symbol.catapult.builders.AccountRestrictionsInfoBuilder;
+import io.nem.symbol.catapult.builders.AddressDto;
+import io.nem.symbol.catapult.builders.EntityTypeDto;
+import io.nem.symbol.sdk.infrastructure.BinarySerializationImpl;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
+import io.nem.symbol.sdk.model.mosaic.MosaicId;
+import io.nem.symbol.sdk.model.transaction.TransactionType;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.Validate;
 
 /** Account properties structure describes property information for an account. */
 public class AccountRestrictions {
@@ -27,6 +42,8 @@ public class AccountRestrictions {
   private final List<AccountRestriction> restrictions;
 
   public AccountRestrictions(Address address, List<AccountRestriction> restrictions) {
+    Validate.notNull(address, "address is required");
+    Validate.notNull(restrictions, "restrictions is required");
     this.address = address;
     this.restrictions = restrictions;
   }
@@ -37,5 +54,58 @@ public class AccountRestrictions {
 
   public List<AccountRestriction> getRestrictions() {
     return restrictions;
+  }
+
+  /** @return serializes the state of this object. */
+  public byte[] serialize() {
+    AddressDto address = SerializationUtils.toAddressDto(getAddress());
+    List<AccountRestrictionsInfoBuilder> restrictions =
+        getRestrictions().stream()
+            .map(this::toAccountRestrictionsInfoBuilder)
+            .collect(Collectors.toList());
+    return AccountRestrictionsBuilder.create(address, restrictions).serialize();
+  }
+
+  private AccountRestrictionsInfoBuilder toAccountRestrictionsInfoBuilder(
+      AccountRestriction restriction) {
+    EnumSet<AccountRestrictionFlagsDto> restrictionFlags =
+        BinarySerializationImpl.toAccountRestrictionsFlagsDto(
+            restriction.getRestrictionFlags().getFlags());
+    AccountRestrictionAddressValueBuilder addressRestrictions =
+        toAccountRestrictionAddressValueBuilder(restriction);
+    AccountRestrictionMosaicValueBuilder mosaicIdRestrictions =
+        toAccountRestrictionMosaicValueBuilder(restriction);
+    AccountRestrictionTransactionTypeValueBuilder transactionTypeRestrictions =
+        toAccountRestrictionTransactionTypeValueBuilder(restriction);
+
+    return AccountRestrictionsInfoBuilder.create(
+        restrictionFlags, addressRestrictions, mosaicIdRestrictions, transactionTypeRestrictions);
+  }
+
+  private AccountRestrictionAddressValueBuilder toAccountRestrictionAddressValueBuilder(
+      AccountRestriction restriction) {
+    return AccountRestrictionAddressValueBuilder.create(
+        restriction.getValues().stream()
+            .filter(o -> o instanceof Address)
+            .map(o -> SerializationUtils.toAddressDto((Address) o))
+            .collect(Collectors.toList()));
+  }
+
+  private AccountRestrictionMosaicValueBuilder toAccountRestrictionMosaicValueBuilder(
+      AccountRestriction restriction) {
+    return AccountRestrictionMosaicValueBuilder.create(
+        restriction.getValues().stream()
+            .filter(o -> o instanceof MosaicId)
+            .map(o -> SerializationUtils.toMosaicIdDto((MosaicId) o))
+            .collect(Collectors.toList()));
+  }
+
+  private AccountRestrictionTransactionTypeValueBuilder
+      toAccountRestrictionTransactionTypeValueBuilder(AccountRestriction restriction) {
+    return AccountRestrictionTransactionTypeValueBuilder.create(
+        restriction.getValues().stream()
+            .filter(o -> o instanceof TransactionType)
+            .map(o -> EntityTypeDto.rawValueOf((short) ((TransactionType) o).getValue()))
+            .collect(Collectors.toList()));
   }
 }

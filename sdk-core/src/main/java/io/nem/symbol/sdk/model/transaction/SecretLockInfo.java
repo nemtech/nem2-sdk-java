@@ -15,11 +15,20 @@
  */
 package io.nem.symbol.sdk.model.transaction;
 
+import io.nem.symbol.catapult.builders.AddressDto;
+import io.nem.symbol.catapult.builders.Hash256Dto;
+import io.nem.symbol.catapult.builders.HeightDto;
+import io.nem.symbol.catapult.builders.LockHashAlgorithmDto;
+import io.nem.symbol.catapult.builders.LockStatusDto;
+import io.nem.symbol.catapult.builders.MosaicBuilder;
+import io.nem.symbol.catapult.builders.SecretLockInfoBuilder;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.Stored;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
 import java.util.Optional;
+import org.apache.commons.lang3.Validate;
 
 /** It holds information about a secret lock. */
 public class SecretLockInfo implements Stored {
@@ -67,6 +76,15 @@ public class SecretLockInfo implements Stored {
       String secret,
       Address recipientAddress,
       String compositeHash) {
+
+    Validate.notNull(ownerAddress, "ownerAddress is required");
+    Validate.notNull(mosaicId, "mosaicId is required");
+    Validate.notNull(amount, "amount is required");
+    Validate.notNull(endHeight, "endHeight is required");
+    Validate.notNull(status, "status is required");
+    Validate.notNull(secret, "secret is required");
+    Validate.notNull(recipientAddress, "recipientAddress is required");
+
     this.recordId = recordId;
     this.ownerAddress = ownerAddress;
     this.mosaicId = mosaicId;
@@ -118,5 +136,24 @@ public class SecretLockInfo implements Stored {
 
   public String getCompositeHash() {
     return compositeHash;
+  }
+
+  /** @return serializes the state of this object. */
+  public byte[] serialize() {
+
+    AddressDto ownerAddress = SerializationUtils.toAddressDto(getOwnerAddress());
+    MosaicBuilder mosaic =
+        MosaicBuilder.create(
+            SerializationUtils.toMosaicIdDto(getMosaicId()),
+            SerializationUtils.toAmount(getAmount()));
+    HeightDto endHeight = new HeightDto(getEndHeight().longValue());
+    LockStatusDto status = LockStatusDto.rawValueOf(getStatus().getValue());
+    Hash256Dto secret = SerializationUtils.toHash256Dto(getSecret());
+    AddressDto recipient = SerializationUtils.toAddressDto(getRecipientAddress());
+    LockHashAlgorithmDto hashAlgorithm =
+        LockHashAlgorithmDto.rawValueOf((byte) this.hashAlgorithm.getValue());
+    return SecretLockInfoBuilder.create(
+            ownerAddress, mosaic, endHeight, status, hashAlgorithm, secret, recipient)
+        .serialize();
   }
 }

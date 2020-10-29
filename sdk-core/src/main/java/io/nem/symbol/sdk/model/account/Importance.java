@@ -18,7 +18,7 @@ package io.nem.symbol.sdk.model.account;
 import java.math.BigInteger;
 
 /** Importances of the account */
-public class Importances {
+public class Importance {
 
   private BigInteger value;
   private BigInteger height;
@@ -29,7 +29,7 @@ public class Importances {
    * @param value Value
    * @param height Height
    */
-  public Importances(BigInteger value, BigInteger height) {
+  public Importance(BigInteger value, BigInteger height) {
     this.value = value;
     this.height = height;
   }

@@ -19,6 +19,7 @@ import io.nem.symbol.core.utils.ExceptionUtils;
 import io.nem.symbol.sdk.api.AccountOrderBy;
 import io.nem.symbol.sdk.api.AccountSearchCriteria;
 import io.nem.symbol.sdk.api.RepositoryCallException;
+import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.Address;
@@ -59,11 +60,18 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
 
   @Test
   public void shouldGetAccountInfo() throws Exception {
-    Address address = Address.generateRandom(this.networkType);
+    Account account = Account.generateNewAccount(this.networkType);
+    Address address = account.getAddress();
 
     AccountDTO accountDTO = new AccountDTO();
     accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
     accountDTO.setAddress(encodeAddress(address));
+    accountDTO.setAddressHeight(BigInteger.TEN);
+    accountDTO.setPublicKeyHeight(BigInteger.valueOf(20));
+    accountDTO.setPublicKey(account.getPublicAccount().getPublicKey().toHex());
+    accountDTO.setImportance(BigInteger.valueOf(5));
+    accountDTO.setImportanceHeight(BigInteger.valueOf(10));
+
     List<Mosaic> mosaicDtos = new ArrayList<>();
     mosaicDtos.add(new Mosaic().id("0000000000000ABC").amount(BigInteger.TEN));
     accountDTO.setMosaics(mosaicDtos);
@@ -84,13 +92,21 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
   @Test
   public void shouldGetAccountsInfoFromAddresses() throws ExecutionException, InterruptedException {
 
-    Address address = Address.generateRandom(this.networkType);
+    Account account = Account.generateNewAccount(this.networkType);
+    Account nodeAccount = Account.generateNewAccount(this.networkType);
+    Address address = account.getAddress();
 
     AccountDTO accountDTO = new AccountDTO();
     accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
     accountDTO.setAddress(encodeAddress(address));
+    accountDTO.setAddressHeight(BigInteger.TEN);
+    accountDTO.setPublicKeyHeight(BigInteger.valueOf(20));
+    accountDTO.setPublicKey(account.getPublicAccount().getPublicKey().toHex());
+    accountDTO.setImportance(BigInteger.valueOf(5));
+    accountDTO.setImportanceHeight(BigInteger.valueOf(10));
     accountDTO.setSupplementalPublicKeys(
-        new SupplementalPublicKeysDTO().node(new AccountLinkPublicKeyDTO().publicKey("abc")));
+        new SupplementalPublicKeysDTO()
+            .node(new AccountLinkPublicKeyDTO().publicKey(nodeAccount.getPublicKey())));
 
     AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
     accountInfoDTO.setAccount(accountDTO);
@@ -118,7 +134,8 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
     Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
     Assertions.assertEquals(
-        "abc", resolvedAccountInfo.getSupplementalAccountKeys().getNode().get());
+        nodeAccount.getPublicKey(),
+        resolvedAccountInfo.getSupplementalAccountKeys().getNode().get().toHex());
 
     Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
     Assertions.assertEquals(
@@ -182,14 +199,22 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
 
   @Test
   public void search() throws Exception {
-    Address address = Address.generateRandom(this.networkType);
+    Account account = Account.generateNewAccount(this.networkType);
+    Address address = account.getAddress();
+    Account nodeAccount = Account.generateNewAccount(this.networkType);
 
     AccountDTO accountDTO = new AccountDTO();
     accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
     accountDTO.setAddress(encodeAddress(address));
-    accountDTO.setSupplementalPublicKeys(
-        new SupplementalPublicKeysDTO().node(new AccountLinkPublicKeyDTO().publicKey("abc")));
+    accountDTO.setAddressHeight(BigInteger.TEN);
+    accountDTO.setPublicKeyHeight(BigInteger.valueOf(20));
+    accountDTO.setPublicKey(account.getPublicAccount().getPublicKey().toHex());
+    accountDTO.setImportance(BigInteger.valueOf(5));
+    accountDTO.setImportanceHeight(BigInteger.valueOf(10));
 
+    accountDTO.setSupplementalPublicKeys(
+        new SupplementalPublicKeysDTO()
+            .node(new AccountLinkPublicKeyDTO().publicKey(nodeAccount.getPublicKey())));
     AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
     accountInfoDTO.setAccount(accountDTO);
 
@@ -220,7 +245,8 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     Assertions.assertEquals(address, resolvedAccountInfo.getAddress());
     Assertions.assertEquals(AccountType.MAIN, resolvedAccountInfo.getAccountType());
     Assertions.assertEquals(
-        "abc", resolvedAccountInfo.getSupplementalAccountKeys().getNode().get());
+        nodeAccount.getPublicKey(),
+        resolvedAccountInfo.getSupplementalAccountKeys().getNode().get().toHex());
 
     Assertions.assertEquals(1, resolvedAccountInfo.getActivityBuckets().size());
     Assertions.assertEquals(

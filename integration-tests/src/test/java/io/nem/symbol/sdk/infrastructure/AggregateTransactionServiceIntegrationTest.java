@@ -55,7 +55,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void isMultisigAccountModificationTransactionAdditionComplete(RepositoryType type) {
 
-    Account multisigAccount = helper().getMultisigAccount(type);
+    Account multisigAccount = helper().getMultisigAccount(type).getKey();
     Account cosignatoryAccount = config().getCosignatoryAccount();
     Account cosignatory2Account = config().getCosignatory2Account();
 
@@ -97,7 +97,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void isTransferFromMultisigComplete(RepositoryType type) {
 
-    Account multisigAccount = helper().getMultisigAccount(type);
+    Account multisigAccount = helper().getMultisigAccount(type).getKey();
     Account cosignatoryAccount = config().getCosignatoryAccount();
 
     TransferTransaction transferTransaction =
@@ -132,7 +132,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void isTransferFromMultisigNotComplete(RepositoryType type) {
 
-    Account multisigAccount = helper().getMultisigAccount(type);
+    Account multisigAccount = helper().getMultisigAccount(type).getLeft();
 
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
@@ -166,9 +166,9 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void isMultisigAccountModificationTransactionAdditionNotComplete(RepositoryType type) {
 
-    Account testAccount = helper().getTestAccount(type);
+    Account testAccount = helper().getTestAccount(type).getLeft();
 
-    Account multisigAccount = helper().getMultisigAccount(type);
+    Account multisigAccount = helper().getMultisigAccount(type).getLeft();
     Account cosignatoryAccount = config().getCosignatoryAccount();
     Account cosignatory2Account = config().getCosignatory2Account();
 
@@ -211,7 +211,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void isMultisigAccountModificationTransactionDeletionComplete(RepositoryType type) {
 
-    Account multisigAccount = helper().getMultisigAccount(type);
+    Account multisigAccount = helper().getMultisigAccount(type).getLeft();
     Account cosignatoryAccount = config().getCosignatoryAccount();
     Account cosignatory2Account = config().getCosignatory2Account();
     List<Account> accounts = Arrays.asList(cosignatoryAccount, cosignatory2Account);
@@ -251,7 +251,7 @@ class AggregateTransactionServiceIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void isMultisigAccountModificationTransactionDeletionNotComplete(RepositoryType type) {
 
-    Account multisigAccount = helper().getMultisigAccount(type);
+    Account multisigAccount = helper().getMultisigAccount(type).getLeft();
     Account cosignatoryAccount = config().getCosignatoryAccount();
     Account cosignatory2Account = config().getCosignatory2Account();
 

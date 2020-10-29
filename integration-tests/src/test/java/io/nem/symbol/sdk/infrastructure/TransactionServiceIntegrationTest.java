@@ -44,7 +44,7 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
   public void testTransferCatCurrencyFromNemesis(RepositoryType type) {
     String mosaicAlias = getNetworkCurrency().getNamespaceId().get().getFullName().get();
 
-    Account testAccount = helper().getTestAccount(type);
+    Account testAccount = helper().getTestAccount(type).getLeft();
     String recipientAlias = "testaccount" + RandomUtils.nextInt(0, 10000);
     helper().setAddressAlias(type, testAccount.getAddress(), recipientAlias);
 
@@ -79,7 +79,7 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
     String mosaicAlias =
         ("testTransferCustomCurrencyFromAccount1" + RandomUtils.nextInt(0, 10000)).toLowerCase();
     String recipientAlias = "testaccount" + RandomUtils.nextInt(0, 10000);
-    Account testAccount = helper.getTestAccount(type);
+    Account testAccount = helper.getTestAccount(type).getLeft();
     MosaicId mosaicId =
         helper().createMosaic(testAccount, type, BigInteger.valueOf(10000), mosaicAlias);
     helper().setAddressAlias(type, testAccount.getAddress(), recipientAlias);
@@ -105,7 +105,7 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
     String mosaicAlias =
         ("testTransferCustomCurrencyFromAccount1UsingAggregate" + RandomUtils.nextInt(0, 10000))
             .toLowerCase();
-    Account testAccount = helper().getTestAccount(type);
+    Account testAccount = helper().getTestAccount(type).getLeft();
     String recipientAlias = "testaccount" + RandomUtils.nextInt(0, 10000);
 
     MosaicId mosaicId =

@@ -23,7 +23,7 @@ public enum AliasType {
   MOSAIC(1),
   ADDRESS(2);
 
-  private final Integer value;
+  private final int value;
 
   AliasType(int value) {
     this.value = value;
@@ -41,7 +41,7 @@ public enum AliasType {
    *
    * @return enum value
    */
-  public final Integer getValue() {
+  public final int getValue() {
     return this.value;
   }
 }

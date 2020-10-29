@@ -19,9 +19,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.symbol.catapult.builders.MultisigEntryBuilder;
+import io.nem.symbol.core.utils.ConvertUtils;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.util.Arrays;
 import java.util.Collections;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class MultisigAccountInfoTest {
@@ -138,5 +142,25 @@ class MultisigAccountInfoTest {
             address1, 1, 1, Collections.emptyList(), Arrays.asList(address2, address3));
 
     assertTrue(multisigAccountInfo.isMultisig());
+  }
+
+  @Test
+  void serialize() {
+    MultisigAccountInfo info =
+        new MultisigAccountInfo(
+            address1, 3, 2, Arrays.asList(address3, address4), Arrays.asList(address2, address3));
+
+    byte[] serializedState = info.serialize();
+    String expectedHex =
+        "03000000020000009022D04812D05000F96C283657B0C17990932BC84926CDE6020000000000000090CF2886A23771534F2CEF86094B4C4FBC1E19C286B11E5B9049E14BEBCA93758EB36805BAE760A57239976F009A545C02000000000000009050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E190CF2886A23771534F2CEF86094B4C4FBC1E19C286B11E5B";
+    Assertions.assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
+    MultisigEntryBuilder builder =
+        MultisigEntryBuilder.loadFromBinary(SerializationUtils.toDataInput(serializedState));
+
+    Assertions.assertEquals(
+        ConvertUtils.toHex(serializedState), ConvertUtils.toHex(builder.serialize()));
+
+    Assertions.assertEquals(3, builder.getMinApproval());
+    Assertions.assertEquals(2, builder.getMinRemoval());
   }
 }

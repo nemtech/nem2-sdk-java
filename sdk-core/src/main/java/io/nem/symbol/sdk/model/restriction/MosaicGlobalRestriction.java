@@ -15,9 +15,19 @@
  */
 package io.nem.symbol.sdk.model.restriction;
 
+import io.nem.symbol.catapult.builders.GlobalKeyValueBuilder;
+import io.nem.symbol.catapult.builders.GlobalKeyValueSetBuilder;
+import io.nem.symbol.catapult.builders.MosaicGlobalRestrictionEntryBuilder;
+import io.nem.symbol.catapult.builders.MosaicIdDto;
+import io.nem.symbol.catapult.builders.MosaicRestrictionKeyDto;
+import io.nem.symbol.catapult.builders.MosaicRestrictionTypeDto;
+import io.nem.symbol.catapult.builders.RestrictionRuleBuilder;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /** Mosaic global restriction structure describes restriction information for an mosaic. */
 public class MosaicGlobalRestriction extends MosaicRestriction<MosaicGlobalRestrictionItem> {
@@ -36,5 +46,29 @@ public class MosaicGlobalRestriction extends MosaicRestriction<MosaicGlobalRestr
       MosaicId mosaicId,
       Map<BigInteger, MosaicGlobalRestrictionItem> restrictions) {
     super(compositeHash, entryType, mosaicId, restrictions);
+  }
+
+  /** @return serializes the state of this object. */
+  public byte[] serialize() {
+    MosaicIdDto mosaicId = SerializationUtils.toMosaicIdDto(getMosaicId());
+    GlobalKeyValueSetBuilder restrictions =
+        GlobalKeyValueSetBuilder.create(
+            getRestrictions().entrySet().stream()
+                .map(this::toGlobalKeyValueSetBuilder)
+                .collect(Collectors.toList()));
+    return MosaicGlobalRestrictionEntryBuilder.create(mosaicId, restrictions).serialize();
+  }
+
+  private GlobalKeyValueBuilder toGlobalKeyValueSetBuilder(
+      Entry<BigInteger, MosaicGlobalRestrictionItem> entry) {
+    MosaicRestrictionKeyDto key = new MosaicRestrictionKeyDto(entry.getKey().longValue());
+    MosaicIdDto referenceMosaicId =
+        SerializationUtils.toMosaicIdDto(entry.getValue().getReferenceMosaicId());
+    long restrictionValue = entry.getValue().getRestrictionValue().longValue();
+    MosaicRestrictionTypeDto restrictionType =
+        MosaicRestrictionTypeDto.rawValueOf(entry.getValue().getRestrictionType().getValue());
+    RestrictionRuleBuilder restrictionRule =
+        RestrictionRuleBuilder.create(referenceMosaicId, restrictionValue, restrictionType);
+    return GlobalKeyValueBuilder.create(key, restrictionRule);
   }
 }

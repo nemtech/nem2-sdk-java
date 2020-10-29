@@ -35,8 +35,6 @@ import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.math.BigInteger;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -114,7 +112,7 @@ public class MetadataRepositoryVertxImpl extends AbstractRepositoryVertxImpl
         new BigInteger(entryDto.getScopedMetadataKey(), 16),
         MetadataType.rawValueOf(entryDto.getMetadataType().getValue()),
         ConvertUtils.fromHexToString(entryDto.getValue()),
-        Optional.ofNullable(Objects.toString(entryDto.getTargetId(), null)));
+        entryDto.getTargetId());
   }
 
   @Override

@@ -16,47 +16,75 @@
 package io.nem.symbol.sdk.model.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.symbol.catapult.builders.AccountStateBuilder;
+import io.nem.symbol.catapult.builders.AccountStateFormatDto;
 import io.nem.symbol.core.crypto.PublicKey;
+import io.nem.symbol.core.crypto.VotingKey;
+import io.nem.symbol.core.utils.ConvertUtils;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.ResolvedMosaic;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class AccountInfoTest {
 
+  PublicKey accountPublicKey =
+      PublicKey.fromHexString("1111111111111111111111111111111111111111111111111111111111111111");
+  PublicKey linkedKey =
+      PublicKey.fromHexString("2222222222222222222222222222222222222222222222222222222222222222");
+  PublicKey nodeKey =
+      PublicKey.fromHexString("3333333333333333333333333333333333333333333333333333333333333333");
+  PublicKey vrfKey =
+      PublicKey.fromHexString("4444444444444444444444444444444444444444444444444444444444444444");
+  VotingKey votingKey =
+      VotingKey.fromHexString(
+          "555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555");
+  VotingKey votingKey2 =
+      VotingKey.fromHexString(
+          "666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666");
+  NetworkType networkType = NetworkType.MIJIN_TEST;
+  Address address = Address.createFromPublicKey(accountPublicKey.toHex(), networkType);
+
   @Test
-  void shouldCreateAccountInfoViaConstructor() {
+  void highValueAccountCreationAndSerialization() {
     List<ResolvedMosaic> mosaics =
         Collections.singletonList(
             new ResolvedMosaic(new MosaicId(BigInteger.TEN), BigInteger.valueOf(10000)));
 
     SupplementalAccountKeys supplementalAccountKeys =
         new SupplementalAccountKeys(
-            Optional.of("linkedKey"),
-            Optional.of("nodeKey"),
-            Optional.of("vrfKey"),
-            Collections.singletonList(new AccountLinkVotingKey("votingKey", 10, 20)));
+            linkedKey,
+            nodeKey,
+            vrfKey,
+            Collections.singletonList(new AccountLinkVotingKey(votingKey, 10, 20)));
 
-    BigInteger startHeight = BigInteger.ONE;
-    BigInteger totalFeesPaid = BigInteger.valueOf(2);
-    int beneficiaryCount = 3;
-    BigInteger rawScore = BigInteger.valueOf(4);
-    ActivityBucket bucket =
-        new ActivityBucket(startHeight, totalFeesPaid, beneficiaryCount, rawScore);
-    List<ActivityBucket> activityBuckets = Collections.singletonList(bucket);
-    Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
-    String publicKey = PublicKey.generateRandom().toHex();
+    List<ActivityBucket> activityBuckets =
+        Stream.of(1, 2, 3, 4, 5)
+            .map(
+                index ->
+                    new ActivityBucket(
+                        BigInteger.valueOf(index),
+                        BigInteger.valueOf(10 * index),
+                        100 * index,
+                        BigInteger.valueOf(1000 * index)))
+            .collect(Collectors.toList());
+
     AccountInfo accountInfo =
         new AccountInfo(
             "abc",
             address,
             new BigInteger("964"),
-            publicKey,
+            accountPublicKey,
             new BigInteger("966"),
             new BigInteger("777"),
             new BigInteger("0"),
@@ -68,13 +96,80 @@ class AccountInfoTest {
     assertEquals("abc", accountInfo.getRecordId().get());
     assertEquals(address, accountInfo.getAddress());
     assertEquals(new BigInteger("964"), accountInfo.getAddressHeight());
-    assertEquals(publicKey, accountInfo.getPublicKey());
+    assertEquals(accountPublicKey, accountInfo.getPublicKey());
     assertEquals(new BigInteger("966"), accountInfo.getPublicKeyHeight());
-    assertEquals(new BigInteger("777"), accountInfo.getImportances().get(0).getValue());
-    assertEquals(new BigInteger("0"), accountInfo.getImportances().get(0).getHeight());
+    assertEquals(new BigInteger("777"), accountInfo.getImportance().getValue());
+    assertEquals(new BigInteger("0"), accountInfo.getImportance().getHeight());
     assertEquals(mosaics, accountInfo.getMosaics());
     assertEquals(
-        PublicAccount.createFromPublicKey(publicKey, NetworkType.MIJIN_TEST),
+        PublicAccount.createFromPublicKey(accountPublicKey.toHex(), NetworkType.MIJIN_TEST),
+        accountInfo.getPublicAccount());
+
+    assertEquals(AccountType.REMOTE_UNLINKED, accountInfo.getAccountType());
+    assertTrue(accountInfo.isHighValue());
+
+    assertEquals(supplementalAccountKeys, accountInfo.getSupplementalAccountKeys());
+    assertEquals(activityBuckets, accountInfo.getActivityBuckets());
+
+    assertEquals(linkedKey, supplementalAccountKeys.getLinked().get());
+    assertEquals(nodeKey, supplementalAccountKeys.getNode().get());
+    assertEquals(vrfKey, supplementalAccountKeys.getVrf().get());
+    assertEquals(votingKey, supplementalAccountKeys.getVoting().get(0).getPublicKey());
+    assertEquals(10, supplementalAccountKeys.getVoting().get(0).getStartEpoch());
+    assertEquals(20, supplementalAccountKeys.getVoting().get(0).getEndEpoch());
+
+    byte[] serializedState = accountInfo.serialize();
+    String expectedHex =
+        "90FD35818960C7B18B72F49A5598FA9F712A354DB38EB076C4030000000000001111111111111111111111111111111111111111111111111111111111111111C403000000000000030107012222222222222222222222222222222222222222222222222222222222222222333333333333333333333333333333333333333333333333333333333333333344444444444444444444444444444444444444444444444444444444444444445555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555550A000000140000000903000000000000000000000000000001000000000000000A0000000000000064000000E80300000000000002000000000000001400000000000000C8000000D00700000000000003000000000000001E000000000000002C010000B80B0000000000000400000000000000280000000000000090010000A00F00000000000005000000000000003200000000000000F4010000881300000000000001000A000000000000001027000000000000";
+    assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
+
+    AccountStateBuilder accountStateBuilder =
+        AccountStateBuilder.loadFromBinary(SerializationUtils.toDataInput(serializedState));
+
+    Assertions.assertEquals(AccountStateFormatDto.HIGH_VALUE, accountStateBuilder.getFormat());
+
+    Assertions.assertEquals(
+        ConvertUtils.toHex(serializedState), ConvertUtils.toHex(accountStateBuilder.serialize()));
+  }
+
+  @Test
+  void regularValueAccountCreationAndSerialization() {
+    List<ResolvedMosaic> mosaics =
+        Collections.singletonList(
+            new ResolvedMosaic(new MosaicId(BigInteger.TEN), BigInteger.valueOf(10000)));
+
+    SupplementalAccountKeys supplementalAccountKeys =
+        new SupplementalAccountKeys(
+            linkedKey,
+            nodeKey,
+            vrfKey,
+            Collections.singletonList(new AccountLinkVotingKey(votingKey, 10, 20)));
+
+    List<ActivityBucket> activityBuckets = Collections.emptyList();
+    AccountInfo accountInfo =
+        new AccountInfo(
+            "abc",
+            address,
+            new BigInteger("964"),
+            accountPublicKey,
+            new BigInteger("966"),
+            BigInteger.ZERO,
+            BigInteger.ZERO,
+            mosaics,
+            AccountType.REMOTE_UNLINKED,
+            supplementalAccountKeys,
+            activityBuckets);
+
+    assertEquals("abc", accountInfo.getRecordId().get());
+    assertEquals(address, accountInfo.getAddress());
+    assertEquals(new BigInteger("964"), accountInfo.getAddressHeight());
+    assertEquals(accountPublicKey, accountInfo.getPublicKey());
+    assertEquals(new BigInteger("966"), accountInfo.getPublicKeyHeight());
+    assertEquals(new BigInteger("0"), accountInfo.getImportance().getValue());
+    assertEquals(new BigInteger("0"), accountInfo.getImportance().getHeight());
+    assertEquals(mosaics, accountInfo.getMosaics());
+    assertEquals(
+        PublicAccount.createFromPublicKey(accountPublicKey.toHex(), networkType),
         accountInfo.getPublicAccount());
 
     assertEquals(AccountType.REMOTE_UNLINKED, accountInfo.getAccountType());
@@ -82,11 +177,25 @@ class AccountInfoTest {
     assertEquals(supplementalAccountKeys, accountInfo.getSupplementalAccountKeys());
     assertEquals(activityBuckets, accountInfo.getActivityBuckets());
 
-    assertEquals("linkedKey", supplementalAccountKeys.getLinked().get());
-    assertEquals("nodeKey", supplementalAccountKeys.getNode().get());
-    assertEquals("vrfKey", supplementalAccountKeys.getVrf().get());
-    assertEquals("votingKey", supplementalAccountKeys.getVoting().get(0).getPublicKey());
+    assertEquals(linkedKey, supplementalAccountKeys.getLinked().get());
+    assertEquals(nodeKey, supplementalAccountKeys.getNode().get());
+    assertEquals(vrfKey, supplementalAccountKeys.getVrf().get());
+    assertEquals(votingKey, supplementalAccountKeys.getVoting().get(0).getPublicKey());
     assertEquals(10, supplementalAccountKeys.getVoting().get(0).getStartEpoch());
     assertEquals(20, supplementalAccountKeys.getVoting().get(0).getEndEpoch());
+    assertFalse(accountInfo.isHighValue());
+
+    byte[] serializedState = accountInfo.serialize();
+    String expectedHex =
+        "90FD35818960C7B18B72F49A5598FA9F712A354DB38EB076C4030000000000001111111111111111111111111111111111111111111111111111111111111111C403000000000000030007012222222222222222222222222222222222222222222222222222222222222222333333333333333333333333333333333333333333333333333333333333333344444444444444444444444444444444444444444444444444444444444444445555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555550A0000001400000001000A000000000000001027000000000000";
+    assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
+
+    AccountStateBuilder builder =
+        AccountStateBuilder.loadFromBinary(SerializationUtils.toDataInput(serializedState));
+
+    Assertions.assertEquals(AccountStateFormatDto.REGULAR, builder.getFormat());
+
+    Assertions.assertEquals(
+        ConvertUtils.toHex(serializedState), ConvertUtils.toHex(builder.serialize()));
   }
 }

@@ -21,6 +21,8 @@ import io.nem.symbol.catapult.builders.FinalizationEpochDto;
 import io.nem.symbol.catapult.builders.GeneratorUtils;
 import io.nem.symbol.catapult.builders.Hash256Dto;
 import io.nem.symbol.catapult.builders.KeyDto;
+import io.nem.symbol.catapult.builders.MosaicBuilder;
+import io.nem.symbol.catapult.builders.MosaicFlagsDto;
 import io.nem.symbol.catapult.builders.MosaicIdDto;
 import io.nem.symbol.catapult.builders.NamespaceIdDto;
 import io.nem.symbol.catapult.builders.SignatureDto;
@@ -38,7 +40,9 @@ import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
+import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
+import io.nem.symbol.sdk.model.mosaic.ResolvedMosaic;
 import io.nem.symbol.sdk.model.mosaic.UnresolvedMosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
@@ -47,6 +51,9 @@ import java.io.DataInputStream;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 
 /** Utility class used to serialize/deserialize catbuffer values. */
@@ -407,5 +414,54 @@ public class SerializationUtils {
    */
   public static FinalizationEpochDto toFinalizationEpochDto(long finalizationEpoch) {
     return new FinalizationEpochDto((int) finalizationEpoch);
+  }
+
+  /**
+   * Converts resolved mosaic list to mosaic builder list to serialize
+   *
+   * @param mosaics the mosaics
+   * @return the list of catbuffers.
+   */
+  public static List<MosaicBuilder> toMosaicBuilders(List<ResolvedMosaic> mosaics) {
+    return mosaics.stream().map(SerializationUtils::toMosaicBuilder).collect(Collectors.toList());
+  }
+
+  /**
+   * Converts an a model {@link ResolvedMosaic} into an {@link MosaicBuilder} from catbuffer.
+   *
+   * @param mosaic the model
+   * @return the dto
+   */
+  private static MosaicBuilder toMosaicBuilder(ResolvedMosaic mosaic) {
+    return MosaicBuilder.create(toMosaicIdDto(mosaic.getId()), toAmount(mosaic.getAmount()));
+  }
+
+  /**
+   * Converts an amount to a catbuffer {@link AmountDto}
+   *
+   * @param amount the big int amount
+   * @return the dto.
+   */
+  public static AmountDto toAmount(BigInteger amount) {
+    return new AmountDto(SerializationUtils.toUnsignedLong(amount));
+  }
+
+  /**
+   * Get the mosaic flags.
+   *
+   * @return Mosaic flags
+   */
+  public static EnumSet<MosaicFlagsDto> getMosaicFlagsEnumSet(MosaicFlags flags) {
+    EnumSet<MosaicFlagsDto> mosaicFlagsBuilder = EnumSet.of(MosaicFlagsDto.NONE);
+    if (flags.isSupplyMutable()) {
+      mosaicFlagsBuilder.add(MosaicFlagsDto.SUPPLY_MUTABLE);
+    }
+    if (flags.isTransferable()) {
+      mosaicFlagsBuilder.add(MosaicFlagsDto.TRANSFERABLE);
+    }
+    if (flags.isRestrictable()) {
+      mosaicFlagsBuilder.add(MosaicFlagsDto.RESTRICTABLE);
+    }
+    return mosaicFlagsBuilder;
   }
 }

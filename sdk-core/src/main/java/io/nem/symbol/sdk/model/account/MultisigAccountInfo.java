@@ -15,7 +15,12 @@
  */
 package io.nem.symbol.sdk.model.account;
 
+import io.nem.symbol.catapult.builders.AddressDto;
+import io.nem.symbol.catapult.builders.MultisigEntryBuilder;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.Validate;
 
 /**
  * The multisig account info structure describes information of a multisig account.
@@ -36,6 +41,9 @@ public class MultisigAccountInfo {
       long minRemoval,
       List<Address> cosignatories,
       List<Address> multisigAddresses) {
+    Validate.notNull(accountAddress, "accountAddress is required");
+    Validate.notNull(cosignatories, "cosignatories is required");
+    Validate.notNull(multisigAddresses, "multisigAddresses is required");
     this.accountAddress = accountAddress;
     this.minApproval = minApproval;
     this.minRemoval = minRemoval;
@@ -115,5 +123,23 @@ public class MultisigAccountInfo {
    */
   public boolean isMultisig() {
     return minApproval != 0 && minRemoval != 0;
+  }
+
+  /** @return serializes the state of this object. */
+  public byte[] serialize() {
+    int minApproval = (int) getMinApproval();
+    int minRemoval = (int) getMinRemoval();
+    AddressDto accountAddress = SerializationUtils.toAddressDto(getAccountAddress());
+    List<AddressDto> cosignatoryAddresses =
+        getCosignatoryAddresses().stream()
+            .map(SerializationUtils::toAddressDto)
+            .collect(Collectors.toList());
+    List<AddressDto> multisigAddresses =
+        getMultisigAddresses().stream()
+            .map(SerializationUtils::toAddressDto)
+            .collect(Collectors.toList());
+    return MultisigEntryBuilder.create(
+            minApproval, minRemoval, accountAddress, cosignatoryAddresses, multisigAddresses)
+        .serialize();
   }
 }

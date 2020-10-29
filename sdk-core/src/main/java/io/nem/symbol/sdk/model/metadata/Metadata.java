@@ -15,13 +15,22 @@
  */
 package io.nem.symbol.sdk.model.metadata;
 
+import io.nem.symbol.catapult.builders.AddressDto;
+import io.nem.symbol.catapult.builders.MetadataEntryBuilder;
+import io.nem.symbol.catapult.builders.MetadataTypeDto;
+import io.nem.symbol.catapult.builders.MetadataValueBuilder;
+import io.nem.symbol.catapult.builders.ScopedMetadataKeyDto;
 import io.nem.symbol.core.utils.MapperUtils;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.Stored;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.transaction.MetadataTransaction;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.Optional;
+import org.apache.commons.lang3.Validate;
 
 /**
  * A mosaic describes an instance of a mosaic definition. Mosaics can be transferred by means of a
@@ -30,7 +39,7 @@ import java.util.Optional;
 public class Metadata implements Stored {
 
   /** The stored database. */
-  private final Optional<String> recordId;
+  private final String recordId;
   /** The composite hash */
   private final String compositeHash;
   /** The metadata source address */
@@ -55,7 +64,7 @@ public class Metadata implements Stored {
    *
    * <p>{@link NamespaceId} (when metadata type is NAMESPACE)
    */
-  private final Optional<Object> targetId;
+  private final Object targetId;
 
   @SuppressWarnings("squid:S00107")
   public Metadata(
@@ -66,9 +75,14 @@ public class Metadata implements Stored {
       BigInteger scopedMetadataKey,
       MetadataType metadataType,
       String value,
-      Optional<String> targetId) {
-    this.recordId = Optional.ofNullable(recordId);
+      String targetId) {
+    this.recordId = recordId;
     this.compositeHash = compositeHash;
+    Validate.notNull(sourceAddress, "sourceAddress is required");
+    Validate.notNull(targetAddress, "targetAddress is required");
+    Validate.notNull(scopedMetadataKey, "scopedMetadataKey is required");
+    Validate.notNull(scopedMetadataKey, "scopedMetadataKey is required");
+    Validate.notNull(metadataType, "metadataType is required");
     this.sourceAddress = sourceAddress;
     this.targetAddress = targetAddress;
     this.scopedMetadataKey = scopedMetadataKey;
@@ -77,17 +91,18 @@ public class Metadata implements Stored {
     this.targetId = resolveTargetId(targetId, metadataType);
   }
 
-  private Optional<Object> resolveTargetId(Optional<String> targetId, MetadataType metadataType) {
-    if (!targetId.isPresent() && metadataType == MetadataType.ACCOUNT) {
-      return Optional.empty();
+  private Object resolveTargetId(String targetId, MetadataType metadataType) {
+    if (targetId == null && metadataType == MetadataType.ACCOUNT) {
+      return null;
     }
+    Validate.notNull(targetId, "targetId is required when metadata type is  " + metadataType);
     if (metadataType == MetadataType.NAMESPACE) {
-      return targetId.map(MapperUtils::toNamespaceId);
+      return MapperUtils.toNamespaceId(targetId);
     }
     if (metadataType == MetadataType.MOSAIC) {
-      return targetId.map(MapperUtils::toMosaicId);
+      return MapperUtils.toMosaicId(targetId);
     }
-    return Optional.empty();
+    throw new IllegalArgumentException("Invalid metadata type " + metadataType);
   }
 
   public String getCompositeHash() {
@@ -115,11 +130,43 @@ public class Metadata implements Stored {
   }
 
   public Optional<Object> getTargetId() {
-    return targetId;
+    return Optional.ofNullable(targetId);
   }
 
   @Override
   public Optional<String> getRecordId() {
-    return recordId;
+    return Optional.ofNullable(recordId);
+  }
+
+  /** @return serializes the state of this object. */
+  public byte[] serialize() {
+
+    AddressDto sourceAddress = SerializationUtils.toAddressDto(getSourceAddress());
+    AddressDto targetAddress = SerializationUtils.toAddressDto(getTargetAddress());
+    ScopedMetadataKeyDto scopedMetadataKey =
+        new ScopedMetadataKeyDto(getScopedMetadataKey().longValue());
+    long targetId = getTargetId().map(this::toTargetId).orElse(0L);
+    MetadataTypeDto metadataType = MetadataTypeDto.rawValueOf((byte) getMetadataType().getValue());
+
+    MetadataValueBuilder value = toMetadataValueBuilder(getValue());
+
+    return MetadataEntryBuilder.create(
+            sourceAddress, targetAddress, scopedMetadataKey, targetId, metadataType, value)
+        .serialize();
+  }
+
+  public static MetadataValueBuilder toMetadataValueBuilder(String value) {
+    ByteBuffer rawValue = ByteBuffer.wrap(MetadataTransaction.toByteArray(value));
+    return MetadataValueBuilder.create(rawValue);
+  }
+
+  private Long toTargetId(Object o) {
+    if (o instanceof MosaicId) {
+      return ((MosaicId) o).getIdAsLong();
+    }
+    if (o instanceof NamespaceId) {
+      return ((NamespaceId) o).getIdAsLong();
+    }
+    return 0L;
   }
 }
