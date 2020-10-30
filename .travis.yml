@@ -44,6 +44,7 @@ jobs:
     - name: e2e tests
       script: source e2e.sh
       os: linux
+      jdk: oraclejdk9
       dist: focal
       if: (branch = env(DEV_BRANCH) AND type = cron) OR (commit_message = e2e)
     - stage: publish
