@@ -5,6 +5,8 @@ jdk:
   - oraclejdk8
   - oraclejdk9
   - openjdk8
+  - openjdk9
+  - openjdk10
 services:
   - docker
 env:
@@ -44,7 +46,7 @@ jobs:
     - name: e2e tests
       script: source e2e.sh
       os: linux
-      jdk: oraclejdk9
+      jdk: openjdk10
       dist: focal
       if: (branch = env(DEV_BRANCH) AND type = cron) OR (commit_message = e2e)
     - stage: publish
