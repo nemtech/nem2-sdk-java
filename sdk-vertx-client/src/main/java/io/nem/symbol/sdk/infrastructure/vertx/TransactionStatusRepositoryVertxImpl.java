@@ -53,7 +53,7 @@ public class TransactionStatusRepositoryVertxImpl extends AbstractRepositoryVert
   public Observable<TransactionStatus> getTransactionStatus(String transactionHash) {
     Consumer<Handler<AsyncResult<TransactionStatusDTO>>> callback =
         handler -> getClient().getTransactionStatus(transactionHash, handler);
-    return exceptionHandling(call(callback).map(this::toTransactionStatus));
+    return call(callback, this::toTransactionStatus);
   }
 
   private TransactionStatus toTransactionStatus(TransactionStatusDTO transactionStatusDTO) {

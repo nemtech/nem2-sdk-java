@@ -15,6 +15,8 @@
  */
 package io.nem.symbol.sdk.model.namespace;
 
+import io.nem.symbol.catapult.builders.NamespaceAliasBuilder;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 
 /** Mosaic alias. */
@@ -27,5 +29,10 @@ public class MosaicAlias extends AliasBase<MosaicId> {
    */
   public MosaicAlias(MosaicId mosaicId) {
     super(AliasType.MOSAIC, mosaicId);
+  }
+
+  @Override
+  public NamespaceAliasBuilder createAliasBuilder() {
+    return NamespaceAliasBuilder.createMosaicId(SerializationUtils.toMosaicIdDto(getAliasValue()));
   }
 }

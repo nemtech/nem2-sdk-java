@@ -35,10 +35,10 @@ class AddressVectorTester extends AbstractVectorTester {
 
   private static List<Arguments> extractArgumentsSha(Map<String, String> entry) {
     List<Arguments> arguments = new ArrayList<>();
-    arguments.add(extractArguments(entry, NetworkType.MAIN_NET, "address_public"));
-    arguments.add(extractArguments(entry, NetworkType.TEST_NET, "address_public_test"));
-    arguments.add(extractArguments(entry, NetworkType.MIJIN, "address_mijin"));
-    arguments.add(extractArguments(entry, NetworkType.MIJIN_TEST, "address_mijin_test"));
+    arguments.add(extractArguments(entry, NetworkType.MAIN_NET, "address_Public"));
+    arguments.add(extractArguments(entry, NetworkType.TEST_NET, "address_PublicTest"));
+    arguments.add(extractArguments(entry, NetworkType.PRIVATE, "address_Private"));
+    arguments.add(extractArguments(entry, NetworkType.PRIVATE_TEST, "address_PrivateTest"));
     return arguments;
   }
 

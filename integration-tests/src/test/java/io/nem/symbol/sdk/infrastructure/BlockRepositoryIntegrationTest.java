@@ -18,11 +18,25 @@ package io.nem.symbol.sdk.infrastructure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import io.nem.symbol.core.crypto.Hashes;
 import io.nem.symbol.core.crypto.PublicKey;
+import io.nem.symbol.core.utils.ConvertUtils;
+import io.nem.symbol.sdk.api.AccountPaginationStreamer;
+import io.nem.symbol.sdk.api.AccountRepository;
+import io.nem.symbol.sdk.api.AccountSearchCriteria;
 import io.nem.symbol.sdk.api.BlockOrderBy;
 import io.nem.symbol.sdk.api.BlockPaginationStreamer;
 import io.nem.symbol.sdk.api.BlockRepository;
 import io.nem.symbol.sdk.api.BlockSearchCriteria;
+import io.nem.symbol.sdk.api.MetadataPaginationStreamer;
+import io.nem.symbol.sdk.api.MetadataRepository;
+import io.nem.symbol.sdk.api.MetadataSearchCriteria;
+import io.nem.symbol.sdk.api.MosaicPaginationStreamer;
+import io.nem.symbol.sdk.api.MosaicRepository;
+import io.nem.symbol.sdk.api.MosaicSearchCriteria;
+import io.nem.symbol.sdk.api.NamespacePaginationStreamer;
+import io.nem.symbol.sdk.api.NamespaceRepository;
+import io.nem.symbol.sdk.api.NamespaceSearchCriteria;
 import io.nem.symbol.sdk.api.OrderBy;
 import io.nem.symbol.sdk.api.PaginationStreamer;
 import io.nem.symbol.sdk.api.ReceiptPaginationStreamer;
@@ -34,15 +48,22 @@ import io.nem.symbol.sdk.api.TransactionRepository;
 import io.nem.symbol.sdk.api.TransactionSearchCriteria;
 import io.nem.symbol.sdk.api.TransactionStatementSearchCriteria;
 import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
+import io.nem.symbol.sdk.model.blockchain.StatePacketType;
+import io.nem.symbol.sdk.model.blockchain.StateTree;
+import io.nem.symbol.sdk.model.metadata.Metadata;
+import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.namespace.NamespaceInfo;
 import io.nem.symbol.sdk.model.receipt.AddressResolutionStatement;
 import io.nem.symbol.sdk.model.receipt.MosaicResolutionStatement;
 import io.nem.symbol.sdk.model.receipt.TransactionStatement;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionGroup;
+import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.List;
@@ -267,7 +288,6 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
         });
   }
 
-
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void getMerkleReceiptsFromMosaics(RepositoryType type) {
@@ -296,7 +316,6 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
           Assertions.assertFalse(merkleProofInfo.getMerklePath().isEmpty());
         });
   }
-
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
@@ -336,9 +355,11 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
   void getMerkleTransaction(RepositoryType type) {
     BlockRepository blockRepository = getBlockRepository(type);
 
-    TransactionRepository transactionRepository = getRepositoryFactory(type).createTransactionRepository();
+    TransactionRepository transactionRepository =
+        getRepositoryFactory(type).createTransactionRepository();
 
-    TransactionPaginationStreamer streamer = new TransactionPaginationStreamer(transactionRepository);
+    TransactionPaginationStreamer streamer =
+        new TransactionPaginationStreamer(transactionRepository);
 
     List<Transaction> list =
         get(
@@ -354,9 +375,140 @@ class BlockRepositoryIntegrationTest extends BaseIntegrationTest {
         s -> {
           String hash = s.getTransactionInfo().get().getHash().get();
           BigInteger height = s.getTransactionInfo().get().getHeight();
-          MerkleProofInfo merkleProofInfo =
-              get(blockRepository.getMerkleTransaction(height, hash));
+          MerkleProofInfo merkleProofInfo = get(blockRepository.getMerkleTransaction(height, hash));
           Assertions.assertFalse(merkleProofInfo.getMerklePath().isEmpty());
         });
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getMerkleStateForAccounts(RepositoryType type) {
+    BlockRepository blockRepository = getBlockRepository(type);
+    AccountRepository accountRepository = getRepositoryFactory(type).createAccountRepository();
+
+    AccountPaginationStreamer streamer = new AccountPaginationStreamer(accountRepository);
+
+    List<AccountInfo> accountInfos =
+        get(streamer.search(new AccountSearchCriteria()).toList().toObservable());
+
+    accountInfos.stream()
+        .forEach(
+            a -> {
+              try {
+                byte[] state = a.serialize();
+                String hash = ConvertUtils.toHex(Hashes.sha3_256(state));
+                StateTree stateTree =
+                    get(blockRepository.getMerkleState(StatePacketType.ACCOUNT_STATE_PATH, hash));
+                System.out.println(toJson(stateTree));
+              } catch (Exception e) {
+                System.out.println(e.getMessage());
+              }
+            });
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getMerkleStateForMosaics(RepositoryType type) {
+    BlockRepository blockRepository = getBlockRepository(type);
+    MosaicRepository mosaicRepository = getRepositoryFactory(type).createMosaicRepository();
+
+    MosaicPaginationStreamer streamer = new MosaicPaginationStreamer(mosaicRepository);
+
+    List<MosaicInfo> accountInfos =
+        get(streamer.search(new MosaicSearchCriteria()).toList().toObservable());
+
+    accountInfos.stream()
+        .forEach(
+            a -> {
+              try {
+                byte[] state = a.serialize();
+                String hash = ConvertUtils.toHex(Hashes.sha3_256(state));
+                StateTree stateTree =
+                    get(blockRepository.getMerkleState(StatePacketType.MOSAIC_STATE_PATH, hash));
+                System.out.println(toJson(stateTree));
+              } catch (Exception e) {
+                System.out.println(e.getMessage());
+              }
+            });
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getMerkleStateForMetadata(RepositoryType type) {
+    BlockRepository blockRepository = getBlockRepository(type);
+    MetadataRepository metadataRepository = getRepositoryFactory(type).createMetadataRepository();
+
+    MetadataPaginationStreamer streamer = new MetadataPaginationStreamer(metadataRepository);
+
+    List<Metadata> accountInfos =
+        get(streamer.search(new MetadataSearchCriteria()).toList().toObservable());
+
+    accountInfos.stream()
+        .forEach(
+            a -> {
+              try {
+                byte[] state = a.serialize();
+                String hash = ConvertUtils.toHex(Hashes.sha3_256(state));
+                StateTree stateTree =
+                    get(blockRepository.getMerkleState(StatePacketType.METADATA_STATE_PATH, hash));
+                System.out.println(toJson(stateTree));
+              } catch (Exception e) {
+                System.out.println(e.getMessage());
+              }
+            });
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getNamespaceState(RepositoryType type) {
+    NamespaceRepository repository = getRepositoryFactory(type).createNamespaceRepository();
+    NamespacePaginationStreamer streamer = new NamespacePaginationStreamer(repository);
+    BlockRepository blockRepository = getBlockRepository(type);
+
+    List<NamespaceInfo> infos =
+        get(
+            streamer
+                .search(new NamespaceSearchCriteria())
+                .filter(NamespaceInfo::isRoot)
+                .toList()
+                .toObservable());
+    infos.forEach(
+        namespaceInfo -> {
+          Pair<NamespaceInfo, List<NamespaceInfo>> pair =
+              get(getNamespaceState(type, namespaceInfo.getId()));
+          byte[] state = pair.getKey().serialize(pair.getRight());
+          String hash = ConvertUtils.toHex(Hashes.sha3_256(state));
+          try {
+            StateTree stateTree =
+                get(blockRepository.getMerkleState(StatePacketType.NAMESPACE_STATE_PATH, hash));
+            System.out.println(toJson(stateTree));
+          } catch (Exception e) {
+            System.out.println(e.getMessage());
+          }
+        });
+  }
+
+  Observable<Pair<NamespaceInfo, List<NamespaceInfo>>> getNamespaceState(
+      RepositoryType type, NamespaceId namespaceId) {
+
+    NamespaceRepository repository = getRepositoryFactory(type).createNamespaceRepository();
+    NamespacePaginationStreamer streamer = new NamespacePaginationStreamer(repository);
+
+    return repository
+        .getNamespace(namespaceId)
+        .flatMap(
+            info -> {
+              if (!info.isRoot()) {
+                return Observable.error(
+                    new IllegalArgumentException(
+                        "Namespace " + namespaceId.getIdAsHex() + " is not a root namespace"));
+              } else {
+                return streamer
+                    .search(new NamespaceSearchCriteria().level0(namespaceId.getIdAsHex()))
+                    .toList()
+                    .toObservable()
+                    .map(children -> Pair.of(info, children));
+              }
+            });
   }
 }

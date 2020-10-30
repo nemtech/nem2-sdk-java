@@ -94,8 +94,7 @@ public class TransactionRepositoryVertxImpl extends AbstractRepositoryVertxImpl
   public Observable<Transaction> getTransaction(TransactionGroup group, String transactionHash) {
     Consumer<Handler<AsyncResult<TransactionInfoDTO>>> callback =
         getTransactionHandler(group, transactionHash);
-    return exceptionHandling(
-        call(callback).map(transactionDto -> mapTransaction(group, transactionDto)));
+    return call(callback, transactionDto -> mapTransaction(group, transactionDto));
   }
 
   @Override

@@ -69,6 +69,7 @@ public class SecretLockRepositoryOkHttpImplTest extends AbstractOkHttpRespositor
     lockHashDto.setRecipientAddress(encodeAddress(recipientAddress));
     lockHashDto.setHashAlgorithm(LockHashAlgorithmEnum.NUMBER_2);
     lockHashDto.setStatus(LockStatus.NUMBER_1);
+    lockHashDto.setSecret("someSecret");
 
     SecretLockInfoDTO hashLockInfoDTO = new SecretLockInfoDTO();
     hashLockInfoDTO.setLock(lockHashDto);
@@ -96,6 +97,7 @@ public class SecretLockRepositoryOkHttpImplTest extends AbstractOkHttpRespositor
     Assertions.assertEquals(LockHashAlgorithm.HASH_256, resolvedSecretLockInfo.getHashAlgorithm());
     Assertions.assertEquals(lockHashDto.getAmount(), resolvedSecretLockInfo.getAmount());
     Assertions.assertEquals(lockHashDto.getEndHeight(), resolvedSecretLockInfo.getEndHeight());
+    Assertions.assertEquals(lockHashDto.getSecret(), resolvedSecretLockInfo.getSecret());
   }
 
   private SecretLockPage toPage(SecretLockInfoDTO dto) {

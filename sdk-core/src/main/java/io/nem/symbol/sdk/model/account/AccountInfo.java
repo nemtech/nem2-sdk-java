@@ -93,10 +93,11 @@ public class AccountInfo implements Stored {
     this.activityBuckets = ObjectUtils.defaultIfNull(activityBuckets, Collections.emptyList());
     this.importance = new Importance(importance, importanceHeight);
     this.mosaics = ObjectUtils.defaultIfNull(mosaics, Collections.emptyList());
-    if (isHighValue()) {
-      Validate.isTrue(
-          this.activityBuckets.size() >= 5, "Activity buckets must contain at least 5 values");
-    }
+    //    if (isHighValue()) {
+    //      Validate.isTrue(
+    //          this.activityBuckets.size() >= 5, "Activity buckets must contain at least 5
+    // values");
+    //    }
   }
 
   /** @return the record id if known. */

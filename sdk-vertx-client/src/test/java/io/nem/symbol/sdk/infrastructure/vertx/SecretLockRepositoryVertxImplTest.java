@@ -65,6 +65,7 @@ public class SecretLockRepositoryVertxImplTest extends AbstractVertxRespositoryT
     lockHashDto.setRecipientAddress(encodeAddress(recipientAddress));
     lockHashDto.setMosaicId(mosaicId.getIdAsHex());
     lockHashDto.setStatus(LockStatus.NUMBER_1);
+    lockHashDto.setSecret("someSecret");
     lockHashDto.setHashAlgorithm(LockHashAlgorithmEnum.NUMBER_2);
 
     SecretLockInfoDTO hashLockInfoDTO = new SecretLockInfoDTO();
@@ -131,6 +132,7 @@ public class SecretLockRepositoryVertxImplTest extends AbstractVertxRespositoryT
     Assertions.assertEquals(mosaicId, resolvedSecretLockInfo.getMosaicId());
     Assertions.assertEquals(lockHashDto.getAmount(), resolvedSecretLockInfo.getAmount());
     Assertions.assertEquals(lockHashDto.getEndHeight(), resolvedSecretLockInfo.getEndHeight());
+    Assertions.assertEquals(lockHashDto.getSecret(), resolvedSecretLockInfo.getSecret());
   }
 
   @Test

@@ -17,6 +17,8 @@ package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
+import io.nem.symbol.sdk.model.blockchain.StatePacketType;
+import io.nem.symbol.sdk.model.blockchain.StateTree;
 import io.reactivex.Observable;
 import java.math.BigInteger;
 
@@ -49,9 +51,31 @@ public interface BlockRepository extends Searcher<BlockInfo, BlockSearchCriteria
   Observable<MerkleProofInfo> getMerkleTransaction(BigInteger height, String hash);
 
   /**
-   * @param height the height
-   * @param hash the hash.
+   * Get the merkle path for a given a receipt statement hash and block Returns the merkle path for
+   * a receipt statement or resolution linked to a block. The merkle path is the minimum number of
+   * nodes needed to calculate the merkle root. Steps to calculate the merkle root: 1. proofHash
+   * &#x3D; hash (leaf). 2. Concatenate proofHash with the first unprocessed item from the
+   * merklePath list as follows: * a) If item.position &#x3D;&#x3D; left -&gt; proofHash &#x3D;
+   * sha_256(item.hash + proofHash). * b) If item.position &#x3D;&#x3D; right -&gt; proofHash &#x3D;
+   * sha_256(proofHash+ item.hash). 3. Repeat 2. for every item in the merklePath list. 4. Compare
+   * if the calculated proofHash equals the one recorded in the block header (block.receiptsHash) to
+   * verify if the statement was linked with the block.
+   *
+   * @param height Block height. (required)
+   * @param hash Receipt hash. (required)
    * @return {@link Observable} of MerkleProofInfo
    */
   Observable<MerkleProofInfo> getMerkleReceipts(BigInteger height, String hash);
+
+  /**
+   * Get the merkle path for a given state packet type and state entry hash (asynchronously) Returns
+   * the merkle path if the state entry hash belongs to the latest state packet repository by type.
+   * The path is the complementary data needed to calculate the merkle patricia tree. A client can
+   * compare if the calculated root equals \&quot;stateHash\&quot; recorded in the block header.
+   *
+   * @param state State packet type. (required)
+   * @param hash State hash. (required)
+   * @return {@link Observable} of StateTree
+   */
+  Observable<StateTree> getMerkleState(StatePacketType state, String hash);
 }

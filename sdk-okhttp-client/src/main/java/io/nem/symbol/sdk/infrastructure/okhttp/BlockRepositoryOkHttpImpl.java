@@ -27,6 +27,8 @@ import io.nem.symbol.sdk.model.blockchain.ImportanceBlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerklePathItem;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.symbol.sdk.model.blockchain.Position;
+import io.nem.symbol.sdk.model.blockchain.StatePacketType;
+import io.nem.symbol.sdk.model.blockchain.StateTree;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.BlockRoutesApi;
@@ -36,6 +38,8 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.BlockOrderByEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.BlockPage;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.ImportanceBlockDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MerkleProofInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.StatePacketTypeEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.StateTreeDTO;
 import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.List;
@@ -169,12 +173,23 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
   @Override
   public Observable<MerkleProofInfo> getMerkleTransaction(BigInteger height, String hash) {
     Callable<MerkleProofInfoDTO> callback = () -> getClient().getMerkleTransaction(height, hash);
-    return exceptionHandling(call(callback).map(this::toMerkleProofInfo));
+    return call(callback, this::toMerkleProofInfo);
   }
 
   public Observable<MerkleProofInfo> getMerkleReceipts(BigInteger height, String hash) {
     Callable<MerkleProofInfoDTO> callback = () -> getClient().getMerkleReceipts(height, hash);
-    return exceptionHandling(call(callback).map(this::toMerkleProofInfo));
+    return call(callback, this::toMerkleProofInfo);
+  }
+
+  @Override
+  public Observable<StateTree> getMerkleState(StatePacketType state, String hash) {
+    return call(
+        () -> getClient().getMerkleState(StatePacketTypeEnum.fromValue(state.getValue()), hash),
+        this::toStateTree);
+  }
+
+  private StateTree toStateTree(StateTreeDTO dto) {
+    return new StateTree(dto.getTree());
   }
 
   private MerkleProofInfo toMerkleProofInfo(MerkleProofInfoDTO dto) {

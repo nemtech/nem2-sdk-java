@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package io.nem.symbol.sdk.model.namespace;
+
+import io.nem.symbol.catapult.builders.NamespaceAliasBuilder;
+
 /** The alias structure defines an interface for Aliases */
 public interface Alias<T> {
 
@@ -37,4 +40,7 @@ public interface Alias<T> {
    * @return true if alias is empty; false otherwise
    */
   boolean isEmpty();
+
+  /** @return the namespace alias builder for catbuffer. */
+  NamespaceAliasBuilder createAliasBuilder();
 }

@@ -59,15 +59,9 @@ public class Address implements UnresolvedAddress {
     Optional<String> validationError = validatePlainAddress(this.plainAddress);
     Validate.isTrue(!validationError.isPresent(), validationError.orElse(""));
     char addressNetwork = this.plainAddress.charAt(0);
-    if (networkType.equals(NetworkType.MAIN_NET) && addressNetwork != 'N') {
-      throw new IllegalArgumentException("MAIN_NET Address must start with N");
-    } else if (networkType.equals(NetworkType.TEST_NET) && addressNetwork != 'T') {
-      throw new IllegalArgumentException("TEST_NET Address must start with T");
-    } else if (networkType.equals(NetworkType.MIJIN) && addressNetwork != 'M') {
-      throw new IllegalArgumentException("MIJIN Address must start with M");
-    } else if (networkType.equals(NetworkType.MIJIN_TEST) && addressNetwork != 'S') {
-      throw new IllegalArgumentException("MIJIN_TEST Address must start with S");
-    }
+    Validate.isTrue(
+        addressNetwork == this.networkType.getAddressPrefix(),
+        this.networkType + " Address must start with " + this.networkType.getAddressPrefix());
   }
 
   /**
@@ -100,16 +94,10 @@ public class Address implements UnresolvedAddress {
    */
   private static NetworkType resolveNetworkType(String plainAddress) {
     char addressNetwork = plainAddress.charAt(0);
-    if (addressNetwork == 'N') {
-      return NetworkType.MAIN_NET;
-    } else if (addressNetwork == 'T') {
-      return NetworkType.TEST_NET;
-    } else if (addressNetwork == 'M') {
-      return NetworkType.MIJIN;
-    } else if (addressNetwork == 'S') {
-      return NetworkType.MIJIN_TEST;
-    }
-    throw new IllegalArgumentException(plainAddress + " is an invalid address.");
+    return Arrays.stream(NetworkType.values())
+        .filter(e -> e.getAddressPrefix() == addressNetwork)
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(plainAddress + " is an invalid address."));
   }
 
   /**

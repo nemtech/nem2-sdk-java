@@ -15,11 +15,21 @@
  */
 package io.nem.symbol.sdk.model.namespace;
 
+import io.nem.symbol.catapult.builders.AddressDto;
+import io.nem.symbol.catapult.builders.HeightDto;
+import io.nem.symbol.catapult.builders.NamespaceAliasBuilder;
+import io.nem.symbol.catapult.builders.NamespaceAliasTypeDto;
+import io.nem.symbol.catapult.builders.NamespaceIdDto;
+import io.nem.symbol.catapult.builders.NamespaceLifetimeBuilder;
+import io.nem.symbol.catapult.builders.NamespacePathBuilder;
+import io.nem.symbol.catapult.builders.RootNamespaceHistoryBuilder;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.Stored;
 import io.nem.symbol.sdk.model.account.Address;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -56,7 +66,6 @@ public class NamespaceInfo implements Stored {
       Alias<?> alias) {
 
     Validate.notNull(index, "index is required");
-    Validate.notNull(metaId, "metaId is required");
     Validate.notNull(registrationType, "registrationType is required");
     Validate.notNull(depth, "depth is required");
     Validate.notNull(ownerAddress, "ownerAddress is required");
@@ -224,25 +233,28 @@ public class NamespaceInfo implements Stored {
     return this.parentId;
   }
 
-  //  /** @return serializes the state of this object. */
-  //  public byte[] serialize() {
-  //
-  //    NamespaceIdDto id = new NamespaceIdDto(getId().getIdAsLong());
-  //    AddressDto ownerAddress = SerializationUtils.toAddressDto(getOwnerAddress());
-  //    NamespaceLifetimeBuilder lifetime =
-  //        NamespaceLifetimeBuilder.create(
-  //            new HeightDto(getStartHeight().longValue()), new
-  // HeightDto(getEndHeight().longValue()));
-  //    NamespaceAliasTypeDto rootAlias =
-  //        NamespaceAliasTypeDto.rawValueOf((byte) getAlias().getType().getValue());
-  //    List<NamespacePathBuilder> paths =
-  //        getLevels().stream().map(this::toNamespaceAliasTypeDto).collect(Collectors.toList());
-  //
-  //    return RootNamespaceHistoryBuilder.create(id, ownerAddress, lifetime, rootAlias, paths)
-  //        .serialize();
-  //  }
-  //
-  //  private NamespacePathBuilder toNamespaceAliasTypeDto(NamespaceId namespaceId) {
-  //
-  //  }
+  /** @return serializes the state of this object. */
+  public byte[] serialize(List<NamespaceInfo> children) {
+
+    NamespaceIdDto id = new NamespaceIdDto(getId().getIdAsLong());
+    AddressDto ownerAddress = SerializationUtils.toAddressDto(getOwnerAddress());
+    NamespaceLifetimeBuilder lifetime =
+        NamespaceLifetimeBuilder.create(
+            new HeightDto(getStartHeight().longValue()), new HeightDto(getEndHeight().longValue()));
+    NamespaceAliasTypeDto rootAlias =
+        NamespaceAliasTypeDto.rawValueOf((byte) getAlias().getType().getValue());
+    List<NamespacePathBuilder> paths =
+        children.stream().map(this::toNamespaceAliasTypeDto).collect(Collectors.toList());
+    return RootNamespaceHistoryBuilder.create(id, ownerAddress, lifetime, rootAlias, paths)
+        .serialize();
+  }
+
+  private NamespacePathBuilder toNamespaceAliasTypeDto(NamespaceInfo namespaceInfo) {
+    List<NamespaceIdDto> path =
+        namespaceInfo.getLevels().stream()
+            .map(id -> new NamespaceIdDto(id.getIdAsLong()))
+            .collect(Collectors.toList());
+    NamespaceAliasBuilder alias = namespaceInfo.getAlias().createAliasBuilder();
+    return NamespacePathBuilder.create(path, alias);
+  }
 }

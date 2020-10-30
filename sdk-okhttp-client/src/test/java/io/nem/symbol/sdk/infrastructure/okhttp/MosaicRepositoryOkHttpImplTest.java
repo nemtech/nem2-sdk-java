@@ -64,6 +64,8 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
     mosaicDto.setFlags(5);
     mosaicDto.setDivisibility(6);
     mosaicDto.setDuration(BigInteger.valueOf(7));
+    mosaicDto.supply(BigInteger.valueOf(1000));
+    mosaicDto.startHeight(BigInteger.valueOf(100));
 
     mosaicInfoDto.setMosaic(mosaicDto);
     mockRemoteCall(Collections.singletonList(mosaicInfoDto));
@@ -82,6 +84,8 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
     Assertions.assertFalse(mosaicInfo.isTransferable());
     Assertions.assertEquals(6, mosaicInfo.getDivisibility());
     Assertions.assertEquals(BigInteger.valueOf(7), mosaicInfo.getDuration());
+    Assertions.assertEquals(mosaicDto.getStartHeight(), mosaicInfo.getStartHeight());
+    Assertions.assertEquals(mosaicDto.getSupply(), mosaicInfo.getSupply());
   }
 
   @Test
@@ -99,6 +103,8 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
     mosaicDto.setFlags(5);
     mosaicDto.setDivisibility(6);
     mosaicDto.setDuration(BigInteger.valueOf(7));
+    mosaicDto.supply(BigInteger.valueOf(1000));
+    mosaicDto.startHeight(BigInteger.valueOf(100));
 
     mosaicInfoDto.setMosaic(mosaicDto);
     mockRemoteCall(mosaicInfoDto);
@@ -113,6 +119,8 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
     Assertions.assertFalse(mosaicInfo.isTransferable());
     Assertions.assertEquals(6, mosaicInfo.getDivisibility());
     Assertions.assertEquals(BigInteger.valueOf(7), mosaicInfo.getDuration());
+    Assertions.assertEquals(mosaicDto.getStartHeight(), mosaicInfo.getStartHeight());
+    Assertions.assertEquals(mosaicDto.getSupply(), mosaicInfo.getSupply());
   }
 
   @Test
@@ -130,6 +138,8 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
     mosaicDto.setFlags(5);
     mosaicDto.setDivisibility(6);
     mosaicDto.setDuration(BigInteger.valueOf(7));
+    mosaicDto.supply(BigInteger.valueOf(1000));
+    mosaicDto.startHeight(BigInteger.valueOf(100));
 
     mockRemoteCall(toPage(new MosaicInfoDTO().mosaic(mosaicDto).id("ABC")));
 
@@ -151,6 +161,8 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
     Assertions.assertFalse(mosaicInfo.isTransferable());
     Assertions.assertEquals(6, mosaicInfo.getDivisibility());
     Assertions.assertEquals(BigInteger.valueOf(7), mosaicInfo.getDuration());
+    Assertions.assertEquals(mosaicDto.getStartHeight(), mosaicInfo.getStartHeight());
+    Assertions.assertEquals(mosaicDto.getSupply(), mosaicInfo.getSupply());
   }
 
   private MosaicPage toPage(MosaicInfoDTO dto) {

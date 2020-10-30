@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.nem.symbol.sdk.model.namespace;
+package io.nem.symbol.sdk.model.blockchain;
 
-import io.nem.symbol.catapult.builders.NamespaceAliasBuilder;
+import java.util.List;
 
-/** Empty alias */
-public class EmptyAlias extends AliasBase<Object> {
+/** The state tree. */
+public class StateTree {
 
-  /** Create AddressAlias from address */
-  public EmptyAlias() {
-    super(AliasType.NONE, null);
+  private final List<String> tree;
+
+  public StateTree(List<String> tree) {
+    this.tree = tree;
   }
 
-  @Override
-  public NamespaceAliasBuilder createAliasBuilder() {
-    return NamespaceAliasBuilder.createNone();
+  /** @return the tree */
+  public List<String> getTree() {
+    return tree;
   }
 }

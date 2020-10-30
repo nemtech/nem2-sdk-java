@@ -24,21 +24,31 @@ import java.util.Arrays;
  */
 public enum NetworkType {
   /** Main net network */
-  MAIN_NET(104, "public"),
+  MAIN_NET(104, "public", 'N'),
   /** Test net network */
-  TEST_NET(152, "publicTest"),
+  TEST_NET(152, "publicTest", 'T'),
+  /** Private net network */
+  PRIVATE(120, "private", 'P'),
+  /** Private Test net network */
+  PRIVATE_TEST(128, "privateTest", 'Q'),
   /** Mijin net network */
-  MIJIN(96, "mijin"),
+  MIJIN(96, "mijin", 'M'),
   /** Mijin test net network */
-  MIJIN_TEST(144, "mijinTest");
+  MIJIN_TEST(144, "mijinTest", 'S');
 
+  /** The serialization value. */
   private final int value;
 
+  /** The friendly name */
   private final String networkName;
 
-  NetworkType(int value, String networkName) {
+  /** Addresses of this type starts with this character. */
+  private final char addressPrefix;
+
+  NetworkType(int value, String networkName, char addressPrefix) {
     this.value = value;
     this.networkName = networkName;
+    this.addressPrefix = addressPrefix;
   }
 
   /**
@@ -80,5 +90,10 @@ public enum NetworkType {
   /** @return the network name. */
   public String getNetworkName() {
     return networkName;
+  }
+
+  /** @return the address char prefix. */
+  public char getAddressPrefix() {
+    return addressPrefix;
   }
 }

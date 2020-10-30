@@ -42,7 +42,10 @@ public class PropertyTypeTest {
   @Test
   public void rawValueOfAllVales() {
     Arrays.stream(PropertyType.values())
-        .forEach(t -> Assertions.assertEquals(t, PropertyType.rawValueOf(Integer.toString(t.getValue()))));
+        .forEach(
+            t ->
+                Assertions.assertEquals(
+                    t, PropertyType.rawValueOf(Integer.toString(t.getValue()))));
 
     Arrays.stream(PropertyType.values())
         .forEach(

@@ -15,6 +15,8 @@
  */
 package io.nem.symbol.sdk.model.namespace;
 
+import io.nem.symbol.catapult.builders.NamespaceAliasBuilder;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.account.Address;
 
 /** Address alias. */
@@ -27,5 +29,10 @@ public class AddressAlias extends AliasBase<Address> {
    */
   public AddressAlias(Address address) {
     super(AliasType.ADDRESS, address);
+  }
+
+  @Override
+  public NamespaceAliasBuilder createAliasBuilder() {
+    return NamespaceAliasBuilder.createAddress(SerializationUtils.toAddressDto(getAliasValue()));
   }
 }
