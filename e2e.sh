@@ -7,5 +7,5 @@ if [ "$TRAVIS" = "true" ]; then
     npm install -g symbol-bootstrap@0.2.1-alpha-202010281951
 fi
 source bootstrap-start.sh -d
-gradle integrationTest
+./gradlew integrationTest
 source bootstrap-stop.sh
