@@ -1,4 +1,4 @@
-dist: focal
+dist: trusty
 language: java
 node_js: 12
 jdk:
@@ -43,6 +43,8 @@ jobs:
 #      script: ./gradlew sonarqube -x test
     - name: e2e tests
       script: source e2e.sh
+      os: linux
+      dist: focal
       if: (branch = env(DEV_BRANCH) AND type = cron) OR (commit_message = e2e)
     - stage: publish
       name: github alpha pages
