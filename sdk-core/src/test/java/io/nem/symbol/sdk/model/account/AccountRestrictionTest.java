@@ -53,6 +53,9 @@ public class AccountRestrictionTest {
     AccountRestrictionsBuilder builder =
         AccountRestrictionsBuilder.loadFromBinary(SerializationUtils.toDataInput(serializedState));
 
+    byte[] serialize = builder.getRestrictions().get(0).serialize();
+    System.out.println(ConvertUtils.toHex(serialize));
+
     Assertions.assertEquals(
         ConvertUtils.toHex(serializedState), ConvertUtils.toHex(builder.serialize()));
   }
@@ -94,6 +97,31 @@ public class AccountRestrictionTest {
   }
 
   @Test
+  void shouldCreateAccountRestrictionsViaConstructorEmpty() {
+    Address address = Address.createFromEncoded("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1");
+
+    AccountRestrictions accountRestrictions =
+        new AccountRestrictions(address, Collections.emptyList());
+
+    assertEquals(address, accountRestrictions.getAddress());
+    assertEquals(0, accountRestrictions.getRestrictions().size());
+
+    byte[] serializedState = accountRestrictions.serialize();
+    String expectedHex =
+        "9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E10000000000000000";
+    assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
+
+    AccountRestrictionsBuilder builder =
+        AccountRestrictionsBuilder.loadFromBinary(SerializationUtils.toDataInput(serializedState));
+
+    Assertions.assertEquals(
+        ConvertUtils.toHex(serializedState), ConvertUtils.toHex(builder.serialize()));
+
+    Assertions.assertEquals(
+        accountRestrictions.getRestrictions().size(), builder.getRestrictions().size());
+  }
+
+  @Test
   void shouldCreateAccountRestrictionsViaConstructor() {
     Address address = Address.createFromEncoded("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1");
     AccountRestriction accountAllowIncomingRestriction =
@@ -119,6 +147,9 @@ public class AccountRestrictionTest {
 
     Assertions.assertEquals(
         ConvertUtils.toHex(serializedState), ConvertUtils.toHex(builder.serialize()));
+
+    Assertions.assertEquals(
+        accountRestrictions.getRestrictions().size(), builder.getRestrictions().size());
   }
 
   @Test

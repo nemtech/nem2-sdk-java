@@ -25,6 +25,7 @@ import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.mosaic.Currency;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
+import io.nem.symbol.sdk.model.transaction.LockStatus;
 import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransaction;
 import io.nem.symbol.sdk.model.transaction.SecretLockTransactionFactory;
@@ -74,12 +75,13 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
     Currency currency = get(repositoryFactory.getNetworkCurrency());
     Mosaic mosaic = currency.createAbsolute(BigInteger.valueOf(1));
     BigInteger amount = mosaic.getAmount();
+    BigInteger duration = BigInteger.valueOf(10000);
     SecretLockTransaction secretLockTransaction =
         SecretLockTransactionFactory.create(
                 getNetworkType(),
                 getDeadline(),
                 mosaic,
-                BigInteger.valueOf(100),
+                duration,
                 lockHashAlgorithm,
                 secret,
                 account2.getAddress())
@@ -122,7 +124,7 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
     Assertions.assertEquals(amount, info.getAmount());
     Assertions.assertEquals(storedSecret, info.getSecret());
     Assertions.assertEquals(lockHashAlgorithm, info.getHashAlgorithm());
-    Assertions.assertEquals(1, info.getStatus());
+    Assertions.assertEquals(LockStatus.USED, info.getStatus());
 
     Page<SecretLockInfo> page =
         get(
@@ -140,7 +142,7 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
     Assertions.assertEquals(account2.getAddress(), infoSearch.getRecipientAddress());
     Assertions.assertEquals(amount, infoSearch.getAmount());
     Assertions.assertEquals(lockHashAlgorithm, infoSearch.getHashAlgorithm());
-    Assertions.assertEquals(1, infoSearch.getStatus());
+    Assertions.assertEquals(LockStatus.USED, infoSearch.getStatus());
     Assertions.assertEquals(storedSecret, infoSearch.getSecret());
   }
 }

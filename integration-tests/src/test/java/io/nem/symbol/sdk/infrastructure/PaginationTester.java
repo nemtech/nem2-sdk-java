@@ -48,7 +48,7 @@ public class PaginationTester<E extends Stored, C extends SearchCriteria<C>> {
         secondList.stream().map(Stored::getRecordId).collect(Collectors.toList()));
   }
 
-  public void basicTestSearch(Integer pageSizeParam) {
+  public Page<E> basicTestSearch(Integer pageSizeParam) {
     int pageSize = ObjectUtils.firstNonNull(pageSizeParam, 20);
     C criteria = this.criteriaFactory.get();
     criteria.pageSize(pageSizeParam);
@@ -60,6 +60,7 @@ public class PaginationTester<E extends Stored, C extends SearchCriteria<C>> {
     criteriaLasPage.pageNumber(Integer.MAX_VALUE);
     Page<E> lastPage = helper.get(searcher.search(criteriaLasPage));
     assertPageData(criteriaLasPage.getPageNumber(), pageSize, lastPage);
+    return page;
   }
 
   private void assertPageData(int pageNumber, int pageSize, Page<E> page) {

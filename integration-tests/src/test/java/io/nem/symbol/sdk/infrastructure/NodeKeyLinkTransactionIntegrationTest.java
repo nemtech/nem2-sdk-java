@@ -49,6 +49,6 @@ public class NodeKeyLinkTransactionIntegrationTest extends BaseIntegrationTest {
             .maxFee(maxFee)
             .build();
 
-    announceAndValidate(type, account, unlinkTransaction);
+//    announceAndValidate(type, account, unlinkTransaction);
   }
 }

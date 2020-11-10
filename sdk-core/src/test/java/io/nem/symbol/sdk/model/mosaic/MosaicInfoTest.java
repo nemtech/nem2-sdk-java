@@ -42,7 +42,7 @@ class MosaicInfoTest {
             "abc",
             mosaicId,
             new BigInteger("100"),
-            new BigInteger("0"),
+            new BigInteger("200"),
             address,
             1L,
             mosaicFlags,
@@ -51,7 +51,7 @@ class MosaicInfoTest {
 
     assertEquals(mosaicId, info.getMosaicId());
     assertEquals(new BigInteger("100"), info.getSupply());
-    assertEquals(new BigInteger("0"), info.getStartHeight());
+    assertEquals(new BigInteger("200"), info.getStartHeight());
     assertEquals(address, info.getOwnerAddress());
     assertTrue(info.isSupplyMutable());
     assertTrue(info.isTransferable());
@@ -63,7 +63,7 @@ class MosaicInfoTest {
 
     byte[] serializedState = info.serialize();
     String expectedHex =
-        "000000000000000090F1B694E1801EEFE42846E9239B54C9D381FCDF2A04A4210100000007030A00000000000000";
+        "C80000000000000090F1B694E1801EEFE42846E9239B54C9D381FCDF2A04A4210100000007030A00000000000000";
     Assertions.assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
     MosaicDefinitionBuilder builder =
         MosaicDefinitionBuilder.loadFromBinary(SerializationUtils.toDataInput(serializedState));

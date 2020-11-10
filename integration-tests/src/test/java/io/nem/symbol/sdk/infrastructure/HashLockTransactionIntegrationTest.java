@@ -45,6 +45,7 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void standaloneLockFundsTransaction(RepositoryType type) {
 
+    BigInteger duration = BigInteger.valueOf(10000);
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
                 getNetworkType(),
@@ -69,7 +70,7 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 getDeadline(),
                 getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
-                BigInteger.valueOf(100),
+            duration,
                 signedTransaction)
             .maxFee(maxFee)
             .build();
@@ -83,6 +84,7 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   void aggregateLockFundsTransaction(RepositoryType type) {
 
+    BigInteger duration = BigInteger.valueOf(1000);
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
                 getNetworkType(),
@@ -107,7 +109,7 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 getDeadline(),
                 getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
-                BigInteger.valueOf(100),
+            duration,
                 signedTransaction)
             .maxFee(maxFee)
             .build();

@@ -29,6 +29,7 @@ import io.nem.symbol.catapult.builders.AmountDto;
 import io.nem.symbol.catapult.builders.BlockDurationDto;
 import io.nem.symbol.catapult.builders.CosignatureBuilder;
 import io.nem.symbol.catapult.builders.EmbeddedTransactionBuilder;
+import io.nem.symbol.catapult.builders.EmbeddedTransactionBuilderHelper;
 import io.nem.symbol.catapult.builders.EntityTypeDto;
 import io.nem.symbol.catapult.builders.FinalizationEpochDto;
 import io.nem.symbol.catapult.builders.Hash256Dto;
@@ -59,7 +60,7 @@ import io.nem.symbol.catapult.builders.Serializer;
 import io.nem.symbol.catapult.builders.SignatureDto;
 import io.nem.symbol.catapult.builders.TimestampDto;
 import io.nem.symbol.catapult.builders.TransactionBuilder;
-import io.nem.symbol.catapult.builders.TransactionBuilderFactory;
+import io.nem.symbol.catapult.builders.TransactionBuilderHelper;
 import io.nem.symbol.catapult.builders.TransferTransactionBodyBuilder;
 import io.nem.symbol.catapult.builders.UnresolvedAddressDto;
 import io.nem.symbol.catapult.builders.UnresolvedMosaicBuilder;
@@ -268,7 +269,7 @@ public class BinarySerializationImpl implements BinarySerialization {
    */
   private <T extends Transaction> EmbeddedTransactionBuilder toEmbeddedTransactionBuilder(
       T transaction) {
-    return TransactionBuilderFactory.createEmbeddedTransactionBuilder(
+    return EmbeddedTransactionBuilderHelper.loadFromBinary(
         SerializationUtils.toDataInput(serializeEmbedded(transaction)));
   }
 
@@ -358,7 +359,7 @@ public class BinarySerializationImpl implements BinarySerialization {
   public TransactionFactory<?> deserializeToFactory(byte[] payload) {
     Validate.notNull(payload, "Payload must not be null");
     DataInputStream stream = SerializationUtils.toDataInput(payload);
-    TransactionBuilder builder = TransactionBuilderFactory.createTransactionBuilder(stream);
+    TransactionBuilder builder = TransactionBuilderHelper.loadFromBinary(stream);
 
     return toTransactionFactory(builder);
   }
@@ -434,7 +435,7 @@ public class BinarySerializationImpl implements BinarySerialization {
         () -> {
           Validate.notNull(payload, "Payload must not be null");
           EmbeddedTransactionBuilder builder =
-              TransactionBuilderFactory.createEmbeddedTransactionBuilder(payload);
+              EmbeddedTransactionBuilderHelper.loadFromBinary(payload);
           return toTransaction(builder);
         });
   }

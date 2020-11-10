@@ -17,7 +17,7 @@ package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.catapult.builders.AggregateBondedTransactionBuilder;
 import io.nem.symbol.catapult.builders.AggregateCompleteTransactionBuilder;
-import io.nem.symbol.catapult.builders.TransactionBuilderFactory;
+import io.nem.symbol.catapult.builders.TransactionBuilderHelper;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.api.BinarySerialization;
 import io.nem.symbol.sdk.infrastructure.BinarySerializationImpl;
@@ -68,7 +68,7 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
 
     AggregateBondedTransactionBuilder transactionBuilder =
         (AggregateBondedTransactionBuilder)
-            TransactionBuilderFactory.createTransactionBuilder(
+            TransactionBuilderHelper.loadFromBinary(
                 SerializationUtils.toDataInput(ConvertUtils.fromHexToBytes(expected)));
 
     Assertions.assertEquals(expected, ConvertUtils.toHex(transactionBuilder.serialize()));
@@ -291,7 +291,7 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
 
     AggregateCompleteTransactionBuilder transactionBuilder =
         (AggregateCompleteTransactionBuilder)
-            TransactionBuilderFactory.createTransactionBuilder(
+            TransactionBuilderHelper.loadFromBinary(
                 SerializationUtils.toDataInput(ConvertUtils.fromHexToBytes(expected)));
 
     Assertions.assertEquals(expected, ConvertUtils.toHex(transactionBuilder.serialize()));
@@ -479,7 +479,7 @@ public class AggregateTransactionTest extends AbstractTransactionTester {
 
     AggregateBondedTransactionBuilder transactionBuilder =
         (AggregateBondedTransactionBuilder)
-            TransactionBuilderFactory.createTransactionBuilder(
+            TransactionBuilderHelper.loadFromBinary(
                 SerializationUtils.toDataInput(ConvertUtils.fromHexToBytes(expected2)));
 
     Assertions.assertEquals(expected2, ConvertUtils.toHex(transactionBuilder.serialize()));

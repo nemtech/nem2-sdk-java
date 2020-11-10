@@ -168,7 +168,7 @@ class TransactionTypeTest {
     if (enumTypeDto == EntityTypeDto.RESERVED) {
       return;
     }
-    if (enumTypeDto == EntityTypeDto.BLOCK_HEADER_BUILDER) {
+    if (enumTypeDto == EntityTypeDto.BLOCK_HEADER) {
       return;
     }
     Assertions.assertNotNull(
