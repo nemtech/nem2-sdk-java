@@ -40,8 +40,6 @@ import io.nem.symbol.sdk.api.RestrictionMosaicRepository;
 import io.nem.symbol.sdk.api.SecretLockPaginationStreamer;
 import io.nem.symbol.sdk.api.SecretLockRepository;
 import io.nem.symbol.sdk.api.SecretLockSearchCriteria;
-import io.nem.symbol.sdk.infrastructure.okhttp.RepositoryFactoryOkHttpImpl;
-import io.nem.symbol.sdk.infrastructure.vertx.JsonHelperJackson2;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,12 +51,13 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
 
-//  public static void main(String[] args) {
-//    RepositoryFactory repositoryFactory =
-//        new RepositoryFactoryOkHttpImpl("http://api-01.us-west-2.0.10.0.x.symboldev.network:3000");
-//    List<Map<String, String>> merkles = MerkleLoader.getMerkles(repositoryFactory);
-//    System.out.println(new JsonHelperJackson2().prettyPrint(merkles));
-//  }
+  //  public static void main(String[] args) {
+  //    RepositoryFactory repositoryFactory =
+  //        new
+  // RepositoryFactoryOkHttpImpl("http://api-01.us-west-2.0.10.0.x.symboldev.network:3000");
+  //    List<Map<String, String>> merkles = MerkleLoader.getMerkles(repositoryFactory);
+  //    System.out.println(new JsonHelperJackson2().prettyPrint(merkles));
+  //  }
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
