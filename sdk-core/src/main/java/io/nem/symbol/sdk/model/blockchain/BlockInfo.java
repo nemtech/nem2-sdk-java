@@ -40,7 +40,7 @@ public class BlockInfo implements Stored {
   private final PublicAccount signerPublicAccount;
   private final NetworkType networkType;
   private final Integer version;
-  private final int type;
+  private final BlockType type;
   private final BigInteger height;
   private final BigInteger timestamp;
   private final BigInteger difficulty;
@@ -70,7 +70,7 @@ public class BlockInfo implements Stored {
       PublicAccount signerPublicAccount,
       NetworkType networkType,
       Integer version,
-      int type,
+      BlockType type,
       BigInteger height,
       BigInteger timestamp,
       BigInteger difficulty,
@@ -213,7 +213,7 @@ public class BlockInfo implements Stored {
    *
    * @return int
    */
-  public int getType() {
+  public BlockType getType() {
     return type;
   }
 

@@ -21,10 +21,10 @@ import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.MosaicRepository;
 import io.nem.symbol.sdk.api.MosaicSearchCriteria;
 import io.nem.symbol.sdk.api.Page;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
-import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.openapi.vertx.api.MosaicRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.MosaicRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
@@ -49,13 +49,9 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl
 
   private final MosaicRoutesApi client;
 
-  private final Observable<NetworkType> networkTypeObservable;
-
-  public MosaicRepositoryVertxImpl(
-      ApiClient apiClient, Observable<NetworkType> networkTypeObservable) {
+  public MosaicRepositoryVertxImpl(ApiClient apiClient) {
     super(apiClient);
     this.client = new MosaicRoutesApiImpl(apiClient);
-    this.networkTypeObservable = networkTypeObservable;
   }
 
   public MosaicRoutesApi getClient() {
@@ -67,9 +63,13 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl
 
     Consumer<Handler<AsyncResult<MosaicInfoDTO>>> callback =
         handler -> getClient().getMosaic(mosaicId.getIdAsHex(), handler);
-    return exceptionHandling(
-        networkTypeObservable.flatMap(
-            networkType -> call(callback).map(mosaicInfoDTO -> createMosaicInfo(mosaicInfoDTO))));
+    return call(callback).map(this::createMosaicInfo);
+  }
+
+  @Override
+  public Observable<MerkleStateInfo> getMosaicMerkle(MosaicId mosaicId) {
+    return call(
+        (h) -> getClient().getMosaicMerkle(mosaicId.getIdAsHex(), h), this::toMerkleStateInfo);
   }
 
   @Override
@@ -80,13 +80,11 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     Consumer<Handler<AsyncResult<List<MosaicInfoDTO>>>> callback =
         handler -> getClient().getMosaics(mosaicIds, handler);
     return exceptionHandling(
-        networkTypeObservable.flatMap(
-            networkType ->
-                call(callback)
-                    .flatMapIterable(item -> item)
-                    .map(mosaicInfoDTO -> createMosaicInfo(mosaicInfoDTO))
-                    .toList()
-                    .toObservable()));
+        call(callback)
+            .flatMapIterable(item -> item)
+            .map(this::createMosaicInfo)
+            .toList()
+            .toObservable());
   }
 
   @Override
@@ -103,16 +101,14 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl
                     handler);
 
     return exceptionHandling(
-        networkTypeObservable.flatMap(
-            networkType ->
-                call(callback)
-                    .map(
-                        mosaicPage ->
-                            this.toPage(
-                                mosaicPage.getPagination(),
-                                mosaicPage.getData().stream()
-                                    .map(this::createMosaicInfo)
-                                    .collect(Collectors.toList())))));
+        call(callback)
+            .map(
+                mosaicPage ->
+                    this.toPage(
+                        mosaicPage.getPagination(),
+                        mosaicPage.getData().stream()
+                            .map(this::createMosaicInfo)
+                            .collect(Collectors.toList()))));
   }
 
   private MosaicInfo createMosaicInfo(MosaicInfoDTO mosaicInfoDTO) {

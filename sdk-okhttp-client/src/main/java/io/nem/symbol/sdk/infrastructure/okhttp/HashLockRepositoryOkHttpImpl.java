@@ -19,7 +19,9 @@ import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.HashLockRepository;
 import io.nem.symbol.sdk.api.HashLockSearchCriteria;
 import io.nem.symbol.sdk.api.Page;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.transaction.HashLockInfo;
+import io.nem.symbol.sdk.model.transaction.LockStatus;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.HashLockRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.HashLockEntryDTO;
@@ -27,7 +29,6 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.HashLockInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.HashLockPage;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Order;
 import io.reactivex.Observable;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -48,19 +49,23 @@ public class HashLockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
 
   @Override
   public Observable<HashLockInfo> getHashLock(String hash) {
-    Callable<HashLockInfoDTO> callback = () -> getClient().getHashLock(hash);
-    return this.call(callback, this::toHashLockInfo);
+    return this.call(() -> getClient().getHashLock(hash), this::toHashLockInfo);
+  }
+
+  @Override
+  public Observable<MerkleStateInfo> getHashLockMerkle(String hash) {
+    return this.call(() -> getClient().getHashLockMerkle(hash), this::toMerkleStateInfo);
   }
 
   private HashLockInfo toHashLockInfo(HashLockInfoDTO dto) {
     HashLockEntryDTO lock = dto.getLock();
     return new HashLockInfo(
-        Optional.of(dto.getId()),
+        dto.getId(),
         MapperUtils.toAddress(lock.getOwnerAddress()),
         MapperUtils.toMosaicId(lock.getMosaicId()),
         lock.getAmount(),
         lock.getEndHeight(),
-        lock.getStatus(),
+        LockStatus.rawValueOf(lock.getStatus().getValue()),
         lock.getHash());
   }
 

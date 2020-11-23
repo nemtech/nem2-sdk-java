@@ -22,6 +22,7 @@ import io.nem.symbol.sdk.model.mosaic.MosaicNonce;
 import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
 import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.LockHashAlgorithmEnum;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.LockStatus;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Pagination;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretLockEntryDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretLockInfoDTO;
@@ -67,7 +68,7 @@ public class SecretLockRepositoryOkHttpImplTest extends AbstractOkHttpRespositor
     lockHashDto.setMosaicId(mosaicId.getIdAsHex());
     lockHashDto.setRecipientAddress(encodeAddress(recipientAddress));
     lockHashDto.setHashAlgorithm(LockHashAlgorithmEnum.NUMBER_2);
-    lockHashDto.setStatus(2);
+    lockHashDto.setStatus(LockStatus.NUMBER_1);
 
     SecretLockInfoDTO hashLockInfoDTO = new SecretLockInfoDTO();
     hashLockInfoDTO.setLock(lockHashDto);
@@ -76,7 +77,11 @@ public class SecretLockRepositoryOkHttpImplTest extends AbstractOkHttpRespositor
     mockRemoteCall(toPage(hashLockInfoDTO));
 
     List<SecretLockInfo> list =
-        repository.search(new SecretLockSearchCriteria(address)).toFuture().get().getData();
+        repository
+            .search(new SecretLockSearchCriteria().address(address))
+            .toFuture()
+            .get()
+            .getData();
     Assertions.assertEquals(1, list.size());
     SecretLockInfo resolvedSecretLockInfo = list.get(0);
     Assertions.assertEquals(address, resolvedSecretLockInfo.getOwnerAddress());
@@ -85,7 +90,8 @@ public class SecretLockRepositoryOkHttpImplTest extends AbstractOkHttpRespositor
     Assertions.assertEquals(address, resolvedSecretLockInfo.getOwnerAddress());
     Assertions.assertEquals(
         lockHashDto.getCompositeHash(), resolvedSecretLockInfo.getCompositeHash());
-    Assertions.assertEquals(lockHashDto.getStatus(), resolvedSecretLockInfo.getStatus());
+    Assertions.assertEquals(
+        io.nem.symbol.sdk.model.transaction.LockStatus.USED, resolvedSecretLockInfo.getStatus());
     Assertions.assertEquals(mosaicId, resolvedSecretLockInfo.getMosaicId());
     Assertions.assertEquals(LockHashAlgorithm.HASH_256, resolvedSecretLockInfo.getHashAlgorithm());
     Assertions.assertEquals(lockHashDto.getAmount(), resolvedSecretLockInfo.getAmount());

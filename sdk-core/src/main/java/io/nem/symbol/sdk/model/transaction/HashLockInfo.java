@@ -25,7 +25,7 @@ import java.util.Optional;
 public class HashLockInfo implements Stored {
 
   /** The stored database id. */
-  private final Optional<String> recordId;
+  private final String recordId;
   /** Address expressed in hexadecimal base. */
   private final Address ownerAddress;
 
@@ -42,18 +42,18 @@ public class HashLockInfo implements Stored {
   private final BigInteger endHeight;
 
   /** A number that indicates the status. */
-  private final Integer status;
+  private final LockStatus status;
 
   /** Get hash */
   private final String hash;
 
   public HashLockInfo(
-      Optional<String> recordId,
+      String recordId,
       Address ownerAddress,
       MosaicId mosaicId,
       BigInteger amount,
       BigInteger endHeight,
-      Integer status,
+      LockStatus status,
       String hash) {
     this.recordId = recordId;
     this.ownerAddress = ownerAddress;
@@ -66,7 +66,7 @@ public class HashLockInfo implements Stored {
 
   @Override
   public Optional<String> getRecordId() {
-    return this.recordId;
+    return Optional.ofNullable(this.recordId);
   }
 
   public Address getOwnerAddress() {
@@ -85,7 +85,7 @@ public class HashLockInfo implements Stored {
     return endHeight;
   }
 
-  public Integer getStatus() {
+  public LockStatus getStatus() {
     return status;
   }
 

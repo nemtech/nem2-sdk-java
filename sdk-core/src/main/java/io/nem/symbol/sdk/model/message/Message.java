@@ -43,20 +43,6 @@ public abstract class Message {
    * This factory method knows how to create the right Message instance from the provided message
    * payload.
    *
-   * @param payloadHex the raw payload as it comes from REST data.
-   * @return the Message.
-   */
-  public static Optional<Message> createFromHexPayload(String payloadHex) {
-    if (payloadHex == null || payloadHex.isEmpty()) {
-      return Optional.empty();
-    }
-    return createFromPayload(ConvertUtils.fromHexToBytes(payloadHex));
-  }
-
-  /**
-   * This factory method knows how to create the right Message instance from the provided message
-   * payload.
-   *
    * @param payload the raw payload as it comes from binary data.
    * @return the Message.
    */
@@ -64,24 +50,40 @@ public abstract class Message {
     if (payload == null || payload.length == 0) {
       return Optional.empty();
     }
+    return createFromHexPayload(ConvertUtils.toHex(payload));
+  }
+
+  /**
+   * This factory method knows how to create the right Message instance from the provided message
+   * payload.
+   *
+   * @param payloadHex the raw payload as it comes from REST data.
+   * @return the Message.
+   */
+  public static Optional<Message> createFromHexPayload(String payloadHex) {
+    if (payloadHex == null || payloadHex.isEmpty()) {
+      return Optional.empty();
+    }
+
+    String upperCasePayload = payloadHex.toUpperCase();
+    if (upperCasePayload.length() == PersistentHarvestingDelegationMessage.HEX_PAYLOAD_SIZE
+        && upperCasePayload.startsWith(MessageMarker.PERSISTENT_DELEGATION_UNLOCK)) {
+      return Optional.of(new PersistentHarvestingDelegationMessage(upperCasePayload));
+    }
+
+    byte[] payload = ConvertUtils.fromHexToBytes(payloadHex);
     MessageType messageType =
         MessageType.rawValueOf(SerializationUtils.byteToUnsignedInt(payload[0]));
 
-    return Optional.of(createMessage(payload, messageType));
-  }
-
-  private static Message createMessage(byte[] payload, MessageType messageType) {
-    String messageHex = ConvertUtils.toHex(payload).substring(2);
+    String messageHex = payloadHex.substring(2);
     String text = ConvertUtils.fromHexToString(messageHex);
     switch (messageType) {
       case PLAIN_MESSAGE:
-        return new PlainMessage(text);
+        return Optional.of(new PlainMessage(text));
       case ENCRYPTED_MESSAGE:
-        return new EncryptedMessage(text);
-      case PERSISTENT_HARVESTING_DELEGATION_MESSAGE:
-        return new PersistentHarvestingDelegationMessage(text);
+        return Optional.of(new EncryptedMessage(text));
       default:
-        return new RawMessage(payload);
+        return Optional.of(new RawMessage(payload));
     }
   }
 

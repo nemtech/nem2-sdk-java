@@ -20,15 +20,15 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/** Test of {@link HashLockSearchCriteria} */
-class HashLockSearchCriteriaTest {
+/** Test of {@link AccountRestrictionSearchCriteria} */
+class AccountRestrictionSearchCriteriaTest {
 
   private final Account account1 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
   private final Account account2 = Account.generateNewAccount(NetworkType.MIJIN_TEST);
 
   @Test
   void shouldCreate() {
-    HashLockSearchCriteria criteria = new HashLockSearchCriteria();
+    AccountRestrictionSearchCriteria criteria = new AccountRestrictionSearchCriteria();
     Assertions.assertNull(criteria.getOrder());
     Assertions.assertNull(criteria.getPageSize());
     Assertions.assertNull(criteria.getPageNumber());
@@ -39,7 +39,7 @@ class HashLockSearchCriteriaTest {
   @Test
   void shouldSetValues() {
 
-    HashLockSearchCriteria criteria = new HashLockSearchCriteria();
+    AccountRestrictionSearchCriteria criteria = new AccountRestrictionSearchCriteria();
     criteria.setAddress(account1.getAddress());
     criteria.setOrder(OrderBy.DESC);
     criteria.setPageSize(10);
@@ -56,8 +56,8 @@ class HashLockSearchCriteriaTest {
   @Test
   void shouldUseBuilderMethods() {
 
-    HashLockSearchCriteria criteria =
-        new HashLockSearchCriteria().order(OrderBy.ASC).pageSize(10).pageNumber(5);
+    AccountRestrictionSearchCriteria criteria =
+        new AccountRestrictionSearchCriteria().order(OrderBy.ASC).pageSize(10).pageNumber(5);
 
     criteria.address(account1.getAddress());
     criteria.offset("abc");
@@ -71,16 +71,18 @@ class HashLockSearchCriteriaTest {
   @Test
   void shouldBeEquals() {
 
-    HashLockSearchCriteria criteria1 = new HashLockSearchCriteria().address(account1.getAddress());
+    AccountRestrictionSearchCriteria criteria1 =
+        new AccountRestrictionSearchCriteria().address(account1.getAddress());
 
-    HashLockSearchCriteria criteria2 = new HashLockSearchCriteria().address(account1.getAddress());
+    AccountRestrictionSearchCriteria criteria2 =
+        new AccountRestrictionSearchCriteria().address(account1.getAddress());
 
     Assertions.assertEquals(
-        new HashLockSearchCriteria().address(account1.getAddress()),
-        new HashLockSearchCriteria().address(account1.getAddress()));
+        new AccountRestrictionSearchCriteria().address(account1.getAddress()),
+        new AccountRestrictionSearchCriteria().address(account1.getAddress()));
     Assertions.assertNotEquals(
-        new HashLockSearchCriteria().address(account1.getAddress()),
-        new HashLockSearchCriteria().address(account2.getAddress()));
+        new AccountRestrictionSearchCriteria().address(account1.getAddress()),
+        new AccountRestrictionSearchCriteria().address(account2.getAddress()));
     Assertions.assertEquals(criteria1, criteria2);
     Assertions.assertEquals(criteria1, criteria1);
     Assertions.assertEquals(criteria1.hashCode(), criteria2.hashCode());

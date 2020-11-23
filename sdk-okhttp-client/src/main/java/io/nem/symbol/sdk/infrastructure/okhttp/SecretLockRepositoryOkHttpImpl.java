@@ -19,8 +19,10 @@ import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.SecretLockRepository;
 import io.nem.symbol.sdk.api.SecretLockSearchCriteria;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
+import io.nem.symbol.sdk.model.transaction.LockStatus;
 import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.SecretLockRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
@@ -29,7 +31,6 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretLockEntryDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretLockInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretLockPage;
 import io.reactivex.Observable;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -52,12 +53,12 @@ public class SecretLockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
     SecretLockEntryDTO lock = dto.getLock();
     MosaicId mosaicId = MapperUtils.toMosaicId(lock.getMosaicId());
     return new SecretLockInfo(
-        Optional.of(dto.getId()),
+        dto.getId(),
         MapperUtils.toAddress(lock.getOwnerAddress()),
         mosaicId,
         lock.getAmount(),
         lock.getEndHeight(),
-        lock.getStatus(),
+        LockStatus.rawValueOf(lock.getStatus().getValue()),
         LockHashAlgorithm.rawValueOf(lock.getHashAlgorithm().getValue()),
         lock.getSecret(),
         MapperUtils.toAddress(lock.getRecipientAddress()),
@@ -81,6 +82,16 @@ public class SecretLockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
     return toPage(
         SecretLockPage.getPagination(),
         SecretLockPage.getData().stream().map(this::toSecretLockInfo).collect(Collectors.toList()));
+  }
+
+  @Override
+  public Observable<SecretLockInfo> getSecretLock(String compositeHash) {
+    return this.call(() -> getClient().getSecretLock(compositeHash), this::toSecretLockInfo);
+  }
+
+  @Override
+  public Observable<MerkleStateInfo> getSecretLockMerkle(String compositeHash) {
+    return this.call(() -> getClient().getSecretLockMerkle(compositeHash), this::toMerkleStateInfo);
   }
 
   public SecretLockRoutesApi getClient() {

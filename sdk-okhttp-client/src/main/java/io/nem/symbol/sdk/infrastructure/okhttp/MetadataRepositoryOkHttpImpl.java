@@ -20,6 +20,7 @@ import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.MetadataRepository;
 import io.nem.symbol.sdk.api.MetadataSearchCriteria;
 import io.nem.symbol.sdk.api.Page;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.metadata.Metadata;
 import io.nem.symbol.sdk.model.metadata.MetadataType;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.MetadataRoutesApi;
@@ -107,5 +108,15 @@ public class MetadataRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
         MetadataType.rawValueOf(entryDto.getMetadataType().getValue()),
         ConvertUtils.fromHexToString(entryDto.getValue()),
         Optional.ofNullable(Objects.toString(entryDto.getTargetId(), null)));
+  }
+
+  @Override
+  public Observable<Metadata> getMetadata(String compositeHash) {
+    return call(() -> this.client.getMetadata(compositeHash), this::toMetadata);
+  }
+
+  @Override
+  public Observable<MerkleStateInfo> getMetadataMerkle(String compositeHash) {
+    return call(() -> this.client.getMetadataMerkle(compositeHash), this::toMerkleStateInfo);
   }
 }

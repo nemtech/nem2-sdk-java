@@ -33,7 +33,8 @@ class SecretLockRepositoryIntegrationTest extends BaseIntegrationTest {
   void searchWhenInvalidAddress(RepositoryType type) {
     SecretLockRepository repository = getRepositoryFactory(type).createSecretLockRepository();
     Address address = Address.generateRandom(getNetworkType());
-    Page<SecretLockInfo> page = get(repository.search(new SecretLockSearchCriteria(address)));
+    Page<SecretLockInfo> page =
+        get(repository.search(new SecretLockSearchCriteria().address(address)));
     Assertions.assertTrue(page.isLast());
     Assertions.assertTrue(page.getData().isEmpty());
     Assertions.assertEquals(20, page.getPageSize());

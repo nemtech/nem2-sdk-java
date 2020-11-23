@@ -83,7 +83,7 @@ public class RepositoryFactoryVertxImpl extends RepositoryFactoryBase {
 
   @Override
   public MultisigRepository createMultisigRepository() {
-    return new MultisigRepositoryVertxImpl(apiClient, getNetworkType());
+    return new MultisigRepositoryVertxImpl(apiClient);
   }
 
   @Override
@@ -103,7 +103,7 @@ public class RepositoryFactoryVertxImpl extends RepositoryFactoryBase {
 
   @Override
   public MosaicRepository createMosaicRepository() {
-    return new MosaicRepositoryVertxImpl(apiClient, getNetworkType());
+    return new MosaicRepositoryVertxImpl(apiClient);
   }
 
   @Override

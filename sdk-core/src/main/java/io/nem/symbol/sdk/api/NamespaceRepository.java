@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.account.AccountNames;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNames;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
@@ -39,6 +40,14 @@ public interface NamespaceRepository extends Searcher<NamespaceInfo, NamespaceSe
    * @return {@link Observable} of {@link NamespaceInfo}
    */
   Observable<NamespaceInfo> getNamespace(NamespaceId namespaceId);
+
+  /**
+   * Gets the NamespaceInfo merkle for a given namespaceId.
+   *
+   * @param namespaceId NamespaceId
+   * @return {@link Observable} of {@link MerkleStateInfo}
+   */
+  Observable<MerkleStateInfo> getNamespaceMerkle(NamespaceId namespaceId);
 
   /**
    * Gets list of NamespaceName for different namespaceIds.

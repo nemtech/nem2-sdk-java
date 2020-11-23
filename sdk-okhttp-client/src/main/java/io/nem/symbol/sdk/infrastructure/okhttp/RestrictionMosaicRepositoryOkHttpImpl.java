@@ -19,6 +19,7 @@ import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.MosaicRestrictionSearchCriteria;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RestrictionMosaicRepository;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.restriction.MosaicAddressRestriction;
 import io.nem.symbol.sdk.model.restriction.MosaicGlobalRestriction;
 import io.nem.symbol.sdk.model.restriction.MosaicGlobalRestrictionItem;
@@ -119,7 +120,7 @@ public class RestrictionMosaicRepositoryOkHttpImpl extends AbstractRepositoryOkH
     Callable<MosaicRestrictionsPage> callback =
         () ->
             getClient()
-                .searchMosaicRestriction(
+                .searchMosaicRestrictions(
                     mosaicId, entryType, targetAddress, pageSize, pageNumber, offset, order);
 
     return call(
@@ -145,5 +146,17 @@ public class RestrictionMosaicRepositoryOkHttpImpl extends AbstractRepositoryOkH
             getJsonHelper().convert(restrictionObject, MosaicGlobalRestrictionDTO.class));
     }
     throw new IllegalStateException("Invalid entry type " + thisEntryType);
+  }
+
+  @Override
+  public Observable<MosaicRestriction<?>> getMosaicRestrictions(String compositeHash) {
+    return this.call(
+        () -> getClient().getMosaicRestrictions(compositeHash), this::toMosaicRestriction);
+  }
+
+  @Override
+  public Observable<MerkleStateInfo> getMosaicRestrictionsMerkle(String compositeHash) {
+    return this.call(
+        () -> getClient().getMosaicRestrictionsMerkle(compositeHash), this::toMerkleStateInfo);
   }
 }

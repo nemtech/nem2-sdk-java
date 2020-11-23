@@ -13,13 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.nem.symbol.sdk.model.message;
-/** Special message prefix for symbol. */
-public class MessageMarker {
+package io.nem.symbol.sdk.api;
 
-  /** private constructor. */
-  private MessageMarker() {}
+import io.nem.symbol.sdk.model.account.AccountRestrictions;
 
-  /** 8-byte marker: E201735761802AFE for PersistentDelegationRequestTransaction message */
-  public static final String PERSISTENT_DELEGATION_UNLOCK = "FE2A8061577301E2";
+/** A helper object that streams {@link AccountRestrictions} using the search. */
+public class AccountRestrictionsPaginationStreamer
+    extends PaginationStreamer<AccountRestrictions, AccountRestrictionSearchCriteria> {
+
+  /**
+   * Constructor
+   *
+   * @param searcher the Account repository that will perform the searches
+   */
+  public AccountRestrictionsPaginationStreamer(
+      Searcher<AccountRestrictions, AccountRestrictionSearchCriteria> searcher) {
+    super(searcher);
+  }
 }

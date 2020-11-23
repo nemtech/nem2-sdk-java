@@ -90,7 +90,6 @@ class MetadataTransactionServiceTest {
         "abc",
         true,
         0,
-        "metadaId",
         NamespaceRegistrationType.ROOT_NAMESPACE,
         1,
         Collections.emptyList(),

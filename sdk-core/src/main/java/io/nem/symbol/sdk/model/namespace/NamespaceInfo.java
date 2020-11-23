@@ -31,7 +31,6 @@ public class NamespaceInfo implements Stored {
   private final Optional<String> recordId;
   private final boolean active;
   private final Integer index;
-  private final String metaId;
   private final NamespaceRegistrationType registrationType;
   private final Integer depth;
   private final List<NamespaceId> levels;
@@ -46,7 +45,6 @@ public class NamespaceInfo implements Stored {
       String recordId,
       boolean active,
       Integer index,
-      String metaId,
       NamespaceRegistrationType registrationType,
       Integer depth,
       List<NamespaceId> levels,
@@ -58,7 +56,6 @@ public class NamespaceInfo implements Stored {
     this.recordId = Optional.ofNullable(recordId);
     this.active = active;
     this.index = index;
-    this.metaId = metaId;
     this.registrationType = registrationType;
     this.depth = depth;
     this.levels = levels;
@@ -96,12 +93,13 @@ public class NamespaceInfo implements Stored {
     return !active;
   }
 
+  /**
+   * The namespace meta index
+   *
+   * @return the index.
+   */
   public Integer getIndex() {
     return index;
-  }
-
-  public String getMetaId() {
-    return metaId;
   }
 
   /**

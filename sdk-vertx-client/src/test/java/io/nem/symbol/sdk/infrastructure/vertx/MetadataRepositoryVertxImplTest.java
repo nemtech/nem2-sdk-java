@@ -19,9 +19,11 @@ import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.api.MetadataSearchCriteria;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.metadata.Metadata;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.openapi.vertx.model.MerkleStateInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MetadataEntryDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MetadataInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MetadataPage;
@@ -141,5 +143,12 @@ public class MetadataRepositoryVertxImplTest extends AbstractVertxRespositoryTes
     metadataEntry.setValue(ConvertUtils.fromStringToHex(name + " message"));
     dto.setMetadataEntry(metadataEntry);
     return dto;
+  }
+
+  @Test
+  public void getMetadataMerkle() throws Exception {
+    mockRemoteCall(new MerkleStateInfoDTO().raw("abc"));
+    MerkleStateInfo merkle = repository.getMetadataMerkle("hash").toFuture().get();
+    Assertions.assertEquals("abc", merkle.getRaw());
   }
 }

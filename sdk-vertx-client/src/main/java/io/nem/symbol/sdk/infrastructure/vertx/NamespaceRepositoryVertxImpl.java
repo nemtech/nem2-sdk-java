@@ -23,6 +23,7 @@ import io.nem.symbol.sdk.api.NamespaceSearchCriteria;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.model.account.AccountNames;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNames;
 import io.nem.symbol.sdk.model.namespace.AddressAlias;
@@ -81,9 +82,14 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl
 
   @Override
   public Observable<NamespaceInfo> getNamespace(NamespaceId namespaceId) {
-    Consumer<Handler<AsyncResult<NamespaceInfoDTO>>> callback =
-        handler -> getClient().getNamespace(namespaceId.getIdAsHex(), handler);
-    return exceptionHandling(call(callback).map(this::toNamespaceInfo));
+    return call(h -> getClient().getNamespace(namespaceId.getIdAsHex(), h), this::toNamespaceInfo);
+  }
+
+  @Override
+  public Observable<MerkleStateInfo> getNamespaceMerkle(NamespaceId namespaceId) {
+    return call(
+        (h) -> getClient().getNamespaceMerkle(namespaceId.getIdAsHex(), h),
+        this::toMerkleStateInfo);
   }
 
   @Override
@@ -220,7 +226,6 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl
         namespaceInfoDTO.getId(),
         namespaceInfoDTO.getMeta().getActive(),
         namespaceInfoDTO.getMeta().getIndex(),
-        namespaceInfoDTO.getMeta().getId(),
         NamespaceRegistrationType.rawValueOf(
             namespaceInfoDTO.getNamespace().getRegistrationType().getValue()),
         namespaceInfoDTO.getNamespace().getDepth(),

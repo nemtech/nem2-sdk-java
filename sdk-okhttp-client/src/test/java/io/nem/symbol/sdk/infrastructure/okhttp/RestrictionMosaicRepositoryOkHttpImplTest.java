@@ -19,12 +19,14 @@ import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.MosaicRestrictionSearchCriteria;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.restriction.MosaicAddressRestriction;
 import io.nem.symbol.sdk.model.restriction.MosaicGlobalRestriction;
 import io.nem.symbol.sdk.model.restriction.MosaicRestriction;
 import io.nem.symbol.sdk.model.restriction.MosaicRestrictionEntryType;
 import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.MerkleStateInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicAddressRestrictionDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicAddressRestrictionEntryDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicAddressRestrictionEntryWrapperDTO;
@@ -290,6 +292,13 @@ public class RestrictionMosaicRepositoryOkHttpImplTest extends AbstractOkHttpRes
     Assertions.assertEquals(
         BigInteger.valueOf(2222),
         mosaicAddressRestriction.getRestrictions().get((BigInteger.valueOf(1111))));
+  }
+
+  @Test
+  public void getMosaicRestrictionsMerkle() throws Exception {
+    mockRemoteCall(new MerkleStateInfoDTO().raw("abc"));
+    MerkleStateInfo merkle = repository.getMosaicRestrictionsMerkle("abc").toFuture().get();
+    Assertions.assertEquals("abc", merkle.getRaw());
   }
 
   private MosaicRestrictionsPage toPage(Object dto) {

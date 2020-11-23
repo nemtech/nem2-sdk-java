@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class BlockInfoTest {
+class ImportanceBlockInfoTest {
 
   @Test
   void createANewBlockInfo() {
@@ -54,8 +54,14 @@ class BlockInfoTest {
     Address beneficiaryAddress = Account.generateNewAccount(NetworkType.MIJIN_TEST).getAddress();
     String id = "abc";
     List<String> stateHashSubCacheMerkleRoots = Arrays.asList("abc");
-    BlockInfo blockInfo =
-        new BlockInfo(
+
+    long votingEligibleAccountsCount = 100;
+    BigInteger harvestingEligibleAccountsCount = BigInteger.valueOf(20);
+    BigInteger totalVotingBalance = BigInteger.valueOf(300);
+    String previousImportanceBlockHash = "prhash";
+
+    ImportanceBlockInfo blockInfo =
+        new ImportanceBlockInfo(
             id,
             10L,
             hash,
@@ -70,7 +76,7 @@ class BlockInfoTest {
             signer,
             NetworkType.MIJIN_TEST,
             1,
-            BlockType.NORMAL_BLOCK,
+            BlockType.IMPORTANCE_BLOCK,
             BigInteger.ONE,
             BigInteger.ZERO,
             BigInteger.valueOf(276447232L),
@@ -82,7 +88,11 @@ class BlockInfoTest {
             proofGamma,
             proofScalar,
             proofVerificationHash,
-            beneficiaryAddress);
+            beneficiaryAddress,
+            votingEligibleAccountsCount,
+            harvestingEligibleAccountsCount,
+            totalVotingBalance,
+            previousImportanceBlockHash);
 
     assertEquals(hash, blockInfo.getHash());
     assertEquals(generationHash, blockInfo.getGenerationHash());
@@ -95,7 +105,7 @@ class BlockInfoTest {
     Assertions.assertEquals(signer, blockInfo.getSignerPublicAccount());
     assertEquals(NetworkType.MIJIN_TEST, blockInfo.getNetworkType());
     assertEquals(1, (int) blockInfo.getVersion());
-    assertEquals(BlockType.NORMAL_BLOCK, blockInfo.getType());
+    assertEquals(BlockType.IMPORTANCE_BLOCK, blockInfo.getType());
     assertEquals(BigInteger.valueOf(1), blockInfo.getHeight());
     assertEquals(BigInteger.valueOf(0), blockInfo.getTimestamp());
     assertEquals(BigInteger.valueOf(276447232), blockInfo.getDifficulty());
@@ -110,5 +120,9 @@ class BlockInfoTest {
     assertEquals(proofVerificationHash, blockInfo.getProofVerificationHash());
     assertEquals("abc", blockInfo.getRecordId().get());
     assertEquals(stateHashSubCacheMerkleRoots, blockInfo.getStateHashSubCacheMerkleRoots());
+    assertEquals(votingEligibleAccountsCount, blockInfo.getVotingEligibleAccountsCount());
+    assertEquals(harvestingEligibleAccountsCount, blockInfo.getHarvestingEligibleAccountsCount());
+    assertEquals(totalVotingBalance, blockInfo.getTotalVotingBalance());
+    assertEquals(previousImportanceBlockHash, blockInfo.getPreviousImportanceBlockHash());
   }
 }

@@ -27,6 +27,7 @@ import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.ActivityBucket;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.SupplementalAccountKeys;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.mosaic.ResolvedMosaic;
 import io.nem.symbol.sdk.openapi.vertx.api.AccountRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.AccountRoutesApiImpl;
@@ -67,7 +68,13 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl
 
     Consumer<Handler<AsyncResult<AccountInfoDTO>>> callback =
         handler -> getClient().getAccountInfo(address.plain(), handler);
-    return exceptionHandling(call(callback).map(this::toAccountInfo));
+    return (call(callback, this::toAccountInfo));
+  }
+
+  @Override
+  public Observable<MerkleStateInfo> getAccountInfoMerkle(Address address) {
+    return call(
+        (h) -> getClient().getAccountInfoMerkle(address.plain(), h), this::toMerkleStateInfo);
   }
 
   @Override

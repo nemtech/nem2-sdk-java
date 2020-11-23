@@ -21,11 +21,13 @@ import io.nem.symbol.core.crypto.CryptoEngines;
 import io.nem.symbol.core.crypto.KeyPair;
 import io.nem.symbol.core.crypto.PrivateKey;
 import io.nem.symbol.core.crypto.PublicKey;
+import io.nem.symbol.core.utils.ArrayUtils;
 import io.nem.symbol.core.utils.ConvertUtils;
-import io.nem.symbol.core.utils.StringEncoder;
 import org.apache.commons.lang3.Validate;
 
-public class PersistentHarvestingDelegationMessage extends TypedMessage {
+public class PersistentHarvestingDelegationMessage extends Message {
+
+  public static final int HEX_PAYLOAD_SIZE = 264;
 
   /** When decrypting, the message is converted back to the 2 original private keys. */
   public static class HarvestingKeys {
@@ -50,7 +52,12 @@ public class PersistentHarvestingDelegationMessage extends TypedMessage {
   }
 
   public PersistentHarvestingDelegationMessage(String payload) {
-    super(MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE, payload);
+    super(
+        ConvertUtils.fromHexToBytes(payload), MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE);
+    Validate.isTrue(payload.length() == HEX_PAYLOAD_SIZE, "Invalid delegate message payload size");
+    Validate.isTrue(
+        payload.toUpperCase().startsWith(MessageMarker.PERSISTENT_DELEGATION_UNLOCK),
+        "Invalid delegate message payload prefixed mark");
   }
 
   /**
@@ -80,12 +87,14 @@ public class PersistentHarvestingDelegationMessage extends TypedMessage {
     KeyPair recipient = KeyPair.onlyPublic(nodePublicKey, engine);
     BlockCipher blockCipher = engine.createBlockCipher(ephemeralKeyPair, recipient);
 
+    byte[] encrypted =
+        blockCipher.encrypt(
+            ArrayUtils.concat(signingPrivateKey.getBytes(), vrfPrivateKey.getBytes()));
+    String encryptedHex = ConvertUtils.toHex(encrypted);
     String payload =
         MessageMarker.PERSISTENT_DELEGATION_UNLOCK
             + ephemeralKeyPair.getPublicKey().toHex()
-            + ConvertUtils.toHex(
-                blockCipher.encrypt(
-                    StringEncoder.getBytes(signingPrivateKey.toHex() + vrfPrivateKey.toHex())));
+            + encryptedHex;
 
     return new PersistentHarvestingDelegationMessage(payload.toUpperCase());
   }
@@ -111,12 +120,16 @@ public class PersistentHarvestingDelegationMessage extends TypedMessage {
     KeyPair recipient = KeyPair.fromPrivate(recipientPrivateKey);
     BlockCipher blockCipher = engine.createBlockCipher(sender, recipient);
 
-    String doubleKey =
-        StringEncoder.getString(blockCipher.decrypt(ConvertUtils.fromHexToBytes(encryptedPayload)))
-            .toUpperCase();
+    byte[] decryptPayload = blockCipher.decrypt(ConvertUtils.fromHexToBytes(encryptedPayload));
+    String doubleKey = ConvertUtils.toHex(decryptPayload);
     PrivateKey signingPrivateKey =
         PrivateKey.fromHexString(doubleKey.substring(0, publicKeyHexSize));
     PrivateKey vrfPrivateKey = PrivateKey.fromHexString(doubleKey.substring(publicKeyHexSize));
     return new HarvestingKeys(signingPrivateKey, vrfPrivateKey);
+  }
+
+  @Override
+  public String getText() {
+    return getPayloadHex();
   }
 }

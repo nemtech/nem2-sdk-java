@@ -22,12 +22,14 @@ import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountLinkPublicKeyDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountPage;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountTypeEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.ActivityBucketDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.MerkleStateInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.Pagination;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.SupplementalPublicKeysDTO;
 import java.math.BigInteger;
@@ -258,6 +260,14 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
         beneficiaryCount, resolvedAccountInfo.getActivityBuckets().get(0).getBeneficiaryCount());
     Assertions.assertEquals(
         rawScore, resolvedAccountInfo.getActivityBuckets().get(0).getRawScore());
+  }
+
+  @Test
+  public void getAccountInfoMerkle() throws Exception {
+    mockRemoteCall(new MerkleStateInfoDTO().raw("abc"));
+    MerkleStateInfo merkle =
+        repository.getAccountInfoMerkle(Address.generateRandom(this.networkType)).toFuture().get();
+    Assertions.assertEquals("abc", merkle.getRaw());
   }
 
   private AccountPage toPage(AccountInfoDTO dto) {

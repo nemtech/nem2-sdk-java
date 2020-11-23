@@ -20,6 +20,7 @@ import io.nem.symbol.sdk.api.NamespaceSearchCriteria;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.AccountNames;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNames;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
@@ -31,6 +32,7 @@ import io.nem.symbol.sdk.openapi.vertx.model.AccountNamesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountsNamesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AliasDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AliasTypeEnum;
+import io.nem.symbol.sdk.openapi.vertx.model.MerkleStateInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicNamesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicsNamesDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NamespaceDTO;
@@ -70,9 +72,9 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
     NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
 
     NamespaceInfoDTO dto = new NamespaceInfoDTO();
+    dto.setId("SomeId");
     NamespaceMetaDTO meta = new NamespaceMetaDTO();
     meta.setActive(true);
-    meta.setId("SomeId");
     meta.setIndex(123);
     dto.setMeta(meta);
 
@@ -98,7 +100,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
     Assertions.assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
 
-    Assertions.assertEquals(meta.getId(), info.getMetaId());
+    Assertions.assertEquals(dto.getId(), info.getRecordId().get());
     Assertions.assertEquals(meta.getIndex(), info.getIndex());
     Assertions.assertEquals(meta.getActive(), info.isActive());
 
@@ -114,7 +116,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
     NamespaceInfoDTO dto = new NamespaceInfoDTO();
     NamespaceMetaDTO meta = new NamespaceMetaDTO();
     meta.setActive(true);
-    meta.setId("SomeId");
+    dto.setId("SomeId");
     meta.setIndex(123);
     dto.setMeta(meta);
 
@@ -146,7 +148,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
     Assertions.assertEquals(NamespaceRegistrationType.SUB_NAMESPACE, info.getRegistrationType());
 
-    Assertions.assertEquals(meta.getId(), info.getMetaId());
+    Assertions.assertEquals(dto.getId(), info.getRecordId().get());
     Assertions.assertEquals(meta.getIndex(), info.getIndex());
     Assertions.assertEquals(meta.getActive(), info.isActive());
 
@@ -205,7 +207,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
     NamespaceInfoDTO dto = new NamespaceInfoDTO();
     NamespaceMetaDTO meta = new NamespaceMetaDTO();
     meta.setActive(true);
-    meta.setId("SomeId");
+    dto.setId("SomeId");
     meta.setIndex(123);
     dto.setMeta(meta);
 
@@ -239,7 +241,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
     NamespaceInfoDTO dto = new NamespaceInfoDTO();
     NamespaceMetaDTO meta = new NamespaceMetaDTO();
     meta.setActive(true);
-    meta.setId("SomeId");
+    dto.setId("SomeId");
     meta.setIndex(123);
     dto.setMeta(meta);
 
@@ -311,5 +313,13 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
     Assertions.assertEquals(address, accountNames.getAddress());
     Assertions.assertEquals("accountalias", accountNames.getNames().get(0).getName());
+  }
+
+  @Test
+  public void getNamespaceMerkle() throws Exception {
+    NamespaceId namespaceId = NamespaceId.createFromName("accountalias");
+    mockRemoteCall(new MerkleStateInfoDTO().raw("abc"));
+    MerkleStateInfo merkle = repository.getNamespaceMerkle(namespaceId).toFuture().get();
+    Assertions.assertEquals("abc", merkle.getRaw());
   }
 }

@@ -37,7 +37,7 @@ public class SecretLockInfoTest {
     MosaicId mosaicId = MosaicId.createFromNonce(MosaicNonce.createRandom(), ownerAddress);
     BigInteger amount = BigInteger.ONE;
     BigInteger endHeight = BigInteger.TEN;
-    Integer status = 3;
+    LockStatus status = LockStatus.USED;
     String hash = "ABC";
 
     LockHashAlgorithm hashAlgorithm = LockHashAlgorithm.HASH_256;
@@ -45,7 +45,7 @@ public class SecretLockInfoTest {
 
     SecretLockInfo info =
         new SecretLockInfo(
-            recordId,
+            recordId.get(),
             ownerAddress,
             mosaicId,
             amount,

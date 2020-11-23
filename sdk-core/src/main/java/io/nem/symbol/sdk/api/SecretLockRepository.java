@@ -15,7 +15,26 @@
  */
 package io.nem.symbol.sdk.api;
 
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
+import io.reactivex.Observable;
 
 /** Repository used to retrieves secrets lock. */
-public interface SecretLockRepository extends Searcher<SecretLockInfo, SecretLockSearchCriteria> {}
+public interface SecretLockRepository extends Searcher<SecretLockInfo, SecretLockSearchCriteria> {
+
+  /**
+   * Get secret lock info of the given id.
+   *
+   * @param compositeHash SecretLockInfo composite hash id
+   * @return Observable<SecretLockInfo>
+   */
+  Observable<SecretLockInfo> getSecretLock(String compositeHash);
+
+  /**
+   * Get secret lock merkle info of the given id.
+   *
+   * @param compositeHash SecretLockInfo composite hash id
+   * @return Observable<MerkleStateInfo>
+   */
+  Observable<MerkleStateInfo> getSecretLockMerkle(String compositeHash);
+}

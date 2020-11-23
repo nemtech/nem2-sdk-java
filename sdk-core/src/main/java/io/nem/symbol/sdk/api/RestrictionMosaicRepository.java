@@ -15,7 +15,9 @@
  */
 package io.nem.symbol.sdk.api;
 
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.restriction.MosaicRestriction;
+import io.reactivex.Observable;
 
 /**
  * Restriction interface repository.
@@ -23,4 +25,21 @@ import io.nem.symbol.sdk.model.restriction.MosaicRestriction;
  * @since 1.0
  */
 public interface RestrictionMosaicRepository
-    extends Searcher<MosaicRestriction<?>, MosaicRestrictionSearchCriteria> {}
+    extends Searcher<MosaicRestriction<?>, MosaicRestrictionSearchCriteria> {
+
+  /**
+   * Get mosaic restriction info of the given id.
+   *
+   * @param compositeHash MosaicRestriction composite hash id
+   * @return Observable<MosaicRestriction>
+   */
+  Observable<MosaicRestriction<?>> getMosaicRestrictions(String compositeHash);
+
+  /**
+   * Get mosaic restriction merkle info of the given id.
+   *
+   * @param compositeHash MosaicRestriction composite hash id
+   * @return Observable<MosaicRestriction>
+   */
+  Observable<MerkleStateInfo> getMosaicRestrictionsMerkle(String compositeHash);
+}

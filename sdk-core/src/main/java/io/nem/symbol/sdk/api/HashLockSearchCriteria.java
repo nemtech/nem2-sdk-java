@@ -22,10 +22,15 @@ import java.util.Objects;
 public class HashLockSearchCriteria extends SearchCriteria<HashLockSearchCriteria> {
 
   /** Account address. */
-  private final Address address;
+  private Address address;
 
-  public HashLockSearchCriteria(Address address) {
+  public void setAddress(Address address) {
     this.address = address;
+  }
+
+  public HashLockSearchCriteria address(Address address) {
+    this.address = address;
+    return this;
   }
 
   public Address getAddress() {

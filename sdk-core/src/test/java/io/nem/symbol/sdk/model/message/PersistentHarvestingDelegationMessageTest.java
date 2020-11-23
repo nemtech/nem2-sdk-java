@@ -28,29 +28,62 @@ public class PersistentHarvestingDelegationMessageTest {
   public void testCreateEncryptedMessage() {
     KeyPair signing = KeyPair.random();
     KeyPair vrf = KeyPair.random();
-    KeyPair harvester = KeyPair.random();
+    KeyPair remote = KeyPair.random();
 
-    PersistentHarvestingDelegationMessage encryptedMessage =
+    PersistentHarvestingDelegationMessage message =
         PersistentHarvestingDelegationMessage.create(
-            signing.getPrivateKey(), vrf.getPrivateKey(), harvester.getPublicKey());
+            signing.getPrivateKey(), vrf.getPrivateKey(), remote.getPublicKey());
 
     Assertions.assertTrue(
-        encryptedMessage.getText().startsWith(MessageMarker.PERSISTENT_DELEGATION_UNLOCK));
+        message.getPayloadHex().startsWith(MessageMarker.PERSISTENT_DELEGATION_UNLOCK));
+
+    Assertions.assertEquals(message.getText(), message.getPayloadHex());
 
     Assertions.assertEquals(
-        MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE, encryptedMessage.getType());
+        PersistentHarvestingDelegationMessage.HEX_PAYLOAD_SIZE, message.getPayloadHex().length());
 
-    HarvestingKeys plainMessage = encryptedMessage.decryptPayload(harvester.getPrivateKey());
+    System.out.println(message.getPayloadHex().length());
+
+    Assertions.assertEquals(
+        MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE, message.getType());
+
+    HarvestingKeys plainMessage = message.decryptPayload(remote.getPrivateKey());
 
     Assertions.assertEquals(signing.getPrivateKey(), plainMessage.getSigningPrivateKey());
     Assertions.assertEquals(vrf.getPrivateKey(), plainMessage.getVrfPrivateKey());
 
-    Optional<Message> encryptedMessage2 =
-        Message.createFromHexPayload(encryptedMessage.getPayloadHex());
-    Assertions.assertEquals(encryptedMessage, encryptedMessage2.get());
+    Optional<Message> message2 = Message.createFromHexPayload(message.getPayloadHex());
+    Assertions.assertEquals(message, message2.get());
+    Assertions.assertTrue(message2.get() instanceof PersistentHarvestingDelegationMessage);
 
     Optional<Message> encryptedMessage3 =
-        Message.createFromPayload(encryptedMessage.getPayloadByteBuffer().array());
-    Assertions.assertEquals(encryptedMessage, encryptedMessage3.get());
+        Message.createFromPayload(message.getPayloadByteBuffer().array());
+    Assertions.assertEquals(message, encryptedMessage3.get());
+
+    Assertions.assertTrue(encryptedMessage3.get() instanceof PersistentHarvestingDelegationMessage);
+
+    System.out.println(message.getPayloadHex());
+    Assertions.assertTrue(
+        message.getPayloadHex().startsWith(MessageMarker.PERSISTENT_DELEGATION_UNLOCK));
+  }
+
+  @Test
+  public void createFromPayload() {
+    String payload =
+        "FE2A8061577301E231539A87767B731A725E8F87926FDA9968701C082D2AC6CD16C6572F4F3047184D6C4A0443CC5D2565838040CC31B7EA0BA4588728110668BE960A28CAFCDC1703C234903937CCD0CDD6F11DBE7AE4C288FE2E2245BD4BE08C1F864E7FB42C4648E19CA53622AA0C2EAEDB47B8A06B157BD47FD6C230193FCC50F1F9";
+
+    PersistentHarvestingDelegationMessage message =
+        (PersistentHarvestingDelegationMessage)
+            PersistentHarvestingDelegationMessage.createFromHexPayload(payload).get();
+    Assertions.assertEquals(payload, message.getPayloadHex());
+
+    Assertions.assertTrue(
+        message.getPayloadHex().startsWith(MessageMarker.PERSISTENT_DELEGATION_UNLOCK));
+
+    Assertions.assertEquals(message, Message.createFromHexPayload(payload).get());
+
+    PersistentHarvestingDelegationMessage message2 =
+        (PersistentHarvestingDelegationMessage) Message.createFromHexPayload(payload).get();
+    Assertions.assertEquals(payload, message2.getPayloadHex());
   }
 }

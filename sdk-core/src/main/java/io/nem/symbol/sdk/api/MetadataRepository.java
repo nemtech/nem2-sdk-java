@@ -15,7 +15,26 @@
  */
 package io.nem.symbol.sdk.api;
 
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.metadata.Metadata;
+import io.reactivex.Observable;
 
 /** Metadata interface repository. */
-public interface MetadataRepository extends Searcher<Metadata, MetadataSearchCriteria> {}
+public interface MetadataRepository extends Searcher<Metadata, MetadataSearchCriteria> {
+
+  /**
+   * Get metadata of the given id.
+   *
+   * @param compositeHash Metadata composite hash id
+   * @return Observable<SecretLockInfo>
+   */
+  Observable<Metadata> getMetadata(String compositeHash);
+
+  /**
+   * Get metadata merkle info of the given id.
+   *
+   * @param compositeHash MerkleStateInfo composite hash id
+   * @return Observable<MerkleStateInfo>
+   */
+  Observable<MerkleStateInfo> getMetadataMerkle(String compositeHash);
+}

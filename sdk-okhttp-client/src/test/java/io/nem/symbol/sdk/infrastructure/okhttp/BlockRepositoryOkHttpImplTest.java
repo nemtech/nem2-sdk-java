@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 import io.nem.symbol.sdk.api.BlockSearchCriteria;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
+import io.nem.symbol.sdk.model.blockchain.BlockType;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.symbol.sdk.model.blockchain.Position;
 import io.nem.symbol.sdk.model.network.NetworkType;
@@ -84,7 +85,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
     dto.setMeta(metaDTO);
 
     BlockDTO blockDto = new BlockDTO();
-    blockDto.setType(16716);
+    blockDto.setType(BlockType.NORMAL_BLOCK.getValue());
     blockDto.setSize(10L);
     blockDto.setVersion(3);
     blockDto.setSignerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
@@ -107,7 +108,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
     Assertions.assertEquals(
         blockDto.getSignerPublicKey(), info.getSignerPublicAccount().getPublicKey().toHex());
 
-    Assertions.assertEquals(16716, info.getType());
+    Assertions.assertEquals(BlockType.NORMAL_BLOCK, info.getType());
     Assertions.assertEquals(10, info.getSize());
     Assertions.assertEquals(3, info.getVersion().intValue());
     Assertions.assertEquals(NetworkType.MIJIN_TEST, info.getNetworkType());
@@ -141,7 +142,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
     dto.setMeta(metaDTO);
 
     BlockDTO blockDto = new BlockDTO();
-    blockDto.setType(16716);
+    blockDto.setType(BlockType.NORMAL_BLOCK.getValue());
     blockDto.setVersion(3);
     blockDto.setSignerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
     blockDto.setBeneficiaryAddress(address.encoded());
@@ -171,7 +172,7 @@ public class BlockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTest
     Assertions.assertEquals(
         blockDto.getSignerPublicKey(), info.getSignerPublicAccount().getPublicKey().toHex());
 
-    Assertions.assertEquals(16716, info.getType());
+    Assertions.assertEquals(BlockType.NORMAL_BLOCK, info.getType());
     Assertions.assertEquals(3, info.getVersion().intValue());
     Assertions.assertEquals(NetworkType.MIJIN_TEST, info.getNetworkType());
     Assertions.assertEquals(BigInteger.valueOf(9L), info.getHeight());

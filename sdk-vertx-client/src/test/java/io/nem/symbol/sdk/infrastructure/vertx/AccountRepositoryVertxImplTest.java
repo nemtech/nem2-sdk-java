@@ -22,12 +22,14 @@ import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountLinkPublicKeyDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountPage;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.ActivityBucketDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.MerkleStateInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.Mosaic;
 import io.nem.symbol.sdk.openapi.vertx.model.Pagination;
 import io.nem.symbol.sdk.openapi.vertx.model.SupplementalPublicKeysDTO;
@@ -229,6 +231,14 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
         beneficiaryCount, resolvedAccountInfo.getActivityBuckets().get(0).getBeneficiaryCount());
     Assertions.assertEquals(
         rawScore, resolvedAccountInfo.getActivityBuckets().get(0).getRawScore());
+  }
+
+  @Test
+  public void getAccountInfoMerkle() throws Exception {
+    Address address = Address.generateRandom(this.networkType);
+    mockRemoteCall(new MerkleStateInfoDTO().raw("abc"));
+    MerkleStateInfo merkle = repository.getAccountInfoMerkle(address).toFuture().get();
+    Assertions.assertEquals("abc", merkle.getRaw());
   }
 
   private AccountPage toPage(AccountInfoDTO dto) {

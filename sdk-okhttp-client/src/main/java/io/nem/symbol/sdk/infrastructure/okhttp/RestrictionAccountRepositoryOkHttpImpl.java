@@ -16,16 +16,20 @@
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
 import io.nem.symbol.core.utils.MapperUtils;
+import io.nem.symbol.sdk.api.AccountRestrictionSearchCriteria;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RestrictionAccountRepository;
 import io.nem.symbol.sdk.model.account.AccountRestriction;
 import io.nem.symbol.sdk.model.account.AccountRestrictions;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.RestrictionAccountRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionDTO;
-import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionsDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionsInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionsPage;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.Order;
 import io.reactivex.Observable;
 import java.util.Objects;
 import java.util.concurrent.Callable;
@@ -46,16 +50,13 @@ public class RestrictionAccountRepositoryOkHttpImpl extends AbstractRepositoryOk
 
     Callable<AccountRestrictionsInfoDTO> callback =
         () -> getClient().getAccountRestrictions(address.plain());
-    return exceptionHandling(
-        call(callback)
-            .map(AccountRestrictionsInfoDTO::getAccountRestrictions)
-            .map(this::toAccountRestrictions));
+    return (call(callback, this::toAccountRestrictions));
   }
 
-  private AccountRestrictions toAccountRestrictions(AccountRestrictionsDTO dto) {
+  private AccountRestrictions toAccountRestrictions(AccountRestrictionsInfoDTO dto) {
     return new AccountRestrictions(
-        MapperUtils.toAddress(dto.getAddress()),
-        dto.getRestrictions().stream()
+        MapperUtils.toAddress(dto.getAccountRestrictions().getAddress()),
+        dto.getAccountRestrictions().getRestrictions().stream()
             .map(this::toAccountRestriction)
             .collect(Collectors.toList()));
   }
@@ -70,6 +71,30 @@ public class RestrictionAccountRepositoryOkHttpImpl extends AbstractRepositoryOk
             .map(Object::toString)
             .map(restrictionFlags.getTargetType()::fromString)
             .collect(Collectors.toList()));
+  }
+
+  @Override
+  public Observable<MerkleStateInfo> getAccountRestrictionsMerkle(Address address) {
+    return call(
+        () -> getClient().getAccountRestrictionsMerkle(address.plain()), this::toMerkleStateInfo);
+  }
+
+  @Override
+  public Observable<Page<AccountRestrictions>> search(AccountRestrictionSearchCriteria criteria) {
+    String address = toDto(criteria.getAddress());
+    Integer pageSize = criteria.getPageSize();
+    Integer pageNumber = criteria.getPageNumber();
+    String offset = criteria.getOffset();
+    Order order = toDto(criteria.getOrder());
+    return this.call(
+        () -> getClient().searchAccountRestrictions(address, pageSize, pageNumber, offset, order),
+        this::toPage);
+  }
+
+  private Page<AccountRestrictions> toPage(AccountRestrictionsPage page) {
+    return toPage(
+        page.getPagination(),
+        page.getData().stream().map(this::toAccountRestrictions).collect(Collectors.toList()));
   }
 
   public RestrictionAccountRoutesApi getClient() {

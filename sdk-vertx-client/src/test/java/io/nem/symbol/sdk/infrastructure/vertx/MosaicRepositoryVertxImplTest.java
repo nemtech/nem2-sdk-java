@@ -20,9 +20,11 @@ import io.nem.symbol.sdk.api.MosaicSearchCriteria;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
 import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.openapi.vertx.model.MerkleStateInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MosaicPage;
@@ -46,7 +48,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
   @BeforeEach
   public void setUp() {
     super.setUp();
-    repository = new MosaicRepositoryVertxImpl(apiClientMock, networkTypeObservable);
+    repository = new MosaicRepositoryVertxImpl(apiClientMock);
   }
 
   @Test
@@ -160,5 +162,13 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
     Assertions.assertFalse(mosaicInfo.isTransferable());
     Assertions.assertEquals(6, mosaicInfo.getDivisibility());
     Assertions.assertEquals(BigInteger.valueOf(7), mosaicInfo.getDuration());
+  }
+
+  @Test
+  public void getMetadataMerkle() throws Exception {
+    MosaicId mosaicId = MapperUtils.toMosaicId("481110499");
+    mockRemoteCall(new MerkleStateInfoDTO().raw("abc"));
+    MerkleStateInfo merkle = repository.getMosaicMerkle(mosaicId).toFuture().get();
+    Assertions.assertEquals("abc", merkle.getRaw());
   }
 }

@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.account.AccountRestrictions;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.reactivex.Observable;
 
 /**
@@ -24,7 +25,8 @@ import io.reactivex.Observable;
  *
  * @since 1.0
  */
-public interface RestrictionAccountRepository {
+public interface RestrictionAccountRepository
+    extends Searcher<AccountRestrictions, AccountRestrictionSearchCriteria> {
 
   /**
    * Returns the account restrictions for a given account.
@@ -33,4 +35,12 @@ public interface RestrictionAccountRepository {
    * @return Observable of {@link AccountRestrictions}
    */
   Observable<AccountRestrictions> getAccountRestrictions(Address address);
+
+  /**
+   * Returns the account restrictions merkle for a given account.
+   *
+   * @param address the address
+   * @return Observable of {@link MerkleStateInfo}
+   */
+  Observable<MerkleStateInfo> getAccountRestrictionsMerkle(Address address);
 }

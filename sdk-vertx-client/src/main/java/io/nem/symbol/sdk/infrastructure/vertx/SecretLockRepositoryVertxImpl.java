@@ -19,8 +19,10 @@ import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.SecretLockRepository;
 import io.nem.symbol.sdk.api.SecretLockSearchCriteria;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.transaction.LockHashAlgorithm;
+import io.nem.symbol.sdk.model.transaction.LockStatus;
 import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
 import io.nem.symbol.sdk.openapi.vertx.api.SecretLockRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.SecretLockRoutesApiImpl;
@@ -32,7 +34,6 @@ import io.nem.symbol.sdk.openapi.vertx.model.SecretLockPage;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -50,12 +51,12 @@ public class SecretLockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     SecretLockEntryDTO lock = dto.getLock();
     MosaicId mosaicId = MapperUtils.toMosaicId(lock.getMosaicId());
     return new SecretLockInfo(
-        Optional.of(dto.getId()),
+        dto.getId(),
         MapperUtils.toAddress(lock.getOwnerAddress()),
         mosaicId,
         lock.getAmount(),
         lock.getEndHeight(),
-        lock.getStatus(),
+        LockStatus.rawValueOf(lock.getStatus().getValue()),
         LockHashAlgorithm.rawValueOf(lock.getHashAlgorithm().getValue()),
         lock.getSecret(),
         MapperUtils.toAddress(lock.getRecipientAddress()),
@@ -84,5 +85,16 @@ public class SecretLockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
 
   public SecretLockRoutesApi getClient() {
     return client;
+  }
+
+  @Override
+  public Observable<SecretLockInfo> getSecretLock(String compositeHash) {
+    return this.call((h) -> getClient().getSecretLock(compositeHash, h), this::toSecretLockInfo);
+  }
+
+  @Override
+  public Observable<MerkleStateInfo> getSecretLockMerkle(String compositeHash) {
+    return this.call(
+        (h) -> getClient().getSecretLockMerkle(compositeHash, h), this::toMerkleStateInfo);
   }
 }

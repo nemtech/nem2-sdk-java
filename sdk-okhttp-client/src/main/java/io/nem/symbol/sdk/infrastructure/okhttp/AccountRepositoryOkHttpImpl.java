@@ -27,6 +27,7 @@ import io.nem.symbol.sdk.model.account.AccountType;
 import io.nem.symbol.sdk.model.account.ActivityBucket;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.SupplementalAccountKeys;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.mosaic.ResolvedMosaic;
 import io.nem.symbol.sdk.openapi.okhttp_gson.api.AccountRoutesApi;
 import io.nem.symbol.sdk.openapi.okhttp_gson.invoker.ApiClient;
@@ -61,8 +62,12 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
 
   @Override
   public Observable<AccountInfo> getAccountInfo(Address address) {
-    Callable<AccountInfoDTO> callback = () -> getClient().getAccountInfo(address.plain());
-    return exceptionHandling(call(callback).map(this::toAccountInfo));
+    return call(() -> getClient().getAccountInfo(address.plain()), this::toAccountInfo);
+  }
+
+  @Override
+  public Observable<MerkleStateInfo> getAccountInfoMerkle(Address address) {
+    return call(() -> getClient().getAccountInfoMerkle(address.plain()), this::toMerkleStateInfo);
   }
 
   @Override

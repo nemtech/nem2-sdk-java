@@ -16,8 +16,11 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountGraphInfo;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
+import io.nem.symbol.sdk.openapi.vertx.model.MerkleStateInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MultisigAccountGraphInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MultisigAccountInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MultisigDTO;
@@ -44,7 +47,7 @@ public class MultisigRepositoryVertxImplTest extends AbstractVertxRespositoryTes
   @BeforeEach
   public void setUp() {
     super.setUp();
-    repository = new MultisigRepositoryVertxImpl(apiClientMock, networkTypeObservable);
+    repository = new MultisigRepositoryVertxImpl(apiClientMock);
   }
 
   @Test
@@ -113,5 +116,13 @@ public class MultisigRepositoryVertxImplTest extends AbstractVertxRespositoryTes
         Arrays.asList(account2.getAddress().encoded(), account3.getAddress().encoded()));
     dto.setMultisig(multisigDto);
     return dto;
+  }
+
+  @Test
+  public void getMultisigAccountInfoMerkle() throws Exception {
+    Address address = Address.generateRandom(this.networkType);
+    mockRemoteCall(new MerkleStateInfoDTO().raw("abc"));
+    MerkleStateInfo merkle = repository.getMultisigAccountInfoMerkle(address).toFuture().get();
+    Assertions.assertEquals("abc", merkle.getRaw());
   }
 }

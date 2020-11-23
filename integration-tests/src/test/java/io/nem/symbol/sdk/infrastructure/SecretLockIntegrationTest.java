@@ -113,7 +113,7 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
 
     SecretLockInfo info =
         get(hashLockRepository.search(
-                new SecretLockSearchCriteria(account.getAddress()).secret(storedSecret)))
+                new SecretLockSearchCriteria().address(account.getAddress()).secret(storedSecret)))
             .getData()
             .get(0);
     Assertions.assertNotNull(info);
@@ -127,7 +127,7 @@ class SecretLockIntegrationTest extends BaseIntegrationTest {
     Page<SecretLockInfo> page =
         get(
             hashLockRepository.search(
-                new SecretLockSearchCriteria(account.getAddress()).order(OrderBy.DESC)));
+                new SecretLockSearchCriteria().address(account.getAddress()).order(OrderBy.DESC)));
 
     Assertions.assertTrue(
         page.getData().stream().anyMatch(m -> m.getSecret().equals(storedSecret)));

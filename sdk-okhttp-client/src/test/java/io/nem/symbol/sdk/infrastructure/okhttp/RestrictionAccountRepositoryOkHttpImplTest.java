@@ -18,11 +18,13 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.model.account.AccountRestrictions;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.transaction.AccountMosaicRestrictionFlags;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionFlagsEnum;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionsDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.AccountRestrictionsInfoDTO;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.MerkleStateInfoDTO;
 import java.util.Arrays;
 import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
@@ -70,6 +72,14 @@ public class RestrictionAccountRepositoryOkHttpImplTest extends AbstractOkHttpRe
     Assertions.assertEquals(
         Arrays.asList(MapperUtils.toMosaicId("9636553580561478212")),
         accountRestrictions.getRestrictions().get(0).getValues());
+  }
+
+  @Test
+  public void getAccountRestrictionsMerkle() throws Exception {
+    Address address = Address.generateRandom(this.networkType);
+    mockRemoteCall(new MerkleStateInfoDTO().raw("abc"));
+    MerkleStateInfo merkle = repository.getAccountRestrictionsMerkle(address).toFuture().get();
+    Assertions.assertEquals("abc", merkle.getRaw());
   }
 
   @Override

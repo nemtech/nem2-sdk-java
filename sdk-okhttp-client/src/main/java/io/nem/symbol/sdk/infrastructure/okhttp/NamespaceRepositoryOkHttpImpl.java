@@ -23,6 +23,7 @@ import io.nem.symbol.sdk.api.NamespaceSearchCriteria;
 import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.model.account.AccountNames;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNames;
 import io.nem.symbol.sdk.model.namespace.AddressAlias;
@@ -78,8 +79,13 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
 
   @Override
   public Observable<NamespaceInfo> getNamespace(NamespaceId namespaceId) {
-    Callable<NamespaceInfoDTO> callback = () -> getClient().getNamespace(namespaceId.getIdAsHex());
-    return exceptionHandling(call(callback).map(this::toNamespaceInfo));
+    return call(() -> getClient().getNamespace(namespaceId.getIdAsHex()), this::toNamespaceInfo);
+  }
+
+  @Override
+  public Observable<MerkleStateInfo> getNamespaceMerkle(NamespaceId namespaceId) {
+    return call(
+        () -> getClient().getNamespaceMerkle(namespaceId.getIdAsHex()), this::toMerkleStateInfo);
   }
 
   @Override
@@ -241,7 +247,6 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
         namespaceInfoDTO.getId(),
         namespaceInfoDTO.getMeta().getActive(),
         namespaceInfoDTO.getMeta().getIndex(),
-        namespaceInfoDTO.getMeta().getId(),
         NamespaceRegistrationType.rawValueOf(
             namespaceInfoDTO.getNamespace().getRegistrationType().getValue()),
         namespaceInfoDTO.getNamespace().getDepth(),

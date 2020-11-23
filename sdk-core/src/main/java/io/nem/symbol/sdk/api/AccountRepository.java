@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.reactivex.Observable;
 import java.util.List;
 
@@ -42,4 +43,12 @@ public interface AccountRepository extends Searcher<AccountInfo, AccountSearchCr
    * @return Observable {@link List} of {@link AccountInfo}
    */
   Observable<List<AccountInfo>> getAccountsInfo(List<Address> addresses);
+
+  /**
+   * Returns the merkle information of the given account.
+   *
+   * @param address Address
+   * @return Observable {@link MerkleStateInfo}
+   */
+  Observable<MerkleStateInfo> getAccountInfoMerkle(Address address);
 }

@@ -116,7 +116,7 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
   @Override
   protected BlockInfo toBlockInfo(Object blockInfoDTO) {
     return BlockRepositoryOkHttpImpl.toBlockInfo(
-        getJsonHelper().convert(blockInfoDTO, BlockInfoDTO.class));
+        getJsonHelper().convert(blockInfoDTO, BlockInfoDTO.class), getJsonHelper());
   }
 
   @Override

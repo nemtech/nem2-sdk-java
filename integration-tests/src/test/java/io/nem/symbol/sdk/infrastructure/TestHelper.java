@@ -695,7 +695,9 @@ public class TestHelper {
     Assertions.assertEquals(hashLockTransaction.getHash(), hashLockInfo.getHash());
 
     Page<HashLockInfo> page =
-        get(hashLockRepository.search(new HashLockSearchCriteria(multisigAccount.getAddress())));
+        get(
+            hashLockRepository.search(
+                new HashLockSearchCriteria().address(multisigAccount.getAddress())));
     Assertions.assertTrue(
         page.getData().stream().anyMatch(m -> m.getHash().equals(hashLockTransaction.getHash())));
     Assertions.assertEquals(20, page.getPageSize());

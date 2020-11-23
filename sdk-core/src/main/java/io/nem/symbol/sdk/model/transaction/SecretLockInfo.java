@@ -25,7 +25,7 @@ import java.util.Optional;
 public class SecretLockInfo implements Stored {
 
   /** The stored database id. */
-  private final Optional<String> recordId;
+  private final String recordId;
   /** Address expressed in hexadecimal base. */
   private final Address ownerAddress;
 
@@ -42,7 +42,7 @@ public class SecretLockInfo implements Stored {
   private final BigInteger endHeight;
 
   /** A number that indicates the status. */
-  private final Integer status;
+  private final LockStatus status;
 
   /** The hash algorithm used. */
   private final LockHashAlgorithm hashAlgorithm;
@@ -57,12 +57,12 @@ public class SecretLockInfo implements Stored {
   private final String compositeHash;
 
   public SecretLockInfo(
-      Optional<String> recordId,
+      String recordId,
       Address ownerAddress,
       MosaicId mosaicId,
       BigInteger amount,
       BigInteger endHeight,
-      Integer status,
+      LockStatus status,
       LockHashAlgorithm hashAlgorithm,
       String secret,
       Address recipientAddress,
@@ -81,7 +81,7 @@ public class SecretLockInfo implements Stored {
 
   @Override
   public Optional<String> getRecordId() {
-    return this.recordId;
+    return Optional.ofNullable(this.recordId);
   }
 
   public Address getOwnerAddress() {
@@ -100,7 +100,7 @@ public class SecretLockInfo implements Stored {
     return endHeight;
   }
 
-  public Integer getStatus() {
+  public LockStatus getStatus() {
     return status;
   }
 

@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.api;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountGraphInfo;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.reactivex.Observable;
 
 public interface MultisigRepository {
@@ -37,4 +38,12 @@ public interface MultisigRepository {
    * @return Observable {@link MultisigAccountGraphInfo}
    */
   Observable<MultisigAccountGraphInfo> getMultisigAccountGraphInfo(Address address);
+
+  /**
+   * Gets the merkle information of the multisig account
+   *
+   * @param address the address
+   * @return Observable of {@link MerkleStateInfo}
+   */
+  Observable<MerkleStateInfo> getMultisigAccountInfoMerkle(Address address);
 }

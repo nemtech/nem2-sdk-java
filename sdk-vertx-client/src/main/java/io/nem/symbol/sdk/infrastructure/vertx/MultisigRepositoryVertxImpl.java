@@ -20,7 +20,7 @@ import io.nem.symbol.sdk.api.MultisigRepository;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountGraphInfo;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
-import io.nem.symbol.sdk.model.network.NetworkType;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.openapi.vertx.api.MultisigRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.MultisigRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
@@ -40,50 +40,46 @@ public class MultisigRepositoryVertxImpl extends AbstractRepositoryVertxImpl
 
   private final MultisigRoutesApi client;
 
-  private final Observable<NetworkType> networkTypeObservable;
-
-  public MultisigRepositoryVertxImpl(
-      ApiClient apiClient, Observable<NetworkType> networkTypeObservable) {
+  public MultisigRepositoryVertxImpl(ApiClient apiClient) {
     super(apiClient);
     this.client = new MultisigRoutesApiImpl(apiClient);
-    this.networkTypeObservable = networkTypeObservable;
   }
 
   @Override
   public Observable<MultisigAccountInfo> getMultisigAccountInfo(Address address) {
     return exceptionHandling(
-        networkTypeObservable.flatMap(
-            networkType ->
-                call((Handler<AsyncResult<MultisigAccountInfoDTO>> handler) ->
-                        getClient().getAccountMultisig(address.plain(), handler))
-                    .map(MultisigAccountInfoDTO::getMultisig)
-                    .map(this::toMultisigAccountInfo)));
+        call((Handler<AsyncResult<MultisigAccountInfoDTO>> handler) ->
+                getClient().getAccountMultisig(address.plain(), handler))
+            .map(MultisigAccountInfoDTO::getMultisig)
+            .map(this::toMultisigAccountInfo));
+  }
+
+  @Override
+  public Observable<MerkleStateInfo> getMultisigAccountInfoMerkle(Address address) {
+    return call(
+        (h) -> getClient().getAccountMultisigMerkle(address.plain(), h), this::toMerkleStateInfo);
   }
 
   @Override
   public Observable<MultisigAccountGraphInfo> getMultisigAccountGraphInfo(Address address) {
 
     return exceptionHandling(
-        networkTypeObservable.flatMap(
-            networkType ->
-                call((Handler<AsyncResult<List<MultisigAccountGraphInfoDTO>>> handler) ->
-                        getClient().getAccountMultisigGraph(address.plain(), handler))
-                    .map(
-                        multisigAccountGraphInfoDTOList -> {
-                          Map<Integer, List<MultisigAccountInfo>> multisigAccountInfoMap =
-                              new HashMap<>();
-                          multisigAccountGraphInfoDTOList.forEach(
-                              item ->
-                                  multisigAccountInfoMap.put(
-                                      item.getLevel(), toMultisigAccountInfo(item)));
-                          return new MultisigAccountGraphInfo(multisigAccountInfoMap);
-                        })));
+        call((Handler<AsyncResult<List<MultisigAccountGraphInfoDTO>>> handler) ->
+                getClient().getAccountMultisigGraph(address.plain(), handler))
+            .map(
+                multisigAccountGraphInfoDTOList -> {
+                  Map<Integer, List<MultisigAccountInfo>> multisigAccountInfoMap = new HashMap<>();
+                  multisigAccountGraphInfoDTOList.forEach(
+                      item ->
+                          multisigAccountInfoMap.put(item.getLevel(), toMultisigAccountInfo(item)));
+                  return new MultisigAccountGraphInfo(multisigAccountInfoMap);
+                }));
   }
 
   private List<MultisigAccountInfo> toMultisigAccountInfo(MultisigAccountGraphInfoDTO item) {
     return item.getMultisigEntries().stream()
         .map(MultisigAccountInfoDTO::getMultisig)
-        .map(dto -> toMultisigAccountInfo(dto))
+        .map(this::toMultisigAccountInfo)
         .collect(Collectors.toList());
   }
 

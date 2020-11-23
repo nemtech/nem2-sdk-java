@@ -18,37 +18,23 @@ package io.nem.symbol.sdk.api;
 import io.nem.symbol.sdk.model.account.Address;
 import java.util.Objects;
 
-/** Criteria used to search secret lock entities. */
-public class SecretLockSearchCriteria extends SearchCriteria<SecretLockSearchCriteria> {
+/** The criteria used to search account restrictions */
+public class AccountRestrictionSearchCriteria
+    extends SearchCriteria<AccountRestrictionSearchCriteria> {
 
-  /** Account address. */
+  /** Filter restriction by target address. */
   private Address address;
-  /** filter by secret */
-  private String secret;
-
-  public void setAddress(Address address) {
-    this.address = address;
-  }
-
-  public SecretLockSearchCriteria address(Address address) {
-    this.address = address;
-    return this;
-  }
 
   public Address getAddress() {
     return address;
   }
 
-  public String getSecret() {
-    return secret;
+  public void setAddress(Address address) {
+    this.address = address;
   }
 
-  public void setSecret(String secret) {
-    this.secret = secret;
-  }
-
-  public SecretLockSearchCriteria secret(String secret) {
-    this.secret = secret;
+  public AccountRestrictionSearchCriteria address(Address targetAddress) {
+    this.address = targetAddress;
     return this;
   }
 
@@ -63,12 +49,12 @@ public class SecretLockSearchCriteria extends SearchCriteria<SecretLockSearchCri
     if (!super.equals(o)) {
       return false;
     }
-    SecretLockSearchCriteria that = (SecretLockSearchCriteria) o;
-    return Objects.equals(address, that.address) && Objects.equals(secret, that.secret);
+    AccountRestrictionSearchCriteria that = (AccountRestrictionSearchCriteria) o;
+    return Objects.equals(address, that.address);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), address, secret);
+    return Objects.hash(super.hashCode(), address);
   }
 }

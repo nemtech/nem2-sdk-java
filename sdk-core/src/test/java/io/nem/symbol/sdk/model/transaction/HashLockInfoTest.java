@@ -36,11 +36,11 @@ public class HashLockInfoTest {
     MosaicId mosaicId = MosaicId.createFromNonce(MosaicNonce.createRandom(), ownerAddress);
     BigInteger amount = BigInteger.ONE;
     BigInteger endHeight = BigInteger.TEN;
-    Integer status = 3;
+    LockStatus status = LockStatus.USED;
     String hash = "ABC";
 
     HashLockInfo info =
-        new HashLockInfo(recordId, ownerAddress, mosaicId, amount, endHeight, status, hash);
+        new HashLockInfo(recordId.get(), ownerAddress, mosaicId, amount, endHeight, status, hash);
 
     Assertions.assertEquals(recordId, info.getRecordId());
     Assertions.assertEquals(ownerAddress, info.getOwnerAddress());

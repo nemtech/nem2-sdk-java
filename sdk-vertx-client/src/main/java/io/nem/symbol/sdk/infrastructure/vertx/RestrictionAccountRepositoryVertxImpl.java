@@ -16,21 +16,26 @@
 package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.core.utils.MapperUtils;
+import io.nem.symbol.sdk.api.AccountRestrictionSearchCriteria;
+import io.nem.symbol.sdk.api.Page;
 import io.nem.symbol.sdk.api.RestrictionAccountRepository;
 import io.nem.symbol.sdk.model.account.AccountRestriction;
 import io.nem.symbol.sdk.model.account.AccountRestrictions;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
 import io.nem.symbol.sdk.openapi.vertx.api.RestrictionAccountRoutesApi;
 import io.nem.symbol.sdk.openapi.vertx.api.RestrictionAccountRoutesApiImpl;
 import io.nem.symbol.sdk.openapi.vertx.invoker.ApiClient;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountRestrictionDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.AccountRestrictionsDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.AccountRestrictionsInfoDTO;
+import io.nem.symbol.sdk.openapi.vertx.model.AccountRestrictionsPage;
+import io.nem.symbol.sdk.openapi.vertx.model.Order;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class RestrictionAccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl
@@ -46,17 +51,16 @@ public class RestrictionAccountRepositoryVertxImpl extends AbstractRepositoryVer
   @Override
   public Observable<AccountRestrictions> getAccountRestrictions(Address address) {
 
-    return exceptionHandling(
-        call((Handler<AsyncResult<AccountRestrictionsInfoDTO>> handler) ->
-                getClient().getAccountRestrictions(address.plain(), handler))
-            .map(AccountRestrictionsInfoDTO::getAccountRestrictions)
-            .map(this::toAccountRestrictions));
+    return call(
+        (Handler<AsyncResult<AccountRestrictionsInfoDTO>> handler) ->
+            getClient().getAccountRestrictions(address.plain(), handler),
+        this::toAccountRestrictions);
   }
 
-  private AccountRestrictions toAccountRestrictions(AccountRestrictionsDTO dto) {
+  private AccountRestrictions toAccountRestrictions(AccountRestrictionsInfoDTO dto) {
     return new AccountRestrictions(
-        MapperUtils.toAddress(dto.getAddress()),
-        dto.getRestrictions().stream()
+        MapperUtils.toAddress(dto.getAccountRestrictions().getAddress()),
+        dto.getAccountRestrictions().getRestrictions().stream()
             .map(this::toAccountRestriction)
             .collect(Collectors.toList()));
   }
@@ -73,7 +77,33 @@ public class RestrictionAccountRepositoryVertxImpl extends AbstractRepositoryVer
             .collect(Collectors.toList()));
   }
 
+  @Override
+  public Observable<MerkleStateInfo> getAccountRestrictionsMerkle(Address address) {
+    return call(
+        (h) -> getClient().getAccountRestrictionsMerkle(address.plain(), h),
+        this::toMerkleStateInfo);
+  }
+
   public RestrictionAccountRoutesApi getClient() {
     return client;
+  }
+
+  @Override
+  public Observable<Page<AccountRestrictions>> search(AccountRestrictionSearchCriteria criteria) {
+    String address = toDto(criteria.getAddress());
+    Integer pageSize = criteria.getPageSize();
+    Integer pageNumber = criteria.getPageNumber();
+    String offset = criteria.getOffset();
+    Order order = toDto(criteria.getOrder());
+    Consumer<Handler<AsyncResult<AccountRestrictionsPage>>> handlerConsumer =
+        (h) ->
+            getClient().searchAccountRestrictions(address, pageSize, pageNumber, offset, order, h);
+    return this.call(handlerConsumer, this::toPage);
+  }
+
+  private Page<AccountRestrictions> toPage(AccountRestrictionsPage page) {
+    return toPage(
+        page.getPagination(),
+        page.getData().stream().map(this::toAccountRestrictions).collect(Collectors.toList()));
   }
 }

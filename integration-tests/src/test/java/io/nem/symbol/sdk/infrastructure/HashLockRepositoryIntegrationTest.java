@@ -66,7 +66,7 @@ class HashLockRepositoryIntegrationTest extends BaseIntegrationTest {
   void searchWhenInvalidAddress(RepositoryType type) {
     HashLockRepository repository = getRepositoryFactory(type).createHashLockRepository();
     Address address = Address.generateRandom(getNetworkType());
-    Page<HashLockInfo> page = get(repository.search(new HashLockSearchCriteria(address)));
+    Page<HashLockInfo> page = get(repository.search(new HashLockSearchCriteria().address(address)));
     Assertions.assertTrue(page.isLast());
     Assertions.assertTrue(page.getData().isEmpty());
     Assertions.assertEquals(20, page.getPageSize());

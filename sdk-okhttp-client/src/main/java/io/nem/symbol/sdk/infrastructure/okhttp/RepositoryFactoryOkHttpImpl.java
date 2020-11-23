@@ -71,7 +71,7 @@ public class RepositoryFactoryOkHttpImpl extends RepositoryFactoryBase {
 
   @Override
   public MultisigRepository createMultisigRepository() {
-    return new MultisigRepositoryOkHttpImpl(apiClient, getNetworkType());
+    return new MultisigRepositoryOkHttpImpl(apiClient);
   }
 
   @Override
@@ -91,7 +91,7 @@ public class RepositoryFactoryOkHttpImpl extends RepositoryFactoryBase {
 
   @Override
   public MosaicRepository createMosaicRepository() {
-    return new MosaicRepositoryOkHttpImpl(apiClient, getNetworkType());
+    return new MosaicRepositoryOkHttpImpl(apiClient);
   }
 
   @Override

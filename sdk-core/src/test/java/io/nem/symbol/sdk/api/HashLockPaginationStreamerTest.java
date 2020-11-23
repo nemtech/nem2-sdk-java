@@ -15,8 +15,6 @@
  */
 package io.nem.symbol.sdk.api;
 
-import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.HashLockInfo;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -48,9 +46,6 @@ public class HashLockPaginationStreamerTest {
     HashLockRepository repository = Mockito.mock(HashLockRepository.class);
     HashLockPaginationStreamer streamer = new HashLockPaginationStreamer(repository);
     return new PaginationStreamerTester<>(
-        streamer,
-        HashLockInfo.class,
-        repository,
-        new HashLockSearchCriteria(Address.generateRandom(NetworkType.MIJIN_TEST)));
+        streamer, HashLockInfo.class, repository, new HashLockSearchCriteria());
   }
 }

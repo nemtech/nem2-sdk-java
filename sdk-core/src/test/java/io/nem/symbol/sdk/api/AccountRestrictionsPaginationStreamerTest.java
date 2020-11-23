@@ -15,12 +15,12 @@
  */
 package io.nem.symbol.sdk.api;
 
-import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
+import io.nem.symbol.sdk.model.account.AccountRestrictions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-/** Test of the SecretLockPaginationStreamer */
-public class SecretLockPaginationStreamerTest {
+/** Test of the AccountPaginationStreamer */
+public class AccountRestrictionsPaginationStreamerTest {
 
   @Test
   void testMultiplePageStreamer() {
@@ -42,10 +42,11 @@ public class SecretLockPaginationStreamerTest {
     tester().limitToTwoPages();
   }
 
-  private PaginationStreamerTester<SecretLockInfo, SecretLockSearchCriteria> tester() {
-    SecretLockRepository repository = Mockito.mock(SecretLockRepository.class);
-    SecretLockPaginationStreamer streamer = new SecretLockPaginationStreamer(repository);
+  private PaginationStreamerTester<AccountRestrictions, AccountRestrictionSearchCriteria> tester() {
+    RestrictionAccountRepository repository = Mockito.mock(RestrictionAccountRepository.class);
+    AccountRestrictionsPaginationStreamer streamer =
+        new AccountRestrictionsPaginationStreamer(repository);
     return new PaginationStreamerTester<>(
-        streamer, SecretLockInfo.class, repository, new SecretLockSearchCriteria());
+        streamer, AccountRestrictions.class, repository, new AccountRestrictionSearchCriteria());
   }
 }
