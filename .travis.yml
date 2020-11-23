@@ -31,15 +31,15 @@ before_script:
   - docker-compose -version
 install:
   - true
-script: ./gradlew install spotlessCheck jacocoTestReport coveralls -x javadoc -x integrationTest
+script: ./gradlew install spotlessCheck jacocoTestReport coveralls -x javadoc -x integrationTest javadoc spotlessCheck
 jobs:
   include:
-    - stage: test
-      name: javadoc
-      script: ./gradlew javadoc
-    - stage: test
-      name: spotlessCheck
-      script: ./gradlew spotlessCheck
+#    - stage: test
+#      name: javadoc
+#      script: ./gradlew javadoc
+#    - stage: test
+#      name: spotlessCheck
+#      script: ./gradlew spotlessCheck
 #    - stage: test
 #      name: sonarqube
 #      script: ./gradlew sonarqube -x test

@@ -66,6 +66,7 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
    * Create method factory for {@link VotingKeyLinkTransactionFactory}
    *
    * @param networkType the network type of this transaction.
+   * @param deadline the deadline.
    * @param linkedPublicKey the voting key.
    * @param startEpoch Start finalization epoch.
    * @param endEpoch End finalization epoch.

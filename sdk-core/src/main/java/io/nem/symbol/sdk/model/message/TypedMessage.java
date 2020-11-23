@@ -36,7 +36,13 @@ public abstract class TypedMessage extends Message {
     this.text = text;
   }
 
-  /** @return the full payload including the message type as byte buffer */
+  /**
+   * It creates the final payload
+   *
+   * @param type the message type
+   * @param text the plain/encrypted text.
+   * @return the full payload including the message type as byte buffer
+   */
   public static ByteBuffer getPayloadByteBuffer(MessageType type, String text) {
     final byte byteMessageType = (byte) type.getValue();
     final byte[] bytePayload = text.getBytes(StandardCharsets.UTF_8);

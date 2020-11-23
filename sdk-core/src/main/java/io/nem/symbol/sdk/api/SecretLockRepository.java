@@ -26,7 +26,7 @@ public interface SecretLockRepository extends Searcher<SecretLockInfo, SecretLoc
    * Get secret lock info of the given id.
    *
    * @param compositeHash SecretLockInfo composite hash id
-   * @return Observable<SecretLockInfo>
+   * @return Observable {@link SecretLockInfo}
    */
   Observable<SecretLockInfo> getSecretLock(String compositeHash);
 
@@ -34,7 +34,7 @@ public interface SecretLockRepository extends Searcher<SecretLockInfo, SecretLoc
    * Get secret lock merkle info of the given id.
    *
    * @param compositeHash SecretLockInfo composite hash id
-   * @return Observable<MerkleStateInfo>
+   * @return Observable {@link MerkleStateInfo}
    */
   Observable<MerkleStateInfo> getSecretLockMerkle(String compositeHash);
 }

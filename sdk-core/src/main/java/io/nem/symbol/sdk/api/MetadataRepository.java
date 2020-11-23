@@ -26,7 +26,7 @@ public interface MetadataRepository extends Searcher<Metadata, MetadataSearchCri
    * Get metadata of the given id.
    *
    * @param compositeHash Metadata composite hash id
-   * @return Observable<SecretLockInfo>
+   * @return Observable {@link Metadata}
    */
   Observable<Metadata> getMetadata(String compositeHash);
 
@@ -34,7 +34,7 @@ public interface MetadataRepository extends Searcher<Metadata, MetadataSearchCri
    * Get metadata merkle info of the given id.
    *
    * @param compositeHash MerkleStateInfo composite hash id
-   * @return Observable<MerkleStateInfo>
+   * @return Observable {@link MerkleStateInfo}
    */
   Observable<MerkleStateInfo> getMetadataMerkle(String compositeHash);
 }

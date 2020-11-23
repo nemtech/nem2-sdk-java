@@ -31,7 +31,7 @@ public interface RestrictionMosaicRepository
    * Get mosaic restriction info of the given id.
    *
    * @param compositeHash MosaicRestriction composite hash id
-   * @return Observable<MosaicRestriction>
+   * @return Observable {@link MosaicRestriction}
    */
   Observable<MosaicRestriction<?>> getMosaicRestrictions(String compositeHash);
 
@@ -39,7 +39,7 @@ public interface RestrictionMosaicRepository
    * Get mosaic restriction merkle info of the given id.
    *
    * @param compositeHash MosaicRestriction composite hash id
-   * @return Observable<MosaicRestriction>
+   * @return Observable {@link MerkleStateInfo}
    */
   Observable<MerkleStateInfo> getMosaicRestrictionsMerkle(String compositeHash);
 }
