@@ -121,7 +121,6 @@ class AccountSearchRepositoryIntegrationTest extends BaseIntegrationTest {
 
   private PaginationTester<AccountInfo, AccountSearchCriteria> getPaginationTester(
       RepositoryType type) {
-    return new PaginationTester<>(
-        AccountSearchCriteria::new, getAccountRepository(type)::search);
+    return new PaginationTester<>(AccountSearchCriteria::new, getAccountRepository(type)::search);
   }
 }

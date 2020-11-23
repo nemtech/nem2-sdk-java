@@ -21,7 +21,6 @@ import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import java.math.BigInteger;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class VotingKeyLinkTransactionTest extends AbstractTransactionTester {

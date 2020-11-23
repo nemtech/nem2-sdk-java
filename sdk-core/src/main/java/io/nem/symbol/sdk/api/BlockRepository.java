@@ -64,5 +64,4 @@ public interface BlockRepository extends Searcher<BlockInfo, BlockSearchCriteria
    * @return {@link Observable} of MerkleProofInfo
    */
   Observable<MerkleProofInfo> getMerkleReceipts(BigInteger height, String hash);
-
 }

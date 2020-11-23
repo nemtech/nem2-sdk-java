@@ -16,7 +16,6 @@
 package io.nem.symbol.sdk.model.transaction;
 
 import io.nem.symbol.core.crypto.PublicKey;
-import io.nem.symbol.core.crypto.VotingKey;
 
 /** Voting key link transaction. */
 public class VotingKeyLinkTransaction extends Transaction {

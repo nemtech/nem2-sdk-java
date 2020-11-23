@@ -387,7 +387,6 @@ public class SerializationUtils {
     return new VotingKeyDto(ByteBuffer.wrap(key.getBytes()));
   }
 
-
   /**
    * It creates a catbuffer Hash256Dto from a String hash.
    *

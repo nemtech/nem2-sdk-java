@@ -51,7 +51,6 @@ abstract class AbstractTransactionTester {
     assertEquals(ConvertUtils.fromHexToBytes(expected).length, transaction.getSize());
     T deserialized = (T) binarySerialization.deserialize(actual);
 
-
     assertEquals(
         expected.toUpperCase(), ConvertUtils.toHex(binarySerialization.serialize(deserialized)));
     if (!AggregateTransaction.class.isInstance(transaction)) {

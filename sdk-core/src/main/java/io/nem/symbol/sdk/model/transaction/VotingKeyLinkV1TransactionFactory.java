@@ -21,7 +21,8 @@ import io.nem.symbol.sdk.model.network.NetworkType;
 import org.apache.commons.lang3.Validate;
 
 /** Vrf key link transaction factory. */
-public class VotingKeyLinkV1TransactionFactory extends TransactionFactory<VotingKeyLinkV1Transaction> {
+public class VotingKeyLinkV1TransactionFactory
+    extends TransactionFactory<VotingKeyLinkV1Transaction> {
 
   /** The voting key. */
   private final VotingKey linkedPublicKey;

@@ -104,7 +104,8 @@ public class GeneralTransactionMapper implements TransactionMapper {
   @Override
   public Object mapToDto(Transaction transaction, Boolean embedded) {
     Validate.notNull(transaction, "transaction must not be null");
-    return resolveMapper(transaction.getType(), transaction.getVersion()).mapToDto(transaction, embedded);
+    return resolveMapper(transaction.getType(), transaction.getVersion())
+        .mapToDto(transaction, embedded);
   }
 
   @Override

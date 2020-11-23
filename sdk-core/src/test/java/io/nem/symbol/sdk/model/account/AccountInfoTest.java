@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.nem.symbol.catapult.builders.AccountStateBuilder;
 import io.nem.symbol.catapult.builders.AccountStateFormatDto;
 import io.nem.symbol.core.crypto.PublicKey;
-import io.nem.symbol.core.crypto.VotingKey;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -34,7 +33,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class AccountInfoTest {
@@ -48,8 +46,7 @@ class AccountInfoTest {
   PublicKey vrfKey =
       PublicKey.fromHexString("4444444444444444444444444444444444444444444444444444444444444444");
   PublicKey votingKey =
-      PublicKey.fromHexString(
-          "5555555555555555555555555555555555555555555555555555555555555555");
+      PublicKey.fromHexString("5555555555555555555555555555555555555555555555555555555555555555");
   NetworkType networkType = NetworkType.MIJIN_TEST;
   Address address = Address.createFromPublicKey(accountPublicKey.toHex(), networkType);
 

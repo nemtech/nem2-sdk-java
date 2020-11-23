@@ -16,7 +16,6 @@
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
 import io.nem.symbol.core.crypto.PublicKey;
-import io.nem.symbol.core.crypto.VotingKey;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.Deadline;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;

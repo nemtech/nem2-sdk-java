@@ -55,7 +55,8 @@ class BinarySerializationTest {
             .filter(
                 t -> {
                   try {
-                    Assertions.assertNotNull(binarySerialization.resolveSerializer(t, t.getCurrentVersion()));
+                    Assertions.assertNotNull(
+                        binarySerialization.resolveSerializer(t, t.getCurrentVersion()));
                     return false;
                   } catch (UnsupportedOperationException e) {
                     return true;

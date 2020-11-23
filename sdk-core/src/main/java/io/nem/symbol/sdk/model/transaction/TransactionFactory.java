@@ -86,7 +86,8 @@ public abstract class TransactionFactory<T extends Transaction> {
 
   /**
    * The constructor that sets the required and default attributes.
-   *  @param type the transaction type, this field is generally defined in the sub classes.
+   *
+   * @param type the transaction type, this field is generally defined in the sub classes.
    * @param version the version of the transaction
    * @param networkType the network type of this transaction.
    * @param deadline The deadline of the new transaction based on the server epoch adjustment time.

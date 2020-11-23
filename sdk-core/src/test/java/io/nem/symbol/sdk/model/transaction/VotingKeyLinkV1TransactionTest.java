@@ -49,9 +49,7 @@ public class VotingKeyLinkV1TransactionTest extends AbstractTransactionTester {
                 LinkAction.LINK)
             .build();
     assertEquals(LinkAction.LINK, transaction.getLinkAction());
-    assertEquals(
-        votingKey.toHex(),
-        transaction.getLinkedPublicKey().toHex());
+    assertEquals(votingKey.toHex(), transaction.getLinkedPublicKey().toHex());
 
     assertEquals(1L, transaction.getStartEpoch());
     assertEquals(3L, transaction.getEndEpoch());

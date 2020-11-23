@@ -1735,7 +1735,6 @@ public class BinarySerializationImpl implements BinarySerialization {
     }
   }
 
-
   private static class VotingKeyLinkTransactionBuilderSerializer
       implements TransactionSerializer<VotingKeyLinkTransaction> {
 

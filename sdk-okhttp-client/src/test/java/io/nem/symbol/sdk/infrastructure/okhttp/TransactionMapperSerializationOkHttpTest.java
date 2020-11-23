@@ -79,8 +79,6 @@ public class TransactionMapperSerializationOkHttpTest {
     Assertions.assertEquals(transactionModel.getType().getValue(), type);
     Assertions.assertEquals(transactionModel.getNetworkType().getValue(), network);
 
-
-
     Assertions.assertNotNull(transactionModel);
 
     TransactionInfoDTO mappedTransactionInfo =
@@ -101,8 +99,9 @@ public class TransactionMapperSerializationOkHttpTest {
     BinarySerialization serialization = new BinarySerializationImpl();
     String serialized = ConvertUtils.toHex(serialization.serialize(transactionModel));
 
-    TransactionBuilder builder = TransactionBuilderHelper
-        .loadFromBinary(SerializationUtils.toDataInput(serialization.serialize(transactionModel)));
+    TransactionBuilder builder =
+        TransactionBuilderHelper.loadFromBinary(
+            SerializationUtils.toDataInput(serialization.serialize(transactionModel)));
     System.out.println(ConvertUtils.toHex(builder.serialize()));
 
     serialization.deserialize(serialization.serialize(transactionModel));

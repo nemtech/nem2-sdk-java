@@ -107,8 +107,7 @@ public class AccountRestrictionTest {
     assertEquals(0, accountRestrictions.getRestrictions().size());
 
     byte[] serializedState = accountRestrictions.serialize();
-    String expectedHex =
-        "9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E10000000000000000";
+    String expectedHex = "9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E10000000000000000";
     assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
 
     AccountRestrictionsBuilder builder =

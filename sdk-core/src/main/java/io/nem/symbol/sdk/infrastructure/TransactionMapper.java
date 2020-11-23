@@ -69,10 +69,10 @@ public interface TransactionMapper {
 
   /**
    * The version this mapper handles
+   *
    * @return the transaction version this mapper handles.
    */
-  default int getVersion(){
+  default int getVersion() {
     return getTransactionType().getCurrentVersion();
   }
-
 }

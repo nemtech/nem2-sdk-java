@@ -128,7 +128,6 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     return call(callback, this::toMerkleProofInfo);
   }
 
-
   public static BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO, JsonHelper jsonHelper) {
     ImportanceBlockDTO block =
         jsonHelper.convert(blockInfoDTO.getBlock(), ImportanceBlockDTO.class);

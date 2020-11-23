@@ -63,7 +63,7 @@ public class VotingKeyLinkTransactionIntegrationTest extends BaseIntegrationTest
 
     VotingKeyLinkTransaction linkTransaction =
         VotingKeyLinkTransactionFactory.create(
-            getNetworkType(), getDeadline(), linkedPublicKey, (72), (26280), LinkAction.LINK)
+                getNetworkType(), getDeadline(), linkedPublicKey, (72), (26280), LinkAction.LINK)
             .maxFee(maxFee)
             .build();
 
@@ -71,7 +71,7 @@ public class VotingKeyLinkTransactionIntegrationTest extends BaseIntegrationTest
 
     VotingKeyLinkTransaction unlinkTransaction =
         VotingKeyLinkTransactionFactory.create(
-            getNetworkType(), getDeadline(), linkedPublicKey, (72), (26280), LinkAction.UNLINK)
+                getNetworkType(), getDeadline(), linkedPublicKey, (72), (26280), LinkAction.UNLINK)
             .maxFee(maxFee)
             .build();
 

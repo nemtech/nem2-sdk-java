@@ -121,7 +121,8 @@ public class SecretLockRepositoryVertxImplTest extends AbstractVertxRespositoryT
 
     SecretLockInfo resolvedSecretLockInfo =
         repository.getSecretLock(lockHashDto.getCompositeHash()).toFuture().get();
-    Assertions.assertEquals(hashLockInfoDTO.getLock().getSecret(), resolvedSecretLockInfo.getSecret());
+    Assertions.assertEquals(
+        hashLockInfoDTO.getLock().getSecret(), resolvedSecretLockInfo.getSecret());
     Assertions.assertEquals(address, resolvedSecretLockInfo.getOwnerAddress());
     Assertions.assertEquals(hashLockInfoDTO.getId(), resolvedSecretLockInfo.getRecordId().get());
     Assertions.assertEquals(address, resolvedSecretLockInfo.getOwnerAddress());

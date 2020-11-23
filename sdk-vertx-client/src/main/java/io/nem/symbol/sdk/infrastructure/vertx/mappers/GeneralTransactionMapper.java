@@ -20,7 +20,6 @@ import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -105,7 +104,8 @@ public class GeneralTransactionMapper implements TransactionMapper {
   @Override
   public Object mapToDto(Transaction transaction, Boolean embedded) {
     Validate.notNull(transaction, "transaction must not be null");
-    return resolveMapper(transaction.getType(), transaction.getVersion()).mapToDto(transaction, embedded);
+    return resolveMapper(transaction.getType(), transaction.getVersion())
+        .mapToDto(transaction, embedded);
   }
 
   @Override

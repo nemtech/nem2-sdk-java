@@ -19,7 +19,6 @@ import static io.nem.symbol.core.utils.MapperUtils.toAddress;
 import static io.nem.symbol.core.utils.MapperUtils.toMosaicId;
 
 import io.nem.symbol.core.crypto.PublicKey;
-import io.nem.symbol.core.crypto.VotingKey;
 import io.nem.symbol.sdk.api.AccountRepository;
 import io.nem.symbol.sdk.api.AccountSearchCriteria;
 import io.nem.symbol.sdk.api.Page;

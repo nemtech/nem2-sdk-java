@@ -70,7 +70,7 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 getDeadline(),
                 getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
-            duration,
+                duration,
                 signedTransaction)
             .maxFee(maxFee)
             .build();
@@ -109,7 +109,7 @@ public class HashLockTransactionIntegrationTest extends BaseIntegrationTest {
                 getNetworkType(),
                 getDeadline(),
                 getNetworkCurrency().createRelative(BigInteger.valueOf(10)),
-            duration,
+                duration,
                 signedTransaction)
             .maxFee(maxFee)
             .build();
