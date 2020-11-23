@@ -56,7 +56,7 @@ public class SecretLockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
         mosaicId,
         lock.getAmount(),
         lock.getEndHeight(),
-        LockStatus.rawValueOf(lock.getStatus().getValue()),
+        LockStatus.rawValueOf(lock.getStatus().getValue().byteValue()),
         LockHashAlgorithm.rawValueOf(lock.getHashAlgorithm().getValue()),
         lock.getSecret(),
         MapperUtils.toAddress(lock.getRecipientAddress()),

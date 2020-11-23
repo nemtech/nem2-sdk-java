@@ -27,8 +27,6 @@ import io.nem.symbol.sdk.model.blockchain.ImportanceBlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerklePathItem;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.symbol.sdk.model.blockchain.Position;
-import io.nem.symbol.sdk.model.blockchain.StatePacketType;
-import io.nem.symbol.sdk.model.blockchain.StateTree;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.openapi.vertx.api.BlockRoutesApi;
@@ -39,8 +37,6 @@ import io.nem.symbol.sdk.openapi.vertx.model.BlockOrderByEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.BlockPage;
 import io.nem.symbol.sdk.openapi.vertx.model.ImportanceBlockDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MerkleProofInfoDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.StatePacketTypeEnum;
-import io.nem.symbol.sdk.openapi.vertx.model.StateTreeDTO;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -132,16 +128,6 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     return call(callback, this::toMerkleProofInfo);
   }
 
-  @Override
-  public Observable<StateTree> getMerkleState(StatePacketType state, String hash) {
-    return call(
-        h -> getClient().getMerkleState(StatePacketTypeEnum.fromValue(state.getValue()), hash, h),
-        this::toStateTree);
-  }
-
-  private StateTree toStateTree(StateTreeDTO dto) {
-    return new StateTree(dto.getTree());
-  }
 
   public static BlockInfo toBlockInfo(BlockInfoDTO blockInfoDTO, JsonHelper jsonHelper) {
     ImportanceBlockDTO block =

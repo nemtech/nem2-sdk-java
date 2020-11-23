@@ -39,10 +39,11 @@ public class HashLockInfoTest {
     BigInteger amount = BigInteger.ONE;
     BigInteger endHeight = BigInteger.TEN;
     LockStatus status = LockStatus.USED;
-    String hash = "ABC";
+    String hash = "DD9EC2AC9AB11FC7E942E5FA39AF8811180F236E29BCD40DB812392295512F55";
 
     HashLockInfo info =
-        new HashLockInfo(recordId.get(), ownerAddress, mosaicId, amount, endHeight, status, hash);
+        new HashLockInfo(
+            recordId.orElse(null), ownerAddress, mosaicId, amount, endHeight, status, hash);
 
     Assertions.assertEquals(recordId, info.getRecordId());
     Assertions.assertEquals(ownerAddress, info.getOwnerAddress());

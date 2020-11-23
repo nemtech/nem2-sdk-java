@@ -15,9 +15,12 @@
  */
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
+import io.nem.symbol.catapult.builders.TransactionBuilder;
+import io.nem.symbol.catapult.builders.TransactionBuilderHelper;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.api.BinarySerialization;
 import io.nem.symbol.sdk.infrastructure.BinarySerializationImpl;
+import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.infrastructure.okhttp.mappers.GeneralTransactionMapper;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.Transaction;
@@ -68,6 +71,16 @@ public class TransactionMapperSerializationOkHttpTest {
     TransactionInfoDTO originalTransactionInfo = jsonHelper.parse(json, TransactionInfoDTO.class);
 
     Transaction transactionModel = transactionMapper.mapFromDto(originalTransactionInfo);
+
+    Integer version = jsonHelper.getInteger(originalTransactionInfo, "transaction", "version");
+    Integer type = jsonHelper.getInteger(originalTransactionInfo, "transaction", "type");
+    Integer network = jsonHelper.getInteger(originalTransactionInfo, "transaction", "network");
+    Assertions.assertEquals(transactionModel.getVersion(), version);
+    Assertions.assertEquals(transactionModel.getType().getValue(), type);
+    Assertions.assertEquals(transactionModel.getNetworkType().getValue(), network);
+
+
+
     Assertions.assertNotNull(transactionModel);
 
     TransactionInfoDTO mappedTransactionInfo =
@@ -85,13 +98,21 @@ public class TransactionMapperSerializationOkHttpTest {
     mappedTransactionInfo.setTransaction(transactionMap);
     mappedTransactionInfo.setMeta(jsonHelper.convert(mappedTransactionInfo.getMeta(), Map.class));
 
+    BinarySerialization serialization = new BinarySerializationImpl();
+    String serialized = ConvertUtils.toHex(serialization.serialize(transactionModel));
+
+    TransactionBuilder builder = TransactionBuilderHelper
+        .loadFromBinary(SerializationUtils.toDataInput(serialization.serialize(transactionModel)));
+    System.out.println(ConvertUtils.toHex(builder.serialize()));
+
+    serialization.deserialize(serialization.serialize(transactionModel));
+
     Assertions.assertEquals(
         jsonHelper.prettyPrint(originalTransactionInfo),
         jsonHelper.prettyPrint(mappedTransactionInfo));
 
-    BinarySerialization serialization = new BinarySerializationImpl();
     Assertions.assertEquals(
-        ConvertUtils.toHex(serialization.serialize(transactionModel)),
+        serialized,
         ConvertUtils.toHex(
             serialization.serialize(transactionMapper.mapFromDto(mappedTransactionInfo))));
 

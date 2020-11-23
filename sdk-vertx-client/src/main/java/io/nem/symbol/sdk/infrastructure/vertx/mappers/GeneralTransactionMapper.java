@@ -21,9 +21,11 @@ import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Entry point for the transaction mapping. This mapper should support all the known transactions.
@@ -35,8 +37,8 @@ public class GeneralTransactionMapper implements TransactionMapper {
 
   private final JsonHelper jsonHelper;
 
-  private final Map<TransactionType, TransactionMapper> transactionMappers =
-      new EnumMap<>(TransactionType.class);
+  private final Map<Pair<TransactionType, Integer>, TransactionMapper> transactionMappers =
+      new HashMap<>();
 
   public GeneralTransactionMapper(JsonHelper jsonHelper) {
     this.jsonHelper = jsonHelper;
@@ -61,6 +63,7 @@ public class GeneralTransactionMapper implements TransactionMapper {
     register(new AccountOperationRestrictionTransactionMapper(jsonHelper));
     register(new NodeKeyLinkTransactionMapper(jsonHelper));
     register(new VotingKeyLinkTransactionMapper(jsonHelper));
+    register(new VotingKeyLinkV1TransactionMapper(jsonHelper));
     register(new VrfKeyLinkTransactionMapper(jsonHelper));
     register(new AccountKeyLinkTransactionMapper(jsonHelper));
     register(new AggregateTransactionMapper(jsonHelper, TransactionType.AGGREGATE_BONDED, this));
@@ -68,9 +71,14 @@ public class GeneralTransactionMapper implements TransactionMapper {
   }
 
   private void register(TransactionMapper mapper) {
-    if (transactionMappers.put(mapper.getTransactionType(), mapper) != null) {
+    if (transactionMappers.put(Pair.of(mapper.getTransactionType(), mapper.getVersion()), mapper)
+        != null) {
       throw new IllegalArgumentException(
-          "TransactionMapper for type " + mapper.getTransactionType() + " was already registered!");
+          "TransactionMapper for type "
+              + mapper.getTransactionType()
+              + " version "
+              + mapper.getVersion()
+              + " was already registered!");
     }
   }
 
@@ -97,7 +105,7 @@ public class GeneralTransactionMapper implements TransactionMapper {
   @Override
   public Object mapToDto(Transaction transaction, Boolean embedded) {
     Validate.notNull(transaction, "transaction must not be null");
-    return resolveMapper(transaction.getType()).mapToDto(transaction, embedded);
+    return resolveMapper(transaction.getType(), transaction.getVersion()).mapToDto(transaction, embedded);
   }
 
   @Override
@@ -112,14 +120,20 @@ public class GeneralTransactionMapper implements TransactionMapper {
       throw new IllegalArgumentException(
           "Transaction cannot be mapped, object does not not have transaction type.");
     }
+    Integer version = getJsonHelper().getInteger(transactionInfoJson, "transaction", "version");
+    if (version == null) {
+      throw new IllegalArgumentException(
+          "Transaction cannot be mapped, object does not not have transaction version.");
+    }
     TransactionType transactionType = TransactionType.rawValueOf(type);
-    return resolveMapper(transactionType);
+    return resolveMapper(transactionType, version);
   }
 
-  private TransactionMapper resolveMapper(TransactionType transactionType) {
-    TransactionMapper mapper = transactionMappers.get(transactionType);
+  private TransactionMapper resolveMapper(TransactionType transactionType, int version) {
+    TransactionMapper mapper = transactionMappers.get(Pair.of(transactionType, version));
     if (mapper == null) {
-      throw new UnsupportedOperationException("Unimplemented Transaction type " + transactionType);
+      throw new UnsupportedOperationException(
+          "Unimplemented Transaction type " + transactionType + " version " + version);
     }
     return mapper;
   }

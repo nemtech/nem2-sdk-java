@@ -66,4 +66,13 @@ public interface TransactionMapper {
    * @return the supported transaction type or null if supports all.
    */
   TransactionType getTransactionType();
+
+  /**
+   * The version this mapper handles
+   * @return the transaction version this mapper handles.
+   */
+  default int getVersion(){
+    return getTransactionType().getCurrentVersion();
+  }
+
 }

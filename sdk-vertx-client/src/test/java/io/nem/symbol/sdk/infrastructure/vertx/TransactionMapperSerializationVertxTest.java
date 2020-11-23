@@ -93,17 +93,21 @@ public class TransactionMapperSerializationVertxTest {
         jsonHelper.prettyPrint(mappedTransactionInfo));
 
     BinarySerialization serialization = new BinarySerializationImpl();
-    Assertions.assertEquals(
-        ConvertUtils.toHex(serialization.serialize(transactionModel)),
-        ConvertUtils.toHex(
-            serialization.serialize(transactionMapper.mapFromDto(mappedTransactionInfo))));
+    Transaction transaction = transactionMapper.mapFromDto(mappedTransactionInfo);
+    byte[] serialize1 = serialization.serialize(transactionModel);
+    byte[] serialize2 = serialization.serialize(transaction);
+
+    Assertions.assertEquals(ConvertUtils.toHex(serialize1), ConvertUtils.toHex(serialize2));
 
     removeMeta(originalTransactionInfo);
 
+    byte[] serialize3 = serialization.serialize(transactionModel);
+    Assertions.assertEquals(ConvertUtils.toHex(serialize1), ConvertUtils.toHex(serialize3));
+
+    Transaction deserialized3 = serialization.deserialize(serialize3);
+
     TransactionInfoDTO deserializedTransaction =
-        (TransactionInfoDTO)
-            transactionMapper.mapToDto(
-                serialization.deserialize(serialization.serialize(transactionModel)), false);
+        (TransactionInfoDTO) transactionMapper.mapToDto(deserialized3, false);
 
     deserializedTransaction.setTransaction(
         jsonHelper.convert(deserializedTransaction.getTransaction(), Map.class));

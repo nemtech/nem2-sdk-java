@@ -15,7 +15,6 @@
  */
 package io.nem.symbol.sdk.infrastructure.vertx.mappers;
 
-import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.core.crypto.VotingKey;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.Deadline;
@@ -23,25 +22,25 @@ import io.nem.symbol.sdk.model.transaction.JsonHelper;
 import io.nem.symbol.sdk.model.transaction.LinkAction;
 import io.nem.symbol.sdk.model.transaction.TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
-import io.nem.symbol.sdk.model.transaction.VotingKeyLinkTransaction;
-import io.nem.symbol.sdk.model.transaction.VotingKeyLinkTransactionFactory;
+import io.nem.symbol.sdk.model.transaction.VotingKeyLinkV1Transaction;
+import io.nem.symbol.sdk.model.transaction.VotingKeyLinkV1TransactionFactory;
 import io.nem.symbol.sdk.openapi.vertx.model.LinkActionEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.VotingKeyLinkTransactionDTO;
 
-/** {@link VotingKeyLinkTransaction} mapper. */
-public class VotingKeyLinkTransactionMapper
-    extends AbstractTransactionMapper<VotingKeyLinkTransactionDTO, VotingKeyLinkTransaction> {
+/** {@link VotingKeyLinkV1Transaction} mapper. */
+public class VotingKeyLinkV1TransactionMapper
+    extends AbstractTransactionMapper<VotingKeyLinkTransactionDTO, VotingKeyLinkV1Transaction> {
 
-  public VotingKeyLinkTransactionMapper(JsonHelper jsonHelper) {
+  public VotingKeyLinkV1TransactionMapper(JsonHelper jsonHelper) {
     super(jsonHelper, TransactionType.VOTING_KEY_LINK, VotingKeyLinkTransactionDTO.class);
   }
 
   @Override
-  protected TransactionFactory<VotingKeyLinkTransaction> createFactory(
+  protected TransactionFactory<VotingKeyLinkV1Transaction> createFactory(
       NetworkType networkType, Deadline deadline, VotingKeyLinkTransactionDTO transaction) {
-    PublicKey linkedPublicKey = PublicKey.fromHexString(transaction.getLinkedPublicKey());
+    VotingKey linkedPublicKey = VotingKey.fromHexString(transaction.getLinkedPublicKey());
     LinkAction linkAction = LinkAction.rawValueOf(transaction.getLinkAction().getValue());
-    return VotingKeyLinkTransactionFactory.create(
+    return VotingKeyLinkV1TransactionFactory.create(
         networkType,
         deadline,
         linkedPublicKey,
@@ -50,8 +49,13 @@ public class VotingKeyLinkTransactionMapper
         linkAction);
   }
 
+  public int getVersion() {
+    return 1;
+  }
+
   @Override
-  protected void copyToDto(VotingKeyLinkTransaction transaction, VotingKeyLinkTransactionDTO dto) {
+  protected void copyToDto(
+      VotingKeyLinkV1Transaction transaction, VotingKeyLinkTransactionDTO dto) {
     dto.setLinkAction(LinkActionEnum.fromValue((int) transaction.getLinkAction().getValue()));
     dto.setLinkedPublicKey(transaction.getLinkedPublicKey().toHex());
     dto.setStartEpoch(transaction.getStartEpoch());

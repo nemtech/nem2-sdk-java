@@ -58,7 +58,7 @@ public class SecretLockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
         mosaicId,
         lock.getAmount(),
         lock.getEndHeight(),
-        LockStatus.rawValueOf(lock.getStatus().getValue()),
+        LockStatus.rawValueOf(lock.getStatus().getValue().byteValue()),
         LockHashAlgorithm.rawValueOf(lock.getHashAlgorithm().getValue()),
         lock.getSecret(),
         MapperUtils.toAddress(lock.getRecipientAddress()),

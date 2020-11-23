@@ -86,19 +86,31 @@ public abstract class TransactionFactory<T extends Transaction> {
 
   /**
    * The constructor that sets the required and default attributes.
+   *  @param type the transaction type, this field is generally defined in the sub classes.
+   * @param version the version of the transaction
+   * @param networkType the network type of this transaction.
+   * @param deadline The deadline of the new transaction based on the server epoch adjustment time.
+   */
+  public TransactionFactory(
+      TransactionType type, int version, NetworkType networkType, Deadline deadline) {
+    Validate.notNull(type, "Type must not be null");
+    Validate.notNull(networkType, "NetworkType must not be null");
+    Validate.notNull(deadline, "deadline must not be null");
+    this.type = type;
+    this.networkType = networkType;
+    this.version = version;
+    this.deadline = deadline;
+  }
+
+  /**
+   * The constructor that sets the required and default attributes.
    *
    * @param type the transaction type, this field is generally defined in the sub classes.
    * @param networkType the network type of this transaction.
    * @param deadline The deadline of the new transaction based on the server epoch adjustment time.
    */
   public TransactionFactory(TransactionType type, NetworkType networkType, Deadline deadline) {
-    Validate.notNull(type, "Type must not be null");
-    Validate.notNull(networkType, "NetworkType must not be null");
-    Validate.notNull(deadline, "deadline must not be null");
-    this.type = type;
-    this.networkType = networkType;
-    this.version = type.getCurrentVersion();
-    this.deadline = deadline;
+    this(type, type.getCurrentVersion(), networkType, deadline);
   }
 
   /**

@@ -166,7 +166,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl
                 .map(
                     p ->
                         new AccountLinkVotingKey(
-                            VotingKey.fromHexString(p.getPublicKey()),
+                            PublicKey.fromHexString(p.getPublicKey()),
                             (p.getStartEpoch()),
                             (p.getEndEpoch())))
                 .collect(Collectors.toList());

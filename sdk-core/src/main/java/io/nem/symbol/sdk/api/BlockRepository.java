@@ -17,8 +17,6 @@ package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
-import io.nem.symbol.sdk.model.blockchain.StatePacketType;
-import io.nem.symbol.sdk.model.blockchain.StateTree;
 import io.reactivex.Observable;
 import java.math.BigInteger;
 
@@ -67,15 +65,4 @@ public interface BlockRepository extends Searcher<BlockInfo, BlockSearchCriteria
    */
   Observable<MerkleProofInfo> getMerkleReceipts(BigInteger height, String hash);
 
-  /**
-   * Get the merkle path for a given state packet type and state entry hash (asynchronously) Returns
-   * the merkle path if the state entry hash belongs to the latest state packet repository by type.
-   * The path is the complementary data needed to calculate the merkle patricia tree. A client can
-   * compare if the calculated root equals \&quot;stateHash\&quot; recorded in the block header.
-   *
-   * @param state State packet type. (required)
-   * @param hash State hash. (required)
-   * @return {@link Observable} of StateTree
-   */
-  Observable<StateTree> getMerkleState(StatePacketType state, String hash);
 }

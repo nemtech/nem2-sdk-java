@@ -51,7 +51,7 @@ public enum TransactionType {
   AGGREGATE_BONDED(16961, 1),
 
   /** Voting key link transaction builder. */
-  VOTING_KEY_LINK(16707, 1),
+  VOTING_KEY_LINK(16707, 2),
 
   /** Vrf key link transaction builder. */
   VRF_KEY_LINK(16963, 1),

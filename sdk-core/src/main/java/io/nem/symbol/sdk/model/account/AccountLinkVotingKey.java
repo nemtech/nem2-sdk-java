@@ -15,6 +15,7 @@
  */
 package io.nem.symbol.sdk.model.account;
 
+import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.core.crypto.VotingKey;
 import org.apache.commons.lang3.Validate;
 
@@ -22,7 +23,7 @@ import org.apache.commons.lang3.Validate;
 public class AccountLinkVotingKey {
 
   /** Public Key. */
-  private final VotingKey publicKey;
+  private final PublicKey publicKey;
 
   /** Start epoch. */
   private final long startEpoch;
@@ -30,14 +31,14 @@ public class AccountLinkVotingKey {
   /** End epoch. */
   private final long endEpoch;
 
-  public AccountLinkVotingKey(VotingKey publicKey, long startEpoch, long endEpoch) {
+  public AccountLinkVotingKey(PublicKey publicKey, long startEpoch, long endEpoch) {
     Validate.notNull(publicKey, "public key is required");
     this.publicKey = publicKey;
     this.startEpoch = startEpoch;
     this.endEpoch = endEpoch;
   }
 
-  public VotingKey getPublicKey() {
+  public PublicKey getPublicKey() {
     return publicKey;
   }
 

@@ -15,16 +15,16 @@
  */
 package io.nem.symbol.sdk.model.transaction;
 
-import io.nem.symbol.core.crypto.PublicKey;
+import io.nem.symbol.core.crypto.VotingKey;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import org.apache.commons.lang3.Validate;
 
 /** Vrf key link transaction factory. */
-public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKeyLinkTransaction> {
+public class VotingKeyLinkV1TransactionFactory extends TransactionFactory<VotingKeyLinkV1Transaction> {
 
   /** The voting key. */
-  private final PublicKey linkedPublicKey;
+  private final VotingKey linkedPublicKey;
 
   /** Start finalization epoch. */
   private final long startEpoch;
@@ -36,7 +36,7 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
   private final LinkAction linkAction;
 
   /**
-   * The factory constructor for {@link VotingKeyLinkTransactionFactory}
+   * The factory constructor for {@link VotingKeyLinkV1TransactionFactory}
    *
    * @param networkType the network type of this transaction.
    * @param linkedPublicKey the voting key.
@@ -44,14 +44,14 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
    * @param endEpoch End finalization epoch.
    * @param linkAction the link action.
    */
-  private VotingKeyLinkTransactionFactory(
+  private VotingKeyLinkV1TransactionFactory(
       final NetworkType networkType,
       final Deadline deadline,
-      final PublicKey linkedPublicKey,
+      final VotingKey linkedPublicKey,
       long startEpoch,
       long endEpoch,
       final LinkAction linkAction) {
-    super(TransactionType.VOTING_KEY_LINK, networkType, deadline);
+    super(TransactionType.VOTING_KEY_LINK, 1, networkType, deadline);
     Validate.notNull(linkedPublicKey, "linkedPublicKey must not be null");
     Validate.notNull(linkAction, "linkAction must not be null");
     ConvertUtils.validateNotNegative(startEpoch);
@@ -63,7 +63,7 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
   }
 
   /**
-   * Create method factory for {@link VotingKeyLinkTransactionFactory}
+   * Create method factory for {@link VotingKeyLinkV1TransactionFactory}
    *
    * @param networkType the network type of this transaction.
    * @param deadline the deadline.
@@ -71,25 +71,25 @@ public class VotingKeyLinkTransactionFactory extends TransactionFactory<VotingKe
    * @param startEpoch Start finalization epoch.
    * @param endEpoch End finalization epoch.
    * @param linkAction the link action.
-   * @return a new factory for {@link VotingKeyLinkTransactionFactory}
+   * @return a new factory for {@link VotingKeyLinkV1TransactionFactory}
    */
-  public static VotingKeyLinkTransactionFactory create(
+  public static VotingKeyLinkV1TransactionFactory create(
       final NetworkType networkType,
       final Deadline deadline,
-      final PublicKey linkedPublicKey,
+      final VotingKey linkedPublicKey,
       long startEpoch,
       long endEpoch,
       final LinkAction linkAction) {
-    return new VotingKeyLinkTransactionFactory(
+    return new VotingKeyLinkV1TransactionFactory(
         networkType, deadline, linkedPublicKey, startEpoch, endEpoch, linkAction);
   }
 
   @Override
-  public VotingKeyLinkTransaction build() {
-    return new VotingKeyLinkTransaction(this);
+  public VotingKeyLinkV1Transaction build() {
+    return new VotingKeyLinkV1Transaction(this);
   }
 
-  public PublicKey getLinkedPublicKey() {
+  public VotingKey getLinkedPublicKey() {
     return linkedPublicKey;
   }
 

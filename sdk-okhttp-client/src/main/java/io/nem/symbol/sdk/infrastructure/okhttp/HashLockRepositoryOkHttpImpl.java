@@ -65,7 +65,7 @@ public class HashLockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
         MapperUtils.toMosaicId(lock.getMosaicId()),
         lock.getAmount(),
         lock.getEndHeight(),
-        LockStatus.rawValueOf(lock.getStatus().getValue()),
+        LockStatus.rawValueOf(lock.getStatus().getValue().byteValue()),
         lock.getHash());
   }
 

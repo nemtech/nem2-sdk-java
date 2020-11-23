@@ -15,14 +15,13 @@
  */
 package io.nem.symbol.sdk.model.transaction;
 
-import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.core.crypto.VotingKey;
 
 /** Voting key link transaction. */
-public class VotingKeyLinkTransaction extends Transaction {
+public class VotingKeyLinkV1Transaction extends Transaction {
 
   /** The voting key. */
-  private final PublicKey linkedPublicKey;
+  private final VotingKey linkedPublicKey;
 
   /** Start finalization epoch. */
   private final long startEpoch;
@@ -38,7 +37,7 @@ public class VotingKeyLinkTransaction extends Transaction {
    *
    * @param factory the factory.
    */
-  VotingKeyLinkTransaction(VotingKeyLinkTransactionFactory factory) {
+  VotingKeyLinkV1Transaction(VotingKeyLinkV1TransactionFactory factory) {
     super(factory);
     this.linkedPublicKey = factory.getLinkedPublicKey();
     this.startEpoch = factory.getStartEpoch();
@@ -46,7 +45,7 @@ public class VotingKeyLinkTransaction extends Transaction {
     this.linkAction = factory.getLinkAction();
   }
 
-  public PublicKey getLinkedPublicKey() {
+  public VotingKey getLinkedPublicKey() {
     return linkedPublicKey;
   }
 

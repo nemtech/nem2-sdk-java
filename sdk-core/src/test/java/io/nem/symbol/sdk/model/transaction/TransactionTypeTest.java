@@ -168,7 +168,13 @@ class TransactionTypeTest {
     if (enumTypeDto == EntityTypeDto.RESERVED) {
       return;
     }
-    if (enumTypeDto == EntityTypeDto.BLOCK_HEADER) {
+    if (enumTypeDto == EntityTypeDto.IMPORTANCE_BLOCK_HEADER) {
+      return;
+    }
+    if (enumTypeDto == EntityTypeDto.NORMAL_BLOCK_HEADER) {
+      return;
+    }
+    if (enumTypeDto == EntityTypeDto.NEMESIS_BLOCK_HEADER) {
       return;
     }
     Assertions.assertNotNull(

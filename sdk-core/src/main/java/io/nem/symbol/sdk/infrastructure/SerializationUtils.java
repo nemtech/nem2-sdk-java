@@ -378,6 +378,17 @@ public class SerializationUtils {
   }
 
   /**
+   * It creates a catbuffer VotingKeyDto from a {@link VotingKey}.
+   *
+   * @param key the voting key.
+   * @return the VotingKeyDto
+   */
+  public static VotingKeyDto toVotingKeyDto(PublicKey key) {
+    return new VotingKeyDto(ByteBuffer.wrap(key.getBytes()));
+  }
+
+
+  /**
    * It creates a catbuffer Hash256Dto from a String hash.
    *
    * @param hash the hash
