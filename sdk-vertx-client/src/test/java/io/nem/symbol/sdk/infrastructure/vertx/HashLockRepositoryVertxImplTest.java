@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.infrastructure.vertx;
 
 import io.nem.symbol.sdk.api.HashLockSearchCriteria;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNonce;
 import io.nem.symbol.sdk.model.transaction.HashLockInfo;
@@ -24,6 +25,7 @@ import io.nem.symbol.sdk.openapi.vertx.model.HashLockEntryDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.HashLockInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.HashLockPage;
 import io.nem.symbol.sdk.openapi.vertx.model.LockStatus;
+import io.nem.symbol.sdk.openapi.vertx.model.MerkleStateInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.Pagination;
 import java.math.BigInteger;
 import java.util.Collections;
@@ -110,6 +112,13 @@ public class HashLockRepositoryVertxImplTest extends AbstractVertxRespositoryTes
     Assertions.assertEquals(mosaicId, resolvedHashLockInfo.getMosaicId());
     Assertions.assertEquals(lockHashDto.getAmount(), resolvedHashLockInfo.getAmount());
     Assertions.assertEquals(lockHashDto.getEndHeight(), resolvedHashLockInfo.getEndHeight());
+  }
+
+  @Test
+  public void getHashLockMerkle() throws Exception {
+    mockRemoteCall(new MerkleStateInfoDTO().raw("abc"));
+    MerkleStateInfo merkle = repository.getHashLockMerkle("hash").toFuture().get();
+    Assertions.assertEquals("abc", merkle.getRaw());
   }
 
   private HashLockPage toPage(HashLockInfoDTO dto) {

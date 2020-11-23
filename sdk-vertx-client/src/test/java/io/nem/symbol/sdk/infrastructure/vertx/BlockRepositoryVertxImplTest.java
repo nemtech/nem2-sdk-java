@@ -19,6 +19,7 @@ import io.nem.symbol.sdk.api.BlockSearchCriteria;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.BlockType;
+import io.nem.symbol.sdk.model.blockchain.ImportanceBlockInfo;
 import io.nem.symbol.sdk.model.blockchain.MerkleProofInfo;
 import io.nem.symbol.sdk.model.blockchain.Position;
 import io.nem.symbol.sdk.model.network.NetworkType;
@@ -26,6 +27,7 @@ import io.nem.symbol.sdk.openapi.vertx.model.BlockDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.BlockInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.BlockMetaDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.BlockPage;
+import io.nem.symbol.sdk.openapi.vertx.model.ImportanceBlockDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MerklePathItemDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.MerkleProofInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NetworkTypeEnum;
@@ -127,6 +129,80 @@ public class BlockRepositoryVertxImplTest extends AbstractVertxRespositoryTest {
 
     Assertions.assertEquals(blockDto.getHeight(), info.getHeight());
     Assertions.assertEquals(address, info.getBeneficiaryAddress());
+  }
+
+  @Test
+  public void shouldGetBlockByHeightImportant() throws Exception {
+
+    Address address = Address.generateRandom(this.networkType);
+    BlockInfoDTO dto = new BlockInfoDTO();
+    BlockMetaDTO metaDTO = new BlockMetaDTO();
+    metaDTO.setHash("someHash");
+    metaDTO.setTransactionsCount(10);
+    metaDTO.setTotalTransactionsCount(5);
+    metaDTO.setTransactionsCount(15);
+    metaDTO.setGenerationHash("generationHash");
+    metaDTO.setStatementsCount(20);
+    metaDTO.setStateHashSubCacheMerkleRoots(Arrays.asList("string1", "string2"));
+    metaDTO.setTotalFee(BigInteger.valueOf(8));
+
+    dto.setMeta(metaDTO);
+
+    ImportanceBlockDTO blockDto = new ImportanceBlockDTO();
+    blockDto.setType(BlockType.IMPORTANCE_BLOCK.getValue());
+    blockDto.setVersion(3);
+    blockDto.setSize(10L);
+    blockDto.setNetwork(NetworkTypeEnum.NUMBER_144);
+    blockDto.setSignerPublicKey("B630EFDDFADCC4A2077AB8F1EC846B08FEE2D2972EACF95BBAC6BFAC3D31834C");
+    blockDto.setBeneficiaryAddress(address.encoded());
+    blockDto.setHeight(BigInteger.valueOf(9));
+
+    blockDto.setVotingEligibleAccountsCount(1L);
+    blockDto.setHarvestingEligibleAccountsCount(BigInteger.valueOf(2L));
+    blockDto.setTotalVotingBalance(BigInteger.valueOf(3L));
+    blockDto.setPreviousImportanceBlockHash("ABC");
+
+    dto.setBlock(blockDto);
+
+    mockRemoteCall(dto);
+
+    BigInteger height = BigInteger.valueOf(10L);
+    ImportanceBlockInfo info =
+        (ImportanceBlockInfo) repository.getBlockByHeight(height).toFuture().get();
+
+    Assertions.assertNotNull(info);
+
+    Assertions.assertEquals(
+        blockDto.getBeneficiaryAddress(), info.getBeneficiaryAddress().encoded());
+
+    Assertions.assertEquals(
+        blockDto.getSignerPublicKey(), info.getSignerPublicAccount().getPublicKey().toHex());
+
+    Assertions.assertEquals(BlockType.IMPORTANCE_BLOCK, info.getType());
+    Assertions.assertEquals(10, info.getSize());
+    Assertions.assertEquals(3, info.getVersion().intValue());
+    Assertions.assertEquals(NetworkType.MIJIN_TEST, info.getNetworkType());
+    Assertions.assertEquals(BigInteger.valueOf(9L), info.getHeight());
+    Assertions.assertEquals(metaDTO.getHash(), info.getHash());
+    Assertions.assertEquals(metaDTO.getTotalTransactionsCount(), info.getTotalTransactionsCount());
+    Assertions.assertEquals(metaDTO.getTransactionsCount(), info.getTransactionsCount());
+    Assertions.assertEquals(metaDTO.getTotalTransactionsCount(), info.getTotalTransactionsCount());
+    Assertions.assertEquals(metaDTO.getStatementsCount(), info.getStatementsCount());
+    Assertions.assertEquals(metaDTO.getGenerationHash(), info.getGenerationHash());
+    Assertions.assertEquals(
+        metaDTO.getStateHashSubCacheMerkleRoots(), info.getSubCacheMerkleRoots());
+    Assertions.assertEquals(metaDTO.getTotalFee(), info.getTotalFee());
+
+    Assertions.assertEquals(blockDto.getHeight(), info.getHeight());
+    Assertions.assertEquals(address, info.getBeneficiaryAddress());
+
+    Assertions.assertEquals(
+        blockDto.getVotingEligibleAccountsCount(), info.getVotingEligibleAccountsCount());
+    Assertions.assertEquals(
+        blockDto.getPreviousImportanceBlockHash(), info.getPreviousImportanceBlockHash());
+    Assertions.assertEquals(
+        blockDto.getHarvestingEligibleAccountsCount(), info.getHarvestingEligibleAccountsCount());
+    Assertions.assertEquals(blockDto.getTotalVotingBalance(), info.getTotalVotingBalance());
   }
 
   @Test

@@ -20,8 +20,10 @@ import io.nem.symbol.sdk.api.MosaicSearchCriteria;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
+import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
+import io.nem.symbol.sdk.openapi.okhttp_gson.model.MerkleStateInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicInfoDTO;
 import io.nem.symbol.sdk.openapi.okhttp_gson.model.MosaicPage;
@@ -155,6 +157,14 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
     return new MosaicPage()
         .data(Collections.singletonList(dto))
         .pagination(new Pagination().pageNumber(1).pageSize(2));
+  }
+
+  @Test
+  public void getMetadataMerkle() throws Exception {
+    MosaicId mosaicId = MapperUtils.toMosaicId("481110499");
+    mockRemoteCall(new MerkleStateInfoDTO().raw("abc"));
+    MerkleStateInfo merkle = repository.getMosaicMerkle(mosaicId).toFuture().get();
+    Assertions.assertEquals("abc", merkle.getRaw());
   }
 
   @Override

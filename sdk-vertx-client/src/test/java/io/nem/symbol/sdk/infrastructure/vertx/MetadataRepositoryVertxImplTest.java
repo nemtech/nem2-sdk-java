@@ -65,6 +65,14 @@ public class MetadataRepositoryVertxImplTest extends AbstractVertxRespositoryTes
     assertMetadataList(dto, resultList);
   }
 
+  @Test
+  public void getMetadata() throws Exception {
+    MetadataInfoDTO metadataDTO = getMetadataEntriesDTO().getData().get(0);
+    mockRemoteCall(metadataDTO);
+    Metadata metadata = repository.getMetadata("abc").toFuture().get();
+    assertMetadata(metadataDTO, metadata);
+  }
+
   private void assertMetadataList(MetadataPage expected, List<Metadata> resultList) {
     int index = 0;
     Assertions.assertEquals(expected.getData().size(), resultList.size());
