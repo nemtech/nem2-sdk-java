@@ -51,7 +51,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-public class MerkleLoader extends BaseIntegrationTest {
+public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
 
 //  public static void main(String[] args) {
 //    RepositoryFactory repositoryFactory =
