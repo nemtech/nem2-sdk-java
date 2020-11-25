@@ -31,19 +31,19 @@ import io.reactivex.Observable;
 
 public interface StateProofService {
 
-    Observable<StateMerkleProof<MosaicId>> mosaic(MosaicInfo state);
+  Observable<StateMerkleProof<MosaicId>> mosaic(MosaicInfo state);
 
-    Observable<StateMerkleProof<String>> mosaicRestriction(MosaicRestriction<?> state);
+  Observable<StateMerkleProof<String>> mosaicRestriction(MosaicRestriction<?> state);
 
-    Observable<StateMerkleProof<String>> hashLock(HashLockInfo state);
+  Observable<StateMerkleProof<String>> hashLock(HashLockInfo state);
 
-    Observable<StateMerkleProof<String>> secretLock(SecretLockInfo state);
+  Observable<StateMerkleProof<String>> secretLock(SecretLockInfo state);
 
-    Observable<StateMerkleProof<String>> metadata(Metadata state);
+  Observable<StateMerkleProof<String>> metadata(Metadata state);
 
-    Observable<StateMerkleProof<Address>> accountRestrictions(AccountRestrictions state);
+  Observable<StateMerkleProof<Address>> accountRestrictions(AccountRestrictions state);
 
-    Observable<StateMerkleProof<Address>> account(AccountInfo state);
+  Observable<StateMerkleProof<Address>> account(AccountInfo state);
 
-    Observable<StateMerkleProof<NamespaceId>> namespace(NamespaceInfo state);
+  Observable<StateMerkleProof<NamespaceId>> namespace(NamespaceInfo state);
 }

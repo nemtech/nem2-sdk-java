@@ -81,10 +81,9 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   public List<Arguments> mosaicRestriction() {
     RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
     RestrictionMosaicRepository repository = repositoryFactory.createRestrictionMosaicRepository();
-    MosaicRestrictionPaginationStreamer streamer = new MosaicRestrictionPaginationStreamer(repository);
-    return getArguments(
-        streamer,
-        new MosaicRestrictionSearchCriteria());
+    MosaicRestrictionPaginationStreamer streamer =
+        new MosaicRestrictionPaginationStreamer(repository);
+    return getArguments(streamer, new MosaicRestrictionSearchCriteria());
   }
 
   @ParameterizedTest

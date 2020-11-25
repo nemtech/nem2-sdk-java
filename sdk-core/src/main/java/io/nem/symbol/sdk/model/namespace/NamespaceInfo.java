@@ -18,7 +18,6 @@ package io.nem.symbol.sdk.model.namespace;
 import io.nem.symbol.catapult.builders.AddressDto;
 import io.nem.symbol.catapult.builders.HeightDto;
 import io.nem.symbol.catapult.builders.NamespaceAliasBuilder;
-import io.nem.symbol.catapult.builders.NamespaceAliasTypeDto;
 import io.nem.symbol.catapult.builders.NamespaceIdDto;
 import io.nem.symbol.catapult.builders.NamespaceLifetimeBuilder;
 import io.nem.symbol.catapult.builders.NamespacePathBuilder;

@@ -67,7 +67,6 @@ public class StateProofServiceImpl implements StateProofService {
         .map(merkle -> toStateMerkleProof(id, merkle, state.serialize()));
   }
 
-
   @Override
   public Observable<StateMerkleProof<String>> hashLock(HashLockInfo state) {
     String id = state.getHash();
@@ -76,7 +75,6 @@ public class StateProofServiceImpl implements StateProofService {
         .getHashLockMerkle(id)
         .map(merkle -> toStateMerkleProof(id, merkle, state.serialize()));
   }
-
 
   @Override
   public Observable<StateMerkleProof<String>> secretLock(SecretLockInfo state) {
@@ -136,12 +134,11 @@ public class StateProofServiceImpl implements StateProofService {
 
   private <ID> StateMerkleProof<ID> toStateMerkleProof(
       ID id, MerkleStateInfo merkle, byte[] serialized) {
-    if (merkle.getRaw().isEmpty()){
+    if (merkle.getRaw().isEmpty()) {
       throw new IllegalStateException("Merkle tree is empty!");
     }
     String hex = VERSION + ConvertUtils.toHex(serialized);
     String stateHash = ConvertUtils.toHex(Hashes.sha3_256(ConvertUtils.fromHexToBytes(hex)));
     return new StateMerkleProof<>(id, stateHash, merkle.getTree(), merkle.getRaw());
   }
-
 }

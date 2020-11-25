@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.nem.symbol.catapult.builders.MosaicDefinitionBuilder;
+import io.nem.symbol.catapult.builders.MosaicEntryBuilder;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.account.Account;
@@ -63,10 +63,10 @@ class MosaicInfoTest {
 
     byte[] serializedState = info.serialize();
     String expectedHex =
-        "C80000000000000090F1B694E1801EEFE42846E9239B54C9D381FCDF2A04A4210100000007030A00000000000000";
+        "29CF5FD941AD25D56400000000000000C80000000000000090F1B694E1801EEFE42846E9239B54C9D381FCDF2A04A4210100000007030A00000000000000";
     Assertions.assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
-    MosaicDefinitionBuilder builder =
-        MosaicDefinitionBuilder.loadFromBinary(SerializationUtils.toDataInput(serializedState));
+    MosaicEntryBuilder builder =
+        MosaicEntryBuilder.loadFromBinary(SerializationUtils.toDataInput(serializedState));
 
     Assertions.assertEquals(expectedHex, ConvertUtils.toHex(builder.serialize()));
   }
