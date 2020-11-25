@@ -15,6 +15,9 @@
  */
 package io.nem.symbol.sdk.model.blockchain;
 
+import io.nem.symbol.sdk.model.state.MerkleTree;
+import java.util.Objects;
+
 /** The merkle path information clients can use to proof the state of the given entity. */
 public class MerkleStateInfo {
 
@@ -24,15 +27,41 @@ public class MerkleStateInfo {
    */
   private final String raw;
 
+  /** The merkle tree object parsed from raw */
+  private final MerkleTree tree;
+
   /**
    * @param raw The hex information of the complete merkle tree as returned by server api. More
    *     information can be found in chapter 4.3 of the catapult whitepaper.
+   * @param tree The merkle tree object parsed from raw
    */
-  public MerkleStateInfo(String raw) {
+  public MerkleStateInfo(String raw, MerkleTree tree) {
     this.raw = raw;
+    this.tree = tree;
+  }
+
+  public MerkleTree getTree() {
+    return tree;
   }
 
   public String getRaw() {
     return raw;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    MerkleStateInfo that = (MerkleStateInfo) o;
+    return Objects.equals(raw, that.raw) && Objects.equals(tree, that.tree);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(raw, tree);
   }
 }

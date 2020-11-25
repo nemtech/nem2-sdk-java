@@ -25,6 +25,8 @@ import io.nem.symbol.sdk.model.message.MessageType;
 import io.nem.symbol.sdk.model.message.PersistentHarvestingDelegationMessage;
 import io.nem.symbol.sdk.model.message.PersistentHarvestingDelegationMessage.HarvestingKeys;
 import io.nem.symbol.sdk.model.message.PlainMessage;
+import io.nem.symbol.sdk.model.mosaic.Currency;
+import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.TransactionGroup;
@@ -51,7 +53,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void aggregateTransferTransaction(RepositoryType type) {
-    UnresolvedAddress recipient = getRecipient();
+    UnresolvedAddress recipient = helper().getTestAccount(type).getRight();
     String message =
         "E2ETest:aggregateTransferTransaction:messagelooooooooooooooooooooooooooooooooooooooo"
             + "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
@@ -60,13 +62,12 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
             + "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
             + "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
             + "oooooooong";
+    Currency networkCurrency = getNetworkCurrency();
+    Mosaic mosaic =
+        new Mosaic(networkCurrency.getNamespaceId().get(), BigInteger.valueOf(10202020));
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                getNetworkType(),
-                getDeadline(),
-                recipient,
-                Collections.singletonList(
-                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
+                getNetworkType(), getDeadline(), recipient, Collections.singletonList(mosaic))
             .message(new PlainMessage(message))
             .maxFee(maxFee)
             .build();
@@ -93,14 +94,12 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
     Message encryptedMessage =
         EncryptedMessage.create(
             message, senderKeyPair.getPrivateKey(), recipientKeyPair.getPublicKey());
-
+    Currency networkCurrency = getNetworkCurrency();
+    Mosaic mosaic =
+        new Mosaic(networkCurrency.getNamespaceId().get(), BigInteger.valueOf(10202020));
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
-                getNetworkType(),
-                getDeadline(),
-                recipient,
-                Collections.singletonList(
-                    getNetworkCurrency().createAbsolute(BigInteger.valueOf(1))))
+                getNetworkType(), getDeadline(), recipient, Collections.singletonList(mosaic))
             .message(encryptedMessage)
             .maxFee(maxFee)
             .build();

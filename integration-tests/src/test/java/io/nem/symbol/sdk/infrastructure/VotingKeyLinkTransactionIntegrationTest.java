@@ -35,7 +35,8 @@ public class VotingKeyLinkTransactionIntegrationTest extends BaseIntegrationTest
   public void basicAnnounceV1(RepositoryType type) {
 
     Account account = config().getNemesisAccount2();
-    VotingKey linkedPublicKey = VotingKey.fromHexString("AAAAA");
+
+    VotingKey linkedPublicKey = VotingKey.generateRandom();
 
     VotingKeyLinkV1Transaction linkTransaction =
         VotingKeyLinkV1TransactionFactory.create(
@@ -58,8 +59,8 @@ public class VotingKeyLinkTransactionIntegrationTest extends BaseIntegrationTest
   @EnumSource(RepositoryType.class)
   public void basicAnnounce(RepositoryType type) {
 
-    Account account = config().getNemesisAccount3();
-    PublicKey linkedPublicKey = PublicKey.fromHexString("BBBBB");
+    Account account = config().getNemesisAccount1();
+    PublicKey linkedPublicKey = PublicKey.generateRandom();
 
     VotingKeyLinkTransaction linkTransaction =
         VotingKeyLinkTransactionFactory.create(

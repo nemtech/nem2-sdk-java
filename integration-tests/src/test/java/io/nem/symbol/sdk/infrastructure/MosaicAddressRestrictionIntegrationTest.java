@@ -24,7 +24,6 @@ import io.nem.symbol.sdk.model.blockchain.BlockDuration;
 import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicNonce;
-import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.restriction.MosaicAddressRestriction;
 import io.nem.symbol.sdk.model.restriction.MosaicRestriction;
 import io.nem.symbol.sdk.model.restriction.MosaicRestrictionEntryType;
@@ -84,15 +83,14 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
     BigInteger originalRestrictionValue = BigInteger.valueOf(30);
 
     Address targetAddress = testAccount2.getAddress();
-    NamespaceId targetAddressAlias =
-        setAddressAlias(type, testAccount2.getAddress(), "testaccount2");
+
     MosaicAddressRestrictionTransaction createTransaction =
         MosaicAddressRestrictionTransactionFactory.create(
                 getNetworkType(),
                 getDeadline(),
                 mosaicId,
                 restrictionKey,
-                targetAddressAlias,
+                targetAddress,
                 originalRestrictionValue)
             .maxFee(maxFee)
             .build();

@@ -16,10 +16,13 @@
 package io.nem.symbol.sdk.model.mosaic;
 
 import io.nem.symbol.catapult.builders.AddressDto;
+import io.nem.symbol.catapult.builders.AmountDto;
 import io.nem.symbol.catapult.builders.BlockDurationDto;
 import io.nem.symbol.catapult.builders.HeightDto;
 import io.nem.symbol.catapult.builders.MosaicDefinitionBuilder;
+import io.nem.symbol.catapult.builders.MosaicEntryBuilder;
 import io.nem.symbol.catapult.builders.MosaicFlagsDto;
+import io.nem.symbol.catapult.builders.MosaicIdDto;
 import io.nem.symbol.catapult.builders.MosaicPropertiesBuilder;
 import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.Stored;
@@ -181,6 +184,8 @@ public class MosaicInfo implements Stored {
 
   /** @return serializes the state of the mosaic. */
   public byte[] serialize() {
+    MosaicIdDto mosaicId = SerializationUtils.toMosaicIdDto(getMosaicId());
+    AmountDto supply = SerializationUtils.toAmount(getSupply());
     HeightDto startHeight = new HeightDto(getStartHeight().longValue());
     AddressDto ownerAddress = SerializationUtils.toAddressDto(getOwnerAddress());
     int revision = (int) getRevision();
@@ -188,7 +193,8 @@ public class MosaicInfo implements Stored {
     MosaicPropertiesBuilder properties =
         MosaicPropertiesBuilder.create(
             flags, (byte) getDivisibility(), new BlockDurationDto(getDuration().longValue()));
-    return MosaicDefinitionBuilder.create(startHeight, ownerAddress, revision, properties)
-        .serialize();
+    MosaicDefinitionBuilder definition =
+        MosaicDefinitionBuilder.create(startHeight, ownerAddress, revision, properties);
+    return MosaicEntryBuilder.create(mosaicId, supply, definition).serialize();
   }
 }

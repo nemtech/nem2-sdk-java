@@ -92,7 +92,7 @@ public class Metadata implements Stored {
   }
 
   private Object resolveTargetId(String targetId, MetadataType metadataType) {
-    if (targetId == null && metadataType == MetadataType.ACCOUNT) {
+    if (metadataType == MetadataType.ACCOUNT) {
       return null;
     }
     Validate.notNull(targetId, "targetId is required when metadata type is  " + metadataType);

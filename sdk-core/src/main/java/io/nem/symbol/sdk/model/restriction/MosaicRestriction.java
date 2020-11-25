@@ -72,4 +72,6 @@ public abstract class MosaicRestriction<T> {
   public Map<BigInteger, T> getRestrictions() {
     return restrictions;
   }
+
+  public abstract byte[] serialize();
 }

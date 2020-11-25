@@ -241,8 +241,7 @@ public class NamespaceInfo implements Stored {
     NamespaceLifetimeBuilder lifetime =
         NamespaceLifetimeBuilder.create(
             new HeightDto(getStartHeight().longValue()), new HeightDto(getEndHeight().longValue()));
-    NamespaceAliasTypeDto rootAlias =
-        NamespaceAliasTypeDto.rawValueOf((byte) getAlias().getType().getValue());
+    NamespaceAliasBuilder rootAlias = getAlias().createAliasBuilder();
     List<NamespacePathBuilder> paths =
         children.stream().map(this::toNamespaceAliasTypeDto).collect(Collectors.toList());
     return RootNamespaceHistoryBuilder.create(id, ownerAddress, lifetime, rootAlias, paths)

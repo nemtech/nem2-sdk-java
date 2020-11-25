@@ -37,11 +37,12 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 public class Config {
 
   private static final String CONFIG_JSON = "./integration-tests/src/test/resources/config.json";
-  private static final String ADDRESSES_YML = "./target/bootstrap/addresses.yml";
+  //  private static final String ADDRESSES_YML = "./target/bootstrap/addresses.yml";
   //  private static final String ADDRESSES_YML =
   // "./target/bootstrap/config/generated-addresses/addresses.yml";
   //  private static final String ADDRESSES_YML =
   //      "../../symbol-bootstrap/target/bootstrap/addresses.yml";
+  private static final String ADDRESSES_YML = "../../catapult-rest/rest/target/addresses.yml";
 
   private final JsonObject config;
   private final Map<String, Account> accountCache = new HashMap<>();

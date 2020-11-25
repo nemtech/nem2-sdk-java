@@ -158,6 +158,6 @@ public abstract class AbstractRepositoryVertxImpl {
   }
 
   protected MerkleStateInfo toMerkleStateInfo(MerkleStateInfoDTO dto) {
-    return new MerkleStateInfo(dto.getRaw());
+    return new MerkleMapper(getJsonHelper()).toMerkleStateInfo(dto);
   }
 }

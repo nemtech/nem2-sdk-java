@@ -148,8 +148,8 @@ public abstract class AbstractRepositoryOkHttpImpl {
     return new Page<>(data, pagination.getPageNumber(), pagination.getPageSize());
   }
 
-  protected MerkleStateInfo toMerkleStateInfo(MerkleStateInfoDTO dto) {
-    return new MerkleStateInfo(dto.getRaw());
+  public MerkleStateInfo toMerkleStateInfo(MerkleStateInfoDTO dto) {
+    return new MerkleMapper(getJsonHelper()).toMerkleStateInfo(dto);
   }
 
   public JsonHelper getJsonHelper() {

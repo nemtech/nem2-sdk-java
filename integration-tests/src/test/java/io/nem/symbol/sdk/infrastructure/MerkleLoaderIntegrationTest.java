@@ -34,22 +34,42 @@ import io.nem.symbol.sdk.api.MosaicSearchCriteria;
 import io.nem.symbol.sdk.api.NamespacePaginationStreamer;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.api.NamespaceSearchCriteria;
+import io.nem.symbol.sdk.api.PaginationStreamer;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.RestrictionAccountRepository;
 import io.nem.symbol.sdk.api.RestrictionMosaicRepository;
+import io.nem.symbol.sdk.api.SearchCriteria;
 import io.nem.symbol.sdk.api.SecretLockPaginationStreamer;
 import io.nem.symbol.sdk.api.SecretLockRepository;
 import io.nem.symbol.sdk.api.SecretLockSearchCriteria;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import io.nem.symbol.sdk.model.account.AccountInfo;
+import io.nem.symbol.sdk.model.account.AccountRestrictions;
+import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.metadata.Metadata;
+import io.nem.symbol.sdk.model.mosaic.MosaicId;
+import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
+import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.namespace.NamespaceInfo;
+import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
+import io.nem.symbol.sdk.model.restriction.MosaicRestriction;
+import io.nem.symbol.sdk.model.state.StateMerkleProof;
+import io.nem.symbol.sdk.model.transaction.HashLockInfo;
+import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
+import io.reactivex.Observable;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import org.apache.commons.math3.util.Pair;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+@TestInstance(Lifecycle.PER_CLASS)
 public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
+
+  public static final int TAKE_COUNT = 10;
 
   //  public static void main(String[] args) {
   //    RepositoryFactory repositoryFactory =
@@ -58,167 +78,146 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   //    List<Map<String, String>> merkles = MerkleLoader.getMerkles(repositoryFactory);
   //    System.out.println(new JsonHelperJackson2().prettyPrint(merkles));
   //  }
-
-  @ParameterizedTest
-  @EnumSource(RepositoryType.class)
-  void getMerkles(RepositoryType type) {
-    List<Map<String, String>> merkles = getMerkles(getRepositoryFactory(type));
-    Assertions.assertFalse(merkles.isEmpty());
+  public List<Arguments> mosaicRestriction() {
+    RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
+    RestrictionMosaicRepository repository = repositoryFactory.createRestrictionMosaicRepository();
+    MosaicRestrictionPaginationStreamer streamer = new MosaicRestrictionPaginationStreamer(repository);
+    return getArguments(
+        streamer,
+        new MosaicRestrictionSearchCriteria());
   }
 
-  public static List<Map<String, String>> getMerkles(RepositoryFactory repositoryFactory) {
-    List<Map<String, String>> list = new ArrayList<>();
+  @ParameterizedTest
+  @MethodSource("mosaicRestriction")
+  void mosaicRestrictionMerkles(MosaicRestriction<?> state, RepositoryType repositoryType) {
+    StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
+    StateMerkleProof<String> proof = get(service.mosaicRestriction(state));
+    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId());
+  }
 
-    int takeCount = 4;
-    {
-      MosaicRepository repository = repositoryFactory.createMosaicRepository();
-      MosaicPaginationStreamer streamer = new MosaicPaginationStreamer(repository);
+  public List<Arguments> hashLocks() {
+    RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
+    HashLockRepository repository = repositoryFactory.createHashLockRepository();
+    HashLockPaginationStreamer streamer = new HashLockPaginationStreamer(repository);
+    return getArguments(streamer, new HashLockSearchCriteria());
+  }
 
-      streamer
-          .search(new MosaicSearchCriteria())
-          .flatMap(t -> repository.getMosaicMerkle(t.getMosaicId()).map(m -> new Pair<>(t, m)))
-          .take(takeCount)
-          .subscribe(
-              pair -> {
-                Map<String, String> map = new LinkedHashMap<>();
-                map.put("mosaicId", pair.getFirst().getMosaicId().getIdAsHex());
-                map.put("raw", pair.getSecond().getRaw());
-                list.add(map);
-              });
-    }
+  @ParameterizedTest
+  @MethodSource("hashLocks")
+  void hashLocksMerkles(HashLockInfo state, RepositoryType repositoryType) {
+    StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
+    StateMerkleProof<String> proof = get(service.hashLock(state));
+    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId());
+  }
 
-    {
-      NamespaceRepository repository = repositoryFactory.createNamespaceRepository();
-      NamespacePaginationStreamer streamer = new NamespacePaginationStreamer(repository);
+  public List<Arguments> accountRestrictions() {
+    RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
+    RestrictionAccountRepository repository =
+        repositoryFactory.createRestrictionAccountRepository();
+    AccountRestrictionsPaginationStreamer streamer =
+        new AccountRestrictionsPaginationStreamer(repository);
+    return getArguments(streamer, new AccountRestrictionSearchCriteria());
+  }
 
-      streamer
-          .search(new NamespaceSearchCriteria())
-          .flatMap(t -> repository.getNamespaceMerkle(t.getId()).map(m -> new Pair<>(t, m)))
-          .take(takeCount)
-          .subscribe(
-              pair -> {
-                Map<String, String> map = new LinkedHashMap<>();
-                map.put("namespaceId", pair.getFirst().getId().getIdAsHex());
-                map.put("raw", pair.getSecond().getRaw());
-                list.add(map);
-              });
-    }
+  @ParameterizedTest
+  @MethodSource("accountRestrictions")
+  void accountRestrictionsMerkles(AccountRestrictions state, RepositoryType repositoryType) {
+    StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
+    StateMerkleProof<Address> proof = get(service.accountRestrictions(state));
+    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId().plain());
+  }
 
-    {
-      AccountRepository repository = repositoryFactory.createAccountRepository();
-      AccountPaginationStreamer streamer = new AccountPaginationStreamer(repository);
+  public List<Arguments> secretLocks() {
+    RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
+    SecretLockRepository repository = repositoryFactory.createSecretLockRepository();
+    SecretLockPaginationStreamer streamer = new SecretLockPaginationStreamer(repository);
+    return getArguments(streamer, new SecretLockSearchCriteria());
+  }
 
-      streamer
-          .search(new AccountSearchCriteria())
-          .flatMap(t -> repository.getAccountInfoMerkle(t.getAddress()).map(m -> new Pair<>(t, m)))
-          .take(takeCount)
-          .subscribe(
-              pair -> {
-                Map<String, String> map = new LinkedHashMap<>();
-                map.put("address", pair.getFirst().getAddress().encoded());
-                map.put("raw", pair.getSecond().getRaw());
-                list.add(map);
-              });
-    }
-    {
-      HashLockRepository repository = repositoryFactory.createHashLockRepository();
-      HashLockPaginationStreamer streamer = new HashLockPaginationStreamer(repository);
+  @ParameterizedTest
+  @MethodSource("secretLocks")
+  void secretLocksMerkles(SecretLockInfo state, RepositoryType repositoryType) {
+    StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
+    StateMerkleProof<String> proof = get(service.secretLock(state));
+    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId());
+  }
 
-      streamer
-          .search(new HashLockSearchCriteria())
-          .flatMap(t -> repository.getHashLockMerkle(t.getHash()).map(m -> new Pair<>(t, m)))
-          .take(takeCount)
-          .subscribe(
-              pair -> {
-                Map<String, String> map = new LinkedHashMap<>();
-                map.put("hashLockHash", pair.getFirst().getHash());
-                map.put("raw", pair.getSecond().getRaw());
-                list.add(map);
-              });
-    }
+  public List<Arguments> accounts() {
+    RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
+    AccountRepository repository = repositoryFactory.createAccountRepository();
+    AccountPaginationStreamer streamer = new AccountPaginationStreamer(repository);
+    return getArguments(streamer, new AccountSearchCriteria());
+  }
 
-    {
-      SecretLockRepository repository = repositoryFactory.createSecretLockRepository();
-      SecretLockPaginationStreamer streamer = new SecretLockPaginationStreamer(repository);
+  @ParameterizedTest
+  @MethodSource("accounts")
+  void accountsMerkles(AccountInfo state, RepositoryType repositoryType) {
+    StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
+    StateMerkleProof<Address> proof = get(service.account(state));
+    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId().plain());
+  }
 
-      streamer
-          .search(new SecretLockSearchCriteria())
-          .flatMap(
-              t -> repository.getSecretLockMerkle(t.getCompositeHash()).map(m -> new Pair<>(t, m)))
-          .take(takeCount)
-          .subscribe(
-              pair -> {
-                Map<String, String> map = new LinkedHashMap<>();
-                map.put("secretLockCompositeHash", pair.getFirst().getCompositeHash());
-                map.put("raw", pair.getSecond().getRaw());
-                list.add(map);
-              });
-    }
+  public List<Arguments> mosaics() {
+    RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
+    MosaicRepository repository = repositoryFactory.createMosaicRepository();
+    MosaicPaginationStreamer streamer = new MosaicPaginationStreamer(repository);
+    return getArguments(streamer, new MosaicSearchCriteria());
+  }
 
-    {
-      MetadataRepository repository = repositoryFactory.createMetadataRepository();
-      MetadataPaginationStreamer streamer = new MetadataPaginationStreamer(repository);
+  @ParameterizedTest
+  @MethodSource("mosaics")
+  void mosaicsMerkles(MosaicInfo state, RepositoryType repositoryType) {
+    StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
+    StateMerkleProof<MosaicId> proof = get(service.mosaic(state));
+    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId().getIdAsHex());
+  }
 
-      streamer
-          .search(new MetadataSearchCriteria())
-          .flatMap(
-              t -> repository.getMetadataMerkle(t.getCompositeHash()).map(m -> new Pair<>(t, m)))
-          .take(takeCount)
-          .subscribe(
-              pair -> {
-                Map<String, String> map = new LinkedHashMap<>();
-                map.put("metadataCompositeHash", pair.getFirst().getCompositeHash());
-                map.put("raw", pair.getSecond().getRaw());
-                list.add(map);
-              });
-    }
+  public List<Arguments> namespaces() {
+    RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
+    NamespaceRepository repository = repositoryFactory.createNamespaceRepository();
+    NamespacePaginationStreamer streamer = new NamespacePaginationStreamer(repository);
+    return getArguments(
+        streamer,
+        new NamespaceSearchCriteria().registrationType(NamespaceRegistrationType.ROOT_NAMESPACE));
+  }
 
-    {
-      RestrictionAccountRepository repository =
-          repositoryFactory.createRestrictionAccountRepository();
-      AccountRestrictionsPaginationStreamer streamer =
-          new AccountRestrictionsPaginationStreamer(repository);
+  @ParameterizedTest
+  @MethodSource("namespaces")
+  void namespacesMerkles(NamespaceInfo state, RepositoryType repositoryType) {
+    StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
+    StateMerkleProof<NamespaceId> proof = get(service.namespace(state));
+    System.out.println("NamespaceId " + proof.getId().getIdAsHex());
+    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId().getIdAsHex());
+  }
 
-      streamer
-          .search(new AccountRestrictionSearchCriteria())
-          .flatMap(
-              t ->
-                  repository
-                      .getAccountRestrictionsMerkle(t.getAddress())
-                      .map(m -> new Pair<>(t, m)))
-          .take(takeCount)
-          .subscribe(
-              pair -> {
-                Map<String, String> map = new LinkedHashMap<>();
-                map.put("accountRestrictionsAddress", pair.getFirst().getAddress().encoded());
-                map.put("raw", pair.getSecond().getRaw());
-                list.add(map);
-              });
-    }
+  public List<Arguments> metadatas() {
+    RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
+    MetadataRepository repository = repositoryFactory.createMetadataRepository();
+    MetadataPaginationStreamer streamer = new MetadataPaginationStreamer(repository);
+    return getArguments(streamer, new MetadataSearchCriteria());
+  }
 
-    {
-      RestrictionMosaicRepository repository =
-          repositoryFactory.createRestrictionMosaicRepository();
-      MosaicRestrictionPaginationStreamer streamer =
-          new MosaicRestrictionPaginationStreamer(repository);
+  @ParameterizedTest
+  @MethodSource("metadatas")
+  void metadatasMerkles(Metadata state, RepositoryType repositoryType) {
+    StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
+    StateMerkleProof<String> proof = get(service.metadata(state));
+    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId());
+  }
 
-      streamer
-          .search(new MosaicRestrictionSearchCriteria())
-          .flatMap(
-              t ->
-                  repository
-                      .getMosaicRestrictionsMerkle(t.getCompositeHash())
-                      .map(m -> new Pair<>(t, m)))
-          .take(takeCount)
-          .subscribe(
-              pair -> {
-                Map<String, String> map = new LinkedHashMap<>();
-                map.put("mosaicRestrictionsCompositeHash", pair.getFirst().getCompositeHash());
-                map.put("raw", pair.getSecond().getRaw());
-                list.add(map);
-              });
-    }
-
-    return list;
+  private <E, C extends SearchCriteria<C>> List<Arguments> getArguments(
+      PaginationStreamer<E, C> streamer, C criteria) {
+    return get(
+        streamer
+            .search(criteria)
+            .take(TAKE_COUNT)
+            .flatMap(
+                state ->
+                    Observable.fromIterable(
+                        Arrays.stream(RepositoryType.values())
+                            .map(r -> Arguments.of(state, r))
+                            .collect(Collectors.toList())))
+            .toList()
+            .toObservable());
   }
 }
