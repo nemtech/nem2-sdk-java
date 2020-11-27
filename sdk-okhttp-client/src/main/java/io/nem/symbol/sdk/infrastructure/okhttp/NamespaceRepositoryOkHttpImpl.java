@@ -245,6 +245,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
   private NamespaceInfo toNamespaceInfo(NamespaceInfoDTO namespaceInfoDTO) {
     return new NamespaceInfo(
         namespaceInfoDTO.getId(),
+        1,
         namespaceInfoDTO.getMeta().getActive(),
         namespaceInfoDTO.getMeta().getIndex(),
         NamespaceRegistrationType.rawValueOf(

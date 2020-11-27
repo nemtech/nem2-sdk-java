@@ -57,7 +57,7 @@ class AccountRepositoryIntegrationTest extends BaseIntegrationTest {
         this.getAccountRepository(type).getAccountInfo(testAccount.getPublicAccount().getAddress());
     AccountInfo accountInfo = get(accountInfo1);
 
-    assertEquals(testAccount.getPublicKey(), accountInfo.getPublicKey());
+    assertEquals(testAccount.getPublicKey(), accountInfo.getPublicKey().toHex());
     assertEquals(AccountType.UNLINKED, accountInfo.getAccountType());
   }
 

@@ -35,15 +35,18 @@ import org.apache.commons.lang3.Validate;
 /** Account properties structure describes property information for an account. */
 public class AccountRestrictions {
 
+  /** state version */
+  private final int version;
   /** The address where the restrictions apply. */
   private final Address address;
 
   /** The restrictions. */
   private final List<AccountRestriction> restrictions;
 
-  public AccountRestrictions(Address address, List<AccountRestriction> restrictions) {
+  public AccountRestrictions(int version, Address address, List<AccountRestriction> restrictions) {
     Validate.notNull(address, "address is required");
     Validate.notNull(restrictions, "restrictions is required");
+    this.version = version;
     this.address = address;
     this.restrictions = restrictions;
   }
@@ -56,6 +59,10 @@ public class AccountRestrictions {
     return restrictions;
   }
 
+  public int getVersion() {
+    return version;
+  }
+
   /** @return serializes the state of this object. */
   public byte[] serialize() {
     AddressDto address = SerializationUtils.toAddressDto(getAddress());
@@ -63,7 +70,8 @@ public class AccountRestrictions {
         getRestrictions().stream()
             .map(this::toAccountRestrictionsInfoBuilder)
             .collect(Collectors.toList());
-    return AccountRestrictionsBuilder.create(address, restrictions).serialize();
+    return AccountRestrictionsBuilder.create((short) getVersion(), address, restrictions)
+        .serialize();
   }
 
   private AccountRestrictionsInfoBuilder toAccountRestrictionsInfoBuilder(

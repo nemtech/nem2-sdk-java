@@ -58,6 +58,7 @@ import io.nem.symbol.sdk.model.transaction.HashLockInfo;
 import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
 import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
+import io.nem.symbol.sdk.model.transaction.LockStatus;
 import io.nem.symbol.sdk.model.transaction.MosaicAliasTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicAliasTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransaction;
@@ -692,7 +693,7 @@ public class TestHelper {
     Assertions.assertNotNull(hashLockInfo);
     Assertions.assertEquals(multisigAccount.getAddress(), hashLockInfo.getOwnerAddress());
     Assertions.assertEquals(hashAmount.getAmount(), hashLockInfo.getAmount());
-    Assertions.assertEquals(0, hashLockInfo.getStatus());
+    Assertions.assertEquals(LockStatus.UNUSED, hashLockInfo.getStatus());
     Assertions.assertEquals(hashLockTransaction.getHash(), hashLockInfo.getHash());
 
     Page<HashLockInfo> page =
@@ -784,9 +785,13 @@ public class TestHelper {
   }
 
   public void basicSendMosaicFromNemesis(RepositoryType type, UnresolvedAddress recipient) {
-
-    Account nemesisAccount = config().getNemesisAccount();
     BigInteger amount = BigInteger.valueOf(AMOUNT_PER_TRANSFER);
+    basicTransfer(type, config().getNemesisAccount(), recipient, amount);
+  }
+
+  public void basicTransfer(
+      RepositoryType type, Account nemesisAccount, UnresolvedAddress recipient,
+      BigInteger amount) {
 
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(

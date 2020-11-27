@@ -15,16 +15,22 @@
  */
 package io.nem.symbol.sdk.model.restriction;
 
+import io.nem.symbol.sdk.model.Stored;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import java.math.BigInteger;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Super class of mosaic restriction objects.
  *
  * @param <T> then restriction item.
  */
-public abstract class MosaicRestriction<T> {
+public abstract class MosaicRestriction<T> implements Stored {
+
+  private final String recordId;
+
+  private final int version;
 
   /** composite hash */
   public final String compositeHash;
@@ -41,16 +47,22 @@ public abstract class MosaicRestriction<T> {
   /**
    * constructor
    *
+   * @param recordId the db id
+   * @param version the versoin
    * @param compositeHash the composite hash
    * @param entryType the entry type
    * @param mosaicId the mosaic id
    * @param restrictions the restrictions
    */
   protected MosaicRestriction(
+      String recordId,
+      int version,
       String compositeHash,
       MosaicRestrictionEntryType entryType,
       MosaicId mosaicId,
       Map<BigInteger, T> restrictions) {
+    this.recordId = recordId;
+    this.version = version;
     this.compositeHash = compositeHash;
     this.entryType = entryType;
     this.mosaicId = mosaicId;
@@ -74,4 +86,13 @@ public abstract class MosaicRestriction<T> {
   }
 
   public abstract byte[] serialize();
+
+  public int getVersion() {
+    return version;
+  }
+
+  @Override
+  public Optional<String> getRecordId() {
+    return Optional.ofNullable(recordId);
+  }
 }

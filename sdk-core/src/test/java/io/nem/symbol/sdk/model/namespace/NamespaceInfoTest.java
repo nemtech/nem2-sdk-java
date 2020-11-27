@@ -40,6 +40,7 @@ class NamespaceInfoTest {
     NamespaceInfo namespaceInfo =
         new NamespaceInfo(
             "abc",
+            1,
             true,
             0,
             NamespaceRegistrationType.ROOT_NAMESPACE,
@@ -120,6 +121,7 @@ class NamespaceInfoTest {
   NamespaceInfo createRootNamespaceInfo() {
     return new NamespaceInfo(
         "abc",
+        1,
         true,
         0,
         NamespaceRegistrationType.ROOT_NAMESPACE,
@@ -138,6 +140,7 @@ class NamespaceInfoTest {
   NamespaceInfo createSubNamespaceInfo() {
     return new NamespaceInfo(
         "bcd",
+        1,
         true,
         0,
         NamespaceRegistrationType.SUB_NAMESPACE,

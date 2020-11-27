@@ -87,6 +87,7 @@ class MetadataTransactionServiceTest {
 
     return new NamespaceInfo(
         "abc",
+        1,
         true,
         0,
         NamespaceRegistrationType.ROOT_NAMESPACE,
@@ -114,6 +115,7 @@ class MetadataTransactionServiceTest {
     Metadata metadata =
         new Metadata(
             "someId",
+            1,
             "compositeHash",
             sourceAddress,
             targetAccount.getAddress(),
@@ -263,6 +265,7 @@ class MetadataTransactionServiceTest {
     Metadata metadata =
         new Metadata(
             "someId",
+            1,
             "compositeHash",
             sourceAddress,
             targetAccount.getAddress(),
@@ -310,6 +313,7 @@ class MetadataTransactionServiceTest {
     Metadata metadata =
         new Metadata(
             "someId",
+            1,
             "compositeHash",
             sourceAddress,
             targetAccount.getAddress(),
@@ -468,6 +472,7 @@ class MetadataTransactionServiceTest {
     Metadata metadata =
         new Metadata(
             "someId",
+            1,
             "compositeHash",
             sourceAddress,
             targetAccount.getAddress(),

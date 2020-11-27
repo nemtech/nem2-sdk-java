@@ -20,6 +20,7 @@ import io.nem.symbol.catapult.builders.AddressKeyValueBuilder;
 import io.nem.symbol.catapult.builders.AddressKeyValueSetBuilder;
 import io.nem.symbol.catapult.builders.MosaicAddressRestrictionEntryBuilder;
 import io.nem.symbol.catapult.builders.MosaicIdDto;
+import io.nem.symbol.catapult.builders.MosaicRestrictionEntryBuilder;
 import io.nem.symbol.catapult.builders.MosaicRestrictionKeyDto;
 import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.account.Address;
@@ -38,6 +39,8 @@ public class MosaicAddressRestriction extends MosaicRestriction<BigInteger> {
   /**
    * constructor
    *
+   * @param recordId the db id
+   * @param version the version
    * @param compositeHash the restriction composite hash
    * @param entryType the entry type
    * @param mosaicId the mosaic id
@@ -45,12 +48,14 @@ public class MosaicAddressRestriction extends MosaicRestriction<BigInteger> {
    * @param restrictions the restrictions of the mosaic.
    */
   public MosaicAddressRestriction(
+      String recordId,
+      int version,
       String compositeHash,
       MosaicRestrictionEntryType entryType,
       MosaicId mosaicId,
       Address targetAddress,
       Map<BigInteger, BigInteger> restrictions) {
-    super(compositeHash, entryType, mosaicId, restrictions);
+    super(recordId, version, compositeHash, entryType, mosaicId, restrictions);
     this.targetAddress = targetAddress;
   }
 
@@ -67,8 +72,9 @@ public class MosaicAddressRestriction extends MosaicRestriction<BigInteger> {
             getRestrictions().entrySet().stream()
                 .map(this::toAddressKeyValueBuilder)
                 .collect(Collectors.toList()));
-    return MosaicAddressRestrictionEntryBuilder.create(mosaicId, targetAddress, restrictions)
-        .serialize();
+    MosaicAddressRestrictionEntryBuilder entry =
+        MosaicAddressRestrictionEntryBuilder.create(mosaicId, targetAddress, restrictions);
+    return MosaicRestrictionEntryBuilder.createAddress((short) getVersion(), entry).serialize();
   }
 
   private AddressKeyValueBuilder toAddressKeyValueBuilder(Entry<BigInteger, BigInteger> entry) {

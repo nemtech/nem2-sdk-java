@@ -38,6 +38,8 @@ import org.apache.commons.lang3.Validate;
  */
 public class Metadata implements Stored {
 
+  /** state version */
+  private final int version;
   /** The stored database. */
   private final String recordId;
   /** The composite hash */
@@ -69,6 +71,7 @@ public class Metadata implements Stored {
   @SuppressWarnings("squid:S00107")
   public Metadata(
       String recordId,
+      int version,
       String compositeHash,
       Address sourceAddress,
       Address targetAddress,
@@ -77,6 +80,7 @@ public class Metadata implements Stored {
       String value,
       String targetId) {
     this.recordId = recordId;
+    this.version = version;
     this.compositeHash = compositeHash;
     Validate.notNull(sourceAddress, "sourceAddress is required");
     Validate.notNull(targetAddress, "targetAddress is required");
@@ -138,6 +142,10 @@ public class Metadata implements Stored {
     return Optional.ofNullable(recordId);
   }
 
+  public int getVersion() {
+    return version;
+  }
+
   /** @return serializes the state of this object. */
   public byte[] serialize() {
 
@@ -151,7 +159,13 @@ public class Metadata implements Stored {
     MetadataValueBuilder value = toMetadataValueBuilder(getValue());
 
     return MetadataEntryBuilder.create(
-            sourceAddress, targetAddress, scopedMetadataKey, targetId, metadataType, value)
+            (short) getVersion(),
+            sourceAddress,
+            targetAddress,
+            scopedMetadataKey,
+            targetId,
+            metadataType,
+            value)
         .serialize();
   }
 

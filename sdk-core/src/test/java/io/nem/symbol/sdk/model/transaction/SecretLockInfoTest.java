@@ -49,6 +49,7 @@ public class SecretLockInfoTest {
     SecretLockInfo info =
         new SecretLockInfo(
             recordId.get(),
+            1,
             ownerAddress,
             mosaicId,
             amount,
@@ -71,7 +72,7 @@ public class SecretLockInfoTest {
 
     byte[] serializedState = info.serialize();
     String expectedHex =
-        "90F1B694E1801EEFE42846E9239B54C9D381FCDF2A04A421E9F49B9E5199FC7601000000000000000A000000000000000102DD9EC2AC9AB11FC7E942E5FA39AF8811180F236E29BCD40DB812392295512AAA90F36CA680C35D630662A0C38DC89D4978D10B511B3D241A";
+        "010090F1B694E1801EEFE42846E9239B54C9D381FCDF2A04A421E9F49B9E5199FC7601000000000000000A000000000000000102DD9EC2AC9AB11FC7E942E5FA39AF8811180F236E29BCD40DB812392295512AAA90F36CA680C35D630662A0C38DC89D4978D10B511B3D241A";
     Assertions.assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
     SecretLockInfoBuilder builder =
         SecretLockInfoBuilder.loadFromBinary(SerializationUtils.toDataInput(serializedState));

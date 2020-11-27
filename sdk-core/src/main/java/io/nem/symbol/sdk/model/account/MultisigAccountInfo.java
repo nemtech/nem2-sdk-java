@@ -18,7 +18,9 @@ package io.nem.symbol.sdk.model.account;
 import io.nem.symbol.catapult.builders.AddressDto;
 import io.nem.symbol.catapult.builders.MultisigEntryBuilder;
 import io.nem.symbol.sdk.infrastructure.SerializationUtils;
+import io.nem.symbol.sdk.model.Stored;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 
@@ -27,7 +29,12 @@ import org.apache.commons.lang3.Validate;
  *
  * @since 1.0
  */
-public class MultisigAccountInfo {
+public class MultisigAccountInfo implements Stored {
+
+  /** state version */
+  private final int version;
+  /** The stored database. */
+  private final String recordId;
 
   private final Address accountAddress;
   private final long minApproval;
@@ -36,6 +43,8 @@ public class MultisigAccountInfo {
   private final List<Address> multisigAddresses;
 
   public MultisigAccountInfo(
+      String recordId,
+      int version,
       Address accountAddress,
       long minApproval,
       long minRemoval,
@@ -44,6 +53,8 @@ public class MultisigAccountInfo {
     Validate.notNull(accountAddress, "accountAddress is required");
     Validate.notNull(cosignatories, "cosignatories is required");
     Validate.notNull(multisigAddresses, "multisigAddresses is required");
+    this.version = version;
+    this.recordId = recordId;
     this.accountAddress = accountAddress;
     this.minApproval = minApproval;
     this.minRemoval = minRemoval;
@@ -116,6 +127,16 @@ public class MultisigAccountInfo {
     return this.multisigAddresses.contains(account);
   }
 
+  /** @return state version */
+  public int getVersion() {
+    return version;
+  }
+
+  @Override
+  public Optional<String> getRecordId() {
+    return Optional.ofNullable(this.recordId);
+  }
+
   /**
    * Checks if the account is a multisig account.
    *
@@ -139,7 +160,12 @@ public class MultisigAccountInfo {
             .map(SerializationUtils::toAddressDto)
             .collect(Collectors.toList());
     return MultisigEntryBuilder.create(
-            minApproval, minRemoval, accountAddress, cosignatoryAddresses, multisigAddresses)
+            (short) getVersion(),
+            minApproval,
+            minRemoval,
+            accountAddress,
+            cosignatoryAddresses,
+            multisigAddresses)
         .serialize();
   }
 }

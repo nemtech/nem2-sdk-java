@@ -17,7 +17,7 @@ package io.nem.symbol.sdk.model.restriction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.nem.symbol.catapult.builders.MosaicGlobalRestrictionEntryBuilder;
+import io.nem.symbol.catapult.builders.MosaicRestrictionEntryBuilder;
 import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.infrastructure.SerializationUtils;
@@ -50,14 +50,16 @@ public class MosaicGlobalRestrictionTest {
             new MosaicGlobalRestrictionItem(
                 mosaicId1, BigInteger.valueOf(20), MosaicRestrictionType.EQ));
     MosaicGlobalRestriction restriction =
-        new MosaicGlobalRestriction("AAAA", MosaicRestrictionEntryType.GLOBAL, mosaicId1, map);
+        new MosaicGlobalRestriction(
+            "a", 1, "AAAA", MosaicRestrictionEntryType.GLOBAL, mosaicId1, map);
 
     byte[] serializedState = restriction.serialize();
-    String expectedHex = "9FA9BCEE6D3B6E58010A000000000000009FA9BCEE6D3B6E58140000000000000001";
+    String expectedHex =
+        "0100019FA9BCEE6D3B6E58010A000000000000009FA9BCEE6D3B6E58140000000000000001";
     assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
 
-    MosaicGlobalRestrictionEntryBuilder builder =
-        MosaicGlobalRestrictionEntryBuilder.loadFromBinary(
+    MosaicRestrictionEntryBuilder builder =
+        MosaicRestrictionEntryBuilder.loadFromBinary(
             SerializationUtils.toDataInput(serializedState));
 
     Assertions.assertEquals(

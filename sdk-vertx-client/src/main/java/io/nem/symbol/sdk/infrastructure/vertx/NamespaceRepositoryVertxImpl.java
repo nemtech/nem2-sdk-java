@@ -224,6 +224,7 @@ public class NamespaceRepositoryVertxImpl extends AbstractRepositoryVertxImpl
   private NamespaceInfo toNamespaceInfo(NamespaceInfoDTO namespaceInfoDTO) {
     return new NamespaceInfo(
         namespaceInfoDTO.getId(),
+        1,
         namespaceInfoDTO.getMeta().getActive(),
         namespaceInfoDTO.getMeta().getIndex(),
         NamespaceRegistrationType.rawValueOf(

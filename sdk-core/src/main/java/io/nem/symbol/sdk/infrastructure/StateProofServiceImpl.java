@@ -25,6 +25,7 @@ import io.nem.symbol.sdk.api.StateProofService;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountRestrictions;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.blockchain.MerkleStateInfo;
 import io.nem.symbol.sdk.model.metadata.Metadata;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -41,7 +42,6 @@ import io.reactivex.Observable;
 /** Service used for state proofing */
 public class StateProofServiceImpl implements StateProofService {
 
-  private static final String VERSION = "0100"; // TODO: to add version in catbuffer
   /** Repository factory used to load the merkle information */
   private final RepositoryFactory repositoryFactory;
 
@@ -113,6 +113,15 @@ public class StateProofServiceImpl implements StateProofService {
   }
 
   @Override
+  public Observable<StateMerkleProof<Address>> multisig(MultisigAccountInfo state) {
+    Address id = state.getAccountAddress();
+    return this.repositoryFactory
+        .createMultisigRepository()
+        .getMultisigAccountInfoMerkle(id)
+        .map(merkle -> toStateMerkleProof(id, merkle, state.serialize()));
+  }
+
+  @Override
   public Observable<StateMerkleProof<NamespaceId>> namespace(NamespaceInfo state) {
     NamespaceId id = state.getId();
     NamespaceRepository namespaceRepository = this.repositoryFactory.createNamespaceRepository();
@@ -137,8 +146,7 @@ public class StateProofServiceImpl implements StateProofService {
     if (merkle.getRaw().isEmpty()) {
       throw new IllegalStateException("Merkle tree is empty!");
     }
-    String hex = VERSION + ConvertUtils.toHex(serialized);
-    String stateHash = ConvertUtils.toHex(Hashes.sha3_256(ConvertUtils.fromHexToBytes(hex)));
+    String stateHash = ConvertUtils.toHex(Hashes.sha3_256(serialized));
     return new StateMerkleProof<>(id, stateHash, merkle.getTree(), merkle.getRaw());
   }
 }

@@ -92,6 +92,7 @@ public class AliasServiceTest {
 
     return new NamespaceInfo(
         "abc",
+        1,
         true,
         0,
         NamespaceRegistrationType.ROOT_NAMESPACE,
@@ -108,6 +109,7 @@ public class AliasServiceTest {
 
     return new NamespaceInfo(
         "abc",
+        1,
         true,
         0,
         NamespaceRegistrationType.ROOT_NAMESPACE,

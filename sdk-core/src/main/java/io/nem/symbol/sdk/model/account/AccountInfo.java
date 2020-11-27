@@ -51,7 +51,8 @@ import org.apache.commons.lang3.Validate;
  */
 public class AccountInfo implements Stored {
 
-  private final Optional<String> recordId;
+  private final String recordId;
+  private final int version;
   private final Address address;
   private final BigInteger addressHeight;
   private final PublicKey publicKey;
@@ -65,6 +66,7 @@ public class AccountInfo implements Stored {
   @SuppressWarnings("squid:S00107")
   public AccountInfo(
       String recordId,
+      int version,
       Address address,
       BigInteger addressHeight,
       PublicKey publicKey,
@@ -83,7 +85,8 @@ public class AccountInfo implements Stored {
     Validate.notNull(importanceHeight, "importanceHeight is required");
     Validate.notNull(accountType, "accountType is required");
     Validate.notNull(supplementalAccountKeys, "supplementalAccountKeys is required");
-    this.recordId = Optional.ofNullable(recordId);
+    this.version = version;
+    this.recordId = recordId;
     this.address = address;
     this.addressHeight = addressHeight;
     this.publicKey = publicKey;
@@ -103,7 +106,7 @@ public class AccountInfo implements Stored {
   /** @return the record id if known. */
   @Override
   public Optional<String> getRecordId() {
-    return recordId;
+    return Optional.ofNullable(this.recordId);
   }
 
   /**
@@ -193,6 +196,11 @@ public class AccountInfo implements Stored {
     return getImportance().getValue().compareTo(BigInteger.ZERO) > 0;
   }
 
+  /** @return the version */
+  public int getVersion() {
+    return version;
+  }
+
   public byte[] serialize() {
 
     AddressDto address = SerializationUtils.toAddressDto(getAddress());
@@ -221,6 +229,7 @@ public class AccountInfo implements Stored {
 
     if (isHighValue()) {
       return AccountStateBuilder.createHighValue(
+              (short) getVersion(),
               address,
               addressHeight,
               publicKey,
@@ -237,6 +246,7 @@ public class AccountInfo implements Stored {
           .serialize();
     } else {
       return AccountStateBuilder.createRegular(
+              (short) getVersion(),
               address,
               addressHeight,
               publicKey,

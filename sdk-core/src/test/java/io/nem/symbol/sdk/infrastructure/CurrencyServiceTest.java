@@ -92,6 +92,7 @@ class CurrencyServiceTest {
     MosaicInfo currencyMosaicInfo =
         new MosaicInfo(
             "abc",
+            1,
             currencyMosaicId,
             BigInteger.valueOf(100),
             BigInteger.ONE,
@@ -104,6 +105,7 @@ class CurrencyServiceTest {
     MosaicInfo harvestMosaicInfo =
         new MosaicInfo(
             "abc",
+            1,
             harvestMosaicId,
             BigInteger.valueOf(200),
             BigInteger.ONE,
@@ -138,6 +140,7 @@ class CurrencyServiceTest {
     MosaicInfo mosaicInfo =
         new MosaicInfo(
             "abc",
+            1,
             mosaicId,
             supply,
             BigInteger.ONE,
@@ -173,6 +176,7 @@ class CurrencyServiceTest {
     MosaicInfo mosaicInfo =
         new MosaicInfo(
             "abc",
+            1,
             mosaicId,
             supply,
             BigInteger.ONE,
@@ -208,6 +212,7 @@ class CurrencyServiceTest {
     MosaicInfo mosaicInfo =
         new MosaicInfo(
             "abc",
+            1,
             mosaicId,
             supply,
             BigInteger.ONE,
@@ -245,6 +250,7 @@ class CurrencyServiceTest {
     MosaicInfo mosaicInfo =
         new MosaicInfo(
             "abc",
+            1,
             mosaicId,
             supply,
             BigInteger.ONE,
@@ -292,6 +298,7 @@ class CurrencyServiceTest {
     MosaicInfo mosaicInfo =
         new MosaicInfo(
             "abc",
+            1,
             mosaicId,
             supply,
             BigInteger.ONE,

@@ -99,6 +99,8 @@ public class AggregateTransactionServiceTest {
 
   public MultisigAccountInfo givenMultisig2AccountInfo() {
     return new MultisigAccountInfo(
+        "a",
+        1,
         multisig2.getAddress(),
         2,
         1,
@@ -108,6 +110,8 @@ public class AggregateTransactionServiceTest {
 
   MultisigAccountInfo givenMultisig3AccountInfo() {
     return new MultisigAccountInfo(
+        "a",
+        1,
         multisig3.getAddress(),
         2,
         2,
@@ -117,6 +121,8 @@ public class AggregateTransactionServiceTest {
 
   MultisigAccountInfo givenAccount1Info() {
     return new MultisigAccountInfo(
+        "a",
+        1,
         account1.getAddress(),
         0,
         0,
@@ -126,6 +132,8 @@ public class AggregateTransactionServiceTest {
 
   MultisigAccountInfo givenAccount2Info() {
     return new MultisigAccountInfo(
+        "a",
+        1,
         account2.getAddress(),
         0,
         0,
@@ -135,6 +143,8 @@ public class AggregateTransactionServiceTest {
 
   MultisigAccountInfo givenAccount3Info() {
     return new MultisigAccountInfo(
+        "a",
+        1,
         account3.getAddress(),
         0,
         0,
@@ -144,7 +154,7 @@ public class AggregateTransactionServiceTest {
 
   MultisigAccountInfo givenAccount4Info() {
     return new MultisigAccountInfo(
-        account4.getAddress(), 0, 0, Collections.emptyList(), Collections.emptyList());
+        "a", 1, account4.getAddress(), 0, 0, Collections.emptyList(), Collections.emptyList());
   }
 
   MultisigAccountGraphInfo givenMultisig2AccountGraphInfo() {
@@ -153,6 +163,8 @@ public class AggregateTransactionServiceTest {
         1,
         Collections.singletonList(
             new MultisigAccountInfo(
+                "a",
+                1,
                 multisig2.getAddress(),
                 0,
                 1,
@@ -163,6 +175,8 @@ public class AggregateTransactionServiceTest {
         2,
         Collections.singletonList(
             new MultisigAccountInfo(
+                "a",
+                1,
                 multisig1.getAddress(),
                 1,
                 1,
@@ -178,6 +192,8 @@ public class AggregateTransactionServiceTest {
         0,
         Collections.singletonList(
             new MultisigAccountInfo(
+                "a",
+                1,
                 multisig3.getAddress(),
                 2,
                 2,
@@ -192,6 +208,8 @@ public class AggregateTransactionServiceTest {
     Map<Integer, List<MultisigAccountInfo>> infoMap = new HashMap<>();
     MultisigAccountInfo multisigAccountInfo1 =
         new MultisigAccountInfo(
+            "a",
+            1,
             multisig1.getAddress(),
             1,
             1,
@@ -201,6 +219,8 @@ public class AggregateTransactionServiceTest {
 
     MultisigAccountInfo multisigAccountInfo2 =
         new MultisigAccountInfo(
+            "a",
+            1,
             multisig2.getAddress(),
             1,
             1,

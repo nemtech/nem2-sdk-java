@@ -34,6 +34,7 @@ import io.nem.symbol.sdk.api.MosaicSearchCriteria;
 import io.nem.symbol.sdk.api.NamespacePaginationStreamer;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.api.NamespaceSearchCriteria;
+import io.nem.symbol.sdk.api.OrderBy;
 import io.nem.symbol.sdk.api.PaginationStreamer;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.RestrictionAccountRepository;
@@ -45,11 +46,13 @@ import io.nem.symbol.sdk.api.SecretLockSearchCriteria;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountRestrictions;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.metadata.Metadata;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.namespace.NamespaceInfo;
+import io.nem.symbol.sdk.model.namespace.NamespaceName;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.symbol.sdk.model.restriction.MosaicRestriction;
 import io.nem.symbol.sdk.model.state.StateMerkleProof;
@@ -60,6 +63,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -70,6 +74,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
 
   public static final int TAKE_COUNT = 10;
+  public static final OrderBy ORDER_BY = OrderBy.DESC;
 
   //  public static void main(String[] args) {
   //    RepositoryFactory repositoryFactory =
@@ -98,7 +103,7 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
     RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
     HashLockRepository repository = repositoryFactory.createHashLockRepository();
     HashLockPaginationStreamer streamer = new HashLockPaginationStreamer(repository);
-    return getArguments(streamer, new HashLockSearchCriteria());
+    return getArguments(streamer, new HashLockSearchCriteria().order(OrderBy.DESC));
   }
 
   @ParameterizedTest
@@ -115,7 +120,7 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
         repositoryFactory.createRestrictionAccountRepository();
     AccountRestrictionsPaginationStreamer streamer =
         new AccountRestrictionsPaginationStreamer(repository);
-    return getArguments(streamer, new AccountRestrictionSearchCriteria());
+    return getArguments(streamer, new AccountRestrictionSearchCriteria().order(OrderBy.DESC));
   }
 
   @ParameterizedTest
@@ -126,11 +131,25 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
     Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId().plain());
   }
 
+  @Test
+  void multisigMerkles() {
+    RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
+    MultisigAccountInfo state =
+        get(
+            repositoryFactory
+                .createMultisigRepository()
+                .getMultisigAccountInfo(
+                    Address.createFromRawAddress("TCFAEINOWAAPSGT2OCBCZYMH2Q3PGHQPEYTIUKI")));
+    StateProofServiceImpl service = new StateProofServiceImpl(repositoryFactory);
+    StateMerkleProof<Address> proof = get(service.multisig(state));
+    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId().plain());
+  }
+
   public List<Arguments> secretLocks() {
     RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
     SecretLockRepository repository = repositoryFactory.createSecretLockRepository();
     SecretLockPaginationStreamer streamer = new SecretLockPaginationStreamer(repository);
-    return getArguments(streamer, new SecretLockSearchCriteria());
+    return getArguments(streamer, new SecretLockSearchCriteria().order(ORDER_BY));
   }
 
   @ParameterizedTest
@@ -145,7 +164,7 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
     RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
     AccountRepository repository = repositoryFactory.createAccountRepository();
     AccountPaginationStreamer streamer = new AccountPaginationStreamer(repository);
-    return getArguments(streamer, new AccountSearchCriteria());
+    return getArguments(streamer, new AccountSearchCriteria().order(ORDER_BY));
   }
 
   @ParameterizedTest
@@ -160,7 +179,7 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
     RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
     MosaicRepository repository = repositoryFactory.createMosaicRepository();
     MosaicPaginationStreamer streamer = new MosaicPaginationStreamer(repository);
-    return getArguments(streamer, new MosaicSearchCriteria());
+    return getArguments(streamer, new MosaicSearchCriteria().order(ORDER_BY));
   }
 
   @ParameterizedTest
@@ -177,15 +196,16 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
     NamespacePaginationStreamer streamer = new NamespacePaginationStreamer(repository);
     return getArguments(
         streamer,
-        new NamespaceSearchCriteria().registrationType(NamespaceRegistrationType.ROOT_NAMESPACE));
+        new NamespaceSearchCriteria().order(ORDER_BY)
+            .registrationType(NamespaceRegistrationType.ROOT_NAMESPACE));
   }
 
   @ParameterizedTest
   @MethodSource("namespaces")
   void namespacesMerkles(NamespaceInfo state, RepositoryType repositoryType) {
-    StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
+    RepositoryFactory repositoryFactory = getRepositoryFactory(repositoryType);
+    StateProofServiceImpl service = new StateProofServiceImpl(repositoryFactory);
     StateMerkleProof<NamespaceId> proof = get(service.namespace(state));
-    System.out.println("NamespaceId " + proof.getId().getIdAsHex());
     Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId().getIdAsHex());
   }
 
@@ -193,7 +213,7 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
     RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
     MetadataRepository repository = repositoryFactory.createMetadataRepository();
     MetadataPaginationStreamer streamer = new MetadataPaginationStreamer(repository);
-    return getArguments(streamer, new MetadataSearchCriteria());
+    return getArguments(streamer, new MetadataSearchCriteria().order(ORDER_BY));
   }
 
   @ParameterizedTest

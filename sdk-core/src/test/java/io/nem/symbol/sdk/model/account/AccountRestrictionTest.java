@@ -43,11 +43,11 @@ public class AccountRestrictionTest {
     assertEquals(2, accountRestrictionOperation.getValues().size());
 
     AccountRestrictions accountRestrictions =
-        new AccountRestrictions(address, Collections.singletonList(accountRestrictionOperation));
+        new AccountRestrictions(1, address, Collections.singletonList(accountRestrictionOperation));
 
     byte[] serializedState = accountRestrictions.serialize();
     String expectedHex =
-        "9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E101000000000000000440020000000000000054414442";
+        "01009050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E101000000000000000440020000000000000054414442";
     assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
 
     AccountRestrictionsBuilder builder =
@@ -69,7 +69,7 @@ public class AccountRestrictionTest {
             AccountAddressRestrictionFlags.ALLOW_OUTGOING_ADDRESS,
             Collections.singletonList("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQM"));
     AccountRestrictions accountRestrictions =
-        new AccountRestrictions(address, Arrays.asList(accountRestriction));
+        new AccountRestrictions(1, address, Arrays.asList(accountRestriction));
     AccountPropertiesInfo accountPropertiesInfo =
         new AccountPropertiesInfo(metaId, accountRestrictions);
 
@@ -86,7 +86,7 @@ public class AccountRestrictionTest {
 
     byte[] serializedState = accountRestrictions.serialize();
     String expectedHex =
-        "9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1010000000000000001400000000000000000";
+        "01009050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1010000000000000001400000000000000000";
     assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
 
     AccountRestrictionsBuilder builder =
@@ -101,13 +101,13 @@ public class AccountRestrictionTest {
     Address address = Address.createFromEncoded("9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1");
 
     AccountRestrictions accountRestrictions =
-        new AccountRestrictions(address, Collections.emptyList());
+        new AccountRestrictions(1, address, Collections.emptyList());
 
     assertEquals(address, accountRestrictions.getAddress());
     assertEquals(0, accountRestrictions.getRestrictions().size());
 
     byte[] serializedState = accountRestrictions.serialize();
-    String expectedHex = "9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E10000000000000000";
+    String expectedHex = "01009050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E10000000000000000";
     assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
 
     AccountRestrictionsBuilder builder =
@@ -128,7 +128,7 @@ public class AccountRestrictionTest {
             AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
             Arrays.asList("SDZWZJUAYNOWGBTCUDBY3SE5JF4NCC2RDM6SIGQM"));
     AccountRestrictions accountRestrictions =
-        new AccountRestrictions(address, Arrays.asList(accountAllowIncomingRestriction));
+        new AccountRestrictions(1, address, Arrays.asList(accountAllowIncomingRestriction));
 
     assertEquals(address, accountRestrictions.getAddress());
     assertEquals(1, accountRestrictions.getRestrictions().size());
@@ -138,7 +138,7 @@ public class AccountRestrictionTest {
 
     byte[] serializedState = accountRestrictions.serialize();
     String expectedHex =
-        "9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1010000000000000001000000000000000000";
+        "01009050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E1010000000000000001000000000000000000";
     assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
 
     AccountRestrictionsBuilder builder =
@@ -170,11 +170,13 @@ public class AccountRestrictionTest {
 
     AccountRestrictions accountRestrictions =
         new AccountRestrictions(
-            address, Arrays.asList(accountRestrictionOperation, accountAllowIncomingRestriction));
+            1,
+            address,
+            Arrays.asList(accountRestrictionOperation, accountAllowIncomingRestriction));
 
     byte[] serializedState = accountRestrictions.serialize();
     String expectedHex =
-        "9050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E10200000000000000044002000000000000005441444201000000000000000000";
+        "01009050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E10200000000000000044002000000000000005441444201000000000000000000";
     assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
 
     AccountRestrictionsBuilder builder =

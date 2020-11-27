@@ -41,6 +41,7 @@ public class MosaicInfo implements Stored {
   /** The database id. */
   private final String recordId;
 
+  private final int version;
   private final MosaicId mosaicId;
   private final BigInteger supply;
   private final BigInteger startHeight;
@@ -53,6 +54,7 @@ public class MosaicInfo implements Stored {
   @SuppressWarnings("squid:S00107")
   public MosaicInfo(
       final String recordId,
+      int version,
       final MosaicId mosaicId,
       final BigInteger supply,
       final BigInteger startHeight,
@@ -61,13 +63,14 @@ public class MosaicInfo implements Stored {
       final MosaicFlags mosaicFlags,
       final int divisibility,
       final BigInteger duration) {
-    this.recordId = recordId;
     Validate.notNull(mosaicId, "mosaicId must be provided");
     Validate.notNull(supply, "supply must be provided");
     Validate.notNull(startHeight, "startHeight must be provided");
     Validate.notNull(ownerAddress, "ownerAddress must be provided");
     Validate.notNull(mosaicFlags, "mosaicFlags must be provided");
     Validate.notNull(duration, "duration must be provided");
+    this.recordId = recordId;
+    this.version = version;
     this.mosaicId = mosaicId;
     this.supply = supply;
     this.startHeight = startHeight;
@@ -168,6 +171,20 @@ public class MosaicInfo implements Stored {
     return duration;
   }
 
+  /**
+   * Returns the state version
+   *
+   * @return the version
+   */
+  public int getVersion() {
+    return version;
+  }
+
+  /** @return the flags of the mosaics */
+  public MosaicFlags getMosaicFlags() {
+    return mosaicFlags;
+  }
+
   /** @return the internal database id. */
   public Optional<String> getRecordId() {
     return Optional.ofNullable(recordId);
@@ -189,12 +206,13 @@ public class MosaicInfo implements Stored {
     HeightDto startHeight = new HeightDto(getStartHeight().longValue());
     AddressDto ownerAddress = SerializationUtils.toAddressDto(getOwnerAddress());
     int revision = (int) getRevision();
-    EnumSet<MosaicFlagsDto> flags = SerializationUtils.getMosaicFlagsEnumSet(this.mosaicFlags);
+    EnumSet<MosaicFlagsDto> flags = SerializationUtils.getMosaicFlagsEnumSet(this.getMosaicFlags());
     MosaicPropertiesBuilder properties =
         MosaicPropertiesBuilder.create(
             flags, (byte) getDivisibility(), new BlockDurationDto(getDuration().longValue()));
     MosaicDefinitionBuilder definition =
         MosaicDefinitionBuilder.create(startHeight, ownerAddress, revision, properties);
-    return MosaicEntryBuilder.create(mosaicId, supply, definition).serialize();
+    return MosaicEntryBuilder.create((short) getVersion(), mosaicId, supply, definition)
+        .serialize();
   }
 }

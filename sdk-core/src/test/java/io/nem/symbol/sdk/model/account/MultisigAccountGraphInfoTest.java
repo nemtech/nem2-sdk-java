@@ -33,6 +33,8 @@ class MultisigAccountGraphInfoTest {
     Map<Integer, List<MultisigAccountInfo>> info = new HashMap<>();
     MultisigAccountInfo multisigAccountInfo =
         new MultisigAccountInfo(
+            "a",
+            1,
             new PublicAccount(
                     "5D58EC16F07BF00BDE9B040E7451A37F9908C59E143A01438C04345D8E9DDF39",
                     NetworkType.MIJIN_TEST)

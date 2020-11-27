@@ -72,6 +72,7 @@ public class MetadataTest {
     Metadata metadata =
         new Metadata(
             recordId,
+            1,
             compositeHash,
             sourceAddress,
             targetAddress,
@@ -90,7 +91,7 @@ public class MetadataTest {
 
     byte[] serializedState = metadata.serialize();
     String expectedHex =
-        "900E96DC85F6B24AC9C8DB5FFC59C35880C0B722C7A416A790FD35818960C7B18B72F49A5598FA9F712A354DB38EB0760A0000000000000068E0AE3A0168EDBD020B00536F6D6520537472696E67";
+        "0100900E96DC85F6B24AC9C8DB5FFC59C35880C0B722C7A416A790FD35818960C7B18B72F49A5598FA9F712A354DB38EB0760A0000000000000068E0AE3A0168EDBD020B00536F6D6520537472696E67";
     Assertions.assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
     MetadataEntryBuilder builder =
         MetadataEntryBuilder.loadFromBinary(SerializationUtils.toDataInput(serializedState));
@@ -107,6 +108,7 @@ public class MetadataTest {
     Metadata metadata =
         new Metadata(
             recordId,
+            1,
             compositeHash,
             sourceAddress,
             targetAddress,
@@ -125,7 +127,7 @@ public class MetadataTest {
 
     byte[] serializedState = metadata.serialize();
     String expectedHex =
-        "900E96DC85F6B24AC9C8DB5FFC59C35880C0B722C7A416A790FD35818960C7B18B72F49A5598FA9F712A354DB38EB0760A000000000000000000000000000000000B00536F6D6520537472696E67";
+        "0100900E96DC85F6B24AC9C8DB5FFC59C35880C0B722C7A416A790FD35818960C7B18B72F49A5598FA9F712A354DB38EB0760A000000000000000000000000000000000B00536F6D6520537472696E67";
     Assertions.assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
     MetadataEntryBuilder builder =
         MetadataEntryBuilder.loadFromBinary(SerializationUtils.toDataInput(serializedState));
@@ -142,6 +144,7 @@ public class MetadataTest {
     Metadata metadata =
         new Metadata(
             recordId,
+            1,
             compositeHash,
             sourceAddress,
             targetAddress,
@@ -160,7 +163,7 @@ public class MetadataTest {
 
     byte[] serializedState = metadata.serialize();
     String expectedHex =
-        "900E96DC85F6B24AC9C8DB5FFC59C35880C0B722C7A416A790FD35818960C7B18B72F49A5598FA9F712A354DB38EB0760A000000000000004460BA6E125F9C1C010B00536F6D6520537472696E67";
+        "0100900E96DC85F6B24AC9C8DB5FFC59C35880C0B722C7A416A790FD35818960C7B18B72F49A5598FA9F712A354DB38EB0760A000000000000004460BA6E125F9C1C010B00536F6D6520537472696E67";
     Assertions.assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
     MetadataEntryBuilder builder =
         MetadataEntryBuilder.loadFromBinary(SerializationUtils.toDataInput(serializedState));

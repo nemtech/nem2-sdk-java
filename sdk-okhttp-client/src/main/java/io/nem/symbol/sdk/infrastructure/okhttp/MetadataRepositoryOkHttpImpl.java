@@ -99,6 +99,7 @@ public class MetadataRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
     MetadataEntryDTO entryDto = dto.getMetadataEntry();
     return new Metadata(
         dto.getId(),
+        1,
         entryDto.getCompositeHash(),
         MapperUtils.toAddress(entryDto.getSourceAddress()),
         MapperUtils.toAddress(entryDto.getTargetAddress()),

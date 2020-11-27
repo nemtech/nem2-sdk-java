@@ -35,6 +35,10 @@ public class SecretLockInfo implements Stored {
 
   /** The stored database id. */
   private final String recordId;
+
+  /** the state version */
+  private final int version;
+
   /** Address expressed in hexadecimal base. */
   private final Address ownerAddress;
 
@@ -67,6 +71,7 @@ public class SecretLockInfo implements Stored {
 
   public SecretLockInfo(
       String recordId,
+      int version,
       Address ownerAddress,
       MosaicId mosaicId,
       BigInteger amount,
@@ -76,6 +81,7 @@ public class SecretLockInfo implements Stored {
       String secret,
       Address recipientAddress,
       String compositeHash) {
+    this.version = version;
 
     Validate.notNull(ownerAddress, "ownerAddress is required");
     Validate.notNull(mosaicId, "mosaicId is required");
@@ -138,9 +144,13 @@ public class SecretLockInfo implements Stored {
     return compositeHash;
   }
 
+  public int getVersion() {
+    return version;
+  }
+
   /** @return serializes the state of this object. */
   public byte[] serialize() {
-
+    short version = (short) getVersion();
     AddressDto ownerAddress = SerializationUtils.toAddressDto(getOwnerAddress());
     MosaicBuilder mosaic =
         MosaicBuilder.create(
@@ -153,7 +163,7 @@ public class SecretLockInfo implements Stored {
     LockHashAlgorithmDto hashAlgorithm =
         LockHashAlgorithmDto.rawValueOf((byte) this.hashAlgorithm.getValue());
     return SecretLockInfoBuilder.create(
-            ownerAddress, mosaic, endHeight, status, hashAlgorithm, secret, recipient)
+            version, ownerAddress, mosaic, endHeight, status, hashAlgorithm, secret, recipient)
         .serialize();
   }
 }

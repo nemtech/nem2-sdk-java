@@ -34,6 +34,10 @@ public class HashLockInfo implements Stored {
 
   /** The stored database id. */
   private final String recordId;
+
+  /** the state version */
+  private final int version;
+
   /** Address expressed in hexadecimal base. */
   private final Address ownerAddress;
 
@@ -56,12 +60,14 @@ public class HashLockInfo implements Stored {
 
   public HashLockInfo(
       String recordId,
+      int version,
       Address ownerAddress,
       MosaicId mosaicId,
       BigInteger amount,
       BigInteger endHeight,
       LockStatus status,
       String hash) {
+    this.version = version;
     Validate.notNull(ownerAddress, "ownerAddress is required");
     Validate.notNull(mosaicId, "mosaicId is required");
     Validate.notNull(amount, "amount is required");
@@ -106,6 +112,10 @@ public class HashLockInfo implements Stored {
     return hash;
   }
 
+  public int getVersion() {
+    return version;
+  }
+
   /** @return serializes the state of this object. */
   public byte[] serialize() {
 
@@ -117,6 +127,8 @@ public class HashLockInfo implements Stored {
     HeightDto endHeight = new HeightDto(getEndHeight().longValue());
     LockStatusDto status = LockStatusDto.rawValueOf(getStatus().getValue());
     Hash256Dto hash = SerializationUtils.toHash256Dto(getHash());
-    return HashLockInfoBuilder.create(ownerAddress, mosaic, endHeight, status, hash).serialize();
+    return HashLockInfoBuilder.create(
+            (short) getVersion(), ownerAddress, mosaic, endHeight, status, hash)
+        .serialize();
   }
 }

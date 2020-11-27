@@ -59,6 +59,7 @@ public class HashLockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     HashLockEntryDTO lock = dto.getLock();
     return new HashLockInfo(
         dto.getId(),
+        1,
         MapperUtils.toAddress(lock.getOwnerAddress()),
         MapperUtils.toMosaicId(lock.getMosaicId()),
         lock.getAmount(),

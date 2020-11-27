@@ -43,7 +43,7 @@ public class HashLockInfoTest {
 
     HashLockInfo info =
         new HashLockInfo(
-            recordId.orElse(null), ownerAddress, mosaicId, amount, endHeight, status, hash);
+            recordId.orElse(null), 1, ownerAddress, mosaicId, amount, endHeight, status, hash);
 
     Assertions.assertEquals(recordId, info.getRecordId());
     Assertions.assertEquals(ownerAddress, info.getOwnerAddress());
@@ -55,7 +55,7 @@ public class HashLockInfoTest {
 
     byte[] serializedState = info.serialize();
     String expectedHex =
-        "90F1B694E1801EEFE42846E9239B54C9D381FCDF2A04A421E9F49B9E5199FC7601000000000000000A0000000000000001DD9EC2AC9AB11FC7E942E5FA39AF8811180F236E29BCD40DB812392295512F55";
+        "010090F1B694E1801EEFE42846E9239B54C9D381FCDF2A04A421E9F49B9E5199FC7601000000000000000A0000000000000001DD9EC2AC9AB11FC7E942E5FA39AF8811180F236E29BCD40DB812392295512F55";
     Assertions.assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
     HashLockInfoBuilder builder =
         HashLockInfoBuilder.loadFromBinary(SerializationUtils.toDataInput(serializedState));

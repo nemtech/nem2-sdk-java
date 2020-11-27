@@ -67,6 +67,8 @@ public class RestrictionMosaicRepositoryOkHttpImpl extends AbstractRepositoryOkH
                     LinkedHashMap::new));
 
     return new MosaicGlobalRestriction(
+        mosaicGlobalRestrictionDTO.getId(),
+        1,
         dto.getCompositeHash(),
         MosaicRestrictionEntryType.rawValueOf(dto.getEntryType().getValue()),
         MapperUtils.toMosaicId(dto.getMosaicId()),
@@ -91,6 +93,8 @@ public class RestrictionMosaicRepositoryOkHttpImpl extends AbstractRepositoryOkH
                 Collectors.toMap(e -> new BigInteger(e.getKey()), e -> toBigInteger(e.getValue())));
 
     return new MosaicAddressRestriction(
+        mosaicAddressRestrictionDTO.getId(),
+        1,
         dto.getCompositeHash(),
         MosaicRestrictionEntryType.rawValueOf(dto.getEntryType().getValue()),
         MapperUtils.toMosaicId(dto.getMosaicId()),

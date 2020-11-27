@@ -161,7 +161,6 @@ public class MosaicRestrictionTransactionServiceImpl
             .targetAddress(targetAddress)
             .entryType(MosaicRestrictionEntryType.ADDRESS);
 
-    System.out.println(criteria);
     return MosaicRestrictionPaginationStreamer.address(this.repository, criteria)
         .map(r -> Optional.ofNullable(r.getRestrictions().get(restrictionKey)))
         .first(Optional.empty())

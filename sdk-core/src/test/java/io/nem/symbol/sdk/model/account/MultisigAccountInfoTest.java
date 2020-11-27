@@ -55,7 +55,7 @@ class MultisigAccountInfoTest {
   void shouldBeCreated() {
     MultisigAccountInfo multisigAccountInfo =
         new MultisigAccountInfo(
-            address1, 2, 1, Collections.singletonList(address2), Collections.emptyList());
+            "a", 1, address1, 2, 1, Collections.singletonList(address2), Collections.emptyList());
     assertEquals(1, multisigAccountInfo.getMinRemoval());
     assertEquals(2, multisigAccountInfo.getMinApproval());
     assertEquals(1, multisigAccountInfo.getCosignatoryAddresses().size());
@@ -66,7 +66,7 @@ class MultisigAccountInfoTest {
   void isCosignerShouldReturnTrueWhenTheAccountIsInTheCosignatoriesList() {
     MultisigAccountInfo multisigAccountInfo =
         new MultisigAccountInfo(
-            address1, 2, 1, Arrays.asList(address2, address3), Collections.emptyList());
+            "a", 1, address1, 2, 1, Arrays.asList(address2, address3), Collections.emptyList());
 
     assertTrue(multisigAccountInfo.hasCosigner(address2));
   }
@@ -75,7 +75,7 @@ class MultisigAccountInfoTest {
   void isCosignatoryShouldReturnFalseWhenTheAccountIsNotInTHeCosignatoriesList() {
     MultisigAccountInfo multisigAccountInfo =
         new MultisigAccountInfo(
-            address1, 2, 1, Arrays.asList(address2, address3), Collections.emptyList());
+            "a", 1, address1, 2, 1, Arrays.asList(address2, address3), Collections.emptyList());
 
     assertFalse(multisigAccountInfo.hasCosigner(address4));
   }
@@ -84,7 +84,7 @@ class MultisigAccountInfoTest {
   void isCosignerOfMultisigAccountShouldReturnTrueWhenItContainsThatAccountInMultisigList() {
     MultisigAccountInfo multisigAccountInfo =
         new MultisigAccountInfo(
-            address1, 2, 1, Collections.emptyList(), Arrays.asList(address2, address3));
+            "a", 1, address1, 2, 1, Collections.emptyList(), Arrays.asList(address2, address3));
 
     assertTrue(multisigAccountInfo.isCosignerOfMultisigAccount(address2));
   }
@@ -94,7 +94,7 @@ class MultisigAccountInfoTest {
       isCosignerOfMultisigAccountShouldReturnFalseWhenItDoesNotContainsThatAccountInMultisigList() {
     MultisigAccountInfo multisigAccountInfo =
         new MultisigAccountInfo(
-            address1, 2, 1, Collections.emptyList(), Arrays.asList(address2, address3));
+            "a", 1, address1, 2, 1, Collections.emptyList(), Arrays.asList(address2, address3));
 
     assertFalse(multisigAccountInfo.isCosignerOfMultisigAccount(address4));
   }
@@ -103,7 +103,7 @@ class MultisigAccountInfoTest {
   void returnCosignersList() {
     MultisigAccountInfo multisigAccountInfo =
         new MultisigAccountInfo(
-            address1, 2, 1, Arrays.asList(address2, address3), Collections.emptyList());
+            "a", 1, address1, 2, 1, Arrays.asList(address2, address3), Collections.emptyList());
 
     assertEquals(Arrays.asList(address2, address3), multisigAccountInfo.getCosignatoryAddresses());
   }
@@ -112,7 +112,7 @@ class MultisigAccountInfoTest {
   void returnMultisigList() {
     MultisigAccountInfo multisigAccountInfo =
         new MultisigAccountInfo(
-            address1, 2, 1, Collections.emptyList(), Arrays.asList(address2, address3));
+            "a", 1, address1, 2, 1, Collections.emptyList(), Arrays.asList(address2, address3));
 
     assertEquals(Arrays.asList(address2, address3), multisigAccountInfo.getMultisigAddresses());
   }
@@ -121,7 +121,7 @@ class MultisigAccountInfoTest {
   void isMultisigShouldReturnTrueWhenMinApprovalDifferentTo0() {
     MultisigAccountInfo multisigAccountInfo =
         new MultisigAccountInfo(
-            address1, 0, 1, Collections.emptyList(), Arrays.asList(address2, address3));
+            "a", 1, address1, 0, 1, Collections.emptyList(), Arrays.asList(address2, address3));
 
     assertFalse(multisigAccountInfo.isMultisig());
   }
@@ -130,7 +130,7 @@ class MultisigAccountInfoTest {
   void isMultisigShouldReturnTrueWhenMinRemovalDifferentTo0() {
     MultisigAccountInfo multisigAccountInfo =
         new MultisigAccountInfo(
-            address1, 1, 0, Collections.emptyList(), Arrays.asList(address2, address3));
+            "a", 1, address1, 1, 0, Collections.emptyList(), Arrays.asList(address2, address3));
 
     assertFalse(multisigAccountInfo.isMultisig());
   }
@@ -139,7 +139,7 @@ class MultisigAccountInfoTest {
   void isMultisigShouldReturnFalseWhenMinRemovalAndMinApprovalEqualsTo0() {
     MultisigAccountInfo multisigAccountInfo =
         new MultisigAccountInfo(
-            address1, 1, 1, Collections.emptyList(), Arrays.asList(address2, address3));
+            "a", 1, address1, 1, 1, Collections.emptyList(), Arrays.asList(address2, address3));
 
     assertTrue(multisigAccountInfo.isMultisig());
   }
@@ -148,11 +148,17 @@ class MultisigAccountInfoTest {
   void serialize() {
     MultisigAccountInfo info =
         new MultisigAccountInfo(
-            address1, 3, 2, Arrays.asList(address3, address4), Arrays.asList(address2, address3));
+            "a",
+            1,
+            address1,
+            3,
+            2,
+            Arrays.asList(address3, address4),
+            Arrays.asList(address2, address3));
 
     byte[] serializedState = info.serialize();
     String expectedHex =
-        "03000000020000009022D04812D05000F96C283657B0C17990932BC84926CDE6020000000000000090CF2886A23771534F2CEF86094B4C4FBC1E19C286B11E5B9049E14BEBCA93758EB36805BAE760A57239976F009A545C02000000000000009050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E190CF2886A23771534F2CEF86094B4C4FBC1E19C286B11E5B";
+        "010003000000020000009022D04812D05000F96C283657B0C17990932BC84926CDE6020000000000000090CF2886A23771534F2CEF86094B4C4FBC1E19C286B11E5B9049E14BEBCA93758EB36805BAE760A57239976F009A545C02000000000000009050B9837EFAB4BBE8A4B9BB32D812F9885C00D8FC1650E190CF2886A23771534F2CEF86094B4C4FBC1E19C286B11E5B";
     Assertions.assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
     MultisigEntryBuilder builder =
         MultisigEntryBuilder.loadFromBinary(SerializationUtils.toDataInput(serializedState));

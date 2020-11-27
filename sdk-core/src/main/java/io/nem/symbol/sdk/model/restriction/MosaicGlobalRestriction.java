@@ -19,6 +19,7 @@ import io.nem.symbol.catapult.builders.GlobalKeyValueBuilder;
 import io.nem.symbol.catapult.builders.GlobalKeyValueSetBuilder;
 import io.nem.symbol.catapult.builders.MosaicGlobalRestrictionEntryBuilder;
 import io.nem.symbol.catapult.builders.MosaicIdDto;
+import io.nem.symbol.catapult.builders.MosaicRestrictionEntryBuilder;
 import io.nem.symbol.catapult.builders.MosaicRestrictionKeyDto;
 import io.nem.symbol.catapult.builders.MosaicRestrictionTypeDto;
 import io.nem.symbol.catapult.builders.RestrictionRuleBuilder;
@@ -35,17 +36,21 @@ public class MosaicGlobalRestriction extends MosaicRestriction<MosaicGlobalRestr
   /**
    * constructor
    *
+   * @param recordId the db id
+   * @param version the version
    * @param compositeHash the restriction composite hash
    * @param entryType the entry type
    * @param mosaicId the mosaic id
    * @param restrictions the restrictions of the mosaic.
    */
   public MosaicGlobalRestriction(
+      String recordId,
+      int version,
       String compositeHash,
       MosaicRestrictionEntryType entryType,
       MosaicId mosaicId,
       Map<BigInteger, MosaicGlobalRestrictionItem> restrictions) {
-    super(compositeHash, entryType, mosaicId, restrictions);
+    super(recordId, version, compositeHash, entryType, mosaicId, restrictions);
   }
 
   /** @return serializes the state of this object. */
@@ -56,7 +61,9 @@ public class MosaicGlobalRestriction extends MosaicRestriction<MosaicGlobalRestr
             getRestrictions().entrySet().stream()
                 .map(this::toGlobalKeyValueSetBuilder)
                 .collect(Collectors.toList()));
-    return MosaicGlobalRestrictionEntryBuilder.create(mosaicId, restrictions).serialize();
+    MosaicGlobalRestrictionEntryBuilder entry =
+        MosaicGlobalRestrictionEntryBuilder.create(mosaicId, restrictions);
+    return MosaicRestrictionEntryBuilder.createGlobal((short) getVersion(), entry).serialize();
   }
 
   private GlobalKeyValueBuilder toGlobalKeyValueSetBuilder(

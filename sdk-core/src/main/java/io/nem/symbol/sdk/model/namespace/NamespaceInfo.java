@@ -26,6 +26,8 @@ import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.Stored;
 import io.nem.symbol.sdk.model.account.Address;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,6 +41,7 @@ import org.apache.commons.lang3.Validate;
 public class NamespaceInfo implements Stored {
 
   private final String recordId;
+  private final int version;
   private final boolean active;
   private final Integer index;
   private final NamespaceRegistrationType registrationType;
@@ -53,6 +56,7 @@ public class NamespaceInfo implements Stored {
   @SuppressWarnings("squid:S00107")
   public NamespaceInfo(
       String recordId,
+      int version,
       boolean active,
       Integer index,
       NamespaceRegistrationType registrationType,
@@ -73,6 +77,7 @@ public class NamespaceInfo implements Stored {
     Validate.notNull(alias, "alias is required");
 
     this.recordId = recordId;
+    this.version = version;
     this.active = active;
     this.index = index;
     this.registrationType = registrationType;
@@ -220,6 +225,11 @@ public class NamespaceInfo implements Stored {
     return this.registrationType == NamespaceRegistrationType.SUB_NAMESPACE;
   }
 
+  /** @return The state version */
+  public int getVersion() {
+    return version;
+  }
+
   /**
    * Returns the Parent Namespace Id
    *
@@ -233,7 +243,14 @@ public class NamespaceInfo implements Stored {
   }
 
   /** @return serializes the state of this object. */
-  public byte[] serialize(List<NamespaceInfo> children) {
+  public byte[] serialize(List<NamespaceInfo> fullPath) {
+    if (!this.isRoot()) {
+      throw new IllegalArgumentException("Namespace must be root in order to serialize!");
+    }
+    List<NamespaceInfo> children = sortList(fullPath, this.getId());
+    if (fullPath.size() != children.size()) {
+      throw new IllegalArgumentException("Some of the children do not belong to this root namespace");
+    }
 
     NamespaceIdDto id = new NamespaceIdDto(getId().getIdAsLong());
     AddressDto ownerAddress = SerializationUtils.toAddressDto(getOwnerAddress());
@@ -243,13 +260,35 @@ public class NamespaceInfo implements Stored {
     NamespaceAliasBuilder rootAlias = getAlias().createAliasBuilder();
     List<NamespacePathBuilder> paths =
         children.stream().map(this::toNamespaceAliasTypeDto).collect(Collectors.toList());
-    return RootNamespaceHistoryBuilder.create(id, ownerAddress, lifetime, rootAlias, paths)
-        .serialize();
+    RootNamespaceHistoryBuilder builder =
+        RootNamespaceHistoryBuilder.create(
+            (short) getVersion(), id, ownerAddress, lifetime, rootAlias, paths);
+
+    return builder.serialize();
+  }
+
+  private static List<NamespaceInfo> sortList(
+      final List<NamespaceInfo> nodes, NamespaceId parentId) {
+    return treeAdd(nodes, parentId, new ArrayList<>());
+  }
+
+  private static List<NamespaceInfo> treeAdd(
+      List<NamespaceInfo> nodes, NamespaceId parentId, List<NamespaceInfo> treeList) {
+    nodes.stream()
+        .filter(r -> r.isSubnamespace() && r.parentNamespaceId().equals(parentId))
+        .sorted(Comparator.comparing(n -> n.getId().getId()))
+        .forEach(
+            n -> {
+              treeList.add(n);
+              treeAdd(nodes, n.getId(), treeList);
+            });
+    return treeList;
   }
 
   private NamespacePathBuilder toNamespaceAliasTypeDto(NamespaceInfo namespaceInfo) {
     List<NamespaceIdDto> path =
         namespaceInfo.getLevels().stream()
+            .skip(1)
             .map(id -> new NamespaceIdDto(id.getIdAsLong()))
             .collect(Collectors.toList());
     NamespaceAliasBuilder alias = namespaceInfo.getAlias().createAliasBuilder();

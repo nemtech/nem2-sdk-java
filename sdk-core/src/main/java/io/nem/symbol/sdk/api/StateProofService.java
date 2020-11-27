@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.api;
 import io.nem.symbol.sdk.model.account.AccountInfo;
 import io.nem.symbol.sdk.model.account.AccountRestrictions;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.metadata.Metadata;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
@@ -44,6 +45,8 @@ public interface StateProofService {
   Observable<StateMerkleProof<Address>> accountRestrictions(AccountRestrictions state);
 
   Observable<StateMerkleProof<Address>> account(AccountInfo state);
+
+  Observable<StateMerkleProof<Address>> multisig(MultisigAccountInfo state);
 
   Observable<StateMerkleProof<NamespaceId>> namespace(NamespaceInfo state);
 }
