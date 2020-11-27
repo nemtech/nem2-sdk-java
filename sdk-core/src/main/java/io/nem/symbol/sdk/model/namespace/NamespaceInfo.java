@@ -249,7 +249,8 @@ public class NamespaceInfo implements Stored {
     }
     List<NamespaceInfo> children = sortList(fullPath, this.getId());
     if (fullPath.size() != children.size()) {
-      throw new IllegalArgumentException("Some of the children do not belong to this root namespace");
+      throw new IllegalArgumentException(
+          "Some of the children do not belong to this root namespace");
     }
 
     NamespaceIdDto id = new NamespaceIdDto(getId().getIdAsLong());

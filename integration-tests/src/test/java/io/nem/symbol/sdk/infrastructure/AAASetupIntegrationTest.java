@@ -19,7 +19,6 @@ import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.symbol.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
-import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -44,7 +43,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
 
     NamespaceRegistrationTransaction root =
         NamespaceRegistrationTransactionFactory.createRootNamespace(
-            getNetworkType(), getDeadline(), "root", helper.getDuration())
+                getNetworkType(), getDeadline(), "root", helper.getDuration())
             .maxFee(maxFee)
             .build();
 
@@ -52,7 +51,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
 
     NamespaceRegistrationTransaction child =
         NamespaceRegistrationTransactionFactory.createSubNamespace(
-            getNetworkType(), getDeadline(), "child", root.getNamespaceId())
+                getNetworkType(), getDeadline(), "child", root.getNamespaceId())
             .maxFee(maxFee)
             .build();
 
@@ -66,57 +65,52 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
 
     NamespaceRegistrationTransaction root =
         NamespaceRegistrationTransactionFactory.createRootNamespace(
-            getNetworkType(), getDeadline(), "root3", helper.getDuration())
+                getNetworkType(), getDeadline(), "root3", helper.getDuration())
             .maxFee(maxFee)
             .build();
     helper().announceAndValidate(type, account, root);
 
     NamespaceRegistrationTransaction child1 =
         NamespaceRegistrationTransactionFactory.createSubNamespace(
-            getNetworkType(), getDeadline(), "child1", root.getNamespaceId())
+                getNetworkType(), getDeadline(), "child1", root.getNamespaceId())
             .maxFee(maxFee)
             .build();
     helper().announceAndValidate(type, account, child1);
 
     NamespaceRegistrationTransaction subchild1 =
         NamespaceRegistrationTransactionFactory.createSubNamespace(
-            getNetworkType(), getDeadline(), "subchild1", child1.getNamespaceId())
+                getNetworkType(), getDeadline(), "subchild1", child1.getNamespaceId())
             .maxFee(maxFee)
             .build();
     helper().announceAndValidate(type, account, subchild1);
 
-
     NamespaceRegistrationTransaction subchild2 =
         NamespaceRegistrationTransactionFactory.createSubNamespace(
-            getNetworkType(), getDeadline(), "subchild2", child1.getNamespaceId())
+                getNetworkType(), getDeadline(), "subchild2", child1.getNamespaceId())
             .maxFee(maxFee)
             .build();
     helper().announceAndValidate(type, account, subchild2);
 
     NamespaceRegistrationTransaction child2 =
         NamespaceRegistrationTransactionFactory.createSubNamespace(
-            getNetworkType(), getDeadline(), "child2", root.getNamespaceId())
+                getNetworkType(), getDeadline(), "child2", root.getNamespaceId())
             .maxFee(maxFee)
             .build();
     helper().announceAndValidate(type, account, child2);
 
-
     NamespaceRegistrationTransaction child3 =
         NamespaceRegistrationTransactionFactory.createSubNamespace(
-            getNetworkType(), getDeadline(), "child3", root.getNamespaceId())
+                getNetworkType(), getDeadline(), "child3", root.getNamespaceId())
             .maxFee(maxFee)
             .build();
     helper().announceAndValidate(type, account, child3);
 
     NamespaceRegistrationTransaction subchild3 =
         NamespaceRegistrationTransactionFactory.createSubNamespace(
-            getNetworkType(), getDeadline(), "subchild3", child1.getNamespaceId())
+                getNetworkType(), getDeadline(), "subchild3", child1.getNamespaceId())
             .maxFee(maxFee)
             .build();
     helper().announceAndValidate(type, account, subchild3);
-
-
-
   }
 
   @Test

@@ -52,7 +52,6 @@ import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.namespace.NamespaceInfo;
-import io.nem.symbol.sdk.model.namespace.NamespaceName;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.symbol.sdk.model.restriction.MosaicRestriction;
 import io.nem.symbol.sdk.model.state.StateMerkleProof;
@@ -196,7 +195,8 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
     NamespacePaginationStreamer streamer = new NamespacePaginationStreamer(repository);
     return getArguments(
         streamer,
-        new NamespaceSearchCriteria().order(ORDER_BY)
+        new NamespaceSearchCriteria()
+            .order(ORDER_BY)
             .registrationType(NamespaceRegistrationType.ROOT_NAMESPACE));
   }
 

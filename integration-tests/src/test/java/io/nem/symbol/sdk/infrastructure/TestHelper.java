@@ -790,8 +790,7 @@ public class TestHelper {
   }
 
   public void basicTransfer(
-      RepositoryType type, Account nemesisAccount, UnresolvedAddress recipient,
-      BigInteger amount) {
+      RepositoryType type, Account nemesisAccount, UnresolvedAddress recipient, BigInteger amount) {
 
     TransferTransactionFactory factory =
         TransferTransactionFactory.create(
