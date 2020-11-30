@@ -115,8 +115,6 @@ public class FormatUtilsTest {
 
     Assertions.assertThrows(
         IllegalArgumentException.class, () -> FormatUtils.parseServerDuration("abc 10d"));
-
-
   }
 
   @Test
