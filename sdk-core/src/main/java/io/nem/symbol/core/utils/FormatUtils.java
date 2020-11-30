@@ -19,6 +19,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -90,14 +92,24 @@ public class FormatUtils {
    * @param serverValue time.
    * @return an instant from that value.
    */
-  public static Duration parserServerDuration(String serverValue) {
+  public static Duration parseServerDuration(String serverValue) {
     String preprocessedValue = serverValue.replace("'", "").trim();
     Pattern periodPattern = Pattern.compile("([0-9]+)([hdms]+)[:\\s]?");
     Matcher matcher = periodPattern.matcher(preprocessedValue);
+
     Duration duration = Duration.ofMillis(0);
+    Set<String> usedTypes = new HashSet<>();
+    int expected = 0;
     while (matcher.find()) {
+      if (expected != matcher.start()) {
+        throw new IllegalArgumentException("Duration value format is not recognized.");
+      }
+      expected = matcher.end();
       int num = Integer.parseInt(matcher.group(1));
       String type = matcher.group(2);
+      if (!usedTypes.add(type)) {
+        throw new IllegalArgumentException("Duration value format is not recognized.");
+      }
       switch (type) {
         case "ms":
           duration = duration.plus(Duration.ofMillis(num));
@@ -114,7 +126,12 @@ public class FormatUtils {
         case "d":
           duration = duration.plus(Duration.ofDays(num));
           break;
+        default:
+          throw new IllegalArgumentException("Duration value format is not recognized.");
       }
+    }
+    if (usedTypes.isEmpty()) {
+      throw new IllegalArgumentException("Duration value format is not recognized.");
     }
     return duration;
   }

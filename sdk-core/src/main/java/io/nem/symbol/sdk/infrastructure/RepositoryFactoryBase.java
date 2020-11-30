@@ -94,7 +94,7 @@ public abstract class RepositoryFactoryBase implements RepositoryFactory {
             throw new IllegalStateException(
                 "EpochAdjustment could not be loaded from Rest's network Properties.");
           } else {
-            return FormatUtils.parserServerDuration(cs.getNetwork().getEpochAdjustment());
+            return FormatUtils.parseServerDuration(cs.getNetwork().getEpochAdjustment());
           }
         });
   }

@@ -87,20 +87,36 @@ public class FormatUtilsTest {
   }
 
   @Test
-  public void parserServerDuration() {
-    Assertions.assertEquals("PT15S", FormatUtils.parserServerDuration("15s").toString());
-    Assertions.assertEquals("PT10M15S", FormatUtils.parserServerDuration("10m:15s").toString());
-    Assertions.assertEquals("PT10M", FormatUtils.parserServerDuration("10m").toString());
-    Assertions.assertEquals("PT5H3M1S", FormatUtils.parserServerDuration("5h3m1s").toString());
-    Assertions.assertEquals("PT240H5M1S", FormatUtils.parserServerDuration("10d:5m1s").toString());
-    Assertions.assertEquals("PT240H5M1S", FormatUtils.parserServerDuration("10d 5m1s").toString());
+  public void parseServerDuration() {
+    Assertions.assertEquals("PT10M15S", FormatUtils.parseServerDuration("10m:15s").toString());
+    Assertions.assertEquals("PT15S", FormatUtils.parseServerDuration("15s").toString());
+    Assertions.assertEquals("PT10M", FormatUtils.parseServerDuration("10m").toString());
+    Assertions.assertEquals("PT5H3M1S", FormatUtils.parseServerDuration("5h3m1s").toString());
+    Assertions.assertEquals("PT240H5M1S", FormatUtils.parseServerDuration("10d:5m1s").toString());
+    Assertions.assertEquals("PT240H5M1S", FormatUtils.parseServerDuration("10d 5m1s").toString());
     Assertions.assertEquals(
-        "PT240H5M0.1S", FormatUtils.parserServerDuration("10d:5m100ms").toString());
+        "PT240H5M0.1S", FormatUtils.parseServerDuration("10d:5m100ms").toString());
     Assertions.assertEquals(
-        "PT240H5M0.001S", FormatUtils.parserServerDuration("10d:5m1ms").toString());
-    Assertions.assertEquals("PT1.2S", FormatUtils.parserServerDuration("1'200ms").toString());
-    Assertions.assertEquals("PT5S", FormatUtils.parserServerDuration("5s10x").toString());
-    Assertions.assertEquals("PT0S", FormatUtils.parserServerDuration("5sss").toString());
+        "PT240H5M0.001S", FormatUtils.parseServerDuration("10d:5m1ms").toString());
+    Assertions.assertEquals("PT1.2S", FormatUtils.parseServerDuration("1'200ms").toString());
+    Assertions.assertEquals("PT5S", FormatUtils.parseServerDuration("5s10x").toString());
+
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> FormatUtils.parseServerDuration("5sss"));
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> FormatUtils.parseServerDuration("abc 10d"));
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> FormatUtils.parseServerDuration("abc 2s 1234"));
+
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> FormatUtils.parseServerDuration("10d 5m1s 1m"));
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> FormatUtils.parseServerDuration("5m   10d"));
+
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> FormatUtils.parseServerDuration("abc 10d"));
+
+
   }
 
   @Test
