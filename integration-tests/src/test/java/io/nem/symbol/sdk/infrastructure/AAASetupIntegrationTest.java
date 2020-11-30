@@ -18,7 +18,6 @@ package io.nem.symbol.sdk.infrastructure;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.StateProofService;
 import io.nem.symbol.sdk.model.account.Account;
-import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.state.StateMerkleProof;

@@ -21,28 +21,21 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * This object holds the state merkle proof information
+ *
  * @param <S> the state for reference
  */
 public class StateMerkleProof<S> {
 
-  /**
-   * The state for reference
-   */
+  /** The state for reference */
   private final S state;
 
-  /**
-   * The state hash
-   */
+  /** The state hash */
   private final String stateHash;
 
-  /**
-   * The merkle tree
-   */
+  /** The merkle tree */
   private final MerkleTree merkleTree;
 
-  /**
-   * The raw merkle tree for reference.
-   */
+  /** The raw merkle tree for reference. */
   private final String raw;
 
   public StateMerkleProof(S state, String stateHash, MerkleTree merkleTree, String raw) {
@@ -60,9 +53,7 @@ public class StateMerkleProof<S> {
     return merkleTree;
   }
 
-  /**
-   * @return if the proof is valid or not.
-   */
+  /** @return if the proof is valid or not. */
   public boolean isValid() {
     return getLeafValue()
         .map(leafValue -> StringUtils.equalsAnyIgnoreCase(stateHash, leafValue))
