@@ -66,6 +66,7 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
     mosaicDto.setDuration(BigInteger.valueOf(7));
     mosaicDto.supply(BigInteger.valueOf(1000));
     mosaicDto.startHeight(BigInteger.valueOf(100));
+    mosaicDto.setVersion(1);
 
     mosaicInfoDto.setMosaic(mosaicDto);
     mockRemoteCall(Collections.singletonList(mosaicInfoDto));
@@ -105,6 +106,7 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
     mosaicDto.setDuration(BigInteger.valueOf(7));
     mosaicDto.supply(BigInteger.valueOf(1000));
     mosaicDto.startHeight(BigInteger.valueOf(100));
+    mosaicDto.setVersion(1);
 
     mosaicInfoDto.setMosaic(mosaicDto);
     mockRemoteCall(mosaicInfoDto);
@@ -140,6 +142,7 @@ public class MosaicRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTes
     mosaicDto.setDuration(BigInteger.valueOf(7));
     mosaicDto.supply(BigInteger.valueOf(1000));
     mosaicDto.startHeight(BigInteger.valueOf(100));
+    mosaicDto.setVersion(1);
 
     mockRemoteCall(toPage(new MosaicInfoDTO().mosaic(mosaicDto).id("ABC")));
 

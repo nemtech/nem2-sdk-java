@@ -85,6 +85,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
     namespace.setEndHeight(BigInteger.valueOf(5));
     namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
     namespace.setOwnerAddress(ownerAccount.encoded());
+    namespace.setVersion(1);
 
     AliasDTO alias = new AliasDTO();
     alias.setType(AliasTypeEnum.NUMBER_1);
@@ -127,6 +128,7 @@ public class NamespaceRepositoryOkHttpImplTest extends AbstractOkHttpRespository
     namespace.setEndHeight(BigInteger.valueOf(5));
     namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
     namespace.setOwnerAddress(ownerAccount.encoded());
+    namespace.setVersion(1);
 
     AliasDTO alias = new AliasDTO();
     alias.setType(AliasTypeEnum.NUMBER_2);

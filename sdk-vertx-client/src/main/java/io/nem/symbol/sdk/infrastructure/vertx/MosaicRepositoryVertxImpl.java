@@ -118,7 +118,7 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl
   private MosaicInfo createMosaicInfo(MosaicDTO mosaic, String recordId) {
     return new MosaicInfo(
         recordId,
-        1,
+        mosaic.getVersion(),
         toMosaicId(mosaic.getId()),
         mosaic.getSupply(),
         mosaic.getStartHeight(),

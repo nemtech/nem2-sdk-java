@@ -48,9 +48,7 @@ import io.nem.symbol.sdk.model.account.AccountRestrictions;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.metadata.Metadata;
-import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
-import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.namespace.NamespaceInfo;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.symbol.sdk.model.restriction.MosaicRestriction;
@@ -94,8 +92,8 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   @MethodSource("mosaicRestriction")
   void mosaicRestrictionMerkles(MosaicRestriction<?> state, RepositoryType repositoryType) {
     StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
-    StateMerkleProof<String> proof = get(service.mosaicRestriction(state));
-    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId());
+    StateMerkleProof<MosaicRestriction<?>> proof = get(service.mosaicRestriction(state));
+    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getState().getCompositeHash());
   }
 
   public List<Arguments> hashLocks() {
@@ -109,8 +107,8 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   @MethodSource("hashLocks")
   void hashLocksMerkles(HashLockInfo state, RepositoryType repositoryType) {
     StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
-    StateMerkleProof<String> proof = get(service.hashLock(state));
-    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId());
+    StateMerkleProof<HashLockInfo> proof = get(service.hashLock(state));
+    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getState().getHash());
   }
 
   public List<Arguments> accountRestrictions() {
@@ -126,8 +124,9 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   @MethodSource("accountRestrictions")
   void accountRestrictionsMerkles(AccountRestrictions state, RepositoryType repositoryType) {
     StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
-    StateMerkleProof<Address> proof = get(service.accountRestrictions(state));
-    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId().plain());
+    StateMerkleProof<AccountRestrictions> proof = get(service.accountRestrictions(state));
+    Assertions.assertTrue(
+        proof.isValid(), "Invalid proof " + proof.getState().getAddress().plain());
   }
 
   @Test
@@ -140,8 +139,9 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
                 .getMultisigAccountInfo(
                     Address.createFromRawAddress("TCFAEINOWAAPSGT2OCBCZYMH2Q3PGHQPEYTIUKI")));
     StateProofServiceImpl service = new StateProofServiceImpl(repositoryFactory);
-    StateMerkleProof<Address> proof = get(service.multisig(state));
-    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId().plain());
+    StateMerkleProof<MultisigAccountInfo> proof = get(service.multisig(state));
+    Assertions.assertTrue(
+        proof.isValid(), "Invalid proof " + proof.getState().getAccountAddress().plain());
   }
 
   public List<Arguments> secretLocks() {
@@ -155,8 +155,8 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   @MethodSource("secretLocks")
   void secretLocksMerkles(SecretLockInfo state, RepositoryType repositoryType) {
     StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
-    StateMerkleProof<String> proof = get(service.secretLock(state));
-    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId());
+    StateMerkleProof<SecretLockInfo> proof = get(service.secretLock(state));
+    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getState().getCompositeHash());
   }
 
   public List<Arguments> accounts() {
@@ -170,8 +170,9 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   @MethodSource("accounts")
   void accountsMerkles(AccountInfo state, RepositoryType repositoryType) {
     StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
-    StateMerkleProof<Address> proof = get(service.account(state));
-    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId().plain());
+    StateMerkleProof<AccountInfo> proof = get(service.account(state));
+    Assertions.assertTrue(
+        proof.isValid(), "Invalid proof " + proof.getState().getAddress().plain());
   }
 
   public List<Arguments> mosaics() {
@@ -185,8 +186,9 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   @MethodSource("mosaics")
   void mosaicsMerkles(MosaicInfo state, RepositoryType repositoryType) {
     StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
-    StateMerkleProof<MosaicId> proof = get(service.mosaic(state));
-    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId().getIdAsHex());
+    StateMerkleProof<MosaicInfo> proof = get(service.mosaic(state));
+    Assertions.assertTrue(
+        proof.isValid(), "Invalid proof " + proof.getState().getMosaicId().getIdAsHex());
   }
 
   public List<Arguments> namespaces() {
@@ -205,8 +207,9 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   void namespacesMerkles(NamespaceInfo state, RepositoryType repositoryType) {
     RepositoryFactory repositoryFactory = getRepositoryFactory(repositoryType);
     StateProofServiceImpl service = new StateProofServiceImpl(repositoryFactory);
-    StateMerkleProof<NamespaceId> proof = get(service.namespace(state));
-    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId().getIdAsHex());
+    StateMerkleProof<NamespaceInfo> proof = get(service.namespace(state));
+    Assertions.assertTrue(
+        proof.isValid(), "Invalid proof " + proof.getState().getId().getIdAsHex());
   }
 
   public List<Arguments> metadatas() {
@@ -220,8 +223,8 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   @MethodSource("metadatas")
   void metadatasMerkles(Metadata state, RepositoryType repositoryType) {
     StateProofServiceImpl service = new StateProofServiceImpl(getRepositoryFactory(repositoryType));
-    StateMerkleProof<String> proof = get(service.metadata(state));
-    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getId());
+    StateMerkleProof<Metadata> proof = get(service.metadata(state));
+    Assertions.assertTrue(proof.isValid(), "Invalid proof " + proof.getState().getCompositeHash());
   }
 
   private <E, C extends SearchCriteria<C>> List<Arguments> getArguments(

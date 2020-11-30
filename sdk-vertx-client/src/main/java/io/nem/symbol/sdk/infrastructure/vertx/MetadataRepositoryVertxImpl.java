@@ -106,7 +106,7 @@ public class MetadataRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     MetadataEntryDTO entryDto = dto.getMetadataEntry();
     return new Metadata(
         dto.getId(),
-        1,
+        dto.getMetadataEntry().getVersion(),
         entryDto.getCompositeHash(),
         MapperUtils.toAddress(entryDto.getSourceAddress()),
         MapperUtils.toAddress(entryDto.getTargetAddress()),

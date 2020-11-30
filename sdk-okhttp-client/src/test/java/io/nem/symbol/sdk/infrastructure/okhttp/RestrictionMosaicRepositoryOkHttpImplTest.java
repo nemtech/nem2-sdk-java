@@ -88,6 +88,7 @@ public class RestrictionMosaicRepositoryOkHttpImplTest extends AbstractOkHttpRes
     wrapperDTO.setRestrictions(restrictions);
     wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_0);
     wrapperDTO.setTargetAddress(address.encoded());
+    wrapperDTO.setVersion(1);
 
     mockRemoteCall(toPage(dto));
 
@@ -137,6 +138,7 @@ public class RestrictionMosaicRepositoryOkHttpImplTest extends AbstractOkHttpRes
     wrapperDTO.setMosaicId(mosaicId.getIdAsHex());
     wrapperDTO.setRestrictions(restrictions);
     wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_1);
+    wrapperDTO.setVersion(1);
 
     mockRemoteCall(toPage(dto));
 
@@ -201,6 +203,7 @@ public class RestrictionMosaicRepositoryOkHttpImplTest extends AbstractOkHttpRes
     wrapperDTO.setMosaicId(mosaicId.getIdAsHex());
     wrapperDTO.setRestrictions(restrictions);
     wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_1);
+    wrapperDTO.setVersion(1);
 
     mockRemoteCall(toPage(dto));
 
@@ -264,6 +267,7 @@ public class RestrictionMosaicRepositoryOkHttpImplTest extends AbstractOkHttpRes
     wrapperDTO.setRestrictions(restrictions);
     wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_0);
     wrapperDTO.setTargetAddress(address.encoded());
+    wrapperDTO.setVersion(1);
 
     mockRemoteCall(toPage(dto));
 

@@ -83,7 +83,7 @@ public class MultisigRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     MultisigDTO dto = info.getMultisig();
     return new MultisigAccountInfo(
         null,
-        1,
+        info.getMultisig().getVersion(),
         MapperUtils.toAddress(dto.getAccountAddress()),
         dto.getMinApproval(),
         dto.getMinRemoval(),

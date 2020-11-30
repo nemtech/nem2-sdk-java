@@ -15,8 +15,13 @@
  */
 package io.nem.symbol.sdk.infrastructure;
 
+import io.nem.symbol.sdk.api.RepositoryFactory;
+import io.nem.symbol.sdk.api.StateProofService;
 import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.state.StateMerkleProof;
 import io.nem.symbol.sdk.model.transaction.NamespaceRegistrationTransaction;
 import io.nem.symbol.sdk.model.transaction.NamespaceRegistrationTransactionFactory;
 import org.junit.jupiter.api.Assertions;
@@ -151,24 +156,30 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
   @Test
   @Order(6)
   void createMultisigAccountCompleteUsingNemesis() {
-    System.out.println(config().getNemesisAccount8().getAddress().plain());
-    helper()
-        .createMultisigAccountComplete(
-            type,
-            config().getNemesisAccount8(),
-            config().getNemesisAccount9(),
-            config().getNemesisAccount10());
+    Account multisig = config().getNemesisAccount8();
+    System.out.println(multisig.getAddress().plain());
+    RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
+    MultisigAccountInfo info =
+        helper()
+            .createMultisigAccountComplete(
+                type, multisig, config().getNemesisAccount9(), config().getNemesisAccount10());
+
+    StateProofService service = new StateProofServiceImpl(repositoryFactory);
+    StateMerkleProof<MultisigAccountInfo> proof = get(service.multisig(info));
+    Assertions.assertTrue(proof.isValid());
   }
 
   @Test
   @Order(7)
   void createMultisigAccountBondedUsingNemesis() {
-    System.out.println(config().getNemesisAccount7().getAddress().plain());
-    helper()
-        .createMultisigAccountBonded(
-            type,
-            config().getNemesisAccount8(),
-            config().getNemesisAccount9(),
-            config().getNemesisAccount10());
+    Account multisig = config().getNemesisAccount8();
+    RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
+    MultisigAccountInfo info =
+        helper()
+            .createMultisigAccountBonded(
+                type, multisig, config().getNemesisAccount9(), config().getNemesisAccount10());
+    StateProofService service = new StateProofServiceImpl(repositoryFactory);
+    StateMerkleProof<MultisigAccountInfo> proof = get(service.multisig(info));
+    Assertions.assertTrue(proof.isValid());
   }
 }

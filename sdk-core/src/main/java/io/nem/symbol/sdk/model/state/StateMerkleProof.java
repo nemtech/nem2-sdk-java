@@ -19,18 +19,34 @@ import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
-public class StateMerkleProof<ID> {
+/**
+ * This object holds the state merkle proof information
+ * @param <S> the state for reference
+ */
+public class StateMerkleProof<S> {
 
-  private final ID id;
+  /**
+   * The state for reference
+   */
+  private final S state;
 
+  /**
+   * The state hash
+   */
   private final String stateHash;
 
+  /**
+   * The merkle tree
+   */
   private final MerkleTree merkleTree;
 
+  /**
+   * The raw merkle tree for reference.
+   */
   private final String raw;
 
-  public StateMerkleProof(ID id, String stateHash, MerkleTree merkleTree, String raw) {
-    this.id = id;
+  public StateMerkleProof(S state, String stateHash, MerkleTree merkleTree, String raw) {
+    this.state = state;
     this.stateHash = stateHash;
     this.merkleTree = merkleTree;
     this.raw = raw;
@@ -44,6 +60,9 @@ public class StateMerkleProof<ID> {
     return merkleTree;
   }
 
+  /**
+   * @return if the proof is valid or not.
+   */
   public boolean isValid() {
     return getLeafValue()
         .map(leafValue -> StringUtils.equalsAnyIgnoreCase(stateHash, leafValue))
@@ -89,7 +108,7 @@ public class StateMerkleProof<ID> {
       return false;
     }
     StateMerkleProof<?> that = (StateMerkleProof<?>) o;
-    return Objects.equals(id, that.id)
+    return Objects.equals(state, that.state)
         && Objects.equals(stateHash, that.stateHash)
         && Objects.equals(merkleTree, that.merkleTree)
         && Objects.equals(raw, that.raw);
@@ -97,14 +116,14 @@ public class StateMerkleProof<ID> {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, stateHash, merkleTree, raw);
+    return Objects.hash(state, stateHash, merkleTree, raw);
   }
 
   public String getRaw() {
     return this.raw;
   }
 
-  public ID getId() {
-    return id;
+  public S getState() {
+    return state;
   }
 }

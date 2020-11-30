@@ -80,6 +80,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
     NamespaceDTO namespace = new NamespaceDTO();
     namespace.setDepth(111);
+    namespace.setVersion(1);
     namespace.setStartHeight(BigInteger.valueOf(4));
     namespace.setEndHeight(BigInteger.valueOf(5));
     namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
@@ -122,6 +123,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
     NamespaceDTO namespace = new NamespaceDTO();
     namespace.setDepth(111);
+    namespace.setVersion(1);
     namespace.setStartHeight(BigInteger.valueOf(4));
     namespace.setEndHeight(BigInteger.valueOf(5));
     namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_1);
@@ -213,6 +215,7 @@ public class NamespaceRepositoryVertxImplTest extends AbstractVertxRespositoryTe
 
     NamespaceDTO namespace = new NamespaceDTO();
     namespace.setDepth(111);
+    namespace.setVersion(1);
     namespace.setRegistrationType(NamespaceRegistrationTypeEnum.NUMBER_0);
     namespace.setOwnerAddress(ownerAddress.encoded());
 

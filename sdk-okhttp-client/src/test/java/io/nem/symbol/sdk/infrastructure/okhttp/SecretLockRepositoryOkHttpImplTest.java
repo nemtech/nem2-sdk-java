@@ -70,6 +70,7 @@ public class SecretLockRepositoryOkHttpImplTest extends AbstractOkHttpRespositor
     lockHashDto.setHashAlgorithm(LockHashAlgorithmEnum.NUMBER_2);
     lockHashDto.setStatus(LockStatus.NUMBER_1);
     lockHashDto.setSecret("someSecret");
+    lockHashDto.setVersion(1);
 
     SecretLockInfoDTO hashLockInfoDTO = new SecretLockInfoDTO();
     hashLockInfoDTO.setLock(lockHashDto);

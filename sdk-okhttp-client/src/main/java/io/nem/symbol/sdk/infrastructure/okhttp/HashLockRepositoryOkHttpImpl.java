@@ -61,7 +61,7 @@ public class HashLockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
     HashLockEntryDTO lock = dto.getLock();
     return new HashLockInfo(
         dto.getId(),
-        1,
+        dto.getLock().getVersion(),
         MapperUtils.toAddress(lock.getOwnerAddress()),
         MapperUtils.toMosaicId(lock.getMosaicId()),
         lock.getAmount(),

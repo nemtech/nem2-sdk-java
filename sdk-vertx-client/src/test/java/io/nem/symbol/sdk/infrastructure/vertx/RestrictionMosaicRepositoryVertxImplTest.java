@@ -82,6 +82,7 @@ public class RestrictionMosaicRepositoryVertxImplTest extends AbstractVertxRespo
     wrapperDTO.setMosaicId(mosaicId.getIdAsHex());
     wrapperDTO.setRestrictions(restrictions);
     wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_0);
+    wrapperDTO.setVersion(1);
     wrapperDTO.setTargetAddress(address.encoded());
 
     mockRemoteCall(toPage(dto));
@@ -131,6 +132,7 @@ public class RestrictionMosaicRepositoryVertxImplTest extends AbstractVertxRespo
     wrapperDTO.setCompositeHash("compositeHash");
     wrapperDTO.setMosaicId(mosaicId.getIdAsHex());
     wrapperDTO.setRestrictions(restrictions);
+    wrapperDTO.setVersion(1);
     wrapperDTO.setEntryType(MosaicRestrictionEntryTypeEnum.NUMBER_1);
 
     mockRemoteCall(toPage(dto));
@@ -192,6 +194,7 @@ public class RestrictionMosaicRepositoryVertxImplTest extends AbstractVertxRespo
     List<MosaicGlobalRestrictionEntryDTO> restrictions = new ArrayList<>();
     restrictions.add(entryDTO);
 
+    wrapperDTO.setVersion(1);
     wrapperDTO.setCompositeHash("compositeHash");
     wrapperDTO.setMosaicId(mosaicId.getIdAsHex());
     wrapperDTO.setRestrictions(restrictions);
@@ -249,6 +252,7 @@ public class RestrictionMosaicRepositoryVertxImplTest extends AbstractVertxRespo
     dto.setMosaicRestrictionEntry(wrapperDTO);
 
     MosaicAddressRestrictionEntryDTO entryDTO = new MosaicAddressRestrictionEntryDTO();
+    wrapperDTO.setVersion(1);
     entryDTO.setKey(ConvertUtils.toString(BigInteger.valueOf(1111)));
     entryDTO.setValue("2222");
     List<MosaicAddressRestrictionEntryDTO> restrictions = new ArrayList<>();

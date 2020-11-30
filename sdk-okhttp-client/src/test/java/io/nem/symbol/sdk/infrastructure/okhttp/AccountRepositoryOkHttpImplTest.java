@@ -78,6 +78,7 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     accountDTO.setMosaics(mosaicDtos);
     AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
     accountInfoDTO.setAccount(accountDTO);
+    accountDTO.setVersion(1);
 
     mockRemoteCall(accountInfoDTO);
 
@@ -106,6 +107,7 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     accountDTO.setPublicKey(account.getPublicAccount().getPublicKey().toHex());
     accountDTO.setImportance(BigInteger.valueOf(5));
     accountDTO.setImportanceHeight(BigInteger.valueOf(10));
+    accountDTO.setVersion(1);
     accountDTO.setSupplementalPublicKeys(
         new SupplementalPublicKeysDTO()
             .node(new AccountLinkPublicKeyDTO().publicKey(nodeAccount.getPublicKey())));
@@ -219,6 +221,7 @@ public class AccountRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryTe
     accountDTO.setPublicKey(account.getPublicAccount().getPublicKey().toHex());
     accountDTO.setImportance(BigInteger.valueOf(5));
     accountDTO.setImportanceHeight(BigInteger.valueOf(10));
+    accountDTO.setVersion(1);
 
     accountDTO.setSupplementalPublicKeys(
         new SupplementalPublicKeysDTO()

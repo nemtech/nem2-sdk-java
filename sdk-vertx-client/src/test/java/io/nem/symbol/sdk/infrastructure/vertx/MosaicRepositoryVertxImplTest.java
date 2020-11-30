@@ -64,6 +64,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
     mosaicDto.setRevision(123L);
 
     mosaicDto.setFlags(5);
+    mosaicDto.setVersion(1);
     mosaicDto.setDivisibility(6);
     mosaicDto.setDuration(BigInteger.valueOf(7));
     mosaicDto.supply(BigInteger.valueOf(1000));
@@ -106,6 +107,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
 
     mosaicDto.setFlags(5);
     mosaicDto.setDivisibility(6);
+    mosaicDto.setVersion(1);
     mosaicDto.setDuration(BigInteger.valueOf(7));
     mosaicDto.supply(BigInteger.valueOf(1000));
     mosaicDto.startHeight(BigInteger.valueOf(100));
@@ -152,7 +154,7 @@ public class MosaicRepositoryVertxImplTest extends AbstractVertxRespositoryTest 
     mosaicDto.setOwnerAddress(address.encoded());
     mosaicDto.setId("481110499");
     mosaicDto.setRevision(123L);
-
+    mosaicDto.setVersion(1);
     mosaicDto.setFlags(5);
     mosaicDto.setDivisibility(6);
     mosaicDto.setDuration(BigInteger.valueOf(7));

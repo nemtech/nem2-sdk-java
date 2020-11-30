@@ -142,6 +142,7 @@ public class MetadataRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
     Address targetAddress = Account.generateNewAccount(networkType).getAddress();
 
     MetadataEntryDTO metadataEntry = new MetadataEntryDTO();
+    metadataEntry.setVersion(1);
     metadataEntry.setCompositeHash("ompositeHash " + name);
     metadataEntry.setMetadataType(type);
     metadataEntry.setScopedMetadataKey("10");

@@ -63,6 +63,7 @@ public class HashLockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
     lockHashDto.setOwnerAddress(encodeAddress(address));
     lockHashDto.setAmount(BigInteger.ONE);
     lockHashDto.setEndHeight(BigInteger.TEN);
+    lockHashDto.setVersion(1);
     lockHashDto.setHash("ABC");
     lockHashDto.setMosaicId(mosaicId.getIdAsHex());
     lockHashDto.setStatus(LockStatus.NUMBER_1);
@@ -94,6 +95,7 @@ public class HashLockRepositoryOkHttpImplTest extends AbstractOkHttpRespositoryT
     lockHashDto.setOwnerAddress(encodeAddress(address));
     lockHashDto.setAmount(BigInteger.ONE);
     lockHashDto.setEndHeight(BigInteger.TEN);
+    lockHashDto.setVersion(1);
     lockHashDto.setHash("ABC");
     lockHashDto.setMosaicId(mosaicId.getIdAsHex());
     lockHashDto.setStatus(LockStatus.NUMBER_1);

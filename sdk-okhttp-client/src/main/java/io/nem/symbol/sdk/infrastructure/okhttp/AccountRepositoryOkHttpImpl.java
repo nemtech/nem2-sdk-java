@@ -116,7 +116,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
     AccountDTO accountDTO = accountInfoDTO.getAccount();
     return new AccountInfo(
         accountInfoDTO.getId(),
-        1,
+        accountDTO.getVersion(),
         toAddress(accountDTO.getAddress()),
         accountDTO.getAddressHeight(),
         PublicKey.fromHexString(accountDTO.getPublicKey()),

@@ -621,11 +621,11 @@ public class TestHelper {
     return Pair.of(multisigAccount, namespaceId);
   }
 
-  public void createMultisigAccountBonded(
+  public MultisigAccountInfo createMultisigAccountBonded(
       RepositoryType type, Account multisigAccount, Account... accounts) {
 
     AccountRepository accountRepository = getRepositoryFactory(type).createAccountRepository();
-
+    MultisigRepository multisigRepository = getRepositoryFactory(type).createMultisigRepository();
     AccountInfo accountInfo = get(accountRepository.getAccountInfo(multisigAccount.getAddress()));
     System.out.println(getJsonHelper().print(accountInfo));
 
@@ -634,7 +634,7 @@ public class TestHelper {
           "Multisig account with address "
               + multisigAccount.getAddress().plain()
               + " already exist");
-      return;
+      return get(multisigRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
     }
     System.out.println(
         "Multisig account with address "
@@ -703,9 +703,10 @@ public class TestHelper {
     Assertions.assertTrue(
         page.getData().stream().anyMatch(m -> m.getHash().equals(hashLockTransaction.getHash())));
     Assertions.assertEquals(20, page.getPageSize());
+    return get(multisigRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
   }
 
-  public void createMultisigAccountComplete(
+  public MultisigAccountInfo createMultisigAccountComplete(
       RepositoryType type, Account multisigAccount, Account... accounts) {
 
     AccountRepository accountRepository = getRepositoryFactory(type).createAccountRepository();
@@ -724,7 +725,7 @@ public class TestHelper {
               + multisigAccount.getAddress().plain()
               + " already exist");
       System.out.println(getJsonHelper().print(multisigAccountInfo));
-      return;
+      return multisigAccountInfo;
     } catch (RepositoryCallException e) {
       System.out.println(
           "Multisig account with address "
@@ -767,6 +768,7 @@ public class TestHelper {
     Assertions.assertEquals(
         aggregateTransaciton.getTransactionInfo().get().getHash().get(),
         signedAggregateTransaction.getHash());
+    return get(multisigRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
   }
 
   public TransactionService getTransactionService(RepositoryType type) {

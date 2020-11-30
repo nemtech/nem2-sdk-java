@@ -56,6 +56,7 @@ public class HashLockRepositoryVertxImplTest extends AbstractVertxRespositoryTes
 
     HashLockEntryDTO lockHashDto = new HashLockEntryDTO();
     lockHashDto.setOwnerAddress(encodeAddress(address));
+    lockHashDto.setVersion(1);
     lockHashDto.setAmount(BigInteger.ONE);
     lockHashDto.setEndHeight(BigInteger.TEN);
     lockHashDto.setHash("ABC");
@@ -89,6 +90,7 @@ public class HashLockRepositoryVertxImplTest extends AbstractVertxRespositoryTes
     lockHashDto.setOwnerAddress(encodeAddress(address));
     lockHashDto.setAmount(BigInteger.ONE);
     lockHashDto.setEndHeight(BigInteger.TEN);
+    lockHashDto.setVersion(1);
     lockHashDto.setHash("ABC");
     lockHashDto.setMosaicId(mosaicId.getIdAsHex());
     lockHashDto.setStatus(LockStatus.NUMBER_1);

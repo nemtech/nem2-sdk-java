@@ -50,79 +50,148 @@ public class StateProofServiceImpl implements StateProofService {
   }
 
   @Override
-  public Observable<StateMerkleProof<MosaicId>> mosaic(MosaicInfo state) {
+  public Observable<StateMerkleProof<MosaicInfo>> mosaic(MosaicId mosaicId) {
+    return repositoryFactory.createMosaicRepository().getMosaic(mosaicId).flatMap(this::mosaic);
+  }
+
+  @Override
+  public Observable<StateMerkleProof<MosaicInfo>> mosaic(MosaicInfo state) {
     MosaicId id = state.getMosaicId();
     return this.repositoryFactory
         .createMosaicRepository()
         .getMosaicMerkle(id)
-        .map(merkle -> toStateMerkleProof(id, merkle, state.serialize()));
+        .map(merkle -> toStateMerkleProof(state, merkle, state.serialize()));
   }
 
   @Override
-  public Observable<StateMerkleProof<String>> mosaicRestriction(MosaicRestriction<?> state) {
+  public Observable<StateMerkleProof<MosaicRestriction<?>>> mosaicRestriction(
+      String compositeHash) {
+    return repositoryFactory
+        .createRestrictionMosaicRepository()
+        .getMosaicRestrictions(compositeHash)
+        .flatMap(this::mosaicRestriction);
+  }
+
+  @Override
+  public Observable<StateMerkleProof<MosaicRestriction<?>>> mosaicRestriction(
+      MosaicRestriction<?> state) {
     String id = state.getCompositeHash();
     return this.repositoryFactory
         .createRestrictionMosaicRepository()
         .getMosaicRestrictionsMerkle(id)
-        .map(merkle -> toStateMerkleProof(id, merkle, state.serialize()));
+        .map(merkle -> toStateMerkleProof(state, merkle, state.serialize()));
   }
 
   @Override
-  public Observable<StateMerkleProof<String>> hashLock(HashLockInfo state) {
+  public Observable<StateMerkleProof<HashLockInfo>> hashLock(String hash) {
+    return repositoryFactory.createHashLockRepository().getHashLock(hash).flatMap(this::hashLock);
+  }
+
+  @Override
+  public Observable<StateMerkleProof<HashLockInfo>> hashLock(HashLockInfo state) {
     String id = state.getHash();
     return this.repositoryFactory
         .createHashLockRepository()
         .getHashLockMerkle(id)
-        .map(merkle -> toStateMerkleProof(id, merkle, state.serialize()));
+        .map(merkle -> toStateMerkleProof(state, merkle, state.serialize()));
   }
 
   @Override
-  public Observable<StateMerkleProof<String>> secretLock(SecretLockInfo state) {
+  public Observable<StateMerkleProof<SecretLockInfo>> secretLock(String compositeHash) {
+    return repositoryFactory
+        .createSecretLockRepository()
+        .getSecretLock(compositeHash)
+        .flatMap(this::secretLock);
+  }
+
+  @Override
+  public Observable<StateMerkleProof<SecretLockInfo>> secretLock(SecretLockInfo state) {
     String id = state.getCompositeHash();
     return this.repositoryFactory
         .createSecretLockRepository()
         .getSecretLockMerkle(id)
-        .map(merkle -> toStateMerkleProof(id, merkle, state.serialize()));
+        .map(merkle -> toStateMerkleProof(state, merkle, state.serialize()));
   }
 
   @Override
-  public Observable<StateMerkleProof<String>> metadata(Metadata state) {
+  public Observable<StateMerkleProof<Metadata>> metadata(String compositeHash) {
+    return repositoryFactory
+        .createMetadataRepository()
+        .getMetadata(compositeHash)
+        .flatMap(this::metadata);
+  }
+
+  @Override
+  public Observable<StateMerkleProof<Metadata>> metadata(Metadata state) {
     String id = state.getCompositeHash();
     return this.repositoryFactory
         .createMetadataRepository()
         .getMetadataMerkle(id)
-        .map(merkle -> toStateMerkleProof(id, merkle, state.serialize()));
+        .map(merkle -> toStateMerkleProof(state, merkle, state.serialize()));
   }
 
   @Override
-  public Observable<StateMerkleProof<Address>> accountRestrictions(AccountRestrictions state) {
+  public Observable<StateMerkleProof<AccountRestrictions>> accountRestrictions(Address address) {
+    return repositoryFactory
+        .createRestrictionAccountRepository()
+        .getAccountRestrictions(address)
+        .flatMap(this::accountRestrictions);
+  }
+
+  @Override
+  public Observable<StateMerkleProof<AccountRestrictions>> accountRestrictions(
+      AccountRestrictions state) {
     Address id = state.getAddress();
     return this.repositoryFactory
         .createRestrictionAccountRepository()
         .getAccountRestrictionsMerkle(id)
-        .map(merkle -> toStateMerkleProof(id, merkle, state.serialize()));
+        .map(merkle -> toStateMerkleProof(state, merkle, state.serialize()));
   }
 
   @Override
-  public Observable<StateMerkleProof<Address>> account(AccountInfo state) {
+  public Observable<StateMerkleProof<AccountInfo>> account(Address address) {
+    return repositoryFactory
+        .createAccountRepository()
+        .getAccountInfo(address)
+        .flatMap(this::account);
+  }
+
+  @Override
+  public Observable<StateMerkleProof<AccountInfo>> account(AccountInfo state) {
     Address id = state.getAddress();
     return this.repositoryFactory
         .createAccountRepository()
         .getAccountInfoMerkle(id)
-        .map(merkle -> toStateMerkleProof(id, merkle, state.serialize()));
+        .map(merkle -> toStateMerkleProof(state, merkle, state.serialize()));
   }
 
   @Override
-  public Observable<StateMerkleProof<Address>> multisig(MultisigAccountInfo state) {
+  public Observable<StateMerkleProof<MultisigAccountInfo>> multisig(Address address) {
+    return repositoryFactory
+        .createMultisigRepository()
+        .getMultisigAccountInfo(address)
+        .flatMap(this::multisig);
+  }
+
+  @Override
+  public Observable<StateMerkleProof<MultisigAccountInfo>> multisig(MultisigAccountInfo state) {
     Address id = state.getAccountAddress();
     return this.repositoryFactory
         .createMultisigRepository()
         .getMultisigAccountInfoMerkle(id)
-        .map(merkle -> toStateMerkleProof(id, merkle, state.serialize()));
+        .map(merkle -> toStateMerkleProof(state, merkle, state.serialize()));
   }
 
   @Override
-  public Observable<StateMerkleProof<NamespaceId>> namespace(NamespaceInfo state) {
+  public Observable<StateMerkleProof<NamespaceInfo>> namespace(NamespaceId namespaceId) {
+    return repositoryFactory
+        .createNamespaceRepository()
+        .getNamespace(namespaceId)
+        .flatMap(this::namespace);
+  }
+
+  @Override
+  public Observable<StateMerkleProof<NamespaceInfo>> namespace(NamespaceInfo state) {
     NamespaceId id = state.getId();
     NamespaceRepository namespaceRepository = this.repositoryFactory.createNamespaceRepository();
     NamespacePaginationStreamer streamer = new NamespacePaginationStreamer(namespaceRepository);
@@ -138,15 +207,15 @@ public class StateProofServiceImpl implements StateProofService {
                     .toList()
                     .toObservable()
                     .map(state::serialize)
-                    .map(s -> toStateMerkleProof(id, merkle, s)));
+                    .map(s -> toStateMerkleProof(state, merkle, s)));
   }
 
-  private <ID> StateMerkleProof<ID> toStateMerkleProof(
-      ID id, MerkleStateInfo merkle, byte[] serialized) {
+  private <S> StateMerkleProof<S> toStateMerkleProof(
+      S state, MerkleStateInfo merkle, byte[] serialized) {
     if (merkle.getRaw().isEmpty()) {
       throw new IllegalStateException("Merkle tree is empty!");
     }
     String stateHash = ConvertUtils.toHex(Hashes.sha3_256(serialized));
-    return new StateMerkleProof<>(id, stateHash, merkle.getTree(), merkle.getRaw());
+    return new StateMerkleProof<>(state, stateHash, merkle.getTree(), merkle.getRaw());
   }
 }

@@ -58,6 +58,7 @@ public class RestrictionAccountRepositoryVertxImplTest extends AbstractVertxResp
     restriction.setRestrictionFlags(AccountRestrictionFlagsEnum.NUMBER_32770);
     restriction.setValues(Collections.singletonList("9636553580561478212"));
     dto.setRestrictions(Collections.singletonList(restriction));
+    dto.setVersion(1);
 
     AccountRestrictionsInfoDTO info = new AccountRestrictionsInfoDTO();
     info.setAccountRestrictions(dto);
@@ -86,6 +87,7 @@ public class RestrictionAccountRepositoryVertxImplTest extends AbstractVertxResp
     restriction.setRestrictionFlags(AccountRestrictionFlagsEnum.NUMBER_32770);
     restriction.setValues(Collections.singletonList("9636553580561478212"));
     dto.setRestrictions(Collections.singletonList(restriction));
+    dto.setVersion(1);
 
     AccountRestrictionsInfoDTO info = new AccountRestrictionsInfoDTO();
     info.setAccountRestrictions(dto);

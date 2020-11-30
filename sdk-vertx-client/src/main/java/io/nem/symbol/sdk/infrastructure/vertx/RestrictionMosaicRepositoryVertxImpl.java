@@ -71,7 +71,7 @@ public class RestrictionMosaicRepositoryVertxImpl extends AbstractRepositoryVert
 
     return new MosaicGlobalRestriction(
         mosaicGlobalRestrictionDTO.getId(),
-        1,
+        mosaicGlobalRestrictionDTO.getMosaicRestrictionEntry().getVersion(),
         dto.getCompositeHash(),
         MosaicRestrictionEntryType.rawValueOf(dto.getEntryType().getValue()),
         MapperUtils.toMosaicId(dto.getMosaicId()),
@@ -97,7 +97,7 @@ public class RestrictionMosaicRepositoryVertxImpl extends AbstractRepositoryVert
 
     return new MosaicAddressRestriction(
         mosaicAddressRestrictionDTO.getId(),
-        1,
+        mosaicAddressRestrictionDTO.getMosaicRestrictionEntry().getVersion(),
         dto.getCompositeHash(),
         MosaicRestrictionEntryType.rawValueOf(dto.getEntryType().getValue()),
         MapperUtils.toMosaicId(dto.getMosaicId()),

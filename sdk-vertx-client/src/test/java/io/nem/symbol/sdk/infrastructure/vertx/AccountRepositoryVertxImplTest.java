@@ -64,6 +64,7 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     Address address = account.getAddress();
 
     AccountDTO accountDTO = new AccountDTO();
+    accountDTO.setVersion(1);
     accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
     accountDTO.setAddress(encodeAddress(address));
     accountDTO.setAddressHeight(BigInteger.TEN);
@@ -97,6 +98,7 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     Address address = account.getAddress();
 
     AccountDTO accountDTO = new AccountDTO();
+    accountDTO.setVersion(1);
     accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
     accountDTO.setAddress(encodeAddress(address));
     accountDTO.setAddressHeight(BigInteger.TEN);
@@ -204,6 +206,7 @@ public class AccountRepositoryVertxImplTest extends AbstractVertxRespositoryTest
     Account nodeAccount = Account.generateNewAccount(this.networkType);
 
     AccountDTO accountDTO = new AccountDTO();
+    accountDTO.setVersion(1);
     accountDTO.setAccountType(AccountTypeEnum.NUMBER_1);
     accountDTO.setAddress(encodeAddress(address));
     accountDTO.setAddressHeight(BigInteger.TEN);
