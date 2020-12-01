@@ -15,6 +15,7 @@
  */
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.google.gson.JsonObject;
@@ -25,6 +26,7 @@ import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.blockchain.FinalizedBlock;
+import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import io.nem.symbol.sdk.model.network.NetworkType;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
@@ -55,6 +57,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.mockito.internal.verification.VerificationModeFactory;
 
 /** Tests for the {@link ListenerOkHttp} implementation of the {@link Listener} */
 public class ListenerOkHttpTest {
@@ -214,6 +217,55 @@ public class ListenerOkHttpTest {
         .send(
             jsonHelper.print(
                 new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
+  }
+
+  @Test
+  public void confirmedUsingHashUsingAlias()
+      throws InterruptedException, ExecutionException, TimeoutException {
+    simulateWebSocketStartup();
+
+    TransactionInfoDTO transactionInfo =
+        TestHelperOkHttp.loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json");
+
+    JsonObject transactionInfoDtoJsonObject = jsonHelper.convert(transactionInfo, JsonObject.class);
+
+    Address address =
+        Address.createFromPublicKey(
+            jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
+            networkType);
+
+    NamespaceId alias = NamespaceId.createFromId(BigInteger.TEN);
+
+    Mockito.when(namespaceRepository.getLinkedAddress(alias)).thenReturn(Observable.just(address));
+
+    String channelName = ListenerChannel.CONFIRMED_ADDED.toString();
+
+    List<Transaction> transactions = new ArrayList<>();
+    List<Throwable> exceptions = new ArrayList<>();
+    listener
+        .confirmedOrError(alias, getHash(transactionInfo))
+        .doOnError(exceptions::add)
+        .forEach(transactions::add);
+
+    handle(transactionInfoDtoJsonObject, channelName);
+
+    Assertions.assertEquals(1, transactions.size());
+    Assertions.assertEquals(0, exceptions.size());
+
+    Assertions.assertEquals(address, transactions.get(0).getSigner().get().getAddress());
+
+    Mockito.verify(namespaceRepository, VerificationModeFactory.times(2))
+        .getLinkedAddress(eq(alias));
+
+    Mockito.verify(webSocketMock)
+        .send(
+            jsonHelper.print(
+                new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
+
+    Mockito.verify(webSocketMock)
+        .send(
+            jsonHelper.print(
+                new ListenerSubscribeMessage(this.wsId, "status" + "/" + address.plain())));
   }
 
   @Test
