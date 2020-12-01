@@ -78,11 +78,10 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
 
     Assertions.assertTrue(hasRestriction(type, testAccount, restrictionFlags, transactionType));
 
-    //    System.out.println("Removing transaction restriction");
-    //    sendAccountRestrictionTransaction(type, transactionType, false, restrictionFlags);
-    //
-    //    Assertions.assertFalse(hasRestriction(type, testAccount, restrictionFlags,
-    // transactionType));
+    System.out.println("Removing transaction restriction");
+    sendAccountRestrictionTransaction(type, transactionType, false, restrictionFlags);
+
+    Assertions.assertFalse(hasRestriction(type, testAccount, restrictionFlags, transactionType));
   }
 
   @ParameterizedTest
