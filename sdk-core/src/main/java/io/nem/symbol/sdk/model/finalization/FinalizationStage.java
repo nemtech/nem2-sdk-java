@@ -23,7 +23,7 @@ public enum FinalizationStage {
 
   PRE_COMMIT(1),
 
-  COUTN(2);
+  COUNT(2);
 
   private final int value;
 
