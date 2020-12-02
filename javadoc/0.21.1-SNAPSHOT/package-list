@@ -21,4 +21,5 @@ io.nem.symbol.sdk.model.network
 io.nem.symbol.sdk.model.node
 io.nem.symbol.sdk.model.receipt
 io.nem.symbol.sdk.model.restriction
+io.nem.symbol.sdk.model.state
 io.nem.symbol.sdk.model.transaction
