@@ -62,7 +62,9 @@ public class BlockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
         jsonHelper.convert(blockInfoDTO.getBlock(), ImportanceBlockDTO.class);
     NetworkType networkType = NetworkType.rawValueOf(block.getNetwork().getValue());
     BlockType type = BlockType.rawValueOf(block.getType());
-    if (type == BlockType.NORMAL_BLOCK)
+    // block.getVotingEligibleAccountsCount() == null for the testnet block 1 incomplete nemesis block.
+    // Remove before public net release
+    if (type == BlockType.NORMAL_BLOCK || block.getVotingEligibleAccountsCount() == null)
       return new BlockInfo(
           blockInfoDTO.getId(),
           block.getSize(),
