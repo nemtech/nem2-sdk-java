@@ -133,7 +133,8 @@ public class BlockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
         jsonHelper.convert(blockInfoDTO.getBlock(), ImportanceBlockDTO.class);
     NetworkType networkType = NetworkType.rawValueOf(block.getNetwork().getValue());
     BlockType type = BlockType.rawValueOf(block.getType());
-    // block.getVotingEligibleAccountsCount() == null for the testnet block 1 incomplete nemesis block.
+    // block.getVotingEligibleAccountsCount() == null for the testnet block 1 incomplete nemesis
+    // block.
     // Remove before public net release
     if (type == BlockType.NORMAL_BLOCK || block.getVotingEligibleAccountsCount() == null)
       return new BlockInfo(
