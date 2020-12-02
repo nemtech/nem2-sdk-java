@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -35,8 +36,9 @@ class NamespaceInfoTest {
 
   @Test
   void createANamespaceInfoViaConstructor() {
+
     NamespaceId namespaceId = NamespaceId.createFromId(new BigInteger("-8884663987180930485"));
-    Address address = Address.generateRandom(NetworkType.MIJIN_TEST);
+    Address address = Address.createFromRawAddress("SDXK5NYCKOSAT2NCIPYIEYN57N5XEVNCZ5AIAOI");
     NamespaceInfo namespaceInfo =
         new NamespaceInfo(
             "abc",
@@ -63,6 +65,47 @@ class NamespaceInfoTest {
     assertEquals(AliasType.MOSAIC, namespaceInfo.getAlias().getType());
     assertEquals(
         new BigInteger("100"), ((MosaicId) namespaceInfo.getAlias().getAliasValue()).getId());
+
+    byte[] serialize = namespaceInfo.serialize(Arrays.asList(createSubNamespaceInfo(namespaceId)));
+    assertEquals(
+        "01004BFA5F372D55B38490EEAEB70253A409E9A243F08261BDFB7B7255A2CF4080390100000000000000FFFFFFFFFFFFFFFF01640000000000000001000000000000000129CF2728A91AE7F0016400000000000000",
+        ConvertUtils.toHex(serialize));
+  }
+
+  @Test
+  void createANamespaceInfoViaConstructorEmptyAlias() {
+
+    NamespaceId namespaceId = NamespaceId.createFromId(new BigInteger("-8884663987180930485"));
+    Address address = Address.createFromRawAddress("SDXK5NYCKOSAT2NCIPYIEYN57N5XEVNCZ5AIAOI");
+    NamespaceInfo namespaceInfo =
+        new NamespaceInfo(
+            "abc",
+            1,
+            true,
+            0,
+            NamespaceRegistrationType.ROOT_NAMESPACE,
+            1,
+            Arrays.asList(namespaceId),
+            NamespaceId.createFromId(new BigInteger("0")),
+            address,
+            new BigInteger("1"),
+            new BigInteger("-1"),
+            new EmptyAlias());
+    assertEquals("abc", namespaceInfo.getRecordId().get());
+    assertTrue(namespaceInfo.isActive());
+    assertEquals(0, (int) namespaceInfo.getIndex());
+    assertSame(namespaceInfo.getRegistrationType(), NamespaceRegistrationType.ROOT_NAMESPACE);
+    assertEquals(1, (int) namespaceInfo.getDepth());
+    assertEquals(namespaceId, namespaceInfo.getLevels().get(0));
+    Assertions.assertEquals(address, namespaceInfo.getOwnerAddress());
+    assertEquals(new BigInteger("1"), namespaceInfo.getStartHeight());
+    assertEquals(new BigInteger("-1"), namespaceInfo.getEndHeight());
+    assertEquals(AliasType.NONE, namespaceInfo.getAlias().getType());
+
+    byte[] serialize = namespaceInfo.serialize(Arrays.asList(createSubNamespaceInfo(namespaceId)));
+    assertEquals(
+        "01004BFA5F372D55B38490EEAEB70253A409E9A243F08261BDFB7B7255A2CF4080390100000000000000FFFFFFFFFFFFFFFF0001000000000000000129CF2728A91AE7F0016400000000000000",
+        ConvertUtils.toHex(serialize));
   }
 
   @Test
@@ -73,7 +116,8 @@ class NamespaceInfoTest {
 
   @Test
   void shouldReturnSubNamespaceId() {
-    NamespaceInfo namespaceInfo = createSubNamespaceInfo();
+    NamespaceId parentId = NamespaceId.createFromId(new BigInteger("-3087871471161192663"));
+    NamespaceInfo namespaceInfo = createSubNamespaceInfo(parentId);
     assertEquals(new BigInteger("17358872602548358953"), namespaceInfo.getId().getId());
   }
 
@@ -85,7 +129,8 @@ class NamespaceInfoTest {
 
   @Test
   void shouldReturnRootFalseWhenNamespaceInfoIsFromSubNamespace() {
-    NamespaceInfo namespaceInfo = createSubNamespaceInfo();
+    NamespaceId parentId = NamespaceId.createFromId(new BigInteger("-3087871471161192663"));
+    NamespaceInfo namespaceInfo = createSubNamespaceInfo(parentId);
     assertFalse(namespaceInfo.isRoot());
   }
 
@@ -97,14 +142,16 @@ class NamespaceInfoTest {
 
   @Test
   void shouldReturnSubNamespaceTrueWhenNamespaceInfoIsFromSubNamespace() {
-    NamespaceInfo namespaceInfo = createSubNamespaceInfo();
+    NamespaceId parentId = NamespaceId.createFromId(new BigInteger("-3087871471161192663"));
+    NamespaceInfo namespaceInfo = createSubNamespaceInfo(parentId);
     assertTrue(namespaceInfo.isSubnamespace());
   }
 
   @Test
   void shouldReturnParentNamespaceIdWhenNamespaceInfoIsFromSubNamespace() {
-    NamespaceInfo namespaceInfo = createSubNamespaceInfo();
-    assertEquals(new BigInteger("15358872602548358953"), namespaceInfo.parentNamespaceId().getId());
+    NamespaceId parentId = NamespaceId.createFromId(new BigInteger("-3087871471161192663"));
+    NamespaceInfo namespaceInfo = createSubNamespaceInfo(parentId);
+    assertEquals(parentId, namespaceInfo.parentNamespaceId());
   }
 
   @Test
@@ -137,7 +184,9 @@ class NamespaceInfoTest {
         new MosaicAlias(new MosaicId(new BigInteger("100"))));
   }
 
-  NamespaceInfo createSubNamespaceInfo() {
+  NamespaceInfo createSubNamespaceInfo(NamespaceId parentId) {
+    NamespaceId level0 = NamespaceId.createFromId(new BigInteger("17358872602548358953"));
+    NamespaceId level1 = NamespaceId.createFromId(new BigInteger("-1087871471161192663"));
     return new NamespaceInfo(
         "bcd",
         1,
@@ -145,10 +194,8 @@ class NamespaceInfoTest {
         0,
         NamespaceRegistrationType.SUB_NAMESPACE,
         1,
-        Arrays.asList(
-            NamespaceId.createFromId(new BigInteger("17358872602548358953")),
-            NamespaceId.createFromId(new BigInteger("-1087871471161192663"))),
-        NamespaceId.createFromId(new BigInteger("-3087871471161192663")),
+        Arrays.asList(level0, level1),
+        parentId,
         new PublicAccount(
                 "B4F12E7C9F6946091E2CB8B6D3A12B50D17CCBBF646386EA27CE2946A7423DCF",
                 NetworkType.MIJIN_TEST)
