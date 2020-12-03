@@ -22,6 +22,8 @@ import org.apache.commons.lang3.Validate;
 /** Finalization message group */
 public class MessageGroup {
 
+  /** The signature schema */
+  private final Integer signatureSchema;
   /** Stage. */
   private final FinalizationStage stage;
   /** Height. */
@@ -32,6 +34,7 @@ public class MessageGroup {
   public final List<BmTreeSignature> signatures;
 
   public MessageGroup(
+      Integer signatureSchema,
       FinalizationStage stage,
       BigInteger height,
       List<String> hashes,
@@ -40,10 +43,15 @@ public class MessageGroup {
     Validate.notNull(height, "height is required");
     Validate.notNull(hashes, "hash is required");
     Validate.notNull(signatures, "signatures is required");
+    this.signatureSchema = signatureSchema;
     this.stage = stage;
     this.height = height;
     this.hashes = hashes;
     this.signatures = signatures;
+  }
+
+  public Integer getSignatureSchema() {
+    return signatureSchema;
   }
 
   public FinalizationStage getStage() {

@@ -16,6 +16,8 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.FinalizationRepository;
+import io.nem.symbol.sdk.api.RepositoryFactory;
+import io.nem.symbol.sdk.model.blockchain.FinalizedBlock;
 import io.nem.symbol.sdk.model.finalization.FinalizationProof;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Assertions;
@@ -46,6 +48,25 @@ public class FinalizationRepositoryIntegrationTest extends BaseIntegrationTest {
     Assertions.assertEquals(1L, finalizationProof.getFinalizationEpoch());
     Assertions.assertEquals(1L, finalizationProof.getFinalizationPoint());
     Assertions.assertEquals(BigInteger.ONE, finalizationProof.getHeight());
+    Assertions.assertEquals(1, finalizationProof.getVersion());
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getFinalizationProofAtCurrentFinalizedHeight(RepositoryType type) {
+    RepositoryFactory repositoryFactory = getRepositoryFactory(type);
+    FinalizedBlock finalizedBlock =
+        get(repositoryFactory.createChainRepository().getChainInfo()).getLatestFinalizedBlock();
+
+    FinalizationRepository repository = repositoryFactory.createFinalizationRepository();
+    FinalizationProof finalizationProof =
+        get(repository.getFinalizationProofAtHeight(finalizedBlock.getHeight()));
+
+    Assertions.assertEquals(
+        finalizationProof.getFinalizationEpoch(), finalizationProof.getFinalizationEpoch());
+    Assertions.assertEquals(
+        finalizationProof.getFinalizationPoint(), finalizationProof.getFinalizationPoint());
+    Assertions.assertEquals(finalizationProof.getHeight(), finalizationProof.getHeight());
     Assertions.assertEquals(1, finalizationProof.getVersion());
   }
 }

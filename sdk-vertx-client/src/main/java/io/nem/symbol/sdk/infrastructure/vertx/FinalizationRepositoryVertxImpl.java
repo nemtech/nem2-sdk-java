@@ -67,6 +67,7 @@ public class FinalizationRepositoryVertxImpl extends AbstractRepositoryVertxImpl
 
   private MessageGroup toMessageGroup(io.nem.symbol.sdk.openapi.vertx.model.MessageGroup dto) {
     return new MessageGroup(
+        dto.getSignatureSchema(),
         FinalizationStage.rawValueOf(dto.getStage().getValue()),
         dto.getHeight(),
         dto.getHashes(),
@@ -77,7 +78,6 @@ public class FinalizationRepositoryVertxImpl extends AbstractRepositoryVertxImpl
       io.nem.symbol.sdk.openapi.vertx.model.BmTreeSignature dto) {
     return new BmTreeSignature(
         toParentPublicKeySignaturePair(dto.getRoot()),
-        toParentPublicKeySignaturePair(dto.getTop()),
         toParentPublicKeySignaturePair(dto.getBottom()));
   }
 

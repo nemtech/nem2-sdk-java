@@ -21,29 +21,18 @@ import org.apache.commons.lang3.Validate;
 public class BmTreeSignature {
   /** Root. */
   private final ParentPublicKeySignaturePair root;
-  /** Top. */
-  private final ParentPublicKeySignaturePair top;
   /** Bottom. */
   private final ParentPublicKeySignaturePair bottom;
 
-  public BmTreeSignature(
-      ParentPublicKeySignaturePair root,
-      ParentPublicKeySignaturePair top,
-      ParentPublicKeySignaturePair bottom) {
+  public BmTreeSignature(ParentPublicKeySignaturePair root, ParentPublicKeySignaturePair bottom) {
     Validate.notNull(root, "root is required");
-    Validate.notNull(top, "top is required");
     Validate.notNull(bottom, "bottom is required");
     this.root = root;
-    this.top = top;
     this.bottom = bottom;
   }
 
   public ParentPublicKeySignaturePair getRoot() {
     return root;
-  }
-
-  public ParentPublicKeySignaturePair getTop() {
-    return top;
   }
 
   public ParentPublicKeySignaturePair getBottom() {

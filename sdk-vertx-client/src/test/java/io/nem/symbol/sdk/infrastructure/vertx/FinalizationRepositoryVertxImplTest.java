@@ -76,14 +76,14 @@ public class FinalizationRepositoryVertxImplTest extends AbstractVertxRespositor
     dto.height(BigInteger.valueOf(4));
 
     MessageGroup messageGroup = new MessageGroup();
+    messageGroup.setSignatureSchema(10);
     messageGroup.stage(StageEnum.NUMBER_1);
     messageGroup.addHashesItem("hash1");
     messageGroup.setHeight(BigInteger.valueOf(20));
     messageGroup.addSignaturesItem(
         new BmTreeSignature()
             .bottom(new ParentPublicKeySignaturePair().signature("sp").parentPublicKey("pp"))
-            .root(new ParentPublicKeySignaturePair().signature("sr").parentPublicKey("pr"))
-            .top(new ParentPublicKeySignaturePair().signature("st").parentPublicKey("pt")));
+            .root(new ParentPublicKeySignaturePair().signature("sr").parentPublicKey("pr")));
     dto.addMessageGroupsItem(messageGroup);
     return dto;
   }
