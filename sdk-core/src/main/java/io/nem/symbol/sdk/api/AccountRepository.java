@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @since 1.0
  */
-public interface AccountRepository extends Searcher<AccountInfo, AccountSearchCriteria> {
+public interface AccountRepository extends SearcherRepository<AccountInfo, AccountSearchCriteria> {
 
   /**
    * Gets an AccountInfo for an account.

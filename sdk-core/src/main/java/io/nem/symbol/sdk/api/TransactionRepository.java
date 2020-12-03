@@ -28,7 +28,8 @@ import java.util.List;
  *
  * @since 1.0
  */
-public interface TransactionRepository extends Searcher<Transaction, TransactionSearchCriteria> {
+public interface TransactionRepository
+    extends SearcherRepository<Transaction, TransactionSearchCriteria> {
 
   /**
    * Gets a transaction for a given hash.

@@ -20,7 +20,7 @@ import io.nem.symbol.sdk.model.metadata.Metadata;
 import io.reactivex.Observable;
 
 /** Metadata interface repository. */
-public interface MetadataRepository extends Searcher<Metadata, MetadataSearchCriteria> {
+public interface MetadataRepository extends SearcherRepository<Metadata, MetadataSearchCriteria> {
 
   /**
    * Get metadata of the given id.

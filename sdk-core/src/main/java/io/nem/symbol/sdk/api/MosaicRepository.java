@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @since 1.0
  */
-public interface MosaicRepository extends Searcher<MosaicInfo, MosaicSearchCriteria> {
+public interface MosaicRepository extends SearcherRepository<MosaicInfo, MosaicSearchCriteria> {
 
   /**
    * Gets a MosaicInfo for a given mosaicId

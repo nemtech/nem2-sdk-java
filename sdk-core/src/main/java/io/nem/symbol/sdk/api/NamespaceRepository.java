@@ -31,7 +31,8 @@ import java.util.List;
  *
  * @since 1.0
  */
-public interface NamespaceRepository extends Searcher<NamespaceInfo, NamespaceSearchCriteria> {
+public interface NamespaceRepository
+    extends SearcherRepository<NamespaceInfo, NamespaceSearchCriteria> {
 
   /**
    * Gets the NamespaceInfo for a given namespaceId.

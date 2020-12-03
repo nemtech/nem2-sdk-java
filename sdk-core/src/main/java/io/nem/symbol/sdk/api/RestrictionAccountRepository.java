@@ -26,7 +26,7 @@ import io.reactivex.Observable;
  * @since 1.0
  */
 public interface RestrictionAccountRepository
-    extends Searcher<AccountRestrictions, AccountRestrictionSearchCriteria> {
+    extends SearcherRepository<AccountRestrictions, AccountRestrictionSearchCriteria> {
 
   /**
    * Returns the account restrictions for a given account.

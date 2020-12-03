@@ -25,7 +25,7 @@ import java.math.BigInteger;
  *
  * @since 1.0
  */
-public interface BlockRepository extends Searcher<BlockInfo, BlockSearchCriteria> {
+public interface BlockRepository extends SearcherRepository<BlockInfo, BlockSearchCriteria> {
 
   /**
    * Gets a BlockInfo for a given block height.

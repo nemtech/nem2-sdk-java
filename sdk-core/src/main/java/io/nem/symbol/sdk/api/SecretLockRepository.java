@@ -20,7 +20,8 @@ import io.nem.symbol.sdk.model.transaction.SecretLockInfo;
 import io.reactivex.Observable;
 
 /** Repository used to retrieves secrets lock. */
-public interface SecretLockRepository extends Searcher<SecretLockInfo, SecretLockSearchCriteria> {
+public interface SecretLockRepository
+    extends SearcherRepository<SecretLockInfo, SecretLockSearchCriteria> {
 
   /**
    * Get secret lock info of the given id.

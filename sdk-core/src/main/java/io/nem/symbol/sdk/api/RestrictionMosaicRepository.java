@@ -25,7 +25,7 @@ import io.reactivex.Observable;
  * @since 1.0
  */
 public interface RestrictionMosaicRepository
-    extends Searcher<MosaicRestriction<?>, MosaicRestrictionSearchCriteria> {
+    extends SearcherRepository<MosaicRestriction<?>, MosaicRestrictionSearchCriteria> {
 
   /**
    * Get mosaic restriction info of the given id.

@@ -17,9 +17,9 @@ package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.core.crypto.Hashes;
 import io.nem.symbol.core.utils.ConvertUtils;
-import io.nem.symbol.sdk.api.NamespacePaginationStreamer;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.api.NamespaceSearchCriteria;
+import io.nem.symbol.sdk.api.PaginationStreamer;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.StateProofService;
 import io.nem.symbol.sdk.model.account.AccountInfo;
@@ -194,7 +194,8 @@ public class StateProofServiceImpl implements StateProofService {
   public Observable<StateMerkleProof<NamespaceInfo>> namespace(NamespaceInfo state) {
     NamespaceId id = state.getId();
     NamespaceRepository namespaceRepository = this.repositoryFactory.createNamespaceRepository();
-    NamespacePaginationStreamer streamer = new NamespacePaginationStreamer(namespaceRepository);
+    PaginationStreamer<NamespaceInfo, NamespaceSearchCriteria> streamer =
+        namespaceRepository.streamer();
     return namespaceRepository
         .getNamespaceMerkle(id)
         .flatMap(

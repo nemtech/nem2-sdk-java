@@ -29,6 +29,7 @@ import io.nem.symbol.sdk.api.MosaicRepository;
 import io.nem.symbol.sdk.api.MultisigRepository;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.api.Page;
+import io.nem.symbol.sdk.api.PaginationStreamer;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.RestrictionAccountRepository;
 import io.nem.symbol.sdk.api.RestrictionMosaicRepository;
@@ -108,6 +109,7 @@ public class StateProofServiceTest {
     NamespaceInfo state = Mockito.mock(NamespaceInfo.class);
     when(state.getId()).thenReturn(id);
     when(state.serialize(any())).thenReturn(ConvertUtils.fromHexToBytes(serialized));
+    when(repository.streamer()).thenReturn(new PaginationStreamer<>(repository));
     when(repository.search(any())).thenReturn(Observable.just(new Page<>(new ArrayList<>())));
     when(repository.getNamespace(eq(id))).thenReturn(Observable.just(state));
     when(repository.getNamespaceMerkle(eq(id))).thenReturn(Observable.just(tree));
