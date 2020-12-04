@@ -23,7 +23,9 @@ import org.apache.commons.lang3.Validate;
 public enum RoleType {
   PEER_NODE(1),
   API_NODE(2),
-  VOTING_NODE(4);
+  VOTING_NODE(4),
+  IP_V4_NODE(64),
+  IP_V6_NODE(128);
 
   private static final int MAX_FLAG_VALUE =
       Arrays.stream(RoleType.values()).mapToInt(RoleType::getValue).sum();
@@ -54,7 +56,7 @@ public enum RoleType {
         roles.add(0, roleType);
       }
     }
-
+    Validate.isTrue(temp == 0, "more flags than expected have been provided");
     return roles;
   }
 

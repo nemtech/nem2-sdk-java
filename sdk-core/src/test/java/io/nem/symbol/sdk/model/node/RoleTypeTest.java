@@ -39,7 +39,30 @@ public class RoleTypeTest {
         Arrays.asList(RoleType.PEER_NODE, RoleType.API_NODE, RoleType.VOTING_NODE),
         RoleType.toList(7));
 
+    Assertions.assertEquals(
+        Arrays.asList(
+            RoleType.PEER_NODE,
+            RoleType.API_NODE,
+            RoleType.VOTING_NODE,
+            RoleType.IP_V4_NODE,
+            RoleType.IP_V6_NODE),
+        RoleType.toList(128 + 64 + 7));
+
+    Assertions.assertEquals(
+        Arrays.asList(
+            RoleType.PEER_NODE,
+            RoleType.API_NODE,
+            RoleType.IP_V4_NODE),
+        RoleType.toList( 64 + 3));
+
+    Assertions.assertEquals(
+        Collections.singletonList(
+            RoleType.IP_V6_NODE),
+        RoleType.toList(128));
+
     Assertions.assertThrows(IllegalArgumentException.class, () -> RoleType.toList(-1));
     Assertions.assertThrows(IllegalArgumentException.class, () -> RoleType.toList(8));
+    Assertions.assertThrows(
+        IllegalArgumentException.class, () -> RoleType.toList(2 * RoleType.IP_V6_NODE.getValue()));
   }
 }

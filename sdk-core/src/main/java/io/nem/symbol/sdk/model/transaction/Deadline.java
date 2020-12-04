@@ -55,7 +55,7 @@ public class Deadline {
     long millis =
         Instant.now()
             .plus(units, chronoUnit)
-            .minusMillis(epochAdjustment.toMillis())
+            .minus(epochAdjustment)
             .toEpochMilli();
     return new Deadline(BigInteger.valueOf(millis));
   }

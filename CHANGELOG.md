@@ -14,19 +14,20 @@ Catbuffer Library | v0.0.24 | https://repo.maven.apache.org/maven2/io/nem/catbuf
 Client OkHttp | v0.10.4  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-okhttp-gson-client
 Client Vertx | v0.10.4  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-vertx-client/
 
+- **[BREAKING CHANGE]** `Deadline.create` requires the configurable `epochAdjustment` from the network properties. The value can be retrieved using ``RepositoryFactory.getEpochAdjustment()``.
 - **[BREAKING CHANGE]** `SecreatLockRepository.getSecretLock` has been removed. You can now search by secret by using the search criteria.
 - Added `FinalizationRepository`.
 - Added `transferMosaicId`, `fromTransferAmount`, `toTransferAmount` to transaction searches.
 - Added `CurrencyService` to allow loading Network and custom `Currency` objects from the rest service.
 - Added `StateProofService` to verify the different states.
-- Added `serialize()` to state objects like `AccountInfo`, `MosaicInfo`, etc.
+- Added `serialize()` to state objects `AccountInfo`, `MosaicInfo`, `NamespaceInfo`, `MultisigAccountInfo`, `AccountRestrictions`, `MosaicGlobalRestriction`, `MosaicAddressRestriction`, `MetadataEntry`, `SecretLockInfo`, `HashLockInfo` to generate the state proof hashes.
 - Added `version` field to state objects.
 - Added `/merkle` endpoints to the repositories of the different states.
 - Added `stremer()` to repositories to simplify `PaginationStreamer` objects creation.
 - Improved `search` endpoints allowing "empty" criteria in order to paginate over all the objects.
 - `Listener` now accepts address aliases as `UnresolvedAddress` objects.
 - Added V1 and V2 Voting Key transaction support.
-- Updated `FinalizationProof` objects to the latest server changes.
+- Updated `FinalizationProof` object added ``SignatureSchema`` for server tree testnet/v3.
 
 ## [0.21.0] - 25-Sep-2020
 
