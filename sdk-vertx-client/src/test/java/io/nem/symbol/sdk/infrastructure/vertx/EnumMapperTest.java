@@ -30,7 +30,6 @@ import io.nem.symbol.sdk.model.namespace.AliasAction;
 import io.nem.symbol.sdk.model.namespace.AliasType;
 import io.nem.symbol.sdk.model.namespace.NamespaceRegistrationType;
 import io.nem.symbol.sdk.model.node.NodeStatus;
-import io.nem.symbol.sdk.model.node.RoleType;
 import io.nem.symbol.sdk.model.receipt.ReceiptType;
 import io.nem.symbol.sdk.model.restriction.MosaicRestrictionEntryType;
 import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
@@ -53,7 +52,6 @@ import io.nem.symbol.sdk.openapi.vertx.model.NodeIdentityEqualityStrategy;
 import io.nem.symbol.sdk.openapi.vertx.model.NodeStatusEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.PositionEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.ReceiptTypeEnum;
-import io.nem.symbol.sdk.openapi.vertx.model.RolesTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionGroupEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionTypeEnum;
 import java.util.Arrays;
@@ -464,14 +462,6 @@ public class EnumMapperTest {
     Assertions.assertEquals(
         TransactionState.rawValueOf(transactionState.getValue()).getValue(),
         transactionState.getValue());
-  }
-
-  @ParameterizedTest
-  @EnumSource(RoleType.class)
-  void validFromRoleType(RoleType roleType) {
-    Assertions.assertNotNull(RolesTypeEnum.fromValue(roleType.getValue()));
-    Assertions.assertEquals(
-        RolesTypeEnum.fromValue(roleType.getValue()).getValue(), roleType.getValue());
   }
 
   @ParameterizedTest

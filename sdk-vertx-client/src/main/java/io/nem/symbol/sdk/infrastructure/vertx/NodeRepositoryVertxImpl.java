@@ -85,7 +85,7 @@ public class NodeRepositoryVertxImpl extends AbstractRepositoryVertxImpl impleme
         nodeInfoDTO.getPort(),
         NetworkType.rawValueOf(nodeInfoDTO.getNetworkIdentifier()),
         nodeInfoDTO.getVersion(),
-        RoleType.toList(nodeInfoDTO.getRoles().getValue()),
+        RoleType.toList(nodeInfoDTO.getRoles()),
         nodeInfoDTO.getHost(),
         nodeInfoDTO.getFriendlyName(),
         nodeInfoDTO.getNetworkGenerationHashSeed());

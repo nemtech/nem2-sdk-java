@@ -29,7 +29,6 @@ import io.nem.symbol.sdk.openapi.vertx.model.NodeHealthInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NodeInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.NodeStatusEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.NodeTimeDTO;
-import io.nem.symbol.sdk.openapi.vertx.model.RolesTypeEnum;
 import io.nem.symbol.sdk.openapi.vertx.model.ServerDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.ServerInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.StorageInfoDTO;
@@ -63,7 +62,7 @@ public class NodeRepositoryOkVertxImplTest extends AbstractVertxRespositoryTest 
     dto.setHost("http://hostname");
     dto.setFriendlyName("friendlyName");
     dto.setNetworkIdentifier(104);
-    dto.setRoles(RolesTypeEnum.NUMBER_2);
+    dto.setRoles(2);
     dto.setVersion(1234);
     dto.setPublicKey("somePublicKey");
     dto.setNetworkGenerationHashSeed("abc");
@@ -93,7 +92,7 @@ public class NodeRepositoryOkVertxImplTest extends AbstractVertxRespositoryTest 
     dto.setHost("http://hostname");
     dto.setFriendlyName("friendlyName");
     dto.setNetworkIdentifier(104);
-    dto.setRoles(RolesTypeEnum.NUMBER_2);
+    dto.setRoles(2);
     dto.setVersion(1234);
     dto.setPublicKey("somePublicKey");
     dto.setNetworkGenerationHashSeed("abc");
