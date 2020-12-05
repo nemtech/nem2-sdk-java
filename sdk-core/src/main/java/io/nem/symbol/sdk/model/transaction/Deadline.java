@@ -52,11 +52,7 @@ public class Deadline {
    * @return {@link Deadline}
    */
   public static Deadline create(Duration epochAdjustment, int units, ChronoUnit chronoUnit) {
-    long millis =
-        Instant.now()
-            .plus(units, chronoUnit)
-            .minus(epochAdjustment)
-            .toEpochMilli();
+    long millis = Instant.now().plus(units, chronoUnit).minus(epochAdjustment).toEpochMilli();
     return new Deadline(BigInteger.valueOf(millis));
   }
 
