@@ -69,7 +69,8 @@ public class RestrictionMosaicRepositoryOkHttpImpl extends AbstractRepositoryOkH
 
     return new MosaicGlobalRestriction(
         mosaicGlobalRestrictionDTO.getId(),
-        ObjectUtils.defaultIfNull(mosaicGlobalRestrictionDTO.getMosaicRestrictionEntry().getVersion(), 1),
+        ObjectUtils.defaultIfNull(
+            mosaicGlobalRestrictionDTO.getMosaicRestrictionEntry().getVersion(), 1),
         dto.getCompositeHash(),
         MosaicRestrictionEntryType.rawValueOf(dto.getEntryType().getValue()),
         MapperUtils.toMosaicId(dto.getMosaicId()),

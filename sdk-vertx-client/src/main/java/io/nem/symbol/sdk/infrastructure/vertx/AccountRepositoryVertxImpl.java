@@ -127,7 +127,7 @@ public class AccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     AccountDTO accountDTO = accountInfoDTO.getAccount();
     return new AccountInfo(
         accountInfoDTO.getId(),
-        ObjectUtils.defaultIfNull(accountDTO.getVersion(),1),
+        ObjectUtils.defaultIfNull(accountDTO.getVersion(), 1),
         toAddress(accountDTO.getAddress()),
         accountDTO.getAddressHeight(),
         PublicKey.fromHexString(accountDTO.getPublicKey()),
