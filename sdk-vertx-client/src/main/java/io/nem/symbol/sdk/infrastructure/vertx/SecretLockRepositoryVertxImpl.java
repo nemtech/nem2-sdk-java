@@ -36,6 +36,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 
 public class SecretLockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     implements SecretLockRepository {
@@ -52,7 +53,7 @@ public class SecretLockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     MosaicId mosaicId = MapperUtils.toMosaicId(lock.getMosaicId());
     return new SecretLockInfo(
         dto.getId(),
-        lock.getVersion(),
+        ObjectUtils.defaultIfNull(lock.getVersion(), 1),
         MapperUtils.toAddress(lock.getOwnerAddress()),
         mosaicId,
         lock.getAmount(),

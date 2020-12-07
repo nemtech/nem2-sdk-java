@@ -37,6 +37,7 @@ import io.vertx.core.Handler;
 import java.math.BigInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 
 /** Implementation of {@link MetadataRepository} */
 public class MetadataRepositoryVertxImpl extends AbstractRepositoryVertxImpl
@@ -106,7 +107,7 @@ public class MetadataRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     MetadataEntryDTO entryDto = dto.getMetadataEntry();
     return new Metadata(
         dto.getId(),
-        dto.getMetadataEntry().getVersion(),
+        ObjectUtils.defaultIfNull(dto.getMetadataEntry().getVersion(), 1),
         entryDto.getCompositeHash(),
         MapperUtils.toAddress(entryDto.getSourceAddress()),
         MapperUtils.toAddress(entryDto.getTargetAddress()),

@@ -34,6 +34,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 
 public class HashLockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     implements HashLockRepository {
@@ -59,7 +60,7 @@ public class HashLockRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     HashLockEntryDTO lock = dto.getLock();
     return new HashLockInfo(
         dto.getId(),
-        dto.getLock().getVersion(),
+        ObjectUtils.defaultIfNull(dto.getLock().getVersion(), 1),
         MapperUtils.toAddress(lock.getOwnerAddress()),
         MapperUtils.toMosaicId(lock.getMosaicId()),
         lock.getAmount(),

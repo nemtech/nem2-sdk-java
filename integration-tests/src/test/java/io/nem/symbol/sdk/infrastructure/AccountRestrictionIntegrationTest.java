@@ -34,7 +34,10 @@ import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionFlags;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.AccountOperationRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.AccountRestrictionFlags;
+import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
+import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.TransactionType;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -82,6 +85,66 @@ class AccountRestrictionIntegrationTest extends BaseIntegrationTest {
     sendAccountRestrictionTransaction(type, transactionType, false, restrictionFlags);
 
     Assertions.assertFalse(hasRestriction(type, testAccount, restrictionFlags, transactionType));
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  public void addRestrictionsToRandomAddress(RepositoryType type) {
+    Account testAccount = this.helper().createTestAccount(type);
+    Account testAccount2 = this.helper().createTestAccount(type);
+    Account testAccount3 = this.helper().createTestAccount(type);
+    Account testAccount4 = this.helper().createTestAccount(type);
+
+    AccountOperationRestrictionTransaction operationRestrictions =
+        AccountOperationRestrictionTransactionFactory.create(
+                getNetworkType(),
+                getDeadline(),
+                AccountOperationRestrictionFlags.BLOCK_OUTGOING_TRANSACTION_TYPE,
+                Arrays.asList(TransactionType.HASH_LOCK, TransactionType.SECRET_LOCK),
+                Collections.emptyList())
+            .maxFee(maxFee)
+            .build();
+
+    AccountAddressRestrictionTransaction accountRestrictions1 =
+        AccountAddressRestrictionTransactionFactory.create(
+                getNetworkType(),
+                getDeadline(),
+                AccountAddressRestrictionFlags.BLOCK_ADDRESS,
+                Arrays.asList(testAccount2.getAddress(), testAccount3.getAddress()),
+                Collections.emptyList())
+            .maxFee(maxFee)
+            .build();
+
+    AccountAddressRestrictionTransaction accountRestrictions2 =
+        AccountAddressRestrictionTransactionFactory.create(
+                getNetworkType(),
+                getDeadline(),
+                AccountAddressRestrictionFlags.BLOCK_OUTGOING_ADDRESS,
+                Collections.singletonList(testAccount4.getAddress()),
+                Collections.emptyList())
+            .maxFee(maxFee)
+            .build();
+
+    AggregateTransaction aggregateTransaction =
+        AggregateTransactionFactory.createComplete(
+                getNetworkType(),
+                getDeadline(),
+                Arrays.asList(
+                    operationRestrictions.toAggregate(testAccount.getPublicAccount()),
+                    accountRestrictions1.toAggregate(testAccount.getPublicAccount()),
+                    accountRestrictions2.toAggregate(testAccount.getPublicAccount())))
+            .maxFee(maxFee)
+            .build();
+
+    helper().announceAndValidate(type, testAccount, aggregateTransaction);
+    sleep(1000);
+    AccountRestrictions accountRestrictions =
+        get(
+            getRepositoryFactory(type)
+                .createRestrictionAccountRepository()
+                .getAccountRestrictions(testAccount.getAddress()));
+
+    Assertions.assertEquals(3, accountRestrictions.getRestrictions().size());
   }
 
   @ParameterizedTest

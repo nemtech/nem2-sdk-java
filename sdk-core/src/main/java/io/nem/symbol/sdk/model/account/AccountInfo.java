@@ -206,7 +206,7 @@ public class AccountInfo implements Stored {
     AddressDto address = SerializationUtils.toAddressDto(getAddress());
     HeightDto addressHeight = new HeightDto(getAddressHeight().longValue());
     KeyDto publicKey = SerializationUtils.toKeyDto(getPublicKey());
-    HeightDto publicKeyHeight = new HeightDto(getAddressHeight().longValue());
+    HeightDto publicKeyHeight = new HeightDto(getPublicKeyHeight().longValue());
     AccountTypeDto accountType = AccountTypeDto.rawValueOf((byte) getAccountType().getValue());
     EnumSet<AccountKeyTypeFlagsDto> supplementalPublicKeysMask = getAccountKeyTypeFlags();
     KeyDto linkedPublicKey =

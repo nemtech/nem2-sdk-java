@@ -34,6 +34,7 @@ import io.reactivex.Observable;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 
 public class RestrictionAccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
     implements RestrictionAccountRepository {
@@ -55,7 +56,7 @@ public class RestrictionAccountRepositoryOkHttpImpl extends AbstractRepositoryOk
 
   private AccountRestrictions toAccountRestrictions(AccountRestrictionsInfoDTO dto) {
     return new AccountRestrictions(
-        dto.getAccountRestrictions().getVersion(),
+        ObjectUtils.defaultIfNull(dto.getAccountRestrictions().getVersion(), 1),
         MapperUtils.toAddress(dto.getAccountRestrictions().getAddress()),
         dto.getAccountRestrictions().getRestrictions().stream()
             .map(this::toAccountRestriction)

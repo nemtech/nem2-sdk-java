@@ -45,6 +45,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 
 public class RestrictionMosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     implements RestrictionMosaicRepository {
@@ -71,7 +72,7 @@ public class RestrictionMosaicRepositoryVertxImpl extends AbstractRepositoryVert
 
     return new MosaicGlobalRestriction(
         mosaicGlobalRestrictionDTO.getId(),
-        mosaicGlobalRestrictionDTO.getMosaicRestrictionEntry().getVersion(),
+        ObjectUtils.defaultIfNull(mosaicGlobalRestrictionDTO.getMosaicRestrictionEntry().getVersion(), 1),
         dto.getCompositeHash(),
         MosaicRestrictionEntryType.rawValueOf(dto.getEntryType().getValue()),
         MapperUtils.toMosaicId(dto.getMosaicId()),
@@ -97,7 +98,7 @@ public class RestrictionMosaicRepositoryVertxImpl extends AbstractRepositoryVert
 
     return new MosaicAddressRestriction(
         mosaicAddressRestrictionDTO.getId(),
-        mosaicAddressRestrictionDTO.getMosaicRestrictionEntry().getVersion(),
+        ObjectUtils.defaultIfNull(dto.getVersion(), 1),
         dto.getCompositeHash(),
         MosaicRestrictionEntryType.rawValueOf(dto.getEntryType().getValue()),
         MapperUtils.toMosaicId(dto.getMosaicId()),
