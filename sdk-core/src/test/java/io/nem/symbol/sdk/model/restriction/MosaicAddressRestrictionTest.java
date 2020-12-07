@@ -68,4 +68,35 @@ public class MosaicAddressRestrictionTest {
     Assertions.assertEquals(
         ConvertUtils.toHex(serializedState), ConvertUtils.toHex(builder.serialize()));
   }
+
+  @Test
+  public void serializeWithWrongOrder() {
+
+    Map<BigInteger, BigInteger> restrictions = new LinkedHashMap<>();
+    restrictions.put(BigInteger.valueOf(75425), BigInteger.valueOf(1));
+    restrictions.put(BigInteger.valueOf(60947), BigInteger.valueOf(1));
+    MosaicAddressRestriction restriction =
+            new MosaicAddressRestriction(
+                    "a",
+                    1,
+                    "DEB23060603C93293673A3C50B46351F2C746A821CA815A66C0396363EE7F228",
+                    MosaicRestrictionEntryType.ADDRESS,
+                    new MosaicId("4C8206CB11492AD5"),
+                    Address.createFromEncoded("98D2C95780CE2BE891597AE8984CE4977FB54FAC9913CEA1"),
+                    restrictions);
+
+    byte[] serializedState = restriction.serialize();
+    byte[] hash = Hashes.sha3_256(serializedState);
+    String expectedHashHex = "11F67D85CDF3A8DF1DC74021F6029C9E625E33B2F2F14D166D5FC3EE8E595390";
+    String expectedHex =
+            "010000D52A4911CB06824C98D2C95780CE2BE891597AE8984CE4977FB54FAC9913CEA10213EE0000000000000100000000000000A1260100000000000100000000000000";
+    assertEquals(expectedHex, ConvertUtils.toHex(serializedState));
+    assertEquals(expectedHashHex, ConvertUtils.toHex(hash));
+    MosaicRestrictionEntryBuilder builder =
+            MosaicRestrictionEntryBuilder.loadFromBinary(
+                    SerializationUtils.toDataInput(serializedState));
+
+    Assertions.assertEquals(
+            ConvertUtils.toHex(serializedState), ConvertUtils.toHex(builder.serialize()));
+  }
 }

@@ -59,6 +59,7 @@ public class MosaicGlobalRestriction extends MosaicRestriction<MosaicGlobalRestr
     GlobalKeyValueSetBuilder restrictions =
         GlobalKeyValueSetBuilder.create(
             getRestrictions().entrySet().stream()
+                .sorted(Comparator.comparing(Entry::getKey))
                 .map(this::toGlobalKeyValueSetBuilder)
                 .collect(Collectors.toList()));
     MosaicGlobalRestrictionEntryBuilder entry =
