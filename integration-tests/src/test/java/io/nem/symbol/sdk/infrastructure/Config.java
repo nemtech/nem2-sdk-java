@@ -224,6 +224,10 @@ public class Config {
     return getAccount("testAccount2");
   }
 
+  public Account getTestAccount3() {
+    return getAccount("testAccount3");
+  }
+
   public Account getCosignatory3Account() {
     return getAccount("cosignatory3Account");
   }

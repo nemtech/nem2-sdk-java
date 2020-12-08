@@ -69,4 +69,23 @@ public class FinalizationRepositoryIntegrationTest extends BaseIntegrationTest {
     Assertions.assertEquals(finalizationProof.getHeight(), finalizationProof.getHeight());
     Assertions.assertEquals(1, finalizationProof.getVersion());
   }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getFinalizationProofAtEpochLatest(RepositoryType type) {
+    RepositoryFactory repositoryFactory = getRepositoryFactory(type);
+    FinalizedBlock finalizedBlock =
+        get(repositoryFactory.createChainRepository().getChainInfo()).getLatestFinalizedBlock();
+
+    FinalizationRepository repository = repositoryFactory.createFinalizationRepository();
+    FinalizationProof finalizationProof =
+        get(repository.getFinalizationProofAtEpoch(finalizedBlock.getFinalizationEpoch()));
+
+    Assertions.assertEquals(
+        finalizationProof.getFinalizationEpoch(), finalizationProof.getFinalizationEpoch());
+    Assertions.assertEquals(
+        finalizationProof.getFinalizationPoint(), finalizationProof.getFinalizationPoint());
+    Assertions.assertEquals(finalizationProof.getHeight(), finalizationProof.getHeight());
+    Assertions.assertEquals(1, finalizationProof.getVersion());
+  }
 }

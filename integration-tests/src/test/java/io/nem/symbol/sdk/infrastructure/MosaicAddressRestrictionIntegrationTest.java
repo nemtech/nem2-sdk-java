@@ -17,27 +17,23 @@ package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.MosaicRestrictionSearchCriteria;
 import io.nem.symbol.sdk.api.Page;
+import io.nem.symbol.sdk.api.PaginationStreamer;
 import io.nem.symbol.sdk.api.RestrictionMosaicRepository;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.blockchain.BlockDuration;
-import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
-import io.nem.symbol.sdk.model.mosaic.MosaicNonce;
 import io.nem.symbol.sdk.model.restriction.MosaicAddressRestriction;
 import io.nem.symbol.sdk.model.restriction.MosaicRestriction;
 import io.nem.symbol.sdk.model.restriction.MosaicRestrictionEntryType;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransaction;
-import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MosaicGlobalRestrictionTransaction;
 import io.nem.symbol.sdk.model.transaction.MosaicGlobalRestrictionTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.MosaicRestrictionType;
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -45,23 +41,14 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest {
 
-  private Account testAccount;
-  private Account testAccount2;
-  private BigInteger restrictionKey;
-
-  @BeforeEach
-  void setup() {
-    testAccount = config().getDefaultAccount();
-    testAccount2 = config().getTestAccount2();
-    restrictionKey = BigInteger.valueOf(22222);
-  }
-
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void createMosaicAddressRestrictionAndValidateEndpoints(RepositoryType type) {
-
+    Account testAccount = helper().createTestAccount(type);
+    Account testAccount2 = config().getTestAccount2();
     // 1) Create a mosaic
     MosaicId mosaicId = createMosaic(type, testAccount);
+    BigInteger restrictionKey = BigInteger.valueOf(22222);
 
     // 2) Create a global restriction on the mosaic
     MosaicGlobalRestrictionTransaction mosaicGlobalRestrictionTransaction =
@@ -100,7 +87,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
         announceAggregateAndValidate(type, createTransaction, testAccount).getLeft();
 
     sleep(1000);
-    assertTransaction(createTransaction, announce1);
+    assertTransaction(restrictionKey, createTransaction, announce1);
 
     // 5) Validate that endpoints have the data.
 
@@ -130,13 +117,14 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
         announceAggregateAndValidate(type, updateTransaction, testAccount).getLeft();
 
     sleep(1000);
-    assertTransaction(updateTransaction, announced);
+    assertTransaction(restrictionKey, updateTransaction, announced);
 
     assertMosaicAddressRestriction(
         restrictionRepository, targetAddress, updateTransaction, targetAddress, mosaicId);
   }
 
   private void assertTransaction(
+      BigInteger restrictionKey,
       MosaicAddressRestrictionTransaction expectedTransaction,
       MosaicAddressRestrictionTransaction processedTransaction) {
     Assertions.assertEquals(expectedTransaction.getMosaicId(), processedTransaction.getMosaicId());
@@ -198,27 +186,7 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
   }
 
   private MosaicId createMosaic(RepositoryType type, Account testAccount) {
-    MosaicNonce nonce = MosaicNonce.createRandom();
-    MosaicId mosaicId = MosaicId.createFromNonce(nonce, testAccount.getPublicAccount());
-
-    System.out.println(mosaicId.getIdAsHex());
-
-    MosaicDefinitionTransaction mosaicDefinitionTransaction =
-        MosaicDefinitionTransactionFactory.create(
-                getNetworkType(),
-                getDeadline(),
-                nonce,
-                mosaicId,
-                MosaicFlags.create(true, true, true),
-                4,
-                new BlockDuration(100))
-            .maxFee(maxFee)
-            .build();
-
-    MosaicDefinitionTransaction validateTransaction =
-        announceAndValidate(type, testAccount, mosaicDefinitionTransaction);
-    Assertions.assertEquals(mosaicId, validateTransaction.getMosaicId());
-    return mosaicId;
+    return helper().createMosaic(testAccount, type, BigInteger.ZERO, null);
   }
 
   @ParameterizedTest
@@ -239,5 +207,102 @@ public class MosaicAddressRestrictionIntegrationTest extends BaseIntegrationTest
                     .targetAddress(address)
                     .entryType(MosaicRestrictionEntryType.ADDRESS)));
     Assertions.assertTrue(page.getData().isEmpty());
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void createMultiAddressRestrictions(RepositoryType type) {
+    Account testAccount = helper().createTestAccount(type);
+    Account testAccount2 = config().getTestAccount2();
+    Account testAccount3 = config().getTestAccount3();
+    // 1) Create a mosaic
+    MosaicId mosaicId = createMosaic(type, testAccount);
+    BigInteger restrictionKey1 = BigInteger.valueOf(11);
+    BigInteger restrictionKey2 = BigInteger.valueOf(22);
+
+    // 2) Create a global restriction on the mosaic
+    MosaicGlobalRestrictionTransaction mosaicGlobalRestrictionTransaction1 =
+        MosaicGlobalRestrictionTransactionFactory.create(
+                getNetworkType(),
+                getDeadline(),
+                mosaicId,
+                restrictionKey1,
+                BigInteger.valueOf(20),
+                MosaicRestrictionType.GE)
+            .maxFee(maxFee)
+            .build();
+
+    // 2) Create a global restriction on the mosaic
+    MosaicGlobalRestrictionTransaction mosaicGlobalRestrictionTransaction2 =
+        MosaicGlobalRestrictionTransactionFactory.create(
+                getNetworkType(),
+                getDeadline(),
+                mosaicId,
+                restrictionKey2,
+                BigInteger.valueOf(10),
+                MosaicRestrictionType.GT)
+            .maxFee(maxFee)
+            .build();
+
+    announceAndValidate(type, testAccount, mosaicGlobalRestrictionTransaction1);
+    announceAndValidate(type, testAccount, mosaicGlobalRestrictionTransaction2);
+
+    sleep(1000);
+
+    // 3)Create a new MosaicAddressRestrictionTransaction
+
+    MosaicAddressRestrictionTransaction createTransaction1 =
+        MosaicAddressRestrictionTransactionFactory.create(
+                getNetworkType(),
+                getDeadline(),
+                mosaicId,
+                restrictionKey1,
+                testAccount2.getAddress(),
+                BigInteger.valueOf(30))
+            .maxFee(maxFee)
+            .build();
+
+    MosaicAddressRestrictionTransaction createTransaction2 =
+        MosaicAddressRestrictionTransactionFactory.create(
+                getNetworkType(),
+                getDeadline(),
+                mosaicId,
+                restrictionKey1,
+                testAccount3.getAddress(),
+                BigInteger.valueOf(20))
+            .maxFee(maxFee)
+            .build();
+
+    MosaicAddressRestrictionTransaction createTransaction3 =
+        MosaicAddressRestrictionTransactionFactory.create(
+                getNetworkType(),
+                getDeadline(),
+                mosaicId,
+                restrictionKey2,
+                testAccount3.getAddress(),
+                BigInteger.valueOf(70))
+            .maxFee(maxFee)
+            .build();
+
+    announceAndValidate(type, testAccount, createTransaction1);
+    announceAndValidate(type, testAccount, createTransaction2);
+    announceAndValidate(type, testAccount, createTransaction3);
+
+    sleep(1000);
+
+    RestrictionMosaicRepository restrictionRepository =
+        getRepositoryFactory(type).createRestrictionMosaicRepository();
+
+    PaginationStreamer<MosaicRestriction<?>, MosaicRestrictionSearchCriteria> streamer =
+        restrictionRepository.streamer();
+    List<MosaicRestriction<?>> restrictions =
+        get(
+            streamer
+                .search(
+                    new MosaicRestrictionSearchCriteria().targetAddress(testAccount.getAddress()))
+                .toList()
+                .toObservable());
+
+    Assertions.assertEquals(1, restrictions.size());
   }
 }
