@@ -33,6 +33,7 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.SecretLockPage;
 import io.reactivex.Observable;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * Implements {@link SecretLockRepository}
@@ -54,7 +55,7 @@ public class SecretLockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
     MosaicId mosaicId = MapperUtils.toMosaicId(lock.getMosaicId());
     return new SecretLockInfo(
         dto.getId(),
-        lock.getVersion(),
+        ObjectUtils.defaultIfNull(dto.getLock().getVersion(), 1),
         MapperUtils.toAddress(lock.getOwnerAddress()),
         mosaicId,
         lock.getAmount(),

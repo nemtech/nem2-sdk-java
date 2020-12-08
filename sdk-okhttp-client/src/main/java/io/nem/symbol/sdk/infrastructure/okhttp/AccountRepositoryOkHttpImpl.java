@@ -45,6 +45,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * Created by fernando on 29/07/19.
@@ -116,7 +117,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
     AccountDTO accountDTO = accountInfoDTO.getAccount();
     return new AccountInfo(
         accountInfoDTO.getId(),
-        accountDTO.getVersion(),
+        ObjectUtils.defaultIfNull(accountDTO.getVersion(), 1),
         toAddress(accountDTO.getAddress()),
         accountDTO.getAddressHeight(),
         PublicKey.fromHexString(accountDTO.getPublicKey()),

@@ -37,6 +37,7 @@ import io.vertx.core.Handler;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 
 public class RestrictionAccountRepositoryVertxImpl extends AbstractRepositoryVertxImpl
     implements RestrictionAccountRepository {
@@ -59,7 +60,7 @@ public class RestrictionAccountRepositoryVertxImpl extends AbstractRepositoryVer
 
   private AccountRestrictions toAccountRestrictions(AccountRestrictionsInfoDTO dto) {
     return new AccountRestrictions(
-        dto.getAccountRestrictions().getVersion(),
+        ObjectUtils.defaultIfNull(dto.getAccountRestrictions().getVersion(), 1),
         MapperUtils.toAddress(dto.getAccountRestrictions().getAddress()),
         dto.getAccountRestrictions().getRestrictions().stream()
             .map(this::toAccountRestriction)

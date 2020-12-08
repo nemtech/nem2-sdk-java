@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 
 public class MultisigRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
     implements MultisigRepository {
@@ -75,7 +76,7 @@ public class MultisigRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
     MultisigDTO dto = info.getMultisig();
     return new MultisigAccountInfo(
         null,
-        info.getMultisig().getVersion(),
+        ObjectUtils.defaultIfNull(info.getMultisig().getVersion(), 1),
         MapperUtils.toAddress(dto.getAccountAddress()),
         dto.getMinApproval(),
         dto.getMinRemoval(),

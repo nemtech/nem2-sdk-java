@@ -35,6 +35,7 @@ import io.reactivex.Observable;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * Mosaic http repository.
@@ -108,7 +109,7 @@ public class MosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
   private MosaicInfo createMosaicInfo(MosaicDTO mosaic, String recordId) {
     return new MosaicInfo(
         recordId,
-        mosaic.getVersion(),
+        ObjectUtils.defaultIfNull(mosaic.getVersion(), 1),
         toMosaicId(mosaic.getId()),
         mosaic.getSupply(),
         mosaic.getStartHeight(),

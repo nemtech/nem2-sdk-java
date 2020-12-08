@@ -34,6 +34,7 @@ import io.reactivex.Observable;
 import java.math.BigInteger;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 
 /** Implementation of {@link MetadataRepository} */
 public class MetadataRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
@@ -99,7 +100,7 @@ public class MetadataRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
     MetadataEntryDTO entryDto = dto.getMetadataEntry();
     return new Metadata(
         dto.getId(),
-        dto.getMetadataEntry().getVersion(),
+        ObjectUtils.defaultIfNull(dto.getMetadataEntry().getVersion(), 1),
         entryDto.getCompositeHash(),
         MapperUtils.toAddress(entryDto.getSourceAddress()),
         MapperUtils.toAddress(entryDto.getTargetAddress()),

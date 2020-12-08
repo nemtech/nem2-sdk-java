@@ -57,6 +57,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * Namespace http repository.
@@ -245,7 +246,7 @@ public class NamespaceRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
   private NamespaceInfo toNamespaceInfo(NamespaceInfoDTO namespaceInfoDTO) {
     return new NamespaceInfo(
         namespaceInfoDTO.getId(),
-        namespaceInfoDTO.getNamespace().getVersion(),
+        ObjectUtils.defaultIfNull(namespaceInfoDTO.getNamespace().getVersion(), 1),
         namespaceInfoDTO.getMeta().getActive(),
         namespaceInfoDTO.getMeta().getIndex(),
         NamespaceRegistrationType.rawValueOf(

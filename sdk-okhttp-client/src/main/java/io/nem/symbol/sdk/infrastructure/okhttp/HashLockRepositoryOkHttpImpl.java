@@ -31,6 +31,7 @@ import io.nem.symbol.sdk.openapi.okhttp_gson.model.Order;
 import io.reactivex.Observable;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * Implements {@link HashLockRepository}
@@ -61,7 +62,7 @@ public class HashLockRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
     HashLockEntryDTO lock = dto.getLock();
     return new HashLockInfo(
         dto.getId(),
-        dto.getLock().getVersion(),
+        ObjectUtils.defaultIfNull(lock.getVersion(), 1),
         MapperUtils.toAddress(lock.getOwnerAddress()),
         MapperUtils.toMosaicId(lock.getMosaicId()),
         lock.getAmount(),

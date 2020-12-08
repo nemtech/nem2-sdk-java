@@ -38,6 +38,7 @@ import io.vertx.core.Handler;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * Mosaic http repository.
@@ -118,7 +119,7 @@ public class MosaicRepositoryVertxImpl extends AbstractRepositoryVertxImpl
   private MosaicInfo createMosaicInfo(MosaicDTO mosaic, String recordId) {
     return new MosaicInfo(
         recordId,
-        mosaic.getVersion(),
+        ObjectUtils.defaultIfNull(mosaic.getVersion(), 1),
         toMosaicId(mosaic.getId()),
         mosaic.getSupply(),
         mosaic.getStartHeight(),

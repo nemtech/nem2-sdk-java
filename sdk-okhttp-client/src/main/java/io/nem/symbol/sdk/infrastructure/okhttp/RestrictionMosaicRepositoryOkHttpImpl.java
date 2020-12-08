@@ -42,6 +42,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 
 public class RestrictionMosaicRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
     implements RestrictionMosaicRepository {
@@ -68,7 +69,8 @@ public class RestrictionMosaicRepositoryOkHttpImpl extends AbstractRepositoryOkH
 
     return new MosaicGlobalRestriction(
         mosaicGlobalRestrictionDTO.getId(),
-        mosaicGlobalRestrictionDTO.getMosaicRestrictionEntry().getVersion(),
+        ObjectUtils.defaultIfNull(
+            mosaicGlobalRestrictionDTO.getMosaicRestrictionEntry().getVersion(), 1),
         dto.getCompositeHash(),
         MosaicRestrictionEntryType.rawValueOf(dto.getEntryType().getValue()),
         MapperUtils.toMosaicId(dto.getMosaicId()),
@@ -94,7 +96,7 @@ public class RestrictionMosaicRepositoryOkHttpImpl extends AbstractRepositoryOkH
 
     return new MosaicAddressRestriction(
         mosaicAddressRestrictionDTO.getId(),
-        mosaicAddressRestrictionDTO.getMosaicRestrictionEntry().getVersion(),
+        ObjectUtils.defaultIfNull(dto.getVersion(), 1),
         dto.getCompositeHash(),
         MosaicRestrictionEntryType.rawValueOf(dto.getEntryType().getValue()),
         MapperUtils.toMosaicId(dto.getMosaicId()),
