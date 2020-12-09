@@ -45,8 +45,7 @@ class AccountInfoTest {
       PublicKey.fromHexString("3333333333333333333333333333333333333333333333333333333333333333");
   PublicKey vrfKey =
       PublicKey.fromHexString("4444444444444444444444444444444444444444444444444444444444444444");
-  PublicKey votingKey =
-      PublicKey.fromHexString("5555555555555555555555555555555555555555555555555555555555555555");
+  String votingKey = "5555555555555555555555555555555555555555555555555555555555555555";
   NetworkType networkType = NetworkType.MIJIN_TEST;
   Address address = Address.createFromPublicKey(accountPublicKey.toHex(), networkType);
 

@@ -383,8 +383,8 @@ public class SerializationUtils {
    * @param key the voting key.
    * @return the VotingKeyDto
    */
-  public static VotingKeyDto toVotingKeyDto(PublicKey key) {
-    return new VotingKeyDto(ByteBuffer.wrap(key.getBytes()));
+  public static VotingKeyDto toVotingKeyDto(String key) {
+    return new VotingKeyDto(ByteBuffer.wrap(ConvertUtils.fromHexToBytes((key))));
   }
 
   /**
