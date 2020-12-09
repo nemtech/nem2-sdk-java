@@ -15,7 +15,6 @@
  */
 package io.nem.symbol.sdk.model.account;
 
-import io.nem.symbol.core.crypto.PublicKey;
 import org.apache.commons.lang3.Validate;
 
 /** Account link voting key */
