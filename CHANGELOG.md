@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
-## [0.22.1] - 19-Dec-2020
+## [0.22.1] - 10-Dec-2020
 
 **Milestone**: Catapult-server finality (0.10.0.4)
  Package  | Version  | Link
