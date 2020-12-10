@@ -157,9 +157,7 @@ public class AccountRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
                 .map(
                     p ->
                         new AccountLinkVotingKey(
-                            p.getPublicKey(),
-                            (p.getStartEpoch()),
-                            (p.getEndEpoch())))
+                            p.getPublicKey(), (p.getStartEpoch()), (p.getEndEpoch())))
                 .collect(Collectors.toList());
     return new SupplementalAccountKeys(linked, node, vrf, voting);
   }

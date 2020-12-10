@@ -78,11 +78,15 @@ public class FinalizationRepositoryVertxImpl extends AbstractRepositoryVertxImpl
       io.nem.symbol.sdk.openapi.vertx.model.BmTreeSignature dto) {
     return new BmTreeSignature(
         toParentPublicKeySignaturePair(dto.getRoot()),
-        toParentPublicKeySignaturePair(dto.getBottom()));
+        toParentPublicKeySignaturePair(dto.getBottom()),
+        toParentPublicKeySignaturePair(dto.getTop()));
   }
 
   private ParentPublicKeySignaturePair toParentPublicKeySignaturePair(
       io.nem.symbol.sdk.openapi.vertx.model.ParentPublicKeySignaturePair dto) {
+    if (dto == null) {
+      return null;
+    }
     return new ParentPublicKeySignaturePair(dto.getParentPublicKey(), dto.getSignature());
   }
 

@@ -88,11 +88,15 @@ public class FinalizationRepositoryOkHttpImpl extends AbstractRepositoryOkHttpIm
       io.nem.symbol.sdk.openapi.okhttp_gson.model.BmTreeSignature dto) {
     return new BmTreeSignature(
         toParentPublicKeySignaturePair(dto.getRoot()),
-        toParentPublicKeySignaturePair(dto.getBottom()));
+        toParentPublicKeySignaturePair(dto.getBottom()),
+        toParentPublicKeySignaturePair(dto.getTop()));
   }
 
   private ParentPublicKeySignaturePair toParentPublicKeySignaturePair(
       io.nem.symbol.sdk.openapi.okhttp_gson.model.ParentPublicKeySignaturePair dto) {
+    if (dto == null) {
+      return null;
+    }
     return new ParentPublicKeySignaturePair(dto.getParentPublicKey(), dto.getSignature());
   }
 }
