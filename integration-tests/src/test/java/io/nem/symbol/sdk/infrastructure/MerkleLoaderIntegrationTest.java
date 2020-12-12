@@ -15,32 +15,24 @@
  */
 package io.nem.symbol.sdk.infrastructure;
 
-import io.nem.symbol.sdk.api.AccountPaginationStreamer;
 import io.nem.symbol.sdk.api.AccountRepository;
 import io.nem.symbol.sdk.api.AccountRestrictionSearchCriteria;
-import io.nem.symbol.sdk.api.AccountRestrictionsPaginationStreamer;
 import io.nem.symbol.sdk.api.AccountSearchCriteria;
-import io.nem.symbol.sdk.api.HashLockPaginationStreamer;
 import io.nem.symbol.sdk.api.HashLockRepository;
 import io.nem.symbol.sdk.api.HashLockSearchCriteria;
-import io.nem.symbol.sdk.api.MetadataPaginationStreamer;
 import io.nem.symbol.sdk.api.MetadataRepository;
 import io.nem.symbol.sdk.api.MetadataSearchCriteria;
-import io.nem.symbol.sdk.api.MosaicPaginationStreamer;
 import io.nem.symbol.sdk.api.MosaicRepository;
-import io.nem.symbol.sdk.api.MosaicRestrictionPaginationStreamer;
 import io.nem.symbol.sdk.api.MosaicRestrictionSearchCriteria;
 import io.nem.symbol.sdk.api.MosaicSearchCriteria;
-import io.nem.symbol.sdk.api.NamespacePaginationStreamer;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.api.NamespaceSearchCriteria;
 import io.nem.symbol.sdk.api.OrderBy;
-import io.nem.symbol.sdk.api.PaginationStreamer;
 import io.nem.symbol.sdk.api.RepositoryFactory;
 import io.nem.symbol.sdk.api.RestrictionAccountRepository;
 import io.nem.symbol.sdk.api.RestrictionMosaicRepository;
 import io.nem.symbol.sdk.api.SearchCriteria;
-import io.nem.symbol.sdk.api.SecretLockPaginationStreamer;
+import io.nem.symbol.sdk.api.SearcherRepository;
 import io.nem.symbol.sdk.api.SecretLockRepository;
 import io.nem.symbol.sdk.api.SecretLockSearchCriteria;
 import io.nem.symbol.sdk.model.account.AccountInfo;
@@ -71,21 +63,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
 
   public static final int TAKE_COUNT = 10;
+
   public static final OrderBy ORDER_BY = OrderBy.DESC;
 
-  //  public static void main(String[] args) {
-  //    RepositoryFactory repositoryFactory =
-  //        new
-  // RepositoryFactoryOkHttpImpl("http://api-01.us-west-2.0.10.0.x.symboldev.network:3000");
-  //    List<Map<String, String>> merkles = MerkleLoader.getMerkles(repositoryFactory);
-  //    System.out.println(new JsonHelperJackson2().prettyPrint(merkles));
-  //  }
   public List<Arguments> mosaicRestriction() {
     RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
     RestrictionMosaicRepository repository = repositoryFactory.createRestrictionMosaicRepository();
-    MosaicRestrictionPaginationStreamer streamer =
-        new MosaicRestrictionPaginationStreamer(repository);
-    return getArguments(streamer, new MosaicRestrictionSearchCriteria());
+    return getArguments(repository, new MosaicRestrictionSearchCriteria());
   }
 
   @ParameterizedTest
@@ -99,8 +83,7 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   public List<Arguments> hashLocks() {
     RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
     HashLockRepository repository = repositoryFactory.createHashLockRepository();
-    HashLockPaginationStreamer streamer = new HashLockPaginationStreamer(repository);
-    return getArguments(streamer, new HashLockSearchCriteria().order(OrderBy.DESC));
+    return getArguments(repository, new HashLockSearchCriteria());
   }
 
   @ParameterizedTest
@@ -115,9 +98,7 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
     RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
     RestrictionAccountRepository repository =
         repositoryFactory.createRestrictionAccountRepository();
-    AccountRestrictionsPaginationStreamer streamer =
-        new AccountRestrictionsPaginationStreamer(repository);
-    return getArguments(streamer, new AccountRestrictionSearchCriteria().order(OrderBy.DESC));
+    return getArguments(repository, new AccountRestrictionSearchCriteria());
   }
 
   @ParameterizedTest
@@ -147,8 +128,7 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   public List<Arguments> secretLocks() {
     RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
     SecretLockRepository repository = repositoryFactory.createSecretLockRepository();
-    SecretLockPaginationStreamer streamer = new SecretLockPaginationStreamer(repository);
-    return getArguments(streamer, new SecretLockSearchCriteria().order(ORDER_BY));
+    return getArguments(repository, new SecretLockSearchCriteria().order(ORDER_BY));
   }
 
   @ParameterizedTest
@@ -162,8 +142,7 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   public List<Arguments> accounts() {
     RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
     AccountRepository repository = repositoryFactory.createAccountRepository();
-    AccountPaginationStreamer streamer = new AccountPaginationStreamer(repository);
-    return getArguments(streamer, new AccountSearchCriteria().order(ORDER_BY));
+    return getArguments(repository, new AccountSearchCriteria().order(ORDER_BY));
   }
 
   @ParameterizedTest
@@ -178,8 +157,7 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   public List<Arguments> mosaics() {
     RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
     MosaicRepository repository = repositoryFactory.createMosaicRepository();
-    MosaicPaginationStreamer streamer = new MosaicPaginationStreamer(repository);
-    return getArguments(streamer, new MosaicSearchCriteria().order(ORDER_BY));
+    return getArguments(repository, new MosaicSearchCriteria().order(ORDER_BY));
   }
 
   @ParameterizedTest
@@ -194,9 +172,8 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   public List<Arguments> namespaces() {
     RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
     NamespaceRepository repository = repositoryFactory.createNamespaceRepository();
-    NamespacePaginationStreamer streamer = new NamespacePaginationStreamer(repository);
     return getArguments(
-        streamer,
+        repository,
         new NamespaceSearchCriteria()
             .order(ORDER_BY)
             .registrationType(NamespaceRegistrationType.ROOT_NAMESPACE));
@@ -215,8 +192,7 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   public List<Arguments> metadatas() {
     RepositoryFactory repositoryFactory = getRepositoryFactory(DEFAULT_REPOSITORY_TYPE);
     MetadataRepository repository = repositoryFactory.createMetadataRepository();
-    MetadataPaginationStreamer streamer = new MetadataPaginationStreamer(repository);
-    return getArguments(streamer, new MetadataSearchCriteria().order(ORDER_BY));
+    return getArguments(repository, new MetadataSearchCriteria().order(ORDER_BY));
   }
 
   @ParameterizedTest
@@ -228,10 +204,11 @@ public class MerkleLoaderIntegrationTest extends BaseIntegrationTest {
   }
 
   private <E, C extends SearchCriteria<C>> List<Arguments> getArguments(
-      PaginationStreamer<E, C> streamer, C criteria) {
+      SearcherRepository<E, C> repository, C criteria) {
     return get(
-        streamer
-            .search(criteria)
+        repository
+            .streamer()
+            .search(criteria.order(OrderBy.DESC))
             .take(TAKE_COUNT)
             .flatMap(
                 state ->

@@ -25,7 +25,7 @@ Client Vertx | v0.10.5  | https://repo.maven.apache.org/maven2/io/nem/symbol-op
 ---|---|---
 SDK OkHttp | v0.22.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-okhttp-client
 SDK Vertx | v0.22.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-vertx-client
-Catbuffer Library | v0.0.24 | https://repo.maven.apache.org/maven2/io/nem/catbuffer-java
+Catbuffer Library | v0.0.25 | https://repo.maven.apache.org/maven2/io/nem/catbuffer-java
 Client OkHttp | v0.10.4  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-okhttp-gson-client
 Client Vertx | v0.10.4  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-vertx-client/
 

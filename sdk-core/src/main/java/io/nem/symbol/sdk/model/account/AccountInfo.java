@@ -31,10 +31,13 @@ import io.nem.symbol.catapult.builders.KeyDto;
 import io.nem.symbol.catapult.builders.MosaicBuilder;
 import io.nem.symbol.catapult.builders.PinnedVotingKeyBuilder;
 import io.nem.symbol.catapult.builders.VotingKeyDto;
+import io.nem.symbol.catapult.builders.VotingKeyPaddingDto;
 import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.Stored;
 import io.nem.symbol.sdk.model.mosaic.ResolvedMosaic;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -289,7 +292,10 @@ public class AccountInfo implements Stored {
         new FinalizationEpochDto((int) accountLinkVotingKey.getStartEpoch());
     FinalizationEpochDto endEpoch =
         new FinalizationEpochDto((int) accountLinkVotingKey.getEndEpoch());
-    return PinnedVotingKeyBuilder.create(votingKey, startEpoch, endEpoch);
+
+    VotingKeyPaddingDto padding =
+        new VotingKeyPaddingDto(new DataInputStream(new ByteArrayInputStream(new byte[16])));
+    return PinnedVotingKeyBuilder.create(votingKey, padding, startEpoch, endEpoch);
   }
 
   /**
