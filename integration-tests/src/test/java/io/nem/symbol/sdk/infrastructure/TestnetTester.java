@@ -37,8 +37,6 @@ import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.VotingKeyLinkTransaction;
 import io.nem.symbol.sdk.model.transaction.VotingKeyLinkTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.VotingKeyLinkV1Transaction;
-import io.nem.symbol.sdk.model.transaction.VotingKeyLinkV1TransactionFactory;
 import java.math.BigInteger;
 import java.time.Duration;
 import java.util.Arrays;
@@ -77,26 +75,6 @@ public class TestnetTester {
                 networkType, deadline, recipient.getAddress(), Collections.singletonList(mosaic))
             .maxFee(MAX_FEE)
             .build();
-    announceTransaction(repositoryFactory, account, transaction);
-  }
-
-  private static void sendVotingKey1(RepositoryFactory repositoryFactory) throws Exception {
-
-    NetworkType networkType = repositoryFactory.getNetworkType().toFuture().get();
-    Account account = Account.createFromPrivateKey(PRIVATE_KEY, networkType);
-
-    System.out.println(account.getAddress().plain());
-    Duration duration = repositoryFactory.getEpochAdjustment().toFuture().get();
-    Deadline deadline = Deadline.create(duration);
-    VotingKey votingKey =
-        VotingKey.fromHexString("463CCC639B5306DD06E56A273E13EF08CAB8D46A8ACA1D3919F19AF89DE116C5");
-
-    VotingKeyLinkV1Transaction transaction =
-        VotingKeyLinkV1TransactionFactory.create(
-                networkType, deadline, votingKey, (1), (26280), LinkAction.LINK)
-            .maxFee(MAX_FEE)
-            .build();
-
     announceTransaction(repositoryFactory, account, transaction);
   }
 

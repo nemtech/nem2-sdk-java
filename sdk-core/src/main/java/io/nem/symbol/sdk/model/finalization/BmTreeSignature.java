@@ -23,22 +23,14 @@ public class BmTreeSignature {
   private final ParentPublicKeySignaturePair root;
   /** Bottom. */
   private final ParentPublicKeySignaturePair bottom;
-  /** Top, (for testnet/3 V1 schema only).* */
-  private final ParentPublicKeySignaturePair top;
 
   public BmTreeSignature(
       ParentPublicKeySignaturePair root,
-      ParentPublicKeySignaturePair bottom,
-      ParentPublicKeySignaturePair top) {
-    this.top = top;
+      ParentPublicKeySignaturePair bottom) {
     Validate.notNull(root, "root is required");
     Validate.notNull(bottom, "bottom is required");
     this.root = root;
     this.bottom = bottom;
-  }
-
-  public ParentPublicKeySignaturePair getTop() {
-    return top;
   }
 
   public ParentPublicKeySignaturePair getRoot() {

@@ -77,7 +77,6 @@ public class FinalizationRepositoryOkHttpImpl extends AbstractRepositoryOkHttpIm
   private MessageGroup toMessageGroup(
       io.nem.symbol.sdk.openapi.okhttp_gson.model.MessageGroup dto) {
     return new MessageGroup(
-        dto.getSignatureSchema(),
         FinalizationStage.rawValueOf(dto.getStage().getValue()),
         dto.getHeight(),
         dto.getHashes(),
@@ -88,8 +87,7 @@ public class FinalizationRepositoryOkHttpImpl extends AbstractRepositoryOkHttpIm
       io.nem.symbol.sdk.openapi.okhttp_gson.model.BmTreeSignature dto) {
     return new BmTreeSignature(
         toParentPublicKeySignaturePair(dto.getRoot()),
-        toParentPublicKeySignaturePair(dto.getBottom()),
-        toParentPublicKeySignaturePair(dto.getTop()));
+        toParentPublicKeySignaturePair(dto.getBottom()));
   }
 
   private ParentPublicKeySignaturePair toParentPublicKeySignaturePair(

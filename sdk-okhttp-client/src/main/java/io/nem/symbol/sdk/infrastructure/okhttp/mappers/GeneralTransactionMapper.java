@@ -63,7 +63,6 @@ public class GeneralTransactionMapper implements TransactionMapper {
     register(new VrfKeyLinkTransactionMapper(jsonHelper));
     register(new NodeKeyLinkTransactionMapper(jsonHelper));
     register(new VotingKeyLinkTransactionMapper(jsonHelper));
-    register(new VotingKeyLinkV1TransactionMapper(jsonHelper));
     register(new AccountKeyLinkTransactionMapper(jsonHelper));
     register(new AggregateTransactionMapper(jsonHelper, TransactionType.AGGREGATE_BONDED, this));
     register(new AggregateTransactionMapper(jsonHelper, TransactionType.AGGREGATE_COMPLETE, this));

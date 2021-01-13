@@ -81,7 +81,6 @@ public class FinalizationRepositoryOkHttpImplTest extends AbstractOkHttpResposit
     dto.height(BigInteger.valueOf(4));
 
     MessageGroup messageGroup = new MessageGroup();
-    messageGroup.setSignatureSchema(10);
     messageGroup.stage(StageEnum.NUMBER_1);
     messageGroup.addHashesItem("hash1");
     messageGroup.setHeight(BigInteger.valueOf(20));

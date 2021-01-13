@@ -67,11 +67,8 @@ import io.nem.symbol.catapult.builders.UnresolvedMosaicBuilder;
 import io.nem.symbol.catapult.builders.UnresolvedMosaicIdDto;
 import io.nem.symbol.catapult.builders.VotingKeyDto;
 import io.nem.symbol.catapult.builders.VotingKeyLinkTransactionBodyBuilder;
-import io.nem.symbol.catapult.builders.VotingKeyLinkV1TransactionBodyBuilder;
-import io.nem.symbol.catapult.builders.VotingKeyV1Dto;
 import io.nem.symbol.catapult.builders.VrfKeyLinkTransactionBodyBuilder;
 import io.nem.symbol.core.crypto.PublicKey;
-import io.nem.symbol.core.crypto.VotingKey;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.core.utils.ExceptionUtils;
 import io.nem.symbol.core.utils.StringEncoder;
@@ -148,8 +145,6 @@ import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.VotingKeyLinkTransaction;
 import io.nem.symbol.sdk.model.transaction.VotingKeyLinkTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.VotingKeyLinkV1Transaction;
-import io.nem.symbol.sdk.model.transaction.VotingKeyLinkV1TransactionFactory;
 import io.nem.symbol.sdk.model.transaction.VrfKeyLinkTransaction;
 import io.nem.symbol.sdk.model.transaction.VrfKeyLinkTransactionFactory;
 import java.io.DataInputStream;
@@ -202,7 +197,6 @@ public class BinarySerializationImpl implements BinarySerialization {
     register(new AccountAddressRestrictionTransactionSerializer());
     register(new NodeKeyLinkTransactionBuilderSerializer());
     register(new VotingKeyLinkTransactionBuilderSerializer());
-    register(new VotingKeyLinkV1TransactionBuilderSerializer());
     register(new VrfKeyLinkTransactionBuilderSerializer());
     register(new AggregateTransactionSerializer(TransactionType.AGGREGATE_COMPLETE, this));
     register(new AggregateTransactionSerializer(TransactionType.AGGREGATE_BONDED, this));
@@ -1684,54 +1678,6 @@ public class BinarySerializationImpl implements BinarySerialization {
       KeyDto linkedPublicKey = SerializationUtils.toKeyDto(transaction.getLinkedPublicKey());
       LinkActionDto linkAction = LinkActionDto.rawValueOf(transaction.getLinkAction().getValue());
       return VrfKeyLinkTransactionBodyBuilder.create(linkedPublicKey, linkAction);
-    }
-  }
-
-  private static class VotingKeyLinkV1TransactionBuilderSerializer
-      implements TransactionSerializer<VotingKeyLinkV1Transaction> {
-
-    @Override
-    public TransactionType getTransactionType() {
-      return TransactionType.VOTING_KEY_LINK;
-    }
-
-    @Override
-    public int getVersion() {
-      return 1;
-    }
-
-    @Override
-    public Class<VotingKeyLinkV1Transaction> getTransactionClass() {
-      return VotingKeyLinkV1Transaction.class;
-    }
-
-    @Override
-    public TransactionFactory fromBodyBuilder(
-        NetworkType networkType, Deadline deadline, Serializer transactionBuilder) {
-      VotingKeyLinkV1TransactionBodyBuilder builder =
-          (VotingKeyLinkV1TransactionBodyBuilder) transactionBuilder;
-      VotingKey linkedPublicKey =
-          new VotingKey(builder.getLinkedPublicKey().getVotingKeyV1().array());
-      long startEpoch =
-          SerializationUtils.intToUnsignedLong(builder.getStartEpoch().getFinalizationEpoch());
-      long endEpoch =
-          SerializationUtils.intToUnsignedLong(builder.getEndEpoch().getFinalizationEpoch());
-      LinkAction linkAction = LinkAction.rawValueOf(builder.getLinkAction().getValue());
-      return VotingKeyLinkV1TransactionFactory.create(
-          networkType, deadline, linkedPublicKey, startEpoch, endEpoch, linkAction);
-    }
-
-    @Override
-    public Serializer toBodyBuilder(VotingKeyLinkV1Transaction transaction) {
-      VotingKeyV1Dto linkedPublicKey =
-          new VotingKeyV1Dto(ByteBuffer.wrap(transaction.getLinkedPublicKey().getBytes()));
-      FinalizationEpochDto startEpoch =
-          SerializationUtils.toFinalizationEpochDto(transaction.getStartEpoch());
-      FinalizationEpochDto endEpoch =
-          SerializationUtils.toFinalizationEpochDto(transaction.getEndEpoch());
-      LinkActionDto linkAction = LinkActionDto.rawValueOf(transaction.getLinkAction().getValue());
-      return VotingKeyLinkV1TransactionBodyBuilder.create(
-          linkedPublicKey, startEpoch, endEpoch, linkAction);
     }
   }
 
