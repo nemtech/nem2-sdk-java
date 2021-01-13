@@ -32,15 +32,20 @@ public class TransactionFees {
   /** Highest fee multiplier over the last "numBlocksTransactionFeeStats". */
   private final Long highestFeeMultiplier;
 
+  /** Node specific minimal fee multiplier. */
+  private final Long minFeeMultiplier;
+
   public TransactionFees(
       Long averageFeeMultiplier,
       Long medianFeeMultiplier,
       Long lowestFeeMultiplier,
-      Long highestFeeMultiplier) {
+      Long highestFeeMultiplier,
+      Long minFeeMultiplier) {
     this.averageFeeMultiplier = averageFeeMultiplier;
     this.medianFeeMultiplier = medianFeeMultiplier;
     this.lowestFeeMultiplier = lowestFeeMultiplier;
     this.highestFeeMultiplier = highestFeeMultiplier;
+    this.minFeeMultiplier = minFeeMultiplier;
   }
 
   public Long getAverageFeeMultiplier() {
@@ -57,5 +62,9 @@ public class TransactionFees {
 
   public Long getHighestFeeMultiplier() {
     return highestFeeMultiplier;
+  }
+
+  public Long getMinFeeMultiplier() {
+    return minFeeMultiplier;
   }
 }

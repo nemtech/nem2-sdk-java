@@ -35,8 +35,6 @@ import io.nem.symbol.core.crypto.PublicKey;
 import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.Stored;
 import io.nem.symbol.sdk.model.mosaic.ResolvedMosaic;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.EnumSet;

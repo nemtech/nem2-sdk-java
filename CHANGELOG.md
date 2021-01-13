@@ -3,6 +3,20 @@ All notable changes to this project will be documented in this file.
 
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.23.0] - 13-Jan-2021
+
+**Milestone**: Catapult-server finality (0.10.0.4)
+ Package  | Version  | Link
+---|---|---
+SDK OkHttp | v0.23.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-okhttp-client
+SDK Vertx | v0.23.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-vertx-client
+Catbuffer Library | v0.0.26 | https://repo.maven.apache.org/maven2/io/nem/catbuffer-java
+Client OkHttp | v0.10.7  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-okhttp-gson-client
+Client Vertx | v0.10.7  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-vertx-client/
+
+- Re tracked catapult-server main branch for mainnet releasing.
+- Added `minFeeMultiplier` in transaction fee endpoint.
+
 ## [0.22.1] - 14-Dec-2020
 
 **Milestone**: Catapult-server finality (0.10.0.4)

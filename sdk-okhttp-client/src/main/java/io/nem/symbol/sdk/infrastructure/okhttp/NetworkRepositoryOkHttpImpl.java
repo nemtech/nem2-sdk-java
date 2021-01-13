@@ -97,7 +97,8 @@ public class NetworkRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
                         info.getAverageFeeMultiplier(),
                         info.getMedianFeeMultiplier(),
                         info.getLowestFeeMultiplier(),
-                        info.getHighestFeeMultiplier())));
+                        info.getHighestFeeMultiplier(),
+                        info.getMinFeeMultiplier())));
   }
 
   @Override

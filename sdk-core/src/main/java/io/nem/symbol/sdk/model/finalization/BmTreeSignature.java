@@ -24,9 +24,7 @@ public class BmTreeSignature {
   /** Bottom. */
   private final ParentPublicKeySignaturePair bottom;
 
-  public BmTreeSignature(
-      ParentPublicKeySignaturePair root,
-      ParentPublicKeySignaturePair bottom) {
+  public BmTreeSignature(ParentPublicKeySignaturePair root, ParentPublicKeySignaturePair bottom) {
     Validate.notNull(root, "root is required");
     Validate.notNull(bottom, "bottom is required");
     this.root = root;
