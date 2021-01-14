@@ -98,8 +98,10 @@ public class NetworkRepositoryVertxImpl extends AbstractRepositoryVertxImpl
             .map(
                 info ->
                     new TransactionFees(
-                        info.getAverageFeeMultiplier(), info.getMedianFeeMultiplier(),
-                        info.getLowestFeeMultiplier(), info.getHighestFeeMultiplier(),
+                        info.getAverageFeeMultiplier(),
+                        info.getMedianFeeMultiplier(),
+                        info.getLowestFeeMultiplier(),
+                        info.getHighestFeeMultiplier(),
                         info.getMinFeeMultiplier())));
   }
 

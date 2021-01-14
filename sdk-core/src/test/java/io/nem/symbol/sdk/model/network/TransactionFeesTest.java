@@ -33,6 +33,5 @@ class TransactionFeesTest {
     Assertions.assertEquals(3L, info.getLowestFeeMultiplier());
     Assertions.assertEquals(4L, info.getHighestFeeMultiplier());
     Assertions.assertEquals(5L, info.getMinFeeMultiplier());
-
   }
 }

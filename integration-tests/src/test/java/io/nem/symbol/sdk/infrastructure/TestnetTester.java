@@ -16,7 +16,6 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.core.crypto.PublicKey;
-import io.nem.symbol.core.crypto.VotingKey;
 import io.nem.symbol.core.utils.ConvertUtils;
 import io.nem.symbol.sdk.api.Listener;
 import io.nem.symbol.sdk.api.OrderBy;
