@@ -30,7 +30,7 @@ public enum NetworkType {
   /** Private net network */
   PRIVATE(120, "private", 'P'),
   /** Private Test net network */
-  PRIVATE_TEST(128, "privateTest", 'Q'),
+  PRIVATE_TEST(168, "privateTest", 'V'),
   /** Mijin net network */
   MIJIN(96, "mijin", 'M'),
   /** Mijin test net network */

@@ -44,8 +44,8 @@ ext {
     vertxVersion = "3.5.0"
     rxjavaVersion = "2.1.7"
     junitVersion = "5.4.0"
-    catbufferVersion = "0.0.26-SNAPSHOT"
-    restApiVersion = "0.10.7-SNAPSHOT"
+    catbufferVersion = "0.1.1"
+    restApiVersion = "0.11.1"
     jackson_version = "2.9.9"
     jackson_databind_version = "2.9.9"
 }
@@ -336,7 +336,7 @@ nexusStaging {
     username = ossrhUsername
     password = ossrhPassword
     numberOfRetries = 40
-    delayBetweenRetriesInMillis = 3000
+    delayBetweenRetriesInMillis = 10000
 }
 
 
