@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.mosaic.Mosaic;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
@@ -44,9 +45,8 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
   public void testTransferCatCurrencyFromNemesis(RepositoryType type) {
     String mosaicAlias = getNetworkCurrency().getNamespaceId().get().getFullName().get();
 
-    Account testAccount = helper().getTestAccount(type).getLeft();
-    String recipientAlias = "testaccount" + RandomUtils.nextInt(0, 10000);
-    helper().setAddressAlias(type, testAccount.getAddress(), recipientAlias);
+    Pair<Account, NamespaceId> receipt = helper().createTestAccountWithAlias(type);
+    NamespaceId recipientAlias = receipt.getRight();
 
     String hash =
         transferUsingAliases(
@@ -64,7 +64,7 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
     TransferTransaction resolvedTransaction = (TransferTransaction) transactions.get(0);
     System.out.println(toJson(resolvedTransaction));
 
-    Assertions.assertEquals(testAccount.getAddress(), resolvedTransaction.getRecipient());
+    Assertions.assertEquals(resolvedTransaction.getRecipient(), receipt.getKey().getAddress());
 
     System.out.println(resolvedTransaction.getMosaics().get(0).getId());
 
@@ -78,11 +78,11 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
     String mosaicAlias =
         ("testTransferCustomCurrencyFromAccount1" + RandomUtils.nextInt(0, 10000)).toLowerCase();
-    String recipientAlias = "testaccount" + RandomUtils.nextInt(0, 10000);
+    Pair<Account, NamespaceId> receipt = helper().createTestAccountWithAlias(type);
+    NamespaceId recipientAlias = receipt.getRight();
     Account testAccount = helper.getTestAccount(type).getLeft();
     MosaicId mosaicId =
         helper().createMosaic(testAccount, type, BigInteger.valueOf(10000), mosaicAlias);
-    helper().setAddressAlias(type, testAccount.getAddress(), recipientAlias);
     String transferTransactionHash =
         transferUsingAliases(testAccount, type, mosaicAlias, recipientAlias, BigInteger.ONE)
             .getTransactionInfo()
@@ -95,7 +95,7 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
 
     Assertions.assertEquals(1, transactions.size());
     TransferTransaction resolvedTransaction = (TransferTransaction) transactions.get(0);
-    assertTransaction(mosaicId, resolvedTransaction, testAccount);
+    assertTransaction(mosaicId, resolvedTransaction, testAccount, receipt.getKey());
   }
 
   @ParameterizedTest
@@ -106,7 +106,8 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
         ("testTransferCustomCurrencyFromAccount1UsingAggregate" + RandomUtils.nextInt(0, 10000))
             .toLowerCase();
     Account testAccount = helper().getTestAccount(type).getLeft();
-    String recipientAlias = "testaccount" + RandomUtils.nextInt(0, 10000);
+    Pair<Account, NamespaceId> receipt = helper().createTestAccountWithAlias(type);
+    NamespaceId recipientAlias = receipt.getRight();
 
     MosaicId mosaicId =
         helper().createMosaic(testAccount, type, BigInteger.valueOf(10000), mosaicAlias);
@@ -128,29 +129,30 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
     TransferTransaction resolvedTransaction =
         (TransferTransaction)
             ((AggregateTransaction) transactions.get(0)).getInnerTransactions().get(0);
-    assertTransaction(mosaicId, resolvedTransaction, testAccount);
+    assertTransaction(mosaicId, resolvedTransaction, testAccount, receipt.getKey());
   }
 
   private void assertTransaction(
-      MosaicId mosaicId, TransferTransaction resolvedTransaction, Account testAccount) {
+      MosaicId mosaicId,
+      TransferTransaction resolvedTransaction,
+      Account testAccount,
+      Account receiptAccount) {
 
     System.out.println(toJson(resolvedTransaction));
-    Assertions.assertEquals(testAccount.getAddress(), resolvedTransaction.getRecipient());
+    Assertions.assertEquals(testAccount.getPublicAccount(), resolvedTransaction.getSigner().get());
+    Assertions.assertEquals(receiptAccount.getAddress(), resolvedTransaction.getRecipient());
     System.out.println(resolvedTransaction.getMosaics().get(0).getId());
     Assertions.assertTrue(resolvedTransaction.getMosaics().get(0).getId() instanceof MosaicId);
     Assertions.assertTrue(resolvedTransaction.getRecipient() instanceof Address);
     Assertions.assertEquals(mosaicId, resolvedTransaction.getMosaics().get(0).getId());
-    Assertions.assertEquals(testAccount.getAddress(), resolvedTransaction.getRecipient());
   }
 
   private TransferTransaction transferUsingAliases(
       Account sender,
       RepositoryType type,
       String mosaicAlias,
-      String recipientAlias,
+      UnresolvedAddress recipientNamespace,
       BigInteger amount) {
-
-    NamespaceId recipientNamespace = NamespaceId.createFromName(recipientAlias);
 
     NamespaceId mosaicNamespace = NamespaceId.createFromName(mosaicAlias);
 
@@ -188,10 +190,8 @@ public class TransactionServiceIntegrationTest extends BaseIntegrationTest {
       Account sender,
       RepositoryType type,
       String mosaicAlias,
-      String recipientAlias,
+      UnresolvedAddress recipientNamespace,
       BigInteger amount) {
-
-    NamespaceId recipientNamespace = NamespaceId.createFromName(recipientAlias);
 
     NamespaceId mosaicNamespace = NamespaceId.createFromName(mosaicAlias);
 

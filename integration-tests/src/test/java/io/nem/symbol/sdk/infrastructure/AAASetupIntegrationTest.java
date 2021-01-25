@@ -64,7 +64,7 @@ public class AAASetupIntegrationTest extends BaseIntegrationTest {
 
   @Test
   @Order(1)
-  void createNamespces() {
+  void createNamespaces() {
     Account account = config().getNemesisAccount();
 
     NamespaceRegistrationTransaction root =

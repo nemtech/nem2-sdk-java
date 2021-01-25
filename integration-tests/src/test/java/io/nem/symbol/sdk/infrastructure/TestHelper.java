@@ -90,6 +90,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 
@@ -357,8 +358,8 @@ public class TestHelper {
     switch (type) {
       case VERTX:
         return new RepositoryFactoryVertxImpl(getApiUrl());
-      case OKHTTP:
-        return new RepositoryFactoryOkHttpImpl(getApiUrl());
+//      case OKHTTP:
+//        return new RepositoryFactoryOkHttpImpl(getApiUrl());
       default:
         throw new IllegalStateException("Invalid Repository type " + type);
     }
@@ -600,22 +601,26 @@ public class TestHelper {
   }
 
   public boolean isMultisig(RepositoryType type, Account multisigAccount) {
+
+    MultisigAccountInfo multisigAccountInfo = getMultisig(type, multisigAccount);
+    return multisigAccountInfo != null;
+  }
+
+  private MultisigAccountInfo getMultisig(RepositoryType type, Account multisigAccount) {
     try {
       MultisigRepository multisigRepository = getRepositoryFactory(type).createMultisigRepository();
-      MultisigAccountInfo multisigAccountInfo =
-          get(multisigRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
-      return multisigAccountInfo != null;
+      return get(multisigRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
     } catch (RepositoryCallException e) {
       Assertions.assertEquals(404, e.getStatusCode());
-      return false;
+      return null;
     }
   }
 
   public Pair<Account, NamespaceId> getMultisigAccount(RepositoryType type) {
     Account multisigAccount = config().getMultisigAccount();
+    sendMosaicFromNemesis(type, multisigAccount.getAddress(), false);
     NamespaceId namespaceId =
         setAddressAlias(type, multisigAccount.getAddress(), "multisig-account");
-    sendMosaicFromNemesis(type, multisigAccount.getAddress(), false);
     this.createMultisigAccountBonded(
         type, multisigAccount, config().getCosignatoryAccount(), config().getCosignatory2Account());
     return Pair.of(multisigAccount, namespaceId);
@@ -629,11 +634,14 @@ public class TestHelper {
     AccountInfo accountInfo = get(accountRepository.getAccountInfo(multisigAccount.getAddress()));
     System.out.println(getJsonHelper().print(accountInfo));
 
-    if (isMultisig(type, multisigAccount)) {
+    MultisigAccountInfo multisig = getMultisig(type, multisigAccount);
+    if (multisig != null) {
       System.out.println(
           "Multisig account with address "
               + multisigAccount.getAddress().plain()
-              + " already exist");
+              + " already exist. Cosigners: " + multisig.getCosignatoryAddresses().stream().map(
+              Address::plain).collect(
+              Collectors.joining(", ")));
       return get(multisigRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
     }
     System.out.println(
@@ -648,8 +656,8 @@ public class TestHelper {
         MultisigAccountModificationTransactionFactory.create(
                 getNetworkType(),
                 getDeadline(),
-                (byte) 1,
-                (byte) 1,
+                (byte) 2,
+                (byte) 2,
                 additions,
                 Collections.emptyList())
             .maxFee(maxFee)
@@ -703,6 +711,7 @@ public class TestHelper {
     Assertions.assertTrue(
         page.getData().stream().anyMatch(m -> m.getHash().equals(hashLockTransaction.getHash())));
     Assertions.assertEquals(20, page.getPageSize());
+    sleep(5000);
     return get(multisigRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
   }
 
@@ -740,8 +749,8 @@ public class TestHelper {
         MultisigAccountModificationTransactionFactory.create(
                 getNetworkType(),
                 getDeadline(),
-                (byte) 1,
-                (byte) 1,
+                (byte) 2,
+                (byte) 2,
                 additions,
                 Collections.emptyList())
             .maxFee(maxFee)
@@ -829,6 +838,14 @@ public class TestHelper {
     Account testAccount = Account.generateNewAccount(this.networkType);
     sendMosaicFromNemesis(type, testAccount.getAddress(), false);
     return testAccount;
+  }
+
+  public Pair<Account, NamespaceId> createTestAccountWithAlias(RepositoryType type) {
+    Account testAccount = this.createTestAccount(type);
+    NamespaceId namespaceId =
+        setAddressAlias(
+            type, testAccount.getAddress(), "testaccount" + RandomUtils.nextInt(0, 10000));
+    return Pair.of(testAccount, namespaceId);
   }
 
   public Pair<Account, NamespaceId> getTestAccount(RepositoryType type) {

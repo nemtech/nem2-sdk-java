@@ -15,8 +15,10 @@
  */
 package io.nem.symbol.sdk.infrastructure;
 
+import io.nem.symbol.sdk.api.Listener;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
 import io.nem.symbol.sdk.model.message.PlainMessage;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
@@ -28,6 +30,7 @@ import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,11 +41,21 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
-  void cosignatureTransactionOnSign(RepositoryType type) {
+  void cosignatureTransactionOnSign(RepositoryType type)
+      throws ExecutionException, InterruptedException {
 
     Account multisigAccount = helper().getMultisigAccount(type).getLeft();
+    System.out.println("Multisig public key " + multisigAccount.getPublicKey());
     Account cosignatoryAccount = config().getCosignatoryAccount();
+    System.out.println("Cosignatory public key " + cosignatoryAccount.getPublicKey());
 
+    MultisigAccountInfo multisig =
+        get(
+            getRepositoryFactory(type)
+                .createMultisigRepository()
+                .getMultisigAccountInfo(multisigAccount.getAddress()));
+
+    helper().sendMosaicFromNemesis(type, cosignatoryAccount.getAddress(), false);
     Address recipient = getRecipient();
     TransferTransaction transferTransaction =
         TransferTransactionFactory.create(
@@ -78,12 +91,41 @@ public class MultisigAccountOperationsIntegrationTest extends BaseIntegrationTes
     SignedTransaction signedHashLockTransaction =
         hashLockTransaction.build().signWith(cosignatoryAccount, getGenerationHash());
 
+    Listener listener = getListener(type);
+    listener.open().get();
+
+    Address firstCosignatory = multisig.getCosignatoryAddresses().get(0);
+    listener
+        .aggregateBondedAdded(firstCosignatory)
+        .subscribe(
+            (d) -> {
+              System.out.println("First Cosigner received message! " + firstCosignatory.plain());
+            });
+
+    Address secondCosignatory = multisig.getCosignatoryAddresses().get(1);
+
+    listener
+        .aggregateBondedAdded(secondCosignatory)
+        .subscribe(
+            (d) -> {
+              System.out.println("Second Cosigner received message! " + secondCosignatory.plain());
+            });
+
+    listener
+        .aggregateBondedAdded(multisig.getAccountAddress())
+        .subscribe(
+            (d) -> {
+              System.out.println(
+                  "Multisig received message! " + multisig.getAccountAddress().plain());
+            });
+
     AggregateTransaction finalTransaction =
         getTransactionOrFail(
             getTransactionService(type)
                 .announceHashLockAggregateBonded(
-                    getListener(type), signedHashLockTransaction, signedTransaction),
+                    listener, signedHashLockTransaction, signedTransaction),
             aggregateTransaction);
     Assertions.assertNotNull(finalTransaction);
+    sleep(10000);
   }
 }
