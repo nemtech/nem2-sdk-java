@@ -53,6 +53,8 @@ public class TransactionStatementSearchCriteriaTest {
     criteria.setPageNumber(5);
     criteria.setOffset("abc");
     criteria.setHeight(BigInteger.ONE);
+    criteria.setFromHeight(BigInteger.valueOf(2));
+    criteria.setToHeight(BigInteger.valueOf(3));
     criteria.setReceiptTypes(Collections.singletonList(ReceiptType.MOSAIC_ALIAS_RESOLUTION));
     criteria.setRecipientAddress(recipientAddress);
     criteria.setTargetAddress(targetAddress);
@@ -63,6 +65,8 @@ public class TransactionStatementSearchCriteriaTest {
     Assertions.assertEquals(10, criteria.getPageSize());
     Assertions.assertEquals(5, criteria.getPageNumber());
     Assertions.assertEquals(BigInteger.ONE, criteria.getHeight());
+    Assertions.assertEquals(BigInteger.valueOf(2), criteria.getFromHeight());
+    Assertions.assertEquals(BigInteger.valueOf(3), criteria.getToHeight());
     Assertions.assertEquals("abc", criteria.getOffset());
 
     Assertions.assertEquals(
@@ -82,6 +86,8 @@ public class TransactionStatementSearchCriteriaTest {
 
     TransactionStatementSearchCriteria criteria =
         new TransactionStatementSearchCriteria().height(BigInteger.ONE);
+    criteria.fromHeight(BigInteger.valueOf(2));
+    criteria.toHeight(BigInteger.valueOf(3));
     criteria.order(OrderBy.ASC).pageSize(10).pageNumber(5);
     criteria.receiptTypes(Collections.singletonList(ReceiptType.MOSAIC_ALIAS_RESOLUTION));
     criteria.recipientAddress(recipientAddress);
@@ -94,6 +100,8 @@ public class TransactionStatementSearchCriteriaTest {
     Assertions.assertEquals(10, criteria.getPageSize());
     Assertions.assertEquals(5, criteria.getPageNumber());
     Assertions.assertEquals(BigInteger.ONE, criteria.getHeight());
+    Assertions.assertEquals(BigInteger.valueOf(2), criteria.getFromHeight());
+    Assertions.assertEquals(BigInteger.valueOf(3), criteria.getToHeight());
     Assertions.assertEquals("abc", criteria.getOffset());
 
     Assertions.assertEquals(

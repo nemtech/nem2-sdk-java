@@ -28,6 +28,17 @@ public class TransactionStatementSearchCriteria
   /** Filter the transaction receipts by block height. */
   private BigInteger height;
 
+  /**
+   * Only statements with height greater or equal than this one are returned. (optional, default to
+   * null).
+   */
+  private BigInteger fromHeight;
+  /**
+   * Only statements with height smaller or equal than this one are returned. (optional, default to
+   * null).
+   */
+  private BigInteger toHeight;
+
   /** Filter the transaction receipts by type */
   private List<ReceiptType> receiptTypes;
 
@@ -121,6 +132,32 @@ public class TransactionStatementSearchCriteria
     return this;
   }
 
+  public BigInteger getFromHeight() {
+    return fromHeight;
+  }
+
+  public void setFromHeight(BigInteger fromHeight) {
+    this.fromHeight = fromHeight;
+  }
+
+  public TransactionStatementSearchCriteria fromHeight(BigInteger fromHeight) {
+    this.fromHeight = fromHeight;
+    return this;
+  }
+
+  public BigInteger getToHeight() {
+    return toHeight;
+  }
+
+  public void setToHeight(BigInteger toHeight) {
+    this.toHeight = toHeight;
+  }
+
+  public TransactionStatementSearchCriteria toHeight(BigInteger toHeight) {
+    this.toHeight = toHeight;
+    return this;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -134,6 +171,8 @@ public class TransactionStatementSearchCriteria
     }
     TransactionStatementSearchCriteria that = (TransactionStatementSearchCriteria) o;
     return Objects.equals(height, that.height)
+        && Objects.equals(fromHeight, that.fromHeight)
+        && Objects.equals(toHeight, that.toHeight)
         && Objects.equals(receiptTypes, that.receiptTypes)
         && Objects.equals(recipientAddress, that.recipientAddress)
         && Objects.equals(senderAddress, that.senderAddress)
@@ -146,6 +185,8 @@ public class TransactionStatementSearchCriteria
     return Objects.hash(
         super.hashCode(),
         height,
+        fromHeight,
+        toHeight,
         receiptTypes,
         recipientAddress,
         senderAddress,

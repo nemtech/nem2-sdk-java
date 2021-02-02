@@ -54,6 +54,8 @@ public class ReceiptRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
       TransactionStatementSearchCriteria criteria) {
 
     BigInteger height = criteria.getHeight();
+    BigInteger fromHeight = criteria.getFromHeight();
+    BigInteger toHeight = criteria.getToHeight();
     List<ReceiptTypeEnum> receiptTypes = toDto(criteria.getReceiptTypes());
     String recipientAddress = toDto(criteria.getRecipientAddress());
     String senderAddress = toDto(criteria.getSenderAddress());
@@ -69,6 +71,8 @@ public class ReceiptRepositoryOkHttpImpl extends AbstractRepositoryOkHttpImpl
             getClient()
                 .searchReceipts(
                     height,
+                    fromHeight,
+                    toHeight,
                     receiptTypes,
                     recipientAddress,
                     senderAddress,
