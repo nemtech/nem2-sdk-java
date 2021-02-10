@@ -18,6 +18,7 @@ package io.nem.symbol.sdk.infrastructure.okhttp;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import io.nem.symbol.sdk.api.Listener;
+import io.nem.symbol.sdk.api.MultisigRepository;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.infrastructure.ListenerBase;
 import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
@@ -63,6 +64,7 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
    * @param url nis host
    * @param gson gson's gson.
    * @param namespaceRepository the namespace repository used to resolve alias.
+   * @param multisigRepository the namespace repository used to resolve cosigners.
    * @param networkTypeObservable the network type;
    */
   public ListenerOkHttp(
@@ -70,8 +72,9 @@ public class ListenerOkHttp extends ListenerBase implements Listener {
       String url,
       Gson gson,
       NamespaceRepository namespaceRepository,
+      MultisigRepository multisigRepository,
       Observable<NetworkType> networkTypeObservable) {
-    super(new JsonHelperGson(gson), namespaceRepository, networkTypeObservable);
+    super(new JsonHelperGson(gson), namespaceRepository, multisigRepository, networkTypeObservable);
     try {
       this.url = new URL(url);
     } catch (MalformedURLException e) {

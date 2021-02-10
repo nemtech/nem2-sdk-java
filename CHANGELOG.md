@@ -3,10 +3,24 @@ All notable changes to this project will be documented in this file.
 
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.23.2] - 11-Feb-2021
+
+**Milestone**: Catapult-server finality (0.10.0.7)
+ Package  | Version  | Link
+---|---|---
+SDK OkHttp | v0.23.2 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-okhttp-client
+SDK Vertx | v0.23.2 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-vertx-client
+Catbuffer Library | v0.1.1 | https://repo.maven.apache.org/maven2/io/nem/catbuffer-java
+Client OkHttp | v0.11.2  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-okhttp-gson-client
+Client Vertx | v0.11.2  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-vertx-client/
+
+- Improved Listener allowing multiple addresses and aliases to be provided. 
+- Listener can resolve cosigners of a multisig. The user can receive notifications from all the accounts related to multisig.
+- Listener can resolve aliases of an address. The user can receive notifications related to an account and its aliases.
 
 ## [0.23.1] - 2-Feb-2021
 
-**Milestone**: Catapult-server finality (0.10.0.4)
+**Milestone**: Catapult-server finality (0.10.0.6)
  Package  | Version  | Link
 ---|---|---
 SDK OkHttp | v0.23.1 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-okhttp-client
@@ -19,7 +33,7 @@ Client Vertx | v0.11.2  | https://repo.maven.apache.org/maven2/io/nem/symbol-op
 
 ## [0.23.0] - 14-Jan-2021
 
-**Milestone**: Catapult-server finality (0.10.0.4)
+**Milestone**: Catapult-server finality (0.10.0.5)
  Package  | Version  | Link
 ---|---|---
 SDK OkHttp | v0.23.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-okhttp-client

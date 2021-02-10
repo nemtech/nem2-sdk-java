@@ -15,17 +15,18 @@
  */
 package io.nem.symbol.sdk.model.transaction;
 
-import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 
 /** The transaction status error model returned by listeners. */
 public class TransactionStatusError {
 
-  private final Address address;
+  private final UnresolvedAddress address;
   private final String hash;
   private final String status;
   private final Deadline deadline;
 
-  public TransactionStatusError(Address address, String hash, String status, Deadline deadline) {
+  public TransactionStatusError(
+      UnresolvedAddress address, String hash, String status, Deadline deadline) {
     this.address = address;
     this.hash = hash;
     this.status = status;
@@ -33,7 +34,7 @@ public class TransactionStatusError {
   }
 
   /** @return the address that fires the transaction status error. */
-  public Address getAddress() {
+  public UnresolvedAddress getAddress() {
     return address;
   }
 

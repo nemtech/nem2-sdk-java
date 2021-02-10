@@ -47,12 +47,7 @@ class ListenerStatusIntegrationTest extends BaseIntegrationTest {
         .subscribe(
             a -> {
               System.out.println(
-                  ">>>> account 1 "
-                      + a.getAddress().plain()
-                      + " "
-                      + a.getHash()
-                      + " "
-                      + a.getStatus());
+                  ">>>> account 1 " + a.getAddress() + " " + a.getHash() + " " + a.getStatus());
             });
 
     createListener(type)
@@ -60,12 +55,7 @@ class ListenerStatusIntegrationTest extends BaseIntegrationTest {
         .subscribe(
             a -> {
               System.out.println(
-                  ">>>> account 2 "
-                      + a.getAddress().plain()
-                      + " "
-                      + a.getHash()
-                      + " "
-                      + a.getStatus());
+                  ">>>> account 2 " + a.getAddress() + " " + a.getHash() + " " + a.getStatus());
             });
 
     createListener(type)
@@ -73,12 +63,7 @@ class ListenerStatusIntegrationTest extends BaseIntegrationTest {
         .subscribe(
             a -> {
               System.out.println(
-                  ">>>> account 3  "
-                      + a.getAddress().plain()
-                      + " "
-                      + a.getHash()
-                      + " "
-                      + a.getStatus());
+                  ">>>> account 3  " + a.getAddress() + " " + a.getHash() + " " + a.getStatus());
             });
 
     TransferTransaction transferTransaction =

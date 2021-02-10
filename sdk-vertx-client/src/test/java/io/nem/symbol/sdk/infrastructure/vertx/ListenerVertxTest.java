@@ -19,58 +19,26 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.nem.symbol.core.crypto.PublicKey;
-import io.nem.symbol.core.utils.ConvertUtils;
-import io.nem.symbol.core.utils.MapperUtils;
 import io.nem.symbol.sdk.api.Listener;
+import io.nem.symbol.sdk.api.MultisigRepository;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.infrastructure.ListenerChannel;
 import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
-import io.nem.symbol.sdk.infrastructure.SerializationUtils;
 import io.nem.symbol.sdk.model.account.Account;
-import io.nem.symbol.sdk.model.account.AccountNames;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.account.PublicAccount;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.blockchain.FinalizedBlock;
-import io.nem.symbol.sdk.model.message.PlainMessage;
-import io.nem.symbol.sdk.model.mosaic.Mosaic;
-import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.namespace.NamespaceId;
-import io.nem.symbol.sdk.model.namespace.NamespaceName;
 import io.nem.symbol.sdk.model.network.NetworkType;
-import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionFlags;
-import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransaction;
-import io.nem.symbol.sdk.model.transaction.AccountAddressRestrictionTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.AccountMetadataTransaction;
-import io.nem.symbol.sdk.model.transaction.AccountMetadataTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
-import io.nem.symbol.sdk.model.transaction.AggregateTransactionCosignature;
-import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
-import io.nem.symbol.sdk.model.transaction.Deadline;
-import io.nem.symbol.sdk.model.transaction.HashLockTransaction;
-import io.nem.symbol.sdk.model.transaction.HashLockTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.JsonHelper;
-import io.nem.symbol.sdk.model.transaction.LinkAction;
-import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransaction;
-import io.nem.symbol.sdk.model.transaction.MosaicAddressRestrictionTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransaction;
-import io.nem.symbol.sdk.model.transaction.MultisigAccountModificationTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.SignedTransaction;
 import io.nem.symbol.sdk.model.transaction.Transaction;
 import io.nem.symbol.sdk.model.transaction.TransactionStatusError;
 import io.nem.symbol.sdk.model.transaction.TransactionStatusException;
-import io.nem.symbol.sdk.model.transaction.TransactionType;
-import io.nem.symbol.sdk.model.transaction.TransferTransaction;
-import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
-import io.nem.symbol.sdk.model.transaction.VrfKeyLinkTransaction;
-import io.nem.symbol.sdk.model.transaction.VrfKeyLinkTransactionFactory;
 import io.nem.symbol.sdk.openapi.vertx.model.Cosignature;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionInfoDTO;
 import io.nem.symbol.sdk.openapi.vertx.model.TransactionMetaDTO;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.buffer.impl.BufferFactoryImpl;
@@ -79,12 +47,10 @@ import io.vertx.core.http.RequestOptions;
 import io.vertx.core.http.WebSocket;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -110,15 +76,21 @@ public class ListenerVertxTest {
   private WebSocket webSocketMock;
   private JsonHelper jsonHelper;
   private NamespaceRepository namespaceRepository;
+  private MultisigRepository multisigRepository;
 
   @BeforeEach
   public void setUp() {
     httpClientMock = Mockito.mock(HttpClient.class);
     String url = "http://nem.com:3000/";
     namespaceRepository = Mockito.mock(NamespaceRepository.class);
+    multisigRepository = Mockito.mock(MultisigRepository.class);
     listener =
         new ListenerVertx(
-            httpClientMock, url, namespaceRepository, Observable.just(NetworkType.MIJIN_TEST));
+            httpClientMock,
+            url,
+            namespaceRepository,
+            multisigRepository,
+            Observable.just(NetworkType.MIJIN_TEST));
     jsonHelper = listener.getJsonHelper();
     webSocketMock = Mockito.mock(WebSocket.class);
   }
@@ -244,7 +216,7 @@ public class ListenerVertxTest {
 
     List<Transaction> transactions = new ArrayList<>();
     List<Throwable> exceptions = new ArrayList<>();
-    BiFunction<Address, String, Observable<? extends Transaction>> subscriber =
+    BiFunction<UnresolvedAddress, String, Observable<? extends Transaction>> subscriber =
         channel == ListenerChannel.CONFIRMED_ADDED
             ? listener::confirmedOrError
             : listener::aggregateBondedAddedOrError;
@@ -253,9 +225,7 @@ public class ListenerVertxTest {
         jsonHelper.convert(transactionInfo.getMeta(), TransactionMetaDTO.class);
     subscriber.apply(address, meta.getHash()).doOnError(exceptions::add).forEach(transactions::add);
 
-    handle(
-        transactionInfoDtoJsonObject,
-        channelName + "/" + Address.generateRandom(NETWORK_TYPE).plain());
+    handle(transactionInfoDtoJsonObject, channelName + "/" + address.plain());
 
     Assertions.assertEquals(1, transactions.size());
     Assertions.assertEquals(0, exceptions.size());
@@ -303,9 +273,7 @@ public class ListenerVertxTest {
         jsonHelper.convert(transactionInfo.getMeta(), TransactionMetaDTO.class);
     subscriber.apply(address, meta.getHash()).doOnError(exceptions::add).forEach(transactions::add);
 
-    handle(
-        transactionInfoDtoJsonObject,
-        channel.toString() + "/" + Address.generateRandom(NETWORK_TYPE).plain());
+    handle(transactionInfoDtoJsonObject, channel.toString() + "/" + address.plain());
 
     Assertions.assertEquals(1, transactions.size());
     Assertions.assertEquals(0, exceptions.size());
@@ -337,26 +305,9 @@ public class ListenerVertxTest {
 
     ObjectNode transactionInfoDtoJsonObject = jsonHelper.convert(transactionInfo, ObjectNode.class);
 
-    ((ObjectNode) transactionInfoDtoJsonObject.get("transaction"))
-        .put(
-            "recipientAddress",
-            ConvertUtils.toHex(
-                SerializationUtils.toUnresolvedAddress(namespaceId, NETWORK_TYPE).serialize()));
-
-    Address address = Address.generateRandom(NETWORK_TYPE);
-
-    Mockito.when(
-            namespaceRepository.getAccountsNames(Mockito.eq(Collections.singletonList(address))))
-        .thenReturn(
-            Observable.just(
-                Collections.singletonList(
-                    new AccountNames(
-                        address,
-                        Collections.singletonList(new NamespaceName(namespaceId, "alias"))))));
-
     List<Transaction> transactions = new ArrayList<>();
 
-    BiFunction<Address, String, Observable<? extends Transaction>> subscriber =
+    BiFunction<UnresolvedAddress, String, Observable<? extends Transaction>> subscriber =
         channel == ListenerChannel.CONFIRMED_ADDED
             ? listener::confirmed
             : channel == ListenerChannel.UNCONFIRMED_ADDED
@@ -365,11 +316,9 @@ public class ListenerVertxTest {
 
     TransactionMetaDTO meta =
         jsonHelper.convert(transactionInfo.getMeta(), TransactionMetaDTO.class);
-    subscriber.apply(address, meta.getHash()).forEach(transactions::add);
+    subscriber.apply(namespaceId, meta.getHash()).forEach(transactions::add);
 
-    handle(
-        transactionInfoDtoJsonObject,
-        channelName + "/" + Address.generateRandom(NETWORK_TYPE).plain());
+    handle(transactionInfoDtoJsonObject, channelName + "/" + namespaceId.plain());
 
     Assertions.assertEquals(1, transactions.size());
 
@@ -377,12 +326,12 @@ public class ListenerVertxTest {
     Mockito.verify(webSocketMock)
         .writeTextMessage(
             jsonHelper.print(
-                new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
+                new ListenerSubscribeMessage(this.wsId, channelName + "/" + namespaceId.plain())));
 
     Mockito.verify(webSocketMock)
         .writeTextMessage(
             jsonHelper.print(
-                new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
+                new ListenerSubscribeMessage(this.wsId, channelName + "/" + namespaceId.plain())));
   }
 
   @ParameterizedTest
@@ -580,124 +529,6 @@ public class ListenerVertxTest {
   }
 
   @Test
-  public void shouldCheckTransactionFromAddressTransferTransaction() {
-    Account account1 = Account.generateNewAccount(NETWORK_TYPE);
-    Account account2 = Account.generateNewAccount(NETWORK_TYPE);
-    Account account3 = Account.generateNewAccount(NETWORK_TYPE);
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            transferTransaction(account1.getPublicAccount(), account3.getAddress()),
-            account1.getAddress()));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            transferTransaction(account2.getPublicAccount(), account3.getAddress()),
-            account1.getAddress()));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener, transferTransaction(null, account3.getAddress()), account1.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            transferTransaction(account1.getPublicAccount(), account3.getAddress()),
-            account3.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            transferTransaction(account2.getPublicAccount(), account3.getAddress()),
-            account3.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener, transferTransaction(null, account3.getAddress()), account3.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            transferTransaction(account2.getPublicAccount(), NamespaceId.createFromName("alias")),
-            account3.getAddress(),
-            NamespaceId.createFromName("alias")));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            transferTransaction(account2.getPublicAccount(), NamespaceId.createFromName("alias")),
-            account3.getAddress(),
-            NamespaceId.createFromName("alias2")));
-  }
-
-  private boolean transactionFromAddress(
-      ListenerVertx listener,
-      Transaction transferTransaction,
-      Address address,
-      NamespaceId... aliases) {
-    try {
-      Callable<ObservableSource<? extends List<NamespaceId>>> restCall =
-          () -> Observable.just(Arrays.asList(aliases));
-      Observable<List<NamespaceId>> namespaceIdObservable = Observable.defer(restCall).cache();
-      return listener
-          .transactionFromAddress(transferTransaction, address, namespaceIdObservable)
-          .toFuture()
-          .get();
-    } catch (Exception e) {
-      throw new IllegalStateException(e.getMessage(), e);
-    }
-  }
-
-  @Test
-  public void shouldCheckMultisigAccountModificationTransaction() {
-    Account account1 = Account.generateNewAccount(NETWORK_TYPE);
-    Account account2 = Account.generateNewAccount(NETWORK_TYPE);
-    Account account3 = Account.generateNewAccount(NETWORK_TYPE);
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            multisigAccountModificationTransaction(
-                account1.getPublicAccount(), account3.getAddress()),
-            account1.getAddress()));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            multisigAccountModificationTransaction(
-                account2.getPublicAccount(), account3.getAddress()),
-            account1.getAddress()));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            multisigAccountModificationTransaction(null, account3.getAddress()),
-            account1.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            multisigAccountModificationTransaction(
-                account1.getPublicAccount(), account3.getAddress()),
-            account3.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            multisigAccountModificationTransaction(
-                account2.getPublicAccount(), account3.getAddress()),
-            account3.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            multisigAccountModificationTransaction(null, account3.getAddress()),
-            account3.getAddress()));
-  }
-
-  @Test
   public void shouldHandleStatus()
       throws InterruptedException, ExecutionException, TimeoutException {
     Account account1 = Account.generateNewAccount(NETWORK_TYPE);
@@ -758,450 +589,6 @@ public class ListenerVertxTest {
             jsonHelper.print(
                 new ListenerSubscribeMessage(
                     this.wsId, "status" + "/" + account2.getAddress().plain())));
-  }
-
-  @Test
-  public void shouldCheckTransactionFromAddressHashLockTransaction() {
-    Account account1 = Account.generateNewAccount(NETWORK_TYPE);
-    Account account2 = Account.generateNewAccount(NETWORK_TYPE);
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener, hashLockTransaction(account1.getPublicAccount()), account1.getAddress()));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener, hashLockTransaction(account2.getPublicAccount()), account1.getAddress()));
-
-    Assertions.assertFalse(
-        transactionFromAddress(listener, hashLockTransaction(null), account1.getAddress()));
-  }
-
-  private TransferTransaction transferTransaction(
-      PublicAccount signer, UnresolvedAddress recipient) {
-    TransferTransactionFactory factory =
-        TransferTransactionFactory.create(
-                NETWORK_TYPE, new Deadline(BigInteger.ONE), recipient, Collections.emptyList())
-            .message(new PlainMessage(""));
-    if (signer != null) {
-      factory.signer(signer);
-    }
-    return factory.build();
-  }
-
-  @Test
-  public void shouldCheckVrfKeyLinkTransaction() {
-    Account account1 = Account.generateNewAccount(NETWORK_TYPE);
-    Account account2 = Account.generateNewAccount(NETWORK_TYPE);
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            vrfKeyLinkTransaction(
-                account2.getPublicAccount(), account1.getPublicAccount().getPublicKey()),
-            account1.getAddress()));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            vrfKeyLinkTransaction(
-                account2.getPublicAccount(), account2.getPublicAccount().getPublicKey()),
-            account1.getAddress()));
-  }
-
-  private VrfKeyLinkTransaction vrfKeyLinkTransaction(
-      PublicAccount signer, PublicKey linkedAccount) {
-    VrfKeyLinkTransactionFactory factory =
-        VrfKeyLinkTransactionFactory.create(
-            NETWORK_TYPE, new Deadline(BigInteger.ONE), linkedAccount, LinkAction.LINK);
-    if (signer != null) {
-      factory.signer(signer);
-    }
-    return factory.build();
-  }
-
-  @Test
-  public void shouldCheckAccountMetadataTransaction() {
-    Account account1 = Account.generateNewAccount(NETWORK_TYPE);
-    Account account2 = Account.generateNewAccount(NETWORK_TYPE);
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            accountMetadataTransaction(account2.getPublicAccount(), account1.getAddress()),
-            account1.getAddress()));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            accountMetadataTransaction(account2.getPublicAccount(), account2.getAddress()),
-            account1.getAddress()));
-  }
-
-  private AccountMetadataTransaction accountMetadataTransaction(
-      PublicAccount signer, Address targetAccount) {
-    AccountMetadataTransactionFactory factory =
-        AccountMetadataTransactionFactory.create(
-            NETWORK_TYPE, new Deadline(BigInteger.ONE), targetAccount, BigInteger.ONE, "someValue");
-    if (signer != null) {
-      factory.signer(signer);
-    }
-    return factory.build();
-  }
-
-  private MultisigAccountModificationTransaction multisigAccountModificationTransaction(
-      PublicAccount signer, UnresolvedAddress cosignatoryPublicAccount) {
-    List<UnresolvedAddress> additions = Collections.singletonList(cosignatoryPublicAccount);
-    List<UnresolvedAddress> deletions = Collections.singletonList(cosignatoryPublicAccount);
-
-    MultisigAccountModificationTransactionFactory factory =
-        MultisigAccountModificationTransactionFactory.create(
-            NETWORK_TYPE, new Deadline(BigInteger.ONE), (byte) 0, (byte) 0, additions, deletions);
-    if (signer != null) {
-      factory.signer(signer);
-    }
-    return factory.build();
-  }
-
-  @Test
-  public void shouldAccountAddressRestrictionTransaction() {
-    Account account1 = Account.generateNewAccount(NETWORK_TYPE);
-    Account account2 = Account.generateNewAccount(NETWORK_TYPE);
-    Account account3 = Account.generateNewAccount(NETWORK_TYPE);
-    Account account4 = Account.generateNewAccount(NETWORK_TYPE);
-    NamespaceId alias1 = NamespaceId.createFromName("alias1");
-    NamespaceId alias2 = NamespaceId.createFromName("alias2");
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            accountAddressRestrictionTransaction(
-                account1.getPublicAccount(), account2.getAddress(), account3.getAddress()),
-            account1.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            accountAddressRestrictionTransaction(
-                account1.getPublicAccount(), account2.getAddress(), account3.getAddress()),
-            account2.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            accountAddressRestrictionTransaction(
-                account1.getPublicAccount(), account2.getAddress(), account3.getAddress()),
-            account3.getAddress()));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            accountAddressRestrictionTransaction(
-                account1.getPublicAccount(), account2.getAddress(), account3.getAddress()),
-            account4.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            accountAddressRestrictionTransaction(
-                account1.getPublicAccount(), alias1, account3.getAddress()),
-            account2.getAddress(),
-            alias1));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            accountAddressRestrictionTransaction(
-                account1.getPublicAccount(), account2.getAddress(), alias1),
-            account3.getAddress(),
-            alias1));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            accountAddressRestrictionTransaction(
-                account1.getPublicAccount(), alias1, account3.getAddress()),
-            account2.getAddress(),
-            alias2));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            accountAddressRestrictionTransaction(
-                account1.getPublicAccount(), account2.getAddress(), alias1),
-            account3.getAddress(),
-            alias2));
-  }
-
-  @Test
-  public void shouldCheckTransactionAggregateTransaction() {
-
-    Account account1 = Account.generateNewAccount(NETWORK_TYPE);
-    Account account2 = Account.generateNewAccount(NETWORK_TYPE);
-    Account account3 = Account.generateNewAccount(NETWORK_TYPE);
-    Account account4 = Account.generateNewAccount(NETWORK_TYPE);
-    NamespaceId alias1 = NamespaceId.createFromName("alias1");
-    NamespaceId alias2 = NamespaceId.createFromName("alias2");
-    Transaction hashLockTransaction = hashLockTransaction(account2.getPublicAccount());
-    Transaction transferTransaction1 = transferTransaction(account2.getPublicAccount(), alias1);
-    Transaction transferTransaction2 = transferTransaction(account2.getPublicAccount(), alias2);
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(
-                account1.getPublicAccount(), account3.getPublicAccount(), hashLockTransaction),
-            account1.getAddress()));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(
-                account2.getPublicAccount(), account3.getPublicAccount(), hashLockTransaction),
-            account1.getAddress()));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(null, account3.getPublicAccount(), hashLockTransaction),
-            account1.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(
-                account1.getPublicAccount(), account3.getPublicAccount(), hashLockTransaction),
-            account3.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(
-                account2.getPublicAccount(), account3.getPublicAccount(), hashLockTransaction),
-            account3.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(null, account3.getPublicAccount(), hashLockTransaction),
-            account3.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(
-                account1.getPublicAccount(), account3.getPublicAccount(), hashLockTransaction),
-            account3.getAddress()));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(
-                account1.getPublicAccount(), account2.getPublicAccount(), hashLockTransaction),
-            account3.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(
-                account2.getPublicAccount(), account3.getPublicAccount(), hashLockTransaction),
-            account2.getAddress()));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(null, account2.getPublicAccount(), hashLockTransaction),
-            account3.getAddress()));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(
-                null,
-                account2.getPublicAccount(),
-                hashLockTransaction,
-                transferTransaction1,
-                transferTransaction2),
-            account3.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(
-                null,
-                account2.getPublicAccount(),
-                hashLockTransaction,
-                transferTransaction1,
-                transferTransaction2),
-            account3.getAddress(),
-            alias2));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(
-                null, account2.getPublicAccount(), hashLockTransaction, transferTransaction2),
-            account3.getAddress(),
-            alias2));
-
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(
-                null, account2.getPublicAccount(), hashLockTransaction, transferTransaction1),
-            account3.getAddress(),
-            alias2));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(
-                account2.getPublicAccount(),
-                account4.getPublicAccount(),
-                transferTransaction2,
-                hashLockTransaction,
-                transferTransaction1),
-            account2.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(
-                account1.getPublicAccount(),
-                account1.getPublicAccount(),
-                transferTransaction2,
-                hashLockTransaction,
-                transferTransaction1),
-            account2.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            aggregateTransaction(
-                null,
-                account2.getPublicAccount(),
-                hashLockTransaction,
-                transferTransaction1,
-                transferTransaction1,
-                transferTransaction1,
-                transferTransaction2,
-                transferTransaction1),
-            account3.getAddress(),
-            alias2));
-  }
-
-  private AggregateTransaction aggregateTransaction(
-      PublicAccount signer,
-      PublicAccount consignauturePublicAccount,
-      Transaction... anotherTransactions) {
-    List<AggregateTransactionCosignature> cosignatures = new ArrayList<>();
-    BigInteger version = AggregateTransactionCosignature.DEFAULT_VERSION;
-    cosignatures.add(
-        new AggregateTransactionCosignature(version, "Signature", consignauturePublicAccount));
-    AggregateTransactionFactory factory =
-        AggregateTransactionFactory.create(
-            TransactionType.AGGREGATE_COMPLETE,
-            NETWORK_TYPE,
-            new Deadline(BigInteger.ONE),
-            Arrays.asList(anotherTransactions),
-            cosignatures);
-    if (signer != null) {
-      factory.signer(signer);
-    }
-    return factory.build();
-  }
-
-  private HashLockTransaction hashLockTransaction(PublicAccount signer) {
-    SignedTransaction signedTransaction =
-        new SignedTransaction(
-            signer,
-            "payload",
-            "8498B38D89C1DC8A448EA5824938FF828926CD9F7747B1844B59B4B6807E878B",
-            TransactionType.AGGREGATE_BONDED);
-    MosaicId mosaicId = MapperUtils.toMosaicId("123");
-    Mosaic mosaic = new Mosaic(mosaicId, BigInteger.TEN);
-    HashLockTransactionFactory factory =
-        HashLockTransactionFactory.create(
-            NETWORK_TYPE,
-            new Deadline(BigInteger.ONE),
-            mosaic,
-            BigInteger.TEN,
-            signedTransaction.getHash());
-    if (signer != null) {
-      factory.signer(signer);
-    }
-    return factory.build();
-  }
-
-  @Test
-  public void shouldMosaicAddressRestriction() {
-    Account account1 = Account.generateNewAccount(NETWORK_TYPE);
-    Account account2 = Account.generateNewAccount(NETWORK_TYPE);
-    Account account3 = Account.generateNewAccount(NETWORK_TYPE);
-    NamespaceId alias1 = NamespaceId.createFromName("alias1");
-    NamespaceId alias2 = NamespaceId.createFromName("alias2");
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            mosaicAddressRestriction(account1.getPublicAccount(), account2.getAddress()),
-            account1.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            mosaicAddressRestriction(account1.getPublicAccount(), account2.getAddress()),
-            account2.getAddress()));
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            mosaicAddressRestriction(account1.getPublicAccount(), account2.getAddress()),
-            account3.getAddress()));
-
-    Assertions.assertTrue(
-        transactionFromAddress(
-            listener,
-            mosaicAddressRestriction(account1.getPublicAccount(), alias2),
-            account3.getAddress(),
-            alias2));
-    Assertions.assertFalse(
-        transactionFromAddress(
-            listener,
-            mosaicAddressRestriction(account1.getPublicAccount(), alias2),
-            account3.getAddress(),
-            alias1));
-  }
-
-  private AccountAddressRestrictionTransaction accountAddressRestrictionTransaction(
-      PublicAccount signer, UnresolvedAddress addition, UnresolvedAddress deletion) {
-    List<UnresolvedAddress> additions = Collections.singletonList(addition);
-    List<UnresolvedAddress> deletions = Collections.singletonList(deletion);
-
-    AccountAddressRestrictionTransactionFactory factory =
-        AccountAddressRestrictionTransactionFactory.create(
-            NETWORK_TYPE,
-            new Deadline(BigInteger.ONE),
-            AccountAddressRestrictionFlags.ALLOW_INCOMING_ADDRESS,
-            additions,
-            deletions);
-    if (signer != null) {
-      factory.signer(signer);
-    }
-    return factory.build();
-  }
-
-  private MosaicAddressRestrictionTransaction mosaicAddressRestriction(
-      PublicAccount signer, UnresolvedAddress targetAddress) {
-
-    MosaicAddressRestrictionTransactionFactory factory =
-        MosaicAddressRestrictionTransactionFactory.create(
-            NETWORK_TYPE,
-            new Deadline(BigInteger.ONE),
-            NamespaceId.createFromName("abc"),
-            BigInteger.ONE,
-            targetAddress,
-            BigInteger.TEN);
-    if (signer != null) {
-      factory.signer(signer);
-    }
-    return factory.build();
   }
 
   private void handle(Object data, String topic) {

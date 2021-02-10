@@ -136,4 +136,24 @@ public class MapperUtils {
   public static String getIdAsHex(UnresolvedMosaicId id) {
     return id == null ? null : id.getIdAsHex();
   }
+
+  /**
+   * Returns an unresolved address from a plain string like C0FB8AA409916260 (alias hex) or
+   * TAHNZXQBC57AA7KJTMGS3PJPZBXN7DV5JHJU42A (address)
+   *
+   * @param plainUnresolvedAddress plain address or alias hex
+   * @return an {@link UnresolvedAddress}
+   */
+  public static UnresolvedAddress toUnresolvedAddressFromPlain(String plainUnresolvedAddress) {
+    try {
+      if (Address.isValidPlainAddress(plainUnresolvedAddress)) {
+        return Address.createFromRawAddress(plainUnresolvedAddress);
+      } else {
+        return new NamespaceId(plainUnresolvedAddress);
+      }
+    } catch (Exception e) {
+      throw new IllegalArgumentException(
+          plainUnresolvedAddress + " is not a valid plain address or namespace hex");
+    }
+  }
 }

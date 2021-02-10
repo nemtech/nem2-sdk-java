@@ -15,11 +15,11 @@
  */
 package io.nem.symbol.sdk.infrastructure.okhttp;
 
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.google.gson.JsonObject;
 import io.nem.symbol.sdk.api.Listener;
+import io.nem.symbol.sdk.api.MultisigRepository;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.infrastructure.ListenerChannel;
 import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
@@ -57,7 +57,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.mockito.internal.verification.VerificationModeFactory;
 
 /** Tests for the {@link ListenerOkHttp} implementation of the {@link Listener} */
 public class ListenerOkHttpTest {
@@ -66,6 +65,7 @@ public class ListenerOkHttpTest {
   private ListenerOkHttp listener;
   private OkHttpClient httpClientMock;
   private NamespaceRepository namespaceRepository;
+  private MultisigRepository multisigRepository;
   private WebSocket webSocketMock;
   private JsonHelper jsonHelper;
   private final NetworkType networkType = NetworkType.MIJIN_TEST;
@@ -74,6 +74,7 @@ public class ListenerOkHttpTest {
   public void setUp() {
     httpClientMock = Mockito.mock(OkHttpClient.class);
     namespaceRepository = Mockito.mock(NamespaceRepository.class);
+    multisigRepository = Mockito.mock(MultisigRepository.class);
     String url = "http://nem.com:3000/";
     listener =
         new ListenerOkHttp(
@@ -81,6 +82,7 @@ public class ListenerOkHttpTest {
             url,
             JsonHelperGson.creatGson(false),
             namespaceRepository,
+            multisigRepository,
             Observable.defer(() -> Observable.just(networkType)));
     jsonHelper = listener.getJsonHelper();
   }
@@ -172,7 +174,7 @@ public class ListenerOkHttpTest {
     List<Transaction> transactions = new ArrayList<>();
     listener.confirmed(address).forEach(transactions::add);
 
-    handle(transactionInfoDtoJsonObject, channelName);
+    handle(transactionInfoDtoJsonObject, channelName + "/" + address.plain());
 
     Assertions.assertEquals(1, transactions.size());
 
@@ -236,8 +238,6 @@ public class ListenerOkHttpTest {
 
     NamespaceId alias = NamespaceId.createFromId(BigInteger.TEN);
 
-    Mockito.when(namespaceRepository.getLinkedAddress(alias)).thenReturn(Observable.just(address));
-
     String channelName = ListenerChannel.CONFIRMED_ADDED.toString();
 
     List<Transaction> transactions = new ArrayList<>();
@@ -247,25 +247,22 @@ public class ListenerOkHttpTest {
         .doOnError(exceptions::add)
         .forEach(transactions::add);
 
-    handle(transactionInfoDtoJsonObject, channelName);
+    handle(transactionInfoDtoJsonObject, channelName + "/" + alias.plain());
 
     Assertions.assertEquals(1, transactions.size());
     Assertions.assertEquals(0, exceptions.size());
 
     Assertions.assertEquals(address, transactions.get(0).getSigner().get().getAddress());
 
-    Mockito.verify(namespaceRepository, VerificationModeFactory.times(2))
-        .getLinkedAddress(eq(alias));
+    Mockito.verify(webSocketMock)
+        .send(
+            jsonHelper.print(
+                new ListenerSubscribeMessage(this.wsId, channelName + "/" + alias.plain())));
 
     Mockito.verify(webSocketMock)
         .send(
             jsonHelper.print(
-                new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
-
-    Mockito.verify(webSocketMock)
-        .send(
-            jsonHelper.print(
-                new ListenerSubscribeMessage(this.wsId, "status" + "/" + address.plain())));
+                new ListenerSubscribeMessage(this.wsId, "status" + "/" + alias.plain())));
   }
 
   @Test
@@ -292,12 +289,13 @@ public class ListenerOkHttpTest {
         .doOnError(exceptions::add)
         .forEach(transactions::add);
 
-    handle(transactionInfoDtoJsonObject, channelName);
+    handle(transactionInfoDtoJsonObject, channelName + "/" + address.plain());
 
     Assertions.assertEquals(1, transactions.size());
     Assertions.assertEquals(0, exceptions.size());
 
-    Assertions.assertEquals(address, transactions.get(0).getSigner().get().getAddress());
+    final Address address1 = transactions.get(0).getSigner().get().getAddress();
+    Assertions.assertEquals(address, address1);
 
     Mockito.verify(webSocketMock)
         .send(

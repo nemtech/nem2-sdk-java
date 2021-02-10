@@ -23,14 +23,14 @@ import io.nem.symbol.sdk.api.MosaicSearchCriteria;
 import io.nem.symbol.sdk.api.RepositoryCallException;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
-import io.nem.symbol.sdk.model.blockchain.BlockDuration;
-import io.nem.symbol.sdk.model.mosaic.MosaicFlags;
 import io.nem.symbol.sdk.model.mosaic.MosaicId;
 import io.nem.symbol.sdk.model.mosaic.MosaicInfo;
 import io.nem.symbol.sdk.model.mosaic.MosaicNames;
-import io.nem.symbol.sdk.model.mosaic.MosaicNonce;
-import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransaction;
-import io.nem.symbol.sdk.model.transaction.MosaicDefinitionTransactionFactory;
+import io.nem.symbol.sdk.model.namespace.AliasAction;
+import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.namespace.NamespaceName;
+import io.nem.symbol.sdk.model.transaction.MosaicAliasTransactionFactory;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,12 +47,16 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
   private Account testAccount;
   private final List<MosaicId> mosaicIds = new ArrayList<>();
   private MosaicId mosaicId;
+  private String alias;
+  private NamespaceId namespaceId;
 
   @BeforeAll
   void setup() {
     testAccount = helper().createTestAccount(TestHelper.DEFAULT_REPOSITORY_TYPE);
-    mosaicId = createMosaic(DEFAULT_REPOSITORY_TYPE, testAccount);
+    alias = ("MosaicRepositoryIntegrationTest" + RandomUtils.generateRandomInt()).toLowerCase();
+    mosaicId = helper().createMosaic(testAccount, DEFAULT_REPOSITORY_TYPE, BigInteger.ZERO, alias);
     mosaicIds.add(mosaicId);
+    namespaceId = NamespaceId.createFromName(this.alias);
   }
 
   @ParameterizedTest
@@ -87,14 +91,65 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void getMosaicsNames(RepositoryType type) {
-    List<MosaicNames> mosaicNames =
-        get(
-            getRepositoryFactory(type)
-                .createNamespaceRepository()
-                .getMosaicsNames(Collections.singletonList(mosaicId)));
-    assertEquals(1, mosaicNames.size());
-    assertEquals(mosaicId, mosaicNames.get(0).getMosaicId());
-    assertEquals(0, mosaicNames.get(0).getNames().size());
+    {
+      List<MosaicNames> mosaicNames =
+          get(
+              getRepositoryFactory(type)
+                  .createNamespaceRepository()
+                  .getMosaicsNames(Collections.singletonList(mosaicId)));
+      assertEquals(1, mosaicNames.size());
+      assertEquals(mosaicId, mosaicNames.get(0).getMosaicId());
+      assertEquals(
+          Collections.singletonList(this.alias),
+          mosaicNames.get(0).getNames().stream()
+              .map(NamespaceName::getName)
+              .collect(Collectors.toList()));
+    }
+
+    System.out.println(mosaicId.getIdAsHex());
+    {
+      announceAggregateAndValidate(
+          type,
+          MosaicAliasTransactionFactory.create(
+                  getNetworkType(), getDeadline(), AliasAction.UNLINK, this.namespaceId, mosaicId)
+              .maxFee(maxFee)
+              .build(),
+          this.testAccount);
+
+      sleep(2000);
+      List<MosaicNames> mosaicNames =
+          get(
+              getRepositoryFactory(type)
+                  .createNamespaceRepository()
+                  .getMosaicsNames(Collections.singletonList(mosaicId)));
+      assertEquals(1, mosaicNames.size());
+      assertEquals(mosaicId, mosaicNames.get(0).getMosaicId());
+      assertEquals(0, mosaicNames.get(0).getNames().size());
+    }
+
+    {
+      announceAggregateAndValidate(
+          type,
+          MosaicAliasTransactionFactory.create(
+                  getNetworkType(), getDeadline(), AliasAction.LINK, this.namespaceId, mosaicId)
+              .maxFee(maxFee)
+              .build(),
+          this.testAccount);
+
+      sleep(2000);
+      List<MosaicNames> mosaicNames =
+          get(
+              getRepositoryFactory(type)
+                  .createNamespaceRepository()
+                  .getMosaicsNames(Collections.singletonList(mosaicId)));
+      assertEquals(1, mosaicNames.size());
+      assertEquals(mosaicId, mosaicNames.get(0).getMosaicId());
+      assertEquals(
+          Collections.singletonList(this.alias),
+          mosaicNames.get(0).getNames().stream()
+              .map(NamespaceName::getName)
+              .collect(Collectors.toList()));
+    }
   }
 
   @ParameterizedTest
@@ -118,38 +173,11 @@ class MosaicRepositoryIntegrationTest extends BaseIntegrationTest {
         exception.getMessage());
   }
 
-  private MosaicId createMosaic(RepositoryType type, Account testAccount) {
-    MosaicNonce nonce = MosaicNonce.createFromInteger(0);
-    System.out.println("Nonce: " + nonce.getNonceAsInt());
-    System.out.println("Address: " + testAccount.getAddress().plain());
-    MosaicId mosaicId = MosaicId.createFromNonce(nonce, testAccount.getPublicAccount());
-    System.out.println("mosaicId Hex: " + mosaicId.getIdAsHex());
-
-    System.out.println(mosaicId.getIdAsHex());
-
-    MosaicDefinitionTransaction mosaicDefinitionTransaction =
-        MosaicDefinitionTransactionFactory.create(
-                getNetworkType(),
-                getDeadline(),
-                nonce,
-                mosaicId,
-                MosaicFlags.create(true, true, true),
-                4,
-                new BlockDuration(100))
-            .maxFee(maxFee)
-            .build();
-
-    MosaicDefinitionTransaction validateTransaction =
-        announceAndValidate(type, testAccount, mosaicDefinitionTransaction);
-    Assertions.assertEquals(mosaicId, validateTransaction.getMosaicId());
-    return mosaicId;
-  }
-
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
   void searchByOwnerAddress(RepositoryType type) {
     MosaicSearchCriteria criteria = new MosaicSearchCriteria();
-    Address address = config().getDefaultAccount().getAddress();
+    Address address = testAccount.getAddress();
     criteria.ownerAddress(address);
     MosaicPaginationStreamer streamer = new MosaicPaginationStreamer(getMosaicRepository(type));
     List<MosaicInfo> mosaics = get(streamer.search(criteria).toList().toObservable());

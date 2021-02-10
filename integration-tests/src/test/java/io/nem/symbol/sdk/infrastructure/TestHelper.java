@@ -107,7 +107,7 @@ public class TestHelper {
       new JsonHelperJackson2(JsonHelperJackson2.configureMapper(new ObjectMapper()));
   private final Config config;
   private final Duration epochAdjustment;
-  protected BigInteger maxFee = BigInteger.valueOf(1000000);
+  protected BigInteger maxFee = BigInteger.valueOf(10000000);
 
   public TestHelper() {
     this.config = new Config();
@@ -118,7 +118,7 @@ public class TestHelper {
     this.epochAdjustment = resolveEpochAdjustment();
     this.config.init(this.networkType);
 
-    System.out.println("Network Type: " + networkType);
+    System.out.println("Network Type: " + networkType + " " + networkType.getValue());
     System.out.println("Generation Hash: " + generationHash);
   }
 
@@ -596,7 +596,7 @@ public class TestHelper {
   }
 
   public BigInteger getDuration() {
-    return BigInteger.valueOf(100);
+    return BigInteger.valueOf(10000);
   }
 
   public boolean isMultisig(RepositoryType type, Account multisigAccount) {
@@ -613,9 +613,9 @@ public class TestHelper {
 
   public Pair<Account, NamespaceId> getMultisigAccount(RepositoryType type) {
     Account multisigAccount = config().getMultisigAccount();
-    NamespaceId namespaceId =
-        setAddressAlias(type, multisigAccount.getAddress(), "multisig-account");
     sendMosaicFromNemesis(type, multisigAccount.getAddress(), false);
+    NamespaceId namespaceId =
+        setAddressAlias(type, multisigAccount.getAddress(), "multisigaccount");
     this.createMultisigAccountBonded(
         type, multisigAccount, config().getCosignatoryAccount(), config().getCosignatory2Account());
     return Pair.of(multisigAccount, namespaceId);
@@ -703,6 +703,7 @@ public class TestHelper {
     Assertions.assertTrue(
         page.getData().stream().anyMatch(m -> m.getHash().equals(hashLockTransaction.getHash())));
     Assertions.assertEquals(20, page.getPageSize());
+    sleep(1000);
     return get(multisigRepository.getMultisigAccountInfo(multisigAccount.getAddress()));
   }
 

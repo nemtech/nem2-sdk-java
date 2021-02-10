@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.infrastructure.vertx;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.nem.symbol.sdk.api.Listener;
+import io.nem.symbol.sdk.api.MultisigRepository;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.infrastructure.ListenerBase;
 import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
@@ -61,16 +62,19 @@ public class ListenerVertx extends ListenerBase implements Listener {
    * @param httpClient the http client instance.
    * @param url of the host
    * @param namespaceRepository the namespace repository used to resolve alias.
+   * @param multisigRepository the namespace repository used to resolve cosigners.
    * @param networkTypeObservable the network type
    */
   public ListenerVertx(
       HttpClient httpClient,
       String url,
       NamespaceRepository namespaceRepository,
+      MultisigRepository multisigRepository,
       Observable<NetworkType> networkTypeObservable) {
     super(
         new JsonHelperJackson2(JsonHelperJackson2.configureMapper(Json.mapper)),
         namespaceRepository,
+        multisigRepository,
         networkTypeObservable);
     try {
       this.url = new URL(url);

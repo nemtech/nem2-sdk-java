@@ -26,9 +26,13 @@ import io.nem.symbol.sdk.api.TransactionSearchCriteria;
 import io.nem.symbol.sdk.api.TransactionService;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.MultisigAccountInfo;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.FinalizedBlock;
 import io.nem.symbol.sdk.model.message.PlainMessage;
+import io.nem.symbol.sdk.model.namespace.NamespaceId;
+import io.nem.symbol.sdk.model.namespace.NamespaceName;
 import io.nem.symbol.sdk.model.transaction.AggregateTransaction;
 import io.nem.symbol.sdk.model.transaction.AggregateTransactionFactory;
 import io.nem.symbol.sdk.model.transaction.CosignatureSignedTransaction;
@@ -44,16 +48,21 @@ import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import io.reactivex.Observable;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.internal.util.collections.Sets;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ListenerIntegrationTest extends BaseIntegrationTest {
@@ -69,6 +78,103 @@ class ListenerIntegrationTest extends BaseIntegrationTest {
     multisigAccount = config().getMultisigAccount();
     cosignatoryAccount = config().getCosignatoryAccount();
     cosignatoryAccount2 = config().getCosignatory2Account();
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getAllMultisigAddressesAndAliasesWhenMultisig(RepositoryType type) {
+
+    final MultisigAccountInfo multisigAccountInfo =
+        get(
+            getRepositoryFactory(type)
+                .createMultisigRepository()
+                .getMultisigAccountInfo(this.multisigAccount.getAddress()));
+    Assertions.assertEquals(
+        Arrays.asList(this.cosignatoryAccount.getAddress(), this.cosignatoryAccount2.getAddress()),
+        multisigAccountInfo.getCosignatoryAddresses());
+
+    Set<NamespaceId> aliases =
+        get(
+                getRepositoryFactory(type)
+                    .createNamespaceRepository()
+                    .getAccountsNames(
+                        Arrays.asList(
+                            multisigAccount.getAddress(),
+                            cosignatoryAccount.getAddress(),
+                            cosignatoryAccount2.getAddress())))
+            .stream()
+            .flatMap(a -> a.getNames().stream().map(n -> n.getNamespaceId()))
+            .collect(Collectors.toSet());
+
+    Listener listener = getRepositoryFactory(type).createListener();
+    final Set<UnresolvedAddress> unresolvedAddresses =
+        get(listener.getAllMultisigAddressesAndAliases(this.multisigAccount.getAddress()));
+
+    final Set<UnresolvedAddress> expectedAddresees =
+        Sets.newSet(
+            this.multisigAccount.getAddress(),
+            this.cosignatoryAccount.getAddress(),
+            this.cosignatoryAccount2.getAddress());
+    expectedAddresees.addAll(aliases);
+
+    Assertions.assertEquals(expectedAddresees, unresolvedAddresses);
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getAllMultisigAddressesAndAliasesWhenCosign(RepositoryType type) {
+
+    final MultisigAccountInfo multisigAccountInfo =
+        get(
+            getRepositoryFactory(type)
+                .createMultisigRepository()
+                .getMultisigAccountInfo(this.multisigAccount.getAddress()));
+    Assertions.assertEquals(
+        Arrays.asList(this.cosignatoryAccount.getAddress(), this.cosignatoryAccount2.getAddress()),
+        multisigAccountInfo.getCosignatoryAddresses());
+
+    Set<NamespaceId> aliases =
+        get(
+                getRepositoryFactory(type)
+                    .createNamespaceRepository()
+                    .getAccountsNames(Arrays.asList(cosignatoryAccount.getAddress())))
+            .stream()
+            .flatMap(a -> a.getNames().stream().map(n -> n.getNamespaceId()))
+            .collect(Collectors.toSet());
+
+    Listener listener = getRepositoryFactory(type).createListener();
+    final Set<UnresolvedAddress> unresolvedAddresses =
+        get(listener.getAllMultisigAddressesAndAliases(this.cosignatoryAccount.getAddress()));
+
+    final Set<UnresolvedAddress> expectedAddresees =
+        Sets.newSet(this.cosignatoryAccount.getAddress());
+    expectedAddresees.addAll(aliases);
+
+    Assertions.assertEquals(expectedAddresees, unresolvedAddresses);
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void getAllMultisigAddressesAndAliasesWhenBasic(RepositoryType type) {
+
+    Account testAccount = this.helper().getTestAccount(type).getKey();
+    Set<NamespaceId> cosignatoryAccount1aliases =
+        get(
+                getRepositoryFactory(type)
+                    .createNamespaceRepository()
+                    .getAccountsNames(Collections.singletonList(testAccount.getAddress())))
+            .stream()
+            .flatMap(a -> a.getNames().stream().map(NamespaceName::getNamespaceId))
+            .collect(Collectors.toSet());
+
+    Listener listener = getRepositoryFactory(type).createListener();
+    final Set<UnresolvedAddress> unresolvedAddresses =
+        get(listener.getAllMultisigAddressesAndAliases(testAccount.getAddress()));
+
+    final Set<UnresolvedAddress> expectedAddresees = Sets.newSet(testAccount.getAddress());
+    expectedAddresees.addAll(cosignatoryAccount1aliases);
+
+    Assertions.assertEquals(expectedAddresees, unresolvedAddresses);
   }
 
   @ParameterizedTest

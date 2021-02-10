@@ -156,6 +156,7 @@ public class RepositoryFactoryOkHttpImpl extends RepositoryFactoryBase {
         getBaseUrl(),
         gson,
         createNamespaceRepository(),
+        createMultisigRepository(),
         getNetworkType());
   }
 

@@ -16,6 +16,7 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.core.crypto.KeyPair;
+import io.nem.symbol.sdk.api.Listener;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
@@ -33,7 +34,15 @@ import io.nem.symbol.sdk.model.transaction.TransactionGroup;
 import io.nem.symbol.sdk.model.transaction.TransferTransaction;
 import io.nem.symbol.sdk.model.transaction.TransferTransactionFactory;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
@@ -43,47 +52,189 @@ import org.junit.jupiter.params.provider.EnumSource;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
 
-  private Account account;
+  private Account signerAccount;
+  private Pair<Account, NamespaceId> recipient;
+  private Address recipientAddress;
+  private NamespaceId recipientAlias;
 
   @BeforeEach
   void setup() {
-    account = config().getDefaultAccount();
+    signerAccount = config().getDefaultAccount();
+    recipient = helper().getTestAccount(RepositoryType.VERTX);
+    recipientAddress = recipient.getLeft().getAddress();
+    recipientAlias = recipient.getRight();
+    Assertions.assertNotEquals(recipient.getKey().getAddress(), signerAccount.getAddress());
   }
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
-  void aggregateTransferTransaction(RepositoryType type) {
-    UnresolvedAddress recipient = helper().getTestAccount(type).getRight();
-    String message =
-        "E2ETest:aggregateTransferTransaction:messagelooooooooooooooooooooooooooooooooooooooo"
-            + "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
-            + "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
-            + "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
-            + "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
-            + "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
-            + "oooooooong";
-    Currency networkCurrency = getNetworkCurrency();
-    Mosaic mosaic =
-        new Mosaic(networkCurrency.getNamespaceId().get(), BigInteger.valueOf(10202020));
-    TransferTransaction transferTransaction =
-        TransferTransactionFactory.create(
-                getNetworkType(), getDeadline(), recipient, Collections.singletonList(mosaic))
-            .message(new PlainMessage(message))
-            .maxFee(maxFee)
-            .build();
-
-    TransferTransaction processed =
-        announceAggregateAndValidate(type, transferTransaction, account).getKey();
-    Assertions.assertEquals(message, processed.getMessage().get().getText());
+  void transferTransactionToAliasSwapped(RepositoryType type) throws Exception {
+    final List<String> expected =
+        Arrays.asList(
+            recipientAlias.plain() + " " + ListenerChannel.UNCONFIRMED_ADDED,
+            recipientAddress.plain() + " " + ListenerChannel.CONFIRMED_ADDED);
+    basicTransfer(type, recipientAlias, "", 100, expected, true, recipientAddress);
   }
 
   @ParameterizedTest
   @EnumSource(RepositoryType.class)
-  public void standaloneTransferTransactionEncryptedMessage(RepositoryType type) {
+  void transferTransactionToAddressSwapped(RepositoryType type) throws Exception {
+    final List<String> expected =
+        Arrays.asList(
+            recipientAddress.plain() + " " + ListenerChannel.UNCONFIRMED_ADDED,
+            recipientAddress.plain() + " " + ListenerChannel.CONFIRMED_ADDED);
+    basicTransfer(type, recipientAddress, "", 100, expected, true, recipientAlias);
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void transferTransactionToAliasSame(RepositoryType type) throws Exception {
+    final List<String> expected =
+        Arrays.asList(
+            recipientAlias.plain() + " " + ListenerChannel.UNCONFIRMED_ADDED,
+            recipientAddress.plain() + " " + ListenerChannel.CONFIRMED_ADDED);
+    basicTransfer(type, recipientAlias, "", 100, expected, true, recipientAlias);
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void transferTransactionToAddressSame(RepositoryType type) throws Exception {
+    final List<String> expected =
+        Arrays.asList(
+            recipientAddress.plain() + " " + ListenerChannel.UNCONFIRMED_ADDED,
+            recipientAddress.plain() + " " + ListenerChannel.CONFIRMED_ADDED);
+    basicTransfer(type, recipientAddress, "", 100, expected, true, recipientAddress);
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void transferTransactionToAliasAllSubscriptions(RepositoryType type) throws Exception {
+    final List<String> expected =
+        Arrays.asList(
+            recipientAlias.plain() + " " + ListenerChannel.UNCONFIRMED_ADDED,
+            recipientAlias.plain() + " " + ListenerChannel.UNCONFIRMED_ADDED,
+            recipientAddress.plain() + " " + ListenerChannel.CONFIRMED_ADDED,
+            recipientAddress.plain() + " " + ListenerChannel.CONFIRMED_ADDED);
+    basicTransfer(type, recipientAlias, "", 100, expected, true, recipientAlias, recipientAddress);
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void transferTransactionToAddressAllSubscription(RepositoryType type) throws Exception {
+
+    final List<String> expected =
+        Arrays.asList(
+            recipientAddress.plain() + " " + ListenerChannel.UNCONFIRMED_ADDED,
+            recipientAddress.plain() + " " + ListenerChannel.UNCONFIRMED_ADDED,
+            recipientAddress.plain() + " " + ListenerChannel.CONFIRMED_ADDED,
+            recipientAddress.plain() + " " + ListenerChannel.CONFIRMED_ADDED);
+
+    basicTransfer(
+        type, recipientAddress, "", 100, expected, true, recipientAlias, recipientAddress);
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void transferTransactionToAliasSwappedNoAlias(RepositoryType type) throws Exception {
+    final List<String> expected =
+        Arrays.asList(recipientAddress.plain() + " " + ListenerChannel.CONFIRMED_ADDED);
+    basicTransfer(type, recipientAlias, "", 100, expected, false, recipientAddress);
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void transferTransactionToAddressSwappedNoAlias(RepositoryType type) throws Exception {
+    final List<String> expected = Arrays.asList();
+    basicTransfer(type, recipientAddress, "", 100, expected, false, recipientAlias);
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void transferTransactionToAliasSameNoAlias(RepositoryType type) throws Exception {
+    final List<String> expected =
+        Arrays.asList(
+            recipientAlias.plain() + " " + ListenerChannel.UNCONFIRMED_ADDED,
+            recipientAlias.plain() + " " + ListenerChannel.CONFIRMED_ADDED);
+    basicTransfer(type, recipientAlias, "", 100, expected, false, recipientAlias);
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void transferTransactionToAddressSameNoAlias(RepositoryType type) throws Exception {
+    final List<String> expected =
+        Arrays.asList(
+            recipientAddress.plain() + " " + ListenerChannel.UNCONFIRMED_ADDED,
+            recipientAddress.plain() + " " + ListenerChannel.CONFIRMED_ADDED);
+    basicTransfer(type, recipientAddress, "", 100, expected, false, recipientAddress);
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void transferTransactionToAliasAllSubscriptionsNoAlias(RepositoryType type) throws Exception {
+    final List<String> expected =
+        Arrays.asList(
+            recipientAlias.plain() + " " + ListenerChannel.UNCONFIRMED_ADDED,
+            recipientAddress.plain() + " " + ListenerChannel.CONFIRMED_ADDED);
+    basicTransfer(type, recipientAlias, "", 100, expected, false, recipientAlias, recipientAddress);
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  void transferTransactionToAddressAllSubscriptionNoAlias(RepositoryType type) throws Exception {
+
+    final List<String> expected =
+        Arrays.asList(
+            recipientAddress.plain() + " " + ListenerChannel.UNCONFIRMED_ADDED,
+            recipientAddress.plain() + " " + ListenerChannel.CONFIRMED_ADDED);
+
+    basicTransfer(
+        type, recipientAddress, "", 100, expected, false, recipientAlias, recipientAddress);
+  }
+
+  private List<String> basicTransfer(
+      RepositoryType type,
+      UnresolvedAddress recipient,
+      String s,
+      int i,
+      List<String> expected,
+      boolean includeAliases,
+      UnresolvedAddress... listenTo)
+      throws InterruptedException, ExecutionException {
+    List<String> messages = new ArrayList<>();
+    Listener listener = listen(type, messages, includeAliases, listenTo);
+    sleep(1000);
+    try {
+      String message = s;
+      Currency networkCurrency = getNetworkCurrency();
+      Mosaic mosaic = new Mosaic(networkCurrency.getNamespaceId().get(), BigInteger.valueOf(i));
+      TransferTransaction transferTransaction =
+          TransferTransactionFactory.create(
+                  getNetworkType(), getDeadline(), recipient, Collections.singletonList(mosaic))
+              .message(new PlainMessage(message))
+              .maxFee(maxFee)
+              .build();
+
+      TransferTransaction processed =
+          announceAggregateAndValidate(type, transferTransaction, signerAccount).getKey();
+      Assertions.assertEquals(message, processed.getMessage().get().getText());
+
+      sleep(1000);
+      Assertions.assertEquals(expected, messages);
+      return messages;
+    } finally {
+      listener.close();
+    }
+  }
+
+  @ParameterizedTest
+  @EnumSource(RepositoryType.class)
+  public void standaloneTransferTransactionEncryptedMessage(RepositoryType type) throws Exception {
     this.helper().sendMosaicFromNemesis(type, getRecipient(), false);
     String namespaceName = "standaloneTransferTransactionEncryptedMessagealias".toLowerCase();
 
     NamespaceId recipient = setAddressAlias(type, getRecipient(), namespaceName);
+
+    System.out.println(recipient.getIdAsHex());
     Assertions.assertEquals(
         "9960629109A48AFBC0000000000000000000000000000000", recipient.encoded(getNetworkType()));
     String message = "E2ETest:standaloneTransferTransaction:message 漢字";
@@ -104,7 +255,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
             .maxFee(maxFee)
             .build();
 
-    TransferTransaction processed = announceAndValidate(type, account, transferTransaction);
+    TransferTransaction processed = announceAndValidate(type, signerAccount, transferTransaction);
 
     assertTransferTransactions(transferTransaction, processed);
 
@@ -179,7 +330,7 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
   @EnumSource(RepositoryType.class)
   public void standaloneCreatePersistentDelegationRequestTransaction(RepositoryType type) {
 
-    KeyPair senderKeyPair = KeyPair.random();
+    KeyPair signingKeyPair = KeyPair.random();
     KeyPair vrfPrivateKey = KeyPair.random();
     KeyPair recipientKeyPair = KeyPair.random();
 
@@ -187,15 +338,16 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
         TransferTransactionFactory.createPersistentDelegationRequestTransaction(
                 getNetworkType(),
                 getDeadline(),
-                senderKeyPair.getPrivateKey(),
+                signingKeyPair.getPrivateKey(),
                 vrfPrivateKey.getPrivateKey(),
                 recipientKeyPair.getPublicKey())
             .maxFee(maxFee)
             .build();
 
-    TransferTransaction processed = announceAndValidate(type, account, transferTransaction);
+    TransferTransaction processed = announceAndValidate(type, signerAccount, transferTransaction);
 
-    assertPersistentDelegationTransaction(recipientKeyPair, vrfPrivateKey, processed);
+    assertPersistentDelegationTransaction(
+        recipientKeyPair, signingKeyPair, vrfPrivateKey, processed);
 
     TransferTransaction restTransaction =
         (TransferTransaction)
@@ -206,23 +358,69 @@ public class TransferTransactionIntegrationTest extends BaseIntegrationTest {
                         TransactionGroup.CONFIRMED,
                         processed.getTransactionInfo().get().getHash().get()));
 
-    assertPersistentDelegationTransaction(recipientKeyPair, vrfPrivateKey, restTransaction);
+    assertPersistentDelegationTransaction(
+        recipientKeyPair, signingKeyPair, vrfPrivateKey, restTransaction);
   }
 
   private void assertPersistentDelegationTransaction(
-      KeyPair recipientKeyPair, KeyPair vrfPrivateKey, TransferTransaction transaction) {
-    String message = recipientKeyPair.getPublicKey().toHex();
+      KeyPair recipientKeyPair,
+      KeyPair signingKeyPair,
+      KeyPair vrfPrivateKey,
+      TransferTransaction transaction) {
     Assertions.assertTrue(
         transaction.getMessage().get() instanceof PersistentHarvestingDelegationMessage);
-    Assertions.assertNotEquals(message, transaction.getMessage().get().getText());
     Assertions.assertEquals(
         MessageType.PERSISTENT_HARVESTING_DELEGATION_MESSAGE,
         transaction.getMessage().get().getType());
     HarvestingKeys decryptedMessage =
         ((PersistentHarvestingDelegationMessage) transaction.getMessage().get())
             .decryptPayload(recipientKeyPair.getPrivateKey());
-    Assertions.assertEquals(
-        recipientKeyPair.getPrivateKey(), decryptedMessage.getSigningPrivateKey());
     Assertions.assertEquals(vrfPrivateKey.getPrivateKey(), decryptedMessage.getVrfPrivateKey());
+    Assertions.assertEquals(
+        signingKeyPair.getPrivateKey(), decryptedMessage.getSigningPrivateKey());
+  }
+
+  private Listener listen(
+      RepositoryType type,
+      List<String> messages,
+      boolean includeAliases,
+      UnresolvedAddress... recipients)
+      throws InterruptedException, ExecutionException {
+    Listener listener = getRepositoryFactory(type).createListener();
+    listener.open().get();
+    final HashSet<UnresolvedAddress> expected = new HashSet<>();
+    expected.add(recipientAlias);
+    expected.add(recipientAddress);
+    if (includeAliases) {
+      for (UnresolvedAddress recipient : recipients) {
+        listener
+            .getAllAddressesAndAliases(recipient)
+            .subscribe(
+                multiple -> {
+                  Assertions.assertEquals(expected, multiple);
+                  subscribeMultiple(messages, listener, multiple);
+                });
+      }
+    } else {
+      final Set<UnresolvedAddress> multiple = Arrays.stream(recipients).collect(Collectors.toSet());
+      subscribeMultiple(messages, listener, multiple);
+    }
+    return listener;
+  }
+
+  private void subscribeMultiple(
+      List<String> messages, Listener listener, Set<UnresolvedAddress> multiple) {
+    Arrays.asList(ListenerChannel.CONFIRMED_ADDED, ListenerChannel.UNCONFIRMED_ADDED)
+        .forEach(
+            channel -> {
+              listener
+                  .subscribeMultipleAddresses(channel, multiple, null, false)
+                  .subscribe(
+                      c -> {
+                        final String message = c.getChannelParams() + " " + channel;
+                        messages.add(message);
+                        System.out.println(message);
+                      });
+            });
   }
 }

@@ -39,8 +39,8 @@ public class Config {
   private static final String CONFIG_JSON = "./integration-tests/src/test/resources/config.json";
   private static final String ADDRESSES_YML = "./target/bootstrap/addresses.yml";
   //  private static final String ADDRESSES_YML =
-  //        "../../symbol-bootstrap/target/bootstrap/addresses.yml";
-  //  private static final String ADDRESSES_YML = "../../catapult-rest/rest/target/addresses.yml";
+  //        "../symbol-bootstrap/target/bootstrap/addresses.yml";
+  //  private static final String ADDRESSES_YML = "../catapult-rest/rest/target/addresses.yml";
 
   private final JsonObject config;
   private final Map<String, Account> accountCache = new HashMap<>();
@@ -70,19 +70,10 @@ public class Config {
       }
 
       List<Map<String, String>> bootstrapAddresses;
-      try {
-        // OLD FORMAT
-        Map<String, List<Map<String, String>>> mosaics =
-            (Map<String, List<Map<String, String>>>)
-                mapper.readValue(generatedAddresses, Map.class).get("mosaics");
-        bootstrapAddresses = mosaics.get("currency");
-      } catch (ClassCastException e) {
-        // NEW FORMAT
-        List<Map<String, List<Map<String, String>>>> mosaics =
-            (List<Map<String, List<Map<String, String>>>>)
-                mapper.readValue(generatedAddresses, Map.class).get("mosaics");
-        bootstrapAddresses = mosaics.get(0).get("accounts");
-      }
+      List<Map<String, List<Map<String, String>>>> mosaics =
+          (List<Map<String, List<Map<String, String>>>>)
+              mapper.readValue(generatedAddresses, Map.class).get("mosaics");
+      bootstrapAddresses = mosaics.get(0).get("accounts");
 
       return bootstrapAddresses.stream()
           .map(m -> Account.createFromPrivateKey(m.get("privateKey"), networkType))
@@ -108,7 +99,10 @@ public class Config {
     if (!file.exists()) {
       file = new File("." + configFile);
       if (!file.exists()) {
-        throw new IllegalArgumentException("File " + file.getAbsolutePath() + " doesn't exist");
+        file = new File("../" + configFile);
+        if (!file.exists()) {
+          throw new IllegalArgumentException("File " + file.getAbsolutePath() + " doesn't exist");
+        }
       }
     }
     if (file.isDirectory()) {

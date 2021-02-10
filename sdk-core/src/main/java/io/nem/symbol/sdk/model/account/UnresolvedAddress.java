@@ -31,4 +31,7 @@ public interface UnresolvedAddress {
    *     zero padded. See {@link SerializationUtils}
    */
   String encoded(NetworkType networkType);
+
+  /** @return the plain representation of the address. */
+  String plain();
 }

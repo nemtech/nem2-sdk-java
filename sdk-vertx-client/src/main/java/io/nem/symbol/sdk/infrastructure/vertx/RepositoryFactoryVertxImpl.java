@@ -164,7 +164,11 @@ public class RepositoryFactoryVertxImpl extends RepositoryFactoryBase {
   @Override
   public Listener createListener() {
     return new ListenerVertx(
-        vertx.createHttpClient(), getBaseUrl(), createNamespaceRepository(), getNetworkType());
+        vertx.createHttpClient(),
+        getBaseUrl(),
+        createNamespaceRepository(),
+        createMultisigRepository(),
+        getNetworkType());
   }
 
   @Override

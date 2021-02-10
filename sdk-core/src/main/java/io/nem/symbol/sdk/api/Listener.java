@@ -15,6 +15,8 @@
  */
 package io.nem.symbol.sdk.api;
 
+import io.nem.symbol.sdk.infrastructure.ListenerChannel;
+import io.nem.symbol.sdk.infrastructure.ListenerMessage;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.FinalizedBlock;
@@ -25,6 +27,7 @@ import io.nem.symbol.sdk.model.transaction.TransactionStatusError;
 import io.nem.symbol.sdk.model.transaction.TransactionStatusException;
 import io.reactivex.Observable;
 import java.io.Closeable;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -264,4 +267,49 @@ public interface Listener extends Closeable {
    */
   Observable<CosignatureSignedTransaction> cosignatureAdded(
       UnresolvedAddress unresolvedAddress, String parentTransactionHash);
+
+  /**
+   * Helper method to return all the known cosigners and it's aliases of a given account. The list
+   * includes the aliases of the multisig account.
+   *
+   * <p>You can pipe this method to listen to everything related to an address.
+   *
+   * @param unresolvedAddress the account, most likely a multisig
+   * @return a set of all known aliases and addresses of a multisig and its cosignatures
+   */
+  Observable<Set<UnresolvedAddress>> getAllMultisigAddressesAndAliases(
+      UnresolvedAddress unresolvedAddress);
+
+  /**
+   * Helper method to return all the known aliases of a given address. The list includes the
+   * original address.
+   *
+   * <p>You can pipe this method to listen to everything related to an address.
+   *
+   * @param unresolvedAddress the account
+   * @return a set of all known aliases and addresses of the account.
+   */
+  Observable<Set<UnresolvedAddress>> getAllAddressesAndAliases(UnresolvedAddress unresolvedAddress);
+
+  /**
+   * This method allows you to subscribes to multiple unresolved addresses as the same time.
+   *
+   * <p>This is ideal for:
+   *
+   * <p>1) When you have multiple aliases of a given account.
+   *
+   * <p>2) When you want to subscribe to the cosigners and its aliases.
+   *
+   * @param channel the channel.
+   * @param unresolvedAddresses the unresolved address.
+   * @param transactionHash the transaction hash
+   * @param orError do you want to raise an error when a status for the given hash is received?
+   * @param <T> the type of the payload, most of the time it will be {@link Transaction}
+   * @return the observable of the payload.
+   */
+  <T> Observable<ListenerMessage<T>> subscribeMultipleAddresses(
+      ListenerChannel channel,
+      Set<UnresolvedAddress> unresolvedAddresses,
+      String transactionHash,
+      boolean orError);
 }

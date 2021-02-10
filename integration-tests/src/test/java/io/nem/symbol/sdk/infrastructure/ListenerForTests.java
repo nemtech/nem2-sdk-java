@@ -16,7 +16,9 @@
 package io.nem.symbol.sdk.infrastructure;
 
 import io.nem.symbol.sdk.api.Listener;
-import io.nem.symbol.sdk.model.account.Account;
+import io.nem.symbol.sdk.model.account.Address;
+import io.nem.symbol.sdk.model.account.UnresolvedAddress;
+import io.nem.symbol.sdk.model.namespace.NamespaceId;
 import java.util.concurrent.ExecutionException;
 
 /** Main class that listen to symbol in order to troubleshooting integration tests. */
@@ -44,39 +46,44 @@ public class ListenerForTests extends BaseIntegrationTest {
             b -> {
               System.out.println("New Finalized Block!! " + b.getHeight());
             });
-    listenToAccount("Test Account 1", config().getTestAccount(), listener);
-    listenToAccount("Test Account 2", config().getTestAccount2(), listener);
-    listenToAccount("Cosignatory Account", config().getCosignatoryAccount(), listener);
-    listenToAccount("Cosignatory Account 2", config().getCosignatory2Account(), listener);
-    listenToAccount("Multisign Account 2", config().getMultisigAccount(), listener);
+    listenToAccount("Test Account 1", config().getTestAccount().getAddress(), listener);
+    listenToAccount("Test Account 2", config().getTestAccount2().getAddress(), listener);
+    listenToAccount("Cosignatory Account", config().getCosignatoryAccount().getAddress(), listener);
+    listenToAccount(
+        "Cosignatory Account 2", config().getCosignatory2Account().getAddress(), listener);
+    listenToAccount("Multisign Account 2", config().getMultisigAccount().getAddress(), listener);
 
-    config().getNemesisAccounts().stream()
-        .forEach(account -> listenToAccount("Nemesis Account", account, listener));
+    config()
+        .getNemesisAccounts()
+        .forEach(account -> listenToAccount("Nemesis Account", account.getAddress(), listener));
   }
 
-  private void listenToAccount(String accountDescription, Account account, Listener listener) {
+  private void listenToAccount(
+      String accountDescription, UnresolvedAddress account, Listener listener) {
     System.out.println(
         "Listening for transaction of account "
-            + account.getAddress().plain()
+            + (account instanceof Address
+                ? ((Address) account).plain()
+                : ((NamespaceId) account).getIdAsHex())
             + ". "
             + accountDescription);
 
     listener
-        .confirmed(account.getAddress())
+        .confirmed(account)
         .subscribe(
             c ->
                 System.out.println(
                     accountDescription + " received confirmed transaction " + toJson(c)));
 
     listener
-        .cosignatureAdded(account.getAddress())
+        .cosignatureAdded(account)
         .subscribe(
             c ->
                 System.out.println(
                     accountDescription + " Received cosignatureAdded transaction " + toJson(c)));
 
     listener
-        .aggregateBondedAdded(account.getAddress())
+        .aggregateBondedAdded(account)
         .subscribe(
             c ->
                 System.out.println(
@@ -85,7 +92,7 @@ public class ListenerForTests extends BaseIntegrationTest {
                         + toJson(c)));
 
     listener
-        .aggregateBondedRemoved(account.getAddress())
+        .aggregateBondedRemoved(account)
         .subscribe(
             c ->
                 System.out.println(
@@ -94,14 +101,14 @@ public class ListenerForTests extends BaseIntegrationTest {
                         + toJson(c)));
 
     listener
-        .unconfirmedRemoved(account.getAddress())
+        .unconfirmedRemoved(account)
         .subscribe(
             c ->
                 System.out.println(
                     accountDescription + " Received unconfirmedRemoved transaction " + toJson(c)));
 
     listener
-        .status(account.getAddress())
+        .status(account)
         .subscribe(c -> System.out.println(accountDescription + " Error: " + toJson(c)));
   }
 }

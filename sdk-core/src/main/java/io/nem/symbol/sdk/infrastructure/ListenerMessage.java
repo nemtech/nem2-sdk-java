@@ -15,16 +15,29 @@
  */
 package io.nem.symbol.sdk.infrastructure;
 /** The listener payload with the parsed data. */
-public class ListenerMessage {
+public class ListenerMessage<T> {
 
+  private final String topic;
   private final ListenerChannel channel;
   private final String channelParams;
-  private final Object message;
+  private final T message;
+  private final String transactionHash;
 
-  public ListenerMessage(ListenerChannel channel, String channelParams, Object message) {
+  public ListenerMessage(
+      String topic,
+      ListenerChannel channel,
+      String channelParams,
+      T message,
+      String transactionHash) {
+    this.topic = topic;
     this.channel = channel;
     this.channelParams = channelParams;
     this.message = message;
+    this.transactionHash = transactionHash;
+  }
+
+  public String getTopic() {
+    return topic;
   }
 
   public ListenerChannel getChannel() {
@@ -35,7 +48,11 @@ public class ListenerMessage {
     return channelParams;
   }
 
-  public Object getMessage() {
+  public T getMessage() {
     return message;
+  }
+
+  public String getTransactionHash() {
+    return transactionHash;
   }
 }

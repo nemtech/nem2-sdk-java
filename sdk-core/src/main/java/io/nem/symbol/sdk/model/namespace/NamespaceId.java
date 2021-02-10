@@ -176,6 +176,11 @@ public class NamespaceId implements UnresolvedMosaicId, UnresolvedAddress {
         SerializationUtils.fromUnresolvedAddressToByteBuffer(this, networkType).array());
   }
 
+  @Override
+  public String plain() {
+    return this.getIdAsHex();
+  }
+
   /**
    * Gets the id as a hexadecimal string.
    *

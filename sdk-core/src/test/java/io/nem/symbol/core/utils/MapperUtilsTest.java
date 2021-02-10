@@ -66,6 +66,16 @@ public class MapperUtilsTest {
   }
 
   @Test
+  void toUnresolvedAddress() {
+    NetworkType networkType = NetworkType.TEST_NET;
+    System.out.println(networkType.getValue());
+    String hex = "9960629109A48AFBC0000000000000000000000000000000";
+    UnresolvedAddress value = MapperUtils.toUnresolvedAddress(hex);
+    Assertions.assertEquals("C0FB8AA409916260", ((NamespaceId) value).getIdAsHex());
+    Assertions.assertEquals(hex, ((NamespaceId) value).encoded(networkType));
+  }
+
+  @Test
   void toUnresolvedAddressFromNamespace() {
     Assertions.assertNull(MapperUtils.toUnresolvedAddress(null));
     NamespaceId namespaceId = NamespaceId.createFromName("some.name");
