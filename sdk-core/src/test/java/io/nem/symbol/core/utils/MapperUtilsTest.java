@@ -123,4 +123,23 @@ public class MapperUtilsTest {
     String generatedString = new String(array, StandardCharsets.UTF_8);
     Assertions.assertNotNull(generatedString);
   }
+
+  @Test
+  public void toUnresolvedAddressFromPlain() {
+    Assertions.assertEquals(
+        new NamespaceId("C0FB8AA409916260"),
+        MapperUtils.toUnresolvedAddressFromPlain("C0FB8AA409916260"));
+
+    Assertions.assertEquals(
+        Address.createFromRawAddress("TAHNZXQBC57AA7KJTMGS3PJPZBXN7DV5JHJU42A"),
+        MapperUtils.toUnresolvedAddressFromPlain("TAHNZXQBC57AA7KJTMGS3PJPZBXN7DV5JHJU42A"));
+
+    IllegalArgumentException e =
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+              MapperUtils.toUnresolvedAddressFromPlain("abc");
+            });
+    Assertions.assertEquals("'abc' is not a valid plain address or namespace hex", e.getMessage());
+  }
 }

@@ -153,7 +153,7 @@ public class MapperUtils {
       }
     } catch (Exception e) {
       throw new IllegalArgumentException(
-          plainUnresolvedAddress + " is not a valid plain address or namespace hex");
+          "'" + plainUnresolvedAddress + "' is not a valid plain address or namespace hex");
     }
   }
 }

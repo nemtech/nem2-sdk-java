@@ -23,6 +23,8 @@ import io.nem.symbol.sdk.api.Listener;
 import io.nem.symbol.sdk.api.MultisigRepository;
 import io.nem.symbol.sdk.api.NamespaceRepository;
 import io.nem.symbol.sdk.infrastructure.ListenerChannel;
+import io.nem.symbol.sdk.infrastructure.ListenerMessage;
+import io.nem.symbol.sdk.infrastructure.ListenerRequest;
 import io.nem.symbol.sdk.infrastructure.ListenerSubscribeMessage;
 import io.nem.symbol.sdk.model.account.Account;
 import io.nem.symbol.sdk.model.account.Address;
@@ -231,6 +233,58 @@ public class ListenerVertxTest {
     Assertions.assertEquals(0, exceptions.size());
 
     Assertions.assertEquals(address, transactions.get(0).getSigner().get().getAddress());
+
+    Mockito.verify(webSocketMock).handler(Mockito.any());
+    Mockito.verify(webSocketMock)
+        .writeTextMessage(
+            jsonHelper.print(
+                new ListenerSubscribeMessage(this.wsId, channelName + "/" + address.plain())));
+    Mockito.verify(webSocketMock)
+        .writeTextMessage(
+            jsonHelper.print(
+                new ListenerSubscribeMessage(this.wsId, "status" + "/" + address.plain())));
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"CONFIRMED_ADDED", "AGGREGATE_BONDED_ADDED"})
+  public void subscribeValidUsingBase(ListenerChannel channel)
+      throws InterruptedException, ExecutionException, TimeoutException {
+    simulateWebSocketStartup();
+
+    TransactionInfoDTO transactionInfo =
+        TestHelperVertx.loadTransactionInfoDTO("aggregateMosaicCreationTransaction.json");
+
+    ObjectNode transactionInfoDtoJsonObject = jsonHelper.convert(transactionInfo, ObjectNode.class);
+
+    Address address =
+        Address.createFromPublicKey(
+            jsonHelper.getString(transactionInfoDtoJsonObject, "transaction", "signerPublicKey"),
+            NETWORK_TYPE);
+
+    String channelName = channel.toString();
+
+    List<ListenerMessage<Transaction>> messages = new ArrayList<>();
+    List<Throwable> exceptions = new ArrayList<>();
+
+    TransactionMetaDTO meta =
+        jsonHelper.convert(transactionInfo.getMeta(), TransactionMetaDTO.class);
+    listener
+        .subscribe(
+            new ListenerRequest<Transaction>(channel, address)
+                .transactionHashOrError(meta.getHash()))
+        .doOnError(exceptions::add)
+        .forEach(messages::add);
+
+    handle(transactionInfoDtoJsonObject, channelName + "/" + address.plain());
+
+    Assertions.assertEquals(1, messages.size());
+    Assertions.assertEquals(0, exceptions.size());
+
+    Assertions.assertEquals(meta.getHash(), messages.get(0).getTransactionHash());
+    Assertions.assertEquals(channel, messages.get(0).getChannel());
+    Assertions.assertEquals(address.plain(), messages.get(0).getChannelParams());
+    Assertions.assertEquals(channelName + "/" + address.plain(), messages.get(0).getTopic());
+    Assertions.assertEquals(address, messages.get(0).getMessage().getSigner().get().getAddress());
 
     Mockito.verify(webSocketMock).handler(Mockito.any());
     Mockito.verify(webSocketMock)

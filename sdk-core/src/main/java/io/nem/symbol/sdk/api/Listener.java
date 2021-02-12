@@ -17,6 +17,7 @@ package io.nem.symbol.sdk.api;
 
 import io.nem.symbol.sdk.infrastructure.ListenerChannel;
 import io.nem.symbol.sdk.infrastructure.ListenerMessage;
+import io.nem.symbol.sdk.infrastructure.ListenerRequest;
 import io.nem.symbol.sdk.model.account.UnresolvedAddress;
 import io.nem.symbol.sdk.model.blockchain.BlockInfo;
 import io.nem.symbol.sdk.model.blockchain.FinalizedBlock;
@@ -291,6 +292,16 @@ public interface Listener extends Closeable {
    */
   Observable<Set<UnresolvedAddress>> getAllAddressesAndAliases(UnresolvedAddress unresolvedAddress);
 
+  /**
+   * Low level subscribe method for any channel and message type.
+   *
+   * <p>Devs should use the methods above.
+   *
+   * @param request the request
+   * @param <T> The body type of the message
+   * @return Observable of {@link ListenerMessage}
+   */
+  <T> Observable<ListenerMessage<T>> subscribe(ListenerRequest<T> request);
   /**
    * This method allows you to subscribes to multiple unresolved addresses as the same time.
    *

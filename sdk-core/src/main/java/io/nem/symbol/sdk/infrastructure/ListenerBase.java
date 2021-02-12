@@ -172,86 +172,77 @@ public abstract class ListenerBase implements Listener {
 
   @Override
   public Observable<BlockInfo> newBlock() {
-    return this.<BlockInfo>basicSubscribe(ListenerChannel.BLOCK, null, null)
-        .map(ListenerMessage::getMessage);
+    return this.subscribe(ListenerRequest.block()).map(ListenerMessage::getMessage);
   }
 
   @Override
   public Observable<FinalizedBlock> finalizedBlock() {
-    return this.<FinalizedBlock>basicSubscribe(ListenerChannel.FINALIZED_BLOCK, null, null)
-        .map(ListenerMessage::getMessage);
+    return this.subscribe(ListenerRequest.finalizedBlock()).map(ListenerMessage::getMessage);
   }
 
   @Override
   public Observable<Transaction> confirmed(
       final UnresolvedAddress unresolvedAddress, final String transactionHash) {
-    return this.<Transaction>basicSubscribe(
-            ListenerChannel.CONFIRMED_ADDED, unresolvedAddress, transactionHash)
+    return this.subscribe(
+            ListenerRequest.confirmed(unresolvedAddress).transactionHash(transactionHash))
         .map(ListenerMessage::getMessage);
   }
 
   @Override
   public Observable<Transaction> confirmedOrError(
       UnresolvedAddress unresolvedAddress, String transactionHash) {
-    Validate.notNull(unresolvedAddress, "UnresolvedAddress is required");
-    final Observable<ListenerMessage<AggregateTransaction>> observable =
-        basicSubscribe(ListenerChannel.CONFIRMED_ADDED, unresolvedAddress, transactionHash);
-    return getMessageOrError(unresolvedAddress, transactionHash, observable)
+    return this.subscribe(
+            ListenerRequest.confirmed(unresolvedAddress).transactionHashOrError(transactionHash))
         .map(ListenerMessage::getMessage);
   }
 
   @Override
   public Observable<Transaction> unconfirmedAdded(
       UnresolvedAddress unresolvedAddress, String transactionHash) {
-    Validate.notNull(unresolvedAddress, "UnresolvedAddress is required");
-
-    return this.<Transaction>basicSubscribe(
-            ListenerChannel.UNCONFIRMED_ADDED, unresolvedAddress, transactionHash)
+    return this.subscribe(
+            ListenerRequest.unconfirmedAdded(unresolvedAddress).transactionHash(transactionHash))
         .map(ListenerMessage::getMessage);
   }
 
   @Override
   public Observable<String> unconfirmedRemoved(
       UnresolvedAddress unresolvedAddress, String transactionHash) {
-    Validate.notNull(unresolvedAddress, "UnresolvedAddress is required");
-    return this.<String>basicSubscribe(
-            ListenerChannel.UNCONFIRMED_REMOVED, unresolvedAddress, transactionHash)
+    return this.subscribe(
+            ListenerRequest.unconfirmedRemoved(unresolvedAddress).transactionHash(transactionHash))
         .map(ListenerMessage::getMessage);
   }
 
   @Override
   public Observable<AggregateTransaction> aggregateBondedAdded(
       UnresolvedAddress unresolvedAddress, String transactionHash) {
-    Validate.notNull(unresolvedAddress, "UnresolvedAddress is required");
-    return this.<AggregateTransaction>basicSubscribe(
-            ListenerChannel.AGGREGATE_BONDED_ADDED, unresolvedAddress, transactionHash)
+    return this.subscribe(
+            ListenerRequest.aggregateBondedAdded(unresolvedAddress)
+                .transactionHash(transactionHash))
         .map(ListenerMessage::getMessage);
   }
 
   @Override
   public Observable<String> aggregateBondedRemoved(
       UnresolvedAddress unresolvedAddress, String transactionHash) {
-    Validate.notNull(unresolvedAddress, "UnresolvedAddress is required");
-    return this.<String>basicSubscribe(
-            ListenerChannel.AGGREGATE_BONDED_REMOVED, unresolvedAddress, transactionHash)
+    return this.subscribe(
+            ListenerRequest.aggregateBondedRemoved(unresolvedAddress)
+                .transactionHash(transactionHash))
         .map(ListenerMessage::getMessage);
   }
 
   @Override
   public Observable<TransactionStatusError> status(
       UnresolvedAddress unresolvedAddress, String transactionHash) {
-    Validate.notNull(unresolvedAddress, "UnresolvedAddress is required");
-    return this.<TransactionStatusError>basicSubscribe(
-            ListenerChannel.STATUS, unresolvedAddress, transactionHash)
+    return this.subscribe(
+            ListenerRequest.status(unresolvedAddress).transactionHash(transactionHash))
         .map(ListenerMessage::getMessage);
   }
 
   @Override
   public Observable<CosignatureSignedTransaction> cosignatureAdded(
       UnresolvedAddress unresolvedAddress, String parentTransactionHash) {
-    Validate.notNull(unresolvedAddress, "UnresolvedAddress is required");
-    return this.<CosignatureSignedTransaction>basicSubscribe(
-            ListenerChannel.COSIGNATURE, unresolvedAddress, parentTransactionHash)
+    return this.subscribe(
+            ListenerRequest.cosignature(unresolvedAddress).transactionHash(parentTransactionHash))
         .map(ListenerMessage::getMessage);
   }
 
@@ -265,22 +256,23 @@ public abstract class ListenerBase implements Listener {
   @Override
   public Observable<AggregateTransaction> aggregateBondedAddedOrError(
       UnresolvedAddress unresolvedAddress, String transactionHash) {
-    Validate.notNull(unresolvedAddress, "UnresolvedAddress is required");
-    final Observable<ListenerMessage<AggregateTransaction>> observable =
-        basicSubscribe(ListenerChannel.AGGREGATE_BONDED_ADDED, unresolvedAddress, transactionHash);
-    return getMessageOrError(unresolvedAddress, transactionHash, observable)
+    return this.subscribe(
+            ListenerRequest.aggregateBondedAdded(unresolvedAddress)
+                .transactionHashOrError(transactionHash))
         .map(ListenerMessage::getMessage);
   }
 
   private <T> Observable<ListenerMessage<T>> getMessageOrError(
-      UnresolvedAddress address,
-      String transactionHash,
-      Observable<ListenerMessage<T>> transactionListener) {
+      ListenerRequest<T> request, Observable<ListenerMessage<T>> transactionListener) {
     // I may move this method to the Listener
-    Validate.notNull(address, "address is required");
-    Validate.notNull(transactionHash, "transactionHash is required");
+    Validate.notNull(request.getUnresolvedAddress(), "address is required");
+    Validate.notNull(request.getTransactionHash(), "transactionHash is required");
     IllegalStateException caller = new IllegalStateException("The Caller");
-    Observable<TransactionStatusError> errorListener = status(address, transactionHash);
+    Observable<TransactionStatusError> errorListener =
+        this.subscribe(
+                ListenerRequest.status(request.getUnresolvedAddress())
+                    .transactionHash(request.getTransactionHash()))
+            .map(ListenerMessage::getMessage);
     Observable<Object> errorOrTransactionObservable =
         Observable.merge(transactionListener, errorListener).take(1);
     return errorOrTransactionObservable.map(
@@ -295,14 +287,20 @@ public abstract class ListenerBase implements Listener {
         });
   }
 
-  private <T> Observable<ListenerMessage<T>> basicSubscribe(
-      ListenerChannel channel, UnresolvedAddress unresolvedAddress, String transactionHash) {
-    validateOpen();
-    String topic =
-        unresolvedAddress == null
-            ? channel.toString()
-            : channel.toString() + "/" + unresolvedAddress.plain();
+  @Override
+  public <T> Observable<ListenerMessage<T>> subscribe(ListenerRequest<T> request) {
+    final Observable<ListenerMessage<T>> transactionObservable = basicSubscribe(request);
+    if (request.isOrError()) {
+      return this.getMessageOrError(request, transactionObservable);
+    } else {
+      return transactionObservable;
+    }
+  }
 
+  public <T> Observable<ListenerMessage<T>> basicSubscribe(ListenerRequest<T> request) {
+    validateOpen();
+    String topic = request.getTopic();
+    String transactionHash = request.getTransactionHash();
     this.subscribeTo(topic);
     return getMessageSubject()
         .filter(rawMessage -> rawMessage.getTopic().equalsIgnoreCase(topic))
@@ -316,10 +314,18 @@ public abstract class ListenerBase implements Listener {
 
   private <T> boolean sameMessage(ListenerMessage<T> message1, ListenerMessage<T> message2) {
     // Could have different topic addresses (an alias an a real address).
-    return message1.getTransactionHash() != null
-        && message1.getChannel() == message2.getChannel()
-        && StringUtils.equalsIgnoreCase(
-            message1.getTransactionHash(), message2.getTransactionHash());
+    if (message1.getChannel() != message2.getChannel()) {
+      return false;
+    }
+    if (message1.getTransactionHash() == null) {
+      return false;
+    }
+    if (message1.getChannel() == ListenerChannel.COSIGNATURE) {
+      return false;
+    }
+
+    return StringUtils.equalsIgnoreCase(
+        message1.getTransactionHash(), message2.getTransactionHash());
   }
 
   private Observable<Address> getAddress(UnresolvedAddress unresolvedAddress) {
@@ -386,28 +392,15 @@ public abstract class ListenerBase implements Listener {
       Set<UnresolvedAddress> unresolvedAddresses,
       String transactionHash,
       boolean orError) {
-    if (orError) {
-      return Observable.merge(
-              unresolvedAddresses.stream()
-                  .map(
-                      unresolvedAddress -> {
-                        final Observable<ListenerMessage<T>> transactionObservable =
-                            basicSubscribe(channel, unresolvedAddress, transactionHash);
-                        return this.getMessageOrError(
-                            unresolvedAddress, transactionHash, transactionObservable);
-                      })
-                  .collect(Collectors.toList()))
-          .distinctUntilChanged(this::sameMessage);
-
-    } else {
-      return Observable.merge(
-              unresolvedAddresses.stream()
-                  .map(
-                      unresolvedAddress ->
-                          this.<T>basicSubscribe(channel, unresolvedAddress, transactionHash))
-                  .collect(Collectors.toList()))
-          .distinctUntilChanged(this::sameMessage);
-    }
+    return Observable.merge(
+            unresolvedAddresses.stream()
+                .map(
+                    unresolvedAddress ->
+                        this.<T>subscribe(
+                            new ListenerRequest<T>(channel, unresolvedAddress)
+                                .transactionHashOrError(transactionHash, orError)))
+                .collect(Collectors.toList()))
+        .distinctUntilChanged(this::sameMessage);
   }
 
   /**
@@ -430,16 +423,6 @@ public abstract class ListenerBase implements Listener {
                                             .map(NamespaceName::getNamespaceId))
                                 .collect(Collectors.toList())))
         .cache();
-  }
-
-  /**
-   * Returns the channel param to be used when subscribing
-   *
-   * @param unresolvedAddress the unresolved address
-   * @return observable of the channel param.
-   */
-  private Observable<String> resolveChannelParam(UnresolvedAddress unresolvedAddress) {
-    return Observable.just(unresolvedAddress.plain());
   }
 
   /**
