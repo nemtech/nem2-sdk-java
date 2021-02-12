@@ -323,7 +323,6 @@ public abstract class ListenerBase implements Listener {
     if (message1.getChannel() == ListenerChannel.COSIGNATURE) {
       return false;
     }
-
     return StringUtils.equalsIgnoreCase(
         message1.getTransactionHash(), message2.getTransactionHash());
   }
