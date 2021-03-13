@@ -3,6 +3,19 @@ All notable changes to this project will be documented in this file.
 
 The changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.0.0] - 13-Mar-2021
+
+**Milestone**: Symbol Mainnet
+ Package  | Version  | Link
+---|---|---
+SDK OkHttp | v1.0.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-okhttp-client
+SDK Vertx | v1.0.0 | https://repo.maven.apache.org/maven2/io/nem/symbol-sdk-vertx-client
+Catbuffer Library | v0.1.1 | https://repo.maven.apache.org/maven2/io/nem/catbuffer-java
+Client OkHttp | v1.0.0  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-okhttp-gson-client
+Client Vertx | v1.0.0  | https://repo.maven.apache.org/maven2/io/nem/symbol-openapi-vertx-client/
+
+- Release for Symbol Mainnet.
+
 ## [0.23.2] - 5-Mar-2021
 
 **Milestone**: Catapult-server finality (0.10.0.8)
